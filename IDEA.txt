@@ -1,0 +1,63 @@
+Meta-Idea: A flutter framework with conventions similar to rails
+----------------------------------------------------------------
+
+Key Programming Concepts
+-------------------------
+1. Screen: A screen which can be launched using data from the store combined with data from a path
+
+2. Data Source: Centralized tracking for asynchronous operation like querying an API, operation
+  doing background calculations.  The idea is that this centralizes configuration and tracking of 
+  API operations.
+
+3. Model: Ability to create models in the data store that represent the state of the application
+
+4. Data Store: This is just the redux data store, where the models are stored.
+
+5. Manipulators: Standardized manipulators for models in the data store.
+
+3. Query: A query is an operation which takes some data to build a query, and then knows how to 
+  process the result and put it into the data store.
+
+5. RouteMap: The route map just maps screens identifiers to screens.
+
+6. Route: The route maps 
+
+
+Key Framework Features
+----------------------
+1. Generators for all the key concepts, creating generated files and standard naming and placement conventions.
+E.g:
+  
+   afib generate query firestore GetRecipes
+
+2. Configuration: Ability to configure for test, dev and production, and to configure other aspects of the 
+
+3. Cohesive testing framework
+
+  A. Ability to populate and test entire screens in isolation
+    -- tests layout and display
+
+  B. Ability to test that UI elements generate expected events
+    -- need to test that UI actions generate the expected 
+       redux actions (this seems to be hard.)
+
+  C. Ability to simulate query responses.
+    -- tests parsing data from data sources
+    -- can work with or without UI
+  
+4. UI Utilities
+
+   A. Definitely a standard screen that replaces the back button with a standard action.
+   B. Automatic splash screen and startup sequence
+   C. Maybe some sort of improved model for layout across devices, similar to bootstrap
+   D. Create a model for testeditcontroller that makes sure it gets disposed, and that it 
+      functions properly even if you set the text dynamically.
+
+5. State management
+
+   A. Integration of redux
+  
+6. Routing
+
+   A. Ability to navigate to/from different screens and maintain a stack.
+  

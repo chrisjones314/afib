@@ -1,5 +1,5 @@
 
 void main() {
-  print("Hello afib!");
+  print("Hello afib 0.0.1!");
 }
 

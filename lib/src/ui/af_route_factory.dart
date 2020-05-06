@@ -25,6 +25,6 @@ abstract class AFRouteMap {
 
   /// Override [configure] to setup the route map for your application at 
   /// application startup.
-  void configure2();
+  void configure3();
 
 }

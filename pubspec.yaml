@@ -1,12 +1,21 @@
 name: afib
-version: 0.0.2
+version: 0.0.4
 description: >-
   Beta framework for flutter.
 homepage: https://afibframework.org
 documentation: https://afibframework.org/docs
 environment:
-  sdk: '>=2.0.0 <3.0.0'
+  sdk: ">=2.2.2 <3.0.0"
+
 dependencies:
+  flutter:
+    sdk: flutter
+
+
 dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
 executables:
   afib:

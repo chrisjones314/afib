@@ -1,6 +1,10 @@
 Meta-Idea: A flutter framework with conventions similar to rails
 ----------------------------------------------------------------
 
+Issue:
+------
+
+
 Key Programming Concepts
 -------------------------
 1. Screen: A screen which can be launched using data from the store combined with data from a path
@@ -13,7 +17,10 @@ Key Programming Concepts
 
 4. Data Store: This is just the redux data store, where the models are stored.
 
-5. Manipulators: Standardized manipulators for models in the data store.
+5. Manipulators: Standardized manipulators for models in the data store
+  -- how can you manipulate data at the root?
+  -- how can you tweak data deeper than the route
+
 
 3. Query: A query is an operation which takes some data to build a query, and then knows how to 
   process the result and put it into the data store.

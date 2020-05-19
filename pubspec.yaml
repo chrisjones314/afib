@@ -1,5 +1,5 @@
 name: afib
-version: 0.0.5
+version: 0.0.10
 description: >-
   Beta framework for flutter.
 homepage: https://afibframework.org
@@ -10,11 +10,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  redux: ^3.0.0
+  flutter_redux: ^0.5.3
+  redux_logging: ^0.3.0
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  jinja: ^0.2.4
 
 
 executables:

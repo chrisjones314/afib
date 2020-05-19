@@ -1,0 +1,77 @@
+import 'package:afib/src/flutter/af.dart';
+import 'package:afib/src/dart/utils/af_config.dart';
+import 'package:afib/src/dart/utils/af_config_constants.dart';
+import 'package:flutter/material.dart';
+import 'package:afib/afib_flutter.dart';
+import 'package:logging/logging.dart';
+
+/// Used to populate the screen map used to associate keys with screens.
+typedef InitScreenMap(AFScreenMap map);
+typedef InitConfiguration(AFConfig config);
+
+/// The parent class of [MaterialApp] based AFib apps.
+/// 
+/// The framework creates a subclass of this app for you,
+/// and configures it in the main function of your app.
+abstract class AFApp<AppState> extends StatelessWidget {
+
+  /// Construct an app with the specified [AFScreenMap]
+  AFApp();
+
+  /// The master function called to start up the app prior to
+  /// calling flutter [runApp].
+  /// 
+  /// Rather than overriding this method, see if you can override
+  /// one of the many other methods which it calls.
+  void intialize({
+    @required InitConfiguration initEnvironment,
+    @required InitConfiguration initAppConfig,
+    @required InitConfiguration initDebugConfig,
+    @required InitConfiguration initProductionConfig,
+    @required InitConfiguration initPrototypeConfig,
+    @required InitConfiguration initTestConfig,
+    @required InitScreenMap     initScreenMap,
+    Logger logger
+  }) {
+    // first do the separate initialization that just says what environment it is, since this
+    initEnvironment(AF.config);
+    initAppConfig(AF.config);
+    final String env = AF.config.environment;
+    if(env == AFConfigConstants.debug) {
+      initDebugConfig(AF.config);
+    } else if(env == AFConfigConstants.production) {
+      initProductionConfig(AF.config);
+    } else if(env == AFConfigConstants.prototype) {
+      initPrototypeConfig(AF.config);
+    } else if(env == AFConfigConstants.test) {
+      initTestConfig(AF.config);
+    }
+
+    initScreenMap(AF.screenMap);
+
+    if(logger == null) {
+      logger = Logger("AF");
+    }
+    AF.setLogger(logger);
+
+    AF.fine("Environment: " + AF.config.environment);
+
+    // Make sure all the globals in AF are immutable from now on.
+    AF.finishStartup();
+  }
+
+
+  /// Called before the main flutter runApp loop.  
+  /// Do setup here.
+  void beforeRunApp() {
+    Logger.root.level = Level.ALL;
+    Logger.root.onRecord.listen((LogRecord rec) {
+      print('${rec.level.name}: ${rec.time}: ${rec.message}');
+    });  
+  }
+
+  /// Called after the main runApp loop.  Do cleanup here.
+  void afterRunApp() {
+
+  }
+}

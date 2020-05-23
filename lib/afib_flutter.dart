@@ -8,3 +8,4 @@ export 'src/flutter/af_screen_map.dart';
 export 'src/flutter/af_material_app.dart';
 export 'src/flutter/af_main.dart';
 export 'src/flutter/af.dart';
+export 'src/flutter/screen/af_connected_screen.dart';

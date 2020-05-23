@@ -1,3 +1,7 @@
+import 'package:afib/src/dart/redux/middleware/af_async_queries.dart';
+import 'package:afib/src/dart/redux/reducers/af_reducer.dart';
+import 'package:afib/src/dart/redux/state/af_store.dart';
+import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/flutter/af.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_constants.dart';
@@ -6,8 +10,13 @@ import 'package:afib/afib_flutter.dart';
 import 'package:logging/logging.dart';
 
 /// Used to populate the screen map used to associate keys with screens.
-typedef InitScreenMap(AFScreenMap map);
-typedef InitConfiguration(AFConfig config);
+typedef void InitScreenMap(AFScreenMap map);
+typedef void InitConfiguration(AFConfig config);
+typedef void InitAsyncQueries(AFAsyncQueries queries);
+typedef dynamic CreateStartupQueryAction();
+
+//typedef dynamic AppReducer(dynamic appState, dynamic action);
+typedef TAppState AppReducer<TAppState>(TAppState appState, dynamic action);
 
 /// The parent class of [MaterialApp] based AFib apps.
 /// 
@@ -30,7 +39,11 @@ abstract class AFApp<AppState> extends StatelessWidget {
     @required InitConfiguration initProductionConfig,
     @required InitConfiguration initPrototypeConfig,
     @required InitConfiguration initTestConfig,
-    @required InitScreenMap     initScreenMap,
+    @required InitScreenMap         initScreenMap,
+    @required InitializeAppState       initialAppState,
+    @required AppReducer<AppState>  appReducer,
+    @required InitAsyncQueries initAsyncQueries,
+    @required CreateStartupQueryAction createStartupQueryAction,
     Logger logger
   }) {
     // first do the separate initialization that just says what environment it is, since this
@@ -47,14 +60,25 @@ abstract class AFApp<AppState> extends StatelessWidget {
       initTestConfig(AF.config);
     }
 
-    initScreenMap(AF.screenMap);
-
     if(logger == null) {
       logger = Logger("AF");
     }
     AF.setLogger(logger);
 
     AF.fine("Environment: " + AF.config.environment);
+
+    initScreenMap(AF.screenMap);
+
+    AF.setInitialAppStateFactory(initialAppState);
+    AF.setAppReducer(appReducer);
+    AF.setCreateStartupQueryAction(createStartupQueryAction);
+    
+    final store = AFStore(
+      afReducer,
+      initialState: AFState.initialState(),
+      middleware: [] // AF.gMiddleware
+    );
+    AF.setStore(store);
 
     // Make sure all the globals in AF are immutable from now on.
     AF.finishStartup();

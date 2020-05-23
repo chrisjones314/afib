@@ -1,5 +1,4 @@
 import 'package:afib/src/flutter/af_app.dart';
-import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -17,13 +16,10 @@ abstract class AFMaterialApp<AppState> extends AFApp<AppState> {
   @override
   Widget build(BuildContext context) {
     return StoreProvider(
-      store: buildStore(),
+      store: AF.store,
       child: buildMaterialApp()
     );
   }
-
-  /// Build, or just return, the redux [Store] for the application.
-  Store<AppState> buildStore();
 
   /// Build a [MaterialApp] for the application
   Widget buildMaterialApp();

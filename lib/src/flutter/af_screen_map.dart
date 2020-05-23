@@ -1,4 +1,5 @@
 import 'package:afib/src/flutter/af.dart';
+import 'package:afib/src/flutter/screen/af_startup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:afib/afib_dart.dart';
 
@@ -6,17 +7,29 @@ import 'package:afib/afib_dart.dart';
 /// build the correct screen widget for the leaf element in the route.
 class AFScreenMap {
 
-  String initialKey;
-  final Map<String, WidgetBuilder> screens = Map<String, WidgetBuilder>();
+  String _initialKey;
+  final Map<String, WidgetBuilder> _screens = Map<String, WidgetBuilder>();
+
+  AFScreenMap() {
+    screen(AFConfigConstants.startupScreenId, (_) => AFStartupScreenWrapper());
+  }
+
+  String get initialScreenId { 
+    return _initialKey;
+  }
+
+  Map<String, WidgetBuilder> get screens {
+     return _screens;
+  }
 
   /// Call [initialScreen] once to specify the initial screen for your app.
   void initialScreen(String screenKey, WidgetBuilder screenBuilder) {
     AF.verifyNotImmutable();
     
-    if(initialKey != null) {
+    if(_initialKey != null) {
       throw AFException("Specified initial screen twice.");
     }
-    initialKey = screenKey;
+    _initialKey = screenKey;
     screen(screenKey, screenBuilder);
   }
 
@@ -24,11 +37,16 @@ class AFScreenMap {
   /// [screenKey] and screens built by the [WidgetBuilder]
   void screen(String screenKey, WidgetBuilder screenBuilder) {
     AF.verifyNotImmutable();
-    screens[screenKey] = screenBuilder;
+    _screens[screenKey] = screenBuilder;
+  }
+
+  /// Returns the widget builder for the initial screen.
+  WidgetBuilder get initialScreenBuilder {
+    return _screens[_initialKey];
   }
 
   /// Returns the current mapping of routes to screens.
-  Map<String, WidgetBuilder> screenMap() {
-    return screens;
+  Map<String, WidgetBuilder> get screenMap {
+    return _screens;
   }
 }

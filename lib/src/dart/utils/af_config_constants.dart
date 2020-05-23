@@ -14,5 +14,7 @@ class AFConfigConstants {
   static final prototype = "prototype";
   static final test = "test";
   static final allEnvironments = [production, debug, prototype, test];
+
+  static final startupScreenId = "afStartupScreen";
   
 }

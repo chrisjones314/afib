@@ -2,18 +2,19 @@
 
 
 import 'package:afib/src/dart/redux/state/af_state.dart';
+import 'package:afib/src/flutter/af.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
-import 'package:redux/redux.dart';
+
 
 /// Superclass for a kind of action that queries some data asynchronously, then knows
 /// how to process the result.
-abstract class AFAsyncQueryAction<TState, TResponse> {
+abstract class AFAsyncQuery<TState, TResponse, TError> {
 
-  void startAsyncAF(AFDispatcher dispatcher, AFState state, NextDispatcher next) {
-    startAsync( (TResponse result) {
-      finishAsync(dispatcher, state, result);
+  void startAsyncAF(AFDispatcher dispatcher, AFState state) {
+    AF.logger.fine("Starting query: ${toString()}");
+    startAsync( (TResponse result, TError error) {
+      finishAsync(dispatcher, state.app, result);
     });
-    next(this);
   }
 
 
@@ -22,11 +23,11 @@ abstract class AFAsyncQueryAction<TState, TResponse> {
   /// 
   /// The implementation should call either [onResponse] or [onError], which will in turn
   /// call finishAsync.
-  void startAsync( Function(TResponse response) onResponse);  
+  void startAsync( Function(TResponse response, TError error) onResponse);  
 
   /// Called when the asynchronous process completes with a response  It should merge the results 
   /// into the state (preserving immutability by making copies of the relevant portions of the state using copyWith), 
   /// and then use the dispatcher to call set actions for any modified 
   /// state elements.
-  void finishAsync(AFDispatcher dispatcher, AFState state, TResponse response);
+  void finishAsync(AFDispatcher dispatcher, TState state, TResponse response);
 }

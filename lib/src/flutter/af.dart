@@ -31,11 +31,11 @@ class AF {
 
 
   /// a key for referencing the Navigator for the material app.
-  final GlobalKey<NavigatorState> afNavigatorKey = new GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> _afNavigatorKey = new GlobalKey<NavigatorState>();
 
   /// The navigator key for referencing the Navigator for the material app.
   static GlobalKey<NavigatorState> get navigatorKey {
-    return AF.navigatorKey;
+    return _afNavigatorKey;
   }
   
   /// Contains configuration data for the app, specific to test, production, etc.
@@ -130,10 +130,12 @@ class AF {
   }
 
   static void setAppReducer<TAppState>(AppReducer<TAppState> reducer) {
-    _appReducer = (dynamic state, dynamic action) {
-      dynamic d = reducer(state, action);
-      return d;
-    };
+    if(reducer != null) {
+      _appReducer = (dynamic state, dynamic action) {
+        dynamic d = reducer(state, action);
+        return d;
+      };
+    }
   }
 
   /// Throws an exception if called after the startup process completes.  

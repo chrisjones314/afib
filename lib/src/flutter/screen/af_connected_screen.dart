@@ -126,7 +126,7 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData> extends StatelessWid
         converter: (store) => createData(AFStoreDispatcher(store), store.state),
         distinct: true,
         ignoreChange: (AFState state) {
-          return shouldIgnoreChange(state);
+          return shouldIgnoreChangeAF(state);
         },
         onInit: (store) {
           final data = createData(AFStoreDispatcher(store), store.state);
@@ -150,8 +150,15 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData> extends StatelessWid
   /// Builds a widget using the data extracted from the state.
   Widget buildWithData(BuildContext context, TData data);
 
-  /// Override this if in a particular state the widget should not be re-rendered.
-  bool shouldIgnoreChange(AFState state) { return false; }
+  /// If you are looking to customize this behavior, override [shouldIngoreChange] instead.
+  bool shouldIgnoreChangeAF(AFState state) { 
+    return shouldIgnoreChange(state.app);
+  }
+
+  /// Override this method if you want to prevent re-rendering under certain states.
+  bool shouldIgnoreChange(TState state) {
+    return false;
+  }
 
   /// Override this to perform screen specific initialization.
   void onInit(TData data) {}
@@ -197,7 +204,7 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
   /// causing exceptions if it trys to render itself.   This method detects taht case
   /// and prevents the re-rendering gracefully.
   @override
-  bool shouldIgnoreChange(AFState state) { 
+  bool shouldIgnoreChangeAF(AFState state) { 
     final param = findParam(state);
     return (param == null);
    }
@@ -226,11 +233,11 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
 /// Use this to connect a widget to the store.  
 /// 
 /// The widget can still have a route parameter, but it must be passed in
-/// from the parent screen that the widget is created by
+/// from the parent screen that the widget is created by.
 abstract class AFConnectedWidget<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithoutRoute<TState, TData> {
   final TRouteParam parentParam;
 
-  AFConnectedWidget(String screen, this.parentParam, {@required TData testData}): super(screen: screen, testData: testData);
+  AFConnectedWidget(this.parentParam, {@required TData testData}): super(screen: null, testData: testData);
 
 
   @override
@@ -239,5 +246,32 @@ abstract class AFConnectedWidget<TState, TData extends AFStoreConnectorData, TRo
   }
 
   TData createDataWithParam(AFDispatcher dispatcher, TState state, TRouteParam param);
+}
+
+/// Use this for a widget that gets all of its data in its constructor, and does
+/// not need to pull data from the store.
+/// 
+/// Use this instead of just passing individual parameters into the constructor for the 
+/// following reasons:
+/// * It is easy to promote the widget to a store connected widget later, because it
+///   follows the same patterns.
+/// * As you find you need to pass more data into the widget, you don't need to change
+///   a bunch of method signatures within the widget.
+/// * It integrates with the test framework (TODO)
+@immutable
+abstract class AFStandaloneWidget<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends StatelessWidget {
+  final TData data;
+
+  AFStandaloneWidget(this.data);
+
+  /// To build your widget, implement [buildWithData]
+  @override
+  Widget build(BuildContext context) {
+    return buildWithData(context, data);
+  }
+
+  /// Implement this method to build a widget from [data]
+  Widget buildWithData(BuildContext context, TData data);
+
 }
 

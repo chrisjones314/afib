@@ -6,3 +6,8 @@ import 'package:meta/meta.dart';
 class AFRouteParam {
   AFRouteParam();
 }
+
+/// Can be used in cases where no route param is necessary
+class AFRouteParamUnused extends AFRouteParam {
+  
+}

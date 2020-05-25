@@ -14,7 +14,11 @@ class AFScreenMap {
     screen(AFConfigConstants.startupScreenId, (_) => AFStartupScreenWrapper());
   }
 
-  String get initialScreenId { 
+  String get afStartupScreenId {
+    return AFConfigConstants.startupScreenId;
+  }
+
+  String get appInitialScreenId { 
     return _initialKey;
   }
 

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 
 //---------------------------------------------------------------------------
-List<Middleware<AFState>> createMiddleware() {
+List<Middleware<AFState>> createRouteMiddleware() {
   return [
     TypedMiddleware<AFState, AFNavigateReplaceAction>(_navigateReplaceAction),
     TypedMiddleware<AFState, AFNavigateReplaceAllAction>(_navigateReplaceAllAction),
@@ -30,10 +30,10 @@ List<Middleware<AFState>> createMiddleware() {
 //---------------------------------------------------------------------------
 void _navigatePushAction(Store<AFState> store, action, NextDispatcher next) {
 
-  Future<dynamic> ret = AF.navigatorKey.currentState?.pushNamed(action.path);
-  if(ret != null && action.onReturnMessage != null) {
+  Future<dynamic> ret = AF.navigatorKey.currentState?.pushNamed(action.screen);
+  if(ret != null && action.onReturn != null) {
     ret.then( (msg) {
-      action.onReturnMessage(msg);
+      action.onReturn(msg);
     });
   }
   next(action);
@@ -47,10 +47,10 @@ void _navigatePopAction(Store<AFState> store, action, NextDispatcher next) {
 
 //---------------------------------------------------------------------------
 void _navigateReplaceAction(Store<AFState> store, action, NextDispatcher next) {
-  final String path = action.path;
+  final String screen = action.screen;
 
   // first, we do the navigation itself
-  AF.navigatorKey.currentState?.popAndPushNamed(path);
+  AF.navigatorKey.currentState?.popAndPushNamed(screen);
 
   // then, let the reducer integrate that state into the store.
   next(action);
@@ -59,10 +59,10 @@ void _navigateReplaceAction(Store<AFState> store, action, NextDispatcher next) {
 
 //---------------------------------------------------------------------------
 void _navigateReplaceAllAction(Store<AFState> store, action, NextDispatcher next) {
-  final String path = action.path;
+  final String screen = action.screen;
 
   // first, we do the navigation itself
-  AF.navigatorKey.currentState?.pushNamedAndRemoveUntil(path, (Route<dynamic> route) => false);
+  AF.navigatorKey.currentState?.pushNamedAndRemoveUntil(screen, (Route<dynamic> route) => false);
 
   // then, let the reducer integrate that state into the store.
   next(action);

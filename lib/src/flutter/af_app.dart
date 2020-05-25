@@ -1,4 +1,6 @@
 import 'package:afib/src/dart/redux/middleware/af_async_queries.dart';
+import 'package:afib/src/dart/redux/middleware/af_query_middleware.dart';
+import 'package:afib/src/dart/redux/middleware/af_route_middleware.dart';
 import 'package:afib/src/dart/redux/reducers/af_reducer.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
@@ -8,6 +10,7 @@ import 'package:afib/src/dart/utils/af_config_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:logging/logging.dart';
+import 'package:redux/redux.dart';
 
 /// Used to populate the screen map used to associate keys with screens.
 typedef void InitScreenMap(AFScreenMap map);
@@ -41,11 +44,16 @@ abstract class AFApp<AppState> extends StatelessWidget {
     @required InitConfiguration initTestConfig,
     @required InitScreenMap         initScreenMap,
     @required InitializeAppState       initialAppState,
-    @required AppReducer<AppState>  appReducer,
     @required InitAsyncQueries initAsyncQueries,
     @required CreateStartupQueryAction createStartupQueryAction,
+    AppReducer<AppState>  appReducer,
     Logger logger
   }) {
+    Logger.root.level = Level.ALL;
+    Logger.root.onRecord.listen((LogRecord rec) {
+      print('${rec.level.name}: ${rec.time}: ${rec.message}');
+    });  
+
     // first do the separate initialization that just says what environment it is, since this
     initEnvironment(AF.config);
     initAppConfig(AF.config);
@@ -72,11 +80,15 @@ abstract class AFApp<AppState> extends StatelessWidget {
     AF.setInitialAppStateFactory(initialAppState);
     AF.setAppReducer(appReducer);
     AF.setCreateStartupQueryAction(createStartupQueryAction);
+
+    List<Middleware<AFState>> middleware = List<Middleware<AFState>>();
+    middleware.addAll(createRouteMiddleware());
+    middleware.add(AFQueryMiddleware());
     
     final store = AFStore(
       afReducer,
       initialState: AFState.initialState(),
-      middleware: [] // AF.gMiddleware
+      middleware: middleware
     );
     AF.setStore(store);
 
@@ -88,10 +100,6 @@ abstract class AFApp<AppState> extends StatelessWidget {
   /// Called before the main flutter runApp loop.  
   /// Do setup here.
   void beforeRunApp() {
-    Logger.root.level = Level.ALL;
-    Logger.root.onRecord.listen((LogRecord rec) {
-      print('${rec.level.name}: ${rec.time}: ${rec.message}');
-    });  
   }
 
   /// Called after the main runApp loop.  Do cleanup here.

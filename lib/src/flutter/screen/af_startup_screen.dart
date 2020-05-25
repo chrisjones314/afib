@@ -21,7 +21,8 @@ class _AFStartupScreenState extends State<AFStartupScreenWrapper> {
   void initState() {
     super.initState();
 
-    // tell redux to check the login status.
+    // Kick off the app by firing a query.  In a typical app this might check the user's
+    // logged in status while a splash screen displays.
     AF.store.dispatch(AF.createStartupQueryAction());
   }
 

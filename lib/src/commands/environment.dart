@@ -1,5 +1,5 @@
 
-import 'package:afib/afib_dart.dart';
+import 'package:afib/src/dart/utils/af_config_constants.dart';
 import 'package:afib/src/commands/af_args.dart';
 import 'package:afib/src/commands/af_template_command.dart';
 import 'package:afib/src/commands/af_templates.dart';

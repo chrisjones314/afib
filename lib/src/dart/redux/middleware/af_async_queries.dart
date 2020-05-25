@@ -1,12 +1,12 @@
-import 'package:afib/src/dart/redux/actions/af_async_query_action.dart';
+import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 
 /// A list of asynchronous queries that the app uses to collect and integrate
 /// data.
 class AFAsyncQueries {
 
-  final List<AFAsyncQueryAction> queries = List<AFAsyncQueryAction>();
+  final List<AFAsyncQuery> queries = List<AFAsyncQuery>();
 
-  void add(AFAsyncQueryAction action) {
+  void add(AFAsyncQuery action) {
     queries.add(action);
   }
 

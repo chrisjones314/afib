@@ -1,9 +1,9 @@
 
 
-import 'package:afib/src/dart/redux/actions/af_reset_to_intial_state_action.dart';
+import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
+import 'package:afib/src/dart/redux/reducers/af_app_state_reducer.dart';
 import 'package:afib/src/dart/redux/reducers/af_route_reducer.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
-import 'package:afib/src/flutter/af.dart';
 
 /// The primary reducer for an AFib appliations state.  
 /// 
@@ -17,6 +17,6 @@ AFState afReducer(AFState state, action) {
 
   return AFState(
     route: routeReducer(state.route, action),
-    app: AF.appReducer(state.app, action)
+    app: afAppStateReducer(state.app, action)
   );
 }

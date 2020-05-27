@@ -1,6 +1,5 @@
 
 import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
-import 'package:afib/src/dart/redux/state/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
@@ -58,97 +57,105 @@ class AFTestDispatcher extends AFDispatcher {
 /// This allows screens to be populated with data without ever
 /// having a store in test scenarios.
 @immutable
-class AFStoreConnectorData<TRouteParam extends AFRouteParam, TV1, TV2, TV3, TV4> {
-  final TRouteParam param;
+class AFStoreConnectorData<TV1, TV2, TV3, TV4> {
   final TV1 first;
   final TV2 second;
   final TV3 third;
   final TV4 fourth;
-  final AFDispatcher dispatcher;
 
-  AFStoreConnectorData({@required this.dispatcher, @required this.param, this.first, this.second, this.third, this.fourth});
+  AFStoreConnectorData({this.first, this.second, this.third, this.fourth});
 
   /// Because store connector data is always recreated, it is 
   /// important to implement deep equality so that the screen won't be re-rendered
   /// each time if the data has not changed.
   bool operator==(o) {
-    bool result = (o is AFStoreConnectorData<TRouteParam, TV1, TV2, TV3, TV4> && param == o.param && first == o.first && second == o.second && third == o.third && fourth == o.fourth);
+    bool result = (o is AFStoreConnectorData<TV1, TV2, TV3, TV4> && first == o.first && second == o.second && third == o.third && fourth == o.fourth);
     return result;
   }
 
-  /// The testing-friendly way to dispatch actions to the store from within a screen.
-  void dispatch(dynamic action) {
-    dispatcher.dispatch(action);
-  }
 }
 
 /// Use this version of [AFStoreConnectorData] if you only need one piece of data from the store.
 @immutable 
-class AFStoreConnectorData1<TRouteParam extends AFRouteParam, TV1> extends AFStoreConnectorData<TRouteParam, TV1, AFUnused, AFUnused, AFUnused> {
-  AFStoreConnectorData1({AFDispatcher dispatcher, AFRouteParam param, TV1 first}): super(dispatcher: dispatcher, param: param, first: first);
+class AFStoreConnectorData1<TV1> extends AFStoreConnectorData<TV1, AFUnused, AFUnused, AFUnused> {
+  AFStoreConnectorData1({AFDispatcher dispatcher, AFRouteParam param, TV1 first}): super(first: first);
 }
 
 /// Use this version of [AFStoreConnectorData] if you need two pieces of data from the store.
 @immutable 
-class AFStoreConnectorData2<TRouteParam extends AFRouteParam, TV1, TV2> extends AFStoreConnectorData<TRouteParam, TV1, TV2, AFUnused, AFUnused> {
-  AFStoreConnectorData2({AFDispatcher dispatcher, AFRouteParam param, TV1 first, TV2 second}): super(dispatcher: dispatcher, param: param, first: first, second: second);
+class AFStoreConnectorData2<TV1, TV2> extends AFStoreConnectorData<TV1, TV2, AFUnused, AFUnused> {
+  AFStoreConnectorData2({AFDispatcher dispatcher, AFRouteParam param, TV1 first, TV2 second}): super(first: first, second: second);
 }
 
 /// Use this version of [AFStoreConnectorData] if you need three pieces of data from the store.
 @immutable 
-class AFStoreConnectorData3<TRouteParam extends AFRouteParam, TV1, TV2, TV3> extends AFStoreConnectorData<TRouteParam, TV1, TV2, TV3, AFUnused> {
-  AFStoreConnectorData3({AFDispatcher dispatcher, AFRouteParam param, TV1 first, TV2 second, TV3 third}): super(dispatcher: dispatcher, param: param, first: first, second: second, third: third);
+class AFStoreConnectorData3<TV1, TV2, TV3> extends AFStoreConnectorData<TV1, TV2, TV3, AFUnused> {
+  AFStoreConnectorData3({AFDispatcher dispatcher, AFRouteParam param, TV1 first, TV2 second, TV3 third}): super(first: first, second: second, third: third);
 }
 
 /// Use this version of [AFStoreConnectorData] if you need four pieces of data from the store.
 @immutable 
-class AFStoreConnectorData4<TRouteParam extends AFRouteParam, TV1, TV2, TV3, TV4> extends AFStoreConnectorData<TRouteParam, TV1, TV2, TV3, TV4> {
-  AFStoreConnectorData4({AFDispatcher dispatcher, AFRouteParam param, TV1 first, TV2 second, TV3 third, TV4 fourth}): super(dispatcher: dispatcher, param: param, first: first, second: second, third: third, fourth: fourth);
+class AFStoreConnectorData4<TV1, TV2, TV3, TV4> extends AFStoreConnectorData<TV1, TV2, TV3, TV4> {
+  AFStoreConnectorData4({TV1 first, TV2 second, TV3 third, TV4 fourth}): super(first: first, second: second, third: third, fourth: fourth);
+}
+
+/// This common superclass makes it possible to treat all afib widgets/screens
+/// similarly for testing and prototyping purposes.
+abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends StatelessWidget {
+    /// Builds a widget using the data extracted from the state.
+  Widget buildWithContext(AFBuildContext<TData, TRouteParam> context);
+
+  /// Wrap all four pieces of data needed during a build in a single utility object.
+  AFBuildContext createContext(BuildContext context, AFDispatcher dispatcher, TData data, TRouteParam param) {
+    return AFBuildContext<TData, TRouteParam>(context, dispatcher, data, param);
+  }
 }
 
 /// A screen that uses data from the store but not from the route.
-abstract class AFConnectedScreenWithoutRoute<TState, TData> extends StatelessWidget {
+abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFBuildableWidget<TData, TRouteParam> {
   final String screen;
-  final TData testData;
 
   //--------------------------------------------------------------------------------------
-  AFConnectedScreenWithoutRoute({@required this.screen, @required this.testData});
+  AFConnectedScreenWithoutRoute(this.screen);
 
   //--------------------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    if(testData != null) {
-      onInit(testData);
-      return buildWithData(context, this.testData);
-    }
-
-    return StoreConnector<AFState, TData>(
-        converter: (store) => createData(AFStoreDispatcher(store), store.state),
+    return StoreConnector<AFState, AFBuildContext>(
+        converter: (store) => createContext(null, AFStoreDispatcher(store), createDataAF(store.state), findParam(store.state)),
         distinct: true,
         ignoreChange: (AFState state) {
           return shouldIgnoreChangeAF(state);
         },
         onInit: (store) {
-          final data = createData(AFStoreDispatcher(store), store.state);
+          final data = createDataAF(store.state);
           onInit(data);
         },
         onDispose: (store) {
           onDispose(store.state.app);
         },
-        builder: (context, obj) {
-          if(obj == null) {
+        builder: (buildContext, dataContext) {
+          if(dataContext == null) {
             return CircularProgressIndicator();
           }
-          return buildWithData(context, obj);
+          final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p);
+          return buildWithContext(withContext);
         }
     );
   }
 
+  /// Find the route param for this screen. 
+  AFRouteParam findParam(AFState state) { return null; }
+
+  TData createDataAF(AFState state) {
+    return createData(state.app);
+  }
+
   /// Override this to create an [AFStoreConnectorData] with the required data from the state.
-  TData createData(AFDispatcher dispatcher, AFState state);
+  TData createData(TState state);
 
   /// Builds a widget using the data extracted from the state.
-  Widget buildWithData(BuildContext context, TData data);
+  Widget buildWithContext(AFBuildContext<TData, TRouteParam> context);
 
   /// If you are looking to customize this behavior, override [shouldIngoreChange] instead.
   bool shouldIgnoreChangeAF(AFState state) { 
@@ -170,9 +177,8 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData> extends StatelessWid
 
 /// Superclass for a screen widget, which combined data from the store with data from
 /// the route in order to render itself.
-abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithoutRoute<TState, TData> {
-
-  AFConnectedScreen(String screen, {@required TData testData}): super(screen: screen, testData: testData);
+abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithoutRoute<TState, TData, TRouteParam> {
+  AFConnectedScreen(String screen): super(screen);
 
   /// Utility for updating the route parameter for this screen.
   /// 
@@ -183,20 +189,18 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
   /// ### Example
   ///   final revisedParam = screenData.param.copyWith(someField: myRevisedValue);
   ///   updateParam(screenData, revisedParam);
-  void updateParam(TData data, TRouteParam revised) {
-    updateParamWithDispatcher(data.dispatcher, revised);
+  void updateParam(AFDispatcher dispatcher, TRouteParam revised) {
+    dispatcher.dispatch(AFNavigateSetParamAction(
+      screen: this.screen, 
+      param: revised)
+    );
   }
 
-  /// Override this method if you need access to the entire route, otherwise,
-  /// override createDataWithParam
-  TData createDataWithRoute(AFDispatcher dispatcher, AFRouteState route, TState state) {
-    TRouteParam param = route.findParamFor(screen);
-    return createDataWithParam(dispatcher, state, param);
+  /// Utility method which updates the parameter, but takes a build context
+  /// rather than a dispatcher for convenience
+  void updateParamC(AFBuildContext context, TRouteParam revised) {
+    return updateParam(context.dispatcher, revised);
   }
-
-
-  /// Override this method to 
-  TData createDataWithParam(AFDispatcher dispatcher, TState state, TRouteParam param);
 
   /// This exists because when navigating up from a child to a parent screen,
   /// flutter will re-render the child screen during the animation.   At that point,
@@ -209,24 +213,9 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
     return (param == null);
    }
 
-  /// Given a state, extracts the data that this specific screen needs to
-  /// render itself.
-  @override
-  TData createData(AFDispatcher dispatcher, AFState state) {
-    return createDataWithRoute(dispatcher, state.route, state.app);
-  }
-
   /// Find the route parameter for the specified named screen
   AFRouteParam findParam(AFState state) {
     return state.route?.findParamFor(this.screen);
-  }
-
-  /// Modify the route parameter for this screens route element.
-  void updateParamWithDispatcher(AFDispatcher dispatcher, dynamic param) {
-    dispatcher.dispatch(AFNavigateSetParamAction(
-      screen: this.screen, 
-      param: param)
-    );
   }
 }
 
@@ -234,44 +223,37 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
 /// 
 /// The widget can still have a route parameter, but it must be passed in
 /// from the parent screen that the widget is created by.
-abstract class AFConnectedWidget<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithoutRoute<TState, TData> {
+abstract class AFConnectedWidget<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithoutRoute<TState, TData, TRouteParam> {
   final TRouteParam parentParam;
 
-  AFConnectedWidget(this.parentParam, {@required TData testData}): super(screen: null, testData: testData);
-
-
-  @override
-  TData createData(AFDispatcher dispatcher, AFState state) {
-    return createDataWithParam(dispatcher, state.app, parentParam);
-  }
-
-  TData createDataWithParam(AFDispatcher dispatcher, TState state, TRouteParam param);
+  AFConnectedWidget(this.parentParam): super(null);
 }
 
-/// Use this for a widget that gets all of its data in its constructor, and does
-/// not need to pull data from the store.
+
+
+/// A utility class which you can use when you have a complex screen which passes the dispatcher,
+/// screen data and param to many functions, to make things more concise.  
 /// 
-/// Use this instead of just passing individual parameters into the constructor for the 
-/// following reasons:
-/// * It is easy to promote the widget to a store connected widget later, because it
-///   follows the same patterns.
-/// * As you find you need to pass more data into the widget, you don't need to change
-///   a bunch of method signatures within the widget.
-/// * It integrates with the test framework (TODO)
-@immutable
-abstract class AFStandaloneWidget<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends StatelessWidget {
-  final TData data;
+/// The framework cannot pass you this itself because 
+class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> {
+  BuildContext context;
+  AFDispatcher dispatcher;
+  TData storeData;
+  TRouteParam param;
+  AFBuildContext(this.context, this.dispatcher, this.storeData, this.param);
 
-  AFStandaloneWidget(this.data);
+  /// Shorthand for accessing the route param.
+  TRouteParam get p { return param; }
 
-  /// To build your widget, implement [buildWithData]
-  @override
-  Widget build(BuildContext context) {
-    return buildWithData(context, data);
-  }
+  /// Shorthand for accessing data from the store
+  TData get s { return storeData; }
 
-  /// Implement this method to build a widget from [data]
-  Widget buildWithData(BuildContext context, TData data);
+  /// Shorthand for accessing the dispatcher
+  AFDispatcher get d { return dispatcher; }
+
+  /// Shorthand for accessing the flutter build context
+  BuildContext get c { return context; }
+  void dispatch(dynamic action) { dispatcher.dispatch(action); }
 
 }
 

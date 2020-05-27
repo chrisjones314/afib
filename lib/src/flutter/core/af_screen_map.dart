@@ -1,3 +1,4 @@
+import 'package:afib/src/dart/utils/af_ui_constants.dart';
 import 'package:afib/src/flutter/af.dart';
 import 'package:afib/src/flutter/screen/af_startup_screen.dart';
 import 'package:flutter/material.dart';
@@ -11,11 +12,11 @@ class AFScreenMap {
   final Map<String, WidgetBuilder> _screens = Map<String, WidgetBuilder>();
 
   AFScreenMap() {
-    screen(AFConfigConstants.startupScreenId, (_) => AFStartupScreenWrapper());
+    screen(AFUIConstants.startupScreenId, (_) => AFStartupScreenWrapper());
   }
 
   String get afStartupScreenId {
-    return AFConfigConstants.startupScreenId;
+    return AFUIConstants.startupScreenId;
   }
 
   String get appInitialScreenId { 

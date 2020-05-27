@@ -32,6 +32,13 @@ class AFConfig {
   String get environment  {
     return getString(AFConfigConstants.environmentKey);
   }
+
+  // Returns true if our current mode requires prototype data.
+  bool get requiresPrototypeData {
+    final String env = environment;
+    return (env == AFConfigConstants.prototype);
+  }
+
   
   //void setJson(String key, HashMap<String, dynamic> json) { jsonSettings[key] = json; }
   //HashMap<String, dynamic> getJson(String key) { return jsonSettings[key]; }

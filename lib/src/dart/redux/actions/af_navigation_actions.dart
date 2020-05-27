@@ -14,11 +14,7 @@ class AFNavigateAction {
   AFNavigateAction({
     @required this.screen,
     this.param
-  }) {
-    if(this.screen == null) {
-      throw new AFException("Screen must not be null.");
-    }
-  }
+  });
 }
 
 /// Action that replaces the current leaf screen with a new screen.
@@ -51,5 +47,5 @@ class AFNavigatePushAction extends AFNavigateAction {
 class AFNavigatePopAction extends AFNavigateAction {
   final dynamic returnData;
   
-  AFNavigatePopAction({String screen, AFRouteParam input, this.returnData}): super(screen: screen, param: input);
+  AFNavigatePopAction({this.returnData}): super(screen: null, param: null);
 }

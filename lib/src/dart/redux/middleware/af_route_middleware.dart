@@ -41,7 +41,7 @@ void _navigatePushAction(Store<AFState> store, action, NextDispatcher next) {
 
 //---------------------------------------------------------------------------
 void _navigatePopAction(Store<AFState> store, action, NextDispatcher next) {
-  AF.navigatorKey.currentState?.pop(action.returnMessage);
+  AF.navigatorKey.currentState?.pop(action.returnData);
   next(action);
 }
 

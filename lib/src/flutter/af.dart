@@ -2,8 +2,10 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/middleware/af_async_queries.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/utils/af_ui_constants.dart';
 import 'package:afib/src/flutter/af_app.dart';
-import 'package:afib/src/flutter/af_screen_map.dart';
+import 'package:afib/src/flutter/core/af_screen_map.dart';
+import 'package:afib/src/flutter/test/af_user_interface_scenarios.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
@@ -28,7 +30,8 @@ class AF {
   static AFStore _afStore;
   static AFAsyncQueries _afAsyncQueries = AFAsyncQueries();
   static CreateStartupQueryAction _afCreateStartupQueryAction;
-
+  static final AFUserInterfaceScenarios _afUserInterfaceScenarios = AFUserInterfaceScenarios();
+  static AFScreenMap _afPrototypeScreenMap;
 
   /// a key for referencing the Navigator for the material app.
   static final GlobalKey<NavigatorState> _afNavigatorKey = new GlobalKey<NavigatorState>();
@@ -48,9 +51,24 @@ class AF {
     return _afLogger;
   }
 
-  /// Mapping from string ids to builders for specific screens.
+  /// Mapping from string ids to builders for specific screens for the real app.
   static AFScreenMap get screenMap {
     return _afScreenMap;
+  }
+
+  /// The screen map to use given the mode we are running in (its different in prototype mode, for example)
+  static AFScreenMap get effectiveScreenMap {
+    if(AF.config.requiresPrototypeData) {
+      return _afPrototypeScreenMap;
+    }
+    return _afScreenMap;
+  }
+
+  static String get effectiveStartupScreenId {
+    if(AF.config.requiresPrototypeData) {
+      return AFUIConstants.scenarioListScreenId;
+    }
+    return AFUIConstants.startupScreenId;
   }
 
   /// Returns a function that creates the initial applications state, used to reset the state.
@@ -74,6 +92,12 @@ class AF {
   /// it is responsible for producing a new state that reflects the impact of that action.
   static AppReducer get appReducer {
     return _appReducer;
+  }
+
+  /// Retrieves user interface scenarios (combinations of widgets and data used for prototyping)
+  /// and testing.
+  static AFUserInterfaceScenarios get userInterfaceScenarios {
+    return _afUserInterfaceScenarios;
   }
 
   /// The redux store, which contains the application state.   WARNING: You should never
@@ -129,6 +153,7 @@ class AF {
     _afCreateStartupQueryAction = createStartupQueryAction;
   }
 
+  /// Do not call this method, AFApp.initialize will do it for you.
   static void setAppReducer<TAppState>(AppReducer<TAppState> reducer) {
     if(reducer != null) {
       _appReducer = (dynamic state, dynamic action) {
@@ -136,6 +161,12 @@ class AF {
         return d;
       };
     }
+  }
+  
+  /// Do not call this method, AFApp.initialize will do it for you.
+  static void setPrototypeScreenMap(AFScreenMap screens) {
+    AF.verifyNotImmutable();
+    _afPrototypeScreenMap = screens;
   }
 
   /// Throws an exception if called after the startup process completes.  

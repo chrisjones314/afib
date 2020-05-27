@@ -1,4 +1,5 @@
 
+import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/af.dart';
 import 'package:meta/meta.dart';
@@ -7,7 +8,7 @@ import 'package:meta/meta.dart';
 /// transient data associated with that screen.
 @immutable 
 class AFRouteSegment {
-  final String screen;
+  final AFScreenID screen;
   final AFRouteParam param;
 
   AFRouteSegment({this.screen, this.param});
@@ -23,14 +24,14 @@ class AFRouteSegment {
   }
 
   String toString() {
-    return screen;
+    return screen.name;
   }
 
-  factory AFRouteSegment.withScreen(String screen) {
+  factory AFRouteSegment.withScreen(AFScreenID screen) {
     return AFRouteSegment(screen: screen);
   }
 
-  factory AFRouteSegment.withParam(String screen, AFRouteParam param) {
+  factory AFRouteSegment.withParam(AFScreenID screen, AFRouteParam param) {
     return AFRouteSegment(
       screen: screen,
       param: param);
@@ -53,7 +54,7 @@ class AFRouteState {
 
   /// Returns the segment in the current route associated with the 
   /// specified screen.
-  AFRouteSegment findSegmentFor(String screen) {
+  AFRouteSegment findSegmentFor(AFScreenID screen) {
     for(int i = 0; i < route.length; i++) {
       AFRouteSegment segment = route[i];
       if(segment.screen == screen) {
@@ -65,7 +66,7 @@ class AFRouteState {
   }
 
   /// Finds the data associated with the specified screen in the current route.
-  AFRouteParam findParamFor(String screen) {
+  AFRouteParam findParamFor(AFScreenID screen) {
     AFRouteSegment seg = findSegmentFor(screen);
     if(seg == null) {
       return null;
@@ -85,19 +86,19 @@ class AFRouteState {
 
   /// Removes the current leaf from the route, and adds the specified screen
   /// and data in its place.
-  AFRouteState popAndPushNamed(String path, AFRouteParam param) {
+  AFRouteState popAndPushNamed(AFScreenID screen, AFRouteParam param) {
     final newRoute = copyRoute();
     newRoute.removeLast();
-    newRoute.add(AFRouteSegment.withParam(path, param));
+    newRoute.add(AFRouteSegment.withParam(screen, param));
     return copyWith(
       route: newRoute
     );
   }
 
   /// Adds a new screen/data below the current screen in the route.
-  AFRouteState pushNamed(String path, AFRouteParam param) {
+  AFRouteState pushNamed(AFScreenID screen, AFRouteParam param) {
     final newRoute = copyRoute();
-    newRoute.add(AFRouteSegment.withParam(path, param));
+    newRoute.add(AFRouteSegment.withParam(screen, param));
     return copyWith(
       route: newRoute
     );
@@ -115,7 +116,7 @@ class AFRouteState {
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteState setParam(String screen, AFRouteParam param) {
+  AFRouteState setParam(AFScreenID screen, AFRouteParam param) {
     final revised = copyRoute();
     for(int i = 0; i < revised.length; i++) {
       AFRouteSegment seg = revised[i];
@@ -129,7 +130,7 @@ class AFRouteState {
   }
 
   /// Removes all existing segments in the route, and adds back the specified screen/data.
-  AFRouteState replaceAll(String screen, AFRouteParam param) {
+  AFRouteState replaceAll(AFScreenID screen, AFRouteParam param) {
     List<AFRouteSegment> revised = new List<AFRouteSegment>();
     revised.add(AFRouteSegment.withParam(screen, param));
     return copyWith(

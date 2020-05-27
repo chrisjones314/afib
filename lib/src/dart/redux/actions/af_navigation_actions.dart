@@ -8,7 +8,7 @@ typedef void AFReturnFunc<T>(T returnData);
 /// and determines which screen is showing, and what data is visible.
 @immutable
 class AFNavigateAction {
-  final String screen;
+  final AFID screen;
   final AFRouteParam param;
 
   AFNavigateAction({
@@ -19,19 +19,19 @@ class AFNavigateAction {
 
 /// Action that replaces the current leaf screen with a new screen.
 class AFNavigateReplaceAction extends AFNavigateAction {  
-  AFNavigateReplaceAction({String screen, AFRouteParam param}): super(screen: screen, param: param);
+  AFNavigateReplaceAction({AFID screen, AFRouteParam param}): super(screen: screen, param: param);
 }
 
 /// Action that removes all screens in the route, and replaces them with
 /// a single new screen at the root.
 class AFNavigateReplaceAllAction extends AFNavigateAction {
-  AFNavigateReplaceAllAction({String screen, AFRouteParam param}): super(screen: screen, param: param);
+  AFNavigateReplaceAllAction({AFID screen, AFRouteParam param}): super(screen: screen, param: param);
 }
 
 /// Action that changes the data associated with the current screen, but 
 /// does not change the screen itself.
 class AFNavigateSetParamAction extends AFNavigateAction {
-  AFNavigateSetParamAction({String screen, AFRouteParam param}): super(screen: screen, param: param);
+  AFNavigateSetParamAction({AFID screen, AFRouteParam param}): super(screen: screen, param: param);
 }
 
 /// Action that adds a new screen after the current screen in the route.
@@ -40,7 +40,7 @@ class AFNavigateSetParamAction extends AFNavigateAction {
 class AFNavigatePushAction extends AFNavigateAction {
   final AFReturnFunc<dynamic> onReturn;
 
-  AFNavigatePushAction({String screen, AFRouteParam param, this.onReturn}): super(screen: screen, param: param);
+  AFNavigatePushAction({AFID screen, AFRouteParam param, this.onReturn}): super(screen: screen, param: param);
 }
 
 /// Action that navigates on screen up in the route, discarding the current leaf route.

@@ -30,7 +30,7 @@ List<Middleware<AFState>> createRouteMiddleware() {
 //---------------------------------------------------------------------------
 void _navigatePushAction(Store<AFState> store, action, NextDispatcher next) {
 
-  Future<dynamic> ret = AF.navigatorKey.currentState?.pushNamed(action.screen);
+  Future<dynamic> ret = AF.navigatorKey.currentState?.pushNamed(action.screen.code);
   if(ret != null && action.onReturn != null) {
     ret.then( (msg) {
       action.onReturn(msg);
@@ -47,7 +47,7 @@ void _navigatePopAction(Store<AFState> store, action, NextDispatcher next) {
 
 //---------------------------------------------------------------------------
 void _navigateReplaceAction(Store<AFState> store, action, NextDispatcher next) {
-  final String screen = action.screen;
+  final String screen = action.screen.code;
 
   // first, we do the navigation itself
   AF.navigatorKey.currentState?.popAndPushNamed(screen);
@@ -59,7 +59,7 @@ void _navigateReplaceAction(Store<AFState> store, action, NextDispatcher next) {
 
 //---------------------------------------------------------------------------
 void _navigateReplaceAllAction(Store<AFState> store, action, NextDispatcher next) {
-  final String screen = action.screen;
+  final String screen = action.screen.code;
 
   // first, we do the navigation itself
   AF.navigatorKey.currentState?.pushNamedAndRemoveUntil(screen, (Route<dynamic> route) => false);

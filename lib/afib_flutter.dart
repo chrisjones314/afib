@@ -9,5 +9,5 @@ export 'src/flutter/af_material_app.dart';
 export 'src/flutter/af_main.dart';
 export 'src/flutter/af.dart';
 export 'src/flutter/screen/af_connected_screen.dart';
-export 'src/flutter/test/af_user_interface_scenarios.dart';
+export 'src/flutter/test/af_user_interface_screen_tests.dart';
 export 'src/flutter/core/afui.dart';

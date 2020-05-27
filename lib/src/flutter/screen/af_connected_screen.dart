@@ -2,6 +2,7 @@
 import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_unused.dart';
 import 'package:flutter/material.dart';
@@ -113,7 +114,7 @@ abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam
 
 /// A screen that uses data from the store but not from the route.
 abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFBuildableWidget<TData, TRouteParam> {
-  final String screen;
+  final AFScreenID screen;
 
   //--------------------------------------------------------------------------------------
   AFConnectedScreenWithoutRoute(this.screen);
@@ -178,7 +179,7 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
 /// Superclass for a screen widget, which combined data from the store with data from
 /// the route in order to render itself.
 abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithoutRoute<TState, TData, TRouteParam> {
-  AFConnectedScreen(String screen): super(screen);
+  AFConnectedScreen(AFScreenID screen): super(screen);
 
   /// Utility for updating the route parameter for this screen.
   /// 

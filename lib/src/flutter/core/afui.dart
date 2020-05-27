@@ -1,4 +1,5 @@
 
+import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:flutter/widgets.dart';
 
 /// Some very simple user interface utilities.
@@ -12,6 +13,10 @@ class AFUI {
   ///    // instead of
   ///    final col = List<Widget>();
   static List<Widget> column() { return List<Widget>(); }
+
+  static Key testKey(AFWidgetID wid) {
+    return Key(wid.code);
+  }
 
 
 }

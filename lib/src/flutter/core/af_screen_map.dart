@@ -1,4 +1,4 @@
-import 'package:afib/src/dart/utils/af_ui_constants.dart';
+import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/af.dart';
 import 'package:afib/src/flutter/screen/af_startup_screen.dart';
 import 'package:flutter/material.dart';
@@ -8,27 +8,29 @@ import 'package:afib/afib_dart.dart';
 /// build the correct screen widget for the leaf element in the route.
 class AFScreenMap {
 
-  String _initialKey;
-  final Map<String, WidgetBuilder> _screens = Map<String, WidgetBuilder>();
+  AFScreenID _initialKey;
+  final Map<AFScreenID, WidgetBuilder> _screens = Map<AFScreenID, WidgetBuilder>();
 
   AFScreenMap() {
-    screen(AFUIConstants.startupScreenId, (_) => AFStartupScreenWrapper());
+    screen(AFUIID.screenStartup, (_) => AFStartupScreenWrapper());
   }
 
-  String get afStartupScreenId {
-    return AFUIConstants.startupScreenId;
+  AFScreenID get afStartupScreenId {
+    return AFUIID.screenStartup;
   }
 
   String get appInitialScreenId { 
-    return _initialKey;
+    return _initialKey.code;
   }
 
   Map<String, WidgetBuilder> get screens {
-     return _screens;
+     return _screens.map<String, WidgetBuilder>((k, v) {
+       return MapEntry(k.code, v);
+     });
   }
 
   /// Call [initialScreen] once to specify the initial screen for your app.
-  void initialScreen(String screenKey, WidgetBuilder screenBuilder) {
+  void initialScreen(AFScreenID screenKey, WidgetBuilder screenBuilder) {
     AF.verifyNotImmutable();
     
     if(_initialKey != null) {
@@ -40,7 +42,7 @@ class AFScreenMap {
 
   /// Call [screen] multiple times to specify the relationship between 
   /// [screenKey] and screens built by the [WidgetBuilder]
-  void screen(String screenKey, WidgetBuilder screenBuilder) {
+  void screen(AFScreenID screenKey, WidgetBuilder screenBuilder) {
     AF.verifyNotImmutable();
     _screens[screenKey] = screenBuilder;
   }
@@ -51,7 +53,7 @@ class AFScreenMap {
   }
 
   /// Returns the current mapping of routes to screens.
-  Map<String, WidgetBuilder> get screenMap {
+  Map<AFID, WidgetBuilder> get screenMap {
     return _screens;
   }
 }

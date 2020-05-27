@@ -1,11 +1,11 @@
 
 import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/dart/utils/af_ui_constants.dart';
+import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/test/af_scenario_instance_screen.dart';
 
 class AFPrototypeDispatcher extends AFDispatcher {
-  String screenId;
+  AFID screenId;
   AFDispatcher main;
   
   AFPrototypeDispatcher(this.screenId, this.main);
@@ -18,7 +18,7 @@ class AFPrototypeDispatcher extends AFDispatcher {
     } else if(action is AFNavigateSetParamAction) {
       // change this into a set param action for the prototype.
       main.dispatch(
-        AFNavigateSetParamAction(screen: AFUIConstants.scenarioInstanceScreenId,
+        AFNavigateSetParamAction(screen: AFUIID.screenPrototypeInstance,
           param: AFScenarioInstanceScreenParam(id: screenId, param: action.param)
       ));
     } else {

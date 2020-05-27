@@ -2,10 +2,11 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/middleware/af_async_queries.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
-import 'package:afib/src/dart/utils/af_ui_constants.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
-import 'package:afib/src/flutter/test/af_user_interface_scenarios.dart';
+import 'package:afib/src/flutter/test/af_user_interface_screen_tests.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
@@ -30,7 +31,7 @@ class AF {
   static AFStore _afStore;
   static AFAsyncQueries _afAsyncQueries = AFAsyncQueries();
   static CreateStartupQueryAction _afCreateStartupQueryAction;
-  static final AFUserInterfaceScenarios _afUserInterfaceScenarios = AFUserInterfaceScenarios();
+  static final AFUserInterfaceScreenTests _afUserInterfaceScreenTests = AFUserInterfaceScreenTests();
   static AFScreenMap _afPrototypeScreenMap;
 
   /// a key for referencing the Navigator for the material app.
@@ -64,11 +65,11 @@ class AF {
     return _afScreenMap;
   }
 
-  static String get effectiveStartupScreenId {
+  static AFID get effectiveStartupScreenId {
     if(AF.config.requiresPrototypeData) {
-      return AFUIConstants.scenarioListScreenId;
+      return AFUIID.screenPrototypeList;
     }
-    return AFUIConstants.startupScreenId;
+    return AFUIID.screenStartup;
   }
 
   /// Returns a function that creates the initial applications state, used to reset the state.
@@ -96,8 +97,8 @@ class AF {
 
   /// Retrieves user interface scenarios (combinations of widgets and data used for prototyping)
   /// and testing.
-  static AFUserInterfaceScenarios get userInterfaceScenarios {
-    return _afUserInterfaceScenarios;
+  static AFUserInterfaceScreenTests get userInterfaceScenarios {
+    return _afUserInterfaceScreenTests;
   }
 
   /// The redux store, which contains the application state.   WARNING: You should never

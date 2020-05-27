@@ -8,8 +8,7 @@ import 'package:afib/src/flutter/af.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_constants.dart';
 import 'package:afib/src/flutter/test/af_init_proto_screen_map.dart';
-import 'package:afib/src/flutter/test/af_prototype_dispatcher.dart';
-import 'package:afib/src/flutter/test/af_user_interface_scenarios.dart';
+import 'package:afib/src/flutter/test/af_user_interface_screen_tests.dart';
 import 'package:flutter/material.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:logging/logging.dart';
@@ -20,7 +19,7 @@ typedef void InitScreenMap(AFScreenMap map);
 typedef void InitConfiguration(AFConfig config);
 typedef void InitAsyncQueries(AFAsyncQueries queries);
 typedef dynamic CreateStartupQueryAction();
-typedef void InitUserInterfaceScenarios(AFUserInterfaceScenarios scenarios);
+typedef void InitUserInterfaceScreenTests(AFUserInterfaceScreenTests scenarios);
 
 //typedef dynamic AppReducer(dynamic appState, dynamic action);
 typedef TAppState AppReducer<TAppState>(TAppState appState, dynamic action);
@@ -50,7 +49,7 @@ abstract class AFApp<AppState> extends StatelessWidget {
     @required InitializeAppState       initialAppState,
     @required InitAsyncQueries initAsyncQueries,
     @required CreateStartupQueryAction createStartupQueryAction,
-    @required InitUserInterfaceScenarios initUserInterfaceScenarios,
+    @required InitUserInterfaceScreenTests initUserInterfaceScreenTests,
     AppReducer<AppState>  appReducer,
     Logger logger
   }) {
@@ -99,7 +98,7 @@ abstract class AFApp<AppState> extends StatelessWidget {
     AF.setStore(store);
 
     if(AF.config.requiresPrototypeData) {
-      initUserInterfaceScenarios(AF.userInterfaceScenarios);
+      initUserInterfaceScreenTests(AF.userInterfaceScenarios);
       AFScreenMap protoScreenMap = AFScreenMap();
       afInitPrototypeScreenMap(protoScreenMap);
       AF.setPrototypeScreenMap(protoScreenMap);

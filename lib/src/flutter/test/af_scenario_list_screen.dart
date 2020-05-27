@@ -2,7 +2,7 @@
 
 import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/dart/utils/af_ui_constants.dart';
+import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_scenario_instance_screen.dart';
 import 'package:flutter/material.dart';
@@ -23,22 +23,22 @@ class AFScenarioListScreenParam extends AFRouteParam {
 }
 
 /// Data used to render the screen
-class AFScenarioListScreenData extends AFStoreConnectorData1<AFUserInterfaceScenarios> {
-  AFScenarioListScreenData(AFUserInterfaceScenarios scenarios): 
+class AFScenarioListScreenData extends AFStoreConnectorData1<AFUserInterfaceScreenTests> {
+  AFScenarioListScreenData(AFUserInterfaceScreenTests scenarios): 
     super(first: scenarios);
   
-  AFUserInterfaceScenarios get scenarios { return first; }
+  AFUserInterfaceScreenTests get scenarios { return first; }
 }
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
 class AFScenarioListScreen extends AFConnectedScreen<AFAppState, AFScenarioListScreenData, AFScenarioListScreenParam>{
 
-  AFScenarioListScreen(): super(AFUIConstants.scenarioListScreenId);
+  AFScenarioListScreen(): super(AFUIID.screenPrototypeList);
 
   @override
   AFScenarioListScreenData createData(AFAppState state) {
-    AFUserInterfaceScenarios scenarios = AF.userInterfaceScenarios;
+    AFUserInterfaceScreenTests scenarios = AF.userInterfaceScenarios;
     return AFScenarioListScreenData(scenarios);
   }
 
@@ -50,7 +50,7 @@ class AFScenarioListScreen extends AFConnectedScreen<AFAppState, AFScenarioListS
   Widget _buildList(AFBuildContext<AFScenarioListScreenData, AFScenarioListScreenParam> context) {
     final column = AFUI.column();
 
-    AFUserInterfaceScenarios scenarios = context.s.scenarios;
+    AFUserInterfaceScreenTests scenarios = context.s.scenarios;
     scenarios.all.forEach( (scenario) {
       _addForWidget(context, column, scenario);
     });    
@@ -60,7 +60,7 @@ class AFScenarioListScreen extends AFConnectedScreen<AFAppState, AFScenarioListS
     );    
   }
 
-  void _addForWidget(AFBuildContext<AFScenarioListScreenData, AFScenarioListScreenParam> context, List<Widget> column, AFUserInterfaceScenario source) {
+  void _addForWidget(AFBuildContext<AFScenarioListScreenData, AFScenarioListScreenParam> context, List<Widget> column, AFUserInterfaceScreenTest source) {
     StringBuffer title = StringBuffer(source.widget.runtimeType.toString());
     column.add(Card(
       color: Colors.grey,
@@ -76,16 +76,16 @@ class AFScenarioListScreen extends AFConnectedScreen<AFAppState, AFScenarioListS
 
   }
 
-  Widget _createCard(AFBuildContext<AFScenarioListScreenData, AFScenarioListScreenParam> context, AFUserInterfaceScenarioData instance) {
+  Widget _createCard(AFBuildContext<AFScenarioListScreenData, AFScenarioListScreenParam> context, AFUserInterfaceScreenTestData instance) {
     return Card(
-      key: Key(instance.id),
+      key: Key(instance.id.code),
       child: ListTile(
-        title: Text(instance.title),
-        subtitle: Text(instance.id),
+        title: Text(instance.id.name),
+        subtitle: Text(instance.id.code),
         onTap: () {
           context.dispatch(AFNavigatePushAction(
             param: AFScenarioInstanceScreenParam(id: instance.id),
-            screen: AFUIConstants.scenarioInstanceScreenId
+            screen: AFUIID.screenPrototypeInstance
           ));
         }
       )

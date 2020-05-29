@@ -16,3 +16,12 @@ class AFWidgetID extends AFID {
 class AFTestID extends AFID {
   AFTestID(String code, String name) : super(code, name);
 }
+
+class AFStateTestID extends AFID {
+  AFStateTestID(String code, String name) : super(code, name);
+}
+
+class AFQueryTestID extends AFID {
+  AFQueryTestID(String code, String name) : super(code, name);
+}
+

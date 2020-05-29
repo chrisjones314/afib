@@ -1,18 +1,63 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/middleware/af_async_queries.dart';
+import 'package:afib/src/dart/redux/middleware/af_query_middleware.dart';
+import 'package:afib/src/dart/redux/middleware/af_route_middleware.dart';
+import 'package:afib/src/dart/redux/reducers/af_reducer.dart';
+import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
+import 'package:afib/src/dart/utils/af_config_constants.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
-import 'package:afib/src/flutter/test/af_user_interface_screen_tests.dart';
+import 'package:afib/src/flutter/test/af_init_proto_screen_map.dart';
+import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
+import 'package:redux/redux.dart';
 
 
 typedef dynamic InitializeAppState();
+
+class AFInitParams<AppState> {
+  final InitConfiguration initEnvironment;
+  final InitConfiguration initAppConfig;
+  final InitConfiguration initDebugConfig;
+  final InitConfiguration initProductionConfig;
+  final InitConfiguration initPrototypeConfig;
+  final InitConfiguration initTestConfig;
+  final InitScreenMap         initScreenMap;
+  final InitializeAppState       initialAppState;
+  final InitAsyncQueries initAsyncQueries;
+  final CreateStartupQueryAction createStartupQueryAction;
+  final CreateAFApp createApp;
+  final InitStateTests initStateTests;
+  final InitScreenTests initScreenTests;
+  final AppReducer<AppState>  appReducer;
+  final Logger logger;
+  final String forceEnv;
+  
+  AFInitParams({
+    @required this.initEnvironment,
+    @required this.initAppConfig,
+    @required this.initDebugConfig,
+    @required this.initProductionConfig,
+    @required this.initPrototypeConfig,
+    @required this.initTestConfig,
+    @required this.initScreenMap,
+    @required this.initialAppState,
+    @required this.initAsyncQueries,
+    @required this.createStartupQueryAction,
+    @required this.createApp,
+    @required this.initStateTests,
+    @required this.initScreenTests,
+    this.appReducer,
+    this.logger,
+    this.forceEnv
+  });
+}
 
 
 /// A class for finding accessing global utilities in AFib. 
@@ -31,11 +76,80 @@ class AF {
   static AFStore _afStore;
   static AFAsyncQueries _afAsyncQueries = AFAsyncQueries();
   static CreateStartupQueryAction _afCreateStartupQueryAction;
-  static final AFUserInterfaceScreenTests _afUserInterfaceScreenTests = AFUserInterfaceScreenTests();
+  static final AFScreenTests _afScreenTests = AFScreenTests();
+  static final AFStateTests _afStateTests = AFStateTests();
   static AFScreenMap _afPrototypeScreenMap;
+  static CreateAFApp _afCreateApp;
+  static AFScreenID forcedStartupScreen;
 
   /// a key for referencing the Navigator for the material app.
   static final GlobalKey<NavigatorState> _afNavigatorKey = new GlobalKey<NavigatorState>();
+
+  static void initialize<AppState>(AFInitParams p) {
+    _afCreateApp = p.createApp;
+    Logger logger = p.logger;
+    if(logger == null) {
+      logger = Logger("AF");
+    }
+    AF.setLogger(logger);
+
+    Logger.root.level = Level.ALL;
+    Logger.root.onRecord.listen((LogRecord rec) {
+      print('${rec.level.name}: ${rec.time}: ${rec.message}');
+    });  
+
+    // first do the separate initialization that just says what environment it is, since this
+    p.initEnvironment(AF.config);
+    if(p.forceEnv != null) {
+      AF.config.setString(AFConfigConstants.environmentKey, p.forceEnv);
+    }
+    p.initAppConfig(AF.config);
+    final String env = AF.config.environment;
+    if(env == AFConfigConstants.debug) {
+      p.initDebugConfig(AF.config);
+    } else if(env == AFConfigConstants.production) {
+      p.initProductionConfig(AF.config);
+    } else if(env == AFConfigConstants.prototype) {
+      p.initPrototypeConfig(AF.config);
+    } else if(env == AFConfigConstants.test_store) {
+      p.initTestConfig(AF.config);
+    }
+
+
+    AF.fine("Environment: " + AF.config.environment);
+
+    p.initScreenMap(AF.screenMap);
+
+    AF.setInitialAppStateFactory(p.initialAppState);
+    AF.setAppReducer(appReducer);
+    AF.setCreateStartupQueryAction(createStartupQueryAction);
+
+    List<Middleware<AFState>> middleware = List<Middleware<AFState>>();
+    middleware.addAll(createRouteMiddleware());
+    middleware.add(AFQueryMiddleware());
+    
+    final store = AFStore(
+      afReducer,
+      initialState: AFState.initialState(),
+      middleware: middleware
+    );
+    setStore(store);
+
+    if(AF.config.requiresTestData) {
+      p.initScreenTests(AF.screenTests);
+      p.initStateTests(AF.stateTests);
+    }
+
+    if(AF.config.requiresPrototypeData) {
+      AFScreenMap protoScreenMap = AFScreenMap();
+      afInitPrototypeScreenMap(protoScreenMap);
+      setPrototypeScreenMap(protoScreenMap);
+    }
+
+    // Make sure all the globals in AF are immutable from now on.
+    finishStartup();
+  }
+
 
   /// The navigator key for referencing the Navigator for the material app.
   static GlobalKey<NavigatorState> get navigatorKey {
@@ -57,6 +171,11 @@ class AF {
     return _afScreenMap;
   }
 
+  /// Static access to the store, should only be used for testing.
+  static AFStore get testOnlyStore {
+    return _afStore;
+  }
+
   /// The screen map to use given the mode we are running in (its different in prototype mode, for example)
   static AFScreenMap get effectiveScreenMap {
     if(AF.config.requiresPrototypeData) {
@@ -65,7 +184,10 @@ class AF {
     return _afScreenMap;
   }
 
-  static AFID get effectiveStartupScreenId {
+  static AFScreenID get effectiveStartupScreenId {
+    if(forcedStartupScreen != null) {
+      return forcedStartupScreen;
+    }
     if(AF.config.requiresPrototypeData) {
       return AFUIID.screenPrototypeList;
     }
@@ -97,8 +219,16 @@ class AF {
 
   /// Retrieves user interface scenarios (combinations of widgets and data used for prototyping)
   /// and testing.
-  static AFUserInterfaceScreenTests get userInterfaceScenarios {
-    return _afUserInterfaceScreenTests;
+  static AFScreenTests get screenTests {
+    return _afScreenTests;
+  }
+
+  static AFStateTests get stateTests {
+    return _afStateTests;
+  }
+
+  static CreateAFApp get createApp {
+    return _afCreateApp;
   }
 
   /// The redux store, which contains the application state.   WARNING: You should never
@@ -136,6 +266,7 @@ class AF {
     _afInitializeAppState = initialState;
   }
 
+
   /// Do not call this method, AFApp.initialize will create the store for you.
   static void setStore(AFStore store) {
     if(_afStore != null) {
@@ -164,6 +295,12 @@ class AF {
     }
   }
   
+  /// testOnlySetForcedStartupScreen
+  static void testOnlySetForcedStartupScreen(AFScreenID id) {
+    forcedStartupScreen = id;
+  }
+
+
   /// Do not call this method, AFApp.initialize will do it for you.
   static void setPrototypeScreenMap(AFScreenMap screens) {
     AF.verifyNotImmutable();

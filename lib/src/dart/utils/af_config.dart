@@ -39,6 +39,11 @@ class AFConfig {
     return (env == AFConfigConstants.prototype);
   }
 
+  bool get requiresTestData {
+    final String env = environment;
+    return (env != AFConfigConstants.production && env != AFConfigConstants.debug);
+  }
+
   
   //void setJson(String key, HashMap<String, dynamic> json) { jsonSettings[key] = json; }
   //HashMap<String, dynamic> getJson(String key) { return jsonSettings[key]; }

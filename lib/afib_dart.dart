@@ -18,3 +18,5 @@ export "src/dart/redux/actions/af_async_query.dart";
 export "src/dart/redux/actions/af_app_state_actions.dart";
 export "src/dart/redux/state/af_app_state.dart";
 export "src/dart/utils/af_id.dart";
+export "src/dart/redux/state/af_route_state.dart";
+export "src/flutter/test/af_state_test.dart";

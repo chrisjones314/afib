@@ -5,6 +5,7 @@ import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_unused.dart';
+import 'package:afib/src/flutter/test/af_test_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
@@ -110,6 +111,7 @@ abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam
   AFBuildContext createContext(BuildContext context, AFDispatcher dispatcher, TData data, TRouteParam param) {
     return AFBuildContext<TData, TRouteParam>(context, dispatcher, data, param);
   }
+
 }
 
 /// A screen that uses data from the store but not from the route.
@@ -241,6 +243,8 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   AFDispatcher dispatcher;
   TData storeData;
   TRouteParam param;
+  bool isUITestContext = false;
+
   AFBuildContext(this.context, this.dispatcher, this.storeData, this.param);
 
   /// Shorthand for accessing the route param.
@@ -255,6 +259,18 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   /// Shorthand for accessing the flutter build context
   BuildContext get c { return context; }
   void dispatch(dynamic action) { dispatcher.dispatch(action); }
+
+  void enableTestContext() {
+    isUITestContext = true;
+  }
+
+  Widget createDebugDrawer() {
+    if(isUITestContext) {
+      return AFTestDrawer();
+    };
+    return null;
+  }
+
 
 }
 

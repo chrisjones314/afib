@@ -12,6 +12,6 @@ class AFConfigConstants {
   static final production = "production";
   static final debug = "debug";
   static final prototype = "prototype";
-  static final test = "test";
-  static final allEnvironments = [production, debug, prototype, test];
+  static final test_store = "test_store";
+  static final allEnvironments = [production, debug, prototype, test_store];
 }

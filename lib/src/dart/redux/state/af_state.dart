@@ -1,4 +1,5 @@
 import 'package:afib/src/dart/redux/state/af_route_state.dart';
+import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/flutter/af.dart';
 import 'package:meta/meta.dart';
 
@@ -7,11 +8,13 @@ import 'package:meta/meta.dart';
 /// routing state managed by AFib, and the custom application state.
 @immutable
 class AFState {
+  final AFTestState testState;
   final AFRouteState route;
   final dynamic app;
 
   /// Construct an AFib state with the specified route and app state.
   AFState({
+    this.testState,
     this.route,
     this.app
   });
@@ -19,6 +22,7 @@ class AFState {
   /// 
   factory AFState.initialState() {
     return AFState(
+      testState: AFTestState.initial(),
       route: AFRouteState.initialState(),
       app: AF.initializeAppState(),
     );

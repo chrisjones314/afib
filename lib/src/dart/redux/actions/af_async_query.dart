@@ -2,19 +2,18 @@
 
 
 import 'package:afib/afib_dart.dart';
+import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/flutter/af.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/test/af_state_test.dart';
 
 
 /// Superclass for a kind of action that queries some data asynchronously, then knows
 /// how to process the result.
-abstract class AFAsyncQueryCustomError<TState, TResponse, TError> {
+abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActionWithKey {
 
-  /// Returns a key used to identify the query.
-  String get key {
-    return runtimeType.toString();
-  }
+  AFAsyncQueryCustomError({AFID wid}): super(wid: wid);
 
   /// Called internally when redux middleware begins processing a query.
   void startAsyncAF(AFDispatcher dispatcher, AFState state) {
@@ -23,6 +22,7 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> {
       finishAsync(dispatcher, state.app, result, error);
     });
   }
+
 
   /// Called at the start of an asynchronous process, starts the query using data from the
   /// command. 
@@ -46,5 +46,5 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> {
 /// A default version of [AFAsyncQueryCustomError] with the standard [AFQueryError] type, which is sufficient
 /// in most cases.
 abstract class AFAsyncQuery<TState, TResponse> extends AFAsyncQueryCustomError<TState, TResponse, AFQueryError> {
-
+  AFAsyncQuery({AFID wid}): super(wid: wid);
 }

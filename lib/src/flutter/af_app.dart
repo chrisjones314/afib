@@ -12,7 +12,7 @@ typedef void InitConfiguration(AFConfig config);
 typedef void InitAsyncQueries(AFAsyncQueries queries);
 typedef dynamic CreateStartupQueryAction();
 typedef AFApp CreateAFApp();
-typedef void InitScreenTests(AFScreenTests scenarios);
+typedef void InitScreenTests(AFScreenTests tests);
 typedef void InitStateTests(AFStateTests tests);
 
 //typedef dynamic AppReducer(dynamic appState, dynamic action);

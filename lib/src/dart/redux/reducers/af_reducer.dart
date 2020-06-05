@@ -3,6 +3,7 @@
 import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
 import 'package:afib/src/dart/redux/reducers/af_app_state_reducer.dart';
 import 'package:afib/src/dart/redux/reducers/af_route_reducer.dart';
+import 'package:afib/src/dart/redux/reducers/af_test_contexts_reducer.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 
 /// The primary reducer for an AFib appliations state.  
@@ -16,6 +17,7 @@ AFState afReducer(AFState state, action) {
   }
 
   return AFState(
+    testState: afTestStateReducer(state.testState, action),
     route: routeReducer(state.route, action),
     app: afAppStateReducer(state.app, action)
   );

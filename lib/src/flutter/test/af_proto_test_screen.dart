@@ -27,7 +27,7 @@ abstract class AFProtoTestScreen extends StatelessWidget {
         },
         builder: (buildContext, dispatcher) {
           final widget = testContext.test.widget;
-          final withContext = widget.createContext(buildContext, dispatcher, testContext.instance.data, testContext.instance.param);
+          final withContext = widget.createContext(buildContext, dispatcher, testContext.test.data, testContext.test.param);
           return widget.buildWithContext(withContext);
         }
     );

@@ -81,6 +81,7 @@ class AF {
   static AFScreenMap _afPrototypeScreenMap;
   static CreateAFApp _afCreateApp;
   static AFScreenID forcedStartupScreen;
+  static BuildContext testOnlyScreenElement;
 
   /// a key for referencing the Navigator for the material app.
   static final GlobalKey<NavigatorState> _afNavigatorKey = new GlobalKey<NavigatorState>();
@@ -217,12 +218,14 @@ class AF {
     return _appReducer;
   }
 
-  /// Retrieves user interface scenarios (combinations of widgets and data used for prototyping)
-  /// and testing.
+  /// Retrieves screen/data pairings used for prototyping and for screen-specific
+  /// testing.
   static AFScreenTests get screenTests {
     return _afScreenTests;
   }
 
+  // Retrieves tests used to manipulate the redux state and verify that it 
+  // changed as expected.
   static AFStateTests get stateTests {
     return _afStateTests;
   }
@@ -245,6 +248,10 @@ class AF {
   /// Meant to be used only within the AF framework itself.  Apps should use
   /// AF.logger.fine(...)
   static void fine(String msg) {
+    _afLogger.fine("AF: " + msg);
+  }
+
+  static void debug(String msg) {
     _afLogger.fine("AF: " + msg);
   }
 
@@ -299,7 +306,6 @@ class AF {
   static void testOnlySetForcedStartupScreen(AFScreenID id) {
     forcedStartupScreen = id;
   }
-
 
   /// Do not call this method, AFApp.initialize will do it for you.
   static void setPrototypeScreenMap(AFScreenMap screens) {

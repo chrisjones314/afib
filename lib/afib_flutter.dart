@@ -16,3 +16,5 @@ export 'src/flutter/test/af_state_test_main.dart';
 export 'src/flutter/test/af_test_drawer.dart';
 export 'src/flutter/test/af_proto_test_screen.dart';
 export 'src/flutter/test/af_screen_test_main.dart';
+export 'src/flutter/core/af_text_field.dart';
+export "src/flutter/test/af_state_test.dart";

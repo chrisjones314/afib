@@ -5,6 +5,8 @@ import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_unused.dart';
+import 'package:afib/src/flutter/af.dart';
+import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -57,7 +59,7 @@ class AFTestDispatcher extends AFDispatcher {
 /// store and expose them to a screen.  
 /// 
 /// This allows screens to be populated with data without ever
-/// having a store in test scenarios.
+/// having a store in tests.
 @immutable
 class AFStoreConnectorData<TV1, TV2, TV3, TV4> {
   final TV1 first;
@@ -111,7 +113,6 @@ abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam
   AFBuildContext createContext(BuildContext context, AFDispatcher dispatcher, TData data, TRouteParam param) {
     return AFBuildContext<TData, TRouteParam>(context, dispatcher, data, param);
   }
-
 }
 
 /// A screen that uses data from the store but not from the route.
@@ -140,6 +141,9 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
         builder: (buildContext, dataContext) {
           if(dataContext == null) {
             return CircularProgressIndicator();
+          }
+          if(!(this is AFTestDrawer)) {
+            AF.testOnlyScreenElement = context;
           }
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p);
           return buildWithContext(withContext);
@@ -192,8 +196,9 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
   /// ### Example
   ///   final revisedParam = screenData.param.copyWith(someField: myRevisedValue);
   ///   updateParam(screenData, revisedParam);
-  void updateParam(AFDispatcher dispatcher, TRouteParam revised) {
+  void updateParam(AFDispatcher dispatcher, TRouteParam revised, { AFID wid }) {
     dispatcher.dispatch(AFNavigateSetParamAction(
+      wid: wid,
       screen: this.screen, 
       param: revised)
     );
@@ -201,8 +206,8 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
 
   /// Utility method which updates the parameter, but takes a build context
   /// rather than a dispatcher for convenience
-  void updateParamC(AFBuildContext context, TRouteParam revised) {
-    return updateParam(context.dispatcher, revised);
+  void updateParamC(AFBuildContext context,TRouteParam revised, { AFID wid }) {
+    return updateParam(context.dispatcher, revised, wid: wid);
   }
 
   /// This exists because when navigating up from a child to a parent screen,
@@ -232,7 +237,18 @@ abstract class AFConnectedWidget<TState, TData extends AFStoreConnectorData, TRo
   AFConnectedWidget(this.parentParam): super(null);
 }
 
+/// Use this to connect a drawer to the store.
+/// 
+/// Drawers are special because the user can drag in from the left or right to open them.
+/// You cannot trust that you used an [AFNavigatePush] action to open the drawer.  Consequently,
+/// you should only rely on information in your [AFAppState] to render your drawers, and perhaps
+/// the full state of the route ()
+abstract class AFConnectedDrawer<TState, TData extends AFStoreConnectorData> extends AFConnectedScreenWithoutRoute<TState, TData, AFRouteParamUnused> {
+  AFConnectedDrawer(): super(null);
 
+
+
+}
 
 /// A utility class which you can use when you have a complex screen which passes the dispatcher,
 /// screen data and param to many functions, to make things more concise.  
@@ -243,7 +259,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   AFDispatcher dispatcher;
   TData storeData;
   TRouteParam param;
-  bool isUITestContext = false;
+  AFScreenPrototypeTest screenTest;
 
   AFBuildContext(this.context, this.dispatcher, this.storeData, this.param);
 
@@ -260,13 +276,13 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   BuildContext get c { return context; }
   void dispatch(dynamic action) { dispatcher.dispatch(action); }
 
-  void enableTestContext() {
-    isUITestContext = true;
+  void enableTestContext(AFScreenPrototypeTest st) {
+    screenTest = st;
   }
 
   Widget createDebugDrawer() {
-    if(isUITestContext) {
-      return AFTestDrawer();
+    if(screenTest != null) {
+      return AFTestDrawer(screenTest);
     };
     return null;
   }

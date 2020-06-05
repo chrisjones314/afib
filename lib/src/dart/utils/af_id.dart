@@ -1,27 +1,31 @@
 
 class AFID {
   final String code;
-  final String name;
-  AFID(this.code, this.name);
+  AFID(this.code);
+
+  @override
+  String toString() {
+    return code;
+  }
 }
 
 class AFScreenID extends AFID {
-  AFScreenID(String code, String name) : super(code, name);
+  AFScreenID(String code) : super(code);
 }
 
 class AFWidgetID extends AFID {
-  AFWidgetID(String code, String name) : super(code, name);
+  AFWidgetID(String code) : super(code);
 }
 
 class AFTestID extends AFID {
-  AFTestID(String code, String name) : super(code, name);
+  AFTestID(String code) : super(code);
 }
 
 class AFStateTestID extends AFID {
-  AFStateTestID(String code, String name) : super(code, name);
+  AFStateTestID(String code) : super(code);
 }
 
 class AFQueryTestID extends AFID {
-  AFQueryTestID(String code, String name) : super(code, name);
+  AFQueryTestID(String code) : super(code);
 }
 

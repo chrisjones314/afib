@@ -24,7 +24,7 @@ class AFRouteSegment {
   }
 
   String toString() {
-    return screen.name;
+    return screen.code;
   }
 
   factory AFRouteSegment.withScreen(AFScreenID screen) {
@@ -55,7 +55,7 @@ class AFRouteState {
   /// Returns the segment in the current route associated with the 
   /// specified screen.
   AFRouteSegment findSegmentFor(AFScreenID screen) {
-    for(int i = 0; i < route.length; i++) {
+    for(int i = route.length - 1; i >= 0; i--) {
       AFRouteSegment segment = route[i];
       if(segment.screen == screen) {
         return segment;

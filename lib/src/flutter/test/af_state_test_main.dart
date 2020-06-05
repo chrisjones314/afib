@@ -37,7 +37,7 @@ void afStateTestMain() {
     int totalErrors = 0;
     errorContexts.forEach((context) {
       final test = context.test;
-      print("    ${test.id.code}: ${test.id.name}");
+      print("    ${test.id.code}:");
       context.errors.forEach((error) {
         print("        $error");
       });

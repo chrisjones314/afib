@@ -25,6 +25,7 @@ class AFUI {
   static List<Widget> row() { return List<Widget>(); }
 
   static Key testKey(AFWidgetID wid) {
+    if(wid == null) { return null; }
     return Key(wid.code);
   }
 

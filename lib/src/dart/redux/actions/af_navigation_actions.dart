@@ -13,27 +13,27 @@ class AFNavigateAction extends AFActionWithKey {
   final AFRouteParam param;
 
   AFNavigateAction({
-    @required AFID wid,
+    @required AFID id,
     @required this.screen,
     this.param
-  }): super(wid: wid);
+  }): super(id: id);
 }
 
 /// Action that replaces the current leaf screen with a new screen.
 class AFNavigateReplaceAction extends AFNavigateAction {  
-  AFNavigateReplaceAction({AFID wid, AFScreenID screen, AFRouteParam param}): super(wid: wid, screen: screen, param: param);
+  AFNavigateReplaceAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
 }
 
 /// Action that removes all screens in the route, and replaces them with
 /// a single new screen at the root.
 class AFNavigateReplaceAllAction extends AFNavigateAction {
-  AFNavigateReplaceAllAction({AFID wid, AFScreenID screen, AFRouteParam param}): super(wid: wid, screen: screen, param: param);
+  AFNavigateReplaceAllAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
 }
 
 /// Action that changes the data associated with the current screen, but 
 /// does not change the screen itself.
 class AFNavigateSetParamAction extends AFNavigateAction {
-  AFNavigateSetParamAction({AFID wid, AFScreenID screen, AFRouteParam param}): super(wid: wid, screen: screen, param: param);
+  AFNavigateSetParamAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
 }
 
 /// Action that adds a new screen after the current screen in the route.
@@ -42,14 +42,14 @@ class AFNavigateSetParamAction extends AFNavigateAction {
 class AFNavigatePushAction extends AFNavigateAction {
   final AFReturnFunc<dynamic> onReturn;
 
-  AFNavigatePushAction({AFID wid, AFScreenID screen, AFRouteParam param, this.onReturn}): super(wid: wid, screen: screen, param: param);
+  AFNavigatePushAction({AFID id, AFScreenID screen, AFRouteParam param, this.onReturn}): super(id: id, screen: screen, param: param);
 }
 
 /// Action that navigates on screen up in the route, discarding the current leaf route.
 class AFNavigatePopAction extends AFNavigateAction {
   final dynamic returnData;
   
-  AFNavigatePopAction({AFID wid, this.returnData}): super(wid: wid, screen: null, param: null);
+  AFNavigatePopAction({AFID id, this.returnData}): super(id: id, screen: null, param: null);
 }
 
 /// Action that causes us to navigate up from a prototype/test screen to the main prototype/test
@@ -58,5 +58,5 @@ class AFNavigatePopAction extends AFNavigateAction {
 /// This is necessary because the testing infrastructure catches all normal actions and records 
 /// them for testing/logging purposes.
 class AFNavigatePopInTestAction extends AFNavigatePopAction {
-  AFNavigatePopInTestAction({AFID wid, dynamic returnData}): super(wid: wid, returnData: returnData);
+  AFNavigatePopInTestAction({AFID id, dynamic returnData}): super(id: id, returnData: returnData);
 }

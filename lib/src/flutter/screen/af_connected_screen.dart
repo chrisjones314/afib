@@ -103,10 +103,10 @@ class AFStoreConnectorData4<TV1, TV2, TV3, TV4> extends AFStoreConnectorData<TV1
   AFStoreConnectorData4({TV1 first, TV2 second, TV3 third, TV4 fourth}): super(first: first, second: second, third: third, fourth: fourth);
 }
 
-/// This common superclass makes it possible to treat all afib widgets/screens
+/// This common superclass makes it possible to treat all afib Widgets/screens
 /// similarly for testing and prototyping purposes.
 abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends StatelessWidget {
-    /// Builds a widget using the data extracted from the state.
+    /// Builds a Widget using the data extracted from the state.
   Widget buildWithContext(AFBuildContext<TData, TRouteParam> context);
 
   /// Wrap all four pieces of data needed during a build in a single utility object.
@@ -143,7 +143,8 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
             return CircularProgressIndicator();
           }
           if(!(this is AFTestDrawer)) {
-            AF.testOnlyScreenElement = context;
+            AF.testOnlyScreenElement = buildContext;
+            AF.testOnlyScreenUpdateCount++;
           }
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p);
           return buildWithContext(withContext);
@@ -161,7 +162,7 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
   /// Override this to create an [AFStoreConnectorData] with the required data from the state.
   TData createData(TState state);
 
-  /// Builds a widget using the data extracted from the state.
+  /// Builds a Widget using the data extracted from the state.
   Widget buildWithContext(AFBuildContext<TData, TRouteParam> context);
 
   /// If you are looking to customize this behavior, override [shouldIngoreChange] instead.
@@ -182,7 +183,7 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
 
 }
 
-/// Superclass for a screen widget, which combined data from the store with data from
+/// Superclass for a screen Widget, which combined data from the store with data from
 /// the route in order to render itself.
 abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithoutRoute<TState, TData, TRouteParam> {
   AFConnectedScreen(AFScreenID screen): super(screen);
@@ -196,9 +197,9 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
   /// ### Example
   ///   final revisedParam = screenData.param.copyWith(someField: myRevisedValue);
   ///   updateParam(screenData, revisedParam);
-  void updateParam(AFDispatcher dispatcher, TRouteParam revised, { AFID wid }) {
+  void updateParam(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
     dispatcher.dispatch(AFNavigateSetParamAction(
-      wid: wid,
+      id: id,
       screen: this.screen, 
       param: revised)
     );
@@ -206,8 +207,8 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
 
   /// Utility method which updates the parameter, but takes a build context
   /// rather than a dispatcher for convenience
-  void updateParamC(AFBuildContext context,TRouteParam revised, { AFID wid }) {
-    return updateParam(context.dispatcher, revised, wid: wid);
+  void updateParamC(AFBuildContext context,TRouteParam revised, { AFID id }) {
+    return updateParam(context.dispatcher, revised, id: id);
   }
 
   /// This exists because when navigating up from a child to a parent screen,
@@ -227,10 +228,10 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
   }
 }
 
-/// Use this to connect a widget to the store.  
+/// Use this to connect a Widget to the store.  
 /// 
-/// The widget can still have a route parameter, but it must be passed in
-/// from the parent screen that the widget is created by.
+/// The Widget can still have a route parameter, but it must be passed in
+/// from the parent screen that the Widget is created by.
 abstract class AFConnectedWidget<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithoutRoute<TState, TData, TRouteParam> {
   final TRouteParam parentParam;
 

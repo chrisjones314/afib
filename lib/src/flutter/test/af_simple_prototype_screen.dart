@@ -14,20 +14,21 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 
 /// Parameter uses to filter the tests shown on the screen.
 @immutable
-class AFScreenTestScreenParam extends AFRouteParam {
+class AFScreenPrototypeScreenParam extends AFRouteParam {
   final AFID id;
   final AFRouteParam param;
+  final dynamic data;
 
-  AFScreenTestScreenParam({this.id, this.param});
+  AFScreenPrototypeScreenParam({this.id, this.param, this.data});
 
-  AFScreenTestScreenParam copyWith() {
-    return AFScreenTestScreenParam();
+  AFScreenPrototypeScreenParam copyWith() {
+    return AFScreenPrototypeScreenParam();
   }
 }
 
 /// Data used to render the screen
-class AFScreenTestScreenData extends AFStoreConnectorData2<AFScreenTests, AFTestState> {
-  AFScreenTestScreenData(AFScreenTests tests, AFTestState testState): 
+class AFScreenPrototypeScreenData extends AFStoreConnectorData2<AFScreenTests, AFTestState> {
+  AFScreenPrototypeScreenData(AFScreenTests tests, AFTestState testState): 
     super(first: tests, second: testState);
   
   AFScreenTests get tests { return first; }
@@ -36,32 +37,32 @@ class AFScreenTestScreenData extends AFStoreConnectorData2<AFScreenTests, AFTest
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFScreenTestInstanceScreen extends AFConnectedScreen<AFAppState, AFScreenTestScreenData, AFScreenTestScreenParam>{
+class AFScreenPrototypeScreen extends AFConnectedScreen<AFAppState, AFScreenPrototypeScreenData, AFScreenPrototypeScreenParam>{
 
-  AFScreenTestInstanceScreen(): super(AFUIID.screenPrototypeInstance);
+  AFScreenPrototypeScreen(): super(AFUIID.screenPrototypeInstance);
 
-  static AFNavigateAction navigatePush(AFScreenPrototypeTest instance, {AFID wid}) {
+  static AFNavigateAction navigatePush(AFScreenPrototypeTest instance, {AFID id}) {
     return AFNavigatePushAction(
-      wid: wid,
-      param: AFScreenTestScreenParam(id: instance.id, param: instance.param),
+      id: id,
+      param: AFScreenPrototypeScreenParam(id: instance.id, param: instance.param),
       screen: AFUIID.screenPrototypeInstance,
     );
   }
 
   @override
-  AFScreenTestScreenData createDataAF(AFState state) {
+  AFScreenPrototypeScreenData createDataAF(AFState state) {
     AFScreenTests tests = AF.screenTests;
-    return AFScreenTestScreenData(tests, state.testState);
+    return AFScreenPrototypeScreenData(tests, state.testState);
   }
 
   @override
-  AFScreenTestScreenData createData(AFAppState state) {
+  AFScreenPrototypeScreenData createData(AFAppState state) {
     // this should never be called, because createDataAF supercedes it.
     throw UnimplementedError();
   }
 
   @override
-  Widget buildWithContext(AFBuildContext<AFScreenTestScreenData, AFScreenTestScreenParam> context) {
+  Widget buildWithContext(AFBuildContext<AFScreenPrototypeScreenData, AFScreenPrototypeScreenParam> context) {
     
     /// Remember what screen we are on for testing purposes.  Maybe eventually try to do this in navigator observer.
     AFTest.currentScreen = context.c;
@@ -69,13 +70,15 @@ class AFScreenTestInstanceScreen extends AFConnectedScreen<AFAppState, AFScreenT
   }
 
 
-  Widget _buildScreen(AFBuildContext<AFScreenTestScreenData, AFScreenTestScreenParam> context) {
+  Widget _buildScreen(AFBuildContext<AFScreenPrototypeScreenData, AFScreenPrototypeScreenParam> context) {
     AFScreenTests tests = context.s.tests;
     AFScreenPrototypeTest test = tests.findById(context.p.id);
     AFRouteParam paramChild = context.p.param ?? test.data.param;
     final testContext = context.s.testState.findContext(test.id);
+    final testState = context.s.testState.findState(test.id);
+    final testData = testState?.data ?? test.data;
     final dispatcher = AFPrototypeDispatcher(context.p.id, context.d, testContext);
-    final childContext = test.widget.createContext(context.c, dispatcher, test.data, paramChild);
+    final childContext = test.widget.createContext(context.c, dispatcher, testData, paramChild);
     childContext.enableTestContext(test);
     return test.widget.buildWithContext(childContext);
     

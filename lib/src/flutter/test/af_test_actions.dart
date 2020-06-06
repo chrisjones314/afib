@@ -1,11 +1,29 @@
 
 
+import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 
-/// Place a test context in the store, so that it can be referenced
-/// by both the screen and the debug drawer
-class AFAddTestContextAction {
+/// Place a test context and a test state in the store, so that they can be referenced
+/// by both the prototype screen and the debug drawer
+class AFStartPrototypeScreenTestAction {
     final AFScreenTestContext context;
+    AFStartPrototypeScreenTestAction(this.context);
+}
 
-    AFAddTestContextAction(this.context);
+/// Update the 'store based' data for a prototype screen.
+class AFUpdatePrototypeScreenTestDataAction {
+  AFTestID testId;
+  dynamic data;
+  AFUpdatePrototypeScreenTestDataAction(this.testId, this.data);
+}
+
+class AFPrototypeScreenTestIncrementPassCount {
+  AFTestID testId;
+  AFPrototypeScreenTestIncrementPassCount(this.testId);
+}
+
+class AFPrototypeScreenTestAddError {
+  AFTestID testId;
+  String err;
+  AFPrototypeScreenTestAddError(this.testId, this.err);
 }

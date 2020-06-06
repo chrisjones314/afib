@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:afib/afib_dart.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/core/afui.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
@@ -12,11 +13,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 //--------------------------------------------------------------------------------------
-class AFTestDrawerData extends AFStoreConnectorData1<AFScreenTestContextSimulator> {
-  AFTestDrawerData(AFScreenTestContextSimulator testContext): 
-    super(first: testContext);
+class AFTestDrawerData extends AFStoreConnectorData2<AFScreenTestContextSimulator, AFScreenTestState> {
+  AFTestDrawerData(AFScreenTestContextSimulator testContext, AFScreenTestState testState): 
+    super(first: testContext, second: testState);
 
   AFScreenTestContextSimulator get testContext { return first; }
+  AFScreenTestState get testState { return second; }
 
 }
 
@@ -32,7 +34,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
   @override
   AFTestDrawerData createDataAF(AFState state) {
     final testState = state.testState;
-    return AFTestDrawerData(testState.findContext(test.id));
+    return AFTestDrawerData(testState.findContext(test.id), testState.findState(test.id));
   }
 
   @override
@@ -73,12 +75,22 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
     final rowActions = AFUI.row();
 
     rowActions.add(FlatButton(
-      child: Text('Exit Screen'),
+      child: Text('Exit'),
       color: AFTheme.primaryBackground,
       textColor: AFTheme.primaryText,
       onPressed: () {
           Navigator.pop(context.c);
           context.dispatch(AFNavigatePopInTestAction());
+      }
+    ));
+
+    rowActions.add(FlatButton(
+      child: Text('Reset'),
+      color: AFTheme.primaryBackground,
+      textColor: AFTheme.primaryText,
+      onPressed: () {
+          Navigator.pop(context.c);
+          context.dispatch(AFUpdatePrototypeScreenTestDataAction(this.test.id, this.test.data));
       }
     ));
 
@@ -88,6 +100,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
         color: AFTheme.primaryBackground,
         textColor: AFTheme.primaryText,
         onPressed: () {
+          final scaffold = Scaffold.of(context.c);
           Navigator.pop(context.c);
 
           // give the drawer time to close, then 
@@ -97,9 +110,13 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
             if(prevContext != null && prevContext.runNumber != null) {
               runNumber = prevContext.runNumber + 1;
             }
-            final testContext = AFScreenTestContextSimulator(test, runNumber);
-            context.dispatch(AFAddTestContextAction(testContext));
-            test.run(testContext);
+
+            final testContext = AFScreenTestContextSimulator(context.d, test, runNumber);
+            context.dispatch(AFStartPrototypeScreenTestAction(testContext));
+            test.run(testContext, onEnd: () {
+              scaffold.openEndDrawer();
+            });
+            
           });
         },
       ));
@@ -113,15 +130,26 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
 
   void _buildTestReport(AFBuildContext<AFTestDrawerData, AFRouteParamUnused> context, List<Widget> col) {
     final testContext = context.s.testContext;
+    final testState = context.s.testState;
     col.add(Container(
       margin: EdgeInsets.symmetric(vertical: 20),
       child: _centerText("Test results")
-    ));
+  ));
     if(testContext == null) {
       col.add(_centerText("None"));
     } else {
       col.add(_centerText("Run ${testContext.runNumber} at ${timeFormat.format(testContext.lastRun)}"));
-      col.add(_centerText(testContext.summaryText));
+      col.add(_centerText(testState.summaryText));
+      for(int i = 0; i < testState.errors.length; i++) {
+        final error = testState.errors[i];
+        final Color background = (i % 2 == 0) ? Colors.grey[300] : Colors.green[50];
+        col.add(
+          Container(
+            padding: EdgeInsets.all(8.0),
+            color: background,
+            child: Text(error)
+        ));
+      }
     }
 
   }

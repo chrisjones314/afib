@@ -1,3 +1,4 @@
+import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:meta/meta.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_route_state.dart';
@@ -5,21 +6,18 @@ import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/af.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
-import 'package:flutter_test/flutter_test.dart' as flutter_test;
-import 'package:stack_trace/stack_trace.dart';
 
 class AFStateTestError {
   final AFStateTest test;
   final String description;
-  final String line;
-  AFStateTestError(this.test, this.description, this.line);
+  AFStateTestError(this.test, this.description);
 
   String toString() {
-    return "$line: $description";
+    return description;
   }
 }
 
-class AFStateTestContext<TState> {
+class AFStateTestContext<TState> extends AFBaseTestExecute {
   AFStateTest test;
   AFStore store;
   AFDispatcher testDisp;
@@ -42,23 +40,17 @@ class AFStateTestContext<TState> {
     test.processQuery(this, q);
   }
 
-  void expect(dynamic value, flutter_test.Matcher matcher) {
-    final matchState = Map();
-    if(!matcher.matches(value, matchState)) {
-      final matchDesc = matcher.describe(flutter_test.StringDescription());
-      final desc = "Expected $matchDesc, found $value";
-
-      final List<Frame> frames = Trace.current().frames;
-      final Frame f = frames[1];
-      _addError(test, desc, "${f.library}:${f.line}");
-    }
-  }
-
   List<AFStateTestError> get errors { return _errors; }
   bool get hasErrors { return _errors.isNotEmpty; }
 
-  void _addError(AFStateTest test, String desc, String line) {
-    _errors.add(AFStateTestError(test, desc, line));
+  @override
+  void addError(String desc, int nDepth) {
+    _errors.add(AFStateTestError(test, desc));
+  }
+
+  @override
+  bool addPassIf(bool test) {
+    return test;
   }
 }
 

@@ -3,7 +3,8 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
-import 'package:afib/src/flutter/test/af_screen_test_screen.dart';
+import 'package:afib/src/flutter/test/af_simple_prototype_screen.dart';
+import 'package:afib/src/flutter/test/af_test_actions.dart';
 
 class AFPrototypeDispatcher extends AFDispatcher {
   AFID screenId;
@@ -17,16 +18,26 @@ class AFPrototypeDispatcher extends AFDispatcher {
     // if the action is a pop, then go ahead and do it.
     if(action is AFNavigatePopInTestAction) {
       main.dispatch(action);
+    } 
+    if(action is AFUpdatePrototypeScreenTestDataAction || 
+       action is AFPrototypeScreenTestAddError ||
+       action is AFPrototypeScreenTestIncrementPassCount) {
+      main.dispatch(action);
     } else if(action is AFNavigateSetParamAction) {
       // change this into a set param action for the prototype.
       main.dispatch(
-        AFNavigateSetParamAction(wid: action.wid, screen: AFUIID.screenPrototypeInstance,
-          param: AFScreenTestScreenParam(id: screenId, param: action.param)
-      ));
+        AFNavigateSetParamAction(screen: AFUIID.screenPrototypeInstance,
+          param: AFScreenPrototypeScreenParam(id: screenId, param: action.param)
+      ));      
     } else {
+      // if this is an action that doesn't really dispatch, then bump the 
+      // screen update count artificially to allow tests to continue (they
+      // are waiting for a screen update.
+      AF.testOnlyScreenUpdateCount++;
+
       if(action is AFActionWithKey) {
         testContext?.registerAction(action);
-        AF.debug("Action: $action");
+        AF.debug("Registered action: $action");
       }
     }
   }

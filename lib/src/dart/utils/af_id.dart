@@ -21,6 +21,10 @@ class AFTestID extends AFID {
   AFTestID(String code) : super(code);
 }
 
+class AFTestSectionID extends AFID {
+  AFTestSectionID(String code) : super(code);
+}
+
 class AFStateTestID extends AFID {
   AFStateTestID(String code) : super(code);
 }

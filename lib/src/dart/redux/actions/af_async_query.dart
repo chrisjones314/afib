@@ -13,7 +13,7 @@ import 'package:afib/src/flutter/test/af_state_test.dart';
 /// how to process the result.
 abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActionWithKey {
 
-  AFAsyncQueryCustomError({AFID wid}): super(wid: wid);
+  AFAsyncQueryCustomError({AFID id}): super(id: id);
 
   /// Called internally when redux middleware begins processing a query.
   void startAsyncAF(AFDispatcher dispatcher, AFState state) {
@@ -46,5 +46,5 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
 /// A default version of [AFAsyncQueryCustomError] with the standard [AFQueryError] type, which is sufficient
 /// in most cases.
 abstract class AFAsyncQuery<TState, TResponse> extends AFAsyncQueryCustomError<TState, TResponse, AFQueryError> {
-  AFAsyncQuery({AFID wid}): super(wid: wid);
+  AFAsyncQuery({AFID id}): super(id: id);
 }

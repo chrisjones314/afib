@@ -7,77 +7,174 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/test/af_base_test_execute.dart';
+import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stack_trace/stack_trace.dart';
 
-abstract class AFScreenTestExecute {
-  Future<void> enterText(AFWidgetID wid, String text);
-  Future<void> tap(AFWidgetID wid);
-  Future<void> tapWithExpectedAction(AFActionWithKey specifier, Function(AFActionWithKey) checkQuery) async {
-    final wid = specifier.wid;
-    await tap(wid);
-    expectAction(specifier, checkQuery);    
-    return _pauseForRender();
+class AFTestSectionParamsFrame {
+  final Map<String, dynamic> values;
+
+  AFTestSectionParamsFrame(this.values);
+  factory AFTestSectionParamsFrame.initial() {
+    return AFTestSectionParamsFrame(Map<String, dynamic>());
   }
 
-  Future<void> tapWithActionType(AFActionWithKey action) async {
-    await tap(action.wid);
+
+  void setString(String key, String value) { values[key] = value; }
+  void setInt(String key, int value) { values[key] = value; }
+  void setObj(String key, dynamic obj) { values[key] = obj; }
+  void setWidget(String key, AFWidgetID wid) { values[key] = wid; }
+
+  String string(String key) { return values[key]; }
+  int integer(String key) { return values[key]; }
+  dynamic obj(String key) { return values[key]; }
+  AFWidgetID widget(String key) { return values[key]; }
+
+  AFTestSectionParamsFrame clone() {
+    return AFTestSectionParamsFrame(Map<String, dynamic>.from(this.values));
+  }
+}
+
+/// [AFTestSectionParams] enables you to reuse sections of test code
+/// by passing in different values as parameters.
+class AFTestSectionParams {
+  final frames = List<AFTestSectionParamsFrame>();
+
+  AFTestSectionParams() {
+    frames.add(AFTestSectionParamsFrame.initial());
+  }
+
+
+  AFTestSectionParamsFrame get _current { return frames.last; }
+
+  String string(String key) { return _current.string(key); }
+  int integer(String key) { return _current.integer(key); }
+  dynamic obj(String key) { return _current.obj(key); }
+  AFWidgetID widget(String key) { return _current.widget(key); }
+
+  void setString(String key, String val) { _current.setString(key, val); }
+  void setInteger(String key, int val) { _current.setInt(key, val); }
+  void setObj(String key, dynamic val) { _current.setObj(key, val); }
+  void setWidget(String key, AFWidgetID wid) { _current.setWidget(key, wid); }
+
+  void pushFrame() {
+    frames.add(frames.last.clone());
+  }
+
+  void popFrame() {
+    frames.removeLast();
+  }
+  
+}
+
+abstract class AFScreenTestExecute extends AFBaseTestExecute {
+  void expectOneWidget(AFWidgetID wid);
+  Future<void> enterText(AFWidgetID id, String text);
+  Future<void> tap(AFWidgetID wid);
+  Future<void> tapWithExpectedAction(AFWidgetID wid, AFActionWithKey specifier, Function(AFActionWithKey) checkQuery) async {
+    final previous = AF.testOnlyScreenUpdateCount;
+    await tap(wid);
+    expectAction(specifier, checkQuery);    
+    return _pauseForRender(previous);
+  }
+
+  Future<void> keepSynchronous() {
+    return Future<void>.delayed(Duration(milliseconds: 10), () {});
+  }
+
+  Future<void> tapWithActionType(AFWidgetID wid, AFActionWithKey action) async {
+    final previous = AF.testOnlyScreenUpdateCount;
+    await tap(wid);
     expectAction(action, (AFActionWithKey action) {
 
     });
-    return _pauseForRender();
+    return _pauseForRender(previous);
   }
 
-  void expectStringEquals(String l, String r);
+  Future<void> updateScreenData(dynamic data);
+
   void expectAction(AFActionWithKey specifier, Function(AFActionWithKey) checkAction);
   TExpected expectType<TExpected>(dynamic obj) {
     if(obj is TExpected) {
       return obj;
     }
-    _addError("Unexpected type ${obj.runtimeType}", 2);
+    addError("Unexpected type ${obj.runtimeType}", 2);
     return null;
   }
 
-  Future<void> _pauseForRender() async {
-    return Future<void>.delayed(Duration(milliseconds: 500), () {});
+  Future<void> executeNamedSection(AFTestSectionID id, AFTestSectionParams params);
+
+  Future<void> _pauseForRender(int previousCount) async {
+
+    /// wait for the screen element to be rebuilt.
+    var current = AF.testOnlyScreenUpdateCount;
+    int n = 0;
+    while(current == previousCount) {
+      await Future<void>.delayed(Duration(milliseconds: 100), () {});
+      current = AF.testOnlyScreenUpdateCount;
+      n++;
+      if(n > 10) {
+        throw new AFException("Timeout waiting for screen update.  You may need to pass noUpdate: true into one of the test manipulators if it does not produce an update.");
+      }
+    }
+
+    return Future<void>.delayed(Duration(milliseconds: 100));
   }
 
-  void _addError(String error, int depth);
+  void addError(String error, int depth);
 
 }
 
-abstract class AFScreenTestVerify {
-  void expectOneWidget(AFWidgetID wid);
-}
-
-typedef void AFScreenTestBodyExecuteFunc(AFScreenTestExecute exec);
-typedef void AFScreenTestBodyVerifyFunc(AFScreenTestVerify verify);
+typedef Future<void> AFScreenTestBodyExecuteFunc(AFScreenTestExecute exec, AFTestSectionParams params);
 
 
 class AFScreenTestBody {
+  final AFScreenTestGroup group;
   final sections = List<dynamic>();
+
+  AFScreenTestBody(this.group);
+
   bool get isNotEmpty { 
     return sections.isNotEmpty;
   }
 
 
-  void execute(AFScreenTestBodyExecuteFunc func) {
+  void execute(AFScreenTestBodyExecuteFunc func, {AFTestSectionID id}) {
     sections.add(func);
-  }
-
-  void verify(AFScreenTestBodyVerifyFunc func) {
-    sections.add(func);
-  }  
-
-  void run(AFScreenTestContext context) {
-    for(int i = 0; i < sections.length; i++) {
-      final section = sections[i];
-
-      section(context);
+    if(id != null) {
+      group.testMgr.addNamedTestSection(id, func);
     }
   }
+
+  void executeNamedSection(AFTestSectionID id, AFScreenTestExecute e, AFTestSectionParams params) {
+    final section = group.testMgr.findNamedTestSection(id);
+    if(section == null) {
+      throw new AFException("Attempt to executing undefined test section $id");
+    }
+    params.pushFrame();
+    section(e, params);
+    params.popFrame();
+  }
+
+
+  void run(AFScreenTestContext context, AFTestSectionParams params, { Function onEnd }) async {
+    for(int i = 0; i < sections.length; i++) {
+      final section = sections[i];
+      print("Running section $i");
+      final fut = section(context, params);
+      if(fut == null) {
+        throw AFException("Test section failed to return a future.  Make sure all test sections end with return e.keepSynchronous");
+      }
+      await fut;
+    }
+    print("finshed sections");
+    onEnd();
+
+  }
+
 }
 
 
@@ -116,17 +213,28 @@ class AFScreenTestContextWidgetTester extends AFScreenTestContext {
   }
   
   @override
-  void expectStringEquals(String l, String r) {
-    // TODO: implement expectStringEquals
+  void expectAction(AFActionWithKey specifier, Function(AFActionWithKey) checkAction) {
   }
 
   @override
-  void expectAction(AFActionWithKey specifier, Function(AFActionWithKey) checkAction) {
-    // TODO: implement expectAction
+  void addError(String error, int depth) {
+
   }
 
-  void _addError(String error, int depth) {
+  @override
+  Future<void> updateScreenData(data) {
+  }
 
+  @override
+  Future<void> executeNamedSection(AFTestSectionID id, AFTestSectionParams params) {
+    // TODO: implement executeNamedSection
+    throw UnimplementedError();
+  }
+
+  @override
+  bool addPassIf(bool test) {
+    // TODO: implement addPassIf
+    throw UnimplementedError();
   }
 }
 
@@ -181,7 +289,7 @@ class _AFScreenTestElementCache {
       }
     }
     
-    return null;
+    return List<Element>();
   }
 
   /// Rebuild our internal cache of paths to elements with keys.
@@ -222,32 +330,15 @@ class _AFScreenTestElementCache {
   }
 }
 
-
 class AFScreenTestContextSimulator extends AFScreenTestContext {
   final int runNumber;
   final elementCache = _AFScreenTestElementCache();
   final DateTime lastRun = DateTime.now();
-  final errors = List<String>();
   final recentActions = Map<String, AFActionWithKey>();
-  int pass = 0;
+  final AFDispatcher dispatcher;
 
-  AFScreenTestContextSimulator(AFScreenPrototypeTest test, this.runNumber): super(test);
-  
-  String get summaryText {
-    final sb = StringBuffer();
-    if(hasErrors) {
-      sb.write(errors.length);
-      sb.write(" failed");
-      sb.write(", ");
-    }    
-    sb.write(pass);
-    sb.write(" passed");
-    return sb.toString();
-  }
+  AFScreenTestContextSimulator(this.dispatcher, AFScreenPrototypeTest test, this.runNumber): super(test);
 
-  bool get hasErrors {
-    return errors.isNotEmpty;
-  }
 
   void registerAction(AFActionWithKey action) {
     final key = action.key;
@@ -256,20 +347,7 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
 
   void expectOneWidget(AFWidgetID wid) {
     Element elem = _findOneElement(wid);
-    _assert(elem != null);
-  }
-
-  @override
-  void expectQuery<TQuery extends AFAsyncQuery>(AFID id, Function(TQuery) checkQuery) {
-    /*
-    AFAsyncQuery query = recentQueries[id.code];
-    if(query == null) {
-      _addError("Failed to find query with id $id", 2);
-      return;
-    }
-    _assert(true);
-    checkQuery(query);
-    */
+    addPassIf(elem != null);
   }
 
   @override
@@ -277,22 +355,16 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
     final key = specifier.key;
     final found = recentActions[key];
     if(found == null) {
-      _addError("Failed to find action with key $key", 3);
+      addError("Failed to find action with key $key", 3);
       return;
     }
-    _assert(true);
+    addPassIf(true);
     checkAction(found);
   }
 
   
-  @override
-  void expectStringEquals(String l, String r) {
-    if(!_assert(l == r)) {
-      _addError("Expected $l found $r", 2);
-    }
-  }
-
   Future<void> enterText(AFWidgetID wid, String text) async {
+    final previous = AF.testOnlyScreenUpdateCount;
     Element elem = _findOneElement(wid);
     if(elem == null) {
       return;
@@ -304,19 +376,19 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
       print("Updating ${widget.key} with $text");
       widget.onChanged(text);
     } else {
-      _addError("enterText called on widget of unsupported type ${widget.runtimeType}", 2);
+      addError("enterText called on widget of unsupported type ${widget.runtimeType}", 2);
       return null;
     }
 
     // give redux a chance to rebuild the UI after this change.
-    return _pauseForRender();
+    return _pauseForRender(previous);
   }
 
   Element _findOneElement(AFWidgetID wid) {
     _updateCache();
     List<Element> elems = elementCache.findWithKey(AFUI.testKey(wid));
-    if(elems.length != 1) {
-      _addError("Expected 1 widget with code ${wid.code}, found ${elems.length}", 3);
+    if(elems?.length != 1) {
+      addError("Expected 1 widget with code ${wid.code}, found ${elems.length}", 3);
       return null;
     }
     return elems.first;
@@ -324,6 +396,7 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
 
   @override
   Future<void> tap(AFWidgetID wid) async {
+    final previous = AF.testOnlyScreenUpdateCount;
     Element elem = _findOneElement(wid);
     if(elem == null) {
       return null;
@@ -334,30 +407,43 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
       widget.onPressed();
     }
 
-    return _pauseForRender();
+    return _pauseForRender(previous);
   }
   
+  @override
+  Future<void> updateScreenData(dynamic data) {
+    final previous = AF.testOnlyScreenUpdateCount;
+    dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.test.id, data));
+    return _pauseForRender(previous);
+  }
+
+  @override
+  Future<void> executeNamedSection(AFTestSectionID id, AFTestSectionParams params) {
+    this.test.body.executeNamedSection(id, this, params);
+    return null;
+  }
+
+
   void _updateCache() {
     elementCache.refresh(AF.testOnlyScreenElement);
   }
 
-  bool _assert(bool shouldBeTrue) {
-    if(shouldBeTrue) {
-      pass++;
-    }
-    return shouldBeTrue;
-  }
-
-  void _addError(String desc, int depth) {
+  void addError(String desc, int depth) {
     final List<Frame> frames = Trace.current().frames;
     final Frame f = frames[depth];
     final loc = "${f.library}:${f.line}";
 
     final err = loc + ": " + desc;
-    errors.add(err);
+    dispatcher.dispatch(AFPrototypeScreenTestAddError(this.test.id, err));
     AF.debug(err);
   }
 
+  bool addPassIf(bool test) {
+    if(test) {
+      dispatcher.dispatch(AFPrototypeScreenTestIncrementPassCount(this.test.id));
+    }
+    return test;
+  }
 }
 
 /// All the information necessary to render a single screen for
@@ -384,17 +470,20 @@ class AFScreenPrototypeTest {
     return body.isNotEmpty;
   }
 
-  void run(AFScreenTestContext context) {
-    body.run(context);
+  void run(AFScreenTestContext context, { Function onEnd}) {
+    final params = AFTestSectionParams();
+    body.run(context, params, onEnd: onEnd);
   }
 }
 
 /// All the screen tests/prototypes associated with a single screen.
 class AFScreenTestGroup {
+  final AFScreenTests testMgr;
   AFBuildableWidget widget;
   List<AFScreenPrototypeTest> tests = List<AFScreenPrototypeTest>();
 
   AFScreenTestGroup({
+    @required this.testMgr, 
     @required this.widget,
   });
 
@@ -403,7 +492,7 @@ class AFScreenTestGroup {
   /// 
   /// Returns an [AFScreenTestBody], which can be used to create a 
   /// test for the screen.
-  AFScreenTestBody addPrototype({
+  AFScreenTestBody addSimplePrototype({
     @required AFTestID   id,
     @required dynamic data,
     @required dynamic param
@@ -413,7 +502,7 @@ class AFScreenTestGroup {
       data: data,
       param: param,
       widget: widget,
-      body: AFScreenTestBody()
+      body: AFScreenTestBody(this)
     );
     tests.add(instance);
     return instance.body;
@@ -424,12 +513,13 @@ class AFScreenTestGroup {
 /// with specific data for testing and prototyping purposes.
 class AFScreenTests<TState> {
   
+  final namedSections = Map<AFTestSectionID, AFScreenTestBodyExecuteFunc>();
   List<AFScreenTestGroup> groups = List<AFScreenTestGroup>();
 
   /// Add a screen widget, and then in the [addInstances] callback add one or more 
   /// data states to render with that screen.
   void addScreen(AFBuildableWidget widget, Function(AFScreenTestGroup) addInstances) {
-    AFScreenTestGroup group = AFScreenTestGroup(widget: widget);
+    AFScreenTestGroup group = AFScreenTestGroup(testMgr: this, widget: widget);
     addInstances(group);
     groups.add(group);
   }
@@ -446,5 +536,18 @@ class AFScreenTests<TState> {
   }
   
   List<AFScreenTestGroup> get all { return groups; }
+
+  void addNamedTestSection(AFTestSectionID id, AFScreenTestBodyExecuteFunc func) {
+    if(namedSections.containsKey(id)) {
+      throw new AFException("Attempt to register duplicate test section $id");
+    }
+    namedSections[id] = func;
+  }
+
+  AFScreenTestBodyExecuteFunc findNamedTestSection(AFTestSectionID id) {    
+    return namedSections[id];
+  }
+
+
 
 }

@@ -81,6 +81,7 @@ class AF {
   static AFScreenMap _afPrototypeScreenMap;
   static CreateAFApp _afCreateApp;
   static AFScreenID forcedStartupScreen;
+  static int testOnlyScreenUpdateCount = 0;
   static BuildContext testOnlyScreenElement;
 
   /// a key for referencing the Navigator for the material app.

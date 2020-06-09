@@ -4,6 +4,7 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
+import 'package:afib/src/flutter/af.dart';
 import 'package:afib/src/flutter/core/afui.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -99,12 +100,12 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
         child: Text('Run Test'),
         color: AFTheme.primaryBackground,
         textColor: AFTheme.primaryText,
-        onPressed: () {
+        onPressed: ()  {
           final scaffold = Scaffold.of(context.c);
           Navigator.pop(context.c);
 
           // give the drawer time to close, then 
-          Timer(Duration(seconds: 1), () {
+          Timer(Duration(seconds: 1), () async {
             final prevContext = context.s.testContext;
             var runNumber = 1;
             if(prevContext != null && prevContext.runNumber != null) {
@@ -112,7 +113,10 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
             }
 
             final testContext = AFScreenTestContextSimulator(context.d, test, runNumber);
+            final screenUpdateCount = AF.testOnlyScreenUpdateCount;
+            context.dispatch(AFUpdatePrototypeScreenTestDataAction(this.test.id, this.test.data));
             context.dispatch(AFStartPrototypeScreenTestAction(testContext));
+            await testContext.pauseForRender(screenUpdateCount);
             test.run(testContext, onEnd: () {
               scaffold.openEndDrawer();
             });

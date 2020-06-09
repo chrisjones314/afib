@@ -6,6 +6,7 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
@@ -78,11 +79,11 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
     final previous = AF.testOnlyScreenUpdateCount;
     await tap(wid);
     expectAction(specifier, checkQuery);    
-    return _pauseForRender(previous);
+    return pauseForRender(previous);
   }
 
   Future<void> keepSynchronous() {
-    return Future<void>.delayed(Duration(milliseconds: 10), () {});
+    return null;
   }
 
   Future<void> tapWithActionType(AFWidgetID wid, AFActionWithKey action) async {
@@ -91,7 +92,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
     expectAction(action, (AFActionWithKey action) {
 
     });
-    return _pauseForRender(previous);
+    return pauseForRender(previous);
   }
 
   Future<void> updateScreenData(dynamic data);
@@ -107,23 +108,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
 
   Future<void> executeNamedSection(AFTestSectionID id, AFTestSectionParams params);
 
-  Future<void> _pauseForRender(int previousCount) async {
-
-    /// wait for the screen element to be rebuilt.
-    var current = AF.testOnlyScreenUpdateCount;
-    int n = 0;
-    while(current == previousCount) {
-      await Future<void>.delayed(Duration(milliseconds: 100), () {});
-      current = AF.testOnlyScreenUpdateCount;
-      n++;
-      if(n > 10) {
-        throw new AFException("Timeout waiting for screen update.  You may need to pass noUpdate: true into one of the test manipulators if it does not produce an update.");
-      }
-    }
-
-    return Future<void>.delayed(Duration(milliseconds: 100));
-  }
-
+  Future<void> pauseForRender(int previousCount);
   void addError(String error, int depth);
 
 }
@@ -149,47 +134,76 @@ class AFScreenTestBody {
     }
   }
 
-  void executeNamedSection(AFTestSectionID id, AFScreenTestExecute e, AFTestSectionParams params) {
+  void _checkFutureExists(Future<void> test) {
+    if(test == null) {
+      throw AFException("Test section failed to return a future.  Make sure all test sections end with return AFScreenTestExecute.keepSynchronous()");
+    }
+  }
+
+
+  Future<void> executeNamedSection(AFTestSectionID id, AFScreenTestExecute e, AFTestSectionParams params) async {
     final section = group.testMgr.findNamedTestSection(id);
     if(section == null) {
       throw new AFException("Attempt to executing undefined test section $id");
     }
     params.pushFrame();
-    section(e, params);
+    Future<void> fut = section(e, params);
+    _checkFutureExists(fut);
+    await fut;
     params.popFrame();
+    return e.keepSynchronous();
   }
 
 
-  void run(AFScreenTestContext context, AFTestSectionParams params, { Function onEnd }) async {
+  Future<void> run(AFScreenTestContext context, AFTestSectionParams params, { Function onEnd }) async {
+    int sectionGuard = 0;
     for(int i = 0; i < sections.length; i++) {
       final section = sections[i];
-      print("Running section $i");
-      final fut = section(context, params);
-      if(fut == null) {
-        throw AFException("Test section failed to return a future.  Make sure all test sections end with return e.keepSynchronous");
+      sectionGuard++;
+      if(sectionGuard > 1) {
+        throw AFException("Test section $i is missing an await!");
       }
+      final fut = section(context, params);
+      _checkFutureExists(fut);
       await fut;
+      sectionGuard--;
     }
-    print("finshed sections");
-    onEnd();
-
+    if(onEnd != null) {
+      onEnd();
+    }
   }
 
 }
 
 
 abstract class AFScreenTestContext extends AFScreenTestExecute {
+  final recentActions = Map<String, AFActionWithKey>();
+  final AFDispatcher dispatcher;
+
   AFScreenPrototypeTest test;
-  AFScreenTestContext(this.test);
+  AFScreenTestContext(this.test, this.dispatcher);
 
   void expectOneWidget(AFWidgetID wid);
   Future<void> enterText(AFWidgetID wid, String text);
+
+  void registerAction(AFActionWithKey action) {
+    final key = action.key;
+    recentActions[key] = action;
+  }
+
+
+  @override
+  Future<void> executeNamedSection(AFTestSectionID id, AFTestSectionParams params) {
+    return this.test.body.executeNamedSection(id, this, params);
+  }
+
 }
 
 class AFScreenTestContextWidgetTester extends AFScreenTestContext {
-  WidgetTester tester;
+  final WidgetTester tester;
+  final AFApp app;
 
-  AFScreenTestContextWidgetTester(this.tester, AFScreenPrototypeTest test): super(test);
+  AFScreenTestContextWidgetTester(this.tester, this.app, AFScreenPrototypeTest test, AFDispatcher dispatcher): super(test, dispatcher);
   
   void expectOneWidget(AFWidgetID wid) {
     final widFinder = find.byKey(Key(wid.code));
@@ -198,18 +212,13 @@ class AFScreenTestContextWidgetTester extends AFScreenTestContext {
 
   Future<void> enterText(AFWidgetID wid, String text) async {
     final widFinder = find.byKey(AFUI.testKey(wid));
-    //await tester.enterText(widFinder, text);
+    await tester.enterText(widFinder, text);
   }
 
   @override
   Future<void> tap(AFWidgetID wid) async {
     final widFinder = find.byKey(AFUI.testKey(wid));
     await tester.tap(widFinder);
-  }
-
-  @override
-  void expectQuery<TQuery extends AFAsyncQuery>(AFID id, Function(TQuery) checkQuery) {
-      // TODO: implement expectQuery
   }
   
   @override
@@ -222,25 +231,27 @@ class AFScreenTestContextWidgetTester extends AFScreenTestContext {
   }
 
   @override
-  Future<void> updateScreenData(data) {
+  Future<void> pauseForRender(int previousCount) async {
+    return tester.pumpAndSettle();
   }
 
   @override
-  Future<void> executeNamedSection(AFTestSectionID id, AFTestSectionParams params) {
-    // TODO: implement executeNamedSection
-    throw UnimplementedError();
+  Future<void> updateScreenData(data) {
+    final previous = AF.testOnlyScreenUpdateCount;
+    dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.test.id, data));
+    return pauseForRender(previous);
   }
 
   @override
   bool addPassIf(bool test) {
-    // TODO: implement addPassIf
-    throw UnimplementedError();
+    return test;
   }
 }
 
 class _AFScreenTestElementCache {
   static const separator = "/";
   Element root;
+  int previousUpdateCount;
   Map<String, List<Element>> paths;
 
   /// Finals the elements that have [key] as their widget key.
@@ -293,13 +304,13 @@ class _AFScreenTestElementCache {
   }
 
   /// Rebuild our internal cache of paths to elements with keys.
-  void refresh(Element currentRoot) {
+  void refresh(Element currentRoot, int currentUpdateCount) {
     // nothing to do if the current root hasn't changed.
-    if(currentRoot == root) {
+    if(currentUpdateCount == previousUpdateCount) {
       return;
     }
 
-    root = currentRoot;
+    previousUpdateCount = currentUpdateCount;
     paths = Map<String, List<Element>>();
 
     _populateChildren(currentRoot, separator);
@@ -334,15 +345,12 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
   final int runNumber;
   final elementCache = _AFScreenTestElementCache();
   final DateTime lastRun = DateTime.now();
-  final recentActions = Map<String, AFActionWithKey>();
-  final AFDispatcher dispatcher;
 
-  AFScreenTestContextSimulator(this.dispatcher, AFScreenPrototypeTest test, this.runNumber): super(test);
+  AFScreenTestContextSimulator(AFDispatcher dispatcher, AFScreenPrototypeTest test, this.runNumber): super(test, dispatcher);
 
-
-  void registerAction(AFActionWithKey action) {
-    final key = action.key;
-    recentActions[key] = action;
+  @override
+  Future<void> keepSynchronous() {
+    return Future<void>.delayed(Duration(milliseconds: 10), () {});
   }
 
   void expectOneWidget(AFWidgetID wid) {
@@ -373,15 +381,14 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
     if(widget is TextField) {
       widget.onChanged(text);
     } else if(widget is AFTextField) {
-      print("Updating ${widget.key} with $text");
       widget.onChanged(text);
     } else {
-      addError("enterText called on widget of unsupported type ${widget.runtimeType}", 2);
+      addError("enterText called on widget ${widget.key} of unsupported type ${widget.runtimeType}", 2);
       return null;
     }
 
     // give redux a chance to rebuild the UI after this change.
-    return _pauseForRender(previous);
+    return pauseForRender(previous);
   }
 
   Element _findOneElement(AFWidgetID wid) {
@@ -407,25 +414,43 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
       widget.onPressed();
     }
 
-    return _pauseForRender(previous);
+    return pauseForRender(previous);
   }
   
   @override
   Future<void> updateScreenData(dynamic data) {
     final previous = AF.testOnlyScreenUpdateCount;
     dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.test.id, data));
-    return _pauseForRender(previous);
+    return pauseForRender(previous);
   }
 
   @override
   Future<void> executeNamedSection(AFTestSectionID id, AFTestSectionParams params) {
-    this.test.body.executeNamedSection(id, this, params);
-    return null;
+    return this.test.body.executeNamedSection(id, this, params);
   }
 
+  @override
+  Future<void> pauseForRender(int previousCount) async {
+
+    /// wait for the screen element to be rebuilt.
+    AF.internal?.fine("Starting _pauseForRender with $previousCount");
+    var current = AF.testOnlyScreenUpdateCount;
+    int n = 0;
+    while(current == previousCount) {
+      AF.internal?.fine("Pausing");
+      await Future<void>.delayed(Duration(milliseconds: 100), () {});
+      current = AF.testOnlyScreenUpdateCount;
+      n++;
+      if(n > 10) {
+        throw new AFException("Timeout waiting for screen update.  You may need to pass noUpdate: true into one of the test manipulators if it does not produce an update.");
+      }
+    }
+    AF.internal?.fine("Exiting _pauseForRender with count $current");
+    return Future<void>.delayed(Duration(milliseconds: 100));
+  }
 
   void _updateCache() {
-    elementCache.refresh(AF.testOnlyScreenElement);
+    elementCache.refresh(AF.testOnlyScreenElement, AF.testOnlyScreenUpdateCount);
   }
 
   void addError(String desc, int depth) {
@@ -456,7 +481,7 @@ class AFScreenPrototypeTest {
   dynamic data;
   dynamic param;
   AFScreenTestBody body;
-  AFBuildableWidget widget;
+  AFConnectedScreenWithoutRoute widget;
 
   AFScreenPrototypeTest({
     @required this.id,

@@ -146,6 +146,7 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
             AF.testOnlyScreenElement = buildContext;
             AF.testOnlyScreenUpdateCount++;
           }
+          AF.internal?.fine("Rebuilding screen $screen with updateCount ${AF.testOnlyScreenUpdateCount}");
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p);
           return buildWithContext(withContext);
         }

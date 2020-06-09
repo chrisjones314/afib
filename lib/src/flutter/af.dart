@@ -83,6 +83,7 @@ class AF {
   static AFScreenID forcedStartupScreen;
   static int testOnlyScreenUpdateCount = 0;
   static BuildContext testOnlyScreenElement;
+  static Logger internal;
 
   /// a key for referencing the Navigator for the material app.
   static final GlobalKey<NavigatorState> _afNavigatorKey = new GlobalKey<NavigatorState>();
@@ -117,8 +118,12 @@ class AF {
       p.initTestConfig(AF.config);
     }
 
+    bool verbose = AF.config.getBool(AFConfigConstants.internal_logging);
+    if(verbose != null && verbose) {
+      AF.internal = AF._afLogger;
+    }
 
-    AF.fine("Environment: " + AF.config.environment);
+    AF.internal?.fine("Environment: " + AF.config.environment);
 
     p.initScreenMap(AF.screenMap);
 

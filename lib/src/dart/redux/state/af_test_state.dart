@@ -91,7 +91,12 @@ class AFTestState {
   AFTestState updateStateData(AFTestID testId, dynamic data) {
     final revisedStates = Map<AFTestID, AFScreenTestState>.from(testStates);
     final currentState = revisedStates[testId];
-    revisedStates[testId] = currentState.reviseData(data);
+    if(currentState == null) {
+      revisedStates[testId] = AFScreenTestState(data: data, errors: List<String>(), pass: 0);    
+    } else {
+      revisedStates[testId] = currentState.reviseData(data);
+
+    }
     return copyWith(
       testStates: revisedStates
     );

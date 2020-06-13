@@ -38,7 +38,7 @@ class AFConfig {
   }
 
   bool get isWidgetTesterContext {
-    return getBool(AFConfigConstants.widget_tester_context);
+    return getBool(AFConfigConstants.widget_tester_context) ?? false;
   }
 
   // Returns true if our current mode requires prototype data.

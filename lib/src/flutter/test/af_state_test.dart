@@ -59,17 +59,25 @@ typedef void ProcessTest<TState>(AFStateTest<TState> test);
 typedef void ProcessVerify<TState>(AFStateTestContext context);
 
 class AFStateTests {
+  final Map<dynamic, dynamic> data = Map<dynamic, dynamic>();
   final List<AFStateTest<dynamic>> tests = List<AFStateTest<dynamic>>();
   AFStateTestContext<dynamic> context;
 
-  void test(AFStateTestID id, ProcessTest<dynamic> handler) {
-    final test = AFStateTest<dynamic>(id);
+  void queryTest(AFStateTestID id, AFAsyncQuery query, ProcessTest<dynamic> handler) {
+    final test = AFStateTest<dynamic>(id, query, this);
     tests.add(test);
     handler(test);
   }
 
-}
+  void registerData(dynamic id, dynamic data) {
+    data[id] = data;
+  }
 
+  dynamic lookupData(dynamic id) {
+    return data[id];
+  }
+
+}
 class _AFStateResultEntry {
   final AFAsyncQuery query;
   final ProcessQuery handler;
@@ -82,28 +90,40 @@ class _AFStateQueryEntry {
   _AFStateQueryEntry(this.query, this.verify);
 }
 
-
 class AFStateTest<TState> {
+  final AFStateTests tests;
   final AFStateTestID id;
+  final AFAsyncQuery query;
   final Map<String, _AFStateResultEntry> results = Map<String, _AFStateResultEntry>();
-  final List<_AFStateQueryEntry> queries = List<_AFStateQueryEntry>();
+  final List<_AFStateQueryEntry> postQueries = List<_AFStateQueryEntry>();
 
-  AFStateTest(this.id);
+  AFStateTest(this.id, this.query, this.tests);
     
-  void result<TQuery extends AFAsyncQuery>(TQuery query, ProcessQuery handler) {
+  void registerResult(AFAsyncQuery query, ProcessQuery handler) {
     results[query.key] = _AFStateResultEntry(query, handler);
   }
 
-  void query<TQuery extends AFAsyncQuery>(TQuery query, { ProcessVerify<TState> verify }) {
-  queries.add(_AFStateQueryEntry(query, verify));
+  /// 
+  void specifySecondaryResponseWithId(AFAsyncQuery query, dynamic idData) {
+    registerResult(query, (AFStateTestContext context, AFAsyncQuery query) {
+      final data = tests.lookupData(idData);
+      query.testFinishAsyncWithResponse(context, data);
+    });
   }
 
+  void specifyPrimaryResponseWithId(dynamic idData) {
+    specifySecondaryResponseWithId(this.query, idData);
+  }
+
+  void verifyAfter(ProcessVerify verify) {
+    postQueries.add(_AFStateQueryEntry(query, verify));
+  }
 
   /// Execute the test by kicking of its queries, then 
   void execute(AFStateTestContext context) {    
     AFStateTestContext.setCurrentTest(context);
     // basically, we need to go through an execute each query that they specified.
-    queries.forEach((q) {
+    postQueries.forEach((q) {
       // lookup the result for that query
       processQuery(context, q.query);
       q?.verify(context);

@@ -1,4 +1,5 @@
 import 'package:afib/afib_flutter.dart';
+import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/middleware/af_async_queries.dart';
 import 'package:afib/src/dart/redux/middleware/af_query_middleware.dart';
 import 'package:afib/src/dart/redux/middleware/af_route_middleware.dart';
@@ -84,6 +85,7 @@ class AF {
   static int testOnlyScreenUpdateCount = 0;
   static BuildContext testOnlyScreenElement;
   static Logger internal;
+  static Map<String, AFAsyncQueryListenerCustomError> listenerQueries = Map<String, AFAsyncQueryListenerCustomError>();
 
   /// a key for referencing the Navigator for the material app.
   static final GlobalKey<NavigatorState> _afNavigatorKey = new GlobalKey<NavigatorState>();
@@ -129,7 +131,7 @@ class AF {
 
     AF.setInitialAppStateFactory(p.initialAppState);
     AF.setAppReducer(appReducer);
-    AF.setCreateStartupQueryAction(createStartupQueryAction);
+    AF.setCreateStartupQueryAction(p.createStartupQueryAction);
 
     List<Middleware<AFState>> middleware = List<Middleware<AFState>>();
     middleware.addAll(createRouteMiddleware());
@@ -247,6 +249,39 @@ class AF {
   /// You should never ever reference this store directly, as it might not always exist.
   static AFStore get store {
     return _afStore;
+  }
+
+  /// Register an ongoing listener query which must eventually be shut down.  
+  /// 
+  /// This is used internally by AFib anytime you dispatch a listener query,
+  /// you should not call it directly.
+  static void registerListenerQuery(AFAsyncQueryListenerCustomError query) {
+    final key = query.key;
+    AF.internal?.fine("Registering listener query $key");
+    final current = listenerQueries[key];
+    if(current != null) {
+      current.afShutdown();
+    }
+    listenerQueries[key] = query;
+  }
+
+  /// Shutdown all outstanding listener queries using [AFAsyncQueryListenerCustomError.shutdown]
+  /// 
+  /// You might use this to shut down outstanding listener queries when a user logs out.
+  static void shutdownListenerQueries() {
+    for(var query in listenerQueries.values) { 
+      query.afShutdown();
+    };
+    listenerQueries.clear();
+  }
+
+  /// Shutdown a single outstanding listener query using [AFAsyncQueryListnerCustomError.shutdown]
+  static void shutdownListenerQuery(String key) {
+    final query = listenerQueries[key];
+    if(query != null) {
+      query.shutdown();
+      listenerQueries[key] = null;
+    }
   }
 
   /// Prepends "AF: " to a fine level log message.

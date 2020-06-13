@@ -19,7 +19,7 @@ class AFCircularProgressIndicator extends StatelessWidget {
     this.value, 
     this.backgroundColor, 
     this.valueColor, 
-    this.strokeWidth, 
+    this.strokeWidth = 4.0, 
     this.semanticsLabel, 
     this.semanticsValue});
 

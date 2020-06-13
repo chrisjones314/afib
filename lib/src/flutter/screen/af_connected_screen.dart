@@ -220,7 +220,10 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
   @override
   bool shouldIgnoreChangeAF(AFState state) { 
     final param = findParam(state);
-    return (param == null);
+    if(param == null) {
+      return true;
+    }
+    return shouldIgnoreChange(state.app);
    }
 
   /// Find the route parameter for the specified named screen

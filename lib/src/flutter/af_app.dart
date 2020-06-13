@@ -26,12 +26,25 @@ abstract class AFApp<AppState> extends StatelessWidget {
   /// Construct an app with the specified [AFScreenMap]
   AFApp();
 
+  ///
+  void afBeforeRunApp() {
+    beforeRunApp();
+  }
+
+  void afAfterRunApp() {
+    afterRunApp();
+    AF.shutdownListenerQueries();
+  }
+
   /// Called before the main flutter runApp loop.  
+  /// 
   /// Do setup here.
   void beforeRunApp() {
   }
 
-  /// Called after the main runApp loop.  Do cleanup here.
+  /// Called after the main runApp loop.  
+  /// 
+  /// Do cleanup here.
   void afterRunApp() {
 
   }

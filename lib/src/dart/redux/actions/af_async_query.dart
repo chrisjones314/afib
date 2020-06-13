@@ -17,9 +17,11 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
 
   /// Called internally when redux middleware begins processing a query.
   void startAsyncAF(AFDispatcher dispatcher, AFState state) {
-    AF.logger.fine("Starting query: ${toString()}");
-    startAsync( (TResponse result, TError error) {
-      finishAsync(dispatcher, state.app, result, error);
+    AF.logger.fine("Starting query: $this");
+    startAsync( (TResponse result) { 
+      finishAsyncWithResponse(dispatcher, state.app, result);
+    }, (TError error) {
+      finishAsyncWithError(dispatcher, state.app, error);
     });
   }
 
@@ -28,18 +30,21 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
   /// command. 
   /// 
   /// The implementation should call either [onResponse] or [onError], which will in turn
-  /// call finishAsync.
-  void startAsync( Function(TResponse response, TError error) onResponse);  
+  /// call [finishAsyncWithResult] or [finishAsyncWithError].
+  void startAsync(Function(TResponse) onResponse, Function(TError) onError);
 
   /// Called when the asynchronous process completes with a response  It should merge the results 
   /// into the state (preserving immutability by making copies of the relevant portions of the state using copyWith), 
   /// and then use the dispatcher to call set actions for any modified 
   /// state elements.
-  void finishAsync(AFDispatcher dispatcher, TState state, TResponse response, TError error);
+  void finishAsyncWithResponse(AFDispatcher dispatcher, TState state, TResponse response);
+
+  
+  void finishAsyncWithError(AFDispatcher dispatcher, TState state, TError error);
 
   /// Called during testing to simulate results from an asynchronous call.
-  void testFinishAsync(AFStateTestContext context, TResponse response, TError error) {
-    finishAsync(context.dispatcher, context.state, response, error);
+  void testFinishAsyncWithResponse(AFStateTestContext context, TResponse response) {
+    finishAsyncWithResponse(context.dispatcher, context.state, response);
   }
 }
 
@@ -47,4 +52,27 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
 /// in most cases.
 abstract class AFAsyncQuery<TState, TResponse> extends AFAsyncQueryCustomError<TState, TResponse, AFQueryError> {
   AFAsyncQuery({AFID id}): super(id: id);
+}
+
+
+/// A version of [AFAsyncQueryCustomError] for queries that have some kind of ongoing
+/// connection or state that needs to be shutdown.  
+/// 
+/// Afib will automatically track these queries when you dispatch them.  You can dispatch the
+/// [AFShutdownQueryListeners] action to call the shutdown method on some or all outstanding
+/// listeners.  
+abstract class AFAsyncQueryListenerCustomError<TState, TResponse, TError> extends AFAsyncQueryCustomError<TState, TResponse, TError> {
+  AFAsyncQueryListenerCustomError({AFID id}): super(id: id);
+
+  void afShutdown() {
+    AF.internal?.fine("Shutting down listener query $key");
+    shutdown();
+  }
+
+  void shutdown();
+}
+
+/// A version of [AFAsyncQueryListenerCustomError] which users [AFQueryError] for errors.
+abstract class AFAsyncQueryListener<TState, TResponse> extends AFAsyncQueryListenerCustomError<TState, TResponse, AFQueryError> {
+    AFAsyncQueryListener({AFID id}): super(id: id);
 }

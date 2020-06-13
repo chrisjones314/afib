@@ -446,7 +446,6 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
       }
     }
     AF.internal?.fine("Exiting _pauseForRender with count $current");
-    return Future<void>.delayed(Duration(milliseconds: 100));
   }
 
   void _updateCache() {

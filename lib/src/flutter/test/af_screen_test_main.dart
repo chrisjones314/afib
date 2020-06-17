@@ -1,18 +1,15 @@
 
 
 import 'package:afib/afib_dart.dart';
-import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
-import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/af.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_prototype_dispatcher.dart';
 import 'package:afib/src/flutter/test/af_simple_prototype_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Future<void> afScreenTestMain(WidgetTester tester) async {
-  AF.config.setBool(AFConfigConstants.widget_tester_context, true);
+  AF.config.setBool(AFConfigConstants.widgetTesterContext, true);
   final app = AF.createApp();
   await tester.pumpWidget(app);
 

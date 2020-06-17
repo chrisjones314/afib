@@ -23,7 +23,7 @@ import 'package:redux/redux.dart';
 typedef dynamic InitializeAppState();
 
 class AFInitParams<AppState> {
-  final InitConfiguration initEnvironment;
+  final InitConfiguration initAfib;
   final InitConfiguration initAppConfig;
   final InitConfiguration initDebugConfig;
   final InitConfiguration initProductionConfig;
@@ -31,7 +31,6 @@ class AFInitParams<AppState> {
   final InitConfiguration initTestConfig;
   final InitScreenMap         initScreenMap;
   final InitializeAppState       initialAppState;
-  final InitAsyncQueries initAsyncQueries;
   final CreateStartupQueryAction createStartupQueryAction;
   final CreateAFApp createApp;
   final InitStateTests initStateTests;
@@ -41,7 +40,7 @@ class AFInitParams<AppState> {
   final String forceEnv;
   
   AFInitParams({
-    @required this.initEnvironment,
+    @required this.initAfib,
     @required this.initAppConfig,
     @required this.initDebugConfig,
     @required this.initProductionConfig,
@@ -49,7 +48,6 @@ class AFInitParams<AppState> {
     @required this.initTestConfig,
     @required this.initScreenMap,
     @required this.initialAppState,
-    @required this.initAsyncQueries,
     @required this.createStartupQueryAction,
     @required this.createApp,
     @required this.initStateTests,
@@ -104,7 +102,7 @@ class AF {
     });  
 
     // first do the separate initialization that just says what environment it is, since this
-    p.initEnvironment(AF.config);
+    p.initAfib(AF.config);
     if(p.forceEnv != null) {
       AF.config.setString(AFConfigConstants.environmentKey, p.forceEnv);
     }
@@ -116,11 +114,11 @@ class AF {
       p.initProductionConfig(AF.config);
     } else if(env == AFConfigConstants.prototype) {
       p.initPrototypeConfig(AF.config);
-    } else if(env == AFConfigConstants.test_store) {
+    } else if(env == AFConfigConstants.testStore) {
       p.initTestConfig(AF.config);
     }
 
-    bool verbose = AF.config.getBool(AFConfigConstants.internal_logging);
+    bool verbose = AF.config.getBool(AFConfigConstants.internalLogging);
     if(verbose != null && verbose) {
       AF.internal = AF._afLogger;
     }
@@ -271,7 +269,7 @@ class AF {
   static void shutdownListenerQueries() {
     for(var query in listenerQueries.values) { 
       query.afShutdown();
-    };
+    }
     listenerQueries.clear();
   }
 

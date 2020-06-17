@@ -41,9 +41,18 @@ class AFRouteSegment {
 /// The current route, a list of nested screens and the data associated with them.
 @immutable
 class AFRouteState {
+  /// Tracks the segement which was just popped off the route. 
+  /// 
+  /// When Flutter animates a screen transition, it rebuilds both the current and
+  /// new screens.  During this interim period, it is conventient to still have 
+  /// access to the data in the route segment that was just popped, even though
+  /// it is not the final route segment anymore.  This is where we store that value.
+  final AFRouteSegment priorLastSegment;
+  
+  
   final List<AFRouteSegment> route;
 
-  AFRouteState({this.route});  
+  AFRouteState({this.route, this.priorLastSegment});  
 
   /// Creates the default initial state.
   factory AFRouteState.initialState() {
@@ -54,20 +63,27 @@ class AFRouteState {
 
   /// Returns the segment in the current route associated with the 
   /// specified screen.
-  AFRouteSegment findSegmentFor(AFScreenID screen) {
+  AFRouteSegment _findSegmentFor(AFScreenID screen, bool includePrior) {
     for(int i = route.length - 1; i >= 0; i--) {
       AFRouteSegment segment = route[i];
       if(segment.screen == screen) {
         return segment;
       }
     }
+    if(includePrior && screen == priorLastSegment?.screen) {
+      return priorLastSegment;
+    }
     return null;
 
   }
 
-  /// Finds the data associated with the specified screen in the current route.
-  AFRouteParam findParamFor(AFScreenID screen) {
-    AFRouteSegment seg = findSegmentFor(screen);
+  /// Finds the data associated with the specified [screen] in the current route.
+  /// 
+  /// If [includePrior] is true, it will also include the most recent final segment
+  /// in the search.  This is useful when the final segement has been popped off the route,
+  /// but still needs to be included in the search.
+  AFRouteParam findParamFor(AFScreenID screen, bool includePrior) {
+    AFRouteSegment seg = _findSegmentFor(screen, includePrior);
     if(seg == null) {
       return null;
     }
@@ -88,10 +104,11 @@ class AFRouteState {
   /// and data in its place.
   AFRouteState popAndPushNamed(AFScreenID screen, AFRouteParam param) {
     final newRoute = copyRoute();
-    newRoute.removeLast();
+    final prior = newRoute.removeLast();
     newRoute.add(AFRouteSegment.withParam(screen, param));
     return copyWith(
-      route: newRoute
+      route: newRoute,
+      priorLastSegment: prior
     );
   }
 
@@ -108,9 +125,10 @@ class AFRouteState {
   /// screen.
   AFRouteState pop(dynamic childReturn) {
     final revised = copyRoute();
-    revised.removeLast();
+    final prior = revised.removeLast();
     return copyWith(
-      route: revised
+      route: revised,
+      priorLastSegment: prior
     );
   }
 
@@ -131,10 +149,15 @@ class AFRouteState {
 
   /// Removes all existing segments in the route, and adds back the specified screen/data.
   AFRouteState replaceAll(AFScreenID screen, AFRouteParam param) {
+    AFRouteSegment prior;
+    if(!route.isEmpty) {
+      prior = route.last;
+    }
     List<AFRouteSegment> revised = new List<AFRouteSegment>();
     revised.add(AFRouteSegment.withParam(screen, param));
     return copyWith(
-      route: revised
+      route: revised,
+      priorLastSegment: prior
     );
   }
 
@@ -145,10 +168,12 @@ class AFRouteState {
 
   //---------------------------------------------------------------------------------------
   AFRouteState copyWith({
-    List<AFRouteSegment> route
+    List<AFRouteSegment> route,
+    AFRouteSegment priorLastSegment
   }) {
     return new AFRouteState(
-      route: route ?? this.route
+      route: route ?? this.route,
+      priorLastSegment: priorLastSegment
     );
   }
 

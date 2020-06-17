@@ -2,11 +2,13 @@
 
 import 'dart:async';
 
-import 'package:afib/afib_dart.dart';
-import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
+import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:afib/src/flutter/af.dart';
 import 'package:afib/src/flutter/af_app.dart';
+import 'package:afib/src/flutter/core/af_text_field.dart';
+import 'package:afib/src/flutter/core/afui.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
@@ -111,6 +113,14 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
   Future<void> pauseForRender(int previousCount);
   void addError(String error, int depth);
 
+  static String composeError(String desc, int depth) {
+    final List<Frame> frames = Trace.current().frames;
+    final Frame f = frames[depth+1];
+    final loc = "${f.library}:${f.line}";
+
+    final err = loc + ": " + desc;
+    return err;
+  }
 }
 
 typedef Future<void> AFScreenTestBodyExecuteFunc(AFScreenTestExecute exec, AFTestSectionParams params);
@@ -453,11 +463,7 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
   }
 
   void addError(String desc, int depth) {
-    final List<Frame> frames = Trace.current().frames;
-    final Frame f = frames[depth];
-    final loc = "${f.library}:${f.line}";
-
-    final err = loc + ": " + desc;
+    String err = AFScreenTestExecute.composeError(desc, depth);
     dispatcher.dispatch(AFPrototypeScreenTestAddError(this.test.id, err));
     AF.debug(err);
   }

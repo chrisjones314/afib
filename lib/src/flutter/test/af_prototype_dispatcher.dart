@@ -1,7 +1,7 @@
 
 import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
+import 'package:afib/src/dart/utils/af_object_with_key.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/test/af_simple_prototype_screen.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
@@ -35,7 +35,7 @@ class AFPrototypeDispatcher extends AFDispatcher {
       // are waiting for a screen update.
       AF.testOnlyScreenUpdateCount++;
 
-      if(action is AFActionWithKey) {
+      if(action is AFObjectWithKey) {
         testContext?.registerAction(action);
         AF.debug("Registered action: $action");
       }

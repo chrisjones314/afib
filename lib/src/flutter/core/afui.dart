@@ -29,5 +29,11 @@ class AFUI {
     return Key(wid.code);
   }
 
+  static Key key3(String a, String b, String c) {
+    final full = a + "_" + b + "_" + c;
+    return Key(full);
+  }
+
+
 
 }

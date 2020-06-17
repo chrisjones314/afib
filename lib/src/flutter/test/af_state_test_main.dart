@@ -1,5 +1,6 @@
 
 
+import 'package:afib/afib_dart.dart';
 import 'package:afib/src/flutter/af.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,28 +23,38 @@ class AFibTestsFailedMatcher extends Matcher {
 /// The main function which executes the store test defined in your initStateTests function.
 void afStateTestMain() {
   final tests = AF.stateTests;
-  final errorContexts = List<AFStateTestContext>();
+  final contexts = List<AFStateTestContext>();
 
   tests.tests.forEach((test) {
     final context = AFStateTestContext(test, isTrueTestContext: true);
+    
+    context.store.dispatch(AFResetToInitialStateAction());
     test.execute(context);
-    if(context.hasErrors) {
-      errorContexts.add(context);
-    }
+    contexts.add(context);
   });
 
-  if(errorContexts.isNotEmpty) {
-    print("------------------------------\nAfib State Test Errors:\n");
-    int totalErrors = 0;
-    errorContexts.forEach((context) {
-      final test = context.test;
+  print("------------------------------\nAfib State Tests:\n");
+  for(var context in contexts) {
+    final test = context.test;
+    if(!context.hasErrors) {
+      print("    ${test.id.code}: ${context.pass} passed");
+    }
+  }
+
+  int totalErrors = 0;
+  for(var context in contexts) {
+    final test = context.test;
+    if(context.hasErrors) {
       print("    ${test.id.code}:");
       context.errors.forEach((error) {
         print("        $error");
       });
       totalErrors += context.errors.length;
-    });
-    print("------------------------------");
+    }
+  }
+  print("------------------------------");
+  if(totalErrors > 0) {
     expect("$totalErrors errors (see details above)", AFibTestsFailedMatcher());
   }
+
 }

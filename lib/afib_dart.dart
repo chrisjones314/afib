@@ -19,4 +19,6 @@ export "src/dart/redux/actions/af_app_state_actions.dart";
 export "src/dart/redux/state/af_app_state.dart";
 export "src/dart/utils/af_id.dart";
 export "src/dart/redux/state/af_route_state.dart";
+export "src/dart/utils/af_object_with_key.dart";
 export "src/dart/redux/actions/af_action_with_key.dart";
+export "src/dart/redux/state/af_ui_state.dart";

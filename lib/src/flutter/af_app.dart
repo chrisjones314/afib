@@ -9,7 +9,6 @@ import '../../afib_dart.dart';
 /// Used to populate the screen map used to associate keys with screens.
 typedef void InitScreenMap(AFScreenMap map);
 typedef void InitConfiguration(AFConfig config);
-typedef void InitAsyncQueries(AFAsyncQueries queries);
 typedef dynamic CreateStartupQueryAction();
 typedef AFApp CreateAFApp();
 typedef void InitScreenTests(AFScreenTests tests);

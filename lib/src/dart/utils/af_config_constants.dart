@@ -12,12 +12,12 @@ class AFConfigConstants {
   static final production = "production";
   static final debug = "debug";
   static final prototype = "prototype";
-  static final test_store = "test_store";
-  static final allEnvironments = [production, debug, prototype, test_store];
+  static final testStore = "test_store";
+  static final allEnvironments = [production, debug, prototype, testStore];
 
   /// Used to turn on debug logging that may be useful in finding problems in 
   /// the Afib framework, off by default.
-  static final internal_logging = "internal_logging";
+  static final internalLogging = "internal_logging";
 
   /// Set to true only when running under a flutter WidgetTester test.
   /// 
@@ -26,7 +26,7 @@ class AFConfigConstants {
   /// you should use widgets like [AFCircularProgressIndicator], which use this flag,
   /// by way of the utility [AFConfig.isWidgetTesterContext] to return static widgets
   /// instead of an infinite animation in the widget tester context.
-  static final widget_tester_context = "widget_tester_context";
+  static final widgetTesterContext = "widget_tester_context";
 
 
 }

@@ -79,6 +79,26 @@ class AFStoreConnectorData<TV1, TV2, TV3, TV4> {
 
 }
 
+@immutable
+class AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> extends AFStoreConnectorData<TV1, TV2, TV3, TV4> {
+  final TV5 fifth;
+  final TV6 sixth;
+  final TV7 seventh;
+  final TV8 eighth;
+
+  AFStoreConnectorDataExtended({TV1 first, TV2 second, TV3 third, TV4 fourth, this.fifth, this.sixth, this.seventh, this.eighth}):
+    super(first: first, second: second, third: third, fourth: fourth);
+
+  bool operator==(o) {
+    bool result = (o is AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> 
+      && first == o.first && second == o.second && third == o.third && fourth == o.fourth
+      && fifth == o.fifth && sixth == o.sixth && seventh == o.seventh && eighth == o.eighth);
+    return result;
+  }
+
+}
+
+
 /// Use this version of [AFStoreConnectorData] if you only need one piece of data from the store.
 @immutable 
 class AFStoreConnectorData1<TV1> extends AFStoreConnectorData<TV1, AFUnused, AFUnused, AFUnused> {
@@ -101,6 +121,12 @@ class AFStoreConnectorData3<TV1, TV2, TV3> extends AFStoreConnectorData<TV1, TV2
 @immutable 
 class AFStoreConnectorData4<TV1, TV2, TV3, TV4> extends AFStoreConnectorData<TV1, TV2, TV3, TV4> {
   AFStoreConnectorData4({TV1 first, TV2 second, TV3 third, TV4 fourth}): super(first: first, second: second, third: third, fourth: fourth);
+}
+
+/// User this version of [AFStoreConnectorDataExtended] if you need five pieces of data from the store.
+class AFStoreConnectorData5<TV1, TV2, TV3, TV4, TV5> extends AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, AFUnused, AFUnused, AFUnused> {
+  AFStoreConnectorData5({TV1 first, TV2 second, TV3 third, TV4 fourth, TV5 fifth}): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth);
+
 }
 
 /// This common superclass makes it possible to treat all afib Widgets/screens
@@ -126,11 +152,14 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AFState, AFBuildContext>(
-        converter: (store) => createContext(null, AFStoreDispatcher(store), createDataAF(store.state), findParam(store.state)),
-        distinct: true,
         ignoreChange: (AFState state) {
           return shouldIgnoreChangeAF(state);
         },
+        converter: (store) {
+          final context = createContext(null, AFStoreDispatcher(store), createDataAF(store.state), findParam(store.state));
+          return context;
+        },
+        distinct: true,
         onInit: (store) {
           final data = createDataAF(store.state);
           onInit(data);
@@ -146,7 +175,7 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
             AF.testOnlyScreenElement = buildContext;
             AF.testOnlyScreenUpdateCount++;
           }
-          AF.internal?.fine("Rebuilding screen $screen with updateCount ${AF.testOnlyScreenUpdateCount}");
+          AF.internal?.fine("Rebuilding screen $runtimeType with updateCount ${AF.testOnlyScreenUpdateCount} and param ${dataContext.p}");
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p);
           return buildWithContext(withContext);
         }
@@ -168,7 +197,8 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
 
   /// If you are looking to customize this behavior, override [shouldIngoreChange] instead.
   bool shouldIgnoreChangeAF(AFState state) { 
-    return shouldIgnoreChange(state.app);
+    bool result = shouldIgnoreChange(state.app);
+    return result;
   }
 
   /// Override this method if you want to prevent re-rendering under certain states.
@@ -228,7 +258,7 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
 
   /// Find the route parameter for the specified named screen
   AFRouteParam findParam(AFState state) {
-    return state.route?.findParamFor(this.screen);
+    return state.route?.findParamFor(this.screen, true);
   }
 }
 
@@ -239,7 +269,7 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
 abstract class AFConnectedWidget<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithoutRoute<TState, TData, TRouteParam> {
   final TRouteParam parentParam;
 
-  AFConnectedWidget(this.parentParam): super(null);
+AFConnectedWidget(this.parentParam): super(null);
 }
 
 /// Use this to connect a drawer to the store.
@@ -281,6 +311,11 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   BuildContext get c { return context; }
   void dispatch(dynamic action) { dispatcher.dispatch(action); }
 
+  bool operator==(o) {
+    bool result = (o is AFBuildContext<TData, TRouteParam> && param == o.param && storeData == o.storeData);
+    return result;
+  }
+
   void enableTestContext(AFScreenPrototypeTest st) {
     screenTest = st;
   }
@@ -288,7 +323,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   Widget createDebugDrawer() {
     if(screenTest != null) {
       return AFTestDrawer(screenTest);
-    };
+    }
     return null;
   }
 

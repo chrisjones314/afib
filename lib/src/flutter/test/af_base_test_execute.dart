@@ -8,7 +8,7 @@ abstract class AFBaseTestExecute {
     if(!addPassIf(matcher.matches(value, matchState))) {
       final matchDesc = matcher.describe(flutter_test.StringDescription());
       final desc = "Expected $matchDesc, found $value";
-      addError(desc, 1);
+      addError(desc, 2);
     }
   }
 

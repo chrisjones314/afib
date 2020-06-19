@@ -443,11 +443,11 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
   Future<void> pauseForRender(int previousCount) async {
 
     /// wait for the screen element to be rebuilt.
-    AF.internal?.fine("Starting _pauseForRender with $previousCount");
+    AF.logInternal?.fine("Starting _pauseForRender with $previousCount");
     var current = AF.testOnlyScreenUpdateCount;
     int n = 0;
     while(current == previousCount) {
-      AF.internal?.fine("Pausing");
+      AF.logInternal?.fine("Pausing");
       await Future<void>.delayed(Duration(milliseconds: 100), () {});
       current = AF.testOnlyScreenUpdateCount;
       n++;
@@ -455,7 +455,7 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
         throw new AFException("Timeout waiting for screen update.  You may need to pass noUpdate: true into one of the test manipulators if it does not produce an update.");
       }
     }
-    AF.internal?.fine("Exiting _pauseForRender with count $current");
+    AF.logInternal?.fine("Exiting _pauseForRender with count $current");
   }
 
   void _updateCache() {

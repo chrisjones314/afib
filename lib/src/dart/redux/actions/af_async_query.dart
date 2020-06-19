@@ -72,7 +72,7 @@ abstract class AFAsyncQueryListenerCustomError<TState, TResponse, TError> extend
   AFAsyncQueryListenerCustomError({AFID id}): super(id: id);
 
   void afShutdown() {
-    AF.internal?.fine("Shutting down listener query $key");
+    AF.logInternal?.fine("Shutting down listener query $key");
     shutdown();
   }
 

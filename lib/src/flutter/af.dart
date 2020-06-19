@@ -1,5 +1,6 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
+import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/middleware/af_async_queries.dart';
 import 'package:afib/src/dart/redux/middleware/af_query_middleware.dart';
 import 'package:afib/src/dart/redux/middleware/af_route_middleware.dart';
@@ -82,8 +83,9 @@ class AF {
   static AFScreenID forcedStartupScreen;
   static int testOnlyScreenUpdateCount = 0;
   static BuildContext testOnlyScreenElement;
-  static Logger internal;
+  static Logger logInternal;
   static Map<String, AFAsyncQueryListenerCustomError> listenerQueries = Map<String, AFAsyncQueryListenerCustomError>();
+  static Map<String, AFDeferredQueryCustomError> deferredQueries = Map<String, AFDeferredQueryCustomError>();
 
   /// a key for referencing the Navigator for the material app.
   static final GlobalKey<NavigatorState> _afNavigatorKey = new GlobalKey<NavigatorState>();
@@ -120,10 +122,10 @@ class AF {
 
     bool verbose = AF.config.getBool(AFConfigConstants.internalLogging);
     if(verbose != null && verbose) {
-      AF.internal = AF._afLogger;
+      AF.logInternal = AF._afLogger;
     }
 
-    AF.internal?.fine("Environment: " + AF.config.environment);
+    AF.logInternal?.fine("Environment: " + AF.config.environment);
 
     p.initScreenMap(AF.screenMap);
 
@@ -255,22 +257,43 @@ class AF {
   /// you should not call it directly.
   static void registerListenerQuery(AFAsyncQueryListenerCustomError query) {
     final key = query.key;
-    AF.internal?.fine("Registering listener query $key");
+    AF.logInternal?.fine("Registering listener query $key");
     final current = listenerQueries[key];
     if(current != null) {
       current.afShutdown();
     }
     listenerQueries[key] = query;
+    
+  }
+
+  /// Register a query which executes asynchronously later.
+  /// 
+  /// This is used internally by AFib anytime you dispatch a deferred query,
+  /// you should not call it directly.
+  static void registerDeferredQuery(AFDeferredQueryCustomError query) {
+    final key = query.key;
+    AF.logInternal?.fine("Registering deferred query $key");
+    final current = deferredQueries[key];
+    if(current != null) {
+      current.afShutdown();
+    }
+    deferredQueries[key] = query;
+    
   }
 
   /// Shutdown all outstanding listener queries using [AFAsyncQueryListenerCustomError.shutdown]
   /// 
   /// You might use this to shut down outstanding listener queries when a user logs out.
-  static void shutdownListenerQueries() {
+  static void shutdownOutstandingQueries() {
     for(var query in listenerQueries.values) { 
       query.afShutdown();
     }
     listenerQueries.clear();
+
+    for(var query in deferredQueries.values) {
+      query.afShutdown();
+    }
+    deferredQueries.clear();
   }
 
   /// Shutdown a single outstanding listener query using [AFAsyncQueryListnerCustomError.shutdown]

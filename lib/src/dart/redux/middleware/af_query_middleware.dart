@@ -1,6 +1,7 @@
 
 
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
+import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/flutter/af.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
@@ -16,6 +17,10 @@ class AFQueryMiddleware implements MiddlewareClass<AFState>
       // keep track of listener queries so we can shut them down at the end.
       if(query is AFAsyncQueryListenerCustomError) {
         AF.registerListenerQuery(query);
+      }
+
+      if(query is AFDeferredQueryCustomError) {
+        AF.registerDeferredQuery(query);
       }
 
       AFStateTestContext testContext = AFStateTestContext.currentTest;

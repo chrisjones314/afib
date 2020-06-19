@@ -22,3 +22,4 @@ export "src/dart/redux/state/af_route_state.dart";
 export "src/dart/utils/af_object_with_key.dart";
 export "src/dart/redux/actions/af_action_with_key.dart";
 export "src/dart/redux/state/af_ui_state.dart";
+export "src/dart/redux/actions/af_deferred_query.dart";

@@ -17,7 +17,7 @@ Future<void> afScreenTestMain(WidgetTester tester) async {
     for(var test in group.tests) {
       //AF.testOnlyStore.dispatch(AFResetToInitialStateAction());
       AF.testOnlyStore.dispatch(AFScreenPrototypeScreen.navigatePush(test));
-      AF.internal?.fine("Starting ${test.id}");
+      AF.logInternal?.fine("Starting ${test.id}");
 
       final screenId = test.widget.screen;
       final dispatcher = AFPrototypeDispatcher(screenId, AFStoreDispatcher(AF.testOnlyStore), null);
@@ -29,11 +29,11 @@ Future<void> afScreenTestMain(WidgetTester tester) async {
       // tell the store to go to the correct screen.
       await tester.pumpAndSettle();
  
-      AF.internal?.fine("Finished pumpWidget for ${test.id}");
+      AF.logInternal?.fine("Finished pumpWidget for ${test.id}");
       final params = AFTestSectionParams();
       //debugDumpApp();
       await test.body.run(context, params);
-      AF.internal?.fine("Finished ${test.id}");
+      AF.logInternal?.fine("Finished ${test.id}");
 
       // pop this test screen off so that we are ready for the next one.
       AF.testOnlyStore.dispatch(AFNavigatePopAction());

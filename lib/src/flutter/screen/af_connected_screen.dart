@@ -152,9 +152,6 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AFState, AFBuildContext>(
-        ignoreChange: (AFState state) {
-          return shouldIgnoreChangeAF(state);
-        },
         converter: (store) {
           final context = createContext(null, AFStoreDispatcher(store), createDataAF(store.state), findParam(store.state));
           return context;
@@ -175,7 +172,7 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
             AF.testOnlyScreenElement = buildContext;
             AF.testOnlyScreenUpdateCount++;
           }
-          AF.internal?.fine("Rebuilding screen $runtimeType with updateCount ${AF.testOnlyScreenUpdateCount} and param ${dataContext.p}");
+          AF.logInternal?.fine("Rebuilding screen $runtimeType with updateCount ${AF.testOnlyScreenUpdateCount} and param ${dataContext.p}");
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p);
           return buildWithContext(withContext);
         }
@@ -194,17 +191,6 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
 
   /// Builds a Widget using the data extracted from the state.
   Widget buildWithContext(AFBuildContext<TData, TRouteParam> context);
-
-  /// If you are looking to customize this behavior, override [shouldIngoreChange] instead.
-  bool shouldIgnoreChangeAF(AFState state) { 
-    bool result = shouldIgnoreChange(state.app);
-    return result;
-  }
-
-  /// Override this method if you want to prevent re-rendering under certain states.
-  bool shouldIgnoreChange(TState state) {
-    return false;
-  }
 
   /// Override this to perform screen specific initialization.
   void onInit(TData data) {}
@@ -241,20 +227,6 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
   void updateParamC(AFBuildContext context,TRouteParam revised, { AFID id }) {
     return updateParam(context.dispatcher, revised, id: id);
   }
-
-  /// This exists because when navigating up from a child to a parent screen,
-  /// flutter will re-render the child screen during the animation.   At that point,
-  /// the state has already been updated to remove the data for the child screen,
-  /// causing exceptions if it trys to render itself.   This method detects taht case
-  /// and prevents the re-rendering gracefully.
-  @override
-  bool shouldIgnoreChangeAF(AFState state) { 
-    final param = findParam(state);
-    if(param == null) {
-      return true;
-    }
-    return shouldIgnoreChange(state.app);
-   }
 
   /// Find the route parameter for the specified named screen
   AFRouteParam findParam(AFState state) {

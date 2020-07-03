@@ -33,11 +33,11 @@ class AFPrototypeDispatcher extends AFDispatcher {
       // if this is an action that doesn't really dispatch, then bump the 
       // screen update count artificially to allow tests to continue (they
       // are waiting for a screen update.
-      AF.testOnlyScreenUpdateCount++;
+      AFibF.testOnlyScreenUpdateCount++;
 
       if(action is AFObjectWithKey) {
         testContext?.registerAction(action);
-        AF.debug("Registered action: $action");
+        AFibD.logInternal?.fine("Registered action: $action");
       }
     }
   }

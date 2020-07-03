@@ -23,13 +23,13 @@ class _AFStartupScreenState extends State<AFStartupScreenWrapper> {
 
     // Kick off the app by firing a query.  In a typical app this might check the user's
     // logged in status while a splash screen displays.
-    AF.store.dispatch(AF.createStartupQueryAction());
+    AFibF.store.dispatch(AFibF.createStartupQueryAction());
   }
 
   //--------------------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    WidgetBuilder builder = AF.screenMap.initialScreenBuilder;
+    WidgetBuilder builder = AFibF.screenMap.initialScreenBuilder;
     return builder(context);
   }
 }

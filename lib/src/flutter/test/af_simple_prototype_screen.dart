@@ -51,7 +51,7 @@ class AFScreenPrototypeScreen extends AFConnectedScreen<AFAppState, AFScreenProt
 
   @override
   AFScreenPrototypeScreenData createDataAF(AFState state) {
-    AFScreenTests tests = AF.screenTests;
+    AFScreenTests tests = AFibF.screenTests;
     return AFScreenPrototypeScreenData(tests, state.testState);
   }
 

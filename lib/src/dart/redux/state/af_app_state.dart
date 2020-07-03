@@ -67,5 +67,11 @@ abstract class AFAppState {
     return createWith(AFAppState.integrate(models, toIntegrate));
   }
 
+  AFAppState copyWithOne(Object toIntegrate) {
+    final toI = List<Object>();
+    toI.add(toIntegrate);
+    return copyWith(toI);
+  }
+
   AFAppState createWith(Map<String, Object> models);
 }

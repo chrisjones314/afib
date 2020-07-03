@@ -1,5 +1,5 @@
 import 'package:afib/src/dart/utils/af_ui_id.dart';
-import 'package:afib/src/flutter/af.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:afib/src/flutter/screen/af_startup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:afib/afib_dart.dart';
@@ -31,7 +31,7 @@ class AFScreenMap {
 
   /// Call [initialScreen] once to specify the initial screen for your app.
   void initialScreen(AFScreenID screenKey, WidgetBuilder screenBuilder) {
-    AF.verifyNotImmutable();
+    AFibF.verifyNotImmutable();
     
     if(_initialKey != null) {
       throw AFException("Specified initial screen twice.");
@@ -43,7 +43,7 @@ class AFScreenMap {
   /// Call [screen] multiple times to specify the relationship between 
   /// [screenKey] and screens built by the [WidgetBuilder]
   void screen(AFScreenID screenKey, WidgetBuilder screenBuilder) {
-    AF.verifyNotImmutable();
+    AFibF.verifyNotImmutable();
     _screens[screenKey] = screenBuilder;
   }
 

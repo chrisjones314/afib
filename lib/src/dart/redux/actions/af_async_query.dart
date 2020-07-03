@@ -2,12 +2,13 @@
 
 
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
-import 'package:afib/src/dart/redux/state/af_state.dart';
+import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
-import 'package:afib/src/flutter/af.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 
 
 /// Superclass for a kind of action that queries some data asynchronously, then knows
@@ -17,15 +18,29 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
   AFAsyncQueryCustomError({AFID id}): super(id: id);
 
   /// Called internally when redux middleware begins processing a query.
-  void startAsyncAF(AFDispatcher dispatcher, AFState state) {
-    AF.logger.fine("Starting query: $this");
+  void startAsyncAF(AFDispatcher dispatcher, AFStore store) {
+    AFibD.logInternal?.fine("Starting query: $this");
     startAsync( (TResponse result) { 
-      finishAsyncWithResponse(dispatcher, state.app, result);
+      // note: there could be multiple queries outstanding at once, meaning the state
+      // might be changed by some other query while we are waiting for a responser.  
+      // Consequently, it is important not to make a copy of the state above this point,
+      // as it might go out of date.
+      finishAsyncWithResponseAF(dispatcher, store.state.app, result);
     }, (TError error) {
-      finishAsyncWithError(dispatcher, state.app, error);
+      finishAsyncWithErrorAF(dispatcher, store.state.app, error);
     });
   }
 
+  /// Called internally by the framework to do pre and post processing before [finishAsyncWithResponse]
+  void finishAsyncWithResponseAF(AFDispatcher dispatcher, TState state, TResponse response) {
+    finishAsyncWithResponse(dispatcher, state, response);
+    AFibF.handleFinishWithResponse(this, dispatcher, state);
+  }
+
+  void finishAsyncWithErrorAF(AFDispatcher dispatcher, TState state, TError error) {
+    finishAsyncWithError(dispatcher, state, error);
+    AFibF.handleFinishWithError(this, dispatcher, state);
+  }
 
   /// Called at the start of an asynchronous process, starts the query using data from the
   /// command. 
@@ -45,12 +60,12 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
 
   /// Called during testing to simulate results from an asynchronous call.
   void testFinishAsyncWithResponse(AFStateTestContext context, TResponse response) {
-    finishAsyncWithResponse(context.dispatcher, context.state, response);
+    finishAsyncWithResponseAF(context.dispatcher, context.state, response);
   }
 
   /// Called during testing to simulate results from an asynchronous call.
   void testFinishAsyncWithError(AFStateTestContext context, TError error) {
-    finishAsyncWithError(context.dispatcher, context.state, error);
+    finishAsyncWithErrorAF(context.dispatcher, context.state, error);
   }
 
 }
@@ -72,7 +87,7 @@ abstract class AFAsyncQueryListenerCustomError<TState, TResponse, TError> extend
   AFAsyncQueryListenerCustomError({AFID id}): super(id: id);
 
   void afShutdown() {
-    AF.logInternal?.fine("Shutting down listener query $key");
+    AFibD.logInternal?.fine("Shutting down listener query $key");
     shutdown();
   }
 

@@ -39,7 +39,7 @@ class AFPrototypeListScreen extends AFConnectedScreen<AFAppState, APrototypeList
 
   @override
   APrototypeListScreenData createData(AFAppState state) {
-    AFScreenTests tests = AF.screenTests;
+    AFScreenTests tests = AFibF.screenTests;
     return APrototypeListScreenData(tests);
   }
 

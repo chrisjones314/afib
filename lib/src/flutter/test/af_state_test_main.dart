@@ -1,9 +1,15 @@
 
 
 import 'package:afib/afib_dart.dart';
-import 'package:afib/src/flutter/af.dart';
+import 'package:afib/src/dart/command/af_command_output.dart';
+import 'package:afib/src/dart/command/af_standard_configs.dart';
+import 'package:afib/src/dart/utils/af_dart_params.dart';
+import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
+import 'package:afib/src/flutter/utils/af_flutter_params.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:colorize/colorize.dart';
 
 class AFibTestsFailedMatcher extends Matcher {
   AFibTestsFailedMatcher();
@@ -21,8 +27,12 @@ class AFibTestsFailedMatcher extends Matcher {
 }
 
 /// The main function which executes the store test defined in your initStateTests function.
-void afStateTestMain() {
-  final tests = AF.stateTests;
+void afStateTestMain(AFDartParams paramsD, AFFlutterParams paramsF) {
+  final paramsTest = paramsD.forceEnvironment(AFConfigEntryEnvironment.testStore);
+  AFibD.initialize(paramsTest);
+  AFibF.initialize(paramsF);
+
+  final tests = AFibF.stateTests;
   final contexts = List<AFStateTestContext>();
 
   tests.tests.forEach((test) {
@@ -33,26 +43,10 @@ void afStateTestMain() {
     contexts.add(context);
   });
 
-  print("------------------------------\nAfib State Tests:\n");
-  for(var context in contexts) {
-    final test = context.test;
-    if(!context.hasErrors) {
-      print("    ${test.id.code}: ${context.pass} passed");
-    }
-  }
-
-  int totalErrors = 0;
-  for(var context in contexts) {
-    final test = context.test;
-    if(context.hasErrors) {
-      print("    ${test.id.code}:");
-      context.errors.forEach((error) {
-        print("        $error");
-      });
-      totalErrors += context.errors.length;
-    }
-  }
-  print("------------------------------");
+  final baseContexts = List<AFBaseTestExecute>.of(contexts);
+  final output = AFCommandOutput();
+  int totalErrors = printTestResults(output, "State", baseContexts);
+  
   if(totalErrors > 0) {
     expect("$totalErrors errors (see details above)", AFibTestsFailedMatcher());
   }

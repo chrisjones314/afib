@@ -8,6 +8,11 @@ class AFArgs {
   List<String> args;
   AFArgs(this.args);
 
+  /// The name of the command that was executed.
+  String get command {
+    return args[0];
+  }
+
   /// The number of arguments to the command (not including the command itself)
   int get count {
     if(args.length == 0)

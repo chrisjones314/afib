@@ -16,7 +16,7 @@ abstract class AFMaterialApp<AppState> extends AFApp<AppState> {
   @override
   Widget build(BuildContext context) {
     return StoreProvider(
-      store: AF.store,
+      store: AFibF.store,
       child: buildMaterialApp()
     );
   }

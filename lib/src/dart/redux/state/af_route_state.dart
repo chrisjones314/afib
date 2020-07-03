@@ -1,7 +1,7 @@
 
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
-import 'package:afib/src/flutter/af.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:meta/meta.dart';
 
 /// A segment in the route which specifies a screen to display, and 
@@ -57,7 +57,7 @@ class AFRouteState {
   /// Creates the default initial state.
   factory AFRouteState.initialState() {
     final route = List<AFRouteSegment>();
-    route.add(AFRouteSegment.withScreen(AF.effectiveStartupScreenId));
+    route.add(AFRouteSegment.withScreen(AFibF.effectiveStartupScreenId));
     return AFRouteState(route: route);
   }
 

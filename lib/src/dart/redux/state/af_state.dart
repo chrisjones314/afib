@@ -1,6 +1,6 @@
 import 'package:afib/src/dart/redux/state/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
-import 'package:afib/src/flutter/af.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:meta/meta.dart';
 
 
@@ -24,7 +24,7 @@ class AFState {
     return AFState(
       testState: AFTestState.initial(),
       route: AFRouteState.initialState(),
-      app: AF.initializeAppState(),
+      app: AFibF.initializeAppState(),
     );
   }  
 

@@ -8,7 +8,6 @@ import '../../afib_dart.dart';
 
 /// Used to populate the screen map used to associate keys with screens.
 typedef void InitScreenMap(AFScreenMap map);
-typedef void InitConfiguration(AFConfig config);
 typedef dynamic CreateStartupQueryAction();
 typedef AFApp CreateAFApp();
 typedef void InitScreenTests(AFScreenTests tests);
@@ -32,7 +31,7 @@ abstract class AFApp<AppState> extends StatelessWidget {
 
   void afAfterRunApp() {
     afterRunApp();
-    AF.shutdownOutstandingQueries();
+    AFibF.shutdownOutstandingQueries();
   }
 
   /// Called before the main flutter runApp loop.  

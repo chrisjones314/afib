@@ -2,7 +2,7 @@
 import 'dart:core';
 import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
-import 'package:afib/src/flutter/af.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 
@@ -30,7 +30,7 @@ List<Middleware<AFState>> createRouteMiddleware() {
 //---------------------------------------------------------------------------
 void _navigatePushAction(Store<AFState> store, action, NextDispatcher next) {
 
-  Future<dynamic> ret = AF.navigatorKey.currentState?.pushNamed(action.screen.code);
+  Future<dynamic> ret = AFibF.navigatorKey.currentState?.pushNamed(action.screen.code);
   if(ret != null && action.onReturn != null) {
     ret.then( (msg) {
       action.onReturn(msg);
@@ -41,7 +41,7 @@ void _navigatePushAction(Store<AFState> store, action, NextDispatcher next) {
 
 //---------------------------------------------------------------------------
 void _navigatePopAction(Store<AFState> store, action, NextDispatcher next) {
-  AF.navigatorKey.currentState?.pop(action.returnData);
+  AFibF.navigatorKey.currentState?.pop(action.returnData);
   next(action);
 }
 
@@ -50,7 +50,7 @@ void _navigateReplaceAction(Store<AFState> store, action, NextDispatcher next) {
   final String screen = action.screen.code;
 
   // first, we do the navigation itself
-  AF.navigatorKey.currentState?.popAndPushNamed(screen);
+  AFibF.navigatorKey.currentState?.popAndPushNamed(screen);
 
   // then, let the reducer integrate that state into the store.
   next(action);
@@ -62,7 +62,7 @@ void _navigateReplaceAllAction(Store<AFState> store, action, NextDispatcher next
   final String screen = action.screen.code;
 
   // first, we do the navigation itself
-  AF.navigatorKey.currentState?.pushNamedAndRemoveUntil(screen, (Route<dynamic> route) => false);
+  AFibF.navigatorKey.currentState?.pushNamedAndRemoveUntil(screen, (Route<dynamic> route) => false);
 
   // then, let the reducer integrate that state into the store.
   next(action);

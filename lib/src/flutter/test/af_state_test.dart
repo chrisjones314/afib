@@ -1,23 +1,16 @@
+import 'package:afib/afib_dart.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
-import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:meta/meta.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
-import 'package:afib/src/flutter/af.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 
-class AFStateTestError {
-  final AFStateTest test;
-  final String description;
-  AFStateTestError(this.test, this.description);
 
-  String toString() {
-    return description;
-  }
-}
 
 abstract class AFStateTestExecute extends AFBaseTestExecute {
 
@@ -30,15 +23,14 @@ class AFStateTestContext<TState> extends AFStateTestExecute {
   AFStore store;
   AFDispatcher testDisp;
   static AFStateTestContext _currentTest;
-  final _errors = List<AFStateTestError>();
   final bool isTrueTestContext;
-  int pass = 0;
   
   AFStateTestContext(this.test, { @required this.isTrueTestContext } ) {
-    store = AF.testOnlyStore;
+    store = AFibF.testOnlyStore;
     testDisp = AFStoreDispatcher(store);    
   }
 
+  AFTestID get testID { return this.test.id; }
   TState get state { return store.state.app; }
   AFRouteState get route { return store.state.route; }
   AFDispatcher get dispatcher { return testDisp; }
@@ -49,22 +41,6 @@ class AFStateTestContext<TState> extends AFStateTestExecute {
     test.processQuery(this, q);
   }
 
-  List<AFStateTestError> get errors { return _errors; }
-  bool get hasErrors { return _errors.isNotEmpty; }
-
-  @override
-  void addError(String desc, int depth) {
-    String err = AFScreenTestExecute.composeError(desc, depth);
-    _errors.add(AFStateTestError(test, err));
-  }
-
-  @override
-  bool addPassIf(bool test) {
-    if(test) {
-      pass++;
-    }
-    return test;
-  }
 }
 
 typedef void ProcessQuery(AFStateTestContext context, AFAsyncQueryCustomError query);
@@ -76,7 +52,7 @@ class AFStateTests {
   final List<AFStateTest<dynamic>> tests = List<AFStateTest<dynamic>>();
   AFStateTestContext<dynamic> context;
 
-  void queryTest(AFStateTestID id, AFAsyncQueryCustomError query, ProcessTest handler) {
+  void queryTest(AFTestID id, AFAsyncQueryCustomError query, ProcessTest handler) {
     final test = AFStateTest<AFAppState>(id, query, this);
     tests.add(test);
     handler(test);
@@ -115,7 +91,7 @@ class _AFStateQueryEntry {
 
 class AFStateTest<TState extends AFAppState> {
   final AFStateTests tests;
-  final AFStateTestID id;
+  final AFTestID id;
   AFStateTestID idPredecessor;
   final AFAsyncQueryCustomError query;
   final Map<String, _AFStateResultEntry> results = Map<String, _AFStateResultEntry>();
@@ -199,6 +175,16 @@ class AFStateTest<TState extends AFAppState> {
   /// and then feeding them to its testAsyncResponse method.
   void processQuery(AFStateTestContext context, AFAsyncQueryCustomError query) {
     final h = results[query.key];
+    if(h == null) {
+
+      /// deferred queries don't have any results.
+      if(query is AFDeferredQueryCustomError) {
+        query.finishAsyncExecute(context.dispatcher, context.state);
+        return;
+      }
+
+      throw AFException("No results specified for query ${query.key}");
+    }
     h.handler(context, query);
   }
 }

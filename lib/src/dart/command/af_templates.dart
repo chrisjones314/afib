@@ -1,7 +1,7 @@
 
-import 'package:afib/src/dart/utils/af_config_constants.dart';
-import 'package:path/path.dart';
 import 'dart:io';
+import 'package:path/path.dart';
+import 'package:afib/src/dart/utils/af_config_entries.dart';
 
 /// Utility for loading, populating, and writing new dart files from templates included
 /// with Afib.
@@ -31,7 +31,7 @@ class AFTemplates {
     if(!findProjectFile(["pubspec.yaml"])) {
       return false;
     }
-    if(!findProjectFile(["lib", "config", "environment.g.dart"])) {
+    if(!findProjectFile(["lib", "initialization", "afib.g.dart"])) {
       return false;
     }
 
@@ -40,11 +40,13 @@ class AFTemplates {
 
   void writeEnvironment({String environment}) {
     // load in the path for this file.
-    String srcPath = calculateTemplatePath(AFConfigConstants.environmentKey);
+    /*
+    String srcPath = calculateTemplatePath(AFConfigEntries.environmentKey);
     String dstPath = calculateDestPath(["lib", "config", "environment.g.dart"]);
     final localVars = createVars();
-    localVars[AFConfigConstants.environmentKey] = environment;
+    localVars[AFConfigEntries.environmentKey] = environment;
     instantiateTemplate(srcPath, dstPath, localVars);
+    */
   }
 
   Map<String, String> createVars() {

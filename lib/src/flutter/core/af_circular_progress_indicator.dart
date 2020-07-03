@@ -1,5 +1,5 @@
 
-import 'package:afib/src/flutter/af.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +25,7 @@ class AFCircularProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if(AF.config.isWidgetTesterContext) {
+    if(AFibD.config.isWidgetTesterContext) {
       return SizedBox(key: childKey, width: 20.0, height: 20.0);
     } else {
       return CircularProgressIndicator(

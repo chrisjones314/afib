@@ -1,7 +1,10 @@
 
 import 'dart:core';
-
-import 'package:afib/src/dart/utils/af_config_constants.dart';
+import 'package:afib/src/dart/command/af_command.dart';
+import 'package:afib/src/dart/command/af_command_output.dart';
+import 'package:afib/src/dart/command/commands/af_config_command.dart';
+import 'package:afib/src/dart/utils/af_config_entries.dart';
+import 'package:afib/src/dart/utils/af_exception.dart';
 
 
 /// A config is used to agreggate, universal and environment specific configuration settings
@@ -13,43 +16,68 @@ import 'package:afib/src/dart/utils/af_config_constants.dart';
 /// All get methods return null if the key does not have a value. 
 class AFConfig {
 
-  final Map<String, int>    intSettings = Map<String, int>();
-  final Map<String, String> strSettings = Map<String, String>();
-  final Map<String, double> dblSettings = Map<String, double>();
-  final Map<String, bool> boolSettings = Map<String, bool>();
-  //final Map<String, HashMap<String, dynamic> >() jsonSettings = Map<String, HashMap<String, dynamic> >();
+  final Map<AFConfigEntry, dynamic> values = Map<AFConfigEntry, dynamic>();
 
-  void setInt(String key, int i) { intSettings[key] = i; }
-  int getInt(String key) { return intSettings[key]; }
-  bool equalsInt(String key, int compare) { return intSettings[key] == compare; }
+  /// This should only be used for validated values of the correct type, you should
+  /// use [setValue] in most cases.
+  void putInternal(AFConfigEntry entry, dynamic value) {
+    values[entry] = value;
+  }
 
-  void setString(String key, String s) { strSettings[key] = s; }
-  String getString(String key) { return strSettings[key]; }
-
-  void setDouble(String key, double d) { dblSettings[key] = d; }
-  double getDouble(String key) { return dblSettings[key]; }
-
-  void setBool(String key, bool b) { boolSettings[key] = b; }
-  bool getBool(String key) { return boolSettings[key]; }
+  /// Performs validation and type conversion on the value before placing it in our
+  /// list of values.
+  void setValue(AFConfigEntry entry, dynamic value) {
+    entry.setValue(this, value);
+  }
 
   /// Returns a text-version of the current AFConfigConstants.environmentKey value.
   String get environment  {
-    return getString(AFConfigConstants.environmentKey);
+    return stringFor(AFConfigEntries.environment);
   }
 
+  /// 
   bool get isWidgetTesterContext {
-    return getBool(AFConfigConstants.widgetTesterContext) ?? false;
+    return boolFor(AFConfigEntries.widgetTesterContext);
   }
 
-  // Returns true if our current mode requires prototype data.
+  /// Casts the value for [entry] to a string and returns it.
+  String stringFor(AFConfigEntry entry) {
+    return valueFor(entry);
+  }
+
+  /// Casts the value for [entry] to a boolean and returns it.
+  bool boolFor(AFConfigEntry entry) {
+    return valueFor(entry);
+  }
+
+  dynamic valueFor(AFConfigEntry entry) {
+    dynamic val = values[entry];
+    return val ?? entry.defaultValue;
+  }
+
+  /// Returns true if our current mode requires prototype data.
   bool get requiresPrototypeData {
-    final String env = environment;
-    return (env == AFConfigConstants.prototype);
+    return AFConfigEntries.environment.requiresPrototypeData(this);
   }
 
+  /// True if the current mode requires test data.
   bool get requiresTestData {
-    final String env = environment;
-    return (env != AFConfigConstants.production && env != AFConfigConstants.debug);
+    return AFConfigEntries.environment.requiresTestData(this);
+  }
+
+  /// True if AFib should display internal log statements.
+  bool get enableInternalLogging {
+    return boolFor(AFConfigEntries.internalLogging);
+  }
+
+  void dumpAll(List<AFConfigEntry> entries, AFCommandOutput output) {
+    output.writeLine("Configuration values from initialization/afib.g.dart");
+    for(final entry in entries) {
+      AFCommand.startCommandColumn(output);
+      output.write(entry.namespaceKey + ": ");
+      AFCommand.startHelpColumn(output);
+      output.writeLine(valueFor(entry).toString());
+    }
   }
 
   

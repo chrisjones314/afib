@@ -1,13 +1,13 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
+import 'package:afib/src/dart/redux/actions/af_wait_query.dart';
 import 'package:afib/src/dart/redux/middleware/af_async_queries.dart';
 import 'package:afib/src/dart/redux/middleware/af_query_middleware.dart';
 import 'package:afib/src/dart/redux/middleware/af_route_middleware.dart';
 import 'package:afib/src/dart/redux/reducers/af_reducer.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
-import 'package:afib/src/dart/utils/af_config_constants.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
@@ -15,49 +15,12 @@ import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
 import 'package:afib/src/flutter/test/af_init_proto_screen_map.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/utils/af_flutter_params.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:flutter/material.dart';
-import 'package:logging/logging.dart';
-import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:redux/redux.dart';
 
 
-typedef dynamic InitializeAppState();
-
-class AFInitParams<AppState> {
-  final InitConfiguration initAfib;
-  final InitConfiguration initAppConfig;
-  final InitConfiguration initDebugConfig;
-  final InitConfiguration initProductionConfig;
-  final InitConfiguration initPrototypeConfig;
-  final InitConfiguration initTestConfig;
-  final InitScreenMap         initScreenMap;
-  final InitializeAppState       initialAppState;
-  final CreateStartupQueryAction createStartupQueryAction;
-  final CreateAFApp createApp;
-  final InitStateTests initStateTests;
-  final InitScreenTests initScreenTests;
-  final AppReducer<AppState>  appReducer;
-  final Logger logger;
-  final String forceEnv;
-  
-  AFInitParams({
-    @required this.initAfib,
-    @required this.initAppConfig,
-    @required this.initDebugConfig,
-    @required this.initProductionConfig,
-    @required this.initPrototypeConfig,
-    @required this.initTestConfig,
-    @required this.initScreenMap,
-    @required this.initialAppState,
-    @required this.createStartupQueryAction,
-    @required this.createApp,
-    @required this.initStateTests,
-    @required this.initScreenTests,
-    this.appReducer,
-    this.logger,
-    this.forceEnv
-  });
-}
 
 
 /// A class for finding accessing global utilities in AFib. 
@@ -65,11 +28,9 @@ class AFInitParams<AppState> {
 /// Never use the globals to track or change state in your
 /// application.  Globals contain debugging utilities (e.g. logging)
 /// and configuration that is immutable after startup (e.g. configuration).
-class AF {
+class AFibF {
 
   static bool _postStartup = false;
-  static final AFConfig _afConfig = AFConfig();
-  static Logger _afLogger;
   static final AFScreenMap _afScreenMap = AFScreenMap();
   static InitializeAppState _afInitializeAppState;
   static AppReducer _appReducer;
@@ -83,55 +44,23 @@ class AF {
   static AFScreenID forcedStartupScreen;
   static int testOnlyScreenUpdateCount = 0;
   static BuildContext testOnlyScreenElement;
-  static Logger logInternal;
   static Map<String, AFAsyncQueryListenerCustomError> listenerQueries = Map<String, AFAsyncQueryListenerCustomError>();
   static Map<String, AFDeferredQueryCustomError> deferredQueries = Map<String, AFDeferredQueryCustomError>();
+  static Map<String, AFWaitQuery> waitQueries = Map<String, AFWaitQuery>();
+
+  
 
   /// a key for referencing the Navigator for the material app.
   static final GlobalKey<NavigatorState> _afNavigatorKey = new GlobalKey<NavigatorState>();
 
-  static void initialize<AppState>(AFInitParams p) {
-    _afCreateApp = p.createApp;
-    Logger logger = p.logger;
-    if(logger == null) {
-      logger = Logger("AF");
-    }
-    AF.setLogger(logger);
+  static void initialize<AppState>(AFFlutterParams p) {
+      _afCreateApp = p.createApp;
 
-    Logger.root.level = Level.ALL;
-    Logger.root.onRecord.listen((LogRecord rec) {
-      print('${rec.level.name}: ${rec.time}: ${rec.message}');
-    });  
+    p.initScreenMap(AFibF.screenMap);
 
-    // first do the separate initialization that just says what environment it is, since this
-    p.initAfib(AF.config);
-    if(p.forceEnv != null) {
-      AF.config.setString(AFConfigConstants.environmentKey, p.forceEnv);
-    }
-    p.initAppConfig(AF.config);
-    final String env = AF.config.environment;
-    if(env == AFConfigConstants.debug) {
-      p.initDebugConfig(AF.config);
-    } else if(env == AFConfigConstants.production) {
-      p.initProductionConfig(AF.config);
-    } else if(env == AFConfigConstants.prototype) {
-      p.initPrototypeConfig(AF.config);
-    } else if(env == AFConfigConstants.testStore) {
-      p.initTestConfig(AF.config);
-    }
-
-    bool verbose = AF.config.getBool(AFConfigConstants.internalLogging);
-    if(verbose != null && verbose) {
-      AF.logInternal = AF._afLogger;
-    }
-
-    AF.logInternal?.fine("Environment: " + AF.config.environment);
-
-    p.initScreenMap(AF.screenMap);
-
-    AF.setInitialAppStateFactory(p.initialAppState);
-    AF.setAppReducer(appReducer);
-    AF.setCreateStartupQueryAction(p.createStartupQueryAction);
+    AFibF.setInitialAppStateFactory(p.initialAppState);
+    AFibF.setAppReducer(appReducer);
+    AFibF.setCreateStartupQueryAction(p.createStartupQueryAction);
 
     List<Middleware<AFState>> middleware = List<Middleware<AFState>>();
     middleware.addAll(createRouteMiddleware());
@@ -144,12 +73,12 @@ class AF {
     );
     setStore(store);
 
-    if(AF.config.requiresTestData) {
-      p.initScreenTests(AF.screenTests);
-      p.initStateTests(AF.stateTests);
+    if(AFibD.config.requiresTestData) {
+      p.initScreenTests(AFibF.screenTests);
+      p.initStateTests(AFibF.stateTests);
     }
 
-    if(AF.config.requiresPrototypeData) {
+    if(AFibD.config.requiresPrototypeData) {
       AFScreenMap protoScreenMap = AFScreenMap();
       afInitPrototypeScreenMap(protoScreenMap);
       setPrototypeScreenMap(protoScreenMap);
@@ -165,16 +94,6 @@ class AF {
     return _afNavigatorKey;
   }
   
-  /// Contains configuration data for the app, specific to test, production, etc.
-  static AFConfig get config {
-    return _afConfig;
-  }
-
-  /// A logger for use throughout the app.
-  static Logger get logger {
-    return _afLogger;
-  }
-
   /// Mapping from string ids to builders for specific screens for the real app.
   static AFScreenMap get screenMap {
     return _afScreenMap;
@@ -187,7 +106,7 @@ class AF {
 
   /// The screen map to use given the mode we are running in (its different in prototype mode, for example)
   static AFScreenMap get effectiveScreenMap {
-    if(AF.config.requiresPrototypeData) {
+    if(AFibD.config.requiresPrototypeData) {
       return _afPrototypeScreenMap;
     }
     return _afScreenMap;
@@ -197,7 +116,7 @@ class AF {
     if(forcedStartupScreen != null) {
       return forcedStartupScreen;
     }
-    if(AF.config.requiresPrototypeData) {
+    if(AFibD.config.requiresPrototypeData) {
       return AFUIID.screenPrototypeList;
     }
     return AFUIID.screenStartup;
@@ -257,7 +176,7 @@ class AF {
   /// you should not call it directly.
   static void registerListenerQuery(AFAsyncQueryListenerCustomError query) {
     final key = query.key;
-    AF.logInternal?.fine("Registering listener query $key");
+    AFibD.logInternal?.fine("Registering listener query $key");
     final current = listenerQueries[key];
     if(current != null) {
       current.afShutdown();
@@ -272,13 +191,45 @@ class AF {
   /// you should not call it directly.
   static void registerDeferredQuery(AFDeferredQueryCustomError query) {
     final key = query.key;
-    AF.logInternal?.fine("Registering deferred query $key");
+    AFibD.logInternal?.fine("Registering deferred query $key");
     final current = deferredQueries[key];
     if(current != null) {
       current.afShutdown();
     }
-    deferredQueries[key] = query;
-    
+    deferredQueries[key] = query; 
+  }
+
+  static void registerWaitQuery(AFWaitQuery query) {
+    final key = query.key;
+    AFibD.logInternal?.fine("Registering wait query $key");
+    var current = waitQueries[key];
+    if(current == null) {
+      current = query;
+    } else {
+      current.mergeIn(query);
+    }
+    waitQueries[key] = query; 
+  }
+
+  static void handleFinish(AFAsyncQueryCustomError query, AFDispatcher dispatcher, dynamic state) {
+    if(waitQueries.isEmpty) {
+      return;
+    }
+
+    for(var waitQuery in waitQueries.values) {
+      if(waitQuery.doesComplete(query)) {
+        waitQuery.finishAsyncExecute(dispatcher, state);
+        waitQueries.remove(waitQuery.key);
+      }
+    }
+  }
+
+  static void handleFinishWithResponse(AFAsyncQueryCustomError query, AFDispatcher dispatcher, dynamic state) {
+    handleFinish(query, dispatcher, state);
+  }
+
+  static void handleFinishWithError(AFAsyncQueryCustomError query, AFDispatcher dispatcher, dynamic state) {
+    handleFinish(query, dispatcher, state);
   }
 
   /// Shutdown all outstanding listener queries using [AFAsyncQueryListenerCustomError.shutdown]
@@ -305,33 +256,12 @@ class AF {
     }
   }
 
-  /// Prepends "AF: " to a fine level log message.
-  /// 
-  /// Meant to be used only within the AF framework itself.  Apps should use
-  /// AF.logger.fine(...)
-  static void fine(String msg) {
-    _afLogger.fine("AF: " + msg);
-  }
-
-  static void debug(String msg) {
-    _afLogger.fine("AF: " + msg);
-  }
-
-  /// Do not call this method, see AFApp.initialize instead.
-  static void setLogger(Logger logger) {
-    if(_afLogger != null) {
-      _directCallException();
-    }
-    AF.verifyNotImmutable();
-    _afLogger = logger;
-  }
-
   /// Do not call this method, see AFApp.initialize instead.
   static void setInitialAppStateFactory(InitializeAppState initialState) {
     if(_afInitializeAppState != null) {
       _directCallException();
     }
-    AF.verifyNotImmutable();
+    AFibF.verifyNotImmutable();
     _afInitializeAppState = initialState;
   }
 
@@ -341,7 +271,7 @@ class AF {
     if(_afStore != null) {
       _directCallException();
     }
-    AF.verifyNotImmutable();
+    AFibF.verifyNotImmutable();
     _afStore = store;
   }
 
@@ -350,7 +280,7 @@ class AF {
     if(_afCreateStartupQueryAction != null) {
       _directCallException();
     }
-    AF.verifyNotImmutable();
+    AFibF.verifyNotImmutable();
     _afCreateStartupQueryAction = createStartupQueryAction;
   }
 
@@ -371,7 +301,7 @@ class AF {
 
   /// Do not call this method, AFApp.initialize will do it for you.
   static void setPrototypeScreenMap(AFScreenMap screens) {
-    AF.verifyNotImmutable();
+    AFibF.verifyNotImmutable();
     _afPrototypeScreenMap = screens;
   }
 

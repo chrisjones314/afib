@@ -5,7 +5,8 @@ import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_unused.dart';
-import 'package:afib/src/flutter/af.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_drawer.dart';
 import 'package:flutter/material.dart';
@@ -169,10 +170,10 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
             return CircularProgressIndicator();
           }
           if(!(this is AFTestDrawer)) {
-            AF.testOnlyScreenElement = buildContext;
-            AF.testOnlyScreenUpdateCount++;
+            AFibF.testOnlyScreenElement = buildContext;
+            AFibF.testOnlyScreenUpdateCount++;
           }
-          AF.logInternal?.fine("Rebuilding screen $runtimeType with updateCount ${AF.testOnlyScreenUpdateCount} and param ${dataContext.p}");
+          AFibD.logInternal?.fine("Rebuilding screen $runtimeType with updateCount ${AFibF.testOnlyScreenUpdateCount} and param ${dataContext.p}");
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p);
           return buildWithContext(withContext);
         }

@@ -1,6 +1,9 @@
 
+import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/af_args.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
+import 'package:afib/src/dart/command/af_project_paths.dart';
+import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 
@@ -28,6 +31,14 @@ class AFItemWithNamespace {
     return sb.toString();
   }
 
+  static List<T> sortIterable<T extends AFItemWithNamespace>(Iterable<T> it) {
+    final result = List<T>.of(it);
+    result.sort((l, r) {
+      return l.namespaceKey.compareTo(r.namespaceKey);
+    });
+    return result;
+  }
+
 }
 
 /// Parent for commands executed through the afib command line app.
@@ -51,6 +62,14 @@ abstract class AFCommand extends AFItemWithNamespace {
   /// Should return a simple help string summarizing the command.
   String get shortHelp;
 
+  bool errorIfNotProjectRoot(AFCommandOutput output) {
+    if(!AFProjectPaths.inRootOfAfibProject) {
+      output.writeErrorLine("Please run the $namespaceKey command from the project root");
+      return false;
+    }
+    return true;
+  }
+
   /// Briefly describe command usage.
   void writeShortHelp(AFCommandOutput output, { int indent: 0 }) {
     startCommandColumn(output, indent: indent);
@@ -60,9 +79,10 @@ abstract class AFCommand extends AFItemWithNamespace {
     output.endLine();
   }
 
+
   /// Optionally override this to provide more verbose help for a command,
   /// Which is shown for afib help <command>.  By default, shows the [shortHelp]. 
-  void writeLongHelp(AFCommandOutput output) {
+  void writeLongHelp(AFCommandOutput output, String subCommand) {
     writeShortHelp(output);
   }
 
@@ -77,6 +97,11 @@ abstract class AFCommand extends AFItemWithNamespace {
 
   static void startHelpColumn(AFCommandOutput output) {
     output.startColumn(alignment: AFOutputAlignment.alignRight);
+  }
+
+  static void emptyCommandColumn(AFCommandOutput output) {
+    startCommandColumn(output);
+    output.write("");
   }
 
 }
@@ -102,9 +127,13 @@ class AFCommands {
   /// Register a command.
   /// 
   /// The command will display in the help and be executable.   It will generally
-  /// 
   void register(AFCommand command) {
     commands.add(command);
+  }
+
+  /// Get the configuration commnd, which can be extended to allow for 3rd party configuration values.
+  AFConfigCommand findConfigCommand() {
+    return find(AFConfigCommand.cmdName);
   }
 
   /// Given "help" or "--help", returns the HelpCommand, etc.
@@ -126,10 +155,15 @@ class AFCommands {
     if(afArgs.count < cmd.minArgs) {
       output.writeErrorLine("Command $command must have at least ${cmd.minArgs} arguments.");
     }
-    if(afArgs.count > cmd.maxArgs) {
+    if(afArgs.count > cmd.maxArgs && cmd.maxArgs != 0) {
       output.writeErrorLine("Command $command must have at most ${cmd.maxArgs} arguments.");
     }
-    cmd.execute(afArgs, afibConfig, output);
+
+    try {
+      cmd.execute(afArgs, afibConfig, output);
+    } catch(e) {
+      output.writeErrorLine(e.toString());
+    }
   }
 
 }

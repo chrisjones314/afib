@@ -20,19 +20,29 @@ class AFArgs {
     return args.length - 1;
   }
 
+  /// The nth space-separated argument (not including the command itself)
+  String at(int i) {
+    final idx = i+1;
+    // ignore the command itself.
+    if(idx >= args.length) {
+      return null;
+    }
+    return args[idx];
+  }
+
   /// The first argument to the command (not including the command itself)
   String get first {
-    return args[1];
+    return at(0);
   }
 
   /// The second argument to the command (not including the command itself)
   String get second {
-    return args[2];
+    return at(1);
   }
 
   /// The third argument to the command (not including the command itself)
   String get third {
-    return args[3];
+    return at(2);
   }
 
 }

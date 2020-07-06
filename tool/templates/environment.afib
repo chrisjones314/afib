@@ -1,8 +1,0 @@
-
-import 'package:afib/afib_dart.dart';
-
-[[generated_warning_comment]]
-
-void configureEnvironment(AFConfig config) {
-  config.setString(AFConfigConstants.environmentKey, AFConfigConstants.[[environment]]);
-}

@@ -27,17 +27,6 @@ class AFTemplates {
     commonVars["generated_warning_comment"] = "// *** WARNING ***: This file is generated source.\n// Do not modify it as your changes might be overwritten in the future.\n// Use the command afib environment ... instead.";
   }
 
-  bool verifyCurrentIsAfibProject() {
-    if(!findProjectFile(["pubspec.yaml"])) {
-      return false;
-    }
-    if(!findProjectFile(["lib", "initialization", "afib.g.dart"])) {
-      return false;
-    }
-
-    return true;
-  }
-
   void writeEnvironment({String environment}) {
     // load in the path for this file.
     /*

@@ -1,29 +1,52 @@
 
 import 'package:afib/src/dart/command/af_command.dart';
+import 'package:afib/src/dart/command/af_project_paths.dart';
+import 'package:afib/src/dart/command/generators/af_config_generator.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/command/af_args.dart';
-import 'package:afib/src/dart/command/af_template_command.dart';
-import 'package:afib/src/dart/command/af_templates.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
-import 'package:afib/src/dart/utils/afib_d.dart';
 
 import '../af_command_output.dart';
 
 /// Superclass for all configuration definitions.
 abstract class AFConfigEntry extends AFItemWithNamespace {
     final dynamic defaultValue;
+    final String declaringClass;
     
-    AFConfigEntry(String namespace, String key, this.defaultValue): super(namespace, key);
+    AFConfigEntry(String namespace, String key, this.defaultValue, {this.declaringClass = AFConfigEntries.declaredIn}): super(namespace, key);
 
     void writeHelp(AFCommandOutput output, {int indent = 0});
+
+    String get codeIdentifier {
+      return "$declaringClass.$key";
+    }
+
+    String codeValue(AFConfig config) {
+      dynamic val = config.valueFor(this);
+      if(val == null) {
+        return null;
+      }
+      if(val is String) {
+        return "\"$val\"";
+      }
+      return val.toString();
+    }
     
     /// Return an error message if the value is invalid, otherwise return null.
     String validate(String value);
 
-    void setValue(AFConfig dest, String value) {
+    void setValueWithString(AFConfig dest, String value) {
       validateWithException(value);
       dest.putInternal(this, value);
+    }
+
+    void setValue(AFConfig dest, dynamic value) {
+      if(value is String) {
+        setValueWithString(dest, value);
+      } else {
+        dest.putInternal(this, value);
+      }
     }
     
     void writeCommandHelp(AFCommandOutput output, String help, {int indent = 0}) {
@@ -41,6 +64,7 @@ abstract class AFConfigEntry extends AFItemWithNamespace {
       }
     }
 
+
 }
 
 
@@ -57,7 +81,7 @@ class AFConfigEntryDescription {
 abstract class AFConfigEntryChoice extends AFConfigEntry {
   final choices = List<AFConfigEntryDescription>();
   
-  AFConfigEntryChoice(String namespace, String key, dynamic defaultValue): super(namespace, key, defaultValue);
+  AFConfigEntryChoice(String namespace, String key, dynamic defaultValue, {String declaringClass = AFConfigEntries.declaredIn}): super(namespace, key, defaultValue, declaringClass: declaringClass);
 
   void addChoice(String choice, String help) {
     choices.add(AFConfigEntryDescription(choice, help));
@@ -98,7 +122,7 @@ class AFConfigEntryBool extends AFConfigEntryChoice {
 
   final String help;
   
-  AFConfigEntryBool(String namespace, String key, bool defaultValue, this.help): super(namespace, key, defaultValue) {
+  AFConfigEntryBool(String namespace, String key, bool defaultValue, this.help, {String declaringClass = AFConfigEntries.declaredIn}): super(namespace, key, defaultValue, declaringClass: declaringClass) {
     addChoice(trueValue, "");
     addChoice(falseValue, "");
   }
@@ -107,7 +131,7 @@ class AFConfigEntryBool extends AFConfigEntryChoice {
     writeCommandHelp(output, this.help, indent: indent);
   }
 
-  void setValue(AFConfig dest, String value) {
+  void setValueWithString(AFConfig dest, String value) {
     validateWithException(value);
     bool val = (value == "true");
     dest.putInternal(this, val);
@@ -118,10 +142,11 @@ class AFConfigEntryBool extends AFConfigEntryChoice {
 
 /// Command that displays or modified values from [AFConfig], and
 /// that modifed values under the initialization/afib.g.dart.
-class AFConfigCommand extends AFTemplateCommand { 
+class AFConfigCommand extends AFCommand { 
   final configs = Map<String, AFConfigEntry>();
+  static const cmdName = "config";
 
-  AFConfigCommand(): super(AFConfigEntries.afNamespace, "config", 0, 3) {
+  AFConfigCommand(): super(AFConfigEntries.afNamespace, cmdName, 0, 2) {
     registerEntry(AFConfigEntries.environment);
     registerEntry(AFConfigEntries.internalLogging);
   }
@@ -135,38 +160,58 @@ class AFConfigCommand extends AFTemplateCommand {
     configs[entry.key] = entry;
   }
 
-  void writeLongHelp(AFCommandOutput output) {
+  void writeLongHelp(AFCommandOutput output, String subCommand) {
     writeShortHelp(output, );
-    List<AFConfigEntry> entries = List<AFConfigEntry>.of(configs.values);
-    entries.sort((l, r) { return l.namespaceKey.compareTo(r.namespaceKey); });
+    List<AFConfigEntry> entries = AFItemWithNamespace.sortIterable<AFConfigEntry>(configs.values);
     for(final entry in entries) {
       entry.writeHelp(output, indent: 2);
     }
   }
+
+  /// Adds default values for all the registered configuration entries.
+  void initAfibDefaults(AFConfig config) {
+    for(final entry in configs.values) {
+      config.putInternal(entry, entry.defaultValue);
+    }
+  }
   
   @override
-  void executeTemplate(AFArgs args, AFConfig afibConfig, AFTemplates templates, AFCommandOutput output) {    
+  void execute(AFArgs args, AFConfig afibConfig, AFCommandOutput output) {    
+    // dump out the current value of all arguments.
     if(args.count == 0) {
-
-      List<AFConfigEntry> sorted = List<AFConfigEntry>.of(configs.values);
-      sorted.sort((l, r) {
-        return l.namespaceKey.compareTo(r.namespaceKey);
-      });
+      final sorted = AFItemWithNamespace.sortIterable<AFConfigEntry>(afibConfig.all);
       afibConfig.dumpAll(sorted, output);
       return;
     }
 
-    /*
-    String env = args.first;
-    final allEnvs = AFConfigConstants.allEnvironments;
-    if(!allEnvs.contains(env)) {
-      printError("Invalid environment $env");
+    // dump out the current value of a specific argument
+    String configKey = args.first;
+    if(args.count == 1) {
+      afibConfig.dumpOne(configKey, output);
       return;
     }
 
-    templates.writeEnvironment(environment: env);
-    print("Switched to environment $env");
-    */
+    String configVal = args.second;
+    final entry = afibConfig.find(configKey);
+    if(entry == null) {
+      output.writeError("Unknown configuration entry $configKey");
+      return;
+    }
+
+    /// set the value.  this will throw an exception if it is an invalid value.
+    afibConfig.setValue(entry, configVal);
+    output.writeLine("Set ${entry.codeIdentifier} to $configVal");
+
+    if(!errorIfNotProjectRoot(output)) {
+      return;
+    }
+    
+    final generator = AFConfigGenerator();
+    if(!generator.validateBefore(args, afibConfig, output)) {
+      return;
+    }
+
+    generator.execute(args, afibConfig, output);    
   }
 
   @override

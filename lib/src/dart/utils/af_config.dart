@@ -18,6 +18,18 @@ class AFConfig {
 
   final Map<AFConfigEntry, dynamic> values = Map<AFConfigEntry, dynamic>();
 
+
+  /// Finds a configuration entry based on its command line name.
+  AFConfigEntry find(String cmdLine) {
+    
+    for(final entry in values.keys) {
+      if(entry.namespaceKey == cmdLine) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
   /// This should only be used for validated values of the correct type, you should
   /// use [setValue] in most cases.
   void putInternal(AFConfigEntry entry, dynamic value) {
@@ -70,14 +82,31 @@ class AFConfig {
     return boolFor(AFConfigEntries.internalLogging);
   }
 
+  Iterable<AFConfigEntry> get all {
+    return values.keys;
+  }
+
   void dumpAll(List<AFConfigEntry> entries, AFCommandOutput output) {
     output.writeLine("Configuration values from initialization/afib.g.dart");
     for(final entry in entries) {
+      dumpEntry(entry, output);
+    }
+  }
+
+  void dumpOne(String key, AFCommandOutput output) {
+    final entry = find(key);
+    if(entry == null) {
+      output.writeErrorLine("No conifguration value for $key");
+      return;
+    }
+    dumpEntry(entry, output);
+  }
+
+  void dumpEntry(AFConfigEntry entry, AFCommandOutput output) {
       AFCommand.startCommandColumn(output);
       output.write(entry.namespaceKey + ": ");
       AFCommand.startHelpColumn(output);
-      output.writeLine(valueFor(entry).toString());
-    }
+      output.writeLine(valueFor(entry).toString());    
   }
 
   

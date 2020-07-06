@@ -5,10 +5,10 @@ import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 
 /// Parent for commands executed through the afib command line app.
-class HelpCommand extends AFCommand { 
+class AFHelpCommand extends AFCommand { 
   final AFCommands all;
 
-  HelpCommand({this.all}): super(AFConfigEntries.afNamespace, "help", 0, 1);
+  AFHelpCommand({this.all}): super(AFConfigEntries.afNamespace, "help", 0, 0);
 
   void execute(AFArgs args, AFConfig afibConfig, AFCommandOutput output) {    
 
@@ -28,13 +28,14 @@ class HelpCommand extends AFCommand {
       return;
     }
 
-    if(args.count == 1) {
+    if(args.count >= 1) {
       String command = args.first;
+      String subCommand = args.second;
       AFCommand cmd = all.find(command);
       if(cmd == null) {
         output.writeLine("Unknown command: $command");
       } else {
-        cmd.writeLongHelp(output);
+        cmd.writeLongHelp(output, subCommand);
       }
     }
   }

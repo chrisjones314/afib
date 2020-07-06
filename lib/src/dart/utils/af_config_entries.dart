@@ -12,6 +12,8 @@ class AFConfigEntries {
   /// 
   /// Third parties can extend this namespace.
   static const afNamespace = 'af';
+  static const afNamespaceSeparator = ':';
+  static const declaredIn = 'AFConfigEntries';
 
   /// Used to indicate an environment of [debug], [production], [prototype] or [release].
   /// 
@@ -21,7 +23,7 @@ class AFConfigEntries {
 
   /// Used to turn on debug logging that may be useful in finding problems in 
   /// the Afib framework, off by default.
-  static final internalLogging = AFConfigEntryBool(afNamespace, "internal_logging", false, "Set to true to show internal afib log statements");
+  static final internalLogging = AFConfigEntryBool(afNamespace, "internalLogging", false, "Set to true to show internal afib log statements");
 
   /// Set to true only when running under a flutter WidgetTester test.
   /// 
@@ -30,7 +32,7 @@ class AFConfigEntries {
   /// you should use widgets like [AFCircularProgressIndicator], which use this flag,
   /// by way of the utility [AFConfig.isWidgetTesterContext] to return static widgets
   /// instead of an infinite animation in the widget tester context.
-  static final widgetTesterContext = AFConfigEntryBool(afNamespace, "widget_tester_context", false, "Internal value set to true when we are doing widget tests");
+  static final widgetTesterContext = AFConfigEntryBool(afNamespace, "widgetTesterContext", false, "Internal value set to true when we are doing widget tests");
 
 
 

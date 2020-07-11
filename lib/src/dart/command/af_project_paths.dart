@@ -14,6 +14,8 @@ class AFProjectPaths {
   static const initializationPath = [libFolder, initializationFolder];
   static const afibConfigPath = [libFolder, initializationFolder, afibConfigFile];
   static const pubspecPath = [pubspecFile];
+  static const idFile = "id.dart";
+  static const idPath = [libFolder, idFile];
 
   static bool projectFileExists(List<String> relativePath) {
     final path = projectPathFor(relativePath);

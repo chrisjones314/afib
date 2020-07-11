@@ -4,6 +4,7 @@ import 'package:afib/src/dart/command/af_args.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 
@@ -57,7 +58,7 @@ abstract class AFCommand extends AFItemWithNamespace {
   /// 
   /// [afibConfig] contains only the values from initialization/afib.g.dart, which can be 
   /// manipulated from the command line.
-  void execute(AFArgs args, AFConfig afibConfig, AFCommandOutput output);
+  void execute(AFCommandContext ctx);
 
   /// Should return a simple help string summarizing the command.
   String get shortHelp;
@@ -106,6 +107,16 @@ abstract class AFCommand extends AFItemWithNamespace {
 
 }
 
+class AFCommandContext {
+  final AFCommands commands;
+  final AFArgs args;
+  final AFConfig afibConfig;
+  final AFCommandOutput output;
+
+  AFCommandContext(this.commands, this.args, this.afibConfig, this.output);
+
+}
+
 /// The set of all known afib commands.
 class AFCommands {
   final List<AFCommand> commands = List<AFCommand>();
@@ -131,9 +142,19 @@ class AFCommands {
     commands.add(command);
   }
 
+  /// Access the [AFGenerateCommand] command, which can be modified/extended by third parties.
+  AFGenerateCommand get generateCmd {
+    return find(AFGenerateCommand.cmdKey);
+  }
+
+  /// Access the [AFConfigCommand] command, which can be modified/extended by third parties.
+  AFConfigCommand get configCmd {
+    return find(AFConfigCommand.cmdKey);
+  }
+
   /// Get the configuration commnd, which can be extended to allow for 3rd party configuration values.
   AFConfigCommand findConfigCommand() {
-    return find(AFConfigCommand.cmdName);
+    return find(AFConfigCommand.cmdKey);
   }
 
   /// Given "help" or "--help", returns the HelpCommand, etc.
@@ -160,7 +181,8 @@ class AFCommands {
     }
 
     try {
-      cmd.execute(afArgs, afibConfig, output);
+      final ctx = AFCommandContext(this, afArgs, afibConfig, output);
+      cmd.execute(ctx);
     } catch(e) {
       output.writeErrorLine(e.toString());
     }

@@ -1,9 +1,15 @@
 
 /// An insertion point in a file, with an optional whitespace indentation before each line.
-class AFTemplateInsertionPoint {
+class AFTemplateReplacementPoint {
   final String indent;
   final String key;
-  AFTemplateInsertionPoint(this.indent, this.key);
+  AFTemplateReplacementPoint(this.indent, this.key);
+}
+
+enum AFTemplateSourceCreationRule {
+  createAlways,
+  createOnce,
+  updateInPlace
 }
 
 /// A source of template source code. 
@@ -12,16 +18,19 @@ class AFTemplateInsertionPoint {
 /// but because dart programs are sometimes compiled, you cannot depend on
 /// resource files to be present (see https://github.com/dart-archive/resource)
 abstract class AFTemplateSource {
+  final AFTemplateSourceCreationRule creationRule;
+
+  AFTemplateSource(this.creationRule);
 
   String template();
 
-  List<AFTemplateInsertionPoint> findInsertionPoints() {
+  List<AFTemplateReplacementPoint> findReplacementPoints() {
     String t = template();
-    RegExp exp = new RegExp(r"([ \t]*?)\[!(.*?)!\]");
+    RegExp exp = new RegExp(r"([ \t]*?)AfibReplacementPoint\((.*?)\)");
     Iterable<RegExpMatch> matches = exp.allMatches(t);
-    final result = List<AFTemplateInsertionPoint>();
+    final result = List<AFTemplateReplacementPoint>();
     for(final match in matches) {
-      result.add(AFTemplateInsertionPoint(match.group(1), match.group(2)));
+      result.add(AFTemplateReplacementPoint(match.group(1), match.group(2)));
     }
     return result;
   }

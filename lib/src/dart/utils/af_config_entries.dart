@@ -34,7 +34,12 @@ class AFConfigEntries {
   /// instead of an infinite animation in the widget tester context.
   static final widgetTesterContext = AFConfigEntryBool(afNamespace, "widgetTesterContext", false, "Internal value set to true when we are doing widget tests");
 
-
+  /// A two or three character value which is used as the namespace for app-specific
+  /// commands, and also the prefix on certain app-specific classs names.
+  /// 
+  /// For example, if the AppNamespace is ab, then the widget ID container class will be 
+  /// named ABWidgetID, and a custom command called fixupdb will be ab:fixupdb.
+  static final appNamespace = AFConfigEntryString(afNamespace, "appNamespace", "A 2-3 character code identifying your app.", minChars: 2, maxChars: 3, reqLower: true);
 
 
 }

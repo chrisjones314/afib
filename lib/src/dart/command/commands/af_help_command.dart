@@ -10,9 +10,11 @@ class AFHelpCommand extends AFCommand {
 
   AFHelpCommand({this.all}): super(AFConfigEntries.afNamespace, "help", 0, 0);
 
-  void execute(AFArgs args, AFConfig afibConfig, AFCommandOutput output) {    
-
+  void execute(AFCommandContext ctx) {    
+    final output = ctx.output;
+    final args = ctx.args;
     if(this.all.isAfib) {
+      
       output.writeSeparatorLine();
       output.writeLine("Note: The afib command is only used for operations that are not application specific.");
       output.writeLine("Look in your project's bin folder for an XX_afib command that has");

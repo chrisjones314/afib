@@ -9,12 +9,12 @@ import 'package:afib/src/dart/command/generator_steps/af_file_generator_step.dar
 import 'package:afib/src/dart/command/templates/afib.t.dart';
 
 class AFConfigGenerator extends AFSourceGenerator {
-  static const genKey = "config";
+  static const cmdKey = "config";
   
-  AFConfigGenerator() : super(AFConfigEntries.afNamespace, genKey, "Update a single configuration parameter in ${AFProjectPaths.afibConfigFile}") {
-    final genAfib = AFFileGeneratorStep(AFibT(), AFProjectPaths.afibConfigPath);
-    genAfib.setDynamicHandler(AFConfigsSectionGenerator());
-    genAfib.setDynamicHandler(AFImportCommandGenerator());
+  AFConfigGenerator() : super(AFConfigEntries.afNamespace, cmdKey, "Update a single configuration parameter in ${AFProjectPaths.afibConfigFile}") {
+    final genAfib = AFFileGeneratorStep(AFProjectPaths.afibConfigPath);
+    genAfib.setCodeGenerator(AFConfigsSectionGenerator());
+    genAfib.setCodeGenerator(AFImportCommandGenerator());
     addStep(genAfib);
   }
 }

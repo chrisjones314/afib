@@ -1,13 +1,20 @@
 
 /// Used to insert code at a particular point in a file.
 class AFCodeBuffer {
-  int indent = 0;
+  final String indent;
   final lines = List<String>();
   final currentLine = StringBuffer();
 
+  AFCodeBuffer({this.indent = ""});
+
   void writeLine(String line) {
+    currentLine.write(line);
+    lines.add(currentLine.toString());
     currentLine.clear();
-    lines.add(line);
+  }
+
+  void write(String content) {
+    currentLine.write(content);
   }
 
   String withIndent(String indent) {

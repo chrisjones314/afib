@@ -1,6 +1,7 @@
 
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
+import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/generators/af_config_generator.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
@@ -139,14 +140,45 @@ class AFConfigEntryBool extends AFConfigEntryChoice {
 
 }
 
+class AFConfigEntryString extends AFConfigEntry {
+  final int maxChars;
+  final int minChars;
+  final String help;
+  final bool reqLower;
+
+  AFConfigEntryString(String namespace, String key, this.help, {this.minChars = -1, this.maxChars = -1, this.reqLower = false}): super(namespace, key, "");
+  
+  @override
+  String validate(String value) {
+    if(minChars > 0 && value.length < minChars ) {
+      return "$value must be at least $minChars characters long.";
+    }
+    if(maxChars > 0 && value.length > maxChars) {
+      return "$value must be at most $maxChars characters long.";
+    }
+    if(reqLower) {
+      if(value.toLowerCase() != value) {
+        return "$value must be all lowercase";
+      }
+    }
+    return null;
+  }  
+
+  void writeHelp(AFCommandOutput output, { int indent = 0 }) {
+    writeCommandHelp(output, this.help, indent: indent);
+  }
+
+
+}
+
 
 /// Command that displays or modified values from [AFConfig], and
 /// that modifed values under the initialization/afib.g.dart.
 class AFConfigCommand extends AFCommand { 
   final configs = Map<String, AFConfigEntry>();
-  static const cmdName = "config";
+  static const cmdKey = "config";
 
-  AFConfigCommand(): super(AFConfigEntries.afNamespace, cmdName, 0, 2) {
+  AFConfigCommand(): super(AFConfigEntries.afNamespace, cmdKey, 0, 2) {
     registerEntry(AFConfigEntries.environment);
     registerEntry(AFConfigEntries.internalLogging);
   }
@@ -176,7 +208,11 @@ class AFConfigCommand extends AFCommand {
   }
   
   @override
-  void execute(AFArgs args, AFConfig afibConfig, AFCommandOutput output) {    
+  void execute(AFCommandContext ctx) {    
+    final args = ctx.args;
+    final afibConfig = ctx.afibConfig;
+    final output = ctx.output;
+    
     // dump out the current value of all arguments.
     if(args.count == 0) {
       final sorted = AFItemWithNamespace.sortIterable<AFConfigEntry>(afibConfig.all);
@@ -206,12 +242,17 @@ class AFConfigCommand extends AFCommand {
       return;
     }
     
-    final generator = AFConfigGenerator();
-    if(!generator.validateBefore(args, afibConfig, output)) {
+    
+    final generateCmd = ctx.commands.generateCmd;
+    final configGenerator = generateCmd.configGenerator;
+    final files = generateCmd.files;
+    if(!configGenerator.validateBefore(ctx, files)) {
       return;
-    }
 
-    generator.execute(args, afibConfig, output);    
+    }
+    configGenerator.execute(ctx, files);    
+
+    files.saveChangedFiles(output);
   }
 
   @override

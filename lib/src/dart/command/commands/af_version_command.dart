@@ -9,8 +9,8 @@ class AFVersionCommand extends AFCommand {
 
   AFVersionCommand(): super(AFConfigEntries.afNamespace, "version", 0, 0);
 
-  void execute(AFArgs args, AFConfig afibConfig, AFCommandOutput output) {
-    output.writeLine("Afib 0.0.10");
+  void execute(AFCommandContext ctx) {
+    ctx.output.writeLine("Afib 0.0.10");
   }
 
 

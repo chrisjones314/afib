@@ -3,6 +3,7 @@ import 'dart:core';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
+import 'package:afib/src/dart/command/generator_code/af_code_generator.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 
@@ -80,6 +81,11 @@ class AFConfig {
   /// True if AFib should display internal log statements.
   bool get enableInternalLogging {
     return boolFor(AFConfigEntries.internalLogging);
+  }
+
+  String get projectFolderName {
+    final projectName = stringFor(AFConfigEntries.projectName);
+    return AFCodeGenerator.toSnakeCase(projectName);
   }
 
   Iterable<AFConfigEntry> get all {

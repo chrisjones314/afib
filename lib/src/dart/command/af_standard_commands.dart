@@ -5,6 +5,7 @@ import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/commands/af_help_command.dart';
+import 'package:afib/src/dart/command/commands/af_new_project_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
@@ -14,6 +15,7 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 void afRegisterAfibOnlyCommands(AFCommands commands) {
   commands.register(AFHelpCommand(all: commands));
   commands.register(AFVersionCommand());
+  commands.register(AFNewProjectCommand());
 }
 
 /// Initialize afib comamnds that are used from the application-specific

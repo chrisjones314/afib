@@ -19,12 +19,19 @@ class AFCodeBuffer {
 
   String withIndent(String indent) {
     final result = StringBuffer();
+    if(currentLine.isNotEmpty) {
+      writeLine("");
+    }
     for(int i = 0; i < lines.length; i++) {
       String line = lines[i];
       if(i > 0) {
         result.write(indent);
       }
-      result.writeln(line);
+      if(i+1 < lines.length) {
+        result.writeln(line);
+      } else {
+        result.write(line);
+      }
     }
     return result.toString();
   }

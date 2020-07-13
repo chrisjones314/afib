@@ -25,7 +25,7 @@ class AFHelpCommand extends AFCommand {
     if(args.count == 0) {
       output.writeLine("AFib commands, use afib help <command> for details: ");
       all.commands.forEach((cmd) {
-        cmd.writeShortHelp(output);
+        cmd.writeShortHelp(ctx);
       });
       return;
     }
@@ -37,7 +37,7 @@ class AFHelpCommand extends AFCommand {
       if(cmd == null) {
         output.writeLine("Unknown command: $command");
       } else {
-        cmd.writeLongHelp(output, subCommand);
+        cmd.writeLongHelp(ctx, subCommand);
       }
     }
   }

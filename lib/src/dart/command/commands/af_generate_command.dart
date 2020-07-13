@@ -2,16 +2,18 @@
 import 'dart:io';
 
 import 'package:afib/src/dart/command/af_project_paths.dart';
-import 'package:afib/src/dart/command/generator_steps/af_code_buffer.dart';
-import 'package:afib/src/dart/command/generator_steps/af_id_generator_step.dart';
-import 'package:afib/src/dart/command/generator_steps/af_section_generator_step.dart';
+import 'package:afib/src/dart/command/generator_code/af_code_buffer.dart';
+import 'package:afib/src/dart/command/generator_code/af_code_generator.dart';
+import 'package:afib/src/dart/command/generator_code/af_namespace_generator.dart';
 import 'package:afib/src/dart/command/generators/af_id_generator.dart';
-import 'package:afib/src/dart/command/templates/afib.t.dart';
+import 'package:afib/src/dart/command/templates/af_template_registry.dart';
+import 'package:afib/src/dart/command/templates/files/afib.t.dart';
 import 'package:afib/src/dart/command/af_command.dart';
-import 'package:afib/src/dart/command/af_template_source.dart';
-import 'package:afib/src/dart/command/generator_steps/af_file_generator_step.dart';
+import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/generators/af_config_generator.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
+import 'package:afib/src/dart/command/templates/files/id.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_id_statement.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 
@@ -42,7 +44,7 @@ class AFInsertionPoint {
 
   String findIndentFor(String content) {
     final source = StringBuffer();
-    source.write("(\\s*)//\\s+");
+    source.write("([\t ]*)//\\s+");
     source.write(buildFullText(id, true));
     final re = RegExp(source.toString());
     final matches = re.allMatches(content);
@@ -85,9 +87,20 @@ class AFGeneratedFile {
     return content.contains(insert.replaceRegexFor);
   }
 
+  void saveIfModified(AFCommandOutput output) {
+    if(modified) {
+      save(output);
+    }
+  }
+
   void save(AFCommandOutput output) {
-    output.writeLine("Writing ${AFProjectPaths.pathFor(projectPath)}");
-    final path = AFProjectPaths.projectPathFor(this.projectPath);
+    // make sure the folder exists before we write a file.
+    if(AFProjectPaths.ensureFolderExistsForFile(projectPath)) {
+      output.writeLine("Created folder at ${AFProjectPaths.relativePathFor(projectPath)}");
+    }
+
+    output.writeLine("Writing ${AFProjectPaths.relativePathFor(projectPath)}");
+    final path = AFProjectPaths.fullPathFor(this.projectPath);
     final f = File(path);
     f.writeAsStringSync(content);
   }
@@ -100,13 +113,15 @@ class AFGeneratedFile {
 
     String indent = insert.findIndentFor(content);
     final re = insert.replaceRegexFor;
-    updateContent(content.replaceAll(re, buffer.withIndent(indent))); 
-    ctx.output.writeLine("Inserted code in ${AFProjectPaths.pathFor(projectPath)}");
+    final toInsert = buffer.withIndent(indent);
+    final revised = content.replaceAll(re, toInsert);
+    updateContent(ctx.o, revised); 
   }
 
-  void updateContent(String revised) {
+  void updateContent(AFCommandOutput output, String revised) {
     this.content = revised;
     modified = true;
+    output.writeLine("Updated code in ${AFProjectPaths.relativePathFor(projectPath)}");
   }
 
 }
@@ -115,7 +130,7 @@ class AFGeneratedFile {
 /// generate command.
 class AFGeneratedFiles {
   final files = Map<String, AFGeneratedFile>();
-  final templates = Map<String, AFTemplateSource>();
+
 
   void saveChangedFiles(AFCommandOutput output) {
     for(final file in files.values) {
@@ -129,50 +144,51 @@ class AFGeneratedFiles {
     return AFProjectPaths.projectFileExists(projectPath);
   }
 
-  void registerFile(List<String> projectPath, AFTemplateSource source) {
-    final path = AFProjectPaths.pathFor(projectPath);
-    templates[path] = source;
-  }
-
-  AFGeneratedFile fileFor(List<String> projectPath) {
-    final path = AFProjectPaths.pathFor(projectPath);
+  AFGeneratedFile fileFor(AFTemplateRegistry templates, List<String> projectPath) {
+    final path = AFProjectPaths.relativePathFor(projectPath);
     var file = files[path];
     if(file == null) {
       /// read in the file.
-      final f = File(AFProjectPaths.projectPathFor(projectPath));
-      final content = f.readAsStringSync();
+      var content;
+      if(AFProjectPaths.projectFileExists(projectPath)) {
+        final f = File(AFProjectPaths.fullPathFor(projectPath));
+        content = f.readAsStringSync();
+      } else {
+        final template = templates.templateForFile(projectPath);
+        content = template.template;
+      }
       file = AFGeneratedFile(projectPath, content);
       files[path] = file;
     }
     return file;
   }
 
-  AFTemplateSource templateFor(List<String> projectPath) {
-    final path = AFProjectPaths.pathFor(projectPath);
-    return templates[path];
-  }
 }
 
 /// A single process in the 
-abstract class AFSourceGeneratorStep {
+abstract class AFSourceGenerationStep {
 
   /// Validate that all the necessary templates, insertion points, and parameters
   /// are valid prior to doing the source code generation.
   /// 
   /// If they are not, output an error and return false.
   bool validateBefore(AFCommandContext ctx, AFGeneratedFiles files);
+
+
+  /// Execute the generation step.
+  void execute(AFCommandContext ctx, AFGeneratedFiles files);
 }
 
 /// A an algorithm that manipulates one or more pieces of code, consisting
-/// of a serious of [AFSourceGeneratorStep]
+/// of a serious of [AFSourceGenerationStep]
 class AFSourceGenerator extends AFItemWithNamespace {
-  final steps = List<AFFileGeneratorStep>();
+  final steps = List<AFSourceGenerationStep>();
   final String shortHelp;
 
   /// 
   AFSourceGenerator(String namespace, String key, this.shortHelp): super(namespace, key);
 
-  void addStep(AFSourceGeneratorStep step) {
+  void addStep(AFSourceGenerationStep step) {
     steps.add(step);
   }
 
@@ -210,8 +226,6 @@ class AFGenerateCommand extends AFCommand {
   final files = AFGeneratedFiles();
 
   AFGenerateCommand(): super(AFConfigEntries.afNamespace, cmdKey, 1, 0) {
-    files.registerFile(AFProjectPaths.afibConfigPath, AFibT());
-
     registerGenerator(AFConfigGenerator());
     registerGenerator(AFIDGenerator());
   }
@@ -249,8 +263,9 @@ class AFGenerateCommand extends AFCommand {
   }
 
   @override  
-  void writeLongHelp(AFCommandOutput output, String subCommand) {
-    writeShortHelp(output);
+  void writeLongHelp(AFCommandContext ctx, String subCommand) {
+    final output = ctx.o;
+    writeShortHelp(ctx);
     if(subCommand == null) {
       AFCommand.emptyCommandColumn(output);
       AFCommand.startHelpColumn(output);

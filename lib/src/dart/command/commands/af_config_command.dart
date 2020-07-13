@@ -17,10 +17,20 @@ abstract class AFConfigEntry extends AFItemWithNamespace {
     
     AFConfigEntry(String namespace, String key, this.defaultValue, {this.declaringClass = AFConfigEntries.declaredIn}): super(namespace, key);
 
+
+
     void writeHelp(AFCommandOutput output, {int indent = 0});
 
     String get codeIdentifier {
       return "$declaringClass.$key";
+    }
+
+    String get argumentString {
+      return key;
+    }
+
+    String get argumentHelp {
+      return "";
     }
 
     String codeValue(AFConfig config) {
@@ -141,12 +151,16 @@ class AFConfigEntryBool extends AFConfigEntryChoice {
 }
 
 class AFConfigEntryString extends AFConfigEntry {
+  static const optionLowercase = 1;
+  static const optionIdentifier = 2;
+  static const optionMixedCase = 4;
+
   final int maxChars;
   final int minChars;
   final String help;
-  final bool reqLower;
+  final int options;
 
-  AFConfigEntryString(String namespace, String key, this.help, {this.minChars = -1, this.maxChars = -1, this.reqLower = false}): super(namespace, key, "");
+  AFConfigEntryString(String namespace, String key, this.help, {this.minChars = -1, this.maxChars = -1, this.options = 0}): super(namespace, key, "");
   
   @override
   String validate(String value) {
@@ -156,7 +170,7 @@ class AFConfigEntryString extends AFConfigEntry {
     if(maxChars > 0 && value.length > maxChars) {
       return "$value must be at most $maxChars characters long.";
     }
-    if(reqLower) {
+    if(hasOption(optionLowercase)) {
       if(value.toLowerCase() != value) {
         return "$value must be all lowercase";
       }
@@ -164,11 +178,46 @@ class AFConfigEntryString extends AFConfigEntry {
     return null;
   }  
 
-  void writeHelp(AFCommandOutput output, { int indent = 0 }) {
-    writeCommandHelp(output, this.help, indent: indent);
+  String get argumentHelp {
+    bool extraDetails = (maxChars > 0 || minChars > 0 || options != 0);
+    final sb = StringBuffer();
+    sb.write(help);
+    if(extraDetails) {
+      final dets = List<String>();
+      if(minChars > 0) {
+        dets.add("min: $minChars");
+      }
+      if(maxChars > 0) {
+        dets.add("max: $maxChars");
+      }
+      if(options != 0) {
+        if(hasOption(optionLowercase)) {
+          dets.add("all lowercase");
+        }
+        if(hasOption(optionMixedCase)) {
+          dets.add("mixed case");
+        }
+        if(hasOption(optionIdentifier)) {
+          dets.add("valid identifier");
+        }
+      }
+      if(dets.isNotEmpty) {
+        sb.write(" (");
+        sb.write(dets.join(", "));
+        sb.write(")");
+      }
+    }
+    return sb.toString();
   }
 
 
+  void writeHelp(AFCommandOutput output, { int indent = 0 }) {    
+    writeCommandHelp(output, this.argumentString, indent: indent);
+  }
+
+  bool hasOption(int opt) {
+    return (options & opt) != 0;
+  }
 }
 
 
@@ -192,8 +241,9 @@ class AFConfigCommand extends AFCommand {
     configs[entry.key] = entry;
   }
 
-  void writeLongHelp(AFCommandOutput output, String subCommand) {
-    writeShortHelp(output, );
+  void writeLongHelp(AFCommandContext ctx, String subCommand) {
+    final output = ctx.o;
+    writeShortHelp(ctx);
     List<AFConfigEntry> entries = AFItemWithNamespace.sortIterable<AFConfigEntry>(configs.values);
     for(final entry in entries) {
       entry.writeHelp(output, indent: 2);
@@ -257,6 +307,6 @@ class AFConfigCommand extends AFCommand {
 
   @override
   String get shortHelp {
-    return "Set the values below, which are written to initialization/afib.g.dart:";
+    return "Set the values below, which are written to ${AFProjectPaths.relativePathFor(AFProjectPaths.afibConfigPath)}";
   }
 }

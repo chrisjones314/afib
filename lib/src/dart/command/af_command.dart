@@ -5,6 +5,7 @@ import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
+import 'package:afib/src/dart/command/templates/af_template_registry.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 
@@ -72,7 +73,8 @@ abstract class AFCommand extends AFItemWithNamespace {
   }
 
   /// Briefly describe command usage.
-  void writeShortHelp(AFCommandOutput output, { int indent: 0 }) {
+  void writeShortHelp(AFCommandContext ctx, { int indent: 0 }) {
+    final output = ctx.o;
     startCommandColumn(output, indent: indent);
     output.write(namespaceKey + " - ");
     startHelpColumn(output);
@@ -83,12 +85,33 @@ abstract class AFCommand extends AFItemWithNamespace {
 
   /// Optionally override this to provide more verbose help for a command,
   /// Which is shown for afib help <command>.  By default, shows the [shortHelp]. 
-  void writeLongHelp(AFCommandOutput output, String subCommand) {
-    writeShortHelp(output);
+  void writeLongHelp(AFCommandContext ctx, String subCommand) {
+    writeShortHelp(ctx);
+  }
+
+  void writeUsage(AFCommandContext ctx, String cmdKey, String args) {
+    final output = ctx.o;
+    output.writeLine("Usage: ");
+    output.writeLine("    ${ctx.commandUsed} $cmdKey $args");
+  }
+
+  void startArguments(AFCommandContext ctx) {
+    ctx.o.writeLine("\nArguments: ");
+  }
+
+  void writeConfigArgument(AFCommandContext ctx, AFConfigEntry entry) {
+    startArgColumn(ctx.o);
+    ctx.o.write("${entry.argumentString} - ");
+    startHelpColumn(ctx.o);
+    ctx.o.writeLine(entry.argumentHelp);
   }
 
   void printError(String text) {
     print("Error: $text");
+  }
+
+  static void startArgColumn(AFCommandOutput output) {
+    output.startColumn(alignment: AFOutputAlignment.alignRight, width: 30);
   }
 
   static void startCommandColumn(AFCommandOutput output, { int indent = 0 }) {
@@ -97,7 +120,7 @@ abstract class AFCommand extends AFItemWithNamespace {
   }
 
   static void startHelpColumn(AFCommandOutput output) {
-    output.startColumn(alignment: AFOutputAlignment.alignRight);
+    output.startColumn(alignment: AFOutputAlignment.alignLeft);
   }
 
   static void emptyCommandColumn(AFCommandOutput output) {
@@ -112,8 +135,23 @@ class AFCommandContext {
   final AFArgs args;
   final AFConfig afibConfig;
   final AFCommandOutput output;
+  final AFTemplateRegistry templates;
+  final AFGeneratorRegistry generators;
+  
 
-  AFCommandContext(this.commands, this.args, this.afibConfig, this.output);
+  AFCommandContext(this.commands, this.args, this.afibConfig, this.output, this.templates, this.generators);
+
+  AFCommandOutput get o { return output; }
+  AFArgs get a { return args; }
+
+  String get commandUsed {
+    if(commands.isAfib) {
+      return "afib";
+    } else {
+      String namespace = afibConfig.stringFor(AFConfigEntries.appNamespace);
+      return "${namespace}_afib";
+    }
+  }
 
 }
 
@@ -122,6 +160,12 @@ class AFCommands {
   final List<AFCommand> commands = List<AFCommand>();
   static const afCommandAfib = 1;
   static const afCommandApp  = 2;
+
+  /// When you are registerying commands, you can also register your own templates,
+  /// or overwrite the existing templates.
+  final templates = AFTemplateRegistry();
+
+  final generators = AFGeneratorRegistry();
 
   /// Either [afCommandAfib] if the command is afib, or [afCommandApp] if this is the 
   /// app-specific command
@@ -180,8 +224,9 @@ class AFCommands {
       output.writeErrorLine("Command $command must have at most ${cmd.maxArgs} arguments.");
     }
 
+    generators.registerGlobals();
     try {
-      final ctx = AFCommandContext(this, afArgs, afibConfig, output);
+      final ctx = AFCommandContext(this, afArgs, afibConfig, output, templates, generators);
       cmd.execute(ctx);
     } catch(e) {
       output.writeErrorLine(e.toString());

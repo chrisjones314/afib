@@ -572,6 +572,13 @@ class AFScreenTests<TState> {
     return namedSections[id];
   }
 
+  void registerData(dynamic id, dynamic data) {
+    AFibF.testData.registerData(id, data);
+  }
+
+  dynamic findData(dynamic id) {
+    return AFibF.testData.findData(id);
+  }
 
 
 }

@@ -1,17 +1,17 @@
-import 'package:afib/src/dart/redux/middleware/af_async_queries.dart';
-import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/test/af_test_data_registry.dart';
 import 'package:flutter/material.dart';
 import 'package:afib/afib_flutter.dart';
-
-import '../../afib_dart.dart';
 
 /// Used to populate the screen map used to associate keys with screens.
 typedef void InitScreenMap(AFScreenMap map);
 typedef dynamic CreateStartupQueryAction();
 typedef AFApp CreateAFApp();
-typedef void InitScreenTests(AFScreenTests tests);
-typedef void InitStateTests(AFStateTests tests);
+typedef void InitTestData(AFTestDataRegistry registry);
+typedef void InitUnitTests(AFUnitTests tests, AFTestDataRegistry testData);
+typedef void InitScreenTests(AFScreenTests tests, AFTestDataRegistry testData);
+typedef void InitStateTests(AFStateTests tests, AFTestDataRegistry testData);
+
 
 //typedef dynamic AppReducer(dynamic appState, dynamic action);
 typedef TAppState AppReducer<TAppState>(TAppState appState, dynamic action);

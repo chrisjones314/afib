@@ -55,10 +55,15 @@ abstract class AFBaseTestExecute {
     _errors.addError(AFTestError(testID, err));
   }
 
-  void printPassMessages(AFCommandOutput output) {
+  int printPassMessages(AFCommandOutput output) {
     if(!_errors.hasErrors) {
       _writeTestResult(output, "${testID.code}:", _errors.pass, " passed", Styles.GREEN);
     }
+    return _errors.pass;
+  }
+
+  static void printTotalPass(AFCommandOutput output, int pass) {
+      _writeTestResult(output, "TOTAL:", pass, " passed", Styles.GREEN);
   }
 
   int printFailMessages(AFCommandOutput output) {
@@ -74,7 +79,7 @@ abstract class AFBaseTestExecute {
     return 0;
   }
 
-  void _writeTestResult(AFCommandOutput output, String code, int count, String suffix, Styles color) {
+  static void _writeTestResult(AFCommandOutput output, String code, int count, String suffix, Styles color) {
     output.startColumn(alignment: AFOutputAlignment.alignRight, width: 35);
     output.write(code);
     output.startColumn(alignment: AFOutputAlignment.alignRight, color: color, width: 5);
@@ -107,9 +112,11 @@ int printTestResults(AFCommandOutput output, String kind, List<AFBaseTestExecute
   output.writeLine("Afib $kind Tests:");
   output.indent();
 
+  int totalPass = 0;
   for(var context in baseContexts) {
-    context.printPassMessages(output);
+    totalPass += context.printPassMessages(output);
   }
+  AFBaseTestExecute.printTotalPass(output, totalPass);
 
   int totalErrors = 0;
   for(var context in baseContexts) {

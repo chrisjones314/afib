@@ -66,16 +66,8 @@ class AFStateTests {
     }
     return null;
   }
-
-  void registerData(dynamic id, dynamic data) {
-    this.data[id] = data;
-  }
-
-  dynamic lookupData(dynamic id) {
-    return data[id];
-  }
-
 }
+
 class _AFStateResultEntry {
   final AFAsyncQueryCustomError query;
   final ProcessQuery handler;
@@ -128,7 +120,7 @@ class AFStateTest<TState extends AFAppState> {
   /// 
   void specifySecondaryResponseWithId(AFAsyncQueryCustomError query, dynamic idData) {
     registerResult(query, (AFStateTestContext context, AFAsyncQueryCustomError query) {
-      final data = tests.lookupData(idData);
+      final data = AFibF.testData.findData(idData);
       query.testFinishAsyncWithResponse(context, data);
     });
   }

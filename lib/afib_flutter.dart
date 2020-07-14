@@ -20,3 +20,6 @@ export 'src/flutter/core/af_text_field.dart';
 export "src/flutter/test/af_state_test.dart";
 export "src/flutter/core/af_circular_progress_indicator.dart";
 export "src/flutter/utils/af_flutter_params.dart";
+export "src/flutter/test/af_test_data_registry.dart";
+export 'src/flutter/test/af_unit_tests.dart';
+export 'src/flutter/test/af_unit_test_main.dart';

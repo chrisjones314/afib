@@ -1,7 +1,7 @@
 
 class AFID {
   final String code;
-  AFID(this.code);
+  const AFID(this.code);
 
   @override
   String toString() {
@@ -10,29 +10,33 @@ class AFID {
 }
 
 class AFScreenID extends AFID {
-  AFScreenID(String code) : super(code);
+  const AFScreenID(String code) : super(code);
 }
 
 class AFWidgetID extends AFID {
-  AFWidgetID(String code) : super(code);
+  const AFWidgetID(String code) : super(code);
 }
 
 class AFTestID extends AFID {
-  AFTestID(String code) : super(code);
+  const AFTestID(String code) : super(code);
+}
+
+class AFTestDataID extends AFID {
+  const AFTestDataID(String code) : super(code);
 }
 
 class AFTestSectionID extends AFID {
-  AFTestSectionID(String code) : super(code);
+  const AFTestSectionID(String code) : super(code);
 }
 
 class AFStateTestID extends AFTestID {
-  AFStateTestID(String code) : super(code);
+  const AFStateTestID(String code) : super(code);
 }
 
 class AFQueryTestID extends AFID {
-  AFQueryTestID(String code) : super(code);
+  const AFQueryTestID(String code) : super(code);
 }
 
 class AFQueryID extends AFID {
-  AFQueryID(String code): super(code);
+  const AFQueryID(String code): super(code);
 }

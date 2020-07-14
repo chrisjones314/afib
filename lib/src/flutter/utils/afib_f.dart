@@ -15,6 +15,7 @@ import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
 import 'package:afib/src/flutter/test/af_init_proto_screen_map.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/test/af_test_data_registry.dart';
 import 'package:afib/src/flutter/utils/af_flutter_params.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:flutter/material.dart';
@@ -37,8 +38,10 @@ class AFibF {
   static AFStore _afStore;
   static AFAsyncQueries _afAsyncQueries = AFAsyncQueries();
   static CreateStartupQueryAction _afCreateStartupQueryAction;
+  static final AFTestDataRegistry _afTestData = AFTestDataRegistry();
   static final AFScreenTests _afScreenTests = AFScreenTests();
   static final AFStateTests _afStateTests = AFStateTests();
+  static final AFUnitTests _afUnitTests = AFUnitTests();
   static AFScreenMap _afPrototypeScreenMap;
   static CreateAFApp _afCreateApp;
   static AFScreenID forcedStartupScreen;
@@ -74,8 +77,11 @@ class AFibF {
     setStore(store);
 
     if(AFibD.config.requiresTestData) {
-      p.initScreenTests(AFibF.screenTests);
-      p.initStateTests(AFibF.stateTests);
+      final testData = AFibF.testData;
+      p.initTestData(testData);
+      p.initUnitTests(AFibF.unitTests, testData);
+      p.initScreenTests(AFibF.screenTests, testData);
+      p.initStateTests(AFibF.stateTests, testData);
     }
 
     if(AFibD.config.requiresPrototypeData) {
@@ -149,6 +155,16 @@ class AFibF {
   /// testing.
   static AFScreenTests get screenTests {
     return _afScreenTests;
+  }
+
+  /// Retrieves unit/calculation tests
+  static AFUnitTests get unitTests {
+    return _afUnitTests;
+  }
+
+  /// Mapping from string ids to builders for specific screens for the real app.
+  static AFTestDataRegistry get testData {
+    return _afTestData;
   }
 
   // Retrieves tests used to manipulate the redux state and verify that it 

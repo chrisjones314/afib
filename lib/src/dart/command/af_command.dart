@@ -99,11 +99,15 @@ abstract class AFCommand extends AFItemWithNamespace {
     ctx.o.writeLine("\nArguments: ");
   }
 
-  void writeConfigArgument(AFCommandContext ctx, AFConfigEntry entry) {
+  void writeArgument(AFCommandContext ctx, String arg, String help) {
     startArgColumn(ctx.o);
-    ctx.o.write("${entry.argumentString} - ");
+    ctx.o.write("$arg - ");
     startHelpColumn(ctx.o);
-    ctx.o.writeLine(entry.argumentHelp);
+    ctx.o.writeLine(help);
+  }
+
+  void writeConfigArgument(AFCommandContext ctx, AFConfigEntry entry) {
+    writeArgument(ctx, entry.argumentString, entry.argumentHelp);
   }
 
   void printError(String text) {
@@ -137,7 +141,7 @@ class AFCommandContext {
   final AFCommandOutput output;
   final AFTemplateRegistry templates;
   final AFGeneratorRegistry generators;
-  
+  final files = AFGeneratedFiles();
 
   AFCommandContext(this.commands, this.args, this.afibConfig, this.output, this.templates, this.generators);
 
@@ -207,8 +211,7 @@ class AFCommands {
   }
 
   /// Execute a command with the specified arguments.
-  void execute(String command, List<String> args, AFConfig afibConfig) {
-    final afArgs = AFArgs(args);
+  void execute(String command, AFArgs afArgs, AFConfig afibConfig) {
     final cmd = find(command);
     final output = AFCommandOutput();
 

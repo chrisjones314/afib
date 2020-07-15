@@ -13,6 +13,8 @@ class AFProjectPaths {
   static const pubspecFile = 'pubspec.yaml';
   static const afibConfigFile = 'afib.g.dart';
   static const libFolder = 'lib';
+  static const testFolder = 'test';
+  static const afibFolder = 'afib';
   static const initializationFolder = 'initialization';
   static const libPath = [libFolder];
   static const initializationPath = [libFolder, initializationFolder];
@@ -20,6 +22,10 @@ class AFProjectPaths {
   static const pubspecPath = [pubspecFile];
   static const idFile = "id.dart";
   static const idPath = [libFolder, idFile];
+  static const afTestFile = "afib_test.dart";
+  static const afTestPath = [testFolder, afibFolder, afTestFile];
+  static const afTestConfigFile = "afib_test_config.g.dart";
+  static const afTestConfigPath = [testFolder, afibFolder, afTestConfigFile];
 
   static List<String> extraParentFolder;
 

@@ -58,7 +58,7 @@ class AFStateTests {
     handler(test);
   }
 
-  AFStateTest findById(AFStateTestID id) {
+  AFStateTest findById(AFTestID id) {
     for(var test in tests) {
       if(test.id == id) {
         return test;
@@ -84,18 +84,18 @@ class _AFStateQueryEntry {
 class AFStateTest<TState extends AFAppState> {
   final AFStateTests tests;
   final AFTestID id;
-  AFStateTestID idPredecessor;
+  AFTestID idPredecessor;
   final AFAsyncQueryCustomError query;
   final Map<String, _AFStateResultEntry> results = Map<String, _AFStateResultEntry>();
   final List<_AFStateQueryEntry> postQueries = List<_AFStateQueryEntry>();
 
   AFStateTest(this.id, this.query, this.tests);
 
-  void continuesAfter(AFStateTestID pred) {
+  void continuesAfter(AFTestID pred) {
     idPredecessor = pred;
   }
 
-  void initializeResultsFrom(AFStateTestID idTest) {
+  void initializeResultsFrom(AFTestID idTest) {
     final test = tests.findById(idTest);
     test.results.forEach((key, result) { 
       /// if this is the primary result, then copy it over to the primary result for
@@ -108,7 +108,7 @@ class AFStateTest<TState extends AFAppState> {
     });
   }
 
-  void initializeVerifyFrom(AFStateTestID idTest) {
+  void initializeVerifyFrom(AFTestID idTest) {
     final test = tests.findById(idTest);
     postQueries.addAll(test.postQueries);
   }

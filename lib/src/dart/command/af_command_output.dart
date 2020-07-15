@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:colorize/colorize.dart';
 
 enum AFOutputAlignment {
@@ -60,16 +59,12 @@ class AFCommandOutput {
     col.write(output);
   }
 
-  void writeError(String error) {
-    final out = Colorize("ERROR: ").apply(Styles.RED);
-    stdout.write(out);
-    stdout.write(error);
-    stdout.writeln();
-  }
-
   void writeErrorLine(String error) {
-    writeError(error);
-    endLine();
+    final out = Colorize("ERROR: ").apply(Styles.RED);
+    final result = StringBuffer();
+    result.write(out);
+    result.write(error);
+    writeLine(result.toString());
   }
 
   void writeLine(String output) {
@@ -78,34 +73,36 @@ class AFCommandOutput {
   }
 
   void writeSeparatorLine() {
-    writeLine("--------------------------------------------------------------------");
+    writeLine("------------------------------------");
   }
 
   void endLine() {
-    _writeSpace(2*nIndent);
+    final sb = StringBuffer();
+    _writeSpace(sb, 2*nIndent);
 
     for(var col in cols) {
       if(col.alignment == AFOutputAlignment.alignRight) {
         int req = col.width - col.length;
-        _writeSpace(req);
+        _writeSpace(sb, req);
       }
 
       final out = Colorize(col.content.toString()).apply(col.color);
-      stdout.write(out);
+      sb.write(out);
       
       if(col.alignment == AFOutputAlignment.alignLeft) {
         int req = col.width - col.length;
-        _writeSpace(req);
+        _writeSpace(sb, req);
       }
     }
 
-    stdout.writeln();
+    print(sb.toString());
+
     cols.clear();
   }
 
-  void _writeSpace(int count) {
+  void _writeSpace(StringBuffer sb, int count) {
     for(int i = 0; i < count; i++) {
-      stdout.write(" ");
+      sb.write(" ");
     }   
   }
 

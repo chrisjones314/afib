@@ -7,13 +7,16 @@ import 'package:afib/src/dart/command/generator_code/af_code_buffer.dart';
 import 'package:afib/src/dart/command/generator_code/af_code_generator.dart';
 
 class AFConfigsSectionGenerator extends AFCodeGenerator {
-  AFConfigsSectionGenerator(): super(AFConfigEntries.afNamespace, "configuration_entries");
+  final AFConfig source;
+  final List<AFConfigEntry> entries;
+  AFConfigsSectionGenerator({this.source, this.entries}): super(AFConfigEntries.afNamespace, "configuration_entries");
 
   @override
   void execute(AFCommandContext ctx, AFCodeBuffer buffer) {
-    final afibConfig = ctx.afibConfig;
-    final entries = AFItemWithNamespace.sortIterable<AFConfigEntry>(afibConfig.all);
-    for(final entry in entries) {
+    final afibConfig = this.source ?? ctx.afibConfig;
+    Iterable<AFConfigEntry> scope = this.entries ?? afibConfig.all;
+    final sorted = AFItemWithNamespace.sortIterable<AFConfigEntry>(scope);
+    for(final entry in sorted) {
       String codeVal = entry.codeValue(afibConfig);
       if(codeVal != null) {
         buffer.writeLine("config.setValue(AFConfigEntries.${entry.key}, $codeVal);");

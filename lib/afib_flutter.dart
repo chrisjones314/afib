@@ -23,3 +23,4 @@ export "src/flutter/utils/af_flutter_params.dart";
 export "src/flutter/test/af_test_data_registry.dart";
 export 'src/flutter/test/af_unit_tests.dart';
 export 'src/flutter/test/af_unit_test_main.dart';
+export "src/flutter/test/af_test_main.dart";

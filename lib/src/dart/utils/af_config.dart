@@ -58,6 +58,10 @@ class AFConfig {
     return valueFor(entry);
   }
 
+  List<String> stringListFor(AFConfigEntry entry) {
+    return valueFor(entry);
+  }
+
   /// Casts the value for [entry] to a boolean and returns it.
   bool boolFor(AFConfigEntry entry) {
     return valueFor(entry);

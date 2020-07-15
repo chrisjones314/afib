@@ -3,6 +3,7 @@ import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/generator_code/af_code_generator.dart';
 import 'package:afib/src/dart/command/generator_code/af_namespace_generator.dart';
 import 'package:afib/src/dart/command/templates/files/afib.t.dart';
+import 'package:afib/src/dart/command/templates/files/afib_test_config.t.dart';
 import 'package:afib/src/dart/command/templates/files/id.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_id_statement.dart';
 import 'package:afib/src/dart/command/templates/statements/import_statements.dart';
@@ -39,6 +40,7 @@ class AFTemplateRegistry {
   AFTemplateRegistry() {
     registerFile(AFProjectPaths.afibConfigPath, AFibT());
     registerFile(AFProjectPaths.idPath, IdentifierT());
+    registerFile(AFProjectPaths.afTestConfigPath, AFTestConfigT());
 
     registerStatement(AFStatementID.stmtDeclareID, DeclareIDStatementT());
   }  

@@ -2,6 +2,7 @@
 import 'dart:io';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:afib/src/flutter/test/af_test_stats.dart';
 import 'package:colorize/colorize.dart';
 import 'package:flutter_test/flutter_test.dart' as flutter_test;
 import 'package:stack_trace/stack_trace.dart';
@@ -57,18 +58,18 @@ abstract class AFBaseTestExecute {
 
   int printPassMessages(AFCommandOutput output) {
     if(!_errors.hasErrors) {
-      _writeTestResult(output, "${testID.code}:", _errors.pass, " passed", Styles.GREEN);
+      _writeTestResult(output, "${testID.code}:", _errors.pass, " passed", Styles.GREEN, tags: testID.tagsText);
     }
     return _errors.pass;
   }
 
-  static void printTotalPass(AFCommandOutput output, int pass) {
-      _writeTestResult(output, "TOTAL:", pass, " passed", Styles.GREEN);
+  static void printTotalPass(AFCommandOutput output, String title, int pass) {
+      _writeTestResult(output, "$title:", pass, " passed", Styles.GREEN);
   }
 
   int printFailMessages(AFCommandOutput output) {
     if(_errors.hasErrors) {
-      _writeTestResult(output, "${testID.code}:", _errors.errorCount, " failed", Styles.RED);
+      _writeTestResult(output, "${testID.code}:", _errors.errorCount, " failed", Styles.RED, tags: testID.tagsText);
       output.indent();
       for(var error in _errors.errors) {
          output.writeLine(error.toString());
@@ -79,13 +80,17 @@ abstract class AFBaseTestExecute {
     return 0;
   }
 
-  static void _writeTestResult(AFCommandOutput output, String code, int count, String suffix, Styles color) {
+  static void _writeTestResult(AFCommandOutput output, String title, int count, String suffix, Styles color, { String tags }) {
     output.startColumn(alignment: AFOutputAlignment.alignRight, width: 35);
-    output.write(code);
+    output.write(title);
     output.startColumn(alignment: AFOutputAlignment.alignRight, color: color, width: 5);
     output.write(count.toString());
-    output.startColumn(alignment: AFOutputAlignment.alignLeft, color: color);
+    output.startColumn(alignment: AFOutputAlignment.alignLeft, color: color, width: 8);
     output.write(suffix);
+    if(tags != null) {
+      output.startColumn(alignment: AFOutputAlignment.alignLeft);
+      output.write(tags);
+    }
     output.endLine();
   }
 
@@ -107,21 +112,23 @@ abstract class AFBaseTestExecute {
 
 }
 
-int printTestResults(AFCommandOutput output, String kind, List<AFBaseTestExecute> baseContexts) {
-  stdout.writeln("------------------------------");
+void printTestResults(AFCommandOutput output, String kind, List<AFBaseTestExecute> baseContexts, AFTestStats stats) {
+  if(baseContexts.isEmpty) {
+    return;
+  }
+  output.writeSeparatorLine();
   output.writeLine("Afib $kind Tests:");
-  output.indent();
 
   int totalPass = 0;
   for(var context in baseContexts) {
     totalPass += context.printPassMessages(output);
   }
-  AFBaseTestExecute.printTotalPass(output, totalPass);
+  AFBaseTestExecute.printTotalPass(output, "TOTAL", totalPass);
+  stats.addPasses(totalPass);
 
   int totalErrors = 0;
   for(var context in baseContexts) {
     totalErrors += context.printFailMessages(output);
   }
-  stdout.writeln("------------------------------");
-  return totalErrors;
+  stats.addErrors(totalErrors);
 }

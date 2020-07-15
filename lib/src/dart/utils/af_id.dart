@@ -9,6 +9,20 @@ class AFID {
   }
 }
 
+class AFIDWithTags extends AFID {
+  final List<String> tags;
+
+  const AFIDWithTags(String code, this.tags): super(code);
+
+  String get tagsText {
+    return tags.join(", ");
+  }
+
+  bool hasTag(String tag) {
+    return tags != null && tags.contains(tag);
+  }
+}
+
 class AFScreenID extends AFID {
   const AFScreenID(String code) : super(code);
 }
@@ -17,8 +31,8 @@ class AFWidgetID extends AFID {
   const AFWidgetID(String code) : super(code);
 }
 
-class AFTestID extends AFID {
-  const AFTestID(String code) : super(code);
+class AFTestID extends AFIDWithTags {
+  const AFTestID(String code, {List<String> tags}) : super(code, tags);
 }
 
 class AFTestDataID extends AFID {
@@ -27,10 +41,6 @@ class AFTestDataID extends AFID {
 
 class AFTestSectionID extends AFID {
   const AFTestSectionID(String code) : super(code);
-}
-
-class AFStateTestID extends AFTestID {
-  const AFStateTestID(String code) : super(code);
 }
 
 class AFQueryTestID extends AFID {

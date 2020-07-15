@@ -1,12 +1,11 @@
 
+import 'package:afib/src/dart/command/af_args.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
-import 'package:afib/src/dart/command/commands/af_generate_command.dart';
-import 'package:afib/src/dart/command/generators/af_config_generator.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
-import 'package:afib/src/dart/command/af_args.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
 
 import '../af_command_output.dart';
 
@@ -45,7 +44,7 @@ abstract class AFConfigEntry extends AFItemWithNamespace {
     }
     
     /// Return an error message if the value is invalid, otherwise return null.
-    String validate(String value);
+    String validate(dynamic value);
 
     void setValueWithString(AFConfig dest, String value) {
       validateWithException(value);
@@ -78,6 +77,99 @@ abstract class AFConfigEntry extends AFItemWithNamespace {
 
 }
 
+class AFConfigEntryList extends AFConfigEntry {
+  final List<String> allowed;
+  final help;
+  AFConfigEntryList(String namespace, String key, dynamic defaultValue, {String declaringClass = AFConfigEntries.declaredIn, this.allowed, this.help}): super(namespace, key, defaultValue, declaringClass: declaringClass);
+
+  @override
+  String validate(dynamic value) {
+    if(allowed == null) {
+      return null;
+    }
+
+    if(value is String) {
+      if(!allowed.contains(value)) {
+        return "$namespaceKey must be one of $allowed";
+      }
+    }
+    return null;
+  }
+  
+  @override
+  String codeValue(AFConfig config) {
+    final sb = StringBuffer("[");
+    final vals = config.stringListFor(this);
+    for(int i = 0; i < vals.length; i++) {
+      sb.write('"');
+      sb.write(vals[i]);
+      sb.write('"');
+      if(i+1 < vals.length) {
+        sb.write(", ");
+      }
+    }
+    sb.write("]");
+    return sb.toString();
+  }
+
+  void writeHelp(AFCommandOutput output, { int indent = 0 }) {
+    writeCommandHelp(output, help, indent: indent);
+  }
+
+}
+
+class AFConfigEntryEnabledTests extends AFConfigEntryList {
+  static const allTests = "all";
+  static const stateTests = "state";
+  static const unitTests = "unit";
+  static const screenTests = "screen";
+  static const queryTests = "query";
+  static const allAreas = [allTests, unitTests, stateTests, screenTests, queryTests];
+
+  AFConfigEntryEnabledTests(): super(AFConfigEntries.afNamespace, "enabledTestList", [allTests], help: "Space separated list of [$allTests|$unitTests|$stateTests|$screenTests|test_id|test_tag]");
+
+  bool isAreaEnabled(AFConfig config, String area) {
+    List<String> areas = config.stringListFor(this);
+    if(hasNoAreas(areas)) {
+      return true;
+    }
+    return areas.contains(area) || areas.contains(allTests);
+  }
+
+  bool isTestEnabled(AFConfig config, AFTestID id) {
+    List<String> areas = config.stringListFor(this);
+    if(hasOnlyAreas(areas)) {
+      return true;
+    }
+    if(areas.contains(id.code)) {
+      return true;
+    }
+    for(final area in areas) {
+      if(id.hasTag(area)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool hasNoAreas(List<String> areas) {
+    for(final area in allAreas) {
+      if(areas.contains(area)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool hasOnlyAreas(List<String> areas) {
+    for(final area in areas) {
+      if(!allAreas.contains(area)) {
+        return false;
+      }
+    }
+    return true;
+  }
+}
 
 /// Used to define choices for a configuration value.
 class AFConfigEntryDescription {
@@ -109,7 +201,7 @@ abstract class AFConfigEntryChoice extends AFConfigEntry {
     }
   }
 
-  String validate(String value) {
+  String validate(dynamic value) {
     final choice = findChoice(value);
     if(choice == null) {
       return "$value is not a valid choice for $namespaceKey";
@@ -163,7 +255,7 @@ class AFConfigEntryString extends AFConfigEntry {
   AFConfigEntryString(String namespace, String key, this.help, {this.minChars = -1, this.maxChars = -1, this.options = 0}): super(namespace, key, "");
   
   @override
-  String validate(String value) {
+  String validate(dynamic value) {
     if(minChars > 0 && value.length < minChars ) {
       return "$value must be at least $minChars characters long.";
     }
@@ -280,7 +372,7 @@ class AFConfigCommand extends AFCommand {
     String configVal = args.second;
     final entry = afibConfig.find(configKey);
     if(entry == null) {
-      output.writeError("Unknown configuration entry $configKey");
+      output.writeErrorLine("Unknown configuration entry $configKey");
       return;
     }
 
@@ -295,7 +387,7 @@ class AFConfigCommand extends AFCommand {
     
     final generateCmd = ctx.commands.generateCmd;
     final configGenerator = generateCmd.configGenerator;
-    final files = generateCmd.files;
+    final files = ctx.files;
     if(!configGenerator.validateBefore(ctx, files)) {
       return;
 

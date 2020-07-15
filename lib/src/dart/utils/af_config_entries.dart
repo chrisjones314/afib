@@ -2,6 +2,7 @@
 
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
+import 'package:afib/src/dart/command/commands/af_test_command.dart';
 
 /// Constants used to specify values in [AF.config].
 /// 
@@ -45,5 +46,7 @@ class AFConfigEntries {
   static final projectName = AFConfigEntryString(afNamespace, "projectName", "The project name for your app", minChars: 4,
    options: AFConfigEntryString.optionMixedCase | AFConfigEntryString.optionIdentifier);
 
-
+  /// Specify a list of test categories, ids or tags.  This is used automatically in
+  /// test/afib/afib_test_config.g.dart
+  static final enabledTestList = AFConfigEntryEnabledTests();
 }

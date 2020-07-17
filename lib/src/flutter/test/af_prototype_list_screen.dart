@@ -89,11 +89,12 @@ class AFPrototypeListScreen extends AFConnectedScreen<AFAppState, APrototypeList
   }
 
   Widget _createCard(AFBuildContext<APrototypeListScreenData, AFPrototypeListScreenParam> context, AFScreenTestGroup test, AFScreenPrototypeTest instance) {
+    final subtitleWidget = (instance.subtitle == null) ? null : Text(instance.subtitle);
     return Card(
       key: Key(instance.id.code),
       child: ListTile(
         title: Text(instance.id.code),
-        subtitle: null,
+        subtitle: subtitleWidget,
         onTap: () {
           // either create or reset a test context for tracking and executing the test
           context.dispatch(AFScreenPrototypeScreen.navigatePush(instance, id: instance.id));

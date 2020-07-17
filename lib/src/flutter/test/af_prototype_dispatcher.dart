@@ -15,13 +15,12 @@ class AFPrototypeDispatcher extends AFDispatcher {
 
   @override
   void dispatch(action) {
+    final isTestAction = action is AFNavigatePopInTestAction ||
+                          action is AFUpdatePrototypeScreenTestDataAction || 
+                          action is AFPrototypeScreenTestAddError ||
+                          action is AFPrototypeScreenTestIncrementPassCount;
     // if the action is a pop, then go ahead and do it.
-    if(action is AFNavigatePopInTestAction) {
-      main.dispatch(action);
-    } 
-    if(action is AFUpdatePrototypeScreenTestDataAction || 
-       action is AFPrototypeScreenTestAddError ||
-       action is AFPrototypeScreenTestIncrementPassCount) {
+    if(isTestAction) {
       main.dispatch(action);
     } else if(action is AFNavigateSetParamAction) {
       // change this into a set param action for the prototype.
@@ -34,11 +33,12 @@ class AFPrototypeDispatcher extends AFDispatcher {
       // screen update count artificially to allow tests to continue (they
       // are waiting for a screen update.
       AFibF.testOnlyScreenUpdateCount++;
+    }
 
-      if(action is AFObjectWithKey) {
-        testContext?.registerAction(action);
-        AFibD.logInternal?.fine("Registered action: $action");
-      }
+    // if this is a test action, then remember it so that we can 
+    if(!isTestAction && action is AFObjectWithKey) {
+      testContext?.registerAction(action);
+      AFibD.logInternal?.fine("Registered action: $action");
     }
   }
 

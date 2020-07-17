@@ -15,6 +15,9 @@ class AFIDWithTags extends AFID {
   const AFIDWithTags(String code, this.tags): super(code);
 
   String get tagsText {
+    if(tags == null) {
+      return "";
+    }
     return tags.join(", ");
   }
 

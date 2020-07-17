@@ -50,7 +50,7 @@ class _AFTextFieldState extends State<AFTextField> {
       textController.text = widget.text;
     }
     return TextField(
-      key: widget.key,
+      key: Key("${widget.key}_text_field"),
       controller: textController,
       onChanged: widget.onChanged,
       obscureText: widget.obscureText,

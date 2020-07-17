@@ -40,12 +40,12 @@ abstract class AFBaseTestExecute {
 
   final _errors = AFTestErrors();
 
-  void expect(dynamic value, flutter_test.Matcher matcher) {
+  void expect(dynamic value, flutter_test.Matcher matcher, {int stackFrames = 2}) {
     final matchState = Map();
     if(!addPassIf(matcher.matches(value, matchState))) {
       final matchDesc = matcher.describe(flutter_test.StringDescription());
       final desc = "Expected $matchDesc, found $value";
-      addError(desc, 2);
+      addError(desc, stackFrames);
     }
   }
 

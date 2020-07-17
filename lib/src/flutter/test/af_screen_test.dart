@@ -3,8 +3,10 @@
 import 'dart:async';
 
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
+import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/core/af_text_field.dart';
@@ -13,9 +15,11 @@ import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart' as ft;
 
 class AFTestSectionParamsFrame {
   final Map<String, dynamic> values;
@@ -75,12 +79,26 @@ class AFTestSectionParams {
 
 abstract class AFScreenTestExecute extends AFBaseTestExecute {
   void expectOneWidget(AFWidgetID wid);
+  void expectMissingWidget(AFWidgetID wid);
+  void expectText(AFWidgetID wid, String text);
+  void expectChipSelected(AFWidgetID wid, bool sel);
   Future<void> enterText(AFWidgetID id, String text);
   Future<void> tap(AFWidgetID wid);
   Future<void> tapWithExpectedAction(AFWidgetID wid, AFActionWithKey specifier, Function(AFActionWithKey) checkQuery) async {
     final previous = AFibF.testOnlyScreenUpdateCount;
     await tap(wid);
     expectAction(specifier, checkQuery);    
+    return pauseForRender(previous);
+  }
+
+  Future<void> tapWithExpectedParam(AFWidgetID wid, Function(AFRouteParam) checkParam) async {
+    final previous = AFibF.testOnlyScreenUpdateCount;
+    await tap(wid);
+    expectAction(AFNavigateSetParamAction(), (dynamic action) {
+      AFNavigateSetParamAction paramAction = action;
+      checkParam(paramAction.param);
+    });    
+    
     return pauseForRender(previous);
   }
 
@@ -201,26 +219,88 @@ abstract class AFScreenTestContext extends AFScreenTestExecute {
     return this.test.body.executeNamedSection(id, this, params);
   }
 
+  void testText(Widget widget, String expect) {
+    if(widget is Text) {
+      this.expect(widget.data, ft.equals(expect));
+    } else if(widget is TextField) {
+      if(widget.controller != null) {
+        this.expect(widget.controller.value.text, ft.equals(expect));
+      } 
+    } 
+
+  }
+
+  void testChipSelected(Widget widget, bool expect) {
+    bool selected = false;
+    if(widget is ChoiceChip) {
+      selected = widget.selected;
+    } else if(widget is InputChip) {
+      selected = widget.selected;
+    } else if(widget is FilterChip) {
+      selected = widget.selected;
+    }
+    this.expect(selected, ft.equals(expect), stackFrames: 4);
+  }
+
 }
 
 class AFScreenTestContextWidgetTester extends AFScreenTestContext {
-  final WidgetTester tester;
+  final ft.WidgetTester tester;
   final AFApp app;
 
   AFScreenTestContextWidgetTester(this.tester, this.app, AFScreenPrototypeTest test, AFDispatcher dispatcher): super(test, dispatcher);
 
   void expectOneWidget(AFWidgetID wid) {
-    this.expect(find.byKey(AFUI.testKey(wid)), findsOneWidget);
+    expect(ft.find.byKey(AFUI.testKey(wid)), ft.findsOneWidget);
+  }
+
+  void expectMissingWidget(AFWidgetID wid) {
+    expect(ft.find.byKey(AFUI.testKey(wid)), ft.findsNothing);
+  }
+
+  void expectText(AFWidgetID wid, String text) {
+    ft.Finder found = ft.find.byKey(AFUI.testKey(wid));
+    Widget widget = _firstWidget(
+      ft.find.descendant(
+        of: found,
+        matching: ft.find.byType(Text),
+    ));
+    if(widget == null) {
+      widget = _firstWidget(
+        ft.find.descendant(
+          of: found,
+          matching: ft.find.byType(TextField),
+      ));
+    }
+
+    if(widget != null) {
+      testText(widget, text);
+    }
+  }
+
+  void expectChipSelected(AFWidgetID wid, bool expect) {
+    ft.Finder found = ft.find.byKey(AFUI.testKey(wid));
+    Widget widget = _firstWidget(found);
+    testChipSelected(widget, expect);
+  }
+
+
+  Widget _firstWidget(ft.Finder found) {
+    Iterable<Widget> it = tester.widgetList(found);
+    if(it.isEmpty) {
+      return null;
+    }
+    return it.first;
   }
 
   Future<void> enterText(AFWidgetID wid, String text) async {
-    final widFinder = find.byKey(AFUI.testKey(wid));
+    final widFinder = ft.find.byKey(AFUI.testKey(wid));
     await tester.enterText(widFinder, text);
   }
 
   @override
   Future<void> tap(AFWidgetID wid) async {
-    final widFinder = find.byKey(AFUI.testKey(wid));
+    final widFinder = ft.find.byKey(AFUI.testKey(wid));
     return tester.tap(widFinder);
   }
   
@@ -362,6 +442,89 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
     addPassIf(elem != null);
   }
 
+  void expectMissingWidget(AFWidgetID wid) {
+    Element elem = _findOneElement(wid, errorIfMissing: false);
+    addPassIf(elem == null);
+  }
+
+  void expectText(AFWidgetID wid, String expect) {
+    Element elem = _findTextUnder(wid);
+    if(elem == null) {
+      return;
+    }
+
+    testText(elem.widget, expect);
+  }
+
+  void expectChipSelected(AFWidgetID wid, bool expect) {
+    Element elem = _findOneElement(wid);
+    if(elem == null) {
+      return;
+    }
+    Element elemType = _findChildMatching(elem, (Element test) {
+      final widget = test.widget;
+      return widget is ChoiceChip || widget is InputChip || widget is FilterChip;
+    });
+
+    if(elemType == null) {
+      addError("Could not find a widget under ${wid.code} of type ChoiceChip, InputChip, or FilterChip", 3);
+      return;
+    }
+    
+    final widget = elemType.widget;
+    testChipSelected(widget, expect);
+  }
+
+
+
+  Element _findTextUnder(AFWidgetID wid, { bool errorIfMissing = true}) {
+    Element parent = _findOneElement(wid);
+    if(parent.widget is Text) {
+      return parent;
+    }
+    Element text = _findChildMatching(parent, (Element test) {
+      return test.widget is Text;
+    });
+
+    if(text != null) {
+      return text;
+    }
+    
+    Element textField = _findChildMatching(parent, (Element test) {
+      return test.widget is TextField;
+    });
+    
+    if(textField == null) {
+      addError("Expected 1 widget with type Text under ${wid.code}", 3);
+    }
+    
+    return textField;
+  }
+
+  Element _findChildMatching(Element current, bool Function(Element) testElement) {
+    if(testElement(current)) {
+      return current;
+    }
+    final children = List<Element>();
+    current.visitChildren((child) {
+      children.add(child);
+    });
+
+    for(final child in children) {
+      if(testElement(child)) {
+        return child;
+      }
+    }
+
+    for(final child in children) {
+      Element e = _findChildMatching(child, testElement);
+      if(e != null) {
+        return e;
+      }
+    }
+    return null;
+  }
+
   @override
   void expectAction(AFActionWithKey specifier, Function(AFActionWithKey) checkAction) {
     final key = specifier.key;
@@ -395,11 +558,13 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
     return pauseForRender(previous);
   }
 
-  Element _findOneElement(AFWidgetID wid) {
+  Element _findOneElement(AFWidgetID wid, { bool errorIfMissing = true }) {
     _updateCache();
     List<Element> elems = elementCache.findWithKey(AFUI.testKey(wid));
     if(elems?.length != 1) {
-      addError("Expected 1 widget with code ${wid.code}, found ${elems.length}", 3);
+      if(errorIfMissing) {
+        addError("Expected 1 widget with code ${wid.code}, found ${elems.length}", 3);
+      }
       return null;
     }
     return elems.first;
@@ -412,10 +577,23 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
     if(elem == null) {
       return null;
     }
+    /*
+    final render = elem.findRenderObject();
+    if (render is RenderBox) {
+      final hitTestResult = BoxHitTestResult();
+      if (render.hitTest(hitTestResult, position: elem.size.center(Offset.zero))) {
+        render.handleEvent(PointerDownEvent(), hitTestResult.path.first);
+        render.handleEvent(PointerUpEvent(), hitTestResult.path.first);
+        //AFibD.fine("Tapped $wid");
+      }
+    }
+    */
 
     final widget = elem.widget;
     if(widget is FlatButton) {
       widget.onPressed();
+    } else if(widget is ChoiceChip) {
+      widget.onSelected(!widget.selected);      
     }
 
     return pauseForRender(previous);
@@ -479,6 +657,7 @@ class AFScreenPrototypeTest {
   AFTestID id;
   dynamic data;
   dynamic param;
+  String subtitle;
   AFScreenTestBody body;
   AFConnectedScreenWithoutRoute widget;
 
@@ -487,7 +666,8 @@ class AFScreenPrototypeTest {
     @required this.data,
     @required this.param,
     @required this.widget,
-    @required this.body
+    @required this.body,
+    this.subtitle
   });
 
   bool get hasBody {
@@ -519,13 +699,15 @@ class AFScreenTestGroup {
   AFScreenTestBody addSimplePrototype({
     @required AFTestID   id,
     @required dynamic data,
-    @required dynamic param
+    @required dynamic param,
+    String subtitle
   }) {
     AFScreenPrototypeTest instance = AFScreenPrototypeTest(
       id: id,
       data: data,
       param: param,
       widget: widget,
+      subtitle: subtitle,
       body: AFScreenTestBody(this)
     );
     tests.add(instance);

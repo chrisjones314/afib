@@ -9,15 +9,12 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/af_app.dart';
-import 'package:afib/src/flutter/core/af_text_field.dart';
-import 'package:afib/src/flutter/core/afui.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
+import 'package:afib/src/flutter/test/af_widget_actions.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
 
@@ -74,67 +71,134 @@ class AFTestSectionParams {
   void popFrame() {
     frames.removeLast();
   }
+}
+
+/// A superclass that declares all the methods which select specific widgets.
+/// This is used by [AFScreenWidgetSelectorCollector] to determine which widgets
+/// it needs to track for each test.
+abstract class AFScreenTestWidgetSelector extends AFBaseTestExecute {
   
 }
 
-abstract class AFScreenTestExecute extends AFBaseTestExecute {
-  void expectOneWidget(AFWidgetID wid);
-  void expectMissingWidget(AFWidgetID wid);
-  void expectText(AFWidgetID wid, String text);
-  void expectChipSelected(AFWidgetID wid, bool sel);
-  Future<void> enterText(AFWidgetID id, String text);
-  Future<void> tap(AFWidgetID wid);
-  Future<void> tapWithExpectedAction(AFWidgetID wid, AFActionWithKey specifier, Function(AFActionWithKey) checkQuery) async {
-    final previous = AFibF.testOnlyScreenUpdateCount;
-    await tap(wid);
-    expectAction(specifier, checkQuery);    
-    return pauseForRender(previous);
+/// A utility class used to pass 
+abstract class AFWidgetSelector {
+  final elements = List<Element>();
+  void add(Element elem) {
+    elements.add(elem);
   }
 
-  Future<void> tapWithExpectedParam(AFWidgetID wid, Function(AFRouteParam) checkParam) async {
-    final previous = AFibF.testOnlyScreenUpdateCount;
-    await tap(wid);
-    expectAction(AFNavigateSetParamAction(), (dynamic action) {
-      AFNavigateSetParamAction paramAction = action;
-      checkParam(paramAction.param);
-    });    
-    
-    return pauseForRender(previous);
+  void clearWidgets() {
+    elements.clear();
   }
 
-  Future<void> keepSynchronous() {
-    return null;
+  bool matchesPath(List<Element> elem) {
+    // by default, just match the leaf, but allow for more complicated
+    // paths
+    return matches(elem.last);
   }
 
-  Future<void> tapWithActionType(AFWidgetID wid, AFActionWithKey action) async {
-    final previous = AFibF.testOnlyScreenUpdateCount;
-    await tap(wid);
-    expectAction(action, (AFActionWithKey action) {
+  bool matches(Element elem);
+}
 
-    });
-    return pauseForRender(previous);
+class AFKeySelector extends AFWidgetSelector {
+  Key key;
+  AFKeySelector(String keyStr) {
+    key = Key(keyStr);
   }
 
+  bool matches(Element elem) {
+    return elem.widget.key == key;
+  }
+
+  bool operator==(dynamic o) {
+    return o is AFKeySelector && o.key == key;
+  }
+}
+
+class AFSparsePathWidgetSelector extends AFWidgetSelector {
+  final pathSelectors = List<AFWidgetSelector>();
+
+  bool matchesPath(List<Element> path) {
+    int curSel = 0;
+    for(final item in path) {
+      final selector = pathSelectors[curSel];
+      if(selector.matches(item)) {
+        curSel++;
+        if(curSel >= pathSelectors.length) {
+          break;
+        }
+      }
+    }
+
+    // this will be true only if we matched all the selectors somewhere along the path,
+    // and the last element in the path matched the final selector.
+    return curSel == path.length - 1;
+  }
+
+  bool matches(Element elem) {
+    throw AFException("Do not attempt to add sparse path widget selectors recursively into each other.");
+  }
+
+  bool operator==(dynamic o) {
+    if(o is AFSparsePathWidgetSelector) {
+      if(o.pathSelectors.length != pathSelectors.length) {
+        return false;
+      }
+
+      for(int i = 0; i < pathSelectors.length; i++) {
+        final l = pathSelectors[i];
+        final r = o.pathSelectors[i];
+        if(l != r) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+    return false;
+  }
+}
+
+
+
+abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
+  AFScreenPrototypeTest test;
+  AFScreenTestExecute(this.test);
+
+  @override
+  AFTestID get testID => test.id;
+
+  void expectOneWidget(dynamic selector) {
+    expectNWidgets(selector, 1, extraFrames: 1);
+  }
+  
+  void expectMissingWidget(dynamic selector) {
+    expectNWidgets(selector, 0, extraFrames: 1);
+  }
+
+  void expectNWidgets(dynamic selector, int n, {int extraFrames = 0});
+  void expectText(dynamic selector, String text);
+  void expectChipSelected(dynamic selector, bool sel);
+
+  Future<void> enterText(dynamic selector, String text);
+  Future<void> tap(dynamic selector);
+  Future<void> tapWithExpectedAction(dynamic selector, AFActionWithKey specifier, Function(AFActionWithKey) checkQuery);
+  Future<void> tapWithExpectedParam(dynamic selector, Function(AFRouteParam) checkParam);
+  Future<void> tapWithActionType(dynamic selector, AFActionWithKey action);
+  Future<void> keepSynchronous();
   Future<void> updateScreenData(dynamic data);
 
-  void expectAction(AFActionWithKey specifier, Function(AFActionWithKey) checkAction);
-  TExpected expectType<TExpected>(dynamic obj) {
-    if(obj is TExpected) {
-      return obj;
-    }
-    addError("Unexpected type ${obj.runtimeType}", 2);
-    return null;
-  }
+  void expectAction(AFActionWithKey specifier, Function(AFActionWithKey) checkAction, {int extraFrames = 0});
 
-  Future<void> executeNamedSection(AFTestSectionID id, AFTestSectionParams params);
+  Future<void> executeNamedSection(AFTestSectionID id, AFTestSectionParams params) {
+    return this.test.body.executeNamedSection(id, this, params);
+  }
 
   Future<void> pauseForRender(int previousCount);
   void addError(String error, int depth);
-
 }
 
 typedef Future<void> AFScreenTestBodyExecuteFunc(AFScreenTestExecute exec, AFTestSectionParams params);
-
 
 class AFScreenTestBody {
   final AFScreenTestGroup group;
@@ -145,7 +209,6 @@ class AFScreenTestBody {
   bool get isNotEmpty { 
     return sections.isNotEmpty;
   }
-
 
   void execute(AFScreenTestBodyExecuteFunc func, {AFTestSectionID id}) {
     sections.add(func);
@@ -159,7 +222,6 @@ class AFScreenTestBody {
       throw AFException("Test section failed to return a future.  Make sure all test sections end with return AFScreenTestExecute.keepSynchronous()");
     }
   }
-
 
   Future<void> executeNamedSection(AFTestSectionID id, AFScreenTestExecute e, AFTestSectionParams params) async {
     final section = group.testMgr.findNamedTestSection(id);
@@ -183,6 +245,11 @@ class AFScreenTestBody {
       if(sectionGuard > 1) {
         throw AFException("Test section $i is missing an await!");
       }
+      // first, we run the section with the widget specifier collector so we know what kind of widgets we
+      // are looking for.
+      final fut0 = section(context.elementCollector, params);
+      await fut0;
+
       final fut = section(context, params);
       _checkFutureExists(fut);
       await fut;
@@ -195,28 +262,274 @@ class AFScreenTestBody {
 
 }
 
+/// This class is used to determine which widget selectors a tests uses to reference
+/// widgets, and then to collect those widgets on the screen so that they can be referenced
+/// during the test.
+class AFScreenTestWidgetCollector extends AFScreenTestExecute {
+
+  AFScreenTestWidgetCollector(AFScreenPrototypeTest test): super(test);
+
+  final selectors = List<AFWidgetSelector>();
+  int previousUpdateCount;
+
+  void _updateCache() {
+    _refresh(AFibF.testOnlyScreenElement, AFibF.testOnlyScreenUpdateCount);
+  }
+
+  List<Element> findWidgetsFor(dynamic selector) {
+    _updateCache();
+    final sel = _convertSelector(selector);
+    for(final test in selectors) {
+      if(test == sel) {
+        return test.elements;
+      }
+    }
+    return List<Element>();
+  }
+  
+  void expectNWidgets(dynamic selector, int n, {int extraFrames = 0}) {
+    _addSelector(selector);
+    return null;
+  }
+
+  void expectText(dynamic selector, String text) {
+    _addSelector(selector);
+    return null;
+  }
+
+
+  void expectChipSelected(dynamic selector, bool sel) {
+    _addSelector(selector);
+    return null;
+  }
+
+  Future<void> enterText(dynamic selector, String text) {
+    _addSelector(selector);
+    return null;
+  }
+
+  Future<void> tap(dynamic selector) {
+    _addSelector(selector);
+    return null;
+  }
+
+  Future<void> tapWithExpectedAction(dynamic selector, AFActionWithKey specifier, Function(AFActionWithKey) checkQuery) async {
+    _addSelector(selector);
+    return null;
+  }
+
+  Future<void> tapWithExpectedParam(dynamic selector, Function(AFRouteParam) checkParam) async {
+    _addSelector(selector);
+    return null;
+  }
+
+  Future<void> tapWithActionType(dynamic selector, AFActionWithKey action) {
+    _addSelector(selector);
+    return null;
+  }
+
+  void expectAction(AFActionWithKey specifier, Function(AFActionWithKey) checkAction, { int extraFrames = 0 }) {
+
+  }
+
+  Future<void> pauseForRender(int previousCount) {
+    return keepSynchronous();
+  }
+
+  Future<void> keepSynchronous() {
+    return null;
+  }
+
+  Future<void> updateScreenData(dynamic data) {
+    return null;
+  }
+
+  AFWidgetSelector _convertSelector(dynamic sel) {
+    if(sel is String) {
+      return AFKeySelector(sel);
+    } else if(sel is AFWidgetID) {
+      return AFKeySelector(sel.code);
+    } else if(sel is AFWidgetSelector) {
+      return sel;
+    } else {
+      throw AFException("Unknown widget selector type: ${sel.runtimeType}");
+    }
+  }
+
+  void _addSelector(dynamic sel) {
+    selectors.add(_convertSelector(sel));
+  }
+
+  /// Rebuild our internal cache of paths to elements with keys.
+  void _refresh(Element currentRoot, int currentUpdateCount) {
+    // nothing to do if the current root hasn't changed.
+    if(currentUpdateCount == previousUpdateCount) {
+      return;
+    }
+
+    _clearAll();
+
+    final currentPath = List<Element>();
+    _populateChildren(currentRoot, currentPath);
+  }
+
+  // Go though all the children of [current], having the parent path [currentPath],
+  // and add path entries for any widgets with keys.
+  void _populateChildren(Element currentElem, List<Element> currentPath) {
+
+    // add the current element.
+    currentPath.add(currentElem);
+
+    // go through all the selectors, and see if any of them match.
+    for(final selector in selectors) {
+      if(selector.matchesPath(currentPath)) {
+        selector.add(currentPath.last);
+      }
+    } 
+
+    // do this same process recursively on the childrne.
+    currentElem.visitChildren((child) {
+      _populateChildren(child, currentPath);
+    });
+
+    // maintain the path as we go back up.
+    currentPath.removeLast();
+  }
+
+  void _clearAll() {
+    for(final sel in selectors) {
+      sel.clearWidgets();
+    }
+  }
+
+}
+
 
 abstract class AFScreenTestContext extends AFScreenTestExecute {
+  AFScreenTestWidgetCollector elementCollector;
   final recentActions = Map<String, AFActionWithKey>();
   final AFDispatcher dispatcher;
-
-  AFScreenPrototypeTest test;
-  AFScreenTestContext(this.test, this.dispatcher);
+  AFScreenTestContext(this.dispatcher, AFScreenPrototypeTest test): super(test) {
+    elementCollector = AFScreenTestWidgetCollector(test);
+  }
   AFTestID get testID { return this.test.id; }
 
-  void expectOneWidget(AFWidgetID wid);
+  void expectNWidgets(dynamic selector, int n, {int extraFrames = 0}) {
+    List<Element> elems = elementCollector.findWidgetsFor(selector);
+    this.expect(elems.length, ft.equals(n), extraFrames: extraFrames+1);
+  }
 
-  Future<void> enterText(AFWidgetID wid, String text);
+  void expectText(dynamic selector, String text) {
+    AFScreenTests testManager = _testManager;
+    List<Element> elems = elementCollector.findWidgetsFor(selector);
+    if(elems.length != 1) {
+      throw AFException("Expected to enter text for exactly one widget for selector $selector, found ${elems.length} widgets");
+    }
+    Element elem = elems.first;
+    final widget = elem.widget;
+    final extract = testManager.findExtractor(widget);
+    if(extract == null) {
+      throw AFException("No AFExtractTextWidgetAction found for ${elem.widget.runtimeType}, you can register one using AFScreenTests.registerExtractText");
+    }
+    final actualText = extract.extract(elem, widget);
+    this.expect(actualText, ft.equals(text), extraFrames: 1);      
+  }
+
+
+  void expectChipSelected(dynamic selector, bool sel) {
+    AFScreenTests testManager = _testManager;
+    List<Element> elems = elementCollector.findWidgetsFor(selector);
+    if(elems.isEmpty) {
+      this.expect(elems, ft.isNotEmpty, extraFrames: 1);
+      return;
+    }
+
+    for(final elem in elems) {
+      final widget = elem.widget;
+      final selectable = testManager.findExtractor(widget);
+      if(selectable == null) {
+        throw AFException("No AFSelectedWidgetTest found for ${elem.widget.runtimeType}, you can register one using AFScreenTests.registerSelectable");
+      }
+      this.expect(selectable.extract(elem, widget), ft.equals(sel), extraFrames: 1);
+    }
+  }
+
+  Future<void> enterText(dynamic selector, String text) {
+    final previous = AFibF.testOnlyScreenUpdateCount;
+    AFScreenTests testManager = _testManager;
+    List<Element> elems = elementCollector.findWidgetsFor(selector);
+    if(elems.length != 1) {
+      throw AFException("Expected to enter text for exactly one widget for selector $selector, found ${elems.length} widgets");
+    }
+    Element elem = elems.first;
+    final widget = elem.widget;
+    final apply = testManager.findApplicator(widget);
+    if(apply == null) {
+      throw AFException("No AFApplyTextWidgetAction found for ${elem.widget.runtimeType}, you can register one using AFScreenTests.registerApplyText");
+    }
+    apply.apply(widget, text);
+    return pauseForRender(previous);
+
+  }
+
+  Future<void> tap(dynamic selector) {
+    final previous = AFibF.testOnlyScreenUpdateCount;
+    AFScreenTests testManager = _testManager;
+    List<Element> elems = elementCollector.findWidgetsFor(selector);
+    if(elems.length != 1) {
+      throw AFException("Expected a tap on exactly one widget for selector $selector, found ${elems.length} widgets");
+    }
+    Element elem = elems.first;
+    final tapable = testManager.findApplicator(elem.widget);
+    if(tapable == null) {
+      throw AFException("No AFTapableWidgetAction found for ${elem.widget.runtimeType}, you can register one using AFScreenTests.registerTapable");
+    }
+    tapable.apply(elem.widget, null);    
+    return pauseForRender(previous);
+  }
+
+  Future<void> tapWithExpectedAction(dynamic widgetSpecifier, AFActionWithKey actionSpecifier, Function(AFActionWithKey) checkQuery) async {
+    final previous = AFibF.testOnlyScreenUpdateCount;
+    await tap(widgetSpecifier);
+    expectAction(actionSpecifier, checkQuery, extraFrames: 1);    
+    return pauseForRender(previous);
+  }
+
+  Future<void> tapWithExpectedParam(dynamic specifier, Function(AFRouteParam) checkParam) async {
+    final previous = AFibF.testOnlyScreenUpdateCount;
+    await tap(specifier);
+    expectAction(AFNavigateSetParamAction(), (dynamic action) {
+      AFNavigateSetParamAction paramAction = action;
+      checkParam(paramAction.param);
+    }, extraFrames: 1);    
+    
+    return pauseForRender(previous);
+  }
+
+  Future<void> keepSynchronous() {
+    return null;
+  }
+
+  Future<void> tapWithActionType(dynamic specifier, AFActionWithKey action) async {
+    final previous = AFibF.testOnlyScreenUpdateCount;
+    await tap(specifier);
+    expectAction(action, (AFActionWithKey action) {
+
+    }, extraFrames: 1);
+    return pauseForRender(previous);
+  }
+
+  TExpected expectType<TExpected>(dynamic obj) {
+    if(obj is TExpected) {
+      return obj;
+    }
+    addError("Unexpected type ${obj.runtimeType}", 2);
+    return null;
+  }
 
   void registerAction(AFActionWithKey action) {
     final key = action.key;
     recentActions[key] = action;
-  }
-
-
-  @override
-  Future<void> executeNamedSection(AFTestSectionID id, AFTestSectionParams params) {
-    return this.test.body.executeNamedSection(id, this, params);
   }
 
   void testText(Widget widget, String expect) {
@@ -239,376 +552,31 @@ abstract class AFScreenTestContext extends AFScreenTestExecute {
     } else if(widget is FilterChip) {
       selected = widget.selected;
     }
-    this.expect(selected, ft.equals(expect), stackFrames: 4);
-  }
-
-}
-
-class AFScreenTestContextWidgetTester extends AFScreenTestContext {
-  final ft.WidgetTester tester;
-  final AFApp app;
-
-  AFScreenTestContextWidgetTester(this.tester, this.app, AFScreenPrototypeTest test, AFDispatcher dispatcher): super(test, dispatcher);
-
-  void expectOneWidget(AFWidgetID wid) {
-    expect(ft.find.byKey(AFUI.testKey(wid)), ft.findsOneWidget);
-  }
-
-  void expectMissingWidget(AFWidgetID wid) {
-    expect(ft.find.byKey(AFUI.testKey(wid)), ft.findsNothing);
-  }
-
-  void expectText(AFWidgetID wid, String text) {
-    ft.Finder found = ft.find.byKey(AFUI.testKey(wid));
-    Widget widget = _firstWidget(
-      ft.find.descendant(
-        of: found,
-        matching: ft.find.byType(Text),
-    ));
-    if(widget == null) {
-      widget = _firstWidget(
-        ft.find.descendant(
-          of: found,
-          matching: ft.find.byType(TextField),
-      ));
-    }
-
-    if(widget != null) {
-      testText(widget, text);
-    }
-  }
-
-  void expectChipSelected(AFWidgetID wid, bool expect) {
-    ft.Finder found = ft.find.byKey(AFUI.testKey(wid));
-    Widget widget = _firstWidget(found);
-    testChipSelected(widget, expect);
-  }
-
-
-  Widget _firstWidget(ft.Finder found) {
-    Iterable<Widget> it = tester.widgetList(found);
-    if(it.isEmpty) {
-      return null;
-    }
-    return it.first;
-  }
-
-  Future<void> enterText(AFWidgetID wid, String text) async {
-    final widFinder = ft.find.byKey(AFUI.testKey(wid));
-    await tester.enterText(widFinder, text);
+    this.expect(selected, ft.equals(expect), extraFrames: 4);
   }
 
   @override
-  Future<void> tap(AFWidgetID wid) async {
-    final widFinder = ft.find.byKey(AFUI.testKey(wid));
-    return tester.tap(widFinder);
-  }
-  
-  @override
-  void expectAction(AFActionWithKey specifier, Function(AFActionWithKey) checkAction) {
-    // TODO: Fix testing here.  This doesn't work because the widgetTester.tap doesn't seem to be working (or is happening asynchronously.)
-    /*
+  void expectAction(AFActionWithKey specifier, Function(AFActionWithKey) checkAction, { int extraFrames = 0 }) {
     final key = specifier.key;
     final found = recentActions[key];
+    this.expect(found, ft.isNotNull, extraFrames: extraFrames+1);
     if(found == null) {
-      addError("Failed to find action with key $key", 3);
-      return;
-    }
-    addPassIf(true);
-    checkAction(found);
-    */
-  }
-
-  @override
-  Future<void> pauseForRender(int previousCount) async {
-    return tester.pumpAndSettle();
-  }
-
-  @override
-  Future<void> updateScreenData(data) {
-    final previous = AFibF.testOnlyScreenUpdateCount;
-    dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.test.id, data));
-    return pauseForRender(previous);
-  }
-}
-
-class _AFScreenTestElementCache {
-  static const separator = "/";
-  Element root;
-  int previousUpdateCount;
-  Map<String, List<Element>> paths;
-
-  /// Finals the elements that have [key] as their widget key.
-  List<Element> findWithKey(Key key) {
-    return findWithParent(null, key);
-  }
-
-  /// Finds the elements that have [key] as their widget key,
-  /// and have a parent with the key [parent].  
-  /// 
-  /// [parent] must be the first widget above the element that
-  /// has a key, but there could be intervening elements with no 
-  /// key
-  List<Element> findWithParent(Key parent, Key key) {
-    final searchPath = List<Key>();
-    if(parent != null) {
-      searchPath.add(parent);
-    }
-    searchPath.add(key);
-    return findWithPath(searchPath);
-  }
-
-  /// Finds the element that has all the specified 
-  /// keys in their path, from the root-most to the leaf-most.
-  /// 
-  /// Unkeyed elements are ignored, but all keyed elements
-  /// in a path must be specified for their to be a match.
-  List<Element> findWithPath(List<Key> pathList) {
-    final sb = StringBuffer();
-    pathList.forEach((key) {
-      sb.write(separator);
-      sb.write(key.toString());
-    });
-    final searchPath = sb.toString();
-
-    // first, see if it exists in the map
-    final simple = paths[searchPath];
-    if(simple != null) {
-      return simple;
-    }
-
-    // otherwise, go through the map looking for a path that ends with our current path.
-    for(var testPath in paths.keys) {
-      if(testPath.endsWith(searchPath)) {
-        return paths[testPath];
-      }
-    }
-    
-    return List<Element>();
-  }
-
-  /// Rebuild our internal cache of paths to elements with keys.
-  void refresh(Element currentRoot, int currentUpdateCount) {
-    // nothing to do if the current root hasn't changed.
-    if(currentUpdateCount == previousUpdateCount) {
-      return;
-    }
-
-    previousUpdateCount = currentUpdateCount;
-    paths = Map<String, List<Element>>();
-
-    _populateChildren(currentRoot, separator);
-  }
-
-  // Go though all the children of [current], having the parent path [currentPath],
-  // and add path entries for any widgets with keys.
-  void _populateChildren(Element current, String currentPath) {
-    var nextPath = currentPath;
-    if(current.widget.key != null) {
-      nextPath = currentPath + separator + current.widget.key.toString();
-      _addPath(nextPath, current);
-    }  
-
-    current.visitChildren((child) {
-      _populateChildren(child, nextPath);
-    });
-  }
-
-  /// Add an [elem] at the specified path, creating it if necessary.
-  void _addPath(String path, Element elem) {
-    List<Element> current = paths[path];
-    if(current == null) {
-      current = List<Element>();
-      paths[path] = current;
-    }
-    current.add(elem);
-  }
-}
-
-class AFScreenTestContextSimulator extends AFScreenTestContext {
-  final int runNumber;
-  final elementCache = _AFScreenTestElementCache();
-  final DateTime lastRun = DateTime.now();
-
-  AFScreenTestContextSimulator(AFDispatcher dispatcher, AFScreenPrototypeTest test, this.runNumber): super(test, dispatcher);
-
-  @override
-  Future<void> keepSynchronous() {
-    return Future<void>.delayed(Duration(milliseconds: 10), () {});
-  }
-
-  void expectOneWidget(AFWidgetID wid) {
-    Element elem = _findOneElement(wid);
-    addPassIf(elem != null);
-  }
-
-  void expectMissingWidget(AFWidgetID wid) {
-    Element elem = _findOneElement(wid, errorIfMissing: false);
-    addPassIf(elem == null);
-  }
-
-  void expectText(AFWidgetID wid, String expect) {
-    Element elem = _findTextUnder(wid);
-    if(elem == null) {
-      return;
-    }
-
-    testText(elem.widget, expect);
-  }
-
-  void expectChipSelected(AFWidgetID wid, bool expect) {
-    Element elem = _findOneElement(wid);
-    if(elem == null) {
-      return;
-    }
-    Element elemType = _findChildMatching(elem, (Element test) {
-      final widget = test.widget;
-      return widget is ChoiceChip || widget is InputChip || widget is FilterChip;
-    });
-
-    if(elemType == null) {
-      addError("Could not find a widget under ${wid.code} of type ChoiceChip, InputChip, or FilterChip", 3);
       return;
     }
     
-    final widget = elemType.widget;
-    testChipSelected(widget, expect);
-  }
-
-
-
-  Element _findTextUnder(AFWidgetID wid, { bool errorIfMissing = true}) {
-    Element parent = _findOneElement(wid);
-    if(parent.widget is Text) {
-      return parent;
-    }
-    Element text = _findChildMatching(parent, (Element test) {
-      return test.widget is Text;
-    });
-
-    if(text != null) {
-      return text;
-    }
-    
-    Element textField = _findChildMatching(parent, (Element test) {
-      return test.widget is TextField;
-    });
-    
-    if(textField == null) {
-      addError("Expected 1 widget with type Text under ${wid.code}", 3);
-    }
-    
-    return textField;
-  }
-
-  Element _findChildMatching(Element current, bool Function(Element) testElement) {
-    if(testElement(current)) {
-      return current;
-    }
-    final children = List<Element>();
-    current.visitChildren((child) {
-      children.add(child);
-    });
-
-    for(final child in children) {
-      if(testElement(child)) {
-        return child;
-      }
-    }
-
-    for(final child in children) {
-      Element e = _findChildMatching(child, testElement);
-      if(e != null) {
-        return e;
-      }
-    }
-    return null;
-  }
-
-  @override
-  void expectAction(AFActionWithKey specifier, Function(AFActionWithKey) checkAction) {
-    final key = specifier.key;
-    final found = recentActions[key];
-    if(found == null) {
-      addError("Failed to find action with key $key", 3);
-      return;
-    }
-    addPassIf(true);
     checkAction(found);
   }
 
-  
-  Future<void> enterText(AFWidgetID wid, String text) async {
-    final previous = AFibF.testOnlyScreenUpdateCount;
-    Element elem = _findOneElement(wid);
-    if(elem == null) {
-      return;
-    }
-    final widget = elem.widget;
-    if(widget is TextField) {
-      widget.onChanged(text);
-    } else if(widget is AFTextField) {
-      widget.onChanged(text);
-    } else {
-      addError("enterText called on widget ${widget.key} of unsupported type ${widget.runtimeType}", 2);
-      return null;
-    }
-
-    // give redux a chance to rebuild the UI after this change.
-    return pauseForRender(previous);
+  AFScreenTests get _testManager {
+    return test.body.group.testMgr;
   }
 
-  Element _findOneElement(AFWidgetID wid, { bool errorIfMissing = true }) {
-    _updateCache();
-    List<Element> elems = elementCache.findWithKey(AFUI.testKey(wid));
-    if(elems?.length != 1) {
-      if(errorIfMissing) {
-        addError("Expected 1 widget with code ${wid.code}, found ${elems.length}", 3);
-      }
-      return null;
-    }
-    return elems.first;
-  }
-
-  @override
-  Future<void> tap(AFWidgetID wid) async {
-    final previous = AFibF.testOnlyScreenUpdateCount;
-    Element elem = _findOneElement(wid);
-    if(elem == null) {
-      return null;
-    }
-    /*
-    final render = elem.findRenderObject();
-    if (render is RenderBox) {
-      final hitTestResult = BoxHitTestResult();
-      if (render.hitTest(hitTestResult, position: elem.size.center(Offset.zero))) {
-        render.handleEvent(PointerDownEvent(), hitTestResult.path.first);
-        render.handleEvent(PointerUpEvent(), hitTestResult.path.first);
-        //AFibD.fine("Tapped $wid");
-      }
-    }
-    */
-
-    final widget = elem.widget;
-    if(widget is FlatButton) {
-      widget.onPressed();
-    } else if(widget is ChoiceChip) {
-      widget.onSelected(!widget.selected);      
-    }
-
-    return pauseForRender(previous);
-  }
   
   @override
   Future<void> updateScreenData(dynamic data) {
     final previous = AFibF.testOnlyScreenUpdateCount;
     dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.test.id, data));
     return pauseForRender(previous);
-  }
-
-  @override
-  Future<void> executeNamedSection(AFTestSectionID id, AFTestSectionParams params) {
-    return this.test.body.executeNamedSection(id, this, params);
   }
 
   @override
@@ -619,9 +587,10 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
     var current = AFibF.testOnlyScreenUpdateCount;
     int n = 0;
     while(current == previousCount) {
-      AFibD.logInternal?.fine("Pausing");
+      AFibD.logInternal?.fine("Starting pause");
       await Future<void>.delayed(Duration(milliseconds: 100), () {});
       current = AFibF.testOnlyScreenUpdateCount;
+      AFibD.logInternal?.fine("Starting finished pause with update count $current");
       n++;
       if(n > 10) {
         throw new AFException("Timeout waiting for screen update.  You may need to pass noUpdate: true into one of the test manipulators if it does not produce an update.");
@@ -630,8 +599,17 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
     AFibD.logInternal?.fine("Exiting _pauseForRender with count $current");
   }
 
-  void _updateCache() {
-    elementCache.refresh(AFibF.testOnlyScreenElement, AFibF.testOnlyScreenUpdateCount);
+}
+
+class AFScreenTestContextSimulator extends AFScreenTestContext {
+  final int runNumber;
+  final DateTime lastRun = DateTime.now();
+
+  AFScreenTestContextSimulator(AFDispatcher dispatcher, AFScreenPrototypeTest test, this.runNumber): super(dispatcher, test);
+
+  @override
+  Future<void> keepSynchronous() {
+    return Future<void>.delayed(Duration(milliseconds: 0), () {});
   }
 
   void addError(String desc, int depth) {
@@ -645,6 +623,23 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
       dispatcher.dispatch(AFPrototypeScreenTestIncrementPassCount(this.test.id));
     }
     return test;
+  }
+}
+
+class AFScreenTestContextWidgetTester extends AFScreenTestContext {
+  final ft.WidgetTester tester;
+  final AFApp app;
+
+  AFScreenTestContextWidgetTester(this.tester, this.app, AFDispatcher dispatcher, AFScreenPrototypeTest test): super(dispatcher, test);
+
+  @override
+  Future<void> pauseForRender(int previousCount) async {
+    await tester.pumpAndSettle(Duration(seconds: 1));
+    return super.pauseForRender(previousCount);
+  }
+
+  Future<void> keepSynchronous() {
+    return null;
   }
 }
 
@@ -721,6 +716,41 @@ class AFScreenTests<TState> {
   
   final namedSections = Map<AFTestSectionID, AFScreenTestBodyExecuteFunc>();
   List<AFScreenTestGroup> groups = List<AFScreenTestGroup>();
+  final extractors = Map<Type, AFExtractWidgetAction>();
+  final applicators = Map<Type, AFApplyWidgetAction>();
+
+  AFScreenTests() {
+    registerApplicator(AFTapFlatButton());
+    registerApplicator(AFToggleChoiceChip());
+    registerApplicator(AFApplyTextTextFieldAction());
+    registerApplicator(AFApplyTextAFTextFieldAction());
+
+    registerExtractor(AFSelectableChoiceChip());
+    registerExtractor(AFExtractTextTextAction());
+    registerExtractor(AFExtractTextTextFieldAction());
+    registerExtractor(AFExtractTextAFTextFieldAction());
+  }
+
+  /// Register a way to tap on a particular kind of widget.
+  /// 
+  /// The intent is to allow the testing framework to be extended for
+  /// arbitrary widgets that might get tapped.
+  void registerApplicator(AFApplyWidgetAction apply) {
+    applicators[apply.appliesToType] = apply;
+  }
+
+  void registerExtractor(AFExtractWidgetAction extract) {
+    extractors[extract.appliesTo] = extract;
+  }
+
+
+  AFExtractWidgetAction findExtractor(Widget widget) {
+    return extractors[widget.runtimeType];
+  }
+
+  AFApplyWidgetAction findApplicator(Widget widget) {
+    return applicators[widget.runtimeType];
+  }
 
   /// Add a screen widget, and then in the [addInstances] callback add one or more 
   /// data states to render with that screen.
@@ -762,5 +792,11 @@ class AFScreenTests<TState> {
     return AFibF.testData.findData(id);
   }
 
+  bool addPassIf(bool test) {
+    if(test) {
+      
+    }
+    return test;
+  }
 
 }

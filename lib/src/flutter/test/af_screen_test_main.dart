@@ -11,6 +11,7 @@ import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_prototype_dispatcher.dart';
 import 'package:afib/src/flutter/test/af_simple_prototype_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
 import 'package:afib/src/flutter/utils/af_flutter_params.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
@@ -30,6 +31,9 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
 
   for(var group in AFibF.screenTests.groups) {
     for(var test in group.tests) {
+      if(!test.hasBody) {
+        continue;
+      }
       if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
         //AF.testOnlyStore.dispatch(AFResetToInitialStateAction());
         AFibF.testOnlyStore.dispatch(AFScreenPrototypeScreen.navigatePush(test));
@@ -37,14 +41,13 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
 
         final screenId = test.widget.screen;
         final dispatcher = AFPrototypeDispatcher(screenId, AFStoreDispatcher(AFibF.testOnlyStore), null);
-        final context = AFScreenTestContextWidgetTester(tester, app, test, dispatcher);
-        if(!test.hasBody) {
-          continue;
-        }
+        final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test);
+        dispatcher.dispatch(AFStartPrototypeScreenTestAction(context));
+        dispatcher.setContext(context);
         contexts.add(context);
 
         // tell the store to go to the correct screen.
-        await tester.pumpAndSettle();
+        await tester.pumpAndSettle(Duration(seconds: 1));
   
         AFibD.logInternal?.fine("Finished pumpWidget for ${test.id}");
         final params = AFTestSectionParams();
@@ -54,7 +57,9 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
 
         // pop this test screen off so that we are ready for the next one.
         AFibF.testOnlyStore.dispatch(AFNavigatePopAction());
-        await tester.pumpAndSettle();
+        
+        dispatcher.setContext(context);
+        await tester.pumpAndSettle(Duration(seconds: 1));
       }
     }
   }

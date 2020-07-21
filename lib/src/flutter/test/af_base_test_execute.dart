@@ -38,29 +38,25 @@ class AFTestErrors {
 
 abstract class AFBaseTestExecute {
 
-  final _errors = AFTestErrors();
+  final errors = AFTestErrors();
 
-  void expect(dynamic value, flutter_test.Matcher matcher, {int stackFrames = 2}) {
+  void expect(dynamic value, flutter_test.Matcher matcher, {int extraFrames = 0}) {
     final matchState = Map();
     if(!addPassIf(matcher.matches(value, matchState))) {
       final matchDesc = matcher.describe(flutter_test.StringDescription());
       final desc = "Expected $matchDesc, found $value";
+      final int stackFrames = extraFrames + 2;
       addError(desc, stackFrames);
     }
   }
 
   AFTestID get testID;
 
-  void addError(String desc, int depth) {
-    String err = composeError(desc, depth);
-    _errors.addError(AFTestError(testID, err));
-  }
-
   int printPassMessages(AFCommandOutput output) {
-    if(!_errors.hasErrors) {
-      _writeTestResult(output, "${testID.code}:", _errors.pass, " passed", Styles.GREEN, tags: testID.tagsText);
+    if(!errors.hasErrors) {
+      _writeTestResult(output, "${testID.code}:", errors.pass, " passed", Styles.GREEN, tags: testID.tagsText);
     }
-    return _errors.pass;
+    return errors.pass;
   }
 
   static void printTotalPass(AFCommandOutput output, String title, int pass) {
@@ -68,14 +64,14 @@ abstract class AFBaseTestExecute {
   }
 
   int printFailMessages(AFCommandOutput output) {
-    if(_errors.hasErrors) {
-      _writeTestResult(output, "${testID.code}:", _errors.errorCount, " failed", Styles.RED, tags: testID.tagsText);
+    if(errors.hasErrors) {
+      _writeTestResult(output, "${testID.code}:", errors.errorCount, " failed", Styles.RED, tags: testID.tagsText);
       output.indent();
-      for(var error in _errors.errors) {
+      for(var error in errors.errors) {
          output.writeLine(error.toString());
       }
       output.outdent();
-      return _errors.errorCount;
+      return errors.errorCount;
     }
     return 0;
   }
@@ -96,9 +92,14 @@ abstract class AFBaseTestExecute {
 
   bool addPassIf(bool test) {
     if(test) {
-      _errors.addPass();
+      errors.addPass();
     }
     return test;
+  }    
+
+  void addError(String desc, int depth) {
+    String err = AFBaseTestExecute.composeError(desc, depth);
+    errors.addError(AFTestError(testID, err));
   }
 
   static String composeError(String desc, int depth) {

@@ -57,19 +57,19 @@ class AFScreenTestState {
 
 @immutable
 class AFTestState {
-  final Map<AFTestID, AFScreenTestContextSimulator> testContexts;
+  final Map<AFTestID, AFScreenTestContext> testContexts;
   final Map<AFTestID, AFScreenTestState> testStates;
 
   AFTestState({this.testContexts, this.testStates});
 
   factory AFTestState.initial() {
     return AFTestState(
-      testContexts: Map<AFTestID, AFScreenTestContextSimulator>(), 
+      testContexts: Map<AFTestID, AFScreenTestContext>(), 
       testStates:Map<AFTestID, AFScreenTestState>()
     );
   }
 
-  AFScreenTestContextSimulator findContext(AFTestID id) {
+  AFScreenTestContext findContext(AFTestID id) {
     return testContexts[id];
   }
 
@@ -77,8 +77,8 @@ class AFTestState {
     return testStates[id];
   }
 
-  AFTestState startTest(AFScreenTestContextSimulator simulator) {
-    final revisedContexts = Map<AFTestID, AFScreenTestContextSimulator>.from(testContexts);
+  AFTestState startTest(AFScreenTestContext simulator) {
+    final revisedContexts = Map<AFTestID, AFScreenTestContext>.from(testContexts);
     revisedContexts[simulator.test.id] = simulator;
     final revisedStates = Map<AFTestID, AFScreenTestState>.from(testStates);
     revisedStates[simulator.test.id] = AFScreenTestState(pass: 0, errors: List<String>(), data: null);
@@ -105,7 +105,7 @@ class AFTestState {
   AFTestState incrementPassCount(AFTestID testId) {
     final revisedStates = Map<AFTestID, AFScreenTestState>.from(testStates);
     final currentState = revisedStates[testId];
-    revisedStates[testId] = currentState.incrementPassCount();
+    revisedStates[testId] = currentState?.incrementPassCount();
     return copyWith(
       testStates: revisedStates
     );
@@ -121,7 +121,7 @@ class AFTestState {
   }
 
   AFTestState copyWith({
-    Map<AFTestID, AFScreenTestContextSimulator> testContexts,
+    Map<AFTestID, AFScreenTestContext> testContexts,
      Map<AFTestID, AFScreenTestState> testStates
   }) {
     return AFTestState(

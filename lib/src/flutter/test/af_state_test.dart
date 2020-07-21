@@ -40,7 +40,6 @@ class AFStateTestContext<TState> extends AFStateTestExecute {
   void processQuery(AFAsyncQueryCustomError q) {
     test.processQuery(this, q);
   }
-
 }
 
 typedef void ProcessQuery(AFStateTestContext context, AFAsyncQueryCustomError query);

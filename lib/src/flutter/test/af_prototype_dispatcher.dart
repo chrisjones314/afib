@@ -9,16 +9,21 @@ import 'package:afib/src/flutter/test/af_test_actions.dart';
 class AFPrototypeDispatcher extends AFDispatcher {
   AFID screenId;
   AFDispatcher main;
-  AFScreenTestContextSimulator testContext;
+  AFScreenTestContext testContext;
   
   AFPrototypeDispatcher(this.screenId, this.main, this.testContext);
+
+  void setContext(AFScreenTestContext context) {
+    testContext = context;
+  }
 
   @override
   void dispatch(action) {
     final isTestAction = action is AFNavigatePopInTestAction ||
                           action is AFUpdatePrototypeScreenTestDataAction || 
                           action is AFPrototypeScreenTestAddError ||
-                          action is AFPrototypeScreenTestIncrementPassCount;
+                          action is AFPrototypeScreenTestIncrementPassCount ||
+                          action is AFStartPrototypeScreenTestAction;
     // if the action is a pop, then go ahead and do it.
     if(isTestAction) {
       main.dispatch(action);

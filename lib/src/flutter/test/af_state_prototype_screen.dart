@@ -75,9 +75,9 @@ class AFScreenPrototypeScreen extends AFConnectedScreen<AFAppState, AFStateProto
     AFRouteParam paramChild = context.p.param ?? test.data.param;
     final testContext = context.s.testState.findContext(test.id);
     final dispatcher = AFPrototypeDispatcher(context.p.id, context.d, testContext);
-    final childContext = test.widget.createContext(context.c, dispatcher, test.data, paramChild);
+    final childContext = test.screen.createContext(context.c, dispatcher, test.data, paramChild);
     childContext.enableTestContext(test);
-    return test.widget.buildWithContext(childContext);
+    return test.screen.buildWithContext(childContext);
     
   }
 }

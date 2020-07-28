@@ -24,6 +24,29 @@ class AFScreenPrototypeScreenParam extends AFRouteParam {
   AFScreenPrototypeScreenParam copyWith() {
     return AFScreenPrototypeScreenParam();
   }
+
+  @override
+  bool matchesScreen(AFScreenID screenID) {
+    AFScreenPrototypeTest test = AFibF.screenTests.findById(id);
+    if(test.screen?.screen == screenID) {
+      return true;
+    }
+    return false;     
+  }
+
+  Type get effectiveScreenRuntimeType {
+    AFScreenPrototypeTest test = AFibF.screenTests.findById(id);
+    return test.screen?.runtimeType;
+  }
+
+  @override
+  AFRouteParam paramFor(AFScreenID screenID) {
+    AFScreenPrototypeTest test = AFibF.screenTests.findById(id);
+    if(test.screen?.screen == screenID) {
+      return param;
+    }
+    return this;
+  }
 }
 
 /// Data used to render the screen
@@ -78,9 +101,9 @@ class AFScreenPrototypeScreen extends AFConnectedScreen<AFAppState, AFScreenProt
     final testState = context.s.testState.findState(test.id);
     final testData = testState?.data ?? test.data;
     final dispatcher = AFPrototypeDispatcher(context.p.id, context.d, testContext);
-    final childContext = test.widget.createContext(context.c, dispatcher, testData, paramChild);
+    final childContext = test.screen.createContext(context.c, dispatcher, testData, paramChild);
     childContext.enableTestContext(test);
-    return test.widget.buildWithContext(childContext);
+    return test.screen.buildWithContext(childContext);
     
   }
 }

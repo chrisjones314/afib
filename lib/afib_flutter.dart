@@ -25,3 +25,6 @@ export 'src/flutter/test/af_unit_tests.dart';
 export 'src/flutter/test/af_unit_test_main.dart';
 export "src/flutter/test/af_test_main.dart";
 export "src/flutter/test/af_widget_actions.dart";
+export "src/flutter/utils/af_bottom_popup_theme.dart";
+export "src/flutter/utils/af_bottom_popup_layout.dart";
+export "src/flutter/utils/af_custom_popup_route.dart";

@@ -81,7 +81,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
       textColor: AFTheme.primaryText,
       onPressed: () {
           Navigator.pop(context.c);
-          context.dispatch(AFNavigatePopInTestAction());
+          context.dispatch(AFNavigatePopAction());
       }
     ));
 
@@ -113,7 +113,8 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
             }
 
             final testContext = AFScreenTestContextSimulator(context.d, test, runNumber);
-            final screenUpdateCount = AFibF.testOnlyScreenUpdateCount;
+            
+            final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(test.screen.runtimeType);
             context.dispatch(AFUpdatePrototypeScreenTestDataAction(this.test.id, this.test.data));
             context.dispatch(AFStartPrototypeScreenTestAction(testContext));
             await testContext.pauseForRender(screenUpdateCount, true);

@@ -1,4 +1,5 @@
 
+import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
@@ -6,6 +7,8 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_unused.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:afib/src/flutter/test/af_simple_prototype_screen.dart';
+import 'package:afib/src/flutter/utils/af_bottom_popup_layout.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_drawer.dart';
@@ -99,6 +102,11 @@ class AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> exten
 
 }
 
+/// Use this if you don't use any data from the store to render your screen.
+@immutable 
+class AFStoreConnectorDataUnused extends AFStoreConnectorData<AFUnused, AFUnused, AFUnused, AFUnused> {
+  AFStoreConnectorDataUnused({AFDispatcher dispatcher, AFRouteParam param}): super();
+}
 
 /// Use this version of [AFStoreConnectorData] if you only need one piece of data from the store.
 @immutable 
@@ -169,11 +177,16 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
           if(dataContext == null) {
             return CircularProgressIndicator();
           }
+          
           if(!(this is AFTestDrawer)) {
-            AFibF.testOnlyScreenElement = buildContext;
-            AFibF.testOnlyScreenUpdateCount++;
+            var rt = this.runtimeType;
+            if(dataContext.p != null && dataContext.p is AFScreenPrototypeScreenParam) {
+              rt = dataContext.p.effectiveScreenRuntimeType;
+            }
+            
+            final info = AFibF.registerTestScreen(rt, buildContext);
+            AFibD.logInternal?.fine("Rebuilding screen $runtimeType with updateCount ${info.updateCount} and param ${dataContext.p}");
           }
-          AFibD.logInternal?.fine("Rebuilding screen $runtimeType with updateCount ${AFibF.testOnlyScreenUpdateCount} and param ${dataContext.p}");
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p);
           return buildWithContext(withContext);
         }
@@ -233,6 +246,82 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
   AFRouteParam findParam(AFState state) {
     return state.route?.findParamFor(this.screen, true);
   }
+}
+
+/// Just like an [AFConnectedScreen], except it is typically displayed as 
+/// a modal overlay on top of an existing screen, and launched using a custom 
+/// AFPopupRoute
+abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TParentScreen extends AFConnectedScreen> extends AFConnectedScreen<TState, TData, TRouteParam> {
+  final TParentScreen parentScreen;
+  final Animation<double> animation;
+  final AFBottomPopupTheme theme;
+  //final TRouteParam parentParam;
+  final AFDispatcher parentDispatcher;
+  //final TData parentData;
+  //final AFBuildContext<TData, TRouteParam> parentContext;
+
+  AFPopupScreen({
+    @required AFScreenID screen, 
+    @required this.parentScreen, 
+    @required this.animation, 
+    @required this.theme,
+    @required this.parentDispatcher,
+  }): super(screen);
+
+  static void openPopup({
+    @required BuildContext context, 
+    @required AFRouteWidgetBuilder popupBuilder, 
+    @required AFBottomPopupTheme theme}) {
+    Navigator.push(
+      context,
+      new AFCustomPopupRoute(
+          childBuilder: popupBuilder,
+          theme: theme,
+          barrierLabel: "Dismiss",
+      )
+    );
+  }
+
+  /// Updates the parameter for the parent screen, rather than updating a parameter for our screen (which has no route entry).
+  void updateParam(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
+    parentScreen.updateParam(dispatcher, revised, id: id);
+  }
+
+  /// Finds the parameter for the parent screen, since a popup screen had not route entry.
+  TRouteParam findParam(AFState state) {
+    return parentScreen.findParam(state);
+  }
+
+  @override
+  Widget buildWithContext(AFBuildContext<TData, TRouteParam> context) {
+    return buildPopupAnimation(context);
+  }
+
+  Widget buildPopupAnimation(AFBuildContext<TData, TRouteParam> context) {
+    return GestureDetector(
+      child: AnimatedBuilder(
+        animation: animation,
+        builder: (BuildContext ctx, Widget child) {
+          final local = AFBuildContext<TData, TRouteParam>(ctx, parentDispatcher, context.s, context.p);
+          final double bottomPadding = MediaQuery.of(local.c).padding.bottom;
+          return ClipRect(
+            child: CustomSingleChildLayout(
+              delegate: AFBottomPopupLayout(animation.value, theme, bottomPadding: bottomPadding),
+              child: GestureDetector(
+                child: Material(
+                  color: theme.backgroundColor ?? Colors.white,
+                  child: buildPopupContents(local, theme),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget buildPopupContents(AFBuildContext<TData, TRouteParam> context, AFBottomPopupTheme theme);
+
 }
 
 /// Use this to connect a Widget to the store.  

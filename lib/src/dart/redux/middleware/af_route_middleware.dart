@@ -2,6 +2,7 @@
 import 'dart:core';
 import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
+import 'package:afib/src/flutter/utils/af_custom_popup_route.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
@@ -12,7 +13,8 @@ List<Middleware<AFState>> createRouteMiddleware() {
     TypedMiddleware<AFState, AFNavigateReplaceAction>(_navigateReplaceAction),
     TypedMiddleware<AFState, AFNavigateReplaceAllAction>(_navigateReplaceAllAction),
     TypedMiddleware<AFState, AFNavigatePushAction>(_navigatePushAction),
-    TypedMiddleware<AFState, AFNavigatePopAction>(_navigatePopAction)
+    TypedMiddleware<AFState, AFNavigatePushPopupAction>(_navigatePushPopupAction),
+    TypedMiddleware<AFState, AFNavigatePopAction>(_navigatePopAction),
   ];
 }
 
@@ -28,7 +30,32 @@ List<Middleware<AFState>> createRouteMiddleware() {
 //final dfMiddleware = createMiddleware();
 
 //---------------------------------------------------------------------------
+void _navigatePushPopupAction(Store<AFState> store, act, NextDispatcher next) {
+  AFNavigatePushPopupAction action = act;
+
+  Future<dynamic> ret = Navigator.push(
+        action.context,
+        new AFCustomPopupRoute(
+            //dispatcher: dispatcher,
+            //param: param,
+            //onChanged: onChanged,
+            //onConfirm: onConfirm,
+            childBuilder: action.popupBuilder,
+            theme: action.theme,
+            barrierLabel: "Dismiss",
+        )
+  );
+  if(ret != null && action.onReturn != null) {
+    ret.then( (msg) {
+      action.onReturn(msg);
+    });
+  }
+  next(action);
+}
+
+//---------------------------------------------------------------------------
 void _navigatePushAction(Store<AFState> store, action, NextDispatcher next) {
+
 
   Future<dynamic> ret = AFibF.navigatorKey.currentState?.pushNamed(action.screen.code);
   if(ret != null && action.onReturn != null) {

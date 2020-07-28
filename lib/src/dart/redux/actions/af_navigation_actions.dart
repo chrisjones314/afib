@@ -1,6 +1,9 @@
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
+import 'package:afib/src/flutter/utils/af_bottom_popup_theme.dart';
+import 'package:afib/src/flutter/utils/af_custom_popup_route.dart';
+import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
 typedef void AFReturnFunc<T>(T returnData);
@@ -45,18 +48,34 @@ class AFNavigatePushAction extends AFNavigateAction {
   AFNavigatePushAction({AFID id, AFScreenID screen, AFRouteParam param, this.onReturn}): super(id: id, screen: screen, param: param);
 }
 
-/// Action that navigates on screen up in the route, discarding the current leaf route.
-class AFNavigatePopAction extends AFNavigateAction {
-  final dynamic returnData;
+/// Pushes a popup with a custom route.
+class AFNavigatePushPopupAction extends AFNavigateAction {
   
-  AFNavigatePopAction({AFID id, this.returnData}): super(id: id, screen: null, param: null);
+  final BuildContext context;
+  final AFBottomPopupTheme theme;
+  final AFReturnFunc<dynamic> onReturn;
+  final AFRouteWidgetBuilder popupBuilder;
+  
+  AFNavigatePushPopupAction({
+    AFID id, 
+    @required this.context,
+    @required AFScreenID screen, 
+    @required AFRouteParam param,
+    @required this.theme,
+    @required this.popupBuilder,
+    this.onReturn}): super(id: id, screen: screen, param: param);
 }
 
-/// Action that causes us to navigate up from a prototype/test screen to the main prototype/test
-/// list. 
+
+/// Action that navigates on screen up in the route, discarding the current leaf route.
 /// 
-/// This is necessary because the testing infrastructure catches all normal actions and records 
-/// them for testing/logging purposes.
-class AFNavigatePopInTestAction extends AFNavigatePopAction {
-  AFNavigatePopInTestAction({AFID id, dynamic returnData}): super(id: id, returnData: returnData);
+/// IF you want to test for the presence of a pop action in response to an event in 
+/// prototype mode, you can make [worksInPrototypeMode] false.   By default, pop actions
+/// navigate you out of a prototype screen in test mode.
+class AFNavigatePopAction extends AFNavigateAction {
+  final dynamic returnData;
+  final bool worksInPrototypeMode;
+  
+  AFNavigatePopAction({AFID id, this.returnData, this.worksInPrototypeMode = true}): super(id: id, screen: null, param: null);
 }
+

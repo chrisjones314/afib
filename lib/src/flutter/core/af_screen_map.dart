@@ -29,6 +29,10 @@ class AFScreenMap {
      });
   }
 
+  WidgetBuilder findBy(AFScreenID id) {
+    return _screens[id];
+  }
+
   /// Call [initialScreen] once to specify the initial screen for your app.
   void initialScreen(AFScreenID screenKey, WidgetBuilder screenBuilder) {
     AFibF.verifyNotImmutable();

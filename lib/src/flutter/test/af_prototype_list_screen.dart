@@ -71,7 +71,7 @@ class AFPrototypeListScreen extends AFConnectedScreen<AFAppState, APrototypeList
   }
 
   void _addForWidget(AFBuildContext<APrototypeListScreenData, AFPrototypeListScreenParam> context, List<Widget> column, AFScreenTestGroup source) {
-    StringBuffer title = StringBuffer(source.widget.runtimeType.toString());
+    StringBuffer title = StringBuffer(source.screen.runtimeType.toString());
     column.add(Card(
       color: AFTheme.primaryBackground,
       child: Container(

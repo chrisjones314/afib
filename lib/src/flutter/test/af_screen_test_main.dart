@@ -39,7 +39,7 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
         AFibF.testOnlyStore.dispatch(AFScreenPrototypeScreen.navigatePush(test));
         AFibD.logInternal?.fine("Starting ${test.id}");
 
-        final screenId = test.widget.screen;
+        final screenId = test.screen.screen;
         final dispatcher = AFPrototypeDispatcher(screenId, AFStoreDispatcher(AFibF.testOnlyStore), null);
         final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test);
         dispatcher.dispatch(AFStartPrototypeScreenTestAction(context));

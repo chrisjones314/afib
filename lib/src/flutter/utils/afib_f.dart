@@ -21,8 +21,17 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 
+class AFibTestOnlyScreenElement {
+  final Type screenType;
+  BuildContext element;
+  int updateCount = 0;
 
+  AFibTestOnlyScreenElement(this.screenType, this.element);
 
+  void increaseBuildCount() {
+    updateCount++;
+  }
+}
 
 /// A class for finding accessing global utilities in AFib. 
 /// 
@@ -45,8 +54,7 @@ class AFibF {
   static AFScreenMap _afPrototypeScreenMap;
   static CreateAFApp _afCreateApp;
   static AFScreenID forcedStartupScreen;
-  static int testOnlyScreenUpdateCount = 0;
-  static BuildContext testOnlyScreenElement;
+  static final testOnlyScreens = Map<Type, AFibTestOnlyScreenElement>();
   static Map<String, AFAsyncQueryListenerCustomError> listenerQueries = Map<String, AFAsyncQueryListenerCustomError>();
   static Map<String, AFDeferredQueryCustomError> deferredQueries = Map<String, AFDeferredQueryCustomError>();
   static Map<String, AFWaitQuery> waitQueries = Map<String, AFWaitQuery>();
@@ -94,6 +102,37 @@ class AFibF {
     finishStartup();
   }
 
+  /// Used internally in tests to find widgets on the screen.  Not for public use.
+  static AFibTestOnlyScreenElement registerTestScreen(Type screenType, BuildContext screenElement) {
+    var info = testOnlyScreens[screenType];
+    if(info == null) {
+      info = AFibTestOnlyScreenElement(screenType, screenElement);
+      testOnlyScreens[screenType] = info;
+    }
+    info.element = screenElement;
+    info.increaseBuildCount();
+    return info;
+  }
+
+  /// Used internally in tests to find widgets on the screen.  Not for public use.
+  static AFibTestOnlyScreenElement findTestScreen(Type screenType) {
+    return testOnlyScreens[screenType];
+  }
+
+  /// Used internally in tests to find widgets on the screen.  Not for public use.
+  static int testOnlyScreenUpdateCount(Type screenType) {
+    final info = testOnlyScreens[screenType];
+    if(info == null) {
+      return 0;
+    }
+    return info.updateCount;
+  }
+
+  static void testOnlyIncreaseAllUpdateCounts() {
+    for(final info in testOnlyScreens.values) {
+      info.increaseBuildCount();
+    }
+  }
 
   /// The navigator key for referencing the Navigator for the material app.
   static GlobalKey<NavigatorState> get navigatorKey {

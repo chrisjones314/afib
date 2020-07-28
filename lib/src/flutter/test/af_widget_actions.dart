@@ -1,5 +1,6 @@
 
 
+import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/flutter/core/af_text_field.dart';
 import 'package:flutter/material.dart';
@@ -10,21 +11,22 @@ import 'package:flutter/widgets.dart';
 /// a widget.
 abstract class AFWidgetAction {
 
-  bool matches(Element element);
+  bool matches(String actionType, Element element);
 
 }
 
 abstract class AFWidgetByTypeAction {
   /// The type of the widget that this can tap on.
-  Type appliesTo;
+  final Type appliesTo;
+  final String actionType;
   bool allowMultiple;
 
-  AFWidgetByTypeAction(this.appliesTo, {this.allowMultiple = false});
+  AFWidgetByTypeAction(this.actionType, this.appliesTo, {this.allowMultiple = false});
   Type get appliesToType { return appliesTo; }
 
-  bool matches(Element element) {
+  bool matches(String actionT, Element element) {
     final widget = element.widget;
-    return (widget.runtimeType == this.appliesTo);
+    return (actionType == actionT && widget.runtimeType == this.appliesTo);
   }
 
   void throwUnknownAction(String actionType) {
@@ -36,7 +38,7 @@ abstract class AFApplyWidgetAction extends AFWidgetByTypeAction {
   static const applyTap = "apply_tap";
   static const applySetValue = "apply_set_value";
 
-  AFApplyWidgetAction(Type appliesTo): super(appliesTo);
+  AFApplyWidgetAction(String actionType, Type appliesTo): super(actionType, appliesTo);
 
   static bool isTap(String applyType) { return applyType == applyTap; }
   static bool isSetValue(String applyType) { return applyType == applySetValue; }
@@ -46,13 +48,24 @@ abstract class AFApplyWidgetAction extends AFWidgetByTypeAction {
   void apply(String applyType, Element elem, dynamic data);
 }
 
+abstract class AFApplyTapWidgetAction extends AFApplyWidgetAction {
+  AFApplyTapWidgetAction(Type appliesTo): super(AFApplyWidgetAction.applyTap, appliesTo);
+}
+
+abstract class AFApplySetValueWidgetAction extends AFApplyWidgetAction {
+  AFApplySetValueWidgetAction(Type appliesTo): super(AFApplyWidgetAction.applySetValue, appliesTo);
+}
+
+
 abstract class AFExtractWidgetAction extends AFWidgetByTypeAction {
-  AFExtractWidgetAction(Type appliesTo): super(appliesTo);
+  static const extractPrimary = "extract_primary";
+
+  AFExtractWidgetAction(String actionType, Type appliesTo): super(actionType, appliesTo);
 
   /// This extracts data from a widget and returns it.
-  dynamic extract(Element element);
+  dynamic extract(String extractType, Element element);
 
-
+  static bool isPrimary(String extractType) { return extractType == extractPrimary; }
 
   List<Element> findChildrenWithWidgetType<T>(Element element) {
     final result = List<Element>();
@@ -66,7 +79,11 @@ abstract class AFExtractWidgetAction extends AFWidgetByTypeAction {
   }
 }
 
-class AFFlatButtonAction extends AFApplyWidgetAction {
+abstract class AFExtractPrimaryWidgetAction extends AFExtractWidgetAction {
+  AFExtractPrimaryWidgetAction(Type appliesTo): super(AFExtractWidgetAction.extractPrimary, appliesTo); 
+}
+
+class AFFlatButtonAction extends AFApplyTapWidgetAction {
 
   AFFlatButtonAction(): super(FlatButton);
 
@@ -74,100 +91,111 @@ class AFFlatButtonAction extends AFApplyWidgetAction {
   @override
   void apply(String applyType, Element elem, dynamic data) {
     final tapOn = elem.widget;
-    if(AFApplyWidgetAction.isTap(applyType) && tapOn is FlatButton) {
+    if(tapOn is FlatButton) {
       tapOn.onPressed();
-    } else {
-      throwUnknownAction(applyType);
-    }
+    } 
   }
 }
 
-class AFToggleChoiceChip extends AFApplyWidgetAction {
+class AFRaisedButtonAction extends AFApplyTapWidgetAction {
+
+  AFRaisedButtonAction(): super(RaisedButton);
+
+  /// [data] is ignored.
+  @override
+  void apply(String applyType, Element elem, dynamic data) {
+    final tapOn = elem.widget;
+    if(tapOn is RaisedButton) {
+      tapOn.onPressed();
+    } 
+  }
+}
+
+
+class AFToggleChoiceChip extends AFApplyTapWidgetAction {
   AFToggleChoiceChip(): super(ChoiceChip);
 
   /// Note that [data] is ignored, this toggles the chip state.
   @override
   void apply(String applyType, Element element, dynamic data) {
     final widget = element.widget;
-    if(AFApplyWidgetAction.isTap(applyType) && widget is ChoiceChip) {
+    if(widget is ChoiceChip) {
       widget.onSelected(!widget.selected);
-    } else {
-      throwUnknownAction(applyType);
-    }
+    } 
   }
 
 }
 
-class AFApplyTextTextFieldAction extends AFApplyWidgetAction {
+class AFApplyTextTextFieldAction extends AFApplySetValueWidgetAction {
 
   AFApplyTextTextFieldAction(): super(TextField);
 
   @override
   void apply(String applyType, Element element, dynamic data) {
     final widget = element.widget;
-    if(AFApplyWidgetAction.isSetValue(applyType) && widget is TextField && data is String) {
+    if(widget is TextField && data is String) {
       widget.onChanged(data);
-    } else {
-      throwUnknownAction(applyType);
-    }
+    } 
   }
 }
 
-class AFApplyTextAFTextFieldAction extends AFApplyWidgetAction {
+class AFApplyTextAFTextFieldAction extends AFApplySetValueWidgetAction {
 
   AFApplyTextAFTextFieldAction(): super(AFTextField);
 
   @override
   void apply(String applyType, Element elem, dynamic data) {
     final widget = elem.widget;
-    if(AFApplyWidgetAction.isSetValue(applyType) && widget is AFTextField && data is String) {
+    if(widget is AFTextField && data is String) {
       widget.onChanged(data);
-    } else {
-      throwUnknownAction(applyType);
-    }
+    } 
   }
 }
 
 
-class AFExtractTextTextAction extends AFExtractWidgetAction {
+class AFExtractTextTextAction extends AFExtractPrimaryWidgetAction {
 
   AFExtractTextTextAction(): super(Text);
 
   @override
-  dynamic extract(Element element) {
+  dynamic extract(String extractType, Element element) {
     final widget = element.widget;
-    if(widget is Text) {
+    if(AFExtractWidgetAction.isPrimary(extractType) && widget is Text) {
       return widget.data;
+    } else {
+      throwUnknownAction(extractType);
     }
     return null;
   }
 }
 
-class AFExtractTextTextFieldAction extends AFExtractWidgetAction {
+class AFExtractTextTextFieldAction extends AFExtractPrimaryWidgetAction {
 
   AFExtractTextTextFieldAction(): super(TextField);
 
   @override
-  dynamic extract(Element element) {
+  dynamic extract(String extractType, Element element) {
     final widget = element.widget;
-    if(widget is TextField) {
+    if(AFExtractWidgetAction.isPrimary(extractType) && widget is TextField) {
       if(widget.controller != null) {
         return widget.controller.value.text;
       } 
+    } else {
+      throwUnknownAction(extractType);
     }
     return null;
   }
 }
 
-class AFExtractTextAFTextFieldAction extends AFExtractWidgetAction {
+class AFExtractTextAFTextFieldAction extends AFExtractPrimaryWidgetAction {
 
   AFExtractTextAFTextFieldAction(): super(AFTextField);
 
   @override
-  dynamic extract(Element element) {
+  dynamic extract(String extractType, Element element) {
     String text;
     final widget = element.widget;
-    if(widget is AFTextField) {
+    if(AFExtractWidgetAction.isPrimary(extractType) && widget is AFTextField) {
       List<Element> children = this.findChildrenWithWidgetType<TextField>(element);
       if(children.length != 1) {
         throw AFException("AFTextField doesn't have one TextField child?");
@@ -178,20 +206,24 @@ class AFExtractTextAFTextFieldAction extends AFExtractWidgetAction {
       if(childWidget is TextField) {
         text = childWidget.controller.value.text; 
       }
+    } else {
+      throwUnknownAction(extractType);
     }
     return text;
   }
 }
 
-class AFSelectableChoiceChip extends AFExtractWidgetAction {
+class AFSelectableChoiceChip extends AFExtractPrimaryWidgetAction {
 
   AFSelectableChoiceChip(): super(ChoiceChip);
 
   @override
-  dynamic extract(Element element) {
+  dynamic extract(String extractType, Element element) {
     final widget = element.widget;
-    if(widget is ChoiceChip) {
+    if(AFExtractWidgetAction.isPrimary(extractType) && widget is ChoiceChip) {
       return widget.selected;
+    } else {
+      throwUnknownAction(extractType);
     }
     return false;
   }

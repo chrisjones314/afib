@@ -23,6 +23,20 @@ class AFRouteSegment {
     );
   }
 
+  bool matchesScreen(AFScreenID screen) {
+    if(screen == this.screen) {
+      return true;
+    }
+
+    // this is used in testing, where the prototype screen
+    // stands in for other screens.
+    if(param != null && param.matchesScreen(screen)) {
+      return true;
+    }
+
+    return false;
+  }
+
   String toString() {
     return screen.code;
   }
@@ -66,7 +80,7 @@ class AFRouteState {
   AFRouteSegment _findSegmentFor(AFScreenID screen, bool includePrior) {
     for(int i = route.length - 1; i >= 0; i--) {
       AFRouteSegment segment = route[i];
-      if(segment.screen == screen) {
+      if(segment.matchesScreen(screen)) {
         return segment;
       }
     }
@@ -87,7 +101,7 @@ class AFRouteState {
     if(seg == null) {
       return null;
     }
-    return seg.param;
+    return seg.param?.paramFor(screen);
   }
 
   /// Returns the list of screen names, from the root to the leaf.

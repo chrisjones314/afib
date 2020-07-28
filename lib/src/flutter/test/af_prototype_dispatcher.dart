@@ -19,7 +19,12 @@ class AFPrototypeDispatcher extends AFDispatcher {
 
   @override
   void dispatch(action) {
-    final isTestAction = action is AFNavigatePopInTestAction ||
+    bool shouldPop = false;
+    if(action is AFNavigatePopAction) {
+      shouldPop = action.worksInPrototypeMode;
+    }
+
+    final isTestAction =  shouldPop ||
                           action is AFUpdatePrototypeScreenTestDataAction || 
                           action is AFPrototypeScreenTestAddError ||
                           action is AFPrototypeScreenTestIncrementPassCount ||
@@ -37,7 +42,7 @@ class AFPrototypeDispatcher extends AFDispatcher {
       // if this is an action that doesn't really dispatch, then bump the 
       // screen update count artificially to allow tests to continue (they
       // are waiting for a screen update.
-      AFibF.testOnlyScreenUpdateCount++;
+      AFibF.testOnlyIncreaseAllUpdateCounts();
     }
 
     // if this is a test action, then remember it so that we can 

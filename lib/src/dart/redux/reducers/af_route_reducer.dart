@@ -6,6 +6,7 @@ import 'package:redux/redux.dart';
 final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigateReplaceAction>(_navReplace),
   TypedReducer<AFRouteState, AFNavigateReplaceAllAction>(_navReplaceAll),
+  TypedReducer<AFRouteState, AFNavigatePushPopupAction>(_navPushPopup),
   TypedReducer<AFRouteState, AFNavigatePushAction>(_navPush),
   TypedReducer<AFRouteState, AFNavigatePopAction>(_navPop),
   TypedReducer<AFRouteState, AFNavigateSetParamAction>(_navSetParam),
@@ -26,6 +27,13 @@ AFRouteState _navPush(AFRouteState state, AFNavigatePushAction action) {
 
   return state.pushNamed(action.screen, action.param);
 }
+
+//---------------------------------------------------------------------------
+AFRouteState _navPushPopup(AFRouteState state, AFNavigatePushPopupAction action) {
+
+  return state.pushNamed(action.screen, action.param);
+}
+
 
 //---------------------------------------------------------------------------
 AFRouteState _navPop(AFRouteState state, AFNavigatePopAction action) {

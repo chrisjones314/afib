@@ -32,6 +32,10 @@ class AFScreenID extends AFID {
 
 class AFWidgetID extends AFID {
   const AFWidgetID(String code) : super(code);
+
+  AFWidgetID with1(dynamic item) {
+    return AFWidgetID("${code}_${item.toString()}");
+  }
 }
 
 class AFTestID extends AFIDWithTags {

@@ -9,6 +9,7 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/af_app.dart';
+import 'package:afib/src/flutter/core/afui.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
@@ -271,8 +272,8 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
 
   void expectOneWidget(dynamic selector) {
     expectNWidgets(selector, 1, extraFrames: 1);
-  }
-  
+  }  
+
   void expectMissingWidget(dynamic selector) {
     expectNWidgets(selector, 0, extraFrames: 1);
   }
@@ -288,6 +289,8 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   void expectText(dynamic selector, String text) {
     expectWidgetValue(selector, ft.equals(text), extraFrames: 1);
   }
+
+
 
   /// Used to tap on an element that opens a popup of [popupScreenType].
   /// 
@@ -326,8 +329,37 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
     expectWidgetValue(selector, ft.equals(sel), extraFrames: 1);
   }
 
+  void expectWidget(dynamic selector, Function(Element elem) onFound, { int extraFrames = 0 });
+  void expectWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 });
 
   void expectWidgetValue(dynamic selector, ft.Matcher matcher, { int extraFrames = 0 });
+
+  /// Verifies that [element] has the expected [key], which can be
+  /// either a [String] or an [AFWidgetID].
+  void expectKey(Element element, dynamic key, { int extraFrames = 0 }) {
+    var keyVal;
+    if(key is AFWidgetID) {
+      keyVal = key.code;
+    } else if(key is String) {
+      keyVal = key;
+    } else {
+      throw AFException("Unknown key type ${key.runtimeType}");
+    }
+    this.expect(element.widget.key, ft.equals(Key(keyVal)), extraFrames: extraFrames+1);
+  }
+
+  void expectKeys(List<Element> elements, List<dynamic> keys) {
+    this.expect(elements.length, ft.equals(keys.length), extraFrames: 1);
+    if(elements.length != keys.length) {
+      return;
+    }    
+
+    for(int i = 0; i < elements.length; i++) {
+      final elem = elements[i];
+      final source = keys[i];
+      this.expectKey(elem, source, extraFrames: 1);
+    }
+  }
   
   Future<void> applyWidgetValue(dynamic selector, dynamic value, String applyType, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 });
   Future<void> applyWidgetValueWithExpectedAction(dynamic selector, dynamic value, String applyType, AFActionWithKey actionSpecifier, Function(AFActionWithKey) checkAction, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 });
@@ -502,10 +534,17 @@ class AFScreenTestWidgetCollector extends AFScreenTestExecute {
     return null;
   }
 
+  void expectWidget(dynamic selector, Function(Element) onFound, { int extraFrames = 0 }) {
+    _addSelector(selector);
+  }
+
+  void expectWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 }) {
+    _addSelector(selector);
+  }
+
   
   void expectNWidgets(dynamic selector, int n, {int extraFrames = 0}) {
     _addSelector(selector);
-    return null;
   }
 
   void expectWidgetValue(dynamic selector, ft.Matcher matcher, { int extraFrames = 0 }) {
@@ -554,8 +593,6 @@ class AFScreenTestWidgetCollector extends AFScreenTestExecute {
       selector = sel;
     } else if(sel is Type) {
       selector = AFWidgetTypeSelector(sel);
-    } else if(sel is List) {
-      selector = AFMultipleWidgetSelector(sel);
     } else {
       throw AFException("Unknown widget selector type: ${sel.runtimeType}");
     }
@@ -637,6 +674,20 @@ abstract class AFScreenTestContext extends AFScreenTestExecute {
     await elementCollector.underWidget(selector, withinHere);
     return null;
   }
+
+  void expectWidget(dynamic selector, Function(Element elem) onFound, { int extraFrames = 0 }) {
+    List<Element> elems = elementCollector.findWidgetsFor(selector);
+    this.expect(elems.length, ft.equals(1), extraFrames: extraFrames+1);
+    if(elems.length > 0) {
+      onFound(elems.first);
+    }
+  }
+
+  void expectWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 }) {
+    List<Element> elems = elementCollector.findWidgetsFor(selector);
+    onFound(elems);
+  }
+
 
   void setPopupScreenType(final Type popupScreenType) {
     super.setPopupScreenType(popupScreenType);

@@ -14,6 +14,7 @@ class AFTextField extends StatefulWidget {
   final bool autofocus;
   final TextAlign textAlign;
   final InputDecoration decoration;
+  final bool autocorrect;
 
   AFTextField({
     this.key,
@@ -21,6 +22,7 @@ class AFTextField extends StatefulWidget {
     this.onChanged,
     this.obscureText,
     this.autofocus,
+    this.autocorrect,
     this.textAlign,
     this.decoration
     });

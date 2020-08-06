@@ -252,20 +252,23 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
 /// a modal overlay on top of an existing screen, and launched using a custom 
 /// AFPopupRoute
 abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TParentScreen extends AFConnectedScreen> extends AFConnectedScreen<TState, TData, TRouteParam> {
-  final TParentScreen parentScreen;
   final Animation<double> animation;
   final AFBottomPopupTheme theme;
   //final TRouteParam parentParam;
-  final AFDispatcher parentDispatcher;
+  final TParentScreen parentScreen;
+  //final AFDispatcher parentDispatcher;
   //final TData parentData;
-  //final AFBuildContext<TData, TRouteParam> parentContext;
+
+  final AFBuildContext<TData, TRouteParam> parentContext;
 
   AFPopupScreen({
     @required AFScreenID screen, 
     @required this.parentScreen, 
+    //@required this.parentDispatcher,
+    //@required this.parentData,
+    @required this.parentContext,
     @required this.animation, 
     @required this.theme,
-    @required this.parentDispatcher,
   }): super(screen);
 
   static void openPopup({
@@ -281,6 +284,12 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
       )
     );
   }
+
+  @override
+  TData createData(TState state) {
+    return parentContext.s;
+  }
+
 
   /// Updates the parameter for the parent screen, rather than updating a parameter for our screen (which has no route entry).
   void updateParam(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
@@ -302,7 +311,7 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
       child: AnimatedBuilder(
         animation: animation,
         builder: (BuildContext ctx, Widget child) {
-          final local = AFBuildContext<TData, TRouteParam>(ctx, parentDispatcher, context.s, context.p);
+          final local = AFBuildContext<TData, TRouteParam>(ctx, parentContext.d, context.s, context.p);
           final double bottomPadding = MediaQuery.of(local.c).padding.bottom;
           return ClipRect(
             child: CustomSingleChildLayout(

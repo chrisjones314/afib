@@ -168,6 +168,38 @@ class AFMultipleWidgetSelector extends AFWidgetSelector {
   }
 }
 
+class AFRichTextGestureTapSpecifier extends AFWidgetSelector {
+  final AFWidgetSelector selector;
+  final String containsText;
+
+
+  AFRichTextGestureTapSpecifier(this.selector, this.containsText);
+
+  factory AFRichTextGestureTapSpecifier.create(dynamic selector, String containsText) {
+    final sel = AFScreenTestWidgetCollector.createSelector(null, selector);
+    return AFRichTextGestureTapSpecifier(sel, containsText);
+  }
+
+  bool matches(Element elem) {
+    return selector.matches(elem);
+  }
+
+  bool operator==(dynamic o) {
+    if(!(o is AFRichTextGestureTapSpecifier)) {
+      return false;
+    }
+
+    if(o.selector != selector) {
+      return false;
+    }
+
+    if(o.containsText != containsText) {
+      return false;
+    }
+    return true;
+  }
+}
+
 
 class AFSparsePathWidgetSelector extends AFWidgetSelector {
   final  List<AFWidgetSelector> pathSelectors;
@@ -699,8 +731,9 @@ abstract class AFScreenTestContext extends AFScreenTestExecute {
     this.expect(elems.length, ft.equals(n), extraFrames: extraFrames+1);
   }
 
-  void expectWidgetValue(dynamic selector, ft.Matcher matcher, { String extractType = AFExtractWidgetAction.extractPrimary, int extraFrames = 0 }) {
+  void expectWidgetValue(dynamic selectorDyn, ft.Matcher matcher, { String extractType = AFExtractWidgetAction.extractPrimary, int extraFrames = 0 }) {
     AFScreenTests testManager = _testManager;
+    final selector = AFScreenTestWidgetCollector.createSelector(null, selectorDyn);
     List<Element> elems = elementCollector.findWidgetsFor(selector);
     if(elems.isEmpty) {
       this.expect(elems, ft.isNotEmpty, extraFrames: extraFrames+1);
@@ -712,23 +745,28 @@ abstract class AFScreenTestContext extends AFScreenTestExecute {
       if(selectable == null) {
         throw AFException("No AFSelectedWidgetTest found for ${elem.widget.runtimeType}, you can register one using AFScreenTests.registerSelectable");
       }
-      this.expect(selectable.extract(extractType, elem), matcher, extraFrames: extraFrames+1);
+      this.expect(selectable.extract(extractType, selector, elem), matcher, extraFrames: extraFrames+1);
     }
   }
 
-  Future<void> applyWidgetValue(dynamic selector, dynamic value, String applyType, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 }) {
+  Future<void> applyWidgetValue(dynamic selectorDyn, dynamic value, String applyType, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 }) {
     final previous = AFibF.testOnlyScreenUpdateCount(activeScreenType);
     AFScreenTests testManager = _testManager;
+    final selector = AFScreenTestWidgetCollector.createSelector(null, selectorDyn);
     List<Element> elems = elementCollector.findWidgetsFor(selector);
     if(maxWidgets > 0 && maxWidgets < elems.length) {
       throw AFException("Expected at most $maxWidgets widget for selector $selector, found ${elems.length} widgets");
     }
+    if(elems.isEmpty) {
+      throw AFException("applyWidgetValue, no widget found with selector $selectorDyn");
+    }
+
     Element elem = elems.first;
     final tapable = testManager.findApplicator(applyType, elem);
     if(tapable == null) {
       throw AFException("No AFApplyWidgetAction found for ${elem.widget.runtimeType}, you can register one using AFScreenTests.registerApplicator");
     }
-    tapable.apply(applyType, elem, value);    
+    tapable.apply(applyType, selector, elem, value);    
     return pauseForRender(previous, expectRender);
   }
   
@@ -964,6 +1002,8 @@ class AFScreenTests<TState> {
     registerApplicator(AFToggleChoiceChip());
     registerApplicator(AFApplyTextTextFieldAction());
     registerApplicator(AFApplyTextAFTextFieldAction());
+    registerApplicator(AFRichTextGestureTapAction());
+    registerApplicator(AFApplyCupertinoPicker());
 
     registerExtractor(AFSelectableChoiceChip());
     registerExtractor(AFExtractTextTextAction());

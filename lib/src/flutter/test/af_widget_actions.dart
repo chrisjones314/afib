@@ -17,6 +17,7 @@ abstract class AFWidgetAction {
 
 }
 
+/// A superclass for actions that apply to a widget based on its runtimeType.
 abstract class AFWidgetByTypeAction {
   /// The type of the widget that this can tap on.
   final Type appliesTo;

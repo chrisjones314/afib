@@ -8,7 +8,7 @@ import 'package:afib/src/dart/utils/af_dart_params.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
-import 'package:afib/src/flutter/test/af_prototype_dispatcher.dart';
+import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/test/af_simple_prototype_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
@@ -30,17 +30,16 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
 
 
   for(var group in AFibF.screenTests.groups) {
-    for(var test in group.tests) {
+    for(var test in group.simpleTests) {
       if(!test.hasBody) {
         continue;
       }
       if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
-        //AF.testOnlyStore.dispatch(AFResetToInitialStateAction());
         AFibF.testOnlyStore.dispatch(AFScreenPrototypeScreen.navigatePush(test));
         AFibD.logInternal?.fine("Starting ${test.id}");
 
         final screenId = test.screen.screen;
-        final dispatcher = AFPrototypeDispatcher(screenId, AFStoreDispatcher(AFibF.testOnlyStore), null);
+        final dispatcher = AFSimpleScreenTestDispatcher(screenId, AFStoreDispatcher(AFibF.testOnlyStore), null);
         final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test);
         dispatcher.dispatch(AFStartPrototypeScreenTestAction(context));
         dispatcher.setContext(context);
@@ -50,9 +49,8 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
         await tester.pumpAndSettle(Duration(seconds: 1));
   
         AFibD.logInternal?.fine("Finished pumpWidget for ${test.id}");
-        final params = AFTestSectionParams();
         //debugDumpApp();
-        await test.body.run(context, params);
+        await test.body.run(context, null);
         AFibD.logInternal?.fine("Finished ${test.id}");
 
         // pop this test screen off so that we are ready for the next one.

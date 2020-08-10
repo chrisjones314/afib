@@ -1,6 +1,7 @@
 
 
 import 'package:afib/afib_dart.dart';
+import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
@@ -21,7 +22,9 @@ void afStateTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams par
 
   tests.tests.forEach((test) {
     if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
-      final context = AFStateTestContext(test, isTrueTestContext: true);
+      final store = AFibF.testOnlyStore;
+      final dispatcher = AFStoreDispatcher(store);
+      final context = AFStateTestContext(test, store, dispatcher, isTrueTestContext: true);
       
       context.store.dispatch(AFResetToInitialStateAction());
       test.execute(context);

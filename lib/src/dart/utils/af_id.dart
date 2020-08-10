@@ -7,6 +7,10 @@ class AFID {
   String toString() {
     return code;
   }
+
+  int compareTo(AFID other) {
+    return code.compareTo(other.code);
+  }
 }
 
 class AFIDWithTags extends AFID {

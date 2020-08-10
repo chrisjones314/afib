@@ -5,6 +5,7 @@ import 'package:afib/src/dart/redux/reducers/af_app_state_reducer.dart';
 import 'package:afib/src/dart/redux/reducers/af_route_reducer.dart';
 import 'package:afib/src/dart/redux/reducers/af_test_contexts_reducer.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 
 /// The primary reducer for an AFib appliations state.  
 /// 
@@ -13,7 +14,11 @@ import 'package:afib/src/dart/redux/state/af_state.dart';
 AFState afReducer(AFState state, action) {
 
   if(action is AFResetToInitialStateAction) {
-    return AFState.initialState();
+    // In the state/screen test context, we want to reset to the intial
+    // app state, but leave the route and test state unchanged.
+    return state.copyWith(
+      app: AFibF.initializeAppState()
+    );
   }
 
   return AFState(

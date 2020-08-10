@@ -6,5 +6,5 @@ import 'package:afib/src/flutter/test/af_simple_prototype_screen.dart';
 
 void afInitPrototypeScreenMap(AFScreenMap screens) {
   screens.initialScreen(AFUIID.screenPrototypeList, (context) => AFPrototypeListScreen());
-  screens.screen(AFUIID.screenPrototypeInstance, (context) => AFScreenPrototypeScreen());
+  screens.screen(AFUIID.screenPrototypeSimple, (context) => AFScreenPrototypeScreen());
 }

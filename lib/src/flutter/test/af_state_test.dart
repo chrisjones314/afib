@@ -20,20 +20,17 @@ abstract class AFStateTestExecute extends AFBaseTestExecute {
 
 class AFStateTestContext<TState> extends AFStateTestExecute {
   AFStateTest test;
-  AFStore store;
-  AFDispatcher testDisp;
+  final AFStore store;
+  final AFDispatcher dispatcher;
   static AFStateTestContext _currentTest;
   final bool isTrueTestContext;
   
-  AFStateTestContext(this.test, { @required this.isTrueTestContext } ) {
-    store = AFibF.testOnlyStore;
-    testDisp = AFStoreDispatcher(store);    
+  AFStateTestContext(this.test, this.store, this.dispatcher, { @required this.isTrueTestContext} ) {
   }
 
   AFTestID get testID { return this.test.id; }
   TState get state { return store.state.app; }
   AFRouteState get route { return store.state.route; }
-  AFDispatcher get dispatcher { return testDisp; }
   static void setCurrentTest(AFStateTestContext context) { _currentTest = context; }
   static AFStateTestContext get currentTest { return _currentTest; }
 

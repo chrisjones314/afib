@@ -37,9 +37,6 @@ class AFScreenMap {
   void initialScreen(AFScreenID screenKey, WidgetBuilder screenBuilder) {
     AFibF.verifyNotImmutable();
     
-    if(_initialKey != null) {
-      throw AFException("Specified initial screen twice.");
-    }
     _initialKey = screenKey;
     screen(screenKey, screenBuilder);
   }

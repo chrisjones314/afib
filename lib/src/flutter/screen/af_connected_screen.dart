@@ -365,7 +365,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   AFDispatcher dispatcher;
   TData storeData;
   TRouteParam param;
-  AFScreenPrototypeTest screenTest;
+  AFSimpleScreenPrototypeTest screenTest;
 
   AFBuildContext(this.context, this.dispatcher, this.storeData, this.param);
 
@@ -387,7 +387,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
     return result;
   }
 
-  void enableTestContext(AFScreenPrototypeTest st) {
+  void enableTestContext(AFSimpleScreenPrototypeTest st) {
     screenTest = st;
   }
 

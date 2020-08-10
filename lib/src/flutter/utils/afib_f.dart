@@ -93,9 +93,8 @@ class AFibF {
     }
 
     if(AFibD.config.requiresPrototypeData) {
-      AFScreenMap protoScreenMap = AFScreenMap();
-      afInitPrototypeScreenMap(protoScreenMap);
-      setPrototypeScreenMap(protoScreenMap);
+      afInitPrototypeScreenMap(AFibF.screenMap);
+      setPrototypeScreenMap(AFibF.screenMap);
     }
 
     // Make sure all the globals in AF are immutable from now on.
@@ -216,12 +215,17 @@ class AFibF {
     return _afCreateApp;
   }
 
-  /// The redux store, which contains the application state.   WARNING: You should never
-  /// call this.  If you directly reference the store, you will cause testing and prototyping
-  /// not to work.   Anywhere you need access to the state, you will be passed the state.
-  /// Anywhere you might need to dispatch actions, you will be passed an [AFDispatcher].
-  /// You should never ever reference this store directly, as it might not always exist.
-  static AFStore get store {
+  /// The redux store, which contains the application state, NOT FOR PUBLIC USE.
+  /// 
+  /// WARNING: You should never
+  /// call this.  AFib's testing and prototyping systems sometimes operate in contexts
+  /// with a specially modified store, without a store at all, or with a special dispatcher.  If you try to access
+  /// the store directly, or dispatch actions on it directly, you will compromise these systems.   
+  /// 
+  /// If you need to dispatch an action, you should typically call [AFBuildContext.dispatch].
+  /// If you need access to items from your reduce state, you should typically override
+  /// [AFConnectedScreen.createData] or [AFConnectedWidget.createData].
+  static AFStore get internalOnlyStore {
     return _afStore;
   }
 

@@ -4,6 +4,7 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/test/af_simple_prototype_screen.dart';
 import 'package:afib/src/flutter/utils/af_theme.dart';
 import 'package:flutter/material.dart';
@@ -83,7 +84,8 @@ class AFPrototypeListScreen extends AFConnectedScreen<AFAppState, APrototypeList
       )
     ));
 
-    source.tests.forEach((instance) {
+
+    source.allTests.forEach((instance) {
       column.add(_createCard(context, source, instance));
     });
   }
@@ -96,9 +98,43 @@ class AFPrototypeListScreen extends AFConnectedScreen<AFAppState, APrototypeList
         title: Text(instance.id.code),
         subtitle: subtitleWidget,
         onTap: () {
-          // either create or reset a test context for tracking and executing the test
-          context.dispatch(AFScreenPrototypeScreen.navigatePush(instance, id: instance.id));
+          if(instance is AFSimpleScreenPrototypeTest) {
+            _startSimpleTest(context, instance);
+          } else if(instance is AFStateScreenPrototypeTest) {
+            _startStateTest(context, instance);
+          }
+
         })
     );
+  }
+
+  void _startSimpleTest(AFBuildContext<APrototypeListScreenData, AFPrototypeListScreenParam> context, AFSimpleScreenPrototypeTest test) {
+    context.dispatch(AFScreenPrototypeScreen.navigatePush(test, id: test.id));
+  }
+
+  void _startStateTest(AFBuildContext<APrototypeListScreenData, AFPrototypeListScreenParam> context, AFStateScreenPrototypeTest test) {
+
+    // first, reset the state.
+    context.dispatch(AFResetToInitialStateAction());
+
+    // lookup the test.
+    final testImpl = AFibF.stateTests.findById(test.stateTestId);
+    
+    // then, execute the desired state test to bring us to our desired state.
+    final store = AFibF.testOnlyStore;
+    final mainDispatcher = AFStoreDispatcher(store);    
+    final stateDispatcher = AFStateScreenTestDispatcher(mainDispatcher);
+
+    final stateTestContext = AFStateTestContext(testImpl, store, stateDispatcher, isTrueTestContext: false);
+    testImpl.execute(stateTestContext);
+
+    if(stateTestContext.errors.hasErrors) {
+      // TODO: return.
+    }
+
+    // then, navigate into the desired path.
+    for(final push in test.initialPath) {
+      context.dispatch(push);
+    }
   }
 }

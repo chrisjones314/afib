@@ -6,12 +6,42 @@ import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/test/af_simple_prototype_screen.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 
-class AFPrototypeDispatcher extends AFDispatcher {
-  AFID screenId;
-  AFDispatcher main;
+abstract class AFTestDispatcher extends AFDispatcher {
+  final AFDispatcher main;
+  AFTestDispatcher(this.main);
+
+  bool isNavigateAction(action) {
+    return action is AFNavigateAction;
+  }
+
+}
+
+class AFStateScreenTestDispatcher extends AFTestDispatcher {
+  
+  AFStateScreenTestDispatcher(
+    AFDispatcher main
+  ): super(main);
+
+  @override
+  void dispatch(action) {
+    // suppress navigation actions.
+    if(isNavigateAction(action)) {
+      return;
+    }
+
+    main.dispatch(action);
+  }
+
+
+}
+
+class AFSimpleScreenTestDispatcher extends AFTestDispatcher {
+  final AFID screenId;
   AFScreenTestContext testContext;
   
-  AFPrototypeDispatcher(this.screenId, this.main, this.testContext);
+  AFSimpleScreenTestDispatcher(
+    this.screenId, 
+    AFDispatcher main, this.testContext): super(main);
 
   void setContext(AFScreenTestContext context) {
     testContext = context;
@@ -35,7 +65,7 @@ class AFPrototypeDispatcher extends AFDispatcher {
     } else if(action is AFNavigateSetParamAction) {
       // change this into a set param action for the prototype.
       main.dispatch(
-        AFNavigateSetParamAction(screen: AFUIID.screenPrototypeInstance,
+        AFNavigateSetParamAction(screen: AFUIID.screenPrototypeSimple,
           param: AFScreenPrototypeScreenParam(id: screenId, param: action.param)
       ));      
     } else {

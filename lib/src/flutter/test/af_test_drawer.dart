@@ -25,7 +25,7 @@ class AFTestDrawerData extends AFStoreConnectorData2<AFScreenTestContextSimulato
 
 //--------------------------------------------------------------------------------------
 class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
-  final AFScreenPrototypeTest test;
+  final AFSimpleScreenPrototypeTest test;
   final timeFormat = DateFormat('Hms');
 
   //--------------------------------------------------------------------------------------
@@ -65,6 +65,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
     ));
   }
 
+  //--------------------------------------------------------------------------------------
   void _buildTitleRow(AFBuildContext<AFTestDrawerData, AFRouteParamUnused> context, List<Widget> col) {
     col.add(Container(
       margin: EdgeInsets.fromLTRB(8, 60, 8, 20),
@@ -72,6 +73,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
     ));
   }
 
+  //--------------------------------------------------------------------------------------
   void _buildControlRow(AFBuildContext<AFTestDrawerData, AFRouteParamUnused> context, List<Widget> col) {
     final rowActions = AFUI.row();
 

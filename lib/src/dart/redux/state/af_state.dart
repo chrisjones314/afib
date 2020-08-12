@@ -31,11 +31,13 @@ class AFState {
   /// Modify the specified properties and leave everything else the same.
   AFState copyWith({
     AFRouteState route, 
-    dynamic app
+    dynamic app,
+    AFTestState testState
   }) {
     return AFState(
       route: route ?? this.route,
-      app: app ?? this.app
+      app: app ?? this.app,
+      testState: testState ?? this.testState
     );
   }
 }

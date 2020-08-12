@@ -7,35 +7,34 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/core/afui.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
-import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/utils/af_theme.dart';
-import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 //--------------------------------------------------------------------------------------
-class AFTestDrawerData extends AFStoreConnectorData2<AFScreenTestContextSimulator, AFScreenTestState> {
-  AFTestDrawerData(AFScreenTestContextSimulator testContext, AFScreenTestState testState): 
-    super(first: testContext, second: testState);
+class AFTestDrawerData extends AFStoreConnectorData3<AFScreenTestContextSimulator, AFSimpleScreenTestState, AFScreenPrototypeTest> {
+  AFTestDrawerData(AFScreenTestContextSimulator testContext, AFSimpleScreenTestState testState, AFScreenPrototypeTest test): 
+    super(first: testContext, second: testState, third: test);
 
   AFScreenTestContextSimulator get testContext { return first; }
-  AFScreenTestState get testState { return second; }
+  AFSimpleScreenTestState get testState { return second; }
+  AFScreenPrototypeTest get test { return third; }
 
 }
 
 //--------------------------------------------------------------------------------------
 class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
-  final AFSimpleScreenPrototypeTest test;
   final timeFormat = DateFormat('Hms');
 
   //--------------------------------------------------------------------------------------
-  AFTestDrawer(this.test);
+  AFTestDrawer();
 
   //--------------------------------------------------------------------------------------
   @override
   AFTestDrawerData createDataAF(AFState state) {
     final testState = state.testState;
-    return AFTestDrawerData(testState.findContext(test.id), testState.findState(test.id));
+    final test = testState.activeTest;
+    return AFTestDrawerData(testState.findContext(test.id), testState.findState(test.id), testState.activeTest);
   }
 
   @override
@@ -69,13 +68,14 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
   void _buildTitleRow(AFBuildContext<AFTestDrawerData, AFRouteParamUnused> context, List<Widget> col) {
     col.add(Container(
       margin: EdgeInsets.fromLTRB(8, 60, 8, 20),
-      child: Center(child: Text(test.id.code + " test"))
+      child: Center(child: Text(context.s.test.id.code + " test"))
     ));
   }
 
   //--------------------------------------------------------------------------------------
   void _buildControlRow(AFBuildContext<AFTestDrawerData, AFRouteParamUnused> context, List<Widget> col) {
     final rowActions = AFUI.row();
+    final test = context.s.test;
 
     rowActions.add(FlatButton(
       child: Text('Exit'),
@@ -93,7 +93,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
       textColor: AFTheme.primaryText,
       onPressed: () {
           Navigator.pop(context.c);
-          context.dispatch(AFUpdatePrototypeScreenTestDataAction(this.test.id, this.test.data));
+          test.onDrawerReset(context.d);
       }
     ));
 
@@ -107,23 +107,10 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
           Navigator.pop(context.c);
 
           // give the drawer time to close, then 
-          Timer(Duration(seconds: 1), () async {
-            final prevContext = context.s.testContext;
-            var runNumber = 1;
-            if(prevContext != null && prevContext.runNumber != null) {
-              runNumber = prevContext.runNumber + 1;
-            }
-
-            final testContext = AFScreenTestContextSimulator(context.d, test, runNumber);
-            
-            final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(test.screen.runtimeType);
-            context.dispatch(AFUpdatePrototypeScreenTestDataAction(this.test.id, this.test.data));
-            context.dispatch(AFStartPrototypeScreenTestAction(testContext));
-            await testContext.pauseForRender(screenUpdateCount, true);
-            test.run(testContext, onEnd: () {
+          Timer(Duration(seconds: 1), () async {            
+            test.onDrawerRun(context.d, context.s.testContext, context.s.testState, () {
               scaffold.openEndDrawer();
             });
-            
           });
         },
       ));

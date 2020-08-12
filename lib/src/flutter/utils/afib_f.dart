@@ -22,11 +22,11 @@ import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 
 class AFibTestOnlyScreenElement {
-  final Type screenType;
+  final AFScreenID screenId;
   BuildContext element;
   int updateCount = 0;
 
-  AFibTestOnlyScreenElement(this.screenType, this.element);
+  AFibTestOnlyScreenElement(this.screenId, this.element);
 
   void increaseBuildCount() {
     updateCount++;
@@ -49,12 +49,13 @@ class AFibF {
   static CreateStartupQueryAction _afCreateStartupQueryAction;
   static final AFTestDataRegistry _afTestData = AFTestDataRegistry();
   static final AFScreenTests _afScreenTests = AFScreenTests();
+  static final AFMultiScreenStateTests _afMultiScreenStateTests = AFMultiScreenStateTests();
   static final AFStateTests _afStateTests = AFStateTests();
   static final AFUnitTests _afUnitTests = AFUnitTests();
   static AFScreenMap _afPrototypeScreenMap;
   static CreateAFApp _afCreateApp;
   static AFScreenID forcedStartupScreen;
-  static final testOnlyScreens = Map<Type, AFibTestOnlyScreenElement>();
+  static final testOnlyScreens = Map<AFScreenID, AFibTestOnlyScreenElement>();
   static Map<String, AFAsyncQueryListenerCustomError> listenerQueries = Map<String, AFAsyncQueryListenerCustomError>();
   static Map<String, AFDeferredQueryCustomError> deferredQueries = Map<String, AFDeferredQueryCustomError>();
   static Map<String, AFWaitQuery> waitQueries = Map<String, AFWaitQuery>();
@@ -88,8 +89,9 @@ class AFibF {
       final testData = AFibF.testData;
       p.initTestData(testData);
       p.initUnitTests(AFibF.unitTests, testData);
-      p.initScreenTests(AFibF.screenTests, testData);
       p.initStateTests(AFibF.stateTests, testData);
+      p.initScreenTests(AFibF.screenTests, testData);
+      p.initMultiScreenStateTests(AFibF.multiScreenStateTests, testData);
     }
 
     if(AFibD.config.requiresPrototypeData) {
@@ -102,11 +104,11 @@ class AFibF {
   }
 
   /// Used internally in tests to find widgets on the screen.  Not for public use.
-  static AFibTestOnlyScreenElement registerTestScreen(Type screenType, BuildContext screenElement) {
-    var info = testOnlyScreens[screenType];
+  static AFibTestOnlyScreenElement registerTestScreen(AFScreenID screenId, BuildContext screenElement) {
+    var info = testOnlyScreens[screenId];
     if(info == null) {
-      info = AFibTestOnlyScreenElement(screenType, screenElement);
-      testOnlyScreens[screenType] = info;
+      info = AFibTestOnlyScreenElement(screenId, screenElement);
+      testOnlyScreens[screenId] = info;
     }
     info.element = screenElement;
     info.increaseBuildCount();
@@ -114,13 +116,13 @@ class AFibF {
   }
 
   /// Used internally in tests to find widgets on the screen.  Not for public use.
-  static AFibTestOnlyScreenElement findTestScreen(Type screenType) {
-    return testOnlyScreens[screenType];
+  static AFibTestOnlyScreenElement findTestScreen(AFScreenID screenId) {
+    return testOnlyScreens[screenId];
   }
 
   /// Used internally in tests to find widgets on the screen.  Not for public use.
-  static int testOnlyScreenUpdateCount(Type screenType) {
-    final info = testOnlyScreens[screenType];
+  static int testOnlyScreenUpdateCount(AFScreenID screenId) {
+    final info = testOnlyScreens[screenId];
     if(info == null) {
       return 0;
     }
@@ -161,7 +163,7 @@ class AFibF {
       return forcedStartupScreen;
     }
     if(AFibD.config.requiresPrototypeData) {
-      return AFUIID.screenPrototypeList;
+      return AFUIID.screenPrototypeHome;
     }
     return AFUIID.screenStartup;
   }
@@ -193,6 +195,12 @@ class AFibF {
   /// testing.
   static AFScreenTests get screenTests {
     return _afScreenTests;
+  }
+
+  /// Retrieves tests which pair an initial state, and then multiple screen/state tests
+  /// to produce a higher-level multi-screen test.
+  static AFMultiScreenStateTests get multiScreenStateTests {
+    return _afMultiScreenStateTests;
   }
 
   /// Retrieves unit/calculation tests

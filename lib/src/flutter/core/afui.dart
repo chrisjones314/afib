@@ -1,5 +1,9 @@
 
+import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:afib/src/dart/utils/af_ui_id.dart';
+import 'package:afib/src/flutter/screen/af_connected_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 /// Some very simple user interface utilities.
@@ -38,6 +42,18 @@ class AFUI {
     return Key(full);
   }
 
-
-
+  static Widget standardBackButton(AFDispatcher dispatcher, {
+    AFWidgetID wid = AFUIID.buttonBack,
+    IconData icon = Icons.arrow_back,
+    String tooltip = "Back"
+  }) {
+    return IconButton(
+        key: AFUI.prodKey(wid),      
+        icon: Icon(Icons.arrow_back),
+        tooltip: "Back",
+        onPressed: () {
+          dispatcher.dispatch(AFNavigatePopAction(id: wid));
+        }
+    );
+  }
 }

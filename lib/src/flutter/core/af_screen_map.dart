@@ -33,6 +33,10 @@ class AFScreenMap {
     return _screens[id];
   }
 
+  Widget createFor(AFScreenID id) {
+    return _screens[id](null);
+  }
+
   /// Call [initialScreen] once to specify the initial screen for your app.
   void initialScreen(AFScreenID screenKey, WidgetBuilder screenBuilder) {
     AFibF.verifyNotImmutable();

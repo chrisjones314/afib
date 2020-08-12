@@ -6,7 +6,7 @@ import 'package:afib/src/flutter/test/af_test_actions.dart';
 /// This reducer handles the default behavior of the app state, which 
 /// is just to set one or more 
 AFTestState afTestStateReducer(AFTestState state, action) {
-  if(action is AFStartPrototypeScreenTestAction) {
+  if(action is AFStartPrototypeScreenTestContextAction) {
     return state.startTest(action.context);
   } else if(action is AFUpdatePrototypeScreenTestDataAction) {
     return state.updateStateData(action.testId, action.data);
@@ -14,6 +14,8 @@ AFTestState afTestStateReducer(AFTestState state, action) {
     return state.incrementPassCount(action.testId);
   } else if(action is AFPrototypeScreenTestAddError) {
     return state.addError(action.testId, action.err);
+  } else if(action is AFStartPrototypeScreenTestAction) {
+    return state.navigateToTest(action.test);
   }
 
 

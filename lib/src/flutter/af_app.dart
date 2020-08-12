@@ -11,7 +11,7 @@ typedef void InitTestData(AFTestDataRegistry registry);
 typedef void InitUnitTests(AFUnitTests tests, AFTestDataRegistry testData);
 typedef void InitScreenTests(AFScreenTests tests, AFTestDataRegistry testData);
 typedef void InitStateTests(AFStateTests tests, AFTestDataRegistry testData);
-
+typedef void InitMultiScreenStateTests(AFMultiScreenStateTests tests, AFTestDataRegistry testData);
 
 //typedef dynamic AppReducer(dynamic appState, dynamic action);
 typedef TAppState AppReducer<TAppState>(TAppState appState, dynamic action);

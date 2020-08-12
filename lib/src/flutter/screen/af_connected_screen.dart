@@ -179,13 +179,13 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
           }
           
           if(!(this is AFTestDrawer)) {
-            var rt = this.runtimeType;
+            var rt = this.screen;
             if(dataContext.p != null && dataContext.p is AFScreenPrototypeScreenParam) {
-              rt = dataContext.p.effectiveScreenRuntimeType;
+              rt = dataContext.p.effectiveScreenId;
             }
             
             final info = AFibF.registerTestScreen(rt, buildContext);
-            AFibD.logInternal?.fine("Rebuilding screen $runtimeType with updateCount ${info.updateCount} and param ${dataContext.p}");
+            AFibD.logInternal?.fine("Rebuilding screen $runtimeType/$rt with updateCount ${info.updateCount} and param ${dataContext.p}");
           }
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p);
           return buildWithContext(withContext);
@@ -365,7 +365,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   AFDispatcher dispatcher;
   TData storeData;
   TRouteParam param;
-  AFSimpleScreenPrototypeTest screenTest;
+  AFScreenPrototypeTest screenTest;
 
   AFBuildContext(this.context, this.dispatcher, this.storeData, this.param);
 
@@ -387,13 +387,12 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
     return result;
   }
 
-  void enableTestContext(AFSimpleScreenPrototypeTest st) {
-    screenTest = st;
-  }
-
   Widget createDebugDrawer() {
-    if(screenTest != null) {
-      return AFTestDrawer(screenTest);
+    final store = AFibF.testOnlyStore;
+    final state = store.state;
+    final testState = state.testState;
+    if(testState.activeTest != null) {
+      return AFTestDrawer();
     }
     return null;
   }

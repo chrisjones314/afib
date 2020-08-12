@@ -11,7 +11,7 @@ class AFRouteParam {
     return false;
   }
 
-  Type get effectiveScreenRuntimeType {
+  AFScreenID get effectiveScreenId {
     return null;
   }
 

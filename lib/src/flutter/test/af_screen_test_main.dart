@@ -4,6 +4,7 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
+import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
@@ -38,10 +39,10 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
         AFibF.testOnlyStore.dispatch(AFScreenPrototypeScreen.navigatePush(test));
         AFibD.logInternal?.fine("Starting ${test.id}");
 
-        final screenId = test.screen.screen;
+        final screenId = test.screenId;
         final dispatcher = AFSimpleScreenTestDispatcher(screenId, AFStoreDispatcher(AFibF.testOnlyStore), null);
         final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test);
-        dispatcher.dispatch(AFStartPrototypeScreenTestAction(context));
+        dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context));
         dispatcher.setContext(context);
         contexts.add(context);
 

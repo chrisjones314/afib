@@ -14,6 +14,7 @@ class AFFlutterParams<AppState> {
   final InitStateTests initStateTests;
   final InitScreenTests initScreenTests;
   final AppReducer<AppState>  appReducer;
+  final InitMultiScreenStateTests initMultiScreenStateTests;
   
   AFFlutterParams({
     @required this.initScreenMap,
@@ -24,6 +25,7 @@ class AFFlutterParams<AppState> {
     @required this.initUnitTests,
     @required this.initStateTests,
     @required this.initScreenTests,
+    @required this.initMultiScreenStateTests,
     this.appReducer
   });
 }

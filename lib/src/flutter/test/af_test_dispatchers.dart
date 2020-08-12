@@ -58,7 +58,7 @@ class AFSimpleScreenTestDispatcher extends AFTestDispatcher {
                           action is AFUpdatePrototypeScreenTestDataAction || 
                           action is AFPrototypeScreenTestAddError ||
                           action is AFPrototypeScreenTestIncrementPassCount ||
-                          action is AFStartPrototypeScreenTestAction;
+                          action is AFStartPrototypeScreenTestContextAction;
     // if the action is a pop, then go ahead and do it.
     if(isTestAction) {
       main.dispatch(action);

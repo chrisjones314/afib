@@ -28,21 +28,21 @@ class AFScreenPrototypeScreenParam extends AFRouteParam {
   @override
   bool matchesScreen(AFScreenID screenID) {
     AFSimpleScreenPrototypeTest test = AFibF.screenTests.findById(id);
-    if(test.screen?.screen == screenID) {
+    if(test.screenId == screenID) {
       return true;
     }
     return false;     
   }
 
-  Type get effectiveScreenRuntimeType {
+  AFScreenID get effectiveScreenId {
     AFSimpleScreenPrototypeTest test = AFibF.screenTests.findById(id);
-    return test.screen?.runtimeType;
+    return test.screenId;
   }
 
   @override
   AFRouteParam paramFor(AFScreenID screenID) {
     AFSimpleScreenPrototypeTest test = AFibF.screenTests.findById(id);
-    if(test.screen?.screen == screenID) {
+    if(test.screenId == screenID) {
       return param;
     }
     return this;
@@ -101,9 +101,10 @@ class AFScreenPrototypeScreen extends AFConnectedScreen<AFAppState, AFScreenProt
     final testState = context.s.testState.findState(test.id);
     final testData = testState?.data ?? test.data;
     final dispatcher = AFSimpleScreenTestDispatcher(context.p.id, context.d, testContext);
-    final childContext = test.screen.createContext(context.c, dispatcher, testData, paramChild);
-    childContext.enableTestContext(test);
-    return test.screen.buildWithContext(childContext);
+    final screenMap = AFibF.screenMap;
+    final AFConnectedScreenWithoutRoute screen = screenMap.createFor(test.screenId);
+    final childContext = screen.createContext(context.c, dispatcher, testData, paramChild);
+    return screen.buildWithContext(childContext);
     
   }
 }

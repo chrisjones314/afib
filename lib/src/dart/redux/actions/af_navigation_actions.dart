@@ -27,6 +27,11 @@ class AFNavigateReplaceAction extends AFNavigateAction {
   AFNavigateReplaceAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
 }
 
+/// Action that replaces the current leaf screen with a new screen.
+class AFNavigateExitTestAction extends AFNavigateAction {  
+  AFNavigateExitTestAction({AFID id}): super(id: id, screen: null, param: null);
+}
+
 /// Action that removes all screens in the route, and replaces them with
 /// a single new screen at the root.
 class AFNavigateReplaceAllAction extends AFNavigateAction {

@@ -115,6 +115,11 @@ class AFibF {
     return info;
   }
 
+  /// Used internally to reset widget tracking between tests.
+  static void resetTestScreens() {
+    testOnlyScreens.clear();
+  }
+
   /// Used internally in tests to find widgets on the screen.  Not for public use.
   static AFibTestOnlyScreenElement findTestScreen(AFScreenID screenId) {
     return testOnlyScreens[screenId];

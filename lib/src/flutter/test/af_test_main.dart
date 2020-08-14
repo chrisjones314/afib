@@ -37,13 +37,20 @@ Future<int> afTestMain(AFDartParams paramsD, AFFlutterParams paramsF, InitConfig
   // first unit tests
   final output = AFCommandOutput();
   final stats = AFTestStats();
+
+  AFibD.logInternal?.fine("entering afUnitTestMain");
   afUnitTestMain(output, stats, paramsD, paramsF);
+  AFibD.logInternal?.fine("exiting afUnitTestMain");
 
   // then state tests
+  AFibD.logInternal?.fine("entering afStateTestMain");
   afStateTestMain(output, stats, paramsD, paramsF);
+  AFibD.logInternal?.fine("exiting afStateTestMain");
 
   /// then screen tests
+  AFibD.logInternal?.fine("entering afScreenTestMain");
   await afScreenTestMain(output, stats, paramsD, paramsF, widgetTester);
+  AFibD.logInternal?.fine("exiting afScreenTestMain");
   
   if(stats.hasErrors) {
     expect("${stats.totalErrors} errors (see details above)", AFibTestsFailedMatcher());

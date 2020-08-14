@@ -83,7 +83,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
       textColor: AFTheme.primaryText,
       onPressed: () {
           Navigator.pop(context.c);
-          context.dispatch(AFNavigatePopAction());
+          context.dispatch(AFNavigateExitTestAction());
       }
     ));
 

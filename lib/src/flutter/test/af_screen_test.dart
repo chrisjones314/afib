@@ -226,7 +226,7 @@ class AFSparsePathWidgetSelector extends AFWidgetSelector {
 abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   AFScreenPrototypeTest test;
   final underPaths = List<AFSparsePathWidgetSelector>();
-  AFScreenID popupScreenId;
+  final activeScreenIDs = List<AFScreenID>();
   
   AFScreenTestExecute(this.test);
 
@@ -263,7 +263,22 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
     expectWidgetValue(selector, ft.equals(text), extraFrames: 1);
   }
 
+  Future<void> underScreen(AFScreenID screen, Function underHere, { bool expectRender = true }) async {
+    int screenRenderCount = AFibF.testOnlyScreenUpdateCount(screen);
+    pushScreen(screen);
+    await pauseForRender(screenRenderCount, expectRender);
+    await underHere();
+    popScreen();
+    return keepSynchronous();
+  }
 
+  void pushScreen(AFScreenID screen) {
+    activeScreenIDs.add(screen);
+  }
+
+  void popScreen() {
+    activeScreenIDs.removeLast();
+  }
 
   /// Used to tap on an element that opens a popup of [popupScreenType].
   /// 
@@ -271,10 +286,12 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   Future<void> tapWithPopup(dynamic selectorTap, final AFScreenID popupScreenId, Future<void> Function() underHere) async {
     int popupRenderCount = AFibF.testOnlyScreenUpdateCount(popupScreenId);
     await tap(selectorTap, expectRender: false);
-    this.setPopupScreenId(popupScreenId);
-    await pauseForRender(popupRenderCount, true);
-    await underHere();
-    this.setPopupScreenId(null);
+    await this.underScreen(popupScreenId, () async {
+      await pauseForRender(popupRenderCount, true);
+      await underHere();
+      return keepSynchronous();
+    }, expectRender: false);
+
     return null;
   }
 
@@ -285,10 +302,6 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   /// wait for a render.
   Future<void> tapClosePopup(dynamic selector) async {
     return tap(selector, expectRender: false);
-  }
-
-  void setPopupScreenId(final AFScreenID popupScreenId) {
-    this.popupScreenId = popupScreenId;
   }
 
   /// Expect that a [Chip] is selected or not selected.
@@ -374,12 +387,11 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
 }
 
 abstract class AFSingleScreenTestExecute extends AFScreenTestExecute {
-  AFScreenID popupScreenId;
   AFSingleScreenTestExecute(AFScreenPrototypeTest test): super(test);
 
   AFScreenID get activeScreenId {
-    if(popupScreenId != null) {
-      return popupScreenId;
+    if(activeScreenIDs.isNotEmpty) {
+      return activeScreenIDs.last;
     }
 
     AFScreenPrototypeTest screenTest = test;
@@ -392,18 +404,23 @@ abstract class AFSingleScreenTestExecute extends AFScreenTestExecute {
   }
 
   Future<void> executeNamedSection(AFTestSectionID id, dynamic params) {
-    AFSimpleScreenPrototypeTest screenTest = test;
-    return screenTest.body.executeNamedSection(id, this, params);
+    return AFibF.screenTests.executeNamedSection(id, this, params);
   }
 }
 
 typedef Future<void> AFScreenTestBodyExecuteFunc(AFScreenTestExecute exec, dynamic params);
 
+class AFScreenTestBodyWithParam {
+  final AFScreenTestBodyExecuteFunc body;
+  final dynamic param;
+  final AFTestSectionID id;
+  AFScreenTestBodyWithParam({this.id, this.body, this.param});
+}
 
 
 class AFSimpleScreenTestBody {
   final AFScreenTestGroup group;
-  final sections = List<AFScreenTestBodyExecuteFunc>();
+  final sections = List<AFScreenTestBodyWithParam>();
 
   AFSimpleScreenTestBody(this.group);
 
@@ -411,10 +428,10 @@ class AFSimpleScreenTestBody {
     return sections.isNotEmpty;
   }
 
-  void execute(AFScreenTestBodyExecuteFunc func, {AFTestSectionID id}) {
-    sections.add(func);
+  void execute({AFScreenTestBodyExecuteFunc body, AFTestSectionID id, dynamic param}) {
+    sections.add(AFScreenTestBodyWithParam(id: id, body: body, param: param));
     if(id != null) {
-      group.testMgr.defineNamedSection(id, func);
+      group.testMgr.defineNamedSection(id, body);
     }
   }
 
@@ -425,14 +442,7 @@ class AFSimpleScreenTestBody {
   }
 
   Future<void> executeNamedSection(AFTestSectionID id, AFScreenTestExecute e, dynamic params) async {
-    final section = group.testMgr.findNamedTestSection(id);
-    if(section == null) {
-      throw new AFException("Attempt to executing undefined test section $id");
-    }
-    Future<void> fut = section(e, params);
-    _checkFutureExists(fut);
-    await fut;
-    return e.keepSynchronous();
+    return AFibF.screenTests.executeNamedSection(id, e, params);
   }
 
 
@@ -444,12 +454,17 @@ class AFSimpleScreenTestBody {
       if(sectionGuard > 1) {
         throw AFException("Test section $i is missing an await!");
       }
+      var actualParams = params;
+      if(actualParams == null) {
+        actualParams = section.param;
+      }
+
       // first, we run the section with the widget specifier collector so we know what kind of widgets we
       // are looking for.
-      final fut0 = section(context.elementCollector, params);
+      final fut0 = section.body(context.elementCollector, actualParams);
       await fut0;
 
-      final fut = section(context, params);
+      final fut = section.body(context, actualParams);
       _checkFutureExists(fut);
       await fut;
       sectionGuard--;
@@ -458,7 +473,6 @@ class AFSimpleScreenTestBody {
       onEnd();
     }
   }
-
 }
 
 
@@ -494,6 +508,7 @@ class AFScreenTestWidgetCollector extends AFSingleScreenTestExecute {
   AFScreenTestWidgetCollector(AFScreenPrototypeTest test): super(test);
 
   final screens = Map<AFScreenID, AFScreenTestWidgetCollectorScreen>();
+
 
   AFScreenTestWidgetCollectorScreen _updateCache() {
     final info = AFibF.findTestScreen(activeScreenId);
@@ -667,6 +682,16 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   }
   AFTestID get testID { return this.test.id; }
 
+  void pushScreen(AFScreenID screen) {
+    elementCollector.pushScreen(screen);
+    super.pushScreen(screen);
+  }
+
+  void popScreen() {
+    super.popScreen();
+    elementCollector.popScreen();
+  }
+
   Future<void> underWidget(dynamic selector, void Function() withinHere) async {
     await elementCollector.underWidget(selector, withinHere);
     return null;
@@ -683,12 +708,6 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   void expectWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 }) {
     List<Element> elems = elementCollector.findWidgetsFor(selector);
     onFound(elems);
-  }
-
-  @override
-  void setPopupScreenId(final AFScreenID popupScreenId) {
-    super.setPopupScreenId(popupScreenId);
-    elementCollector.setPopupScreenId(popupScreenId);
   }
 
   void expectNWidgets(dynamic selector, int n, {int extraFrames = 0}) {
@@ -713,7 +732,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
     }
   }
 
-  Future<void> applyWidgetValue(dynamic selectorDyn, dynamic value, String applyType, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 }) {
+  Future<void> applyWidgetValue(dynamic selectorDyn, dynamic value, String applyType, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 }) async {
     final previous = AFibF.testOnlyScreenUpdateCount(activeScreenId);
     final selector = AFScreenTestWidgetCollector.createSelector(null, selectorDyn);
     List<Element> elems = elementCollector.findWidgetsFor(selector);
@@ -730,7 +749,8 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
       throw AFException("No AFApplyWidgetAction found for ${elem.widget.runtimeType}, you can register one using AFScreenTests.registerApplicator");
     }
     tapable.apply(applyType, selector, elem, value);    
-    return pauseForRender(previous, expectRender);
+    await pauseForRender(previous, expectRender);
+    return keepSynchronous();
   }
   
   Future<void> applyWidgetValueWithExpectedAction(dynamic selector, dynamic value, String applyType, AFActionWithKey actionSpecifier, Function(AFActionWithKey) checkAction, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 }) async {
@@ -813,20 +833,25 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
     return pauseForRender(previous, expectRender);
   }
 
+  Future<void> yieldToRenderLoop() async {
+    AFibD.logInternal?.fine("Starting yield to event loop");
+    await Future<void>.delayed(Duration(milliseconds: 100), () {});
+    return keepSynchronous();
+  }
+
   @override
-  Future<void> pauseForRender(int previousCount, bool expectRender) async {
+  Future<void> pauseForRender(int previousCount, bool expectRender, { AFScreenID screenId }) async {
     if(!expectRender) {
       AFibD.logInternal?.fine("Skipping pauseForRender because expectRender was false.");
       return null;
     }
     /// wait for the screen element to be rebuilt.
-    final screenType = activeScreenId;
+    final screenType = screenId ?? activeScreenId;
     var current = AFibF.testOnlyScreenUpdateCount(screenType);
     AFibD.logInternal?.fine("Starting _pauseForRender for $screenType with previous $previousCount and current $current");
     int n = 0;
     while(current == previousCount) {
-      AFibD.logInternal?.fine("Starting pause");
-      await Future<void>.delayed(Duration(milliseconds: 100), () {});
+      await yieldToRenderLoop();
       current = AFibF.testOnlyScreenUpdateCount(screenType);
       AFibD.logInternal?.fine("Finished finished pause for $screenType with update count $current");
       n++;
@@ -871,9 +896,16 @@ class AFScreenTestContextWidgetTester extends AFScreenTestContext {
   AFScreenTestContextWidgetTester(this.tester, this.app, AFDispatcher dispatcher, AFSimpleScreenPrototypeTest test): super(dispatcher, test);
 
   @override
-  Future<void> pauseForRender(int previousCount, bool expectRender) async {
-    await tester.pumpAndSettle(Duration(seconds: 1));
-    return super.pauseForRender(previousCount, expectRender);
+  Future<void> pauseForRender(int previousCount, bool expectRender, { AFScreenID screenId }) async {
+    await tester.pumpAndSettle(Duration(seconds: 2));
+    await super.pauseForRender(previousCount, expectRender, screenId: screenId);
+    return keepSynchronous();
+  }
+
+  Future<void> yieldToRenderLoop() async {
+    AFibD.logInternal?.fine("yielding to pump");
+    await tester.pumpAndSettle(Duration(seconds: 2));
+    return keepSynchronous();
   }
 
   Future<void> keepSynchronous() {
@@ -937,8 +969,8 @@ class AFSimpleScreenPrototypeTest extends AFScreenPrototypeTest {
     return body.group.testMgr;
   }
 
-  void run(AFScreenTestContext context, { Function onEnd}) {
-    body.run(context, null, onEnd: onEnd);
+  Future<void> run(AFScreenTestContext context, { Function onEnd}) {
+    return body.run(context, null, onEnd: onEnd);
   }
 
   void onDrawerReset(AFDispatcher dispatcher) {
@@ -947,9 +979,9 @@ class AFSimpleScreenPrototypeTest extends AFScreenPrototypeTest {
 
  
   Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSimpleScreenTestState state, Function onEnd) async {
-    final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
+    //final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
     final testContext = prepareRun(dispatcher, prevContext);
-    await testContext.pauseForRender(screenUpdateCount, true);
+    //await testContext.pauseForRender(screenUpdateCount, true);
     run(testContext, onEnd: onEnd);
     return null;
   }
@@ -991,10 +1023,8 @@ class AFMultiScreenStatePrototypeTest extends AFScreenPrototypeTest {
   }
 
   Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSimpleScreenTestState state, Function onEnd) async {
-    final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(body.initialScreenId);
     final testContext = prepareRun(dispatcher, prevContext);
     run(testContext, onEnd: onEnd);
-    await testContext.pauseForRender(screenUpdateCount, true);
   }
 
 }
@@ -1059,6 +1089,7 @@ class AFScreenTests<TState> {
     registerApplicator(AFApplyTextAFTextFieldAction());
     registerApplicator(AFRichTextGestureTapAction());
     registerApplicator(AFApplyCupertinoPicker());
+    registerApplicator(AFIconButtonAction());
 
     registerExtractor(AFSelectableChoiceChip());
     registerExtractor(AFExtractTextTextAction());
@@ -1128,6 +1159,17 @@ class AFScreenTests<TState> {
     namedSections[id] = func;
   }
 
+  Future<void> executeNamedSection(AFTestSectionID id, AFScreenTestExecute e, dynamic params) async {
+    final section = findNamedTestSection(id);
+    if(section == null) {
+      throw new AFException("Attempt to executing undefined test section $id");
+    }
+    Future<void> fut = section(e, params);
+    await fut;
+    return e.keepSynchronous();
+  }
+
+
   AFScreenTestBodyExecuteFunc findNamedTestSection(AFTestSectionID id) {    
     return namedSections[id];
   }
@@ -1154,18 +1196,62 @@ class AFMultiScreenTestExecute {
   AFMultiScreenTestExecute(this.screenContext);  
 
   /// Execute the specified screen tests, with query-responses provided by the specified state test.
-  void runScreenTest(AFTestID screenTestId, {AFTestID queryResults}) {
+  Future<void> runScreenTest(AFTestID screenTestId, AFScreenID terminalScreen, {AFTestID queryResults, bool expectRender = true}) async {
+    int prevRenderCount = AFibF.testOnlyScreenUpdateCount(terminalScreen);
+    _installQueryResults(queryResults);
+    final screenTest = AFibF.screenTests.findById(screenTestId);
+    final originalScreenID = screenTest.screenId;
+    await screenTest.run(screenContext);  
+    if(originalScreenID != terminalScreen) {
+      await screenContext.pauseForRender(prevRenderCount, expectRender, screenId: terminalScreen);
+    } 
+    return keepSynchronous();  
+  }
 
+  Future<void> tapNavigateFromTo({
+    @required AFWidgetID tap,
+    @required AFScreenID from,
+    @required AFScreenID to
+  }) {
+      return onScreen(from, to, body: (AFScreenTestExecute ste) async {
+        await ste.tap(tap, expectRender: false);
+        return ste.keepSynchronous();
+      });
+  }
+
+  Future<void> onScreen(AFScreenID screenId, AFScreenID terminalScreen, {AFTestID queryResults, Function(AFScreenTestExecute) body, expectRender = true}) async {
+    _installQueryResults(queryResults);
+    final prevRenderCount = AFibF.testOnlyScreenUpdateCount(terminalScreen);
+    await screenContext.underScreen(screenId, () async {
+      AFibD.logInternal?.fine("Starting underScreen");
+      // first, populate the element collector.
+      final fut0 = body(screenContext.elementCollector);
+      await fut0;
+
+      final fut = body(screenContext);
+      await fut;
+      return screenContext.keepSynchronous();
+    }, expectRender: false);
+    AFibD.logInternal?.fine("Finished underscreen");
+
+    if(screenId != terminalScreen) {
+      return screenContext.pauseForRender(prevRenderCount, true, screenId: terminalScreen);
+    } else {
+      return keepSynchronous();
+    }
+  }
+
+  void _installQueryResults(AFTestID queryResults) {
+    if(queryResults == null) {
+      return;
+    }
     final stateTest = AFibF.stateTests.findById(queryResults);
     final store = AFibF.testOnlyStore;
     final dispatcher = AFStoreDispatcher(store);
 
     // This causes the query middleware to return results specified in the state test.
     final stateTestContext = AFStateTestContext(stateTest, store, dispatcher, isTrueTestContext: false);
-    AFStateTestContext.setCurrentTest(stateTestContext);
-  
-    final screenTest = AFibF.screenTests.findById(screenTestId);
-    screenTest.run(screenContext);    
+    AFStateTestContext.setCurrentTest(stateTestContext);    
   }
 
   Future<void> keepSynchronous() {
@@ -1176,22 +1262,39 @@ class AFMultiScreenTestExecute {
 
 typedef Future<void> AFMultiScreenTestBodyExecuteFunc(AFMultiScreenTestExecute exec, dynamic params);
 
+class AFMultiScreenStateTestBodyWithParam {
+  final AFMultiScreenTestBodyExecuteFunc body;
+  final AFTestSectionID id;
+  final dynamic param;
+  AFMultiScreenStateTestBodyWithParam({this.body, this.id, this.param});
+
+
+}
+
 class AFMultiScreenStateTestBody {
   final AFMultiScreenStateTests tests;
   final AFScreenID initialScreenId;
-  final sections = List<AFMultiScreenTestBodyExecuteFunc>();
+  final sections = List<AFMultiScreenStateTestBodyWithParam>();
 
   AFMultiScreenStateTestBody(this.tests, this.initialScreenId);
 
-  void execute(AFMultiScreenTestBodyExecuteFunc func, { AFTestSectionID id}) {
-    sections.add(func);
+  void execute({ AFMultiScreenTestBodyExecuteFunc body, AFTestSectionID id, dynamic param}) {
+    sections.add(AFMultiScreenStateTestBodyWithParam(id: id, body: body, param: param));
   }  
 
   Future<void> run(AFScreenTestContext context, dynamic params, { Function onEnd }) async {
     final e = AFMultiScreenTestExecute(context);
     for(final section in sections) {
-      section(e, params);
+      var actualParams = params;
+      if(actualParams == null) {
+        actualParams = section.param;
+      }
+
+      await section.body(e, actualParams);
     }
+
+    // TODO: this doesn't work because we are on a different screen at the end.
+    onEnd();
   }
 }
 

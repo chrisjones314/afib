@@ -1,6 +1,8 @@
 
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
+import 'package:afib/src/dart/utils/af_ui_id.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:meta/meta.dart';
 
@@ -39,6 +41,10 @@ class AFRouteSegment {
 
   String toString() {
     return screen.code;
+  }
+
+  bool get isAFibScreen {
+    return screen.code.startsWith(AFUIID.afibScreenPrefix);
   }
 
   factory AFRouteSegment.withScreen(AFScreenID screen) {
@@ -91,6 +97,27 @@ class AFRouteState {
 
   }
 
+  /// The number of screens in the route.
+  int get segmentCount {
+    return route.length;
+  }
+
+  /// Returns the number of pops to do to replace the entire path, but 
+  /// does not replace any afib test screens.
+  int get popCountToRoot {
+    int nPop = 0;
+    for(int i = route.length - 1; i >= 0; i--) {
+      final segment = route[i];
+      // the simple prototype screen is really a test of an app screen, so we do
+      // want to pop it off.
+      if(segment.isAFibScreen && segment.screen != AFUIID.screenPrototypeSimple) {
+        return nPop;
+      }
+      nPop++;
+    } 
+    return nPop;
+  }
+
   /// Finds the data associated with the specified [screen] in the current route.
   /// 
   /// If [includePrior] is true, it will also include the most recent final segment
@@ -117,11 +144,11 @@ class AFRouteState {
   /// Removes the current leaf from the route, and adds the specified screen
   /// and data in its place.
   AFRouteState popAndPushNamed(AFScreenID screen, AFRouteParam param) {
-    final newRoute = copyRoute();
-    final prior = newRoute.removeLast();
-    newRoute.add(AFRouteSegment.withParam(screen, param));
+    final revised = copyRoute();
+    final prior = revised.removeLast();
+    revised.add(AFRouteSegment.withParam(screen, param));
     return copyWith(
-      route: newRoute,
+      route: revised,
       priorLastSegment: prior
     );
   }
@@ -146,6 +173,21 @@ class AFRouteState {
     );
   }
 
+  /// Pops the route until we get to the first afib test screen.
+  AFRouteState exitTest() {
+    final prior = lastSegment;
+    final revised = copyRoute();
+    final popCount = this.popCountToRoot;
+    for(int i = 0; i < popCount; i++) {
+      revised.removeLast();
+    }
+    return copyWith(
+      route: revised,
+      priorLastSegment: prior
+    );    
+  }
+
+
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
   AFRouteState setParam(AFScreenID screen, AFRouteParam param) {
@@ -161,13 +203,25 @@ class AFRouteState {
     return copyWith(route: revised);
   }
 
-  /// Removes all existing segments in the route, and adds back the specified screen/data.
-  AFRouteState replaceAll(AFScreenID screen, AFRouteParam param) {
+  AFRouteSegment get lastSegment {
     AFRouteSegment prior;
-    if(!route.isEmpty) {
+    if(route.isNotEmpty) {
       prior = route.last;
     }
-    List<AFRouteSegment> revised = new List<AFRouteSegment>();
+    return prior;
+  }
+
+  /// Removes all existing segments in the route, and adds back the specified screen/data.
+  AFRouteState replaceAll(AFScreenID screen, AFRouteParam param) {
+    final prior = lastSegment;
+
+    // this prevent us from removing afib test screens.
+    final revised = List<AFRouteSegment>.of(route);
+    int popCount = this.popCountToRoot;
+    for(int i = 0; i < popCount; i++) {
+      revised.removeLast();
+    }
+
     revised.add(AFRouteSegment.withParam(screen, param));
     return copyWith(
       route: revised,
@@ -185,10 +239,22 @@ class AFRouteState {
     List<AFRouteSegment> route,
     AFRouteSegment priorLastSegment
   }) {
-    return new AFRouteState(
+    final revised = new AFRouteState(
       route: route ?? this.route,
       priorLastSegment: priorLastSegment
     );
+    AFibD.logInternal?.fine("ROUTE: $revised");
+    return revised;
+  }
+
+  //---------------------------------------------------------------------------------------
+  String toString() {
+    final result = StringBuffer();
+    for(final segment in route) {
+      result.write(segment?.screen?.code);
+      result.write(' / ');
+    }
+    return result.toString();
   }
 
 }

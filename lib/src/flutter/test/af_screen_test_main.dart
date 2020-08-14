@@ -59,10 +59,14 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
         
         dispatcher.setContext(context);
         await tester.pumpAndSettle(Duration(seconds: 1));
+
+        /// Clear out our cache of screen info for the next test.
+        AFibF.resetTestScreens();
       }
     }
   }
 
   final baseContexts = List<AFBaseTestExecute>.of(contexts);
   printTestResults(output, "Screen", baseContexts, stats);
+  return null;
 }

@@ -113,6 +113,22 @@ class AFFlatButtonAction extends AFApplyTapWidgetAction {
   }
 }
 
+class AFIconButtonAction extends AFApplyTapWidgetAction {
+
+  AFIconButtonAction(): super(IconButton);
+
+  /// [data] is ignored.
+  @override
+  bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
+    final tapOn = elem.widget;
+    if(tapOn is IconButton) {
+      tapOn.onPressed();
+      return true;
+    } 
+    return false;
+  }
+}
+
 class AFRaisedButtonAction extends AFApplyTapWidgetAction {
 
   AFRaisedButtonAction(): super(RaisedButton);

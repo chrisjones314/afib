@@ -51,7 +51,7 @@ Future<int> afTestMain(AFDartParams paramsD, AFFlutterParams paramsF, InitConfig
   AFibD.logInternal?.fine("entering afScreenTestMain");
   await afScreenTestMain(output, stats, paramsD, paramsF, widgetTester);
   AFibD.logInternal?.fine("exiting afScreenTestMain");
-  
+
   if(stats.hasErrors) {
     expect("${stats.totalErrors} errors (see details above)", AFibTestsFailedMatcher());
   } else {

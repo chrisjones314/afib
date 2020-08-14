@@ -2,13 +2,13 @@
 
 import 'package:afib/afib_dart.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
-import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
-import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
+import 'package:afib/src/flutter/test/af_multiscreen_state_test_list_screen.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/test/af_simple_prototype_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -19,7 +19,9 @@ import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams paramsD1, AFFlutterParams paramsF, WidgetTester tester) async {
-  if(!AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.screenTests)) {
+  final bool isSimple = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.screenTests);
+  final bool isMulti  = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.multiScreenTests);
+  if(!isSimple && !isMulti) {
     return;
   }
 
@@ -27,8 +29,19 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
   final app = AFibF.createApp();
   await tester.pumpWidget(app);
 
-  final contexts = List<AFScreenTestContextWidgetTester>();
+  if(isSimple) {
+    await _afSimpleScreenTestMain(output, stats, tester, app);
+  }
 
+  if(isMulti) {
+    await _afMultiScreenTestMain(output, stats, tester, app);
+  }
+
+  return null;
+}
+
+Future<void> _afSimpleScreenTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+  final simpleContexts = List<AFScreenTestContextWidgetTester>();
 
   for(var group in AFibF.screenTests.groups) {
     for(var test in group.simpleTests) {
@@ -44,7 +57,7 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
         final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test);
         dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context));
         dispatcher.setContext(context);
-        contexts.add(context);
+        simpleContexts.add(context);
 
         // tell the store to go to the correct screen.
         await tester.pumpAndSettle(Duration(seconds: 1));
@@ -66,7 +79,42 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
     }
   }
 
-  final baseContexts = List<AFBaseTestExecute>.of(contexts);
+  final baseContexts = List<AFBaseTestExecute>.of(simpleContexts);
   printTestResults(output, "Screen", baseContexts, stats);
+}
+
+Future<void> _afMultiScreenTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+ final multiContexts = List<AFScreenTestContextWidgetTester>();
+
+  for(final test in AFibF.multiScreenStateTests.stateTests) {
+        AFibD.logInternal?.fine("Starting test ${test.id}");
+
+        final dispatcher = AFStoreDispatcher(AFibF.testOnlyStore);
+        final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test);
+        multiContexts.add(context);
+
+        AFMultiScreenStateListScreen.initializeMultiscreenPrototype(dispatcher, test);
+        
+
+        // tell the store to go to the correct screen.
+        await tester.pumpAndSettle(Duration(seconds: 1));
+  
+        AFibD.logInternal?.fine("Finished pumpWidget for ${test.id}");
+        //debugDumpApp();
+        await test.body.run(context, null);
+        AFibD.logInternal?.fine("Finished ${test.id}");
+
+        // pop this test screen off so that we are ready for the next one.
+        AFibF.testOnlyStore.dispatch(AFNavigateExitTestAction());
+        
+        //dispatcher.setContext(context);
+        await tester.pumpAndSettle(Duration(seconds: 1));
+
+        /// Clear out our cache of screen info for the next test.
+        AFibF.resetTestScreens();
+  }
+
+  final baseMultiContexts = List<AFBaseTestExecute>.of(multiContexts);
+  printTestResults(output, "Multi-Screen", baseMultiContexts, stats);
   return null;
 }

@@ -49,18 +49,10 @@ class AFSimpleScreenTestDispatcher extends AFTestDispatcher {
 
   @override
   void dispatch(action) {
-    bool shouldPop = false;
-    if(action is AFNavigatePopAction) {
-      shouldPop = action.worksInPrototypeMode;
-    }
+    final isTestAct = isTestAction(action);
 
-    final isTestAction =  shouldPop ||
-                          action is AFUpdatePrototypeScreenTestDataAction || 
-                          action is AFPrototypeScreenTestAddError ||
-                          action is AFPrototypeScreenTestIncrementPassCount ||
-                          action is AFStartPrototypeScreenTestContextAction;
     // if the action is a pop, then go ahead and do it.
-    if(isTestAction) {
+    if(isTestAct) {
       main.dispatch(action);
     } else if(action is AFNavigateSetParamAction) {
       // change this into a set param action for the prototype.
@@ -76,8 +68,8 @@ class AFSimpleScreenTestDispatcher extends AFTestDispatcher {
     }
 
     // if this is a test action, then remember it so that we can 
-    if(!isTestAction && action is AFObjectWithKey) {
-      testContext?.registerAction(action);
+    if(!isTestAct && action is AFObjectWithKey) {
+      AFibF.testOnlyRegisterRegisterAction(action);
       AFibD.logInternal?.fine("Registered action: $action");
     }
   }

@@ -1,4 +1,5 @@
 import 'package:afib/afib_flutter.dart';
+import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/actions/af_wait_query.dart';
@@ -59,6 +60,8 @@ class AFibF {
   static Map<String, AFAsyncQueryListenerCustomError> listenerQueries = Map<String, AFAsyncQueryListenerCustomError>();
   static Map<String, AFDeferredQueryCustomError> deferredQueries = Map<String, AFDeferredQueryCustomError>();
   static Map<String, AFWaitQuery> waitQueries = Map<String, AFWaitQuery>();
+  static final _recentActions = Map<String, AFActionWithKey>();
+
 
   
 
@@ -118,6 +121,7 @@ class AFibF {
   /// Used internally to reset widget tracking between tests.
   static void resetTestScreens() {
     testOnlyScreens.clear();
+    _recentActions.clear();
   }
 
   /// Used internally in tests to find widgets on the screen.  Not for public use.
@@ -139,6 +143,24 @@ class AFibF {
       info.increaseBuildCount();
     }
   }
+
+  /// Used internally in tests to keep track of recently dispatched actions
+  /// so that we can verify their contents.
+  static void testOnlyRegisterRegisterAction(AFActionWithKey action) {
+    final key = action.key;
+    _recentActions[key] = action;
+  }
+
+  /// Used internally to get the most recent action with the specified key.
+  static AFActionWithKey testOnlyRecentActionWithKey(String key) {
+    return _recentActions[key];
+  }
+
+  /// Used internally to remove the most recent action with the specified key.
+  static void testOnlyRemoveRecentActionByKey(String key) {
+    _recentActions.remove(key);
+  }
+
 
   /// The navigator key for referencing the Navigator for the material app.
   static GlobalKey<NavigatorState> get navigatorKey {

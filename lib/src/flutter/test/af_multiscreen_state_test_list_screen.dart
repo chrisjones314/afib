@@ -80,10 +80,13 @@ class AFMultiScreenStateListScreen extends AFConnectedScreen<AFAppState, AFMulti
   }
 
   void _startStatePrototype(AFBuildContext<AFMultiScreenStateListScreenData, AFMultiScreenStateListScreenParam> context, AFMultiScreenStatePrototypeTest test) {
+    initializeMultiscreenPrototype(context.d, test);
+  }
 
+  static void initializeMultiscreenPrototype(AFDispatcher dispatcher, AFMultiScreenStatePrototypeTest test) {
     // first, reset the state.
-    context.dispatch(AFResetToInitialStateAction());
-    context.dispatch(AFStartPrototypeScreenTestAction(test));
+    dispatcher.dispatch(AFResetToInitialStateAction());
+    dispatcher.dispatch(AFStartPrototypeScreenTestAction(test));
 
     // lookup the test.
     final testImpl = AFibF.stateTests.findById(test.stateTestId);
@@ -102,7 +105,7 @@ class AFMultiScreenStateListScreen extends AFConnectedScreen<AFAppState, AFMulti
 
     // then, navigate into the desired path.
     for(final push in test.initialPath) {
-      context.dispatch(push);
+      dispatcher.dispatch(push);
     }
   }
 }

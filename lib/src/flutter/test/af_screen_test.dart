@@ -378,7 +378,7 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   Future<void> keepSynchronous();
   Future<void> updateScreenData(dynamic data);
 
-  void expectAction(AFActionWithKey specifier, Function(AFActionWithKey) checkAction, {int extraFrames = 0});
+  void expectActionOnce(AFActionWithKey specifier, Function(AFActionWithKey) checkAction, {int extraFrames = 0});
 
   Future<void> executeNamedSection(AFTestSectionID id, dynamic params);
 
@@ -579,7 +579,7 @@ class AFScreenTestWidgetCollector extends AFSingleScreenTestExecute {
   }
 
 
-  void expectAction(AFActionWithKey specifier, Function(AFActionWithKey) checkAction, { int extraFrames = 0 }) {
+  void expectActionOnce(AFActionWithKey specifier, Function(AFActionWithKey) checkAction, { int extraFrames = 0 }) {
 
   }
 
@@ -675,7 +675,6 @@ class AFScreenTestWidgetCollector extends AFSingleScreenTestExecute {
 
 abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   AFScreenTestWidgetCollector elementCollector;
-  final recentActions = Map<String, AFActionWithKey>();
   final AFDispatcher dispatcher;
   AFScreenTestContext(this.dispatcher, AFScreenPrototypeTest test): super(test) {
     elementCollector = AFScreenTestWidgetCollector(test);
@@ -756,7 +755,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   Future<void> applyWidgetValueWithExpectedAction(dynamic selector, dynamic value, String applyType, AFActionWithKey actionSpecifier, Function(AFActionWithKey) checkAction, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 }) async {
     final previous = AFibF.testOnlyScreenUpdateCount(activeScreenId);
     await applyWidgetValue(selector, value, applyType, expectRender: expectRender, maxWidgets: maxWidgets);
-    expectAction(actionSpecifier, checkAction, extraFrames: extraFrames+1);    
+    expectActionOnce(actionSpecifier, checkAction, extraFrames: extraFrames+1);    
     return pauseForRender(previous, expectRender);
     //return null;
   }
@@ -783,11 +782,6 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
     return null;
   }
 
-  void registerAction(AFActionWithKey action) {
-    final key = action.key;
-    recentActions[key] = action;
-  }
-
   void testText(Widget widget, String expect) {
     if(widget is Text) {
       this.expect(widget.data, ft.equals(expect));
@@ -812,15 +806,16 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   }
 
   @override
-  void expectAction(AFActionWithKey specifier, Function(AFActionWithKey) checkAction, { int extraFrames = 0 }) {
+  void expectActionOnce(AFActionWithKey specifier, Function(AFActionWithKey) checkAction, { int extraFrames = 0 }) {
     final key = specifier.key;
-    final found = recentActions[key];
+    final found = AFibF.testOnlyRecentActionWithKey(key);
     this.expect(found, ft.isNotNull, extraFrames: extraFrames+1);
     if(found == null) {
       return;
     }
     
     checkAction(found);
+    AFibF.testOnlyRemoveRecentActionByKey(key);
   }
 
   AFScreenTests get screenTests;
@@ -893,7 +888,7 @@ class AFScreenTestContextWidgetTester extends AFScreenTestContext {
   final ft.WidgetTester tester;
   final AFApp app;
 
-  AFScreenTestContextWidgetTester(this.tester, this.app, AFDispatcher dispatcher, AFSimpleScreenPrototypeTest test): super(dispatcher, test);
+  AFScreenTestContextWidgetTester(this.tester, this.app, AFDispatcher dispatcher, AFScreenPrototypeTest test): super(dispatcher, test);
 
   @override
   Future<void> pauseForRender(int previousCount, bool expectRender, { AFScreenID screenId }) async {
@@ -1294,7 +1289,9 @@ class AFMultiScreenStateTestBody {
     }
 
     // TODO: this doesn't work because we are on a different screen at the end.
-    onEnd();
+    if(onEnd != null) {
+      onEnd();
+    }
   }
 }
 

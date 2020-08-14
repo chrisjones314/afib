@@ -1,4 +1,5 @@
 
+import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
@@ -8,6 +9,7 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_unused.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/test/af_simple_prototype_screen.dart';
+import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/utils/af_bottom_popup_layout.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -19,6 +21,19 @@ import 'package:flutter_redux/flutter_redux.dart';
 /// for testing.
 abstract class AFDispatcher {
   dynamic dispatch(dynamic action);
+
+  bool isTestAction(dynamic action) {
+    bool shouldPop = false;
+    if(action is AFNavigatePopAction) {
+      shouldPop = action.worksInPrototypeMode;
+    }
+
+    return ( shouldPop ||
+             action is AFUpdatePrototypeScreenTestDataAction || 
+             action is AFPrototypeScreenTestAddError ||
+             action is AFPrototypeScreenTestIncrementPassCount ||
+             action is AFStartPrototypeScreenTestContextAction );
+  }
 }
 
 /// The production dispatcher which dispatches actions to the store.
@@ -27,9 +42,15 @@ class AFStoreDispatcher extends AFDispatcher {
   AFStore store;
   AFStoreDispatcher(this.store);
 
-  dynamic dispatch(dynamic action) {
+  dynamic dispatch(dynamic action) {  
+    if(AFibD.config.requiresTestData && !isTestAction(action) && action is AFActionWithKey) {
+      AFibF.testOnlyRegisterRegisterAction(action);
+      AFibD.logInternal?.fine("Registered action: $action");
+    }
+
     return store.dispatch(action);
   }
+
 }
 
 /// A test dispatcher which records actions for later inspection.

@@ -124,9 +124,10 @@ class AFConfigEntryEnabledTests extends AFConfigEntryList {
   static const unitTests = "unit";
   static const screenTests = "screen";
   static const queryTests = "query";
-  static const allAreas = [allTests, unitTests, stateTests, screenTests, queryTests];
+  static const multiScreenTests = "multiscreen";
+  static const allAreas = [allTests, unitTests, stateTests, screenTests, queryTests, multiScreenTests];
 
-  AFConfigEntryEnabledTests(): super(AFConfigEntries.afNamespace, "enabledTestList", [allTests], help: "Space separated list of [$allTests|$unitTests|$stateTests|$screenTests|test_id|test_tag]");
+  AFConfigEntryEnabledTests(): super(AFConfigEntries.afNamespace, "enabledTestList", [allTests], help: "Space separated list of [${allAreas.join('|')}|test_id|test_tag]");
 
   bool isAreaEnabled(AFConfig config, String area) {
     List<String> areas = config.stringListFor(this);

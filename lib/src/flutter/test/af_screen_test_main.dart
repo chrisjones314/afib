@@ -50,7 +50,7 @@ Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, 
       }
       if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
         AFibF.testOnlyStore.dispatch(AFPrototypeSingleScreenScreen.navigatePush(test));
-        AFibD.logInternal?.fine("Starting ${test.id}");
+        AFibD.logTest?.d("Starting ${test.id}");
 
         final screenId = test.screenId;
         final dispatcher = AFSingleScreenTestDispatcher(screenId, AFStoreDispatcher(AFibF.testOnlyStore), null);
@@ -62,10 +62,10 @@ Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, 
         // tell the store to go to the correct screen.
         await tester.pumpAndSettle(Duration(seconds: 1));
   
-        AFibD.logInternal?.fine("Finished pumpWidget for ${test.id}");
+        AFibD.logTest?.d("Finished pumpWidget for ${test.id}");
         //debugDumpApp();
         await test.body.run(context, null);
-        AFibD.logInternal?.fine("Finished ${test.id}");
+        AFibD.logTest?.d("Finished ${test.id}");
 
         // pop this test screen off so that we are ready for the next one.
         AFibF.testOnlyStore.dispatch(AFNavigatePopAction());
@@ -87,7 +87,7 @@ Future<void> _afMultiScreenTestMain(AFCommandOutput output, AFTestStats stats, W
  final multiContexts = List<AFScreenTestContextWidgetTester>();
 
   for(final test in AFibF.multiScreenStateTests.stateTests) {
-        AFibD.logInternal?.fine("Starting test ${test.id}");
+        AFibD.logTest?.d("Starting test ${test.id}");
 
         final dispatcher = AFStoreDispatcher(AFibF.testOnlyStore);
         final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test);
@@ -99,10 +99,10 @@ Future<void> _afMultiScreenTestMain(AFCommandOutput output, AFTestStats stats, W
         // tell the store to go to the correct screen.
         await tester.pumpAndSettle(Duration(seconds: 1));
   
-        AFibD.logInternal?.fine("Finished pumpWidget for ${test.id}");
+        AFibD.logTest?.d("Finished pumpWidget for ${test.id}");
         //debugDumpApp();
         await test.body.run(context, null);
-        AFibD.logInternal?.fine("Finished ${test.id}");
+        AFibD.logTest?.d("Finished ${test.id}");
 
         // pop this test screen off so that we are ready for the next one.
         AFibF.testOnlyStore.dispatch(AFNavigateExitTestAction());

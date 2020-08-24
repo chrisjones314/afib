@@ -30,12 +30,12 @@ abstract class AFDeferredQueryCustomError<TState, TError> extends AFAsyncQueryCu
 
   void _delayThenExecute(Function(AFUnused) onResponse) {
     timer = Timer(nextDelay, () {
-      AFibD.logInternal?.fine("Executing finishAsyncExecute for deferred query $key");
+      AFibD.logQuery?.d("Executing finishAsyncExecute for deferred query $this");
       onResponse(null);
       if(nextDelay == null) {
         afShutdown();
       } else {
-        AFibD.logInternal?.fine("Waiting $nextDelay to execute $key again");
+        AFibD.logQuery?.d("Waiting $nextDelay to execute $key again");
         _delayThenExecute(onResponse);
       }
     });
@@ -55,7 +55,7 @@ abstract class AFDeferredQueryCustomError<TState, TError> extends AFAsyncQueryCu
 
   void afShutdown() {
     if(timer != null) {
-      AFibD.logInternal?.fine("Shutting down deferred query $key");
+      AFibD.logQuery?.d("Shutting down deferred query $this");
       timer?.cancel();
       timer = null;
       shutdown();

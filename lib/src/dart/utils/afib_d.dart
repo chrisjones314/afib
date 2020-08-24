@@ -2,25 +2,34 @@
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
-import 'package:logging/logging.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
+import 'package:logger/logger.dart';
 
 class AFibD<AppState> {
     static final AFConfig _afConfig = AFConfig();
     static Logger _afLogger;
-    static Logger logInternal;
+    //static Logger logInternal;
+    static Logger logQuery;
+    static Logger logConfig;
+    static Logger logTest;
+
+    /// should be used for application-level logging that is not internal to AFib.
+    static Logger log;
+
+    /// Logger which is non-null if we should log changes to routing.
+    static Logger logRoute;
 
     static void initialize<AppState>(AFDartParams p) {
       Logger logger = p?.logger;
       if(logger == null) {
-        logger = Logger("AF");
+        logger = Logger();
       }
       AFibD.setLogger(logger);
 
-      Logger.root.level = Level.ALL;
-      Logger.root.onRecord.listen((LogRecord rec) {
-        print('${rec.level.name}: ${rec.time}: ${rec.message}');
-      });  
+      //Logger.root.level = Level.ALL;
+      //Logger.root.onRecord.listen((LogRecord rec) {
+      //  print('${rec.level.name}: ${rec.time}: ${rec.message}');
+      //});  
 
       // the params are null when we run the bin/afib.dart command, which doesn't have any configuration information.
       if(p != null) {
@@ -43,10 +52,13 @@ class AFibD<AppState> {
 
         bool verbose = AFibD.config.enableInternalLogging;
         if(verbose != null && verbose) {
-          AFibD.logInternal = AFibD._afLogger;
+          AFibD.logQuery = AFibD._afLogger;
+          AFibD.logConfig = AFibD._afLogger;
+          AFibD.logTest = AFibD._afLogger;
+
         }
 
-        AFibD.logInternal?.fine("Environment: " + AFibD.config.environment);
+        AFibD.logConfig?.i("Environment: " + AFibD.config.environment);
       }
 
   }
@@ -60,23 +72,4 @@ class AFibD<AppState> {
   static AFConfig get config {
     return _afConfig;
   }
-
-  /// A logger for use throughout the app.
-  static Logger get logger {
-    return _afLogger;
-  }
-  /// Prepends "AF: " to a fine level log message.
-  /// 
-  /// Meant to be used only within the AF framework itself.  Apps should use
-  /// AF.logger.fine(...)
-  static void fine(String msg) {
-    _afLogger.fine("AF: " + msg);
-  }
-
-  static void debug(String msg) {
-    _afLogger.fine("AF: " + msg);
-  }
-
-
-
 }

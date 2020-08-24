@@ -829,7 +829,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   }
 
   Future<void> yieldToRenderLoop() async {
-    AFibD.logInternal?.fine("Starting yield to event loop");
+    AFibD.logTest?.d("Starting yield to event loop");
     await Future<void>.delayed(Duration(milliseconds: 100), () {});
     return keepSynchronous();
   }
@@ -837,24 +837,24 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   @override
   Future<void> pauseForRender(int previousCount, bool expectRender, { AFScreenID screenId }) async {
     if(!expectRender) {
-      AFibD.logInternal?.fine("Skipping pauseForRender because expectRender was false.");
+      AFibD.logTest?.d("Skipping pauseForRender because expectRender was false.");
       return null;
     }
     /// wait for the screen element to be rebuilt.
     final screenType = screenId ?? activeScreenId;
     var current = AFibF.testOnlyScreenUpdateCount(screenType);
-    AFibD.logInternal?.fine("Starting _pauseForRender for $screenType with previous $previousCount and current $current");
+    AFibD.logTest?.d("Starting _pauseForRender for $screenType with previous $previousCount and current $current");
     int n = 0;
     while(current == previousCount) {
       await yieldToRenderLoop();
       current = AFibF.testOnlyScreenUpdateCount(screenType);
-      AFibD.logInternal?.fine("Finished finished pause for $screenType with update count $current");
+      AFibD.logTest?.d("Finished finished pause for $screenType with update count $current");
       n++;
       if(n > 10) {
         throw new AFException("Timeout waiting for screen update.  You may need to pass noUpdate: true into one of the test manipulators if it does not produce an update.");
       }
     }
-    AFibD.logInternal?.fine("Exiting _pauseForRender with count $current");
+    AFibD.logTest?.d("Exiting _pauseForRender with count $current");
     return null;
   }
 }
@@ -873,7 +873,7 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
   void addError(String desc, int depth) {
     String err = AFBaseTestExecute.composeError(desc, depth);
     dispatcher.dispatch(AFPrototypeScreenTestAddError(this.test.id, err));
-    AFibD.debug(err);
+    AFibD.log.e(err);
   }
 
   bool addPassIf(bool test) {
@@ -898,7 +898,7 @@ class AFScreenTestContextWidgetTester extends AFScreenTestContext {
   }
 
   Future<void> yieldToRenderLoop() async {
-    AFibD.logInternal?.fine("yielding to pump");
+    AFibD.logTest?.d("yielding to pump");
     await tester.pumpAndSettle(Duration(seconds: 2));
     return keepSynchronous();
   }
@@ -1218,7 +1218,7 @@ class AFMultiScreenTestExecute {
     _installQueryResults(queryResults);
     final prevRenderCount = AFibF.testOnlyScreenUpdateCount(terminalScreen);
     await screenContext.underScreen(screenId, () async {
-      AFibD.logInternal?.fine("Starting underScreen");
+      AFibD.logTest?.d("Starting underScreen");
       // first, populate the element collector.
       final fut0 = body(screenContext.elementCollector);
       await fut0;
@@ -1227,7 +1227,7 @@ class AFMultiScreenTestExecute {
       await fut;
       return screenContext.keepSynchronous();
     }, expectRender: false);
-    AFibD.logInternal?.fine("Finished underscreen");
+    AFibD.logTest?.d("Finished underscreen");
 
     if(screenId != terminalScreen) {
       return screenContext.pauseForRender(prevRenderCount, true, screenId: terminalScreen);

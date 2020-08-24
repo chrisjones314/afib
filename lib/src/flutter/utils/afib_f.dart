@@ -270,7 +270,7 @@ class AFibF {
   /// you should not call it directly.
   static void registerListenerQuery(AFAsyncQueryListenerCustomError query) {
     final key = query.key;
-    AFibD.logInternal?.fine("Registering listener query $key");
+    AFibD.logQuery?.d("Registering listener query $key");
     final current = listenerQueries[key];
     if(current != null) {
       current.afShutdown();
@@ -285,7 +285,7 @@ class AFibF {
   /// you should not call it directly.
   static void registerDeferredQuery(AFDeferredQueryCustomError query) {
     final key = query.key;
-    AFibD.logInternal?.fine("Registering deferred query $key");
+    AFibD.logQuery?.d("Registering deferred query $key");
     final current = deferredQueries[key];
     if(current != null) {
       current.afShutdown();
@@ -295,7 +295,7 @@ class AFibF {
 
   static void registerWaitQuery(AFWaitQuery query) {
     final key = query.key;
-    AFibD.logInternal?.fine("Registering wait query $key");
+    AFibD.logQuery?.d("Registering wait query $key");
     var current = waitQueries[key];
     if(current == null) {
       current = query;

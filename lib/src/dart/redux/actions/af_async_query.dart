@@ -19,7 +19,7 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
 
   /// Called internally when redux middleware begins processing a query.
   void startAsyncAF(AFDispatcher dispatcher, AFStore store) {
-    AFibD.logInternal?.fine("Starting query: $this");
+    AFibD.logQuery?.d("Starting query: $this");
     startAsync( (TResponse result) { 
       // note: there could be multiple queries outstanding at once, meaning the state
       // might be changed by some other query while we are waiting for a responser.  
@@ -87,7 +87,7 @@ abstract class AFAsyncQueryListenerCustomError<TState, TResponse, TError> extend
   AFAsyncQueryListenerCustomError({AFID id}): super(id: id);
 
   void afShutdown() {
-    AFibD.logInternal?.fine("Shutting down listener query $key");
+    AFibD.logQuery?.d("Shutting down listener query $this");
     shutdown();
   }
 

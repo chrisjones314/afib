@@ -69,7 +69,7 @@ class AFSingleScreenTestDispatcher extends AFTestDispatcher {
     // if this is a test action, then remember it so that we can 
     if(!isTestAct && action is AFObjectWithKey) {
       AFibF.testOnlyRegisterRegisterAction(action);
-      AFibD.logInternal?.fine("Registered action: $action");
+      AFibD.logTest?.d("Registered action: $action");
     }
   }
 

@@ -26,7 +26,7 @@ abstract class AFWaitQuery<TState> extends AFAsyncQueryCustomError<TState, AFUnu
   /// Indicate that this query should not execute until the specified query completes.
   void requireCompletionOf(AFAsyncQueryCustomError query) {
     needed[query.key] = true;
-    AFibD.logInternal?.fine("Wait query $key now needs ${query.key}");
+    AFibD.logQuery?.d("Wait query $key now needs ${query.key}");
   }
 
   void dispatchAll(AFDispatcher dispatcher) {
@@ -40,7 +40,7 @@ abstract class AFWaitQuery<TState> extends AFAsyncQueryCustomError<TState, AFUnu
     other.needed.forEach((queryKey, need) {
       needed[queryKey] = need;
       if(need) {
-        AFibD.logInternal?.fine("Wait query $key now needs $queryKey");
+        AFibD.logQuery?.d("Wait query $key now needs $queryKey");
       }
     });
   }
@@ -52,16 +52,14 @@ abstract class AFWaitQuery<TState> extends AFAsyncQueryCustomError<TState, AFUnu
       needed[queryKey] = false;
     }
     bool finished = allFinished;
-    if(AFibD.logInternal != null) {
-      if(finished) {
-        AFibD.logInternal.fine("wait query $key is completed by ${query.key}");
-      } else {
-        needed.forEach((waitKey, need) { 
-          if(need) {
-            AFibD.logInternal.fine("wait query $key still needs $waitKey");
-          }
-        });
-      }
+    if(finished) {
+      AFibD.logQuery?.d("wait query $key is completed by ${query.key}");
+    } else {
+      needed.forEach((waitKey, need) { 
+        if(need) {
+          AFibD.logQuery?.d("wait query $key still needs $waitKey");
+        }
+      });
     }
     return finished;
   }

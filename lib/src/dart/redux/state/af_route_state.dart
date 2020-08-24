@@ -243,7 +243,7 @@ class AFRouteState {
       route: route ?? this.route,
       priorLastSegment: priorLastSegment
     );
-    AFibD.logInternal?.fine("ROUTE: $revised");
+    AFibD.logRoute?.d("Revised Route: $revised");
     return revised;
   }
 

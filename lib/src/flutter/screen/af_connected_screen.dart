@@ -45,7 +45,7 @@ class AFStoreDispatcher extends AFDispatcher {
   dynamic dispatch(dynamic action) {  
     if(AFibD.config.requiresTestData && !isTestAction(action) && action is AFActionWithKey) {
       AFibF.testOnlyRegisterRegisterAction(action);
-      AFibD.logInternal?.fine("Registered action: $action");
+      AFibD.logTest?.d("Registered action: $action");
     }
 
     return store.dispatch(action);
@@ -206,7 +206,7 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
             }
             
             final info = AFibF.registerTestScreen(rt, buildContext);
-            AFibD.logInternal?.fine("Rebuilding screen $runtimeType/$rt with updateCount ${info.updateCount} and param ${dataContext.p}");
+            AFibD.logTest?.d("Rebuilding screen $runtimeType/$rt with updateCount ${info.updateCount} and param ${dataContext.p}");
           }
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p);
           return buildWithContext(withContext);

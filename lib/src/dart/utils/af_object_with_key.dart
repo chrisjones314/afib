@@ -28,4 +28,8 @@ class AFObjectWithKey {
     }
     return sb.toString();
   }
+
+  String toString() {
+    return key;
+  }
 }

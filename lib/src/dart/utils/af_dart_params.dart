@@ -1,6 +1,6 @@
 
-import 'package:logging/logging.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
+import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
 
 typedef void InitConfiguration(AFConfig config);

@@ -28,7 +28,7 @@ class AFibTestsFailedMatcher extends Matcher {
 }
 
 /// The main function which executes the store test defined in your initStateTests function.
-Future<int> afTestMain(AFDartParams paramsD, AFFlutterParams paramsF, InitConfiguration initTestConfig, WidgetTester widgetTester) async {
+Future<void> afTestMain(AFDartParams paramsD, AFFlutterParams paramsF, InitConfiguration initTestConfig, WidgetTester widgetTester) async {
   final paramsTest = paramsD.forceEnvironment(AFConfigEntryEnvironment.prototype);
   AFibD.initialize(paramsTest);
   AFibF.initialize(paramsF);
@@ -59,4 +59,5 @@ Future<int> afTestMain(AFDartParams paramsD, AFFlutterParams paramsF, InitConfig
     AFBaseTestExecute.printTotalPass(output, "GRAND TOTAL", stats.totalPasses);
     output.writeSeparatorLine();   
   }
+  return null;
 }

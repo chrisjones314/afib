@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:afib/afib_command.dart';
@@ -16,7 +15,6 @@ class AFTestCommand extends AFCommand {
   String get shortHelp => "Run afib tests conveniently";
 
   void writeLongHelp(AFCommandContext ctx, String subCommand) {
-    final output = ctx.o;
     writeUsage(ctx, cmdKey, "[${AFConfigEntries.enabledTestList.argumentString}]*");
     startArguments(ctx);
     writeConfigArgument(ctx, AFConfigEntries.enabledTestList);

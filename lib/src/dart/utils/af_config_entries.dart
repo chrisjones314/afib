@@ -2,7 +2,6 @@
 
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
-import 'package:afib/src/dart/command/commands/af_test_command.dart';
 
 /// Constants used to specify values in [AF.config].
 /// 

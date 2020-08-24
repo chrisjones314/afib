@@ -1,5 +1,4 @@
 //--------------------------------------------------------------------------------------
-import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/utils/af_bottom_popup_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

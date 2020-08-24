@@ -3,8 +3,7 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_object_with_key.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
-import 'package:afib/src/flutter/test/af_simple_prototype_screen.dart';
-import 'package:afib/src/flutter/test/af_test_actions.dart';
+import 'package:afib/src/flutter/test/af_prototype_single_screen_screen.dart';
 
 abstract class AFTestDispatcher extends AFDispatcher {
   final AFDispatcher main;
@@ -35,11 +34,11 @@ class AFStateScreenTestDispatcher extends AFTestDispatcher {
 
 }
 
-class AFSimpleScreenTestDispatcher extends AFTestDispatcher {
+class AFSingleScreenTestDispatcher extends AFTestDispatcher {
   final AFID screenId;
   AFScreenTestContext testContext;
   
-  AFSimpleScreenTestDispatcher(
+  AFSingleScreenTestDispatcher(
     this.screenId, 
     AFDispatcher main, this.testContext): super(main);
 
@@ -57,8 +56,8 @@ class AFSimpleScreenTestDispatcher extends AFTestDispatcher {
     } else if(action is AFNavigateSetParamAction) {
       // change this into a set param action for the prototype.
       main.dispatch(
-        AFNavigateSetParamAction(screen: AFUIID.screenPrototypeSimple,
-          param: AFScreenPrototypeScreenParam(id: screenId, param: action.param)
+        AFNavigateSetParamAction(screen: AFUIID.screenPrototypeSingleScreen,
+          param: AFPrototypeSingleScreenRouteParam(id: screenId, param: action.param)
       ));      
     } else {
       // if this is an action that doesn't really dispatch, then bump the 

@@ -418,11 +418,11 @@ class AFScreenTestBodyWithParam {
 }
 
 
-class AFSimpleScreenTestBody {
+class AFSingleScreenTestBody {
   final AFScreenTestGroup group;
   final sections = List<AFScreenTestBodyWithParam>();
 
-  AFSimpleScreenTestBody(this.group);
+  AFSingleScreenTestBody(this.group);
 
   bool get isNotEmpty { 
     return sections.isNotEmpty;
@@ -922,7 +922,7 @@ abstract class AFScreenPrototypeTest {
   AFScreenTests get screenTests;
   void run(AFScreenTestContext context, { Function onEnd});
   void onDrawerReset(AFDispatcher dispatcher);
-  Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSimpleScreenTestState state, Function onEnd);
+  Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSingleScreenTestState state, Function onEnd);
 
   AFScreenTestContextSimulator prepareRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext) {
     onDrawerReset(dispatcher);
@@ -940,14 +940,14 @@ abstract class AFScreenPrototypeTest {
 
 /// All the information necessary to render a single screen for
 /// prototyping and testing.
-class AFSimpleScreenPrototypeTest extends AFScreenPrototypeTest {
+class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
   dynamic data;
   dynamic param;
-  final AFSimpleScreenTestBody body;
+  final AFSingleScreenTestBody body;
   //final AFConnectedScreenWithoutRoute screen;
   final AFScreenID screenId;
 
-  AFSimpleScreenPrototypeTest({
+  AFSingleScreenPrototypeTest({
     @required AFTestID id,
     @required this.data,
     @required this.param,
@@ -973,7 +973,7 @@ class AFSimpleScreenPrototypeTest extends AFScreenPrototypeTest {
   }
 
  
-  Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSimpleScreenTestState state, Function onEnd) async {
+  Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSingleScreenTestState state, Function onEnd) async {
     //final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
     final testContext = prepareRun(dispatcher, prevContext);
     //await testContext.pauseForRender(screenUpdateCount, true);
@@ -1017,7 +1017,7 @@ class AFMultiScreenStatePrototypeTest extends AFScreenPrototypeTest {
     //throw UnimplementedError();
   }
 
-  Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSimpleScreenTestState state, Function onEnd) async {
+  Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSingleScreenTestState state, Function onEnd) async {
     final testContext = prepareRun(dispatcher, prevContext);
     run(testContext, onEnd: onEnd);
   }
@@ -1028,7 +1028,7 @@ class AFMultiScreenStatePrototypeTest extends AFScreenPrototypeTest {
 class AFScreenTestGroup {
   final AFScreenTests testMgr;
   AFScreenID screenId;
-  final simpleTests = List<AFSimpleScreenPrototypeTest>();
+  final simpleTests = List<AFSingleScreenPrototypeTest>();
 
   AFScreenTestGroup({
     @required this.testMgr, 
@@ -1046,21 +1046,21 @@ class AFScreenTestGroup {
   /// Add a prototype of a particular screen with the specified [data]
   /// and [param].  
   /// 
-  /// Returns an [AFSimpleScreenTestBody], which can be used to create a 
+  /// Returns an [AFSingleScreenTestBody], which can be used to create a 
   /// test for the screen.
-  AFSimpleScreenTestBody addSimplePrototype({
+  AFSingleScreenTestBody addPrototype({
     @required AFTestID   id,
     @required dynamic data,
     @required dynamic param,
     String subtitle
   }) {
-    AFSimpleScreenPrototypeTest instance = AFSimpleScreenPrototypeTest(
+    AFSingleScreenPrototypeTest instance = AFSingleScreenPrototypeTest(
       id: id,
       data: data,
       param: param,
       screenId: screenId,
       subtitle: subtitle,
-      body: AFSimpleScreenTestBody(this)
+      body: AFSingleScreenTestBody(this)
     );
     simpleTests.add(instance);
     return instance.body;
@@ -1130,7 +1130,7 @@ class AFScreenTests<TState> {
     groups.add(group);
   }
 
-  AFSimpleScreenPrototypeTest findById(AFTestID id) {
+  AFSingleScreenPrototypeTest findById(AFTestID id) {
     for(var tests in groups) {
       for(var test in tests.simpleTests) {
         if(test.id == id) {
@@ -1304,7 +1304,7 @@ class AFMultiScreenStateTestBody {
 class AFMultiScreenStateTests {
   final stateTests = List<AFMultiScreenStatePrototypeTest>();
 
-  AFMultiScreenStateTestBody addStatePrototype({
+  AFMultiScreenStateTestBody addPrototype({
     @required AFTestID   id,
     String subtitle,
     @required List<AFNavigatePushAction> initialPath,

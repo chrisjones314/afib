@@ -40,7 +40,7 @@ abstract class AFWaitQuery<TState> extends AFAsyncQueryCustomError<TState, AFUnu
     other.needed.forEach((queryKey, need) {
       needed[queryKey] = need;
       if(need) {
-        AFibD.logInternal?.fine("Wait query $key now needs ${queryKey}");
+        AFibD.logInternal?.fine("Wait query $key now needs $queryKey");
       }
     });
   }

@@ -2,7 +2,6 @@
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
-import 'package:afib/src/flutter/test/af_test_data_registry.dart';
 import 'package:logging/logging.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 

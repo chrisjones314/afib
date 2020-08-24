@@ -4,7 +4,6 @@ import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/generator_code/af_id_code_generator.dart';
-import 'package:afib/src/dart/command/generator_code/af_import_generator.dart';
 import 'package:afib/src/dart/command/generator_steps/af_file_generator_step.dart';
 
 class AFIDGenerator extends AFSourceGenerator {

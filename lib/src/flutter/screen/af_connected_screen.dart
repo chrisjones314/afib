@@ -8,7 +8,7 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_unused.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:afib/src/flutter/test/af_simple_prototype_screen.dart';
+import 'package:afib/src/flutter/test/af_prototype_single_screen_screen.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/utils/af_bottom_popup_layout.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
@@ -201,7 +201,7 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
           
           if(!(this is AFTestDrawer)) {
             var rt = this.screen;
-            if(dataContext.p != null && dataContext.p is AFScreenPrototypeScreenParam) {
+            if(dataContext.p != null && dataContext.p is AFPrototypeSingleScreenRouteParam) {
               rt = dataContext.p.effectiveScreenId;
             }
             

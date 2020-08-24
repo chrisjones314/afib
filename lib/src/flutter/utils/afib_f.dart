@@ -14,7 +14,7 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
-import 'package:afib/src/flutter/test/af_init_proto_screen_map.dart';
+import 'package:afib/src/flutter/test/af_init_prototype_screen_map.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_data_registry.dart';
 import 'package:afib/src/flutter/utils/af_flutter_params.dart';

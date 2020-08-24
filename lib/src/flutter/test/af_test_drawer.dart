@@ -12,12 +12,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 //--------------------------------------------------------------------------------------
-class AFTestDrawerData extends AFStoreConnectorData3<AFScreenTestContextSimulator, AFSimpleScreenTestState, AFScreenPrototypeTest> {
-  AFTestDrawerData(AFScreenTestContextSimulator testContext, AFSimpleScreenTestState testState, AFScreenPrototypeTest test): 
+class AFTestDrawerData extends AFStoreConnectorData3<AFScreenTestContextSimulator, AFSingleScreenTestState, AFScreenPrototypeTest> {
+  AFTestDrawerData(AFScreenTestContextSimulator testContext, AFSingleScreenTestState testState, AFScreenPrototypeTest test): 
     super(first: testContext, second: testState, third: test);
 
   AFScreenTestContextSimulator get testContext { return first; }
-  AFSimpleScreenTestState get testState { return second; }
+  AFSingleScreenTestState get testState { return second; }
   AFScreenPrototypeTest get test { return third; }
 
 }

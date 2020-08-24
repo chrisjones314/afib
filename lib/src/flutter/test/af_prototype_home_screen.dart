@@ -4,8 +4,8 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
-import 'package:afib/src/flutter/test/af_multiscreen_state_test_list_screen.dart';
-import 'package:afib/src/flutter/test/af_simple_prototype_list_screen.dart';
+import 'package:afib/src/flutter/test/af_prototype_list_multi_screen.dart';
+import 'package:afib/src/flutter/test/af_prototype_list_single_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
@@ -53,7 +53,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppState, APrototypeHome
   Widget _buildHome(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context) {
     final rows = AFUI.column();
     rows.add(_createKindRow("Single Screen Prototypes", () {
-      context.dispatch(AFSimplePrototypeListScreen.navigateTo());
+      context.dispatch(AFPrototypeListSingleScreen.navigateTo());
     }));
     
     rows.add(_createKindRow("Wireframe Prototypes", () {
@@ -61,7 +61,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppState, APrototypeHome
     }));
 
     rows.add(_createKindRow("Multi-Screen Prototypes", () {
-      context.dispatch(AFMultiScreenStateListScreen.navigateTo());
+      context.dispatch(AFPrototypeListMultiScreen.navigateTo());
       
     }));
 

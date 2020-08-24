@@ -4,17 +4,11 @@ import 'dart:io';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/generator_code/af_code_buffer.dart';
 import 'package:afib/src/dart/command/generator_code/af_code_generator.dart';
-import 'package:afib/src/dart/command/generator_code/af_namespace_generator.dart';
-import 'package:afib/src/dart/command/generators/af_config_file_generator.dart';
 import 'package:afib/src/dart/command/generators/af_id_generator.dart';
 import 'package:afib/src/dart/command/templates/af_template_registry.dart';
-import 'package:afib/src/dart/command/templates/files/afib.t.dart';
 import 'package:afib/src/dart/command/af_command.dart';
-import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/generators/af_config_generator.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
-import 'package:afib/src/dart/command/templates/files/id.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_id_statement.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 

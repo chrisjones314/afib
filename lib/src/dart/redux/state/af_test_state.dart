@@ -3,23 +3,23 @@ import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:meta/meta.dart';
 
 @immutable 
-class AFSimpleScreenTestState {
+class AFSingleScreenTestState {
   final int pass;
   final List<String> errors;
   final dynamic data;
 
-  AFSimpleScreenTestState({this.pass, this.errors, this.data});
+  AFSingleScreenTestState({this.pass, this.errors, this.data});
 
-  AFSimpleScreenTestState reviseData(dynamic data) {
+  AFSingleScreenTestState reviseData(dynamic data) {
     return copyWith(data: data);
   }
 
-  AFSimpleScreenTestState incrementPassCount() {
+  AFSingleScreenTestState incrementPassCount() {
     final revisedPass = pass+1;
     return copyWith(pass: revisedPass);
   }
 
-  AFSimpleScreenTestState addError(String err) {
+  AFSingleScreenTestState addError(String err) {
     final revised = List<String>.from(errors);
     revised.add(err);
     return copyWith(errors: revised);
@@ -41,12 +41,12 @@ class AFSimpleScreenTestState {
     return errors.isNotEmpty;
   }
 
-  AFSimpleScreenTestState copyWith({
+  AFSingleScreenTestState copyWith({
     int pass, 
     List<String> errors, 
     dynamic data
   }) {
-    return AFSimpleScreenTestState(
+    return AFSingleScreenTestState(
       data: data ?? this.data,
       errors: errors ?? this.errors,
       pass: pass ?? this.pass
@@ -59,7 +59,7 @@ class AFSimpleScreenTestState {
 class AFTestState {
   final AFScreenPrototypeTest activeTest;
   final Map<AFTestID, AFScreenTestContext> testContexts;
-  final Map<AFTestID, AFSimpleScreenTestState> testStates;
+  final Map<AFTestID, AFSingleScreenTestState> testStates;
 
   AFTestState({
     @required this.activeTest, 
@@ -70,7 +70,7 @@ class AFTestState {
     return AFTestState(
       activeTest: null,
       testContexts: Map<AFTestID, AFScreenTestContext>(), 
-      testStates:Map<AFTestID, AFSimpleScreenTestState>()
+      testStates:Map<AFTestID, AFSingleScreenTestState>()
     );
   }
 
@@ -78,7 +78,7 @@ class AFTestState {
     return testContexts[id];
   }
 
-  AFSimpleScreenTestState findState(AFTestID id) {
+  AFSingleScreenTestState findState(AFTestID id) {
     return testStates[id];
   }
 
@@ -89,8 +89,8 @@ class AFTestState {
   AFTestState startTest(AFScreenTestContext simulator) {
     final revisedContexts = Map<AFTestID, AFScreenTestContext>.from(testContexts);
     revisedContexts[simulator.test.id] = simulator;
-    final revisedStates = Map<AFTestID, AFSimpleScreenTestState>.from(testStates);
-    revisedStates[simulator.test.id] = AFSimpleScreenTestState(pass: 0, errors: List<String>(), data: null);
+    final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
+    revisedStates[simulator.test.id] = AFSingleScreenTestState(pass: 0, errors: List<String>(), data: null);
     
     return copyWith(
       activeTest: simulator.test,
@@ -100,10 +100,10 @@ class AFTestState {
   }
 
   AFTestState updateStateData(AFTestID testId, dynamic data) {
-    final revisedStates = Map<AFTestID, AFSimpleScreenTestState>.from(testStates);
+    final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
     final currentState = revisedStates[testId];
     if(currentState == null) {
-      revisedStates[testId] = AFSimpleScreenTestState(data: data, errors: List<String>(), pass: 0);    
+      revisedStates[testId] = AFSingleScreenTestState(data: data, errors: List<String>(), pass: 0);    
     } else {
       revisedStates[testId] = currentState.reviseData(data);
 
@@ -114,7 +114,7 @@ class AFTestState {
   }
 
   AFTestState incrementPassCount(AFTestID testId) {
-    final revisedStates = Map<AFTestID, AFSimpleScreenTestState>.from(testStates);
+    final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
     final currentState = revisedStates[testId];
     revisedStates[testId] = currentState?.incrementPassCount();
     return copyWith(
@@ -123,7 +123,7 @@ class AFTestState {
   }
 
   AFTestState addError(AFTestID testId, String err) {
-    final revisedStates = Map<AFTestID, AFSimpleScreenTestState>.from(testStates);
+    final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
     final currentState = revisedStates[testId];
     revisedStates[testId] = currentState.addError(err);
     return copyWith(
@@ -134,7 +134,7 @@ class AFTestState {
   AFTestState copyWith({
     AFScreenPrototypeTest activeTest,
     Map<AFTestID, AFScreenTestContext> testContexts,
-     Map<AFTestID, AFSimpleScreenTestState> testStates
+     Map<AFTestID, AFSingleScreenTestState> testStates
   }) {
     return AFTestState(
       activeTest: activeTest ?? this.activeTest,

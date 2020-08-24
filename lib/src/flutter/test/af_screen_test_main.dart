@@ -8,9 +8,9 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
-import 'package:afib/src/flutter/test/af_multiscreen_state_test_list_screen.dart';
+import 'package:afib/src/flutter/test/af_prototype_list_multi_screen.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
-import 'package:afib/src/flutter/test/af_simple_prototype_screen.dart';
+import 'package:afib/src/flutter/test/af_prototype_single_screen_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
@@ -30,7 +30,7 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
   await tester.pumpWidget(app);
 
   if(isSimple) {
-    await _afSimpleScreenTestMain(output, stats, tester, app);
+    await _afSingleScreenTestMain(output, stats, tester, app);
   }
 
   if(isMulti) {
@@ -40,7 +40,7 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
   return null;
 }
 
-Future<void> _afSimpleScreenTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
   final simpleContexts = List<AFScreenTestContextWidgetTester>();
 
   for(var group in AFibF.screenTests.groups) {
@@ -49,11 +49,11 @@ Future<void> _afSimpleScreenTestMain(AFCommandOutput output, AFTestStats stats, 
         continue;
       }
       if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
-        AFibF.testOnlyStore.dispatch(AFScreenPrototypeScreen.navigatePush(test));
+        AFibF.testOnlyStore.dispatch(AFPrototypeSingleScreenScreen.navigatePush(test));
         AFibD.logInternal?.fine("Starting ${test.id}");
 
         final screenId = test.screenId;
-        final dispatcher = AFSimpleScreenTestDispatcher(screenId, AFStoreDispatcher(AFibF.testOnlyStore), null);
+        final dispatcher = AFSingleScreenTestDispatcher(screenId, AFStoreDispatcher(AFibF.testOnlyStore), null);
         final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test);
         dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context));
         dispatcher.setContext(context);
@@ -93,7 +93,7 @@ Future<void> _afMultiScreenTestMain(AFCommandOutput output, AFTestStats stats, W
         final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test);
         multiContexts.add(context);
 
-        AFMultiScreenStateListScreen.initializeMultiscreenPrototype(dispatcher, test);
+        AFPrototypeListMultiScreen.initializeMultiscreenPrototype(dispatcher, test);
         
 
         // tell the store to go to the correct screen.

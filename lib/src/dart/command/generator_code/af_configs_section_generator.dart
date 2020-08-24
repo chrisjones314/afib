@@ -2,7 +2,6 @@
 
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/generator_code/af_code_buffer.dart';
 import 'package:afib/src/dart/command/generator_code/af_code_generator.dart';
 
@@ -24,10 +23,4 @@ class AFConfigsSectionGenerator extends AFCodeGenerator {
     }
   }
   
-  @override
-  bool validateBefore(AFCommandContext ctx, AFGeneratedFiles files) {
-      return true;
-  }
-
-
 }

@@ -25,8 +25,7 @@ class AFStateTestContext<TState> extends AFStateTestExecute {
   static AFStateTestContext _currentTest;
   final bool isTrueTestContext;
   
-  AFStateTestContext(this.test, this.store, this.dispatcher, { @required this.isTrueTestContext} ) {
-  }
+  AFStateTestContext(this.test, this.store, this.dispatcher, { @required this.isTrueTestContext} );
 
   AFTestID get testID { return this.test.id; }
   TState get state { return store.state.app; }

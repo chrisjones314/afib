@@ -14,20 +14,20 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 
 /// Parameter uses to filter the tests shown on the screen.
 @immutable
-class AFScreenPrototypeScreenParam extends AFRouteParam {
+class AFPrototypeSingleScreenRouteParam extends AFRouteParam {
   final AFID id;
   final AFRouteParam param;
   final dynamic data;
 
-  AFScreenPrototypeScreenParam({this.id, this.param, this.data});
+  AFPrototypeSingleScreenRouteParam({this.id, this.param, this.data});
 
-  AFScreenPrototypeScreenParam copyWith() {
-    return AFScreenPrototypeScreenParam();
+  AFPrototypeSingleScreenRouteParam copyWith() {
+    return AFPrototypeSingleScreenRouteParam();
   }
 
   @override
   bool matchesScreen(AFScreenID screenID) {
-    AFSimpleScreenPrototypeTest test = AFibF.screenTests.findById(id);
+    AFSingleScreenPrototypeTest test = AFibF.screenTests.findById(id);
     if(test.screenId == screenID) {
       return true;
     }
@@ -35,13 +35,13 @@ class AFScreenPrototypeScreenParam extends AFRouteParam {
   }
 
   AFScreenID get effectiveScreenId {
-    AFSimpleScreenPrototypeTest test = AFibF.screenTests.findById(id);
+    AFSingleScreenPrototypeTest test = AFibF.screenTests.findById(id);
     return test.screenId;
   }
 
   @override
   AFRouteParam paramFor(AFScreenID screenID) {
-    AFSimpleScreenPrototypeTest test = AFibF.screenTests.findById(id);
+    AFSingleScreenPrototypeTest test = AFibF.screenTests.findById(id);
     if(test.screenId == screenID) {
       return param;
     }
@@ -50,8 +50,8 @@ class AFScreenPrototypeScreenParam extends AFRouteParam {
 }
 
 /// Data used to render the screen
-class AFScreenPrototypeScreenData extends AFStoreConnectorData2<AFScreenTests, AFTestState> {
-  AFScreenPrototypeScreenData(AFScreenTests tests, AFTestState testState): 
+class AFPrototypeSingleScreenData extends AFStoreConnectorData2<AFScreenTests, AFTestState> {
+  AFPrototypeSingleScreenData(AFScreenTests tests, AFTestState testState): 
     super(first: tests, second: testState);
   
   AFScreenTests get tests { return first; }
@@ -60,32 +60,32 @@ class AFScreenPrototypeScreenData extends AFStoreConnectorData2<AFScreenTests, A
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFScreenPrototypeScreen extends AFConnectedScreen<AFAppState, AFScreenPrototypeScreenData, AFScreenPrototypeScreenParam>{
+class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppState, AFPrototypeSingleScreenData, AFPrototypeSingleScreenRouteParam>{
 
-  AFScreenPrototypeScreen(): super(AFUIID.screenPrototypeSimple);
+  AFPrototypeSingleScreenScreen(): super(AFUIID.screenPrototypeSingleScreen);
 
-  static AFNavigateAction navigatePush(AFSimpleScreenPrototypeTest instance, {AFID id}) {
+  static AFNavigateAction navigatePush(AFSingleScreenPrototypeTest instance, {AFID id}) {
     return AFNavigatePushAction(
       id: id,
-      param: AFScreenPrototypeScreenParam(id: instance.id, param: instance.param),
-      screen: AFUIID.screenPrototypeSimple,
+      param: AFPrototypeSingleScreenRouteParam(id: instance.id, param: instance.param),
+      screen: AFUIID.screenPrototypeSingleScreen,
     );
   }
 
   @override
-  AFScreenPrototypeScreenData createDataAF(AFState state) {
+  AFPrototypeSingleScreenData createDataAF(AFState state) {
     AFScreenTests tests = AFibF.screenTests;
-    return AFScreenPrototypeScreenData(tests, state.testState);
+    return AFPrototypeSingleScreenData(tests, state.testState);
   }
 
   @override
-  AFScreenPrototypeScreenData createData(AFAppState state) {
+  AFPrototypeSingleScreenData createData(AFAppState state) {
     // this should never be called, because createDataAF supercedes it.
     throw UnimplementedError();
   }
 
   @override
-  Widget buildWithContext(AFBuildContext<AFScreenPrototypeScreenData, AFScreenPrototypeScreenParam> context) {
+  Widget buildWithContext(AFBuildContext<AFPrototypeSingleScreenData, AFPrototypeSingleScreenRouteParam> context) {
     
     /// Remember what screen we are on for testing purposes.  Maybe eventually try to do this in navigator observer.
     AFTest.currentScreen = context.c;
@@ -93,14 +93,14 @@ class AFScreenPrototypeScreen extends AFConnectedScreen<AFAppState, AFScreenProt
   }
 
 
-  Widget _buildScreen(AFBuildContext<AFScreenPrototypeScreenData, AFScreenPrototypeScreenParam> context) {
+  Widget _buildScreen(AFBuildContext<AFPrototypeSingleScreenData, AFPrototypeSingleScreenRouteParam> context) {
     AFScreenTests tests = context.s.tests;
-    AFSimpleScreenPrototypeTest test = tests.findById(context.p.id);
+    AFSingleScreenPrototypeTest test = tests.findById(context.p.id);
     AFRouteParam paramChild = context.p.param ?? test.data.param;
     final testContext = context.s.testState.findContext(test.id);
     final testState = context.s.testState.findState(test.id);
     final testData = testState?.data ?? test.data;
-    final dispatcher = AFSimpleScreenTestDispatcher(context.p.id, context.d, testContext);
+    final dispatcher = AFSingleScreenTestDispatcher(context.p.id, context.d, testContext);
     final screenMap = AFibF.screenMap;
     final AFConnectedScreenWithoutRoute screen = screenMap.createFor(test.screenId);
     final childContext = screen.createContext(context.c, dispatcher, testData, paramChild);

@@ -4,10 +4,9 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
-import 'package:afib/src/flutter/test/af_proto_home_screen.dart';
+import 'package:afib/src/flutter/test/af_prototype_home_screen.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
-import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
-import 'package:afib/src/flutter/test/af_simple_prototype_screen.dart';
+import 'package:afib/src/flutter/test/af_prototype_single_screen_screen.dart';
 import 'package:afib/src/flutter/utils/af_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -16,19 +15,19 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 
 /// Parameter uses to filter the tests/protoypes shown on the screen.
 @immutable
-class AFSimplePrototypeListScreenParam extends AFRouteParam {
+class AFPrototypeListSingleScreenParam extends AFRouteParam {
   final String filter;
 
-  AFSimplePrototypeListScreenParam({this.filter});
+  AFPrototypeListSingleScreenParam({this.filter});
 
-  AFSimplePrototypeListScreenParam copyWith() {
-    return AFSimplePrototypeListScreenParam();
+  AFPrototypeListSingleScreenParam copyWith() {
+    return AFPrototypeListSingleScreenParam();
   }
 }
 
 /// Data used to render the screen
-class AFSimplePrototypeListScreenData extends AFStoreConnectorData1<AFScreenTests> {
-  AFSimplePrototypeListScreenData(AFScreenTests tests): 
+class AFPrototypeListSingleScreenData extends AFStoreConnectorData1<AFScreenTests> {
+  AFPrototypeListSingleScreenData(AFScreenTests tests): 
     super(first: tests);
   
   AFScreenTests get tests { return first; }
@@ -36,27 +35,27 @@ class AFSimplePrototypeListScreenData extends AFStoreConnectorData1<AFScreenTest
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFSimplePrototypeListScreen extends AFConnectedScreen<AFAppState, AFSimplePrototypeListScreenData, AFSimplePrototypeListScreenParam>{
+class AFPrototypeListSingleScreen extends AFConnectedScreen<AFAppState, AFPrototypeListSingleScreenData, AFPrototypeListSingleScreenParam>{
 
-  AFSimplePrototypeListScreen(): super(AFUIID.screenSimplePrototypeList);
+  AFPrototypeListSingleScreen(): super(AFUIID.screenPrototypeListSingleScreen);
 
   static AFNavigatePushAction navigateTo() {
-    return AFNavigatePushAction(screen: AFUIID.screenSimplePrototypeList,
-      param: AFSimplePrototypeListScreenParam(filter: ""));
+    return AFNavigatePushAction(screen: AFUIID.screenPrototypeListSingleScreen,
+      param: AFPrototypeListSingleScreenParam(filter: ""));
   }
 
   @override
-  AFSimplePrototypeListScreenData createData(AFAppState state) {
+  AFPrototypeListSingleScreenData createData(AFAppState state) {
     AFScreenTests tests = AFibF.screenTests;
-    return AFSimplePrototypeListScreenData(tests);
+    return AFPrototypeListSingleScreenData(tests);
   }
 
   @override
-  Widget buildWithContext(AFBuildContext<AFSimplePrototypeListScreenData, AFSimplePrototypeListScreenParam> context) {
+  Widget buildWithContext(AFBuildContext<AFPrototypeListSingleScreenData, AFPrototypeListSingleScreenParam> context) {
     return _buildList(context);
   }
 
-  Widget _buildList(AFBuildContext<AFSimplePrototypeListScreenData, AFSimplePrototypeListScreenParam> context) {
+  Widget _buildList(AFBuildContext<AFPrototypeListSingleScreenData, AFPrototypeListSingleScreenParam> context) {
     final column = AFUI.column();
 
     AFScreenTests tests = context.s.tests;
@@ -68,7 +67,7 @@ class AFSimplePrototypeListScreen extends AFConnectedScreen<AFAppState, AFSimple
     return AFPrototypeHomeScreen.buildPrototypeScaffold("Screen Prototypes", column, leading: leading);
   }
 
-  void _addForWidget(AFBuildContext<AFSimplePrototypeListScreenData, AFSimplePrototypeListScreenParam> context, List<Widget> column, AFScreenTestGroup source) {
+  void _addForWidget(AFBuildContext<AFPrototypeListSingleScreenData, AFPrototypeListSingleScreenParam> context, List<Widget> column, AFScreenTestGroup source) {
     StringBuffer title = StringBuffer(source.screenId);
     column.add(Card(
       color: AFTheme.primaryBackground,
@@ -87,7 +86,7 @@ class AFSimplePrototypeListScreen extends AFConnectedScreen<AFAppState, AFSimple
     });
   }
 
-  Widget _createCard(AFBuildContext<AFSimplePrototypeListScreenData, AFSimplePrototypeListScreenParam> context, AFScreenTestGroup test, AFSimpleScreenPrototypeTest instance) {
+  Widget _createCard(AFBuildContext<AFPrototypeListSingleScreenData, AFPrototypeListSingleScreenParam> context, AFScreenTestGroup test, AFSingleScreenPrototypeTest instance) {
     final subtitleWidget = (instance.subtitle == null) ? null : Text(instance.subtitle);
     return Card(
       key: Key(instance.id.code),
@@ -95,13 +94,13 @@ class AFSimplePrototypeListScreen extends AFConnectedScreen<AFAppState, AFSimple
         title: Text(instance.id.code),
         subtitle: subtitleWidget,
         onTap: () {
-          _startSimplePrototype(context, instance);
+          _startSingleScreenPrototype(context, instance);
         }
     ));
   }
 
-  void _startSimplePrototype(AFBuildContext<AFSimplePrototypeListScreenData, AFSimplePrototypeListScreenParam> context, AFSimpleScreenPrototypeTest test) {
+  void _startSingleScreenPrototype(AFBuildContext<AFPrototypeListSingleScreenData, AFPrototypeListSingleScreenParam> context, AFSingleScreenPrototypeTest test) {
     context.dispatch(AFStartPrototypeScreenTestAction(test));
-    context.dispatch(AFScreenPrototypeScreen.navigatePush(test, id: test.id));
+    context.dispatch(AFPrototypeSingleScreenScreen.navigatePush(test, id: test.id));
   }
 }

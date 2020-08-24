@@ -1,7 +1,4 @@
-import 'package:afib/src/dart/command/af_args.dart';
 import 'package:afib/src/dart/command/af_command.dart';
-import 'package:afib/src/dart/command/af_command_output.dart';
-import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 
 /// Parent for commands executed through the afib command line app.

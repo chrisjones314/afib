@@ -4,7 +4,7 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
-import 'package:afib/src/flutter/test/af_proto_home_screen.dart';
+import 'package:afib/src/flutter/test/af_prototype_home_screen.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:flutter/material.dart';
@@ -14,19 +14,19 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 
 /// Parameter uses to filter the tests/protoypes shown on the screen.
 @immutable
-class AFMultiScreenStateListScreenParam extends AFRouteParam {
+class AFPrototypeListMultiScreenParam extends AFRouteParam {
   final String filter;
 
-  AFMultiScreenStateListScreenParam({this.filter});
+  AFPrototypeListMultiScreenParam({this.filter});
 
-  AFMultiScreenStateListScreenParam copyWith() {
-    return AFMultiScreenStateListScreenParam();
+  AFPrototypeListMultiScreenParam copyWith() {
+    return AFPrototypeListMultiScreenParam();
   }
 }
 
 /// Data used to render the screen
-class AFMultiScreenStateListScreenData extends AFStoreConnectorData1<AFMultiScreenStateTests> {
-  AFMultiScreenStateListScreenData(AFMultiScreenStateTests tests): 
+class AFPrototypeListMultiScreenData extends AFStoreConnectorData1<AFMultiScreenStateTests> {
+  AFPrototypeListMultiScreenData(AFMultiScreenStateTests tests): 
     super(first: tests);
   
   AFMultiScreenStateTests get tests { return first; }
@@ -34,39 +34,39 @@ class AFMultiScreenStateListScreenData extends AFStoreConnectorData1<AFMultiScre
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFMultiScreenStateListScreen extends AFConnectedScreen<AFAppState, AFMultiScreenStateListScreenData, AFMultiScreenStateListScreenParam>{
+class AFPrototypeListMultiScreen extends AFConnectedScreen<AFAppState, AFPrototypeListMultiScreenData, AFPrototypeListMultiScreenParam>{
 
-  AFMultiScreenStateListScreen(): super(AFUIID.screenMultiScreenTestList);
+  AFPrototypeListMultiScreen(): super(AFUIID.screenPrototypeListMultiScreen);
 
   static AFNavigatePushAction navigateTo() {
-    return AFNavigatePushAction(screen: AFUIID.screenMultiScreenTestList,
-      param: AFMultiScreenStateListScreenParam(filter: ""));
+    return AFNavigatePushAction(screen: AFUIID.screenPrototypeListMultiScreen,
+      param: AFPrototypeListMultiScreenParam(filter: ""));
   }
 
   @override
-  AFMultiScreenStateListScreenData createData(AFAppState state) {
+  AFPrototypeListMultiScreenData createData(AFAppState state) {
     AFMultiScreenStateTests tests = AFibF.multiScreenStateTests;
-    return AFMultiScreenStateListScreenData(tests);
+    return AFPrototypeListMultiScreenData(tests);
   }
 
   @override
-  Widget buildWithContext(AFBuildContext<AFMultiScreenStateListScreenData, AFMultiScreenStateListScreenParam> context) {
+  Widget buildWithContext(AFBuildContext<AFPrototypeListMultiScreenData, AFPrototypeListMultiScreenParam> context) {
     return _buildList(context);
   }
 
-  Widget _buildList(AFBuildContext<AFMultiScreenStateListScreenData, AFMultiScreenStateListScreenParam> context) {
+  Widget _buildList(AFBuildContext<AFPrototypeListMultiScreenData, AFPrototypeListMultiScreenParam> context) {
     final rows = AFUI.column();
 
     AFMultiScreenStateTests tests = context.s.tests;
     for(final test in tests.stateTests) {
       rows.add(_createCard(context, test));
-    };    
+    }
 
     final leading = AFUI.standardBackButton(context.d);
     return AFPrototypeHomeScreen.buildPrototypeScaffold("Multi-Screen Prototypes", rows, leading: leading);
   }
 
-  Widget _createCard(AFBuildContext<AFMultiScreenStateListScreenData, AFMultiScreenStateListScreenParam> context, AFMultiScreenStatePrototypeTest test) {
+  Widget _createCard(AFBuildContext<AFPrototypeListMultiScreenData, AFPrototypeListMultiScreenParam> context, AFMultiScreenStatePrototypeTest test) {
     final subtitleWidget = (test.subtitle == null) ? null : Text(test.subtitle);
     return Card(
       key: Key(test.id.code),
@@ -79,7 +79,7 @@ class AFMultiScreenStateListScreen extends AFConnectedScreen<AFAppState, AFMulti
     );
   }
 
-  void _startStatePrototype(AFBuildContext<AFMultiScreenStateListScreenData, AFMultiScreenStateListScreenParam> context, AFMultiScreenStatePrototypeTest test) {
+  void _startStatePrototype(AFBuildContext<AFPrototypeListMultiScreenData, AFPrototypeListMultiScreenParam> context, AFMultiScreenStatePrototypeTest test) {
     initializeMultiscreenPrototype(context.d, test);
   }
 

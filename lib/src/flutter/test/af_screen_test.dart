@@ -964,8 +964,8 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
     return body.group.testMgr;
   }
 
-  Future<void> run(AFScreenTestContext context, { Function onEnd}) {
-    return body.run(context, null, onEnd: onEnd);
+  Future<void> run(AFScreenTestContext context, { dynamic params, Function onEnd}) {
+    return body.run(context, params, onEnd: onEnd);
   }
 
   void onDrawerReset(AFDispatcher dispatcher) {
@@ -1191,12 +1191,12 @@ class AFMultiScreenTestExecute {
   AFMultiScreenTestExecute(this.screenContext);  
 
   /// Execute the specified screen tests, with query-responses provided by the specified state test.
-  Future<void> runScreenTest(AFTestID screenTestId, AFScreenID terminalScreen, {AFTestID queryResults, bool expectRender = true}) async {
+  Future<void> runScreenTest(AFTestID screenTestId, AFScreenID terminalScreen, {dynamic params, AFTestID queryResults, bool expectRender = true}) async {
     int prevRenderCount = AFibF.testOnlyScreenUpdateCount(terminalScreen);
     _installQueryResults(queryResults);
     final screenTest = AFibF.screenTests.findById(screenTestId);
     final originalScreenID = screenTest.screenId;
-    await screenTest.run(screenContext);  
+    await screenTest.run(screenContext, params: params);  
     if(originalScreenID != terminalScreen) {
       await screenContext.pauseForRender(prevRenderCount, expectRender, screenId: terminalScreen);
     } 

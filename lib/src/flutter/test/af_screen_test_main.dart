@@ -87,31 +87,36 @@ Future<void> _afMultiScreenTestMain(AFCommandOutput output, AFTestStats stats, W
  final multiContexts = List<AFScreenTestContextWidgetTester>();
 
   for(final test in AFibF.multiScreenStateTests.stateTests) {
-        AFibD.logTest?.d("Starting test ${test.id}");
+    if(!test.hasBody) {
+      continue;
+    }
+    if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
+      AFibD.logTest?.d("Starting test ${test.id}");
 
-        final dispatcher = AFStoreDispatcher(AFibF.testOnlyStore);
-        final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test);
-        multiContexts.add(context);
+      final dispatcher = AFStoreDispatcher(AFibF.testOnlyStore);
+      final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test);
+      multiContexts.add(context);
 
-        AFPrototypeListMultiScreen.initializeMultiscreenPrototype(dispatcher, test);
-        
+      AFPrototypeListMultiScreen.initializeMultiscreenPrototype(dispatcher, test);
+      
 
-        // tell the store to go to the correct screen.
-        await tester.pumpAndSettle(Duration(seconds: 1));
-  
-        AFibD.logTest?.d("Finished pumpWidget for ${test.id}");
-        //debugDumpApp();
-        await test.body.run(context, null);
-        AFibD.logTest?.d("Finished ${test.id}");
+      // tell the store to go to the correct screen.
+      await tester.pumpAndSettle(Duration(seconds: 1));
 
-        // pop this test screen off so that we are ready for the next one.
-        AFibF.testOnlyStore.dispatch(AFNavigateExitTestAction());
-        
-        //dispatcher.setContext(context);
-        await tester.pumpAndSettle(Duration(seconds: 1));
+      AFibD.logTest?.d("Finished pumpWidget for ${test.id}");
+      //debugDumpApp();
+      await test.body.run(context, null);
+      AFibD.logTest?.d("Finished ${test.id}");
 
-        /// Clear out our cache of screen info for the next test.
-        AFibF.resetTestScreens();
+      // pop this test screen off so that we are ready for the next one.
+      AFibF.testOnlyStore.dispatch(AFNavigateExitTestAction());
+      
+      //dispatcher.setContext(context);
+      await tester.pumpAndSettle(Duration(seconds: 1));
+
+      /// Clear out our cache of screen info for the next test.
+      AFibF.resetTestScreens();
+    }
   }
 
   final baseMultiContexts = List<AFBaseTestExecute>.of(multiContexts);

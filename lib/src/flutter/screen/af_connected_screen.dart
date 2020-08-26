@@ -412,7 +412,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
     final store = AFibF.testOnlyStore;
     final state = store.state;
     final testState = state.testState;
-    if(testState.activeTest != null) {
+    if(testState.activeTestId != null) {
       return AFTestDrawer();
     }
     return null;

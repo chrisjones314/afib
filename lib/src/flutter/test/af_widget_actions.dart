@@ -113,6 +113,38 @@ class AFFlatButtonAction extends AFApplyTapWidgetAction {
   }
 }
 
+class AFListTileTapAction extends AFApplyTapWidgetAction {
+
+  AFListTileTapAction(): super(ListTile);
+
+  /// [data] is ignored.
+  @override
+  bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
+    final tapOn = elem.widget;
+    if(tapOn is ListTile) {
+      tapOn.onTap();
+      return true;
+    } 
+    return false;
+  }
+}
+
+class AFGestureDetectorTapAction extends AFApplyTapWidgetAction {
+
+  AFGestureDetectorTapAction(): super(GestureDetector);
+
+  /// [data] is ignored.
+  @override
+  bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
+    final tapOn = elem.widget;
+    if(tapOn is GestureDetector) {
+      tapOn.onTap();
+      return true;
+    } 
+    return false;
+  }
+}
+
 class AFIconButtonAction extends AFApplyTapWidgetAction {
 
   AFIconButtonAction(): super(IconButton);

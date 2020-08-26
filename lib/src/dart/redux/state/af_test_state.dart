@@ -57,18 +57,18 @@ class AFSingleScreenTestState {
 
 @immutable
 class AFTestState {
-  final AFScreenPrototypeTest activeTest;
+  final AFTestID activeTestId;
   final Map<AFTestID, AFScreenTestContext> testContexts;
   final Map<AFTestID, AFSingleScreenTestState> testStates;
 
   AFTestState({
-    @required this.activeTest, 
+    @required this.activeTestId, 
     @required this.testContexts, 
     @required this.testStates});
 
   factory AFTestState.initial() {
     return AFTestState(
-      activeTest: null,
+      activeTestId: null,
       testContexts: Map<AFTestID, AFScreenTestContext>(), 
       testStates:Map<AFTestID, AFSingleScreenTestState>()
     );
@@ -83,17 +83,17 @@ class AFTestState {
   }
 
   AFTestState navigateToTest(AFScreenPrototypeTest test) {
-    return copyWith(activeTest: test);
+    return copyWith(activeTestId: test.id);
   }
 
   AFTestState startTest(AFScreenTestContext simulator) {
     final revisedContexts = Map<AFTestID, AFScreenTestContext>.from(testContexts);
-    revisedContexts[simulator.test.id] = simulator;
+    revisedContexts[simulator.testId] = simulator;
     final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
-    revisedStates[simulator.test.id] = AFSingleScreenTestState(pass: 0, errors: List<String>(), data: null);
+    revisedStates[simulator.testId] = AFSingleScreenTestState(pass: 0, errors: List<String>(), data: null);
     
     return copyWith(
-      activeTest: simulator.test,
+      activeTestId: simulator.testId,
       testContexts: revisedContexts,
       testStates: revisedStates
     );
@@ -132,12 +132,12 @@ class AFTestState {
   }
 
   AFTestState copyWith({
-    AFScreenPrototypeTest activeTest,
+    AFTestID activeTestId,
     Map<AFTestID, AFScreenTestContext> testContexts,
      Map<AFTestID, AFSingleScreenTestState> testStates
   }) {
     return AFTestState(
-      activeTest: activeTest ?? this.activeTest,
+      activeTestId: activeTestId ?? this.activeTestId,
       testContexts: testContexts ?? this.testContexts,
       testStates: testStates ?? this.testStates
     );

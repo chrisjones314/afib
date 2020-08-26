@@ -8,6 +8,7 @@ import 'package:afib/src/flutter/core/afui.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/utils/af_theme.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -33,8 +34,8 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
   @override
   AFTestDrawerData createDataAF(AFState state) {
     final testState = state.testState;
-    final test = testState.activeTest;
-    return AFTestDrawerData(testState.findContext(test.id), testState.findState(test.id), testState.activeTest);
+    final test = AFibF.findScreenTestById(testState.activeTestId);
+    return AFTestDrawerData(testState.findContext(test.id), testState.findState(test.id), test);
   }
 
   @override

@@ -118,6 +118,20 @@ class AFibF {
     return info;
   }
 
+  static AFScreenPrototypeTest findScreenTestById(AFTestID testId) {
+    final single = screenTests.findById(testId);
+    if(single != null) {
+      return single;
+    }
+
+    final multi = multiScreenStateTests.findById(testId);
+    if(multi != null) {
+      return multi;
+    }
+
+    throw AFException("Unknown test id #{testId}");
+  }
+
   /// Used internally to reset widget tracking between tests.
   static void resetTestScreens() {
     testOnlyScreens.clear();

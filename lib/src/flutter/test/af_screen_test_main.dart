@@ -54,7 +54,7 @@ Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, 
 
         final screenId = test.screenId;
         final dispatcher = AFSingleScreenTestDispatcher(screenId, AFStoreDispatcher(AFibF.testOnlyStore), null);
-        final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test);
+        final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id);
         dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context));
         dispatcher.setContext(context);
         simpleContexts.add(context);
@@ -94,12 +94,11 @@ Future<void> _afMultiScreenTestMain(AFCommandOutput output, AFTestStats stats, W
       AFibD.logTest?.d("Starting test ${test.id}");
 
       final dispatcher = AFStoreDispatcher(AFibF.testOnlyStore);
-      final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test);
+      final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id);
       multiContexts.add(context);
 
       AFPrototypeListMultiScreen.initializeMultiscreenPrototype(dispatcher, test);
       
-
       // tell the store to go to the correct screen.
       await tester.pumpAndSettle(Duration(seconds: 1));
 

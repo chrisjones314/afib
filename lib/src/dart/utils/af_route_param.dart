@@ -18,6 +18,15 @@ class AFRouteParam {
   AFRouteParam paramFor(AFScreenID screen) {
     return this;
   }
+
+  /// Called when the param is permenantly destroyed.
+  /// 
+  /// This is used to that you can put things with persistent state,
+  /// like TapGestureRecognizer, in your route parameter, and then clean
+  /// it up when the screen goes away.
+  void dispose() {
+
+  }
 }
 
 /// Can be used in cases where no route param is necessary

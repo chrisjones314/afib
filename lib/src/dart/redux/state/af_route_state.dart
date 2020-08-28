@@ -47,6 +47,11 @@ class AFRouteSegment {
     return screen.code.startsWith(AFUIID.afibScreenPrefix);
   }
 
+  /// called when the segment goes fully out of scope.
+  void dispose() {
+    param?.dispose();
+  }
+
   factory AFRouteSegment.withScreen(AFScreenID screen) {
     return AFRouteSegment(screen: screen);
   }
@@ -239,6 +244,12 @@ class AFRouteState {
     List<AFRouteSegment> route,
     AFRouteSegment priorLastSegment
   }) {
+    // if there is a prior last segment, and it is going out of scope, then
+    // call dispose on it to allow it to clean up any state in the route parameter.
+    if(this.priorLastSegment != null && this.priorLastSegment != priorLastSegment) {
+      this.priorLastSegment.dispose();
+    }
+
     final revised = new AFRouteState(
       route: route ?? this.route,
       priorLastSegment: priorLastSegment

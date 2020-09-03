@@ -275,6 +275,7 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
 
 typedef AFUpdateParamFunc<TRouteParam>(AFDispatcher dispatcher, TRouteParam param, { AFID id });
 typedef AFRouteParam AFFindParamFunc(AFState state);
+typedef TData AFCreateDataFunc<TData, TState>(TState state);
 
 /// Just like an [AFConnectedScreen], except it is typically displayed as 
 /// a modal overlay on top of an existing screen, and launched using a custom 
@@ -282,23 +283,23 @@ typedef AFRouteParam AFFindParamFunc(AFState state);
 abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreen<TState, TData, TRouteParam> {
   final Animation<double> animation;
   final AFBottomPopupTheme theme;
-  //final TRouteParam parentParam;
-  //final AFDispatcher parentDispatcher;
-  //final TData parentData;
-  final  AFUpdateParamFunc<TRouteParam> updateParamDelegate;
-  final  AFFindParamFunc findParamDelegate;
+  final AFUpdateParamFunc<TRouteParam> updateParamDelegate;
+  final AFFindParamFunc findParamDelegate;
+  final AFCreateDataFunc createDataDelegate;
+  final AFDispatcher dispatcher;
 
-  final AFBuildContext<TData, TRouteParam> parentContext;
+  //final AFBuildContext<TData, TRouteParam> parentContext;
 
   AFPopupScreen({
     @required AFScreenID screen, 
     //@required this.parentDispatcher,
     //@required this.parentData,
-    @required this.parentContext,
     @required this.animation, 
     @required this.theme,
+    @required this.dispatcher,
     @required this.updateParamDelegate,
     @required this.findParamDelegate,
+    @required this.createDataDelegate
   }): super(screen);
 
 
@@ -318,7 +319,7 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
 
   @override
   TData createData(TState state) {
-    return parentContext.s;
+    return this.createDataDelegate(state);
   }
 
 
@@ -342,7 +343,7 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
       child: AnimatedBuilder(
         animation: animation,
         builder: (BuildContext ctx, Widget child) {
-          final local = AFBuildContext<TData, TRouteParam>(ctx, parentContext.d, context.s, context.p);
+          final local = AFBuildContext<TData, TRouteParam>(ctx, dispatcher, context.s, context.p);
           final double bottomPadding = MediaQuery.of(local.c).padding.bottom;
           return ClipRect(
             child: CustomSingleChildLayout(

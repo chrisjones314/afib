@@ -890,7 +890,7 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
   void addError(String desc, int depth) {
     String err = AFBaseTestExecute.composeError(desc, depth);
     dispatcher.dispatch(AFPrototypeScreenTestAddError(this.testId, err));
-    AFibD.log.e(err);
+    AFibD.log?.e(err);
   }
 
   bool addPassIf(bool test) {

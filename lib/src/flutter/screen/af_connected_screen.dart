@@ -159,6 +159,10 @@ class AFStoreConnectorData5<TV1, TV2, TV3, TV4, TV5> extends AFStoreConnectorDat
 
 }
 
+class AFStoreConnectorData6<TV1, TV2, TV3, TV4, TV5, TV6> extends AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, TV6, AFUnused, AFUnused> {
+  AFStoreConnectorData6({TV1 first, TV2 second, TV3 third, TV4 fourth, TV5 fifth, TV6 sixth}): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth, sixth: sixth);
+}
+
 /// This common superclass makes it possible to treat all afib Widgets/screens
 /// similarly for testing and prototyping purposes.
 abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends StatelessWidget {
@@ -269,28 +273,34 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
   }
 }
 
+typedef AFUpdateParamFunc<TRouteParam>(AFDispatcher dispatcher, TRouteParam param, { AFID id });
+typedef AFRouteParam AFFindParamFunc(AFState state);
+
 /// Just like an [AFConnectedScreen], except it is typically displayed as 
 /// a modal overlay on top of an existing screen, and launched using a custom 
 /// AFPopupRoute
-abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TParentScreen extends AFConnectedScreen> extends AFConnectedScreen<TState, TData, TRouteParam> {
+abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreen<TState, TData, TRouteParam> {
   final Animation<double> animation;
   final AFBottomPopupTheme theme;
   //final TRouteParam parentParam;
-  final TParentScreen parentScreen;
   //final AFDispatcher parentDispatcher;
   //final TData parentData;
+  final  AFUpdateParamFunc<TRouteParam> updateParamDelegate;
+  final  AFFindParamFunc findParamDelegate;
 
   final AFBuildContext<TData, TRouteParam> parentContext;
 
   AFPopupScreen({
     @required AFScreenID screen, 
-    @required this.parentScreen, 
     //@required this.parentDispatcher,
     //@required this.parentData,
     @required this.parentContext,
     @required this.animation, 
     @required this.theme,
+    @required this.updateParamDelegate,
+    @required this.findParamDelegate,
   }): super(screen);
+
 
   static void openPopup({
     @required BuildContext context, 
@@ -314,12 +324,12 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
 
   /// Updates the parameter for the parent screen, rather than updating a parameter for our screen (which has no route entry).
   void updateParam(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
-    parentScreen.updateParam(dispatcher, revised, id: id);
+    updateParamDelegate(dispatcher, revised, id: id);
   }
 
   /// Finds the parameter for the parent screen, since a popup screen had not route entry.
   TRouteParam findParam(AFState state) {
-    return parentScreen.findParam(state);
+    return findParamDelegate(state);
   }
 
   @override

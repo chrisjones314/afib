@@ -75,6 +75,11 @@ class AFConfig {
     return val ?? entry.defaultValue;
   }
 
+  /// True if we are inside a running test.
+  bool get isTestContext {
+    return requiresTestData;
+  }
+
   /// Returns true if our current mode requires prototype data.
   bool get requiresPrototypeData {
     return AFConfigEntries.environment.requiresPrototypeData(this);

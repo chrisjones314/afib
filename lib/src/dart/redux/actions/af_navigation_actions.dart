@@ -6,7 +6,7 @@ import 'package:afib/src/flutter/utils/af_custom_popup_route.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
-typedef void AFReturnFunc<T>(T returnData);
+typedef void AFReturnFunc(dynamic returnData);
 
 /// Base class for action that manipulates the route (pushing, popping, replacing)
 /// and determines which screen is showing, and what data is visible.
@@ -20,6 +20,12 @@ class AFNavigateAction extends AFActionWithKey {
     @required this.screen,
     this.param
   }): super(id: id);
+}
+
+class AFNavigateActionWithReturn extends AFNavigateAction {
+  final AFReturnFunc onReturn;
+  AFNavigateActionWithReturn({AFID id, AFScreenID screen, AFRouteParam param, this.onReturn}): super(id: id, screen: screen, param: param);
+
 }
 
 /// Action that replaces the current leaf screen with a new screen.
@@ -47,18 +53,14 @@ class AFNavigateSetParamAction extends AFNavigateAction {
 /// Action that adds a new screen after the current screen in the route.
 /// 
 /// Subsequently, [AFNavigatePopAction] will return you to the parent screen.
-class AFNavigatePushAction extends AFNavigateAction {
-  final AFReturnFunc<dynamic> onReturn;
-
-  AFNavigatePushAction({AFID id, AFScreenID screen, AFRouteParam param, this.onReturn}): super(id: id, screen: screen, param: param);
+class AFNavigatePushAction extends AFNavigateActionWithReturn {
+  AFNavigatePushAction({AFID id, AFScreenID screen, AFRouteParam param, AFReturnFunc onReturn}): super(id: id, screen: screen, param: param, onReturn: onReturn);
 }
 
 /// Pushes a popup with a custom route.
-class AFNavigatePushPopupAction extends AFNavigateAction {
-  
+class AFNavigatePushPopupAction extends AFNavigateActionWithReturn {
   final BuildContext context;
   final AFBottomPopupTheme theme;
-  final AFReturnFunc<dynamic> onReturn;
   final AFRouteWidgetBuilder popupBuilder;
   
   AFNavigatePushPopupAction({
@@ -66,9 +68,9 @@ class AFNavigatePushPopupAction extends AFNavigateAction {
     @required this.context,
     @required AFScreenID screen, 
     @required AFRouteParam param,
+    AFReturnFunc onReturn,
     @required this.theme,
-    @required this.popupBuilder,
-    this.onReturn}): super(id: id, screen: screen, param: param);
+    @required this.popupBuilder}): super(id: id, screen: screen, param: param, onReturn: onReturn);
 }
 
 

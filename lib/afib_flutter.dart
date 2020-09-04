@@ -27,3 +27,4 @@ export "src/flutter/test/af_widget_actions.dart";
 export "src/flutter/utils/af_bottom_popup_theme.dart";
 export "src/flutter/utils/af_bottom_popup_layout.dart";
 export "src/flutter/utils/af_custom_popup_route.dart";
+export "src/flutter/utils/af_builder.dart";

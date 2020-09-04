@@ -11,11 +11,15 @@ import 'package:afib/src/flutter/test/af_state_test.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 
 
+typedef void AFOnResponseDelegate<TResponse>(TResponse response);
+
 /// Superclass for a kind of action that queries some data asynchronously, then knows
 /// how to process the result.
 abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActionWithKey {
+  final List<dynamic> successActions;
+  final AFOnResponseDelegate<TResponse> onSuccessDelegate;
 
-  AFAsyncQueryCustomError({AFID id}): super(id: id);
+  AFAsyncQueryCustomError({AFID id, this.onSuccessDelegate, this.successActions}): super(id: id);
 
   /// Called internally when redux middleware begins processing a query.
   void startAsyncAF(AFDispatcher dispatcher, AFStore store) {
@@ -35,6 +39,14 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
   void finishAsyncWithResponseAF(AFDispatcher dispatcher, TState state, TResponse response) {
     finishAsyncWithResponse(dispatcher, state, response);
     AFibF.handleFinishWithResponse(this, dispatcher, state);
+    if(onSuccessDelegate != null) {
+      onSuccessDelegate(response);
+    }
+    if(successActions != null) {
+      for(final act in successActions) {
+        dispatcher.dispatch(act);
+      }
+    }
   }
 
   void finishAsyncWithErrorAF(AFDispatcher dispatcher, TState state, TError error) {
@@ -73,7 +85,8 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
 /// A default version of [AFAsyncQueryCustomError] with the standard [AFQueryError] type, which is sufficient
 /// in most cases.
 abstract class AFAsyncQuery<TState, TResponse> extends AFAsyncQueryCustomError<TState, TResponse, AFQueryError> {
-  AFAsyncQuery({AFID id}): super(id: id);
+  AFAsyncQuery({AFID id, List<dynamic> successActions, AFOnResponseDelegate<TResponse> onSuccessDelegate}): 
+    super(id: id, successActions: successActions, onSuccessDelegate: onSuccessDelegate);
 }
 
 
@@ -84,7 +97,7 @@ abstract class AFAsyncQuery<TState, TResponse> extends AFAsyncQueryCustomError<T
 /// [AFShutdownQueryListeners] action to call the shutdown method on some or all outstanding
 /// listeners.  
 abstract class AFAsyncQueryListenerCustomError<TState, TResponse, TError> extends AFAsyncQueryCustomError<TState, TResponse, TError> {
-  AFAsyncQueryListenerCustomError({AFID id}): super(id: id);
+  AFAsyncQueryListenerCustomError({AFID id, List<dynamic> successActions, AFOnResponseDelegate<TResponse> onSuccessDelegate}): super(id: id, successActions: successActions, onSuccessDelegate: onSuccessDelegate);
 
   void afShutdown() {
     AFibD.logQuery?.d("Shutting down listener query $this");
@@ -96,5 +109,5 @@ abstract class AFAsyncQueryListenerCustomError<TState, TResponse, TError> extend
 
 /// A version of [AFAsyncQueryListenerCustomError] which users [AFQueryError] for errors.
 abstract class AFAsyncQueryListener<TState, TResponse> extends AFAsyncQueryListenerCustomError<TState, TResponse, AFQueryError> {
-    AFAsyncQueryListener({AFID id}): super(id: id);
+    AFAsyncQueryListener({AFID id, List<dynamic> successActions, AFOnResponseDelegate<TResponse> onSuccessDelegate}): super(id: id, successActions: successActions, onSuccessDelegate: onSuccessDelegate);
 }

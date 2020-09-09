@@ -187,16 +187,17 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
   Widget build(BuildContext context) {
     return StoreConnector<AFState, AFBuildContext>(
         converter: (store) {
-          final context = createContext(null, AFStoreDispatcher(store), createDataAF(store.state), findParam(store.state));
+          final context = _createNonBuildContext(store);
           return context;
         },
         distinct: true,
         onInit: (store) {
-          final data = createDataAF(store.state);
-          onInit(data);
+          final context = _createNonBuildContext(store);
+          onInit(context);
         },
         onDispose: (store) {
-          onDispose(store.state.app);
+          final context = _createNonBuildContext(store);
+          onDispose(context);
         },
         builder: (buildContext, dataContext) {
           if(dataContext == null) {
@@ -218,6 +219,13 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
     );
   }
 
+  AFBuildContext<TData, TRouteParam> _createNonBuildContext(AFStore store) {
+    final data = createDataAF(store.state);
+    final param = findParam(store.state);
+    final context = createContext(null, AFStoreDispatcher(store), data, param);
+    return context;
+  }
+
   /// Find the route param for this screen. 
   AFRouteParam findParam(AFState state) { return null; }
 
@@ -232,10 +240,10 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
   Widget buildWithContext(AFBuildContext<TData, TRouteParam> context);
 
   /// Override this to perform screen specific initialization.
-  void onInit(TData data) {}
+  void onInit(AFBuildContext<TData, TRouteParam> context) {}
 
   /// Override this to perform screen specific cleanup.
-  void onDispose(TState state) {} 
+  void onDispose(AFBuildContext<TData, TRouteParam> context) {} 
 
 }
 
@@ -274,7 +282,7 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
 }
 
 typedef AFUpdateParamFunc<TRouteParam>(AFDispatcher dispatcher, TRouteParam param, { AFID id });
-typedef AFRouteParam AFFindParamFunc(AFState state);
+typedef AFRouteParam AFExtractParamFunc(AFRouteParam original);
 typedef TData AFCreateDataFunc<TData, TState>(TState state);
 
 /// Just like an [AFConnectedScreen], except it is typically displayed as 
@@ -284,21 +292,21 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
   final Animation<double> animation;
   final AFBottomPopupTheme theme;
   final AFUpdateParamFunc<TRouteParam> updateParamDelegate;
-  final AFFindParamFunc findParamDelegate;
+  final AFExtractParamFunc extractParamDelegate;
   final AFCreateDataFunc createDataDelegate;
   final AFDispatcher dispatcher;
+  final AFScreenID paramScreenId;
 
   //final AFBuildContext<TData, TRouteParam> parentContext;
 
   AFPopupScreen({
     @required AFScreenID screen, 
-    //@required this.parentDispatcher,
-    //@required this.parentData,
+    @required this.paramScreenId,
     @required this.animation, 
     @required this.theme,
     @required this.dispatcher,
     @required this.updateParamDelegate,
-    @required this.findParamDelegate,
+    @required this.extractParamDelegate,
     @required this.createDataDelegate
   }): super(screen);
 
@@ -330,7 +338,11 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
 
   /// Finds the parameter for the parent screen, since a popup screen had not route entry.
   TRouteParam findParam(AFState state) {
-    return findParamDelegate(state);
+    AFRouteParam orig = state.route?.findParamFor(this.paramScreenId, true);
+    if(this.extractParamDelegate != null) {
+      orig = this.extractParamDelegate(orig);
+    }
+    return orig;
   }
 
   @override

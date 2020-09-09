@@ -13,9 +13,6 @@ class AFibD<AppState> {
     static Logger logConfig;
     static Logger logTest;
 
-    /// should be used for application-level logging that is not internal to AFib.
-    static Logger log;
-
     /// Logger which is non-null if we should log changes to routing.
     static Logger logRoute;
 
@@ -61,6 +58,11 @@ class AFibD<AppState> {
         AFibD.logConfig?.i("Environment: " + AFibD.config.environment);
       }
 
+  }
+
+  /// should be used for application-level logging that is not internal to AFib.
+  static Logger get log {
+    return _afLogger;
   }
 
   /// Do not call this method, see AFApp.initialize instead.

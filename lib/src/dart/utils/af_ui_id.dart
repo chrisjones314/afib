@@ -9,6 +9,7 @@ class AFUIID {
   static const screenPrototypeSingleScreen = AFScreenID("${afibScreenPrefix}prototype_single_screen");
   static const screenPrototypeMultiScreen = AFScreenID("${afibScreenPrefix}prototype_multi_screen");
   static const screenPrototypeHome = AFScreenID("${afibScreenPrefix}prototype_home");
+  static const screenPrototypeWidget = AFScreenID("${afibScreenPrefix}prototype_widget");
   static const buttonBack = AFWidgetID("${afibScreenPrefix}button_back");  
 }
 

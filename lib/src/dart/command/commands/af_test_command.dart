@@ -28,10 +28,10 @@ class AFTestCommand extends AFCommand {
       return;
     }
 
+    ctx.afibConfig.setValue(AFConfigEntries.enabledTestList, ctx.a.listFrom());
+
     // write out the local configuration file.
-    final config = AFConfig();
-    config.setValue(AFConfigEntries.enabledTestList, ctx.a.listFrom());
-    final generator = AFTestConfigFileGenerator(config);
+    final generator = AFConfigFileGenerator();
     
     final files = ctx.files;
     if(!generator.validateBefore(ctx, files)) {

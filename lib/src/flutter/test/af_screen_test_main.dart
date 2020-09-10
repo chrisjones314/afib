@@ -8,7 +8,6 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
-import 'package:afib/src/flutter/test/af_prototype_list_multi_screen.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/test/af_prototype_single_screen_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -43,39 +42,37 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
 Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
   final simpleContexts = List<AFScreenTestContextWidgetTester>();
 
-  for(var group in AFibF.screenTests.groups) {
-    for(var test in group.simpleTests) {
-      if(!test.hasBody) {
-        continue;
-      }
-      if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
-        AFibF.testOnlyStore.dispatch(AFPrototypeSingleScreenScreen.navigatePush(test));
-        AFibD.logTest?.d("Starting ${test.id}");
+  for(var test in AFibF.screenTests.all) {
+    if(!test.hasBody) {
+      continue;
+    }
+    if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
+      AFibF.testOnlyStore.dispatch(AFPrototypeSingleScreenScreen.navigatePush(test));
+      AFibD.logTest?.d("Starting ${test.id}");
 
-        final screenId = test.screenId;
-        final dispatcher = AFSingleScreenTestDispatcher(screenId, AFStoreDispatcher(AFibF.testOnlyStore), null);
-        final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id);
-        dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context));
-        dispatcher.setContext(context);
-        simpleContexts.add(context);
+      final screenId = test.screenId;
+      final dispatcher = AFSingleScreenTestDispatcher(screenId, AFStoreDispatcher(AFibF.testOnlyStore), null);
+      final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id);
+      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context));
+      dispatcher.setContext(context);
+      simpleContexts.add(context);
 
-        // tell the store to go to the correct screen.
-        await tester.pumpAndSettle(Duration(seconds: 1));
-  
-        AFibD.logTest?.d("Finished pumpWidget for ${test.id}");
-        //debugDumpApp();
-        await test.body.run(context, null);
-        AFibD.logTest?.d("Finished ${test.id}");
+      // tell the store to go to the correct screen.
+      await tester.pumpAndSettle(Duration(seconds: 1));
 
-        // pop this test screen off so that we are ready for the next one.
-        AFibF.testOnlyStore.dispatch(AFNavigatePopAction());
-        
-        dispatcher.setContext(context);
-        await tester.pumpAndSettle(Duration(seconds: 1));
+      AFibD.logTest?.d("Finished pumpWidget for ${test.id}");
+      //debugDumpApp();
+      await test.body.run(context, null);
+      AFibD.logTest?.d("Finished ${test.id}");
 
-        /// Clear out our cache of screen info for the next test.
-        AFibF.resetTestScreens();
-      }
+      // pop this test screen off so that we are ready for the next one.
+      AFibF.testOnlyStore.dispatch(AFNavigatePopAction());
+      
+      dispatcher.setContext(context);
+      await tester.pumpAndSettle(Duration(seconds: 1));
+
+      /// Clear out our cache of screen info for the next test.
+      AFibF.resetTestScreens();
     }
   }
 
@@ -97,7 +94,7 @@ Future<void> _afMultiScreenTestMain(AFCommandOutput output, AFTestStats stats, W
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id);
       multiContexts.add(context);
 
-      AFPrototypeListMultiScreen.initializeMultiscreenPrototype(dispatcher, test);
+      AFMultiScreenStatePrototypeTest.initializeMultiscreenPrototype(dispatcher, test);
       
       // tell the store to go to the correct screen.
       await tester.pumpAndSettle(Duration(seconds: 1));

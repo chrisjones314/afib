@@ -50,11 +50,11 @@ class AFPrototypeSingleScreenRouteParam extends AFRouteParam {
 }
 
 /// Data used to render the screen
-class AFPrototypeSingleScreenData extends AFStoreConnectorData2<AFScreenTests, AFTestState> {
-  AFPrototypeSingleScreenData(AFScreenTests tests, AFTestState testState): 
+class AFPrototypeSingleScreenData extends AFStoreConnectorData2<AFSingleScreenTests, AFTestState> {
+  AFPrototypeSingleScreenData(AFSingleScreenTests tests, AFTestState testState): 
     super(first: tests, second: testState);
   
-  AFScreenTests get tests { return first; }
+  AFSingleScreenTests get tests { return first; }
   AFTestState get testState { return second; }
 }
 
@@ -74,7 +74,7 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppState, AFProt
 
   @override
   AFPrototypeSingleScreenData createDataAF(AFState state) {
-    AFScreenTests tests = AFibF.screenTests;
+    AFSingleScreenTests tests = AFibF.screenTests;
     return AFPrototypeSingleScreenData(tests, state.testState);
   }
 
@@ -94,7 +94,7 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppState, AFProt
 
 
   Widget _buildScreen(AFBuildContext<AFPrototypeSingleScreenData, AFPrototypeSingleScreenRouteParam> context) {
-    AFScreenTests tests = context.s.tests;
+    AFSingleScreenTests tests = context.s.tests;
     AFSingleScreenPrototypeTest test = tests.findById(context.p.id);
     AFRouteParam paramChild = context.p.param ?? test.data.param;
     final testContext = context.s.testState.findContext(test.id);

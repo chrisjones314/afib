@@ -3,18 +3,26 @@
 class AFTestDataRegistry {
   final testData = Map<dynamic, dynamic>();
 
-  void registerData(dynamic id, dynamic data) {
+  void register(dynamic id, dynamic data) {
     testData[id] = data;
   }
 
-  dynamic findData(dynamic id) {
+  dynamic find(dynamic id) {
     return testData[id];
+  }
+
+  dynamic operator[](dynamic id) {
+    return testData[id];
+  }
+
+  void operator[]=(dynamic id, dynamic data) {
+    testData[id] = data;
   }
 
   List<TData> testDataList<TData>(List<dynamic> ids) {
     final list = List<TData>();
     for(final id in ids) {
-      TData data = findData(id);
+      TData data = find(id);
       list.add(data);
     }
     return list;

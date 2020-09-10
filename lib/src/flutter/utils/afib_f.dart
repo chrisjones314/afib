@@ -49,7 +49,8 @@ class AFibF {
   static AFAsyncQueries _afAsyncQueries = AFAsyncQueries();
   static CreateStartupQueryAction _afCreateStartupQueryAction;
   static final AFTestDataRegistry _afTestData = AFTestDataRegistry();
-  static final AFScreenTests _afScreenTests = AFScreenTests();
+  static final AFSingleScreenTests _afScreenTests = AFSingleScreenTests();
+  static final AFWidgetTests _afWidgetTests = AFWidgetTests();
   static final AFMultiScreenStateTests _afMultiScreenStateTests = AFMultiScreenStateTests();
   static final AFStateTests _afStateTests = AFStateTests();
   static final AFUnitTests _afUnitTests = AFUnitTests();
@@ -93,6 +94,7 @@ class AFibF {
       p.initTestData(testData);
       p.initUnitTests(AFibF.unitTests, testData);
       p.initStateTests(AFibF.stateTests, testData);
+      p.initWidgetTests(AFibF.widgetTests, testData);
       p.initScreenTests(AFibF.screenTests, testData);
       p.initMultiScreenStateTests(AFibF.multiScreenStateTests, testData);
     }
@@ -127,6 +129,11 @@ class AFibF {
     final multi = multiScreenStateTests.findById(testId);
     if(multi != null) {
       return multi;
+    }
+
+    final widget = widgetTests.findById(testId);
+    if(widget != null) {
+      return widget;
     }
 
     throw AFException("Unknown test id #{testId}");
@@ -234,8 +241,30 @@ class AFibF {
 
   /// Retrieves screen/data pairings used for prototyping and for screen-specific
   /// testing.
-  static AFScreenTests get screenTests {
+  static AFSingleScreenTests get screenTests {
     return _afScreenTests;
+  }
+
+  static List<AFScreenPrototypeTest> findTestsForAreas(List<String> areas) {
+    final result = List<AFScreenPrototypeTest>();
+    _addTestsForAreas(screenTests.all, areas, result);
+    _addTestsForAreas(multiScreenStateTests.all, areas, result);
+    return result;
+  }
+
+  static void _addTestsForAreas(List<AFScreenPrototypeTest> tests, List<String> areas, List<AFScreenPrototypeTest> results) {
+    for(final test in tests) {
+      for(final area in areas) {
+        if(test.id.code == area || test.id.hasTag(area)) {
+          results.add(test);
+        }
+      }
+    } 
+  }
+
+  /// Retrieves widget/data pairings for connected and unconnected widget tests.
+  static AFWidgetTests get widgetTests {
+    return _afWidgetTests;
   }
 
   /// Retrieves tests which pair an initial state, and then multiple screen/state tests

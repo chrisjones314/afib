@@ -9,7 +9,8 @@ typedef dynamic CreateStartupQueryAction();
 typedef AFApp CreateAFApp();
 typedef void InitTestData(AFTestDataRegistry registry);
 typedef void InitUnitTests(AFUnitTests tests, AFTestDataRegistry testData);
-typedef void InitScreenTests(AFScreenTests tests, AFTestDataRegistry testData);
+typedef void InitScreenTests(AFSingleScreenTests tests, AFTestDataRegistry testData);
+typedef void InitWidgetTests(AFWidgetTests tests, AFTestDataRegistry testData);
 typedef void InitStateTests(AFStateTests tests, AFTestDataRegistry testData);
 typedef void InitMultiScreenStateTests(AFMultiScreenStateTests tests, AFTestDataRegistry testData);
 

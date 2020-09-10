@@ -115,7 +115,7 @@ class AFStateTest<TState extends AFAppState> {
   /// 
   void specifySecondaryResponseWithId(AFAsyncQueryCustomError query, dynamic idData) {
     registerResult(query, (AFStateTestContext context, AFAsyncQueryCustomError query) {
-      final data = AFibF.testData.findData(idData);
+      final data = AFibF.testData.find(idData);
       query.testFinishAsyncWithResponse(context, data);
     });
   }

@@ -14,15 +14,28 @@ class AFID {
 }
 
 class AFIDWithTags extends AFID {
+  final dynamic group;
   final List<String> tags;
 
-  const AFIDWithTags(String code, this.tags): super(code);
+  const AFIDWithTags(String code, this.tags, this.group): super(code);
 
   String get tagsText {
     if(tags == null) {
       return "";
     }
     return tags.join(", ");
+  }
+
+  String get effectiveGroup {
+    if(group != null) {
+      return group.toString();
+    }
+
+    if(tags != null && tags.isNotEmpty) {
+      return tags.first;
+    }
+
+    return null;
   }
 
   bool hasTag(String tag) {
@@ -43,7 +56,7 @@ class AFWidgetID extends AFID {
 }
 
 class AFTestID extends AFIDWithTags {
-  const AFTestID(String code, {List<String> tags}) : super(code, tags);
+  const AFTestID(String code, {String group, List<String> tags}) : super(code, tags, group);
 }
 
 class AFTestDataID extends AFID {

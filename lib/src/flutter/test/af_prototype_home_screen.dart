@@ -4,8 +4,7 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
-import 'package:afib/src/flutter/test/af_prototype_list_multi_screen.dart';
-import 'package:afib/src/flutter/test/af_prototype_list_single_screen.dart';
+import 'package:afib/src/flutter/test/af_prototype_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
@@ -25,11 +24,11 @@ class AFPrototypeHomeScreenParam extends AFRouteParam {
 }
 
 /// Data used to render the screen
-class APrototypeHomeScreenData extends AFStoreConnectorData1<AFScreenTests> {
-  APrototypeHomeScreenData(AFScreenTests tests): 
+class APrototypeHomeScreenData extends AFStoreConnectorData1<AFSingleScreenTests> {
+  APrototypeHomeScreenData(AFSingleScreenTests tests): 
     super(first: tests);
   
-  AFScreenTests get tests { return first; }
+  AFSingleScreenTests get tests { return first; }
 }
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
@@ -40,7 +39,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppState, APrototypeHome
 
   @override
   APrototypeHomeScreenData createData(AFAppState state) {
-    AFScreenTests tests = AFibF.screenTests;
+    AFSingleScreenTests tests = AFibF.screenTests;
     return APrototypeHomeScreenData(tests);
   }
 
@@ -52,8 +51,15 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppState, APrototypeHome
   /// 
   Widget _buildHome(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context) {
     final rows = AFUI.column();
+    
+    rows.add(_createKindRow("Widget Prototypes", () {
+      List<AFScreenPrototypeTest> tests = AFibF.widgetTests.all;
+      context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
+    }));
+    
     rows.add(_createKindRow("Single Screen Prototypes", () {
-      context.dispatch(AFPrototypeListSingleScreen.navigateTo());
+      List<AFScreenPrototypeTest> tests = AFibF.screenTests.all;
+      context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
     }));
     
     rows.add(_createKindRow("Wireframe Prototypes", () {
@@ -61,11 +67,28 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppState, APrototypeHome
     }));
 
     rows.add(_createKindRow("Multi-Screen Prototypes", () {
-      context.dispatch(AFPrototypeListMultiScreen.navigateTo());
-      
+      List<AFScreenPrototypeTest> tests = AFibF.multiScreenStateTests.all;
+      context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
     }));
 
+    _buildFilteredSection(context, rows);
+
+
     return buildPrototypeScaffold('AFib Prototype mode', rows);
+  }
+
+
+  void _buildFilteredSection(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context, List<Widget> rows) {
+    List<String> areas = AFibD.config.stringListFor(AFConfigEntries.enabledTestList);
+    List<AFScreenPrototypeTest> tests = AFibF.findTestsForAreas(areas);
+    if(tests == null || tests.isEmpty) {
+      return;
+    }
+    rows.add(AFPrototypeTestScreen.createSectionHeader("Filtered Tests"));
+
+    for(final test in tests) {
+      rows.add(AFPrototypeTestScreen.createTestCard(context.d, test));
+    }
   }
 
   static Widget buildPrototypeScaffold(String title, List<Widget> rows, { Widget leading }) {

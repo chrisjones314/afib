@@ -46,6 +46,7 @@ class AFNewProjectCommand extends AFCommand {
     ctx.afibConfig.setValue(AFConfigEntries.projectName, projectName);
     ctx.afibConfig.setValue(AFConfigEntries.environment, AFConfigEntryEnvironment.debug);
     ctx.afibConfig.setValue(AFConfigEntries.internalLogging, AFConfigEntryBool.falseValue);
+    ctx.afibConfig.setValue(AFConfigEntries.enabledTestList, []);
 
     // There is no point in trying to expose this generator for manipulation, because the 
     // 'new' command occurs in the afib command, which cannot be extended/customized. 

@@ -384,7 +384,9 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
 abstract class AFConnectedWidget<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithoutRoute<TState, TData, TRouteParam> {
   final TRouteParam parentParam;
 
-AFConnectedWidget(this.parentParam): super(null);
+  AFConnectedWidget(this.parentParam): super(null);
+
+  AFRouteParam findParam(AFState state) { return parentParam; }
 }
 
 /// Use this to connect a drawer to the store.

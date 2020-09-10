@@ -4,6 +4,7 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_object_with_key.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/test/af_prototype_single_screen_screen.dart';
+import 'package:afib/src/flutter/test/af_prototype_widget_screen.dart';
 
 abstract class AFTestDispatcher extends AFDispatcher {
   final AFDispatcher main;
@@ -34,13 +35,9 @@ class AFStateScreenTestDispatcher extends AFTestDispatcher {
 
 }
 
-class AFSingleScreenTestDispatcher extends AFTestDispatcher {
-  final AFID screenId;
+abstract class AFScreenTestDispatcher extends AFTestDispatcher {
   AFScreenTestContext testContext;
-  
-  AFSingleScreenTestDispatcher(
-    this.screenId, 
-    AFDispatcher main, this.testContext): super(main);
+  AFScreenTestDispatcher(AFDispatcher main, this.testContext): super(main);
 
   void setContext(AFScreenTestContext context) {
     testContext = context;
@@ -54,11 +51,8 @@ class AFSingleScreenTestDispatcher extends AFTestDispatcher {
     if(isTestAct) {
       main.dispatch(action);
     } else if(action is AFNavigateSetParamAction) {
+      processSetParam(action);
       // change this into a set param action for the prototype.
-      main.dispatch(
-        AFNavigateSetParamAction(screen: AFUIID.screenPrototypeSingleScreen,
-          param: AFPrototypeSingleScreenRouteParam(id: screenId, param: action.param)
-      ));      
     } else {
       // if this is an action that doesn't really dispatch, then bump the 
       // screen update count artificially to allow tests to continue (they
@@ -73,4 +67,39 @@ class AFSingleScreenTestDispatcher extends AFTestDispatcher {
     }
   }
 
+  void processSetParam(AFNavigateSetParamAction action);
+}
+
+class AFSingleScreenTestDispatcher extends AFScreenTestDispatcher {
+  final AFID screenId;
+  
+  
+  AFSingleScreenTestDispatcher(
+    this.screenId, 
+    AFDispatcher main, 
+    AFScreenTestContext testContext): super(main, testContext);
+
+  void processSetParam(AFNavigateSetParamAction action) {
+    main.dispatch(
+      AFNavigateSetParamAction(screen: AFUIID.screenPrototypeSingleScreen,
+        param: AFPrototypeSingleScreenRouteParam(id: screenId, param: action.param)
+    ));      
+  }
+}
+
+class AFWidgetScreenTestDispatcher extends AFScreenTestDispatcher {
+  AFPrototypeWidgetRouteParam originalParam;
+  
+  AFWidgetScreenTestDispatcher({
+    AFScreenTestContext context,
+    AFDispatcher main,
+    this.originalParam
+  }): super(main, context);
+
+   void processSetParam(AFNavigateSetParamAction action) {
+    main.dispatch(
+      AFNavigateSetParamAction(screen: AFUIID.screenPrototypeSingleScreen,
+        param: originalParam.copyWith(param: action.param)
+    ));      
+  }
 }

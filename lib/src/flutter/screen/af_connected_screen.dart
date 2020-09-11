@@ -176,11 +176,9 @@ abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam
 }
 
 /// A screen that uses data from the store but not from the route.
-abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFBuildableWidget<TData, TRouteParam> {
-  final AFScreenID screen;
-
+abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFBuildableWidget<TData, TRouteParam> {
   //--------------------------------------------------------------------------------------
-  AFConnectedScreenWithoutRoute(this.screen);
+  AFConnectedWidgetBase();
 
   //--------------------------------------------------------------------------------------
   @override
@@ -203,21 +201,25 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
           if(dataContext == null) {
             return CircularProgressIndicator();
           }
-          
-          if(!(this is AFTestDrawer)) {
-            var rt = this.screen;
+
+          var screenIdRegister = this.screenIdForTest;          
+          if(screenIdRegister != null) {
             if(dataContext.p != null && dataContext.p is AFPrototypeSingleScreenRouteParam) {
-              rt = dataContext.p.effectiveScreenId;
+              screenIdRegister = dataContext.p.effectiveScreenId;
             }
             
-            final info = AFibF.registerTestScreen(rt, buildContext);
-            AFibD.logTest?.d("Rebuilding screen $runtimeType/$rt with updateCount ${info.updateCount} and param ${dataContext.p}");
+            final info = AFibF.registerTestScreen(screenIdRegister, buildContext);
+            AFibD.logTest?.d("Rebuilding screen $runtimeType/$screenIdRegister with updateCount ${info.updateCount} and param ${dataContext.p}");
           }
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p);
           return buildWithContext(withContext);
         }
     );
   }
+
+  /// Screens that have their own element tree in testing must return their screen id here,
+  /// otherwise return null.
+  AFScreenID get screenIdForTest;
 
   AFBuildContext<TData, TRouteParam> _createNonBuildContext(AFStore store) {
     final data = createDataAF(store.state);
@@ -245,12 +247,32 @@ abstract class AFConnectedScreenWithoutRoute<TState, TData extends AFStoreConnec
   /// Override this to perform screen specific cleanup.
   void onDispose(AFBuildContext<TData, TRouteParam> context) {} 
 
+  /// Called to update the route parameter and re-render the screen.
+  /// 
+  /// It is strange to have a route-parameter method here (in a AFConnectedScreenWithoutRoute).
+  /// However, subclasses of this like [AFPopupScreen] and [AFConnectedWidgetWithParam] have
+  /// the ability to reference/update the AFRouteParam of their parent screen.
+  /// This is here to create a single consistent mechanism for performing updates
+  /// even in cases where that specific widget does not have its own route entry.
+  void updateParam(AFDispatcher dispatcher, TRouteParam revised, { AFID id });
+
+  /// Like [updateParam], but takes a build context
+  /// rather than a dispatcher for convenience.
+  void updateParamC(AFBuildContext context,TRouteParam revised, { AFID id }) {
+    return updateParam(context.dispatcher, revised, id: id);
+  }
+
 }
 
 /// Superclass for a screen Widget, which combined data from the store with data from
 /// the route in order to render itself.
-abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithoutRoute<TState, TData, TRouteParam> {
-  AFConnectedScreen(AFScreenID screen): super(screen);
+abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedWidgetBase<TState, TData, TRouteParam> {
+  final AFScreenID screenId;
+  AFConnectedScreen(this.screenId): super();
+
+  AFScreenID get screenIdForTest {
+    return screenId;
+  }
 
   /// Utility for updating the route parameter for this screen.
   /// 
@@ -264,7 +286,7 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
   void updateParam(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
     dispatcher.dispatch(AFNavigateSetParamAction(
       id: id,
-      screen: this.screen, 
+      screen: this.screenId, 
       param: revised)
     );
   }
@@ -277,39 +299,89 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
 
   /// Find the route parameter for the specified named screen
   AFRouteParam findParam(AFState state) {
-    return state.route?.findParamFor(this.screen, true);
+    return state.route?.findParamFor(this.screenId, true);
   }
 }
 
-typedef AFUpdateParamFunc<TRouteParam>(AFDispatcher dispatcher, TRouteParam param, { AFID id });
-typedef AFRouteParam AFExtractParamFunc(AFRouteParam original);
-typedef TData AFCreateDataFunc<TData, TState>(TState state);
+typedef AFUpdateParamDelegate<TRouteParam>(AFDispatcher dispatcher, TRouteParam param, { AFID id });
+typedef AFRouteParam AFExtractParamDelegate(AFRouteParam original);
+typedef TData AFCreateDataDelegate<TData, TState>(TState state);
+typedef AFRouteParam AFFindParamDelegate(AFState state);
+
+/// Use this to connect a Widget to the store.  
+/// 
+/// The Widget can still have a route parameter, but it must be passed in
+/// from the parent screen that the Widget is created by.
+abstract class AFConnectedWidgetWithParam<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedWidgetBase<TState, TData, TRouteParam> {
+  //final TRouteParam parentParam;
+  final AFUpdateParamDelegate<TRouteParam> updateParamDelegate;
+  final AFExtractParamDelegate extractParamDelegate;
+  final AFCreateDataDelegate createDataDelegate;
+  final AFFindParamDelegate findParamDelegate;
+
+  AFConnectedWidgetWithParam({
+    @required this.findParamDelegate,
+    @required this.updateParamDelegate,
+    @required this.extractParamDelegate,
+    @required this.createDataDelegate
+  }): super();
+
+  AFScreenID get screenIdForTest {
+    return null;
+  }
+
+  @override
+  TData createData(TState state) {
+    return this.createDataDelegate(state);
+  }
+
+  /// Finds the parameter for the parent screen, since a popup screen had not route entry.
+  TRouteParam findParam(AFState state) {
+    AFRouteParam orig;
+    if(findParamDelegate != null) {
+       orig = this.findParamDelegate(state);
+    }
+    if(orig != null && this.extractParamDelegate != null) {
+      orig = this.extractParamDelegate(orig);
+    }
+    return orig;
+  }
+
+  /// Updates the parameter for the parent screen, rather than updating a parameter for our screen (which has no route entry).
+  void updateParam(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
+    updateParamDelegate(dispatcher, revised, id: id);
+  }
+
+}
+
 
 /// Just like an [AFConnectedScreen], except it is typically displayed as 
 /// a modal overlay on top of an existing screen, and launched using a custom 
 /// AFPopupRoute
-abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreen<TState, TData, TRouteParam> {
+abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedWidgetWithParam<TState, TData, TRouteParam> {
+  final AFScreenID screenId;
   final Animation<double> animation;
   final AFBottomPopupTheme theme;
-  final AFUpdateParamFunc<TRouteParam> updateParamDelegate;
-  final AFExtractParamFunc extractParamDelegate;
-  final AFCreateDataFunc createDataDelegate;
   final AFDispatcher dispatcher;
-  final AFScreenID paramScreenId;
-
-  //final AFBuildContext<TData, TRouteParam> parentContext;
-
   AFPopupScreen({
-    @required AFScreenID screen, 
-    @required this.paramScreenId,
+    @required this.screenId,
     @required this.animation, 
     @required this.theme,
     @required this.dispatcher,
-    @required this.updateParamDelegate,
-    @required this.extractParamDelegate,
-    @required this.createDataDelegate
-  }): super(screen);
+    @required AFUpdateParamDelegate<TRouteParam> updateParamDelegate,
+    @required AFExtractParamDelegate extractParamDelegate,
+    @required AFCreateDataDelegate createDataDelegate,
+    @required AFFindParamDelegate findParamDelegate,
+  }): super(
+    updateParamDelegate: updateParamDelegate,
+    extractParamDelegate: extractParamDelegate,
+    createDataDelegate: createDataDelegate,
+    findParamDelegate: findParamDelegate
+  );
 
+  AFScreenID get screenIdForTest {
+    return screenId;
+  }
 
   static void openPopup({
     @required BuildContext context, 
@@ -325,25 +397,7 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
     );
   }
 
-  @override
-  TData createData(TState state) {
-    return this.createDataDelegate(state);
-  }
 
-
-  /// Updates the parameter for the parent screen, rather than updating a parameter for our screen (which has no route entry).
-  void updateParam(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
-    updateParamDelegate(dispatcher, revised, id: id);
-  }
-
-  /// Finds the parameter for the parent screen, since a popup screen had not route entry.
-  TRouteParam findParam(AFState state) {
-    AFRouteParam orig = state.route?.findParamFor(this.paramScreenId, true);
-    if(this.extractParamDelegate != null) {
-      orig = this.extractParamDelegate(orig);
-    }
-    return orig;
-  }
 
   @override
   Widget buildWithContext(AFBuildContext<TData, TRouteParam> context) {
@@ -377,28 +431,31 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
 
 }
 
-/// Use this to connect a Widget to the store.  
-/// 
-/// The Widget can still have a route parameter, but it must be passed in
-/// from the parent screen that the Widget is created by.
-abstract class AFConnectedWidget<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithoutRoute<TState, TData, TRouteParam> {
-  final TRouteParam parentParam;
-
-  AFConnectedWidget(this.parentParam): super(null);
-
-  AFRouteParam findParam(AFState state) { return parentParam; }
-}
-
 /// Use this to connect a drawer to the store.
 /// 
 /// Drawers are special because the user can drag in from the left or right to open them.
 /// You cannot trust that you used an [AFNavigatePush] action to open the drawer.  Consequently,
 /// you should only rely on information in your [AFAppState] to render your drawers, and perhaps
 /// the full state of the route ()
-abstract class AFConnectedDrawer<TState, TData extends AFStoreConnectorData> extends AFConnectedScreenWithoutRoute<TState, TData, AFRouteParamUnused> {
-  AFConnectedDrawer(): super(null);
+abstract class AFConnectedDrawer<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedWidgetWithParam<TState, TData, TRouteParam> {
+  final AFScreenID screenId;
 
+  AFConnectedDrawer({
+    @required this.screenId,
+    @required AFUpdateParamDelegate<TRouteParam> updateParamDelegate,
+    @required AFExtractParamDelegate extractParamDelegate,
+    @required AFCreateDataDelegate createDataDelegate,
+    @required AFFindParamDelegate findParamDelegate,
+  }): super(
+    updateParamDelegate: updateParamDelegate,
+    extractParamDelegate: extractParamDelegate,
+    createDataDelegate: createDataDelegate,
+    findParamDelegate: findParamDelegate
+  );
 
+  AFScreenID get screenIdForTest {
+    return screenId;
+  }
 
 }
 
@@ -438,7 +495,9 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
     final state = store.state;
     final testState = state.testState;
     if(testState.activeTestId != null) {
-      return AFTestDrawer();
+      return AFTestDrawer(
+        //findParamDelegate: findParamDelegate
+      );
     }
     return null;
   }

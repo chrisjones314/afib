@@ -102,7 +102,7 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppState, AFProt
     final testData = testState?.data ?? test.data;
     final dispatcher = AFSingleScreenTestDispatcher(context.p.id, context.d, testContext);
     final screenMap = AFibF.screenMap;
-    final AFConnectedScreenWithoutRoute screen = screenMap.createFor(test.screenId);
+    final AFConnectedWidgetBase screen = screenMap.createFor(test.screenId);
     final childContext = screen.createContext(context.c, dispatcher, testData, paramChild);
     return screen.buildWithContext(childContext);
     

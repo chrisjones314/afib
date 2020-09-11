@@ -302,7 +302,7 @@ class AFibF {
   /// 
   /// If you need to dispatch an action, you should typically call [AFBuildContext.dispatch].
   /// If you need access to items from your reduce state, you should typically override
-  /// [AFConnectedScreen.createData] or [AFConnectedWidget.createData].
+  /// [AFConnectedScreen.createData] or [AFConnectedWidgetWithParam.createData].
   static AFStore get internalOnlyStore {
     return _afStore;
   }

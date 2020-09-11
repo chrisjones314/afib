@@ -4,6 +4,7 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
+import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/core/afui.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -24,11 +25,26 @@ class AFTestDrawerData extends AFStoreConnectorData3<AFScreenTestContextSimulato
 }
 
 //--------------------------------------------------------------------------------------
-class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData> {
+class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData, AFRouteParamUnused> {
   final timeFormat = DateFormat('Hms');
 
   //--------------------------------------------------------------------------------------
-  AFTestDrawer();
+  AFTestDrawer({
+    AFUpdateParamDelegate<AFRouteParamUnused> updateParamDelegate,
+    AFExtractParamDelegate extractParamDelegate,
+    AFCreateDataDelegate createDataDelegate,
+    AFFindParamDelegate findParamDelegate,
+  }): super(
+    screenId: AFUIID.screenTestDrawer,
+    updateParamDelegate: updateParamDelegate,
+    extractParamDelegate: extractParamDelegate,
+    createDataDelegate: createDataDelegate,
+    findParamDelegate: findParamDelegate
+  );
+
+  AFScreenID get screenIdForTest {
+    return null;
+  }
 
   //--------------------------------------------------------------------------------------
   @override

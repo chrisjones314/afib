@@ -98,7 +98,7 @@ class AFWidgetScreenTestDispatcher extends AFScreenTestDispatcher {
 
    void processSetParam(AFNavigateSetParamAction action) {
     main.dispatch(
-      AFNavigateSetParamAction(screen: AFUIID.screenPrototypeSingleScreen,
+      AFNavigateSetParamAction(screen: AFUIID.screenPrototypeWidget,
         param: originalParam.copyWith(param: action.param)
     ));      
   }

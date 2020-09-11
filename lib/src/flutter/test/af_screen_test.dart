@@ -1004,17 +1004,22 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
   }
 }
 
+typedef AFConnectedWidgetWithParam AFCreateConnectedWidget(
+  AFFindParamDelegate findParamDelegate,
+  AFUpdateParamDelegate updateParamDelegate,
+);
+
 class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
   final dynamic data;
   final AFSingleScreenTestBody body;
-  final Widget widget;
+  final AFCreateConnectedWidget createConnectedWidget;
   final AFCreateWidgetWrapperDelegate createWidgetWrapperDelegate;
 
   AFWidgetPrototypeTest({
     @required AFTestID id,
     @required this.body,
     @required this.data,
-    @required this.widget,
+    @required this.createConnectedWidget,
     this.createWidgetWrapperDelegate,
     String subtitle
   }): super(id: id, subtitle: subtitle);
@@ -1048,6 +1053,7 @@ class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
     return null;
   }
 }
+
  
 /// All the information necessary to render a single screen for
 /// prototyping and testing.
@@ -1058,10 +1064,10 @@ class AFConnectedWidgetPrototypeTest extends AFWidgetPrototypeTest {
     @required AFTestID id,
     @required dynamic data,
     @required this.param,
-    @required Widget widget,
+    @required AFCreateConnectedWidget createConnectedWidget,
     @required AFSingleScreenTestBody body,
     String subtitle
-  }): super(id: id, subtitle: subtitle, body: body, data: data, widget: widget);
+  }): super(id: id, subtitle: subtitle, body: body, data: data, createConnectedWidget: createConnectedWidget);
 }
 
 
@@ -1137,13 +1143,14 @@ class AFMultiScreenStatePrototypeTest extends AFScreenPrototypeTest {
 
 }
 
+
 /// Used to register connected or unconnected widget tests.
 class AFWidgetTests<TState> {
   final _connectedTests = List<AFWidgetPrototypeTest>();
   
   AFSingleScreenTestBody addConnectedPrototype({
     @required AFTestID   id,
-    @required AFConnectedWidget widget,
+    @required AFCreateConnectedWidget createConnectedWidget,
     @required dynamic data,
     @required AFRouteParam param,
     String subtitle
@@ -1152,7 +1159,7 @@ class AFWidgetTests<TState> {
       id: id,
       data: data,
       param: param,
-      widget: widget,
+      createConnectedWidget: createConnectedWidget,
       subtitle: subtitle,
       body: null // AFSingleScreenTestBody(id, this)
     );

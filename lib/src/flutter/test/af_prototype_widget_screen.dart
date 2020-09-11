@@ -77,11 +77,17 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppState, AFPrototypeW
     final testContext = context.s.testState.findContext(test.id);
     final testState = context.s.testState.findState(test.id);
     final testData = testState?.data ?? test.data;
-    final sourceWidget = test.widget;
+    final sourceWidget = test.createConnectedWidget(findParam, (dispatcher, param, { id }) {
+      dispatcher.dispatch(AFNavigateSetParamAction(
+        id: id,
+        screen: this.screenId, 
+        param: param)
+      );
+    });
     Widget resultWidget;
-    if(test is AFConnectedWidgetPrototypeTest && sourceWidget is AFConnectedWidget) {
+    if(test is AFConnectedWidgetPrototypeTest && sourceWidget is AFConnectedWidgetWithParam) {
       AFRouteParam paramChild = context.p.param ?? test.param;
-    final dispatcher = AFWidgetScreenTestDispatcher(context: testContext, main: context.d, originalParam: context.p);
+      final dispatcher = AFWidgetScreenTestDispatcher(context: testContext, main: context.d, originalParam: context.p);
       final childContext = sourceWidget.createContext(context.c, dispatcher, testData, paramChild);
       resultWidget = sourceWidget.buildWithContext(childContext);
     } else {

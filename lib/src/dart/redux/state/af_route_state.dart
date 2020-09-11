@@ -72,7 +72,7 @@ class AFRouteState {
   /// new screens.  During this interim period, it is conventient to still have 
   /// access to the data in the route segment that was just popped, even though
   /// it is not the final route segment anymore.  This is where we store that value.
-  final AFRouteSegment priorLastSegment;
+  final List<AFRouteSegment> priorLastSegment;
   
   
   final List<AFRouteSegment> route;
@@ -83,7 +83,7 @@ class AFRouteState {
   factory AFRouteState.initialState() {
     final route = List<AFRouteSegment>();
     route.add(AFRouteSegment.withScreen(AFibF.effectiveStartupScreenId));
-    return AFRouteState(route: route);
+    return AFRouteState(route: route, priorLastSegment: List<AFRouteSegment>());
   }
 
   /// Returns the segment in the current route associated with the 
@@ -95,8 +95,8 @@ class AFRouteState {
         return segment;
       }
     }
-    if(includePrior && screen == priorLastSegment?.screen) {
-      return priorLastSegment;
+    if(includePrior) {
+      return priorLastSegment.firstWhere((seg) => seg.screen == screen, orElse: () => null);
     }
     return null;
 
@@ -152,11 +152,12 @@ class AFRouteState {
   /// and data in its place.
   AFRouteState popAndPushNamed(AFScreenID screen, AFRouteParam param) {
     final revised = copyRoute();
-    final prior = revised.removeLast();
+    final priorLastSegment = _cyclePrior(revised, 1);
+
     revised.add(AFRouteSegment.withParam(screen, param));
     return copyWith(
       route: revised,
-      priorLastSegment: prior
+      priorLastSegment: priorLastSegment
     );
   }
 
@@ -173,24 +174,21 @@ class AFRouteState {
   /// screen.
   AFRouteState pop(dynamic childReturn) {
     final revised = copyRoute();
-    final prior = revised.removeLast();
+    final priorLastSegment = _cyclePrior(revised, 1);
     return copyWith(
       route: revised,
-      priorLastSegment: prior
+      priorLastSegment: priorLastSegment
     );
   }
 
   /// Pops the route until we get to the first afib test screen.
   AFRouteState exitTest() {
-    final prior = lastSegment;
     final revised = copyRoute();
     final popCount = this.popCountToRoot;
-    for(int i = 0; i < popCount; i++) {
-      revised.removeLast();
-    }
+    final priorLastSegment = _cyclePrior(revised, popCount);
     return copyWith(
       route: revised,
-      priorLastSegment: prior
+      priorLastSegment: priorLastSegment
     );    
   }
 
@@ -210,29 +208,18 @@ class AFRouteState {
     return copyWith(route: revised);
   }
 
-  AFRouteSegment get lastSegment {
-    AFRouteSegment prior;
-    if(route.isNotEmpty) {
-      prior = route.last;
-    }
-    return prior;
-  }
-
   /// Removes all existing segments in the route, and adds back the specified screen/data.
   AFRouteState replaceAll(AFScreenID screen, AFRouteParam param) {
-    final prior = lastSegment;
 
     // this prevent us from removing afib test screens.
     final revised = List<AFRouteSegment>.of(route);
     int popCount = this.popCountToRoot;
-    for(int i = 0; i < popCount; i++) {
-      revised.removeLast();
-    }
+    final priorLastSegment = _cyclePrior(revised, popCount);
 
     revised.add(AFRouteSegment.withParam(screen, param));
     return copyWith(
       route: revised,
-      priorLastSegment: prior
+      priorLastSegment: priorLastSegment
     );
   }
 
@@ -241,20 +228,31 @@ class AFRouteState {
     return List<AFRouteSegment>.from(this.route);
   }
 
+  List<AFRouteSegment> _cyclePrior(List<AFRouteSegment> revisedActive, int popCount) {
+    final revisedPrior = List<AFRouteSegment>.of(this.priorLastSegment);
+    
+    for(int i = 0; i < popCount; i++) {
+      final justRemoved = revisedActive.removeLast();
+      revisedPrior.insert(0, justRemoved);
+      if(revisedPrior.length >= 4) {
+        final expiredPrior = revisedPrior.removeLast();
+        expiredPrior.dispose();
+      }
+    }
+
+    return revisedPrior;
+  }
+
+
+
   //---------------------------------------------------------------------------------------
   AFRouteState copyWith({
     List<AFRouteSegment> route,
-    AFRouteSegment priorLastSegment
+    List<AFRouteSegment> priorLastSegment
   }) {
-    // if there is a prior last segment, and it is going out of scope, then
-    // call dispose on it to allow it to clean up any state in the route parameter.
-    if(this.priorLastSegment != null && this.priorLastSegment != priorLastSegment) {
-      this.priorLastSegment.dispose();
-    }
-
     final revised = new AFRouteState(
       route: route ?? this.route,
-      priorLastSegment: priorLastSegment
+      priorLastSegment: priorLastSegment ?? this.priorLastSegment
     );
     AFibD.logRoute?.d("Revised Route: $revised");
     return revised;

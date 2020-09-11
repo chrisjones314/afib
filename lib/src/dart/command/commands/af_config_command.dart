@@ -124,7 +124,8 @@ class AFConfigEntryEnabledTests extends AFConfigEntryList {
   static const screenTests = "screen";
   static const queryTests = "query";
   static const multiScreenTests = "multiscreen";
-  static const allAreas = [allTests, unitTests, stateTests, screenTests, queryTests, multiScreenTests];
+  static const widgetTests = "widget";
+  static const allAreas = [allTests, unitTests, stateTests, widgetTests, screenTests, queryTests, multiScreenTests];
 
   AFConfigEntryEnabledTests(): super(AFConfigEntries.afNamespace, "enabledTestList", [allTests], help: "Space separated list of [${allAreas.join('|')}|test_id|test_tag]");
 

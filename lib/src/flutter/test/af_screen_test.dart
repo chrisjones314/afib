@@ -10,6 +10,7 @@ import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
+import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
@@ -246,7 +247,11 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   AFScreenTestExecute(this.testId);
 
   AFScreenPrototypeTest get test {
-    return AFibF.screenTests.findById(this.testId);
+    AFScreenPrototypeTest found = AFibF.screenTests.findById(this.testId);
+    if(found == null) {
+      found = AFibF.widgetTests.findById(this.testId);
+    }
+    return found;
   }
 
   AFScreenID get activeScreenId;
@@ -941,7 +946,7 @@ abstract class AFScreenPrototypeTest {
   bool get hasBody;
   AFScreenID get screenId;
   void startScreen(AFDispatcher dispatcher);
-  void run(AFScreenTestContext context, { Function onEnd});
+  Future<void> run(AFScreenTestContext context, dynamic params, { Function onEnd});
   void onDrawerReset(AFDispatcher dispatcher);
   Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSingleScreenTestState state, Function onEnd);
 
@@ -986,7 +991,7 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
     dispatcher.dispatch(AFPrototypeSingleScreenScreen.navigatePush(this, id: this.id));    
   }
 
-  Future<void> run(AFScreenTestExecute context, { dynamic params, Function onEnd, bool useParentCollector = false}) {
+  Future<void> run(AFScreenTestExecute context, dynamic params, { Function onEnd, bool useParentCollector = false}) {
     return body.run(context, params, onEnd: onEnd, useParentCollector: useParentCollector);
   }
 
@@ -999,7 +1004,7 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
     //final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
     final testContext = prepareRun(dispatcher, prevContext);
     //await testContext.pauseForRender(screenUpdateCount, true);
-    run(testContext, onEnd: onEnd);
+    run(testContext, null, onEnd: onEnd);
     return null;
   }
 }
@@ -1025,7 +1030,7 @@ class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
   }): super(id: id, subtitle: subtitle);
 
   AFScreenID get screenId {
-    return null;
+    return AFUIID.screenPrototypeWidget;
   }
 
   bool get hasBody {
@@ -1037,7 +1042,7 @@ class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
     dispatcher.dispatch(AFPrototypeWidgetScreen.navigatePush(this, id: this.id));    
   }
   
-  Future<void> run(AFScreenTestExecute context, { dynamic params, Function onEnd, bool useParentCollector = false}) {
+  Future<void> run(AFScreenTestExecute context, dynamic params, { Function onEnd, bool useParentCollector = false}) {
     return body.run(context, params, onEnd: onEnd, useParentCollector: useParentCollector);
   }
 
@@ -1049,7 +1054,7 @@ class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
     //final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
     final testContext = prepareRun(dispatcher, prevContext);
     //await testContext.pauseForRender(screenUpdateCount, true);
-    run(testContext, onEnd: onEnd);
+    run(testContext, null, onEnd: onEnd);
     return null;
   }
 }
@@ -1128,8 +1133,8 @@ class AFMultiScreenStatePrototypeTest extends AFScreenPrototypeTest {
   }
 
 
-  void run(AFScreenTestContext context, { Function onEnd}) {
-    body.run(context, null, onEnd: onEnd);
+  Future<void> run(AFScreenTestContext context, dynamic params, { Function onEnd}) {
+    return body.run(context, params, onEnd: onEnd);
   }
 
   void onDrawerReset(AFDispatcher dispatcher) {
@@ -1138,7 +1143,7 @@ class AFMultiScreenStatePrototypeTest extends AFScreenPrototypeTest {
 
   Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSingleScreenTestState state, Function onEnd) async {
     final testContext = prepareRun(dispatcher, prevContext);
-    run(testContext, onEnd: onEnd);
+    return run(testContext, null, onEnd: onEnd);
   }
 
 }
@@ -1159,9 +1164,10 @@ class AFWidgetTests<TState> {
       id: id,
       data: data,
       param: param,
+
       createConnectedWidget: createConnectedWidget,
       subtitle: subtitle,
-      body: null // AFSingleScreenTestBody(id, this)
+      body: AFSingleScreenTestBody(id)
     );
     _connectedTests.add(instance);
     return instance.body;
@@ -1353,7 +1359,7 @@ class AFMultiScreenTestWidgetCollector extends AFMultiScreenTestExecute {
   Future<void> runScreenTest(AFTestID screenTestId, AFScreenID terminalScreen, {dynamic params, AFTestID queryResults, bool expectRender = true}) async {
     final screenTest = AFibF.screenTests.findById(screenTestId);
     elementCollector.pushScreen(screenTest.screenId);
-    await screenTest.run(elementCollector, params: params);
+    await screenTest.run(elementCollector, params);
     elementCollector.popScreen();
   }
 
@@ -1383,7 +1389,7 @@ class AFMultiScreenTestContext extends AFMultiScreenTestExecute {
     final screenTest = AFibF.screenTests.findById(screenTestId);
     final originalScreenID = screenTest.screenId;
     screenContext.pushScreen(originalScreenID);
-    await screenTest.run(screenContext, params: params, useParentCollector: true);  
+    await screenTest.run(screenContext, params, useParentCollector: true);  
     screenContext.popScreen();    
     if(originalScreenID != terminalScreen) {
       await screenContext.pauseForRender(prevRenderCount, expectRender, screenId: terminalScreen);

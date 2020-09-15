@@ -17,6 +17,8 @@ List<Middleware<AFState>> createRouteMiddleware() {
     TypedMiddleware<AFState, AFNavigatePushAction>(_navigatePushAction),
     TypedMiddleware<AFState, AFNavigatePushPopupAction>(_navigatePushPopupAction),
     TypedMiddleware<AFState, AFNavigatePopAction>(_navigatePopAction),
+    TypedMiddleware<AFState, AFNavigatePopNAction>(_navigatePopNAction),
+    TypedMiddleware<AFState, AFNavigatePopToAction>(_navigatePopToAction),
     TypedMiddleware<AFState, AFNavigateExitTestAction>(_navigateExitTestAction)
   ];
 }
@@ -77,6 +79,40 @@ void _navigatePopAction(Store<AFState> store, action, NextDispatcher next) {
   AFibF.navigatorKey.currentState?.pop(action.returnData);
   next(action);
 }
+
+//---------------------------------------------------------------------------
+void _navigatePopNAction(Store<AFState> store, action, NextDispatcher next) {
+  final AFNavigatePopNAction popN = action;
+  final route = _getRouteState(store);
+
+  /// If the segment count is 1
+  if(route.segmentCount <= popN.popCount) {
+    throw AFException("You popped ${popN.popCount} screen but the route only has ${route.segmentCount} segments");
+  }
+
+  for(int i = 0; i < popN.popCount; i++) {
+    AFibF.navigatorKey.currentState?.pop(action.returnData);
+  }
+  next(action);
+}
+
+//---------------------------------------------------------------------------
+void _navigatePopToAction(Store<AFState> store, action, NextDispatcher next) {
+  final AFNavigatePopToAction popTo = action;
+  final route = _getRouteState(store);
+
+  int popCountTo = route.popCountToScreen(popTo.popTo);
+  /// If the segment count is 1
+  if(popCountTo < 0) {
+    throw AFException("Could not pop to ${popTo.popTo} because that screen is not in the route.");
+  }
+
+  for(int i = 0; i < popCountTo; i++) {
+    AFibF.navigatorKey.currentState?.pop(action.returnData);
+  }
+  next(action);
+}
+
 
 //---------------------------------------------------------------------------
 void _navigateReplaceAction(Store<AFState> store, action, NextDispatcher next) {

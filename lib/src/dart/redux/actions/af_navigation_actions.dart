@@ -33,7 +33,7 @@ class AFNavigateReplaceAction extends AFNavigateAction {
   AFNavigateReplaceAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
 }
 
-/// Action that replaces the current leaf screen with a new screen.
+/// Action that exits the current test screen in prototype mode.
 class AFNavigateExitTestAction extends AFNavigateAction {  
   AFNavigateExitTestAction({AFID id}): super(id: id, screen: null, param: null);
 }
@@ -76,7 +76,11 @@ class AFNavigatePushPopupAction extends AFNavigateActionWithReturn {
 
 /// Action that navigates on screen up in the route, discarding the current leaf route.
 /// 
-/// IF you want to test for the presence of a pop action in response to an event in 
+/// Important: If you want to navigate up several screens, use [AFNavigatePopNAction] or [AFNavigatePopToAction]
+/// rather than dispatching this action multiple times.  Failing to do so can cause cases where 
+/// your [AFRouteParam] is null in widgets that are transitioning/animating off the screen.
+/// 
+/// If you want to test for the presence of a pop action in response to an event in 
 /// prototype mode, you can make [worksInPrototypeMode] false.   By default, pop actions
 /// navigate you out of a prototype screen in test mode.
 class AFNavigatePopAction extends AFNavigateAction {
@@ -86,3 +90,33 @@ class AFNavigatePopAction extends AFNavigateAction {
   AFNavigatePopAction({AFID id, this.returnData, this.worksInPrototypeMode = true}): super(id: id, screen: null, param: null);
 }
 
+/// Pops [popCount] screens off the navigation stack.
+class AFNavigatePopNAction extends AFNavigatePopAction {
+  final int popCount;
+
+  AFNavigatePopNAction({
+    @required this.popCount,
+    AFID id, 
+    dynamic returnData, 
+    bool worksInPrototypeMode = true
+    }): super(
+      id: id,
+      returnData: returnData,
+      worksInPrototypeMode: worksInPrototypeMode
+    );
+}
+
+class AFNavigatePopToAction extends AFNavigatePopAction {
+  final AFScreenID popTo;
+
+  AFNavigatePopToAction({
+    @required this.popTo,
+    AFID id, 
+    dynamic returnData, 
+    bool worksInPrototypeMode = true
+  }): super(
+    id: id,
+    returnData: returnData,
+    worksInPrototypeMode: worksInPrototypeMode
+  );
+}

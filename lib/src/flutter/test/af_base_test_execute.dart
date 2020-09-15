@@ -58,8 +58,15 @@ abstract class AFBaseTestExecute {
     return errors.pass;
   }
 
-  static void printTotalPass(AFCommandOutput output, String title, int pass) {
-      _writeTestResult(output, "$title:", pass, " passed", Styles.GREEN);
+  static void printTotalPass(AFCommandOutput output, String title, int pass, { Stopwatch stopwatch}) {
+    final suffix = StringBuffer(" passed");
+    if(stopwatch != null) {
+      suffix.write(" (in ");
+      double total = stopwatch.elapsedMilliseconds / 1000.0;
+      suffix.write(total.toStringAsFixed(2));
+      suffix.write("s)");
+    }
+      _writeTestResult(output, "$title:", pass, suffix.toString(), Styles.GREEN);
   }
 
   int printFailMessages(AFCommandOutput output) {

@@ -1010,6 +1010,7 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
 }
 
 typedef AFConnectedWidgetWithParam AFCreateConnectedWidget(
+  AFDispatcher dispatcher,
   AFFindParamDelegate findParamDelegate,
   AFUpdateParamDelegate updateParamDelegate,
 );

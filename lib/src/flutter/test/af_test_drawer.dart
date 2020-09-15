@@ -30,12 +30,14 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData, AFRou
 
   //--------------------------------------------------------------------------------------
   AFTestDrawer({
+    AFDispatcher dispatcher,
     AFUpdateParamDelegate<AFRouteParamUnused> updateParamDelegate,
     AFExtractParamDelegate extractParamDelegate,
     AFCreateDataDelegate createDataDelegate,
     AFFindParamDelegate findParamDelegate,
   }): super(
     screenId: AFUIID.screenTestDrawer,
+    dispatcher: dispatcher,
     updateParamDelegate: updateParamDelegate,
     extractParamDelegate: extractParamDelegate,
     createDataDelegate: createDataDelegate,

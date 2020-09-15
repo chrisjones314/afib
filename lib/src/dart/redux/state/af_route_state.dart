@@ -90,13 +90,18 @@ class AFRouteState {
   /// specified screen.
   AFRouteSegment _findSegmentFor(AFScreenID screen, bool includePrior) {
     for(int i = route.length - 1; i >= 0; i--) {
-      AFRouteSegment segment = route[i];
+      final segment = route[i];
       if(segment.matchesScreen(screen)) {
         return segment;
       }
     }
     if(includePrior) {
-      return priorLastSegment.firstWhere((seg) => seg.screen == screen, orElse: () => null);
+      for(int i = 0; i < priorLastSegment.length; i++) {
+        final seg = priorLastSegment[i];
+        if(seg.matchesScreen(screen)) {
+          return seg;
+        }
+      }
     }
     return null;
 
@@ -124,6 +129,21 @@ class AFRouteState {
     } 
     return nPop;
   }
+
+  /// Returns the number of pops to get to the specified screen in the root,
+  /// or -1 if that screen isn't in the route.
+  int popCountToScreen(AFScreenID screen) {
+    int nPop = 0;
+    for(int i = route.length - 1; i >= 0; i--) {
+      final segment = route[i];
+      if(!segment.matchesScreen(screen)) {
+        return nPop;
+      }
+      nPop++;
+    } 
+    return -1;
+  }
+
 
   /// Finds the data associated with the specified [screen] in the current route.
   /// 
@@ -173,8 +193,21 @@ class AFRouteState {
   /// Remove the leaf element from the route, returning back to the parent
   /// screen.
   AFRouteState pop(dynamic childReturn) {
+    return popN(1, childReturn);
+  }
+
+  /// Remove the leaf element from the route, returning back to the parent
+  /// screen.
+  AFRouteState popTo(AFScreenID screen, dynamic childReturn) {
+    int popCount = popCountToScreen(screen);
+    return popN(popCount, childReturn);
+  }
+
+  /// Remove the leaf element from the route, returning back to the parent
+  /// screen.
+  AFRouteState popN(int popCount, dynamic childReturn) {
     final revised = copyRoute();
-    final priorLastSegment = _cyclePrior(revised, 1);
+    final priorLastSegment = _cyclePrior(revised, popCount);
     return copyWith(
       route: revised,
       priorLastSegment: priorLastSegment
@@ -183,13 +216,8 @@ class AFRouteState {
 
   /// Pops the route until we get to the first afib test screen.
   AFRouteState exitTest() {
-    final revised = copyRoute();
     final popCount = this.popCountToRoot;
-    final priorLastSegment = _cyclePrior(revised, popCount);
-    return copyWith(
-      route: revised,
-      priorLastSegment: priorLastSegment
-    );    
+    return popN(popCount, null);
   }
 
 
@@ -229,21 +257,20 @@ class AFRouteState {
   }
 
   List<AFRouteSegment> _cyclePrior(List<AFRouteSegment> revisedActive, int popCount) {
-    final revisedPrior = List<AFRouteSegment>.of(this.priorLastSegment);
-    
+    // dispose any segments from the prior pop.
+    for(final expiredSegment in this.priorLastSegment) {
+      expiredSegment.dispose();
+    }
+
+    // create a new prior segment with all the segments being popped off.
+    final revisedPrior = List<AFRouteSegment>();
     for(int i = 0; i < popCount; i++) {
       final justRemoved = revisedActive.removeLast();
       revisedPrior.insert(0, justRemoved);
-      if(revisedPrior.length >= 4) {
-        final expiredPrior = revisedPrior.removeLast();
-        expiredPrior.dispose();
-      }
     }
 
     return revisedPrior;
   }
-
-
 
   //---------------------------------------------------------------------------------------
   AFRouteState copyWith({

@@ -29,6 +29,8 @@ class AFibTestsFailedMatcher extends Matcher {
 
 /// The main function which executes the store test defined in your initStateTests function.
 Future<void> afTestMain(AFDartParams paramsD, AFFlutterParams paramsF, WidgetTester widgetTester) async {
+  final stopwatch = Stopwatch();
+  stopwatch.start();
   final paramsTest = paramsD.forceEnvironment(AFConfigEntryEnvironment.prototype);
   AFibD.initialize(paramsTest);
   AFibF.initialize(paramsF);
@@ -55,7 +57,7 @@ Future<void> afTestMain(AFDartParams paramsD, AFFlutterParams paramsF, WidgetTes
     expect("${stats.totalErrors} errors (see details above)", AFibTestsFailedMatcher());
   } else {
     output.writeSeparatorLine();
-    AFBaseTestExecute.printTotalPass(output, "GRAND TOTAL", stats.totalPasses);
+    AFBaseTestExecute.printTotalPass(output, "GRAND TOTAL", stats.totalPasses, stopwatch: stopwatch);
     output.writeSeparatorLine();   
   }
   return null;

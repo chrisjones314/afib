@@ -224,8 +224,12 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
   AFBuildContext<TData, TRouteParam> _createNonBuildContext(AFStore store) {
     final data = createDataAF(store.state);
     final param = findParam(store.state);
-    final context = createContext(null, AFStoreDispatcher(store), data, param);
+    final context = createContext(null, createDispatcher(store), data, param);
     return context;
+  }
+
+  AFDispatcher createDispatcher(store) {
+    return AFStoreDispatcher(store);
   }
 
   /// Find the route param for this screen. 
@@ -318,8 +322,10 @@ abstract class AFConnectedWidgetWithParam<TState, TData extends AFStoreConnector
   final AFExtractParamDelegate extractParamDelegate;
   final AFCreateDataDelegate createDataDelegate;
   final AFFindParamDelegate findParamDelegate;
+  final AFDispatcher dispatcher;
 
   AFConnectedWidgetWithParam({
+    @required this.dispatcher,
     @required this.findParamDelegate,
     @required this.updateParamDelegate,
     @required this.extractParamDelegate,
@@ -333,6 +339,11 @@ abstract class AFConnectedWidgetWithParam<TState, TData extends AFStoreConnector
   @override
   TData createData(TState state) {
     return this.createDataDelegate(state);
+  }
+
+  @override
+  AFDispatcher createDispatcher(store) {
+    return dispatcher;
   }
 
   /// Finds the parameter for the parent screen, since a popup screen had not route entry.
@@ -362,17 +373,17 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
   final AFScreenID screenId;
   final Animation<double> animation;
   final AFBottomPopupTheme theme;
-  final AFDispatcher dispatcher;
   AFPopupScreen({
     @required this.screenId,
     @required this.animation, 
     @required this.theme,
-    @required this.dispatcher,
+    @required AFDispatcher dispatcher,
     @required AFUpdateParamDelegate<TRouteParam> updateParamDelegate,
     @required AFExtractParamDelegate extractParamDelegate,
     @required AFCreateDataDelegate createDataDelegate,
     @required AFFindParamDelegate findParamDelegate,
   }): super(
+    dispatcher: dispatcher,
     updateParamDelegate: updateParamDelegate,
     extractParamDelegate: extractParamDelegate,
     createDataDelegate: createDataDelegate,
@@ -442,11 +453,13 @@ abstract class AFConnectedDrawer<TState, TData extends AFStoreConnectorData, TRo
 
   AFConnectedDrawer({
     @required this.screenId,
+    @required AFDispatcher dispatcher,
     @required AFUpdateParamDelegate<TRouteParam> updateParamDelegate,
     @required AFExtractParamDelegate extractParamDelegate,
     @required AFCreateDataDelegate createDataDelegate,
     @required AFFindParamDelegate findParamDelegate,
   }): super(
+    dispatcher: dispatcher,
     updateParamDelegate: updateParamDelegate,
     extractParamDelegate: extractParamDelegate,
     createDataDelegate: createDataDelegate,
@@ -496,7 +509,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
     final testState = state.testState;
     if(testState.activeTestId != null) {
       return AFTestDrawer(
-        //findParamDelegate: findParamDelegate
+        dispatcher: dispatcher,
       );
     }
     return null;

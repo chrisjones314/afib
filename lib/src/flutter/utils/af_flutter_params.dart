@@ -8,6 +8,7 @@ class AFFlutterParams<AppState> {
   final InitScreenMap         initScreenMap;
   final InitializeAppState       initialAppState;
   final CreateStartupQueryAction createStartupQueryAction;
+  final AFCreateLifecycleQueryAction createLifecycleQueryAction;
   final CreateAFApp createApp;
   final InitTestData initTestData;
   final InitUnitTests initUnitTests;
@@ -21,6 +22,7 @@ class AFFlutterParams<AppState> {
     @required this.initScreenMap,
     @required this.initialAppState,
     @required this.createStartupQueryAction,
+    @required this.createLifecycleQueryAction,
     @required this.createApp,
     @required this.initTestData,
     @required this.initUnitTests,

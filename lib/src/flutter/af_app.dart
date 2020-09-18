@@ -6,6 +6,7 @@ import 'package:afib/afib_flutter.dart';
 /// Used to populate the screen map used to associate keys with screens.
 typedef void InitScreenMap(AFScreenMap map);
 typedef dynamic CreateStartupQueryAction();
+typedef dynamic AFCreateLifecycleQueryAction(AppLifecycleState state);
 typedef AFApp CreateAFApp();
 typedef void InitTestData(AFTestDataRegistry registry);
 typedef void InitUnitTests(AFUnitTests tests, AFTestDataRegistry testData);

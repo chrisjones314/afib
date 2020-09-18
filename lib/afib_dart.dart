@@ -23,7 +23,6 @@ export "src/dart/utils/af_object_with_key.dart";
 export "src/dart/redux/actions/af_action_with_key.dart";
 export "src/dart/redux/state/af_ui_state.dart";
 export "src/dart/redux/actions/af_deferred_query.dart";
-export "src/dart/redux/actions/af_wait_query.dart";
 export "src/dart/command/af_command.dart";
 export "src/dart/command/af_standard_commands.dart";
 export "src/dart/utils/afib_d.dart";

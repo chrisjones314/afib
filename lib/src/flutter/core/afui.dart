@@ -17,20 +17,22 @@ class AFUI {
   /// used for clarity
   /// 
   /// ### Example
-  ///    final col = AFUI.column();
+  ///    final rows = AFUI.column();
   ///    // instead of
-  ///    final col = List<Widget>();
+  ///    final rows = List<Widget>();
   static List<Widget> column() { return List<Widget>(); }
-  
 
   /// Creates an empty widget list which will contain rows of widgets,
   /// used for clarity
   /// 
   /// ### Example
-  ///    final row = AFUI.row();
+  ///    final cols = AFUI.row();
   ///    // instead of
-  ///    final row = List<Widget>();
+  ///    final cols = List<Widget>();
   static List<Widget> row() { return List<Widget>(); }
+
+
+  static List<TableRow> tableColumn() { return List<TableRow>(); }
 
   static Key testKey(AFWidgetID wid) {
     if(wid == null) { return null; }

@@ -2,7 +2,6 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
-import 'package:afib/src/dart/redux/actions/af_wait_query.dart';
 import 'package:afib/src/dart/redux/middleware/af_async_queries.dart';
 import 'package:afib/src/dart/redux/middleware/af_query_middleware.dart';
 import 'package:afib/src/dart/redux/middleware/af_route_middleware.dart';
@@ -48,6 +47,7 @@ class AFibF {
   static AFStore _afStore;
   static AFAsyncQueries _afAsyncQueries = AFAsyncQueries();
   static CreateStartupQueryAction _afCreateStartupQueryAction;
+  static AFCreateLifecycleQueryAction _afCreateLifecycleQueryAction;
   static final AFTestDataRegistry _afTestData = AFTestDataRegistry();
   static final AFSingleScreenTests _afScreenTests = AFSingleScreenTests();
   static final AFWidgetTests _afWidgetTests = AFWidgetTests();
@@ -60,7 +60,6 @@ class AFibF {
   static final testOnlyScreens = Map<AFScreenID, AFibTestOnlyScreenElement>();
   static Map<String, AFAsyncQueryListenerCustomError> listenerQueries = Map<String, AFAsyncQueryListenerCustomError>();
   static Map<String, AFDeferredQueryCustomError> deferredQueries = Map<String, AFDeferredQueryCustomError>();
-  static Map<String, AFWaitQuery> waitQueries = Map<String, AFWaitQuery>();
   static final _recentActions = Map<String, AFActionWithKey>();
 
 
@@ -77,6 +76,7 @@ class AFibF {
     AFibF.setInitialAppStateFactory(p.initialAppState);
     AFibF.setAppReducer(appReducer);
     AFibF.setCreateStartupQueryAction(p.createStartupQueryAction);
+    AFibF.setCreateLifecycleQueryAction(p.createLifecycleQueryAction);
 
     List<Middleware<AFState>> middleware = List<Middleware<AFState>>();
     middleware.addAll(createRouteMiddleware());
@@ -226,6 +226,10 @@ class AFibF {
     return _afCreateStartupQueryAction;
   }
 
+  static AFCreateLifecycleQueryAction get createLifecycleQueryAction {
+    return _afCreateLifecycleQueryAction;
+  }
+
   /// A list of asynchronous queries the app uses to retrieve or manipulate remote data.
   /// 
   /// In redux terms, each query is a middleware processor, 
@@ -336,37 +340,11 @@ class AFibF {
     deferredQueries[key] = query; 
   }
 
-  static void registerWaitQuery(AFWaitQuery query) {
-    final key = query.key;
-    AFibD.logQuery?.d("Registering wait query $key");
-    var current = waitQueries[key];
-    if(current == null) {
-      current = query;
-    } else {
-      current.mergeIn(query);
-    }
-    waitQueries[key] = query; 
-  }
-
-  static void handleFinish(AFAsyncQueryCustomError query, AFDispatcher dispatcher, dynamic state) {
-    if(waitQueries.isEmpty) {
-      return;
-    }
-
-    for(var waitQuery in waitQueries.values) {
-      if(waitQuery.doesComplete(query)) {
-        waitQuery.finishAsyncExecute(dispatcher, state);
-        waitQueries.remove(waitQuery.key);
-      }
-    }
-  }
 
   static void handleFinishWithResponse(AFAsyncQueryCustomError query, AFDispatcher dispatcher, dynamic state) {
-    handleFinish(query, dispatcher, state);
   }
 
   static void handleFinishWithError(AFAsyncQueryCustomError query, AFDispatcher dispatcher, dynamic state) {
-    handleFinish(query, dispatcher, state);
   }
 
   /// Shutdown all outstanding listener queries using [AFAsyncQueryListenerCustomError.shutdown]
@@ -419,6 +397,16 @@ class AFibF {
     }
     AFibF.verifyNotImmutable();
     _afCreateStartupQueryAction = createStartupQueryAction;
+  }
+
+  /// Do not call this method, AFApp.initialize will do it for you.
+  static setCreateLifecycleQueryAction(createLifecycleQueryAction) {
+    if(_afCreateLifecycleQueryAction != null) {
+      _directCallException();
+    }
+    AFibF.verifyNotImmutable();
+    
+    _afCreateLifecycleQueryAction = createLifecycleQueryAction;
   }
 
   /// Do not call this method, AFApp.initialize will do it for you.

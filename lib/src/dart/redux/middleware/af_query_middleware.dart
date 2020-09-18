@@ -2,7 +2,6 @@
 
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
-import 'package:afib/src/dart/redux/actions/af_wait_query.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
@@ -22,10 +21,6 @@ class AFQueryMiddleware implements MiddlewareClass<AFState>
 
       if(query is AFDeferredQueryCustomError) {
         AFibF.registerDeferredQuery(query);
-      }
-
-      if(query is AFWaitQuery) {
-        AFibF.registerWaitQuery(query);
       }
 
       AFStateTestContext testContext = AFStateTestContext.currentTest;

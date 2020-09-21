@@ -36,6 +36,7 @@ abstract class AFWidgetByTypeAction {
 abstract class AFApplyWidgetAction extends AFWidgetByTypeAction {
   static const applyTap = "apply_tap";
   static const applySetValue = "apply_set_value";
+  static const applyDismiss = "applyDismiss";
 
   AFApplyWidgetAction(String actionType, Type appliesTo): super(actionType, appliesTo);
 
@@ -60,6 +61,10 @@ abstract class AFApplyTapWidgetAction extends AFApplyWidgetAction {
 
 abstract class AFApplySetValueWidgetAction extends AFApplyWidgetAction {
   AFApplySetValueWidgetAction(Type appliesTo): super(AFApplyWidgetAction.applySetValue, appliesTo);
+}
+
+abstract class AFApplyDismissWidgetAction extends AFApplyWidgetAction {
+  AFApplyDismissWidgetAction(Type appliesTo): super(AFApplyWidgetAction.applyDismiss, appliesTo);
 }
 
 
@@ -123,6 +128,22 @@ class AFListTileTapAction extends AFApplyTapWidgetAction {
     final tapOn = elem.widget;
     if(tapOn is ListTile) {
       tapOn.onTap();
+      return true;
+    } 
+    return false;
+  }
+}
+
+class AFDismissibleSwipeAction extends AFApplyDismissWidgetAction {
+
+  AFDismissibleSwipeAction(): super(Dismissible);
+
+  /// [data] is ignored.
+  @override
+  bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
+    final swipeOn = elem.widget;
+    if(swipeOn is Dismissible) {
+      swipeOn.onDismissed(swipeOn.direction);
       return true;
     } 
     return false;

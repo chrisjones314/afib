@@ -34,18 +34,9 @@ class AFUI {
 
   static List<TableRow> tableColumn() { return List<TableRow>(); }
 
-  static Key testKey(AFWidgetID wid) {
+  static Key keyForWID(AFWidgetID wid) {
     if(wid == null) { return null; }
     return Key(wid.code);
-  }
-
-  static Key prodKey(AFWidgetID wid) {
-    return Key(wid.code);
-  }
-
-  static Key key3(String a, String b, String c) {
-    final full = a + "_" + b + "_" + c;
-    return Key(full);
   }
 
   static Widget standardBackButton(AFDispatcher dispatcher, {
@@ -55,7 +46,7 @@ class AFUI {
     AFShouldContinueCheck shouldContinueCheck,   
   }) {
     return IconButton(
-        key: AFUI.prodKey(wid),      
+        key: AFUI.keyForWID(wid),      
         icon: Icon(Icons.arrow_back),
         tooltip: "Back",
         onPressed: () async {

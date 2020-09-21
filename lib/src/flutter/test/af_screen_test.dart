@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
@@ -15,7 +16,6 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
-import 'package:afib/src/flutter/test/af_prototype_list_screen.dart';
 import 'package:afib/src/flutter/test/af_prototype_single_screen_screen.dart';
 import 'package:afib/src/flutter/test/af_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
@@ -25,6 +25,10 @@ import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
+
+typedef void AFActionListenerDelegate(List<AFActionWithKey> actions);
+typedef void AFParamListenerDelegate(AFRouteParam param);
+typedef void AFAsyncQueryListenerDelegate(AFAsyncQueryCustomError query);
 
 /// A superclass that declares all the methods which select specific widgets.
 /// This is used by [AFScreenWidgetSelectorCollector] to determine which widgets
@@ -379,38 +383,49 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
     }
   }
   
-  Future<void> applyWidgetValue(dynamic selector, dynamic value, String applyType, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 });
-  Future<void> applyWidgetValueWithExpectedAction(dynamic selector, dynamic value, String applyType, AFActionWithKey actionSpecifier, Function(AFActionWithKey) checkAction, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 });
-  Future<void> applyWidgetValueWithExpectedParam(dynamic selector, dynamic value, String applyType, Function(AFRouteParam) checkParam, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 });
+  Future<void> applyWidgetValue(dynamic selector, dynamic value, String applyType, { 
+    AFActionListenerDelegate verifyActions, 
+    AFParamListenerDelegate verifyParamUpdate,
+    AFAsyncQueryListenerDelegate verifyQuery,
+    bool expectRender = true, 
+    int maxWidgets = 1, 
+    int extraFrames = 0 
+  });
 
-  Future<void> enterText(dynamic selector, String text) {
-    return applyWidgetValue(selector, text, AFApplyWidgetAction.applySetValue);
+  Future<void> tap(dynamic selector, { 
+    bool expectRender = true, 
+    AFActionListenerDelegate verifyActions, 
+    AFParamListenerDelegate verifyParamUpdate,
+    AFAsyncQueryListenerDelegate verifyQuery, 
+  }) {
+    return applyWidgetValue(selector, null, AFApplyWidgetAction.applyTap, expectRender: expectRender, verifyActions: verifyActions, verifyParamUpdate: verifyParamUpdate, verifyQuery: verifyQuery);
   }
 
-  Future<void> tap(dynamic selector, { bool expectRender = true }) {
-    return applyWidgetValue(selector, null, AFApplyWidgetAction.applyTap, expectRender: expectRender);
+  Future<void> swipeDismiss(dynamic selector, { 
+    bool expectRender = true, 
+    int maxWidgets = 1, 
+    int extraFrames = 0, 
+    AFActionListenerDelegate verifyActions, 
+    AFParamListenerDelegate verifyParamUpdate,
+    AFAsyncQueryListenerDelegate verifyQuery 
+  }) {
+    return applyWidgetValue(selector, null, AFApplyWidgetAction.applyDismiss, expectRender: expectRender, maxWidgets: maxWidgets, extraFrames: extraFrames+1, verifyActions: verifyActions, verifyParamUpdate: verifyParamUpdate, verifyQuery: verifyQuery);
   }
 
-  Future<void> tapWithExpectedAction(dynamic widgetSpecifier, AFActionWithKey actionSpecifier, Function(AFActionWithKey) checkQuery, { bool expectRender = true }) {
-    return applyWidgetValueWithExpectedAction(widgetSpecifier, null, AFApplyWidgetAction.applyTap, actionSpecifier, checkQuery, extraFrames: 1, expectRender: expectRender);
+  Future<void> setValue(dynamic selector, dynamic value, { 
+    bool expectRender = true, 
+    int maxWidgets = 1, 
+    int extraFrames = 0, 
+    AFActionListenerDelegate verifyActions, 
+    AFParamListenerDelegate verifyParamUpdate,
+    AFAsyncQueryListenerDelegate verifyQuery,    
+  }) {
+    return applyWidgetValue(selector, value, AFApplyWidgetAction.applySetValue, expectRender: expectRender, maxWidgets:  maxWidgets, extraFrames: extraFrames+1, verifyActions: verifyActions, verifyParamUpdate: verifyParamUpdate, verifyQuery: verifyQuery);
   }
 
-  Future<void> tapWithExpectedParam(dynamic specifier, Function(AFRouteParam) checkParam, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 }) {
-    return applyWidgetValueWithExpectedParam(specifier, null, AFApplyWidgetAction.applyTap, checkParam, expectRender: expectRender, extraFrames: extraFrames, maxWidgets: maxWidgets);
-  }
-
-  Future<void> tapWithNavigatePop(dynamic specifier) {
-    return tapWithActionType(specifier, AFNavigatePopAction());
-  }
-
-  Future<void> tapWithActionType(dynamic specifier, AFActionWithKey action, { bool expectRender = true }) {
-    return applyWidgetValueWithExpectedAction(specifier, null, AFApplyWidgetAction.applyTap, action, (AFActionWithKey key) {}, expectRender: expectRender);
-  }
 
   Future<void> keepSynchronous();
   Future<void> updateScreenData(dynamic data);
-
-  void expectActionOnce(AFActionWithKey specifier, Function(AFActionWithKey) checkAction, {int extraFrames = 0});
 
   Future<void> executeNamedSection(AFTestSectionID id, dynamic params);
 
@@ -593,25 +608,18 @@ class AFScreenTestWidgetCollector extends AFSingleScreenTestExecute {
     addSelector(selector);
   }
 
-  Future<void> applyWidgetValue(dynamic selector, dynamic value, String applyType, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 }) {
-    addSelector(selector);
-    return null;
-  }
-  
-  Future<void> applyWidgetValueWithExpectedAction(dynamic selector, dynamic value, String applyType, AFActionWithKey actionSpecifier, Function(AFActionWithKey) checkAction, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 }) {
-    addSelector(selector);
-    return null;
-  }
-  
-  Future<void> applyWidgetValueWithExpectedParam(dynamic selector, dynamic value, String applyType, Function(AFRouteParam) checkParam, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 }) {
+  Future<void> applyWidgetValue(dynamic selector, dynamic value, String applyType, { 
+    AFActionListenerDelegate verifyActions, 
+    AFParamListenerDelegate verifyParamUpdate,
+    AFAsyncQueryListenerDelegate verifyQuery,
+    bool expectRender = true, 
+    int maxWidgets = 1, 
+    int extraFrames = 0 
+  }) {
     addSelector(selector);
     return null;
   }
 
-
-  void expectActionOnce(AFActionWithKey specifier, Function(AFActionWithKey) checkAction, { int extraFrames = 0 }) {
-
-  }
 
   Future<void> pauseForRender(int previousCount, bool expectRender) {
     return keepSynchronous();
@@ -760,7 +768,15 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
     }
   }
 
-  Future<void> applyWidgetValue(dynamic selectorDyn, dynamic value, String applyType, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 }) async {
+  Future<void> applyWidgetValue(dynamic selectorDyn, dynamic value, String applyType, { 
+      AFActionListenerDelegate verifyActions, 
+      AFParamListenerDelegate verifyParamUpdate,
+      AFAsyncQueryListenerDelegate verifyQuery,
+      bool expectRender = true, 
+      int maxWidgets = 1, 
+      int extraFrames = 0 
+    }) async {
+    AFibF.testOnlyClearRecentActions();
     final previous = AFibF.testOnlyScreenUpdateCount(activeScreenId);
     final selector = AFScreenTestWidgetCollector.createSelector(null, selectorDyn);
     List<Element> elems = elementCollector.findWidgetsFor(selector);
@@ -777,26 +793,32 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
       throw AFException("No AFApplyWidgetAction found for ${elem.widget.runtimeType}, you can register one using AFScreenTests.registerApplicator");
     }
     tapable.apply(applyType, selector, elem, value);    
+    if(verifyActions != null) {
+      verifyActions(AFibF.testOnlyRecentActions);
+    } 
+    if(verifyParamUpdate != null) {
+      final AFNavigateSetParamAction setParam = AFibF.testOnlyRecentActions.firstWhere( (act) => (act is AFNavigateSetParamAction), orElse: () => null );
+      if(setParam == null) {
+        throw AFException("Passed in verifyUpdateParam, but there was not an AFNavigateSetParamAction dispatched by action");
+      }
+      var paramOuter = setParam.param;
+      var paramInner = paramOuter;
+      if(paramOuter is AFPrototypeSingleScreenRouteParam) {
+        paramInner = paramOuter.param;
+      }
+
+      verifyParamUpdate(paramInner);
+    }
+    if(verifyQuery != null) {
+      final AFAsyncQueryCustomError query = AFibF.testOnlyRecentActions.firstWhere( (act) => (act is AFAsyncQueryCustomError), orElse: () => null );
+      if(query == null) {
+        throw AFException("Passed in verifyQuery, but there was not an AFAsyncQueryCustomError dispatched by action");
+      }
+      verifyQuery(query);
+    }
+
     await pauseForRender(previous, expectRender);
     return keepSynchronous();
-  }
-  
-  Future<void> applyWidgetValueWithExpectedAction(dynamic selector, dynamic value, String applyType, AFActionWithKey actionSpecifier, Function(AFActionWithKey) checkAction, { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 }) async {
-    final previous = AFibF.testOnlyScreenUpdateCount(activeScreenId);
-    await applyWidgetValue(selector, value, applyType, expectRender: expectRender, maxWidgets: maxWidgets);
-    expectActionOnce(actionSpecifier, checkAction, extraFrames: extraFrames+1);    
-    return pauseForRender(previous, expectRender);
-    //return null;
-  }
-
-  Future<void> applyWidgetValueWithExpectedParam(dynamic selector, dynamic value, String applyType, Function(AFRouteParam) checkParam,  { bool expectRender = true, int maxWidgets = 1, int extraFrames = 0 }) async {
-    final previous = AFibF.testOnlyScreenUpdateCount(activeScreenId);
-    await applyWidgetValueWithExpectedAction(selector, value, applyType, AFNavigateSetParamAction(), (dynamic action) {
-      AFNavigateSetParamAction paramAction = action;
-      checkParam(paramAction.param);
-    }, extraFrames: 1);    
-    
-    return pauseForRender(previous, expectRender);
   }
 
   Future<void> keepSynchronous() {
@@ -832,19 +854,6 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
       selected = widget.selected;
     }
     this.expect(selected, ft.equals(expect), extraFrames: 4);
-  }
-
-  @override
-  void expectActionOnce(AFActionWithKey specifier, Function(AFActionWithKey) checkAction, { int extraFrames = 0 }) {
-    final key = specifier.key;
-    final found = AFibF.testOnlyRecentActionWithKey(key);
-    this.expect(found, ft.isNotNull, extraFrames: extraFrames+1);
-    if(found == null) {
-      return;
-    }
-    
-    checkAction(found);
-    AFibF.testOnlyRemoveRecentActionByKey(key);
   }
   
   @override
@@ -1203,6 +1212,7 @@ class AFSingleScreenTests<TState> {
     registerApplicator(AFIconButtonAction());
     registerApplicator(AFListTileTapAction());
     registerApplicator(AFGestureDetectorTapAction());
+    registerApplicator(AFDismissibleSwipeAction());
 
     registerExtractor(AFSelectableChoiceChip());
     registerExtractor(AFExtractTextTextAction());
@@ -1332,10 +1342,16 @@ abstract class AFMultiScreenTestExecute {
   Future<void> tapNavigateFromTo({
     @required dynamic tap,
     @required AFScreenID from,
-    @required AFScreenID to
+    @required AFScreenID to,
+    bool expectRender = true,
   });
 
-  Future<void> runScreenTest(AFTestID screenTestId, AFScreenID terminalScreen, {dynamic params, AFTestID queryResults, bool expectRender = true});
+  Future<void> runScreenTest(AFTestID screenTestId, {
+    AFScreenID terminalScreen, 
+    dynamic params, 
+    AFTestID queryResults, 
+    bool expectRender = true});
+  Future<void> runWidgetTest(AFTestID widgetTestId, AFScreenID originScreen, {AFScreenID terminalScreen, dynamic params, AFTestID queryResults, bool expectRender = true});
   Future<void> onScreen(AFScreenID screenId, AFScreenID terminalScreen, {AFTestID queryResults, Function(AFScreenTestExecute) body, expectRender = true});
   Future<void> keepSynchronous();
   
@@ -1349,7 +1365,8 @@ class AFMultiScreenTestWidgetCollector extends AFMultiScreenTestExecute {
   Future<void> tapNavigateFromTo({
     @required dynamic tap,
     @required AFScreenID from,
-    @required AFScreenID to
+    @required AFScreenID to,
+    bool expectRender = true
   }) {
     elementCollector.underScreen(from, () {
       elementCollector.addSelector(tap);
@@ -1357,13 +1374,19 @@ class AFMultiScreenTestWidgetCollector extends AFMultiScreenTestExecute {
     return keepSynchronous();
   }
 
-  Future<void> runScreenTest(AFTestID screenTestId, AFScreenID terminalScreen, {dynamic params, AFTestID queryResults, bool expectRender = true}) async {
+  Future<void> runScreenTest(AFTestID screenTestId, {AFScreenID terminalScreen, dynamic params, AFTestID queryResults, bool expectRender = true}) async {
     final screenTest = AFibF.screenTests.findById(screenTestId);
     elementCollector.pushScreen(screenTest.screenId);
     await screenTest.run(elementCollector, params);
     elementCollector.popScreen();
   }
 
+  Future<void> runWidgetTest(AFTestID widgetTestId, AFScreenID originScreen, {AFScreenID terminalScreen, dynamic params, AFTestID queryResults, bool expectRender = true}) async {
+    final widgetTest = AFibF.widgetTests.findById(widgetTestId);
+    elementCollector.pushScreen(originScreen);
+    await widgetTest.run(elementCollector, params);
+    elementCollector.popScreen();
+  }
 
   Future<void> onScreen(AFScreenID screenId, AFScreenID terminalScreen, {AFTestID queryResults, Function(AFScreenTestExecute) body, expectRender = true}) async {
     await elementCollector.underScreen(screenId, () async {
@@ -1384,7 +1407,7 @@ class AFMultiScreenTestContext extends AFMultiScreenTestExecute {
   AFMultiScreenTestContext(this.screenContext);  
 
   /// Execute the specified screen tests, with query-responses provided by the specified state test.
-  Future<void> runScreenTest(AFTestID screenTestId, AFScreenID terminalScreen, {dynamic params, AFTestID queryResults, bool expectRender = true}) async {
+  Future<void> runScreenTest(AFTestID screenTestId,  {AFScreenID terminalScreen, dynamic params, AFTestID queryResults, bool expectRender = true}) async {
     int prevRenderCount = AFibF.testOnlyScreenUpdateCount(terminalScreen);
     _installQueryResults(queryResults);
     final screenTest = AFibF.screenTests.findById(screenTestId);
@@ -1398,12 +1421,21 @@ class AFMultiScreenTestContext extends AFMultiScreenTestExecute {
     return keepSynchronous();  
   }
 
+  Future<void> runWidgetTest(AFTestID widgetTestId, AFScreenID originScreen, {AFScreenID terminalScreen, dynamic params, AFTestID queryResults, bool expectRender = true}) async {
+    _installQueryResults(queryResults);
+    final widgetTest = AFibF.widgetTests.findById(widgetTestId);
+    screenContext.pushScreen(originScreen);
+    await widgetTest.run(screenContext, params, useParentCollector: true);  
+    screenContext.popScreen();    
+  }
+
   Future<void> tapNavigateFromTo({
     @required dynamic tap,
     @required AFScreenID from,
-    @required AFScreenID to
+    @required AFScreenID to,
+    bool expectRender = true
   }) {
-      return onScreen(from, to, body: (AFScreenTestExecute ste) async {
+      return onScreen(from, to, expectRender: expectRender, body: (AFScreenTestExecute ste) async {
         await ste.tap(tap, expectRender: false);
         return ste.keepSynchronous();
       });
@@ -1425,7 +1457,7 @@ class AFMultiScreenTestContext extends AFMultiScreenTestExecute {
     AFibD.logTest?.d("Finished underscreen");
 
     if(screenId != terminalScreen) {
-      return screenContext.pauseForRender(prevRenderCount, true, screenId: terminalScreen);
+      return screenContext.pauseForRender(prevRenderCount, expectRender, screenId: terminalScreen);
     } else {
       return keepSynchronous();
     }

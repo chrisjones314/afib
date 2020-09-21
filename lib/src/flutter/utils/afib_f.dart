@@ -60,7 +60,7 @@ class AFibF {
   static final testOnlyScreens = Map<AFScreenID, AFibTestOnlyScreenElement>();
   static Map<String, AFAsyncQueryListenerCustomError> listenerQueries = Map<String, AFAsyncQueryListenerCustomError>();
   static Map<String, AFDeferredQueryCustomError> deferredQueries = Map<String, AFDeferredQueryCustomError>();
-  static final _recentActions = Map<String, AFActionWithKey>();
+  static final _recentActions = List<AFActionWithKey>();
 
 
   
@@ -168,20 +168,17 @@ class AFibF {
   /// Used internally in tests to keep track of recently dispatched actions
   /// so that we can verify their contents.
   static void testOnlyRegisterRegisterAction(AFActionWithKey action) {
-    final key = action.key;
-    _recentActions[key] = action;
+    _recentActions.add(action);
   }
 
   /// Used internally to get the most recent action with the specified key.
-  static AFActionWithKey testOnlyRecentActionWithKey(String key) {
-    return _recentActions[key];
+  static List<AFActionWithKey> get testOnlyRecentActions {
+    return _recentActions;
   }
 
-  /// Used internally to remove the most recent action with the specified key.
-  static void testOnlyRemoveRecentActionByKey(String key) {
-    _recentActions.remove(key);
+  static void testOnlyClearRecentActions() {
+    _recentActions.clear();
   }
-
 
   /// The navigator key for referencing the Navigator for the material app.
   static GlobalKey<NavigatorState> get navigatorKey {

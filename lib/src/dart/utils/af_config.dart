@@ -80,6 +80,11 @@ class AFConfig {
     return requiresTestData;
   }
 
+  /// True if we are in prototype mode
+  bool get isPrototypeMode {
+    return requiresPrototypeData;
+  }
+
   /// Returns true if our current mode requires prototype data.
   bool get requiresPrototypeData {
     return AFConfigEntries.environment.requiresPrototypeData(this);

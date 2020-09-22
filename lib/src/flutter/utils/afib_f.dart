@@ -447,18 +447,37 @@ class AFibF {
   }
   
   static void _populateAllWidgetCollectors() async {
-    _populateWidgetCollectors(AFibF.screenTests.all);
-    _populateWidgetCollectors(AFibF.widgetTests.all);
-    _populateWidgetCollectors(AFibF.multiScreenStateTests.all);
+    final guard = _AFTestAsyncGuard();
+    await _populateWidgetCollectors(guard, AFibF.screenTests.all);
+    await _populateWidgetCollectors(guard, AFibF.widgetTests.all);
+    await _populateWidgetCollectors(guard, AFibF.multiScreenStateTests.all);
   }
 
-  static Future<void> _populateWidgetCollectors(List<AFScreenPrototypeTest> tests) async {
+  static Future<void> _populateWidgetCollectors(_AFTestAsyncGuard guard, List<AFScreenPrototypeTest> tests) async {
+
     for(final test in tests) {
+      guard.startTest(test.id);
       await test.populateWidgetCollector();
+      guard.finishTest();
     }
 
     return null;
   }
 
 
+}
+
+class _AFTestAsyncGuard {
+  AFTestID activeTest;
+
+  void startTest(AFTestID test) {
+    if(activeTest != null) {
+      throw AFException("The test $activeTest is missing an await somewhere, causing it to execute with asynchronous breaks.  Look for places you were calling a test API that required an await");
+    }
+    activeTest = test;
+  }
+
+  void finishTest() {
+    activeTest = null;
+  } 
 }

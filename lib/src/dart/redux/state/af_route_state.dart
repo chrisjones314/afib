@@ -259,7 +259,15 @@ class AFRouteState {
   List<AFRouteSegment> _cyclePrior(List<AFRouteSegment> revisedActive, int popCount) {
     // dispose any segments from the prior pop.
     for(final expiredSegment in this.priorLastSegment) {
-      expiredSegment.dispose();
+      // In prototype mode, it is possible to navigate in/out of a screen with a test
+      // parameter containing things like TextEditingControllers.  However, because of the
+      // way the test framework works, the route parameter will be the same each time, whereas
+      // in a real app it would get recreated each time you visit the test screen.   
+      // This can cause stuff in the param to get re-used after it is disposed.  So, in prototype
+      // mode we don't call dispose.
+      if(!AFibD.config.isPrototypeMode) {
+        expiredSegment.dispose();
+      }
     }
 
     // create a new prior segment with all the segments being popped off.

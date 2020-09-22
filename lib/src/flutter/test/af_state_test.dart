@@ -134,7 +134,7 @@ class AFStateTest<TState extends AFAppState> {
     });
   }
 
-  void verifyAfter({AFTestSectionID id, ProcessVerify verify}) {
+  void verifyStateAfterQuery({AFTestSectionID id, ProcessVerify verify}) {
     postQueries.add(_AFStateQueryEntry(id, verify));
   }
 

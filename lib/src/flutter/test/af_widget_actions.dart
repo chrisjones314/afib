@@ -337,6 +337,37 @@ class AFExtractTextTextFieldAction extends AFExtractPrimaryWidgetAction {
   }
 }
 
+class AFExtractRichTextAction extends AFExtractPrimaryWidgetAction {
+
+  AFExtractRichTextAction(): super(RichText);
+
+  @override
+  dynamic extractInternal(String extractType, AFWidgetSelector selector, Element element) {
+    final widget = element.widget;
+    if(AFExtractWidgetAction.isPrimary(extractType) && widget is RichText) {
+      final composed = StringBuffer();
+      _populateFromSpan(composed, widget.text);
+      return composed.toString();
+    } 
+    return null;
+  }
+
+  void _populateFromSpan(StringBuffer dest, InlineSpan span) {
+    if(span is TextSpan) {
+      if(span.text != null) {
+        dest.write(span.text);
+      }
+      if(span.children != null) {
+        for(final child in span.children) {
+          _populateFromSpan(dest, child);
+        }
+      }
+    }
+  }
+
+}
+
+
 class AFExtractTextAFTextFieldAction extends AFExtractPrimaryWidgetAction {
 
   AFExtractTextAFTextFieldAction(): super(AFTextField);

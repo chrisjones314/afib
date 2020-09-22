@@ -97,6 +97,7 @@ class AFibF {
       p.initWidgetTests(AFibF.widgetTests, testData);
       p.initScreenTests(AFibF.screenTests, testData);
       p.initMultiScreenStateTests(AFibF.multiScreenStateTests, testData);
+      _populateAllWidgetCollectors();
     }
 
     if(AFibD.config.requiresPrototypeData) {
@@ -445,6 +446,19 @@ class AFibF {
     _postStartup = true;
   }
   
+  static void _populateAllWidgetCollectors() async {
+    _populateWidgetCollectors(AFibF.screenTests.all);
+    _populateWidgetCollectors(AFibF.widgetTests.all);
+    _populateWidgetCollectors(AFibF.multiScreenStateTests.all);
+  }
+
+  static Future<void> _populateWidgetCollectors(List<AFScreenPrototypeTest> tests) async {
+    for(final test in tests) {
+      await test.populateWidgetCollector();
+    }
+
+    return null;
+  }
 
 
 }

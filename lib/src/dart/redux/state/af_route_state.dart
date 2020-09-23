@@ -164,6 +164,16 @@ class AFRouteState {
     return -1;
   }
 
+  AFRouteParam findPopupParamFor(AFScreenID screen) {
+    for(int i = popups.length - 1; i >= 0; i--) {
+      final segment = popups[i];
+      if(segment.matchesScreen(screen)) {
+        return segment.param;
+      }
+    }
+    return null;
+  }
+
 
   /// Finds the data associated with the specified [screen] in the current route.
   /// 
@@ -275,6 +285,20 @@ class AFRouteState {
     }
 
     return copyWith(route: revised);
+  }
+
+  /// Replaces the route parameter for the specified popup screen.
+  AFRouteState setPopupParam(AFScreenID screen, AFRouteParam param) {
+    final revised = List<AFRouteSegment>.of(this.popups);
+    for(int i = 0; i < revised.length; i++) {
+      AFRouteSegment seg = revised[i];
+      if(seg.screen == screen) {
+        revised[i] = seg.copyWith(param: param);
+        break;
+      }
+    }
+
+    return copyWith(popups: revised);
   }
 
   /// Removes all existing segments in the route, and adds back the specified screen/data.

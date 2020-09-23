@@ -371,29 +371,37 @@ abstract class AFConnectedWidgetWithParam<TState, TData extends AFStoreConnector
 /// Just like an [AFConnectedScreen], except it is typically displayed as 
 /// a modal overlay on top of an existing screen, and launched using a custom 
 /// AFPopupRoute
-abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedWidgetWithParam<TState, TData, TRouteParam> {
-  final AFScreenID screenId;
+abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreen<TState, TData, TRouteParam> {
   final Animation<double> animation;
   final AFBottomPopupTheme theme;
+  final AFCreateDataDelegate createDataDelegate;
   AFPopupScreen({
-    @required this.screenId,
+    AFScreenID screenId,
     @required this.animation, 
     @required this.theme,
-    @required AFDispatcher dispatcher,
-    @required AFUpdateParamDelegate<TRouteParam> updateParamDelegate,
-    @required AFExtractParamDelegate extractParamDelegate,
-    @required AFCreateDataDelegate createDataDelegate,
-    @required AFFindParamDelegate findParamDelegate,
-  }): super(
-    dispatcher: dispatcher,
-    updateParamDelegate: updateParamDelegate,
-    extractParamDelegate: extractParamDelegate,
-    createDataDelegate: createDataDelegate,
-    findParamDelegate: findParamDelegate
-  );
+    @required this.createDataDelegate
+  }): super(screenId);
 
   AFScreenID get screenIdForTest {
     return screenId;
+  }
+  
+  /// Find the route parameter for the specified named screen
+  @override
+  TRouteParam findParam(AFState state) {
+    return state.route?.findPopupParamFor(this.screenId);
+  }
+
+  TData createData(TState state) {
+    return this.createDataDelegate(state);
+  }
+
+  void updateParam(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
+    dispatcher.dispatch(AFNavigateSetPopupParamAction(
+      id: id,
+      screen: this.screenId, 
+      param: revised)
+    );
   }
 
   @override
@@ -409,7 +417,7 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
       child: AnimatedBuilder(
         animation: animation,
         builder: (BuildContext ctx, Widget child) {
-          final local = AFBuildContext<TData, TRouteParam>(ctx, dispatcher, context.s, context.p);
+          final local = AFBuildContext<TData, TRouteParam>(ctx, context.d, context.s, context.p);
           final double bottomPadding = MediaQuery.of(local.c).padding.bottom;
           return ClipRect(
             child: CustomSingleChildLayout(

@@ -50,6 +50,10 @@ class AFNavigateSetParamAction extends AFNavigateAction {
   AFNavigateSetParamAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
 }
 
+class AFNavigateSetPopupParamAction extends AFNavigateAction {
+  AFNavigateSetPopupParamAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
+}
+
 /// Action that adds a new screen after the current screen in the route.
 /// 
 /// Subsequently, [AFNavigatePopAction] will return you to the parent screen.
@@ -68,10 +72,11 @@ class AFNavigatePushPopupAction extends AFNavigateActionWithReturn {
     AFID id, 
     @required this.context,
     @required AFScreenID screen, 
+    AFRouteParam param,
     AFReturnFunc onReturn,
     this.barrierLabel,
     @required this.theme,
-    @required this.popupBuilder}): super(id: id, screen: screen, param: null, onReturn: onReturn);
+    @required this.popupBuilder}): super(id: id, screen: screen, param: param, onReturn: onReturn);
 }
 
 class AFNavigatePopFromFlutterAction extends AFNavigateAction {

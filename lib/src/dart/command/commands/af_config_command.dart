@@ -117,6 +117,25 @@ class AFConfigEntryList extends AFConfigEntry {
 
 }
 
+
+
+class AFConfigEntryLogArea extends AFConfigEntryList {
+  static const app = "app";
+  static const query = "query";
+  static const config = "config";
+  static const test = "test";
+  static const route = "route";
+  static const none = "none";
+  static const all = "all";
+  static const allAreas = [app, query, config, test, route, none, all];
+
+  AFConfigEntryLogArea(): super(AFConfigEntries.afNamespace, "logAreas", [app], help: "Space separated list of [${allAreas.join('|')}|grep-style-text]");
+
+  List<String> areasFor(AFConfig config) {
+    return config.stringListFor(this);
+  }
+}
+
 class AFConfigEntryEnabledTests extends AFConfigEntryList {
   static const allTests = "all";
   static const stateTests = "state";
@@ -322,7 +341,7 @@ class AFConfigCommand extends AFCommand {
 
   AFConfigCommand(): super(AFConfigEntries.afNamespace, cmdKey, 0, 2) {
     registerEntry(AFConfigEntries.environment);
-    registerEntry(AFConfigEntries.internalLogging);
+    registerEntry(AFConfigEntries.logAreas);
   }
 
   /// Only register entries that are stored in afib.g.dart and can be manipulated

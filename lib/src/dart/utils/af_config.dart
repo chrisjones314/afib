@@ -96,8 +96,8 @@ class AFConfig {
   }
 
   /// True if AFib should display internal log statements.
-  bool get enableInternalLogging {
-    return boolFor(AFConfigEntries.internalLogging);
+  List<String> get logAreas {
+    return AFConfigEntries.logAreas.areasFor(this);
   }
 
   String get projectFolderName {

@@ -10,7 +10,7 @@ class AFConfigEntryEnvironment extends AFConfigEntryChoice {
   static const testStore = "test_store";
   static const allEnvironments = [production, debug, prototype, testStore];
 
-  AFConfigEntryEnvironment(): super(AFConfigEntries.afNamespace, "environment", "production") {
+  AFConfigEntryEnvironment(): super(AFConfigEntries.afNamespace, "environment", production) {
     addChoice(debug, "");
     addChoice(production, "");
     addChoice(prototype, "Display a list of prototype screens, see initialization/test/screen_tests.dart");
@@ -28,3 +28,4 @@ class AFConfigEntryEnvironment extends AFConfigEntryChoice {
   }
 
 }
+

@@ -23,7 +23,7 @@ class AFConfigEntries {
 
   /// Used to turn on debug logging that may be useful in finding problems in 
   /// the Afib framework, off by default.
-  static final internalLogging = AFConfigEntryBool(afNamespace, "internalLogging", false, "Set to true to show internal afib log statements");
+  static final logAreas = AFConfigEntryLogArea();
 
   /// Set to true only when running under a flutter WidgetTester test.
   /// 

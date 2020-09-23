@@ -56,6 +56,7 @@ class AFibF {
   static Map<String, AFAsyncQueryListenerCustomError> listenerQueries = Map<String, AFAsyncQueryListenerCustomError>();
   static Map<String, AFDeferredQueryCustomError> deferredQueries = Map<String, AFDeferredQueryCustomError>();
   static final _recentActions = List<AFActionWithKey>();
+  static int navDepth = 0;
 
   /// a key for referencing the Navigator for the material app.
   static final GlobalKey<NavigatorState> _afNavigatorKey = new GlobalKey<NavigatorState>();
@@ -126,6 +127,28 @@ class AFibF {
     return routeState.activeScreenId;
   }
 
+  static void correctForFlutterPopNavigation() {
+    _afStore.dispatch(AFNavigatePopFromFlutterAction());
+  }
+
+  static void doMiddlewareNavigation( Function(NavigatorState) underHere ) {
+    navDepth++;
+    if(navDepth > 1) {
+      throw AFException("Unexpected navigation depth greater than 1");
+    }
+    NavigatorState navState = AFibF.navigatorKey.currentState;
+    if(navState != null) {
+      underHere(navState);
+    }
+    navDepth--;
+    if(navDepth < 0) {
+      throw AFException("Unexpected navigation depth less than 0");
+    }
+  }
+
+  static bool get withinMiddewareNavigation {
+    return navDepth > 0;
+  }
 
   /// Used internally in tests to find widgets on the screen.  Not for public use.
   static AFibTestOnlyScreenElement registerTestScreen(AFScreenID screenId, BuildContext screenElement) {

@@ -216,10 +216,19 @@ class AFRouteState {
     return copyWith(popups: revisedPopups);
   }
 
-  AFRouteState popPopup(AFScreenID popup, AFRouteParam param) {
+  AFRouteState popPopup() {
     final revisedPopups = List<AFRouteSegment>.of(this.popups);
     revisedPopups.removeLast();
     return copyWith(popups: revisedPopups);
+  }
+
+  /// 
+  AFRouteState popFromFlutter() {
+    if(popups.isNotEmpty) {
+      return popPopup();
+    } else {
+      return pop(null);
+    }
   }
 
   /// Remove the leaf element from the route, returning back to the parent

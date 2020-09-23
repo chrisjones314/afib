@@ -52,7 +52,7 @@ class AFibD<AppState> {
           AFibD.logQuery = AFibD._afLogger;
           AFibD.logConfig = AFibD._afLogger;
           AFibD.logTest = AFibD._afLogger;
-
+          AFibD.logRoute = AFibD._afLogger;
         }
 
         AFibD.logConfig?.i("Environment: " + AFibD.config.environment);

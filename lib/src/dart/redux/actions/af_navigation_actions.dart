@@ -74,10 +74,8 @@ class AFNavigatePushPopupAction extends AFNavigateActionWithReturn {
     @required this.popupBuilder}): super(id: id, screen: screen, param: null, onReturn: onReturn);
 }
 
-/// Used to close a popup screen
-class AFNavigatePopPopupAction extends AFNavigateAction {
-  final dynamic returnData;
-  AFNavigatePopPopupAction({AFID id, this.returnData}): super(id: id, screen: null, param: null);
+class AFNavigatePopFromFlutterAction extends AFNavigateAction {
+  AFNavigatePopFromFlutterAction({AFID id}): super(id:id, screen:null, param: null);
 }
 
 /// Action that navigates on screen up in the route, discarding the current leaf route.
@@ -95,6 +93,13 @@ class AFNavigatePopAction extends AFNavigateAction {
   
   AFNavigatePopAction({AFID id, this.returnData, this.worksInPrototypeMode = true}): super(id: id, screen: null, param: null);
 }
+
+/// Used to close a popup screen
+class AFNavigatePopPopupAction extends AFNavigatePopAction {
+  BuildContext context;
+  AFNavigatePopPopupAction(this.context, {AFID id, dynamic returnData}): super(id: id, returnData: returnData);
+}
+
 
 /// Pops [popCount] screens off the navigation stack.
 class AFNavigatePopNAction extends AFNavigatePopAction {

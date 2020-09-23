@@ -1,7 +1,45 @@
+import 'package:afib/afib_dart.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:flutter/material.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+
+
+class AFNavigatorObserver extends NavigatorObserver {
+  void didPop(Route route, Route previousRoute) {
+    // TODO: figure out how to detect unexpected pops for both sliding 
+    // back gesture and clicking outside a popup.
+    if(!AFibF.withinMiddewareNavigation) {
+      AFibF.correctForFlutterPopNavigation();
+    }    
+  }
+
+  void didPush(Route route, Route previousRoute) {
+    _logNav("didPush");
+  }
+
+  void didRemove(Route route, Route previousRoute) {
+    _logNav("didRemove");
+
+  }
+  
+  void didReplace({Route newRoute, Route oldRoute}) {
+    _logNav("didReplace");
+  }
+
+  void didStartUserGesture(Route route, Route previousRoute) {
+    _logNav("didStartUserGesture");
+  }
+
+  void didStopUserGesture() {
+    _logNav("didStopUserGesture");
+  }
+
+  void _logNav(String title) {
+    AFibD.logRoute?.d("$title");
+  }
+
+}
 
 /// The parent class of [MaterialApp] based AFib apps.
 /// 
@@ -23,4 +61,8 @@ abstract class AFMaterialApp<AppState> extends AFApp<AppState> {
 
   /// Build a [MaterialApp] for the application
   Widget buildMaterialApp();
+
+  AFNavigatorObserver createAFNavigatorObserver() {
+    return AFNavigatorObserver();
+  }
 }

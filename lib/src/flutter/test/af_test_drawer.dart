@@ -128,7 +128,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData, AFRou
           // give the drawer time to close, then 
           Timer(Duration(seconds: 1), () async {            
             test.onDrawerRun(context.d, context.s.testContext, context.s.testState, () {
-              scaffold.openEndDrawer();
+              test.openTestDrawer();
             });
           });
         },

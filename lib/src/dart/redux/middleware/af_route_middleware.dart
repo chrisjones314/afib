@@ -19,14 +19,23 @@ List<Middleware<AFState>> createRouteMiddleware() {
     TypedMiddleware<AFState, AFNavigatePopAction>(_navigatePopAction),
     TypedMiddleware<AFState, AFNavigatePopNAction>(_navigatePopNAction),
     TypedMiddleware<AFState, AFNavigatePopToAction>(_navigatePopToAction),
-    TypedMiddleware<AFState, AFNavigateExitTestAction>(_navigateExitTestAction)
+    TypedMiddleware<AFState, AFNavigateExitTestAction>(_navigateExitTestAction),
+    TypedMiddleware<AFState, AFNavigatePopPopupAction>(_navigatePopPopupAction)
   ];
 }
+
+
 
 //---------------------------------------------------------------------------
 AFRouteState _getRouteState(Store<AFState> store) {
   final state = store.state;
   return state.route;
+}
+
+//---------------------------------------------------------------------------
+void _navigatePopPopupAction(Store<AFState> store, act, NextDispatcher next) {
+  AFNavigatePopPopupAction action = act;
+  AFibF.navigatorKey.currentState?.pop(action.returnData);
 }
 
 //---------------------------------------------------------------------------
@@ -36,13 +45,9 @@ void _navigatePushPopupAction(Store<AFState> store, act, NextDispatcher next) {
   Future<dynamic> ret = Navigator.push(
         action.context,
         new AFCustomPopupRoute(
-            //dispatcher: dispatcher,
-            //param: param,
-            //onChanged: onChanged,
-            //onConfirm: onConfirm,
             childBuilder: action.popupBuilder,
             theme: action.theme,
-            barrierLabel: "Dismiss",
+            barrierLabel: action.barrierLabel,
         )
   );
   if(ret != null && action.onReturn != null) {
@@ -148,6 +153,9 @@ void _navigateReplaceAllAction(Store<AFState> store, action, NextDispatcher next
 
 //---------------------------------------------------------------------------
 void _navigateExitTestAction(Store<AFState> store, action, NextDispatcher next) {
+  /// Clear out our cache of screen info for the next test.
+  AFibF.resetTestScreens();
+
   final navState = AFibF.navigatorKey.currentState;
   final route = _getRouteState(store);
   final popCount = route.popCountToRoot;

@@ -13,6 +13,7 @@ final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigatePopToAction>(_navPopTo),
   TypedReducer<AFRouteState, AFNavigateSetParamAction>(_navSetParam),
   TypedReducer<AFRouteState, AFNavigateExitTestAction>(_navExitTest),
+  TypedReducer<AFRouteState, AFNavigatePopPopupAction>(_navPopPopup),
 ]);
 
 //---------------------------------------------------------------------------
@@ -33,10 +34,13 @@ AFRouteState _navPush(AFRouteState state, AFNavigatePushAction action) {
 
 //---------------------------------------------------------------------------
 AFRouteState _navPushPopup(AFRouteState state, AFNavigatePushPopupAction action) {
-
-  return state.pushNamed(action.screen, action.param);
+  return state.pushPopup(action.screen, action.param);
 }
 
+//---------------------------------------------------------------------------
+AFRouteState _navPopPopup(AFRouteState state, AFNavigatePopPopupAction action) {
+  return state.popPopup(action.screen, action.param);
+}
 
 //---------------------------------------------------------------------------
 AFRouteState _navPop(AFRouteState state, AFNavigatePopAction action) {

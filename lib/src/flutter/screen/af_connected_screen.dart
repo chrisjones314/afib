@@ -29,6 +29,10 @@ abstract class AFDispatcher {
     }
 
     return ( shouldPop ||
+             action is AFNavigatePushPopupAction ||
+             action is AFNavigatePopPopupAction ||
+             action is AFNavigatePopNAction ||
+             action is AFNavigatePopToAction ||
              action is AFUpdatePrototypeScreenTestDataAction || 
              action is AFPrototypeScreenTestAddError ||
              action is AFPrototypeScreenTestIncrementPassCount ||
@@ -209,7 +213,7 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
             }
             
             final info = AFibF.registerTestScreen(screenIdRegister, buildContext);
-            AFibD.logTest?.d("Rebuilding screen $runtimeType/$screenIdRegister with updateCount ${info.updateCount} and param ${dataContext.p}");
+            AFibD.logTest?.d("Rebuilding screen $runtimeType/$screenIdRegister with param ${dataContext.p}");
           }
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p);
           return buildWithContext(withContext);
@@ -394,22 +398,6 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
     return screenId;
   }
 
-  static void openPopup({
-    @required BuildContext context, 
-    @required AFRouteWidgetBuilder popupBuilder, 
-    @required AFBottomPopupTheme theme}) {
-    Navigator.push(
-      context,
-      new AFCustomPopupRoute(
-          childBuilder: popupBuilder,
-          theme: theme,
-          barrierLabel: "Dismiss",
-      )
-    );
-  }
-
-
-
   @override
   Widget buildWithContext(AFBuildContext<TData, TRouteParam> context) {
     return buildPopupAnimation(context);
@@ -417,6 +405,9 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
 
   Widget buildPopupAnimation(AFBuildContext<TData, TRouteParam> context) {
     return GestureDetector(
+      onTap: () {
+        AFibD.log?.d("OnTapGestureDetector");
+      },
       child: AnimatedBuilder(
         animation: animation,
         builder: (BuildContext ctx, Widget child) {

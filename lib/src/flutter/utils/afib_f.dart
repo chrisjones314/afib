@@ -1,3 +1,4 @@
+import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
@@ -24,13 +25,8 @@ import 'package:redux/redux.dart';
 class AFibTestOnlyScreenElement {
   final AFScreenID screenId;
   BuildContext element;
-  int updateCount = 0;
 
   AFibTestOnlyScreenElement(this.screenId, this.element);
-
-  void increaseBuildCount() {
-    updateCount++;
-  }
 }
 
 /// A class for finding accessing global utilities in AFib. 
@@ -39,7 +35,6 @@ class AFibTestOnlyScreenElement {
 /// application.  Globals contain debugging utilities (e.g. logging)
 /// and configuration that is immutable after startup (e.g. configuration).
 class AFibF {
-
   static bool _postStartup = false;
   static final AFScreenMap _afScreenMap = AFScreenMap();
   static InitializeAppState _afInitializeAppState;
@@ -61,9 +56,6 @@ class AFibF {
   static Map<String, AFAsyncQueryListenerCustomError> listenerQueries = Map<String, AFAsyncQueryListenerCustomError>();
   static Map<String, AFDeferredQueryCustomError> deferredQueries = Map<String, AFDeferredQueryCustomError>();
   static final _recentActions = List<AFActionWithKey>();
-
-
-  
 
   /// a key for referencing the Navigator for the material app.
   static final GlobalKey<NavigatorState> _afNavigatorKey = new GlobalKey<NavigatorState>();
@@ -109,6 +101,32 @@ class AFibF {
     finishStartup();
   }
 
+  static void testOnlyVerifyActiveScreen(AFScreenID screenId, {includePopups = false}) {
+    if(screenId == null) {
+      return;
+    }
+
+    final state = _afStore.state;
+    final routeState = state.route;
+
+    if(!routeState.isActiveScreen(screenId, includePopups: includePopups)) {
+      throw AFException("Screen $screenId is not the currently active screen in route ${routeState.toString()}");
+    }
+
+    var info = testOnlyScreens[screenId];    
+    if(info == null || info.element == null) {
+      throw AFException("Screen $screenId is active, but has not rendered (as there is no screen element), this might be an intenral problem in Afib.");
+    }
+
+  }
+
+  static AFScreenID get testOnlyActiveScreenId {
+    final state = _afStore.state;
+    final routeState = state.route;
+    return routeState.activeScreenId;
+  }
+
+
   /// Used internally in tests to find widgets on the screen.  Not for public use.
   static AFibTestOnlyScreenElement registerTestScreen(AFScreenID screenId, BuildContext screenElement) {
     var info = testOnlyScreens[screenId];
@@ -117,7 +135,6 @@ class AFibF {
       testOnlyScreens[screenId] = info;
     }
     info.element = screenElement;
-    info.increaseBuildCount();
     return info;
   }
 
@@ -146,24 +163,10 @@ class AFibF {
     _recentActions.clear();
   }
 
+
   /// Used internally in tests to find widgets on the screen.  Not for public use.
   static AFibTestOnlyScreenElement findTestScreen(AFScreenID screenId) {
     return testOnlyScreens[screenId];
-  }
-
-  /// Used internally in tests to find widgets on the screen.  Not for public use.
-  static int testOnlyScreenUpdateCount(AFScreenID screenId) {
-    final info = testOnlyScreens[screenId];
-    if(info == null) {
-      return 0;
-    }
-    return info.updateCount;
-  }
-
-  static void testOnlyIncreaseAllUpdateCounts() {
-    for(final info in testOnlyScreens.values) {
-      info.increaseBuildCount();
-    }
   }
 
   /// Used internally in tests to keep track of recently dispatched actions
@@ -463,8 +466,6 @@ class AFibF {
 
     return null;
   }
-
-
 }
 
 class _AFTestAsyncGuard {

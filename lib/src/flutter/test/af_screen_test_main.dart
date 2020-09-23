@@ -81,13 +81,10 @@ Future<void> _afStandardScreenTestMain(
       AFibD.logTest?.d("Finished ${test.id}");
 
       // pop this test screen off so that we are ready for the next one.
-      AFibF.testOnlyStore.dispatch(AFNavigatePopAction());
+      AFibF.testOnlyStore.dispatch(AFNavigateExitTestAction());
       
       dispatcher.setContext(context);
       await tester.pumpAndSettle(Duration(seconds: 1));
-
-      /// Clear out our cache of screen info for the next test.
-      AFibF.resetTestScreens();
     }
   }
 

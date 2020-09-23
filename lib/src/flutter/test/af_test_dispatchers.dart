@@ -53,12 +53,7 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
     } else if(action is AFNavigateSetParamAction) {
       processSetParam(action);
       // change this into a set param action for the prototype.
-    } else {
-      // if this is an action that doesn't really dispatch, then bump the 
-      // screen update count artificially to allow tests to continue (they
-      // are waiting for a screen update.
-      AFibF.testOnlyIncreaseAllUpdateCounts();
-    }
+    } 
 
     // if this is a test action, then remember it so that we can 
     if(!isTestAct && action is AFObjectWithKey) {

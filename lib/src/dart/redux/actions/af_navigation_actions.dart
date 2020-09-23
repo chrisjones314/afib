@@ -62,17 +62,23 @@ class AFNavigatePushPopupAction extends AFNavigateActionWithReturn {
   final BuildContext context;
   final AFBottomPopupTheme theme;
   final AFRouteWidgetBuilder popupBuilder;
+  final String barrierLabel;
   
   AFNavigatePushPopupAction({
     AFID id, 
     @required this.context,
     @required AFScreenID screen, 
-    @required AFRouteParam param,
     AFReturnFunc onReturn,
+    this.barrierLabel,
     @required this.theme,
-    @required this.popupBuilder}): super(id: id, screen: screen, param: param, onReturn: onReturn);
+    @required this.popupBuilder}): super(id: id, screen: screen, param: null, onReturn: onReturn);
 }
 
+/// Used to close a popup screen
+class AFNavigatePopPopupAction extends AFNavigateAction {
+  final dynamic returnData;
+  AFNavigatePopPopupAction({AFID id, this.returnData}): super(id: id, screen: null, param: null);
+}
 
 /// Action that navigates on screen up in the route, discarding the current leaf route.
 /// 

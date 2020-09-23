@@ -39,6 +39,11 @@ class AFRouteSegment {
     return false;
   }
 
+  AFScreenID get screenId {
+    final effective = param?.effectiveScreenId;
+    return effective ?? screen;
+  }
+
   String toString() {
     return screen.code;
   }
@@ -76,14 +81,29 @@ class AFRouteState {
   
   
   final List<AFRouteSegment> route;
+  final List<AFRouteSegment> popups;
 
-  AFRouteState({this.route, this.priorLastSegment});  
+  AFRouteState({this.route, this.popups, this.priorLastSegment});  
 
   /// Creates the default initial state.
   factory AFRouteState.initialState() {
     final route = List<AFRouteSegment>();
+    final popups = List<AFRouteSegment>();
     route.add(AFRouteSegment.withScreen(AFibF.effectiveStartupScreenId));
-    return AFRouteState(route: route, priorLastSegment: List<AFRouteSegment>());
+    return AFRouteState(route: route, popups: popups, priorLastSegment: List<AFRouteSegment>());
+  }
+
+  bool isActiveScreen(AFScreenID screen, { bool includePopups }) {
+    var last = route.last;
+    if(includePopups && popups.isNotEmpty) {
+      last = popups.last;
+    }
+    return last.matchesScreen(screen);
+  }
+
+  AFScreenID get activeScreenId {
+    final last = route.last;
+    return last.screenId;
   }
 
   /// Returns the segment in the current route associated with the 
@@ -190,6 +210,18 @@ class AFRouteState {
     );
   }
 
+  AFRouteState pushPopup(AFScreenID popup, AFRouteParam param) {
+    final revisedPopups = List<AFRouteSegment>.of(this.popups);
+    revisedPopups.add(AFRouteSegment.withParam(popup, param));
+    return copyWith(popups: revisedPopups);
+  }
+
+  AFRouteState popPopup(AFScreenID popup, AFRouteParam param) {
+    final revisedPopups = List<AFRouteSegment>.of(this.popups);
+    revisedPopups.removeLast();
+    return copyWith(popups: revisedPopups);
+  }
+
   /// Remove the leaf element from the route, returning back to the parent
   /// screen.
   AFRouteState pop(dynamic childReturn) {
@@ -283,10 +315,12 @@ class AFRouteState {
   //---------------------------------------------------------------------------------------
   AFRouteState copyWith({
     List<AFRouteSegment> route,
+    List<AFRouteSegment> popups,
     List<AFRouteSegment> priorLastSegment
   }) {
     final revised = new AFRouteState(
       route: route ?? this.route,
+      popups: popups ?? this.popups,
       priorLastSegment: priorLastSegment ?? this.priorLastSegment
     );
     AFibD.logRoute?.d("Revised Route: $revised");

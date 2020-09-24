@@ -224,7 +224,7 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
   AFScreenID get screenIdForTest;
 
   AFBuildContext<TData, TRouteParam> _createNonBuildContext(AFStore store) {
-    final data = createDataAF(store.state);
+    final data = createStateDataAF(store.state);
     final param = findParam(store.state);
     final context = createContext(null, createDispatcher(store), data, param);
     return context;
@@ -237,12 +237,12 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
   /// Find the route param for this screen. 
   AFRouteParam findParam(AFState state) { return null; }
 
-  TData createDataAF(AFState state) {
-    return createData(state.app);
+  TData createStateDataAF(AFState state) {
+    return createStateData(state.app);
   }
 
   /// Override this to create an [AFStoreConnectorData] with the required data from the state.
-  TData createData(TState state);
+  TData createStateData(TState state);
 
   /// Builds a Widget using the data extracted from the state.
   Widget buildWithContext(AFBuildContext<TData, TRouteParam> context);
@@ -260,12 +260,12 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
   /// the ability to reference/update the AFRouteParam of their parent screen.
   /// This is here to create a single consistent mechanism for performing updates
   /// even in cases where that specific widget does not have its own route entry.
-  void updateParam(AFDispatcher dispatcher, TRouteParam revised, { AFID id });
+  void updateParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id });
 
-  /// Like [updateParam], but takes a build context
+  /// Like [updateParamD], but takes a build context
   /// rather than a dispatcher for convenience.
-  void updateParamC(AFBuildContext context,TRouteParam revised, { AFID id }) {
-    return updateParam(context.dispatcher, revised, id: id);
+  void updateParam(AFBuildContext context,TRouteParam revised, { AFID id }) {
+    return updateParamD(context.dispatcher, revised, id: id);
   }
 
 }
@@ -289,7 +289,7 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
   /// ### Example
   ///   final revisedParam = screenData.param.copyWith(someField: myRevisedValue);
   ///   updateParam(screenData, revisedParam);
-  void updateParam(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
+  void updateParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
     dispatcher.dispatch(AFNavigateSetParamAction(
       id: id,
       screen: this.screenId, 
@@ -299,8 +299,8 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
 
   /// Utility method which updates the parameter, but takes a build context
   /// rather than a dispatcher for convenience
-  void updateParamC(AFBuildContext context,TRouteParam revised, { AFID id }) {
-    return updateParam(context.dispatcher, revised, id: id);
+  void updateParam(AFBuildContext context,TRouteParam revised, { AFID id }) {
+    return updateParamD(context.dispatcher, revised, id: id);
   }
 
   /// Find the route parameter for the specified named screen
@@ -339,7 +339,7 @@ abstract class AFConnectedWidgetWithParam<TState, TData extends AFStoreConnector
   }
 
   @override
-  TData createData(TState state) {
+  TData createStateData(TState state) {
     return this.createDataDelegate(state);
   }
 
@@ -361,7 +361,7 @@ abstract class AFConnectedWidgetWithParam<TState, TData extends AFStoreConnector
   }
 
   /// Updates the parameter for the parent screen, rather than updating a parameter for our screen (which has no route entry).
-  void updateParam(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
+  void updateParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
     updateParamDelegate(dispatcher, revised, id: id);
   }
 
@@ -392,11 +392,11 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
     return state.route?.findPopupParamFor(this.screenId);
   }
 
-  TData createData(TState state) {
+  TData createStateData(TState state) {
     return this.createDataDelegate(state);
   }
 
-  void updateParam(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
+  void updateParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
     dispatcher.dispatch(AFNavigateSetPopupParamAction(
       id: id,
       screen: this.screenId, 

@@ -90,7 +90,7 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppState, AFStoreConnect
   }
 
   @override
-  AFStoreConnectorDataUnused createData(AFAppState state) {
+  AFStoreConnectorDataUnused createStateData(AFAppState state) {
     return AFStoreConnectorDataUnused();
   }
 

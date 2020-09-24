@@ -55,12 +55,12 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppState, AFPrototypeW
   }
 
   @override
-  AFPrototypeWidgetData createDataAF(AFState state) {
+  AFPrototypeWidgetData createStateDataAF(AFState state) {
     return AFPrototypeWidgetData(state.testState);
   }
 
   @override
-  AFPrototypeWidgetData createData(AFAppState state) {
+  AFPrototypeWidgetData createStateData(AFAppState state) {
     // this should never be called, because createDataAF supercedes it.
     throw UnimplementedError();
   }

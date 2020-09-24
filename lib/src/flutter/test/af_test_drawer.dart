@@ -50,14 +50,14 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData, AFRou
 
   //--------------------------------------------------------------------------------------
   @override
-  AFTestDrawerData createDataAF(AFState state) {
+  AFTestDrawerData createStateDataAF(AFState state) {
     final testState = state.testState;
     final test = AFibF.findScreenTestById(testState.activeTestId);
     return AFTestDrawerData(testState.findContext(test.id), testState.findState(test.id), test);
   }
 
   @override
-  AFTestDrawerData createData(AFAppState state) {
+  AFTestDrawerData createStateData(AFAppState state) {
     // this should never be called, because createDataAF replaces it.
     throw UnimplementedError();
   }

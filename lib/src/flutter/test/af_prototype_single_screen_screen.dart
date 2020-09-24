@@ -73,13 +73,13 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppState, AFProt
   }
 
   @override
-  AFPrototypeSingleScreenData createDataAF(AFState state) {
+  AFPrototypeSingleScreenData createStateDataAF(AFState state) {
     AFSingleScreenTests tests = AFibF.screenTests;
     return AFPrototypeSingleScreenData(tests, state.testState);
   }
 
   @override
-  AFPrototypeSingleScreenData createData(AFAppState state) {
+  AFPrototypeSingleScreenData createStateData(AFAppState state) {
     // this should never be called, because createDataAF supercedes it.
     throw UnimplementedError();
   }

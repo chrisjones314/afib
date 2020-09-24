@@ -38,7 +38,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppState, APrototypeHome
   AFPrototypeHomeScreen(): super(AFUIID.screenPrototypeHome);
 
   @override
-  APrototypeHomeScreenData createData(AFAppState state) {
+  APrototypeHomeScreenData createStateData(AFAppState state) {
     AFSingleScreenTests tests = AFibF.screenTests;
     return APrototypeHomeScreenData(tests);
   }

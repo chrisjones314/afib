@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
+import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
 import 'package:afib/src/dart/utils/af_unused.dart';
@@ -10,7 +11,6 @@ import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 
 /// A version of [AFAsyncQueryCustomError] for queries that should be run in the background
 /// after a delay.  
-///   
 abstract class AFDeferredQueryCustomError<TState, TError> extends AFAsyncQueryCustomError<TState, AFUnused, TError> {
   Duration nextDelay;
   Timer timer;
@@ -24,34 +24,34 @@ abstract class AFDeferredQueryCustomError<TState, TError> extends AFAsyncQueryCu
   /// In addition, any calculations done at the beginning might be based on an
   /// obsolete state by the time onResponse gets called.   Instead, you want to
   /// do your calculations on the state you are handed on [finishAsyncExecute]
-  void startAsync(Function(AFUnused) onResponse, Function(TError) onError) {
-    _delayThenExecute(onResponse);
+  void startAsync(AFStartQueryContext<AFUnused, TError> context) {
+    _delayThenExecute(context);
   }
 
-  void _delayThenExecute(Function(AFUnused) onResponse) {
+  void _delayThenExecute(AFStartQueryContext<AFUnused, TError> context) {
     timer = Timer(nextDelay, () {
       AFibD.logQuery?.d("Executing finishAsyncExecute for deferred query $this");
-      onResponse(null);
+      context.onSuccess(null);
       if(nextDelay == null) {
         afShutdown();
       } else {
         AFibD.logQuery?.d("Waiting $nextDelay to execute $key again");
-        _delayThenExecute(onResponse);
+        _delayThenExecute(context);
       }
     });
   }
 
   /// Calls the more appropriate [finishAsyncExecute] when the [initialDelay] associated with this
   /// query has expired.
-  void finishAsyncWithResponse(AFDispatcher dispatcher, TState state, AFUnused response) {
-    nextDelay = finishAsyncExecute(dispatcher, state);
+  void finishAsyncWithResponse(AFFinishQuerySuccessContext<TState, AFUnused> context) {
+    nextDelay = finishAsyncExecute(context);
   }
 
   /// Override this method to perform deferred calculations. 
   /// 
   /// Return null if you are done executing, or return a duration if you'd like to try executing
   /// again after another delay.
-  Duration finishAsyncExecute(AFDispatcher dispatcher, TState state);
+  Duration finishAsyncExecute(AFFinishQuerySuccessContext<TState, AFUnused> context);
 
   void afShutdown() {
     if(timer != null) {
@@ -63,6 +63,17 @@ abstract class AFDeferredQueryCustomError<TState, TError> extends AFAsyncQueryCu
   }
 
   void shutdown();
+
+  AFFinishQuerySuccessContext createSuccessContext({
+    AFDispatcher dispatcher, 
+    AFState state, 
+  }) {
+    return AFFinishQuerySuccessContext<TState, AFUnused>(    
+      dispatcher: dispatcher,
+      state: state,
+      response: null,
+    );
+  }
 }
 
 /// A version of [AFDeferredQueryCustomError] which users [AFQueryError] for errors.

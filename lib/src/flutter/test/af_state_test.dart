@@ -10,15 +10,13 @@ import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 
-
-
 abstract class AFStateTestExecute extends AFBaseTestExecute {
 
   AFStateTestExecute();
   
 }
 
-class AFStateTestContext<TState> extends AFStateTestExecute {
+class AFStateTestContext<TState extends AFAppState> extends AFStateTestExecute {
   AFStateTest test;
   final AFStore store;
   final AFDispatcher dispatcher;
@@ -28,6 +26,7 @@ class AFStateTestContext<TState> extends AFStateTestExecute {
   AFStateTestContext(this.test, this.store, this.dispatcher, { @required this.isTrueTestContext} );
 
   AFTestID get testID { return this.test.id; }
+  AFState get afState { return store.state; }
   TState get state { return store.state.app; }
   AFRouteState get route { return store.state.route; }
   static void setCurrentTest(AFStateTestContext context) { _currentTest = context; }
@@ -42,13 +41,13 @@ typedef void ProcessQuery(AFStateTestContext context, AFAsyncQueryCustomError qu
 typedef void ProcessTest(AFStateTest test);
 typedef void ProcessVerify(AFStateTestExecute execute, AFAppState stateBefore, AFAppState stateAfter);
 
-class AFStateTests {
+class AFStateTests<TState extends AFAppState> {
   final Map<dynamic, dynamic> data = Map<dynamic, dynamic>();
   final List<AFStateTest<dynamic>> tests = List<AFStateTest<dynamic>>();
   AFStateTestContext<dynamic> context;
 
   void queryTest(AFTestID id, AFAsyncQueryCustomError query, ProcessTest handler) {
-    final test = AFStateTest<AFAppState>(id, query, this);
+    final test = AFStateTest<TState>(id, query, this);
     tests.add(test);
     handler(test);
   }
@@ -77,7 +76,7 @@ class _AFStateQueryEntry {
 }
 
 class AFStateTest<TState extends AFAppState> {
-  final AFStateTests tests;
+  final AFStateTests<TState> tests;
   final AFTestID id;
   AFTestID idPredecessor;
   final AFAsyncQueryCustomError query;
@@ -166,7 +165,12 @@ void execute(AFStateTestContext context) {
 
       /// deferred queries don't have any results.
       if(query is AFDeferredQueryCustomError) {
-        query.finishAsyncExecute(context.dispatcher, context.state);
+        final successContext = query.createSuccessContext(
+          dispatcher: context.dispatcher,
+          state: context.afState
+        );
+
+        query.finishAsyncExecute(successContext);
         return;
       }
 

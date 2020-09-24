@@ -146,7 +146,7 @@ class AFConfigEntryEnabledTests extends AFConfigEntryList {
   static const widgetTests = "widget";
   static const allAreas = [allTests, unitTests, stateTests, widgetTests, screenTests, queryTests, multiScreenTests];
 
-  AFConfigEntryEnabledTests(): super(AFConfigEntries.afNamespace, "enabledTestList", [allTests], help: "Space separated list of [${allAreas.join('|')}|test_id|test_tag]");
+  AFConfigEntryEnabledTests(): super(AFConfigEntries.afNamespace, "enabledTestList", [allTests], help: "Space separated list of areas that should display logging messages [${allAreas.join('|')}|test_id|test_tag]");
 
   bool isAreaEnabled(AFConfig config, String area) {
     List<String> areas = config.stringListFor(this);

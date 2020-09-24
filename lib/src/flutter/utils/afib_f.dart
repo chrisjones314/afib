@@ -364,13 +364,6 @@ class AFibF {
     deferredQueries[key] = query; 
   }
 
-
-  static void handleFinishWithResponse(AFAsyncQueryCustomError query, AFDispatcher dispatcher, dynamic state) {
-  }
-
-  static void handleFinishWithError(AFAsyncQueryCustomError query, AFDispatcher dispatcher, dynamic state) {
-  }
-
   /// Shutdown all outstanding listener queries using [AFAsyncQueryListenerCustomError.shutdown]
   /// 
   /// You might use this to shut down outstanding listener queries when a user logs out.

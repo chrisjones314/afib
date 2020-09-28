@@ -5,8 +5,6 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_prototype_home_screen.dart';
-import 'package:afib/src/flutter/test/af_test_actions.dart';
-import 'package:afib/src/flutter/test/af_prototype_single_screen_screen.dart';
 import 'package:afib/src/flutter/utils/af_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -141,12 +139,12 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppState, AFStoreConnect
   }
 
   static Widget createTestCard(AFDispatcher dispatcher, AFScreenPrototypeTest instance) {
-    final subtitleWidget = (instance.subtitle == null) ? null : Text(instance.subtitle);
+    final titleText = instance.title ?? instance.id.code;
     return Card(
       key: Key(instance.id.code),
       child: ListTile(
-        title: Text(instance.id.code),
-        subtitle: subtitleWidget,
+        title: Text(titleText),
+        subtitle: Text(instance.id.code),
         dense: true,
         trailing: Icon(Icons.chevron_right),
         onTap: () {

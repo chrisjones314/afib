@@ -53,6 +53,15 @@ class AFWidgetID extends AFID {
   AFWidgetID with1(dynamic item) {
     return AFWidgetID("${code}_${item.toString()}");
   }
+
+  AFWidgetID with2(dynamic first, dynamic second) {
+    final key = StringBuffer(code);
+    key.write("_${first.toString()}");
+    if(second != null) {
+      key.write("_${second.toString()}");
+    }
+    return AFWidgetID(key.toString());
+  }
 }
 
 class AFTestID extends AFIDWithTags {

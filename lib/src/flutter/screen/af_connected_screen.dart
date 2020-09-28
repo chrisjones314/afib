@@ -29,6 +29,7 @@ abstract class AFDispatcher {
     }
 
     return ( shouldPop ||
+             action is AFNavigateExitTestAction || 
              action is AFNavigatePushPopupAction ||
              action is AFNavigatePopPopupAction ||
              action is AFUpdatePrototypeScreenTestDataAction || 
@@ -168,6 +169,9 @@ class AFStoreConnectorData6<TV1, TV2, TV3, TV4, TV5, TV6> extends AFStoreConnect
 /// This common superclass makes it possible to treat all afib Widgets/screens
 /// similarly for testing and prototyping purposes.
 abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends StatelessWidget {
+  AFBuildableWidget({Key key}): super(key: key);
+
+
     /// Builds a Widget using the data extracted from the state.
   Widget buildWithContext(AFBuildContext<TData, TRouteParam> context);
 
@@ -180,7 +184,7 @@ abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam
 /// A screen that uses data from the store but not from the route.
 abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFBuildableWidget<TData, TRouteParam> {
   //--------------------------------------------------------------------------------------
-  AFConnectedWidgetBase();
+  AFConnectedWidgetBase({Key key}): super(key: key);
 
   //--------------------------------------------------------------------------------------
   @override
@@ -327,12 +331,13 @@ abstract class AFConnectedWidgetWithParam<TState, TData extends AFStoreConnector
   final AFDispatcher dispatcher;
 
   AFConnectedWidgetWithParam({
+    Key key,
     @required this.dispatcher,
     @required this.findParamDelegate,
     @required this.updateParamDelegate,
     @required this.extractParamDelegate,
     @required this.createDataDelegate
-  }): super();
+  }): super(key: key);
 
   AFScreenID get screenIdForTest {
     return null;

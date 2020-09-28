@@ -84,7 +84,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppState, APrototypeHome
     if(tests == null || tests.isEmpty) {
       return;
     }
-    rows.add(AFPrototypeTestScreen.createSectionHeader("Filtered Tests"));
+    rows.add(AFPrototypeTestScreen.createSectionHeader("Selected Tests"));
 
     for(final test in tests) {
       rows.add(AFPrototypeTestScreen.createTestCard(context.d, test));

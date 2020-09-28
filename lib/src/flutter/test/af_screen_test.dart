@@ -279,11 +279,11 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
     //throw UnimplementedError();
   }
 
-  void expectOneWidget(dynamic selector) {
-    expectNWidgets(selector, 1, extraFrames: 1);
+  Future<void> expectOneWidget(dynamic selector) {
+    return expectNWidgets(selector, 1, extraFrames: 1);
   }  
 
-  void expectMissingWidget(dynamic selector) {
+  Future<void> expectMissingWidget(dynamic selector) {
     expectNWidgets(selector, 0, extraFrames: 1, scrollIfMissing: false);
   }
 
@@ -294,14 +294,14 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   /// pass in a list of selectors.  If you do so, then the operation takes place
   /// under a sparse-path containing all the items in the list.
   Future<void> underWidget(dynamic selector, Future<void> Function() underHere);
-  void expectNWidgets(dynamic selector, int n, {int extraFrames = 0, bool scrollIfMissing });
+  Future<void> expectNWidgets(dynamic selector, int n, {int extraFrames = 0, bool scrollIfMissing });
 
-  void expectTextEquals(dynamic selector, String text) {
-    expectWidgetValue(selector, ft.equals(text), extraFrames: 1);
+  Future<void> expectTextEquals(dynamic selector, String text) {
+    return expectWidgetValue(selector, ft.equals(text), extraFrames: 1);
   }
 
-  void expectText(dynamic selector, ft.Matcher matcher) {
-    expectWidgetValue(selector, matcher, extraFrames: 1);
+  Future<void> expectText(dynamic selector, ft.Matcher matcher) {
+    return expectWidgetValue(selector, matcher, extraFrames: 1);
   }
 
   Future<void> underScreen(AFScreenID screen, Function underHere) async {
@@ -357,14 +357,14 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   /// it is very common to verify that several of them are on or off
   /// at the same time, and passing in a list is a concise way to do
   /// so.
-  void expectChipSelected(dynamic selector, bool sel) {
-    expectWidgetValue(selector, ft.equals(sel), extraFrames: 1);
+  Future<void> expectChipSelected(dynamic selector, bool sel) {
+    return expectWidgetValue(selector, ft.equals(sel), extraFrames: 1);
   }
 
-  void expectWidget(dynamic selector, Function(Element elem) onFound, { int extraFrames = 0 });
-  void expectWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 });
+  Future<void> expectWidget(dynamic selector, Function(Element elem) onFound, { int extraFrames = 0 });
+  Future<void> expectWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 });
 
-  void expectWidgetValue(dynamic selector, ft.Matcher matcher, { int extraFrames = 0 });
+  Future<void> expectWidgetValue(dynamic selector, ft.Matcher matcher, { int extraFrames = 0 });
 
   /// Verifies that [element] has the expected [key], which can be
   /// either a [String] or an [AFWidgetID].
@@ -774,20 +774,22 @@ class AFScreenTestWidgetCollector extends AFSingleScreenTestExecute {
     return keepSynchronous();
   }
 
-  void expectWidget(dynamic selector, Function(Element) onFound, { int extraFrames = 0 }) {
+  Future<void> expectWidget(dynamic selector, Function(Element) onFound, { int extraFrames = 0 }) {
     addSelector(selector);
   }
 
-  void expectWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 }) {
+  Future<void> expectWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 }) {
     addSelector(selector);
+    return keepSynchronous();
   }
 
   
-  void expectNWidgets(dynamic selector, int n, {int extraFrames = 0, bool scrollIfMissing}) {
+  Future<void> expectNWidgets(dynamic selector, int n, {int extraFrames = 0, bool scrollIfMissing}) {
     addSelector(selector);
+    return keepSynchronous();
   }
 
-  void expectWidgetValue(dynamic selector, ft.Matcher matcher, { int extraFrames = 0 }) {
+  Future<void> expectWidgetValue(dynamic selector, ft.Matcher matcher, { int extraFrames = 0 }) {
     addSelector(selector);
   }
 

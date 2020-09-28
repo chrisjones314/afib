@@ -27,3 +27,5 @@ export "src/dart/command/af_command.dart";
 export "src/dart/command/af_standard_commands.dart";
 export "src/dart/utils/afib_d.dart";
 export "src/dart/utils/af_ui_id.dart";
+export "src/dart/redux/queries/af_package_info_query.dart";
+export "src/dart/redux/state/af_package_info_state.dart";

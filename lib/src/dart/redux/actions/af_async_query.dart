@@ -245,6 +245,27 @@ class AFConsolidatedQuery<TState> extends AFAsyncQuery<TState, AFConsolidatedQue
       successActions: successActions);
   }
 
+  List<AFAsyncQuery> get allQueries {
+    final result = List<AFAsyncQuery>();
+    for(final qr in queryResponses.responses) {
+      result.add(qr.query);
+    }
+    return result;
+  }
+
+  TQuery findQueryWhere<TQuery extends AFAsyncQuery>(Function(TQuery) testQuery) {
+    for(final qr in queryResponses.responses) {
+      final query = qr.query;
+      if(query is TQuery) {
+        if(testQuery(query)) {
+          return query;
+        }
+      }
+    }
+    return null;
+  }
+
+
   void startAsyncAF(AFDispatcher dispatcher, AFStore store, { Function(dynamic) onResponseExtra, Function(dynamic) onErrorExtra }) {
       final completer = Completer<bool>();
 

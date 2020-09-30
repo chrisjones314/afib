@@ -442,6 +442,7 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
 
 
   Future<void> keepSynchronous();
+  Future<void> get ks { return keepSynchronous(); }
   Future<void> updateScreenData(dynamic data);
   void verifyPopupScreenId(AFScreenID screenId);
 

@@ -41,7 +41,7 @@ class AFibD<AppState> {
           AFibD.config.setValue(AFConfigEntries.environment, p.forceEnv);
         }
         p.initAppConfig(AFibD.config);
-        final String env = AFibD.config.environment;
+        final env = AFibD.config.environment;
         if(env == AFConfigEntryEnvironment.debug) {
           p.initDebugConfig(AFibD.config);
         } else if(env == AFConfigEntryEnvironment.production) {
@@ -60,7 +60,7 @@ class AFibD<AppState> {
       AFibD.logConfig  = _createLogger(AFConfigEntryLogArea.config, logAreas);
       AFibD.logTest    = _createLogger(AFConfigEntryLogArea.test, logAreas);
       AFibD.logRoute   = _createLogger(AFConfigEntryLogArea.route, logAreas);
-      AFibD.logConfig?.i("Environment: " + AFibD.config.environment);
+      AFibD.logConfig?.i("Environment: ${AFibD.config.environment}");
 
   }
 

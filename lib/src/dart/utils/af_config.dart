@@ -16,7 +16,7 @@ import 'package:afib/src/dart/utils/af_config_entries.dart';
 /// All get methods return null if the key does not have a value. 
 class AFConfig {
 
-  final Map<AFConfigEntry, dynamic> values = Map<AFConfigEntry, dynamic>();
+  final Map<AFConfigEntry, dynamic> values = <AFConfigEntry, dynamic>{};
 
 
   /// Finds a configuration entry based on its command line name.
@@ -60,7 +60,7 @@ class AFConfig {
   List<String> stringListFor(AFConfigEntry entry) {
     List result = valueFor(entry);
     if(result.length == 0) {
-      return List<String>();
+      return <String>[];
     }
     return result;
   }
@@ -127,7 +127,7 @@ class AFConfig {
 
   void dumpEntry(AFConfigEntry entry, AFCommandOutput output) {
       AFCommand.startCommandColumn(output);
-      output.write(entry.namespaceKey + ": ");
+      output.write("${entry.namespaceKey}: ");
       AFCommand.startHelpColumn(output);
       output.writeLine(valueFor(entry).toString());    
   }

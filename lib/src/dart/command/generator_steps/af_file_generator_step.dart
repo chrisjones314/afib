@@ -21,7 +21,7 @@ class AFFileGeneratorStep extends AFSourceGenerationStep {
   bool validateBefore(AFCommandContext ctx, AFGeneratedFiles files) {
     final output = ctx.output;
     final template = ctx.templates.templateForFile(this.projectPath);
-    List<AFTemplateReplacementPoint> points = template.findReplacementPoints();
+    final points = template.findReplacementPoints();
     for(final point in points) {
       if(!localGenerators.hasGeneratorFor(point) && !ctx.generators.hasGeneratorFor(point)) {
         output.writeErrorLine("Missing dynamic section handler ${point.key} while generating $projectPath");
@@ -35,7 +35,7 @@ class AFFileGeneratorStep extends AFSourceGenerationStep {
     final template = ctx.templates.templateForFile(this.projectPath);
     final file = files.fileFor(ctx.templates, this.projectPath);
 
-    List<AFTemplateReplacementPoint> points = template.findReplacementPoints();
+    final points = template.findReplacementPoints();
     final start = StringBuffer();
     if(projectPath.last.contains(".g.")) {
       // only write this for files that get re-generated.  Not those that are generated once when they 
@@ -56,12 +56,12 @@ class AFFileGeneratorStep extends AFSourceGenerationStep {
         gen = ctx.generators.generatorFor(point);
       }
       if(gen == null) {
-        throw new AFException("Unknown insertion point ${point.key}");
+        throw AFException("Unknown insertion point ${point.key}");
       }
       gen.execute(ctx, toInsert);
 
       // now, do the actual substituation.
-      final re = RegExp("${AFCodeGeneratorWithTemplate.replacementPoint}\\(" + point.key + "\\)");
+      final re = RegExp("${AFCodeGeneratorWithTemplate.replacementPoint}\\(${point.key}\\)");
       final insert = toInsert.withIndent(point.indent);
       result = result.replaceAll(re, insert);
     }

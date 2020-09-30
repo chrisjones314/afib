@@ -44,15 +44,15 @@ abstract class AFAppState {
 
   static Map<String, Object> integrate(Map<String, Object> original, Iterable<Object> toIntegrate) {
     final revised = Map<String, Object>.of(original);
-    toIntegrate?.forEach( (model) {
-      String key = AFAppStateModel.stateKeyFor(model);
+    for(final model in toIntegrate) {
+      final key = AFAppStateModel.stateKeyFor(model);
       revised[key] = model;
-    });
+    }
     return revised;
   }
 
   static Map<String, Object> empty() {
-    return Map<String, Object>();
+    return <String, Object>{};
   }
 
   Object findModel(Type t) {
@@ -68,7 +68,7 @@ abstract class AFAppState {
   }
 
   AFAppState copyWithOne(Object toIntegrate) {
-    final toI = List<Object>();
+    final toI = <Object>[];
     toI.add(toIntegrate);
     return copyWith(toI);
   }

@@ -23,7 +23,7 @@ class AFQueryMiddleware implements MiddlewareClass<AFState>
         AFibF.registerDeferredQuery(query);
       }
 
-      AFStateTestContext testContext = AFStateTestContext.currentTest;
+      final testContext = AFStateTestContext.currentTest;
       if(testContext != null) {
         testContext.processQuery(query);
       } else {

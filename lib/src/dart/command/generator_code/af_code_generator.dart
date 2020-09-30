@@ -13,7 +13,7 @@ abstract class AFCodeGenerator extends AFItemWithNamespace {
 
   static String toSnakeCase(String convert) {
     final sb = StringBuffer();
-    for(int i = 0; i < convert.length; i++) {
+    for(var i = 0; i < convert.length; i++) {
       final c = convert[i];
       if(c == c.toUpperCase()) {
         if(i > 0) {
@@ -52,11 +52,12 @@ class AFCodeGeneratorWithTemplate extends AFCodeGenerator {
   AFCodeGeneratorWithTemplate(this.template, {this.writeLine = true}): super(template.namespace, template.key);
 
   void execute(AFCommandContext ctx, AFCodeBuffer buffer) {
-    String content = AFFileGeneratorStep.replacePoints(ctx, template.template, template.findReplacementPoints(), localGenerators);
-    if(writeLine)
+    final content = AFFileGeneratorStep.replacePoints(ctx, template.template, template.findReplacementPoints(), localGenerators);
+    if(writeLine) {
       buffer.writeLine(content);
-    else
+    } else {
       buffer.write(content);
+    }
   }
 }
 

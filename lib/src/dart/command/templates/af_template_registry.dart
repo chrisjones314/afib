@@ -9,7 +9,7 @@ import 'package:afib/src/dart/command/templates/statements/declare_id_statement.
 import 'package:afib/src/dart/command/templates/statements/import_statements.dart';
 
 class AFGeneratorRegistry {
-  final replacementGenerators = Map<String, AFCodeGenerator>();
+  final replacementGenerators = <String, AFCodeGenerator>{};
 
   AFGeneratorRegistry();
 
@@ -34,8 +34,8 @@ class AFGeneratorRegistry {
 }
 
 class AFTemplateRegistry {
-  final fileTemplates = Map<String, AFFileSourceTemplate>();
-  final statementTemplates = Map<String, AFStatementSourceTemplate>();
+  final fileTemplates = <String, AFFileSourceTemplate>{};
+  final statementTemplates = <String, AFStatementSourceTemplate>{};
 
   AFTemplateRegistry() {
     registerFile(AFProjectPaths.afibConfigPath, AFibT());

@@ -32,7 +32,7 @@ class AFCommandOutputColumn {
 /// Used to achieve nicely formatted output for commands.
 class AFCommandOutput {
   int nIndent = 0;
-  final cols = List<AFCommandOutputColumn>();
+  final cols = <AFCommandOutputColumn>[];
 
   void indent() { nIndent++; }
   void outdent() { nIndent--; }
@@ -82,7 +82,7 @@ class AFCommandOutput {
 
     for(var col in cols) {
       if(col.alignment == AFOutputAlignment.alignRight) {
-        int req = col.width - col.length;
+        final req = col.width - col.length;
         _writeSpace(sb, req);
       }
 
@@ -90,7 +90,7 @@ class AFCommandOutput {
       sb.write(out);
       
       if(col.alignment == AFOutputAlignment.alignLeft) {
-        int req = col.width - col.length;
+        final req = col.width - col.length;
         _writeSpace(sb, req);
       }
     }
@@ -101,7 +101,7 @@ class AFCommandOutput {
   }
 
   void _writeSpace(StringBuffer sb, int count) {
-    for(int i = 0; i < count; i++) {
+    for(var i = 0; i < count; i++) {
       sb.write(" ");
     }   
   }

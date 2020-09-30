@@ -40,7 +40,7 @@ class AFTestCommand extends AFCommand {
     generator.execute(ctx, files);    
     files.saveChangedFiles(ctx.o);
       
-    Process.start('flutter', ['test', AFProjectPaths.relativePathFor(AFProjectPaths.afTestPath)]).then((Process process) {
+    Process.start('flutter', ['test', AFProjectPaths.relativePathFor(AFProjectPaths.afTestPath)]).then((process) {
       stdout.addStream(process.stdout);
       stderr.addStream(process.stderr);      
     });

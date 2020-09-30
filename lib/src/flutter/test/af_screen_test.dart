@@ -1,6 +1,7 @@
 
 
 import 'dart:async';
+import 'package:quiver/core.dart';
 
 import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
@@ -26,9 +27,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
 
-typedef void AFActionListenerDelegate(List<AFActionWithKey> actions);
-typedef void AFParamListenerDelegate(AFRouteParam param);
-typedef void AFAsyncQueryListenerDelegate(AFAsyncQueryCustomError query);
+typedef AFActionListenerDelegate = void Function(List<AFActionWithKey> actions);
+typedef AFParamListenerDelegate = void Function(AFRouteParam param);
+typedef AFAsyncQueryListenerDelegate = void Function(AFAsyncQueryCustomError query);
 
 /// A superclass that declares all the methods which select specific widgets.
 /// This is used by [AFScreenWidgetSelectorCollector] to determine which widgets
@@ -39,7 +40,7 @@ abstract class AFScreenTestWidgetSelector extends AFBaseTestExecute {
 
 /// A utility class used to pass 
 abstract class AFWidgetSelector {
-  final elements = List<Element>();
+  final elements = <Element>[];
   AFScreenTestWidgetCollectorScrollableSubpath parentScrollable;
 
   void add(Element elem) {
@@ -76,6 +77,10 @@ class AFKeySelector extends AFWidgetSelector {
   bool operator==(dynamic o) {
     return o is AFKeySelector && o.key == key;
   }
+
+  int get hashCode {
+    return key.hashCode;
+  }
 }
 
 
@@ -90,11 +95,15 @@ class AFWidgetTypeSelector extends AFWidgetSelector {
   bool operator==(dynamic o) {
     return o is AFWidgetTypeSelector && o.widgetType == widgetType;
   }
+
+  int get hashCode {
+    return widgetType.hashCode;
+  }
 }
 
 
 class AFMultipleWidgetSelector extends AFWidgetSelector {
-  final selectors = List<AFWidgetSelector>();
+  final selectors = <AFWidgetSelector>[];
   AFMultipleWidgetSelector(List sel) {
     for(final item in sel) {
       selectors.add(AFScreenTestWidgetCollector.createSelector(null, item));
@@ -119,7 +128,7 @@ class AFMultipleWidgetSelector extends AFWidgetSelector {
       return false;
     }
 
-    for(int i = 0; i < selectors.length; i++) {
+    for(var i = 0; i < selectors.length; i++) {
       final l = selectors[i];
       final r = o.selectors[i];
       if(l != r) {
@@ -127,6 +136,10 @@ class AFMultipleWidgetSelector extends AFWidgetSelector {
       }
     }
     return true;
+  }
+
+  int get hashCode {
+    return selectors.hashCode;
   }
 }
 
@@ -160,6 +173,10 @@ class AFRichTextGestureTapSpecifier extends AFWidgetSelector {
     }
     return true;
   }
+
+  int get hashCode {
+    return hash2(selector.hashCode, containsText.hashCode);
+  }
 }
 
 
@@ -169,11 +186,11 @@ class AFSparsePathWidgetSelector extends AFWidgetSelector {
   AFSparsePathWidgetSelector(this.pathSelectors);
 
   factory AFSparsePathWidgetSelector.createEmpty() {
-    return AFSparsePathWidgetSelector(List<AFWidgetSelector>());
+    return AFSparsePathWidgetSelector(<AFWidgetSelector>[]);
   }
 
   factory AFSparsePathWidgetSelector.createFrom(List<dynamic> selectors) {
-    final sels = List<AFWidgetSelector>();
+    final sels = <AFWidgetSelector>[];
     for(final selector in selectors) {
       sels.add(AFScreenTestWidgetCollector.createSelector(null, selector));
     }
@@ -187,14 +204,6 @@ class AFSparsePathWidgetSelector extends AFWidgetSelector {
     // extra stuff below the last selector.
     final lastSelector = pathSelectors.last;
     final lastPath = path.last;
-    
-    const testKey = Key("edit_dish_number");
-    if(path.where((testElem) {
-      return (testElem.widget.key == testKey);
-    }).isNotEmpty) {
-      int i = 0;
-      i++;
-    }
 
     if(!lastSelector.matches(lastPath)) {
       return false;
@@ -202,8 +211,8 @@ class AFSparsePathWidgetSelector extends AFWidgetSelector {
 
     // if the last matches, then go up the path making sure that we can
     // find all the other path selectors.
-    int curPath = path.length - 2;
-    int curSel = pathSelectors.length - 2;
+    var curPath = path.length - 2;
+    var curSel = pathSelectors.length - 2;
     while(curSel >= 0 && curPath >= 0) {
       final sel   = pathSelectors[curSel];
       final item  = path[curPath];
@@ -235,7 +244,7 @@ class AFSparsePathWidgetSelector extends AFWidgetSelector {
         return false;
       }
 
-      for(int i = 0; i < pathSelectors.length; i++) {
+      for(var i = 0; i < pathSelectors.length; i++) {
         final l = pathSelectors[i];
         final r = o.pathSelectors[i];
         if(l != r) {
@@ -247,12 +256,16 @@ class AFSparsePathWidgetSelector extends AFWidgetSelector {
     }
     return false;
   }
+
+  int get hashCode {
+    return pathSelectors.hashCode;
+  }
 }
 
 abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   AFTestID testId;
-  final underPaths = List<AFSparsePathWidgetSelector>();
-  final activeScreenIDs = List<AFScreenID>();
+  final underPaths = <AFSparsePathWidgetSelector>[];
+  final activeScreenIDs = <AFScreenID>[];
   
   AFScreenTestExecute(this.testId);
 
@@ -284,7 +297,7 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   }  
 
   Future<void> expectMissingWidget(dynamic selector) {
-    expectNWidgets(selector, 0, extraFrames: 1, scrollIfMissing: false);
+    return expectNWidgets(selector, 0, extraFrames: 1, scrollIfMissing: false);
   }
 
   /// Any operations applied within the [underHere] callback operate on 
@@ -357,8 +370,8 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   /// it is very common to verify that several of them are on or off
   /// at the same time, and passing in a list is a concise way to do
   /// so.
-  Future<void> expectChipSelected(dynamic selector, bool sel) {
-    return expectWidgetValue(selector, ft.equals(sel), extraFrames: 1);
+  Future<void> expectChipSelected(dynamic selector, {bool isSel}) {
+    return expectWidgetValue(selector, ft.equals(isSel), extraFrames: 1);
   }
 
   Future<void> expectWidget(dynamic selector, Function(Element elem) onFound, { int extraFrames = 0 });
@@ -386,7 +399,7 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
       return;
     }    
 
-    for(int i = 0; i < elements.length; i++) {
+    for(var i = 0; i < elements.length; i++) {
       final elem = elements[i];
       final source = keys[i];
       this.expectKey(elem, source, extraFrames: 1);
@@ -446,8 +459,6 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   Future<void> updateScreenData(dynamic data);
   void verifyPopupScreenId(AFScreenID screenId);
 
-  Future<void> executeNamedSection(AFTestSectionID id, dynamic params);
-
   Future<void> pauseForRender();
   void addError(String error, int depth);
 }
@@ -460,27 +471,20 @@ abstract class AFSingleScreenTestExecute extends AFScreenTestExecute {
       return activeScreenIDs.last;
     }
 
-    AFScreenPrototypeTest screenTest = test;
-    return screenTest.screenId;
-  }
-
-  Future<void> executeNamedSection(AFTestSectionID id, dynamic params) {
-    return AFibF.screenTests.executeNamedSection(id, this, params);
+    return test.screenId;
   }
 }
 
-typedef Future<void> AFScreenTestBodyExecuteFunc(AFScreenTestExecute exec, dynamic params);
+typedef AFScreenTestBodyExecuteFunc = Future<void> Function(AFScreenTestExecute ste);
 
 class AFScreenTestBodyWithParam {
   final AFScreenTestBodyExecuteFunc body;
-  final dynamic param;
-  final AFTestSectionID id;
   final AFScreenTestWidgetCollector elementCollector;
-  AFScreenTestBodyWithParam({this.id, this.body, this.param, this.elementCollector});
+  AFScreenTestBodyWithParam({this.body, this.elementCollector});
 
 
   Future<void> populateElementCollector() {
-    return body(elementCollector, param); 
+    return body(elementCollector); 
   }
 
   ScaffoldState findScaffoldState(AFScreenID screenId) {
@@ -490,7 +494,7 @@ class AFScreenTestBodyWithParam {
 
 class AFSingleScreenTestBody {
   final AFTestID testId;
-  final sections = List<AFScreenTestBodyWithParam>();
+  final sections = <AFScreenTestBodyWithParam>[];
 
   AFSingleScreenTestBody(this.testId);
 
@@ -498,14 +502,11 @@ class AFSingleScreenTestBody {
     return sections.isNotEmpty;
   }
 
-  void execute({AFScreenTestBodyExecuteFunc body, AFTestSectionID id, dynamic param}) async {
+  void execute(AFScreenTestBodyExecuteFunc body) async {
     final collector = AFScreenTestWidgetCollector(this.testId);
     // in the first section, always add a scaffold widget collector.
   
-    sections.add(AFScreenTestBodyWithParam(id: id, body: body, param: param, elementCollector: collector));
-    if(id != null) {
-      AFibF.screenTests.defineNamedSection(id, body);
-    }
+    sections.add(AFScreenTestBodyWithParam(body: body, elementCollector: collector));
   }
 
   Future<void> populateWidgetCollector() async {
@@ -521,33 +522,24 @@ class AFSingleScreenTestBody {
     }
   }
 
-  Future<void> executeNamedSection(AFTestSectionID id, AFScreenTestExecute e, dynamic params) async {
-    return AFibF.screenTests.executeNamedSection(id, e, params);
-  }
-
   void openTestDrawer() {
     final scaffoldState = sections.first.findScaffoldState(AFibF.testOnlyActiveScreenId);
     scaffoldState?.openEndDrawer();
   }
 
-  Future<void> run(AFScreenTestExecute context, dynamic params, { Function onEnd, bool useParentCollector = false }) async {
-    int sectionGuard = 0;
-    for(int i = 0; i < sections.length; i++) {
+  Future<void> run(AFScreenTestExecute context, { Function onEnd, bool useParentCollector = false }) async {
+    var sectionGuard = 0;
+    for(var i = 0; i < sections.length; i++) {
       final section = sections[i];
       sectionGuard++;
       if(sectionGuard > 1) {
         throw AFException("Test section $i is missing an await!");
       }
-      var actualParams = params;
-      if(actualParams == null) {
-        actualParams = section.param;
-      }
-
       if(!useParentCollector) {
         context.setCollector(section.elementCollector);
       }
 
-      final fut = section.body(context, actualParams);
+      final fut = section.body(context);
       _checkFutureExists(fut);
       await fut;
       sectionGuard--;
@@ -571,8 +563,8 @@ class AFScreenTestWidgetCollectorScrollableSubpath {
 
 class AFScreenTestWidgetCollectorScreen {
   final AFScreenID screenId;
-  final selectors = List<AFWidgetSelector>();
-  final scrollables = List<AFScreenTestWidgetCollectorScrollableSubpath>();
+  final selectors = <AFWidgetSelector>[];
+  final scrollables = <AFScreenTestWidgetCollectorScrollableSubpath>[];
   ScaffoldState scaffoldState;
 
   AFScreenTestWidgetCollectorScreen(this.screenId);
@@ -583,10 +575,6 @@ class AFScreenTestWidgetCollectorScreen {
   
   bool get hasScaffoldState {
     return scaffoldState != null;
-  }
-
-  void addScaffoldState(ScaffoldState state) {
-    scaffoldState = state;
   }
 
   AFScreenTestWidgetCollectorScrollableSubpath addScrollableAt(List<Element> path) {
@@ -619,7 +607,7 @@ class AFScreenTestWidgetCollectorScreen {
     }
 
     if(!scrollIfMissing) {
-      return List<Element>();
+      return <Element>[];
     }
     
     // if we didn't find the selector, and we are under a scrollable widget,
@@ -630,7 +618,7 @@ class AFScreenTestWidgetCollectorScreen {
 
   // Go though all the children of [current], having the parent path [currentPath],
   // and add path entries for any widgets with keys.
-  void populateChildren(Element currentElem, List<Element> currentPath, bool underScaffold, AFScreenTestWidgetCollectorScrollableSubpath parentScrollable) {
+  void populateChildren(Element currentElem, List<Element> currentPath, AFScreenTestWidgetCollectorScrollableSubpath parentScrollable, { bool underScaffold }) {
 
     // add the current element.
     currentPath.add(currentElem);
@@ -641,9 +629,9 @@ class AFScreenTestWidgetCollectorScreen {
     }
 
     if(underScaffold && !hasScaffoldState) {
-      ScaffoldState scaffoldState = Scaffold.of(currentElem);
+      final scaffoldState = Scaffold.of(currentElem);
       if(scaffoldState != null) {
-        addScaffoldState(scaffoldState);
+        this.scaffoldState = scaffoldState;
       }
     }
 
@@ -660,7 +648,7 @@ class AFScreenTestWidgetCollectorScreen {
     // do this same process recursively on the childrne.
     currentElem.visitChildren((child) {
       final nowUnderScaffold = underScaffold || currentElem.widget is Scaffold;
-      populateChildren(child, currentPath, nowUnderScaffold, parentScrollable);
+      populateChildren(child, currentPath, parentScrollable, underScaffold: nowUnderScaffold);
     });
 
     // maintain the path as we go back up.
@@ -669,12 +657,12 @@ class AFScreenTestWidgetCollectorScreen {
 
   Future<List<Element>> scrollUntilFound(AFWidgetSelector selector) async {
     for(final scrollable in scrollables) {
-      List<Element> found = await scrollOneUntilFound(scrollable, selector);
+      final found = await scrollOneUntilFound(scrollable, selector);
       if(found != null) {
         return found;
       }
     }
-    return List<Element>();
+    return <Element>[];
   }
 
   Future<List<Element>> scrollOneUntilFound(AFScreenTestWidgetCollectorScrollableSubpath source, AFWidgetSelector selector) async {
@@ -683,7 +671,7 @@ class AFScreenTestWidgetCollectorScreen {
     final Scrollable widgetScrollable = elemScrollable.widget;
     final controller = widgetScrollable.controller;
 
-    double currentPosition = 0.0;
+    var currentPosition = 0.0;
     final scrollIncrement = 200.0;
 
     while(true) {
@@ -697,10 +685,10 @@ class AFScreenTestWidgetCollectorScreen {
       _clearChildrenUnderScrollable(source);
 
       // rebuild with whatever is there now.
-      populateChildren(elemScrollable, pathTo, true, source);
+      populateChildren(elemScrollable, pathTo, source, underScaffold: true);
     
       // see if we found the widget at this position.
-      List<Element> currentResults = await findElementsForSelector(selector, scrollIfMissing: false);
+      final currentResults = await findElementsForSelector(selector, scrollIfMissing: false);
       if(currentResults.isNotEmpty) {
         return currentResults;
       }
@@ -708,7 +696,7 @@ class AFScreenTestWidgetCollectorScreen {
       // if we got to a point where our current offset is less than our desired offset, we must have scrolled
       // all the way to the bottom, in that case just return the empty set.
       if(controller.offset < currentPosition) {
-        return List<Element>();
+        return <Element>[];
       }
 
       // if we didn't then we need to scroll down about, and try again.
@@ -733,7 +721,7 @@ class AFScreenTestWidgetCollector extends AFSingleScreenTestExecute {
 
   AFScreenTestWidgetCollector(AFTestID testId): super(testId);
 
-  final screens = Map<AFScreenID, AFScreenTestWidgetCollectorScreen>();
+  final screens = <AFScreenID, AFScreenTestWidgetCollectorScreen>{};
 
 
   AFScreenTestWidgetCollectorScreen _updateCache() {
@@ -777,11 +765,12 @@ class AFScreenTestWidgetCollector extends AFSingleScreenTestExecute {
 
   Future<void> expectWidget(dynamic selector, Function(Element) onFound, { int extraFrames = 0 }) {
     addSelector(selector);
+    return null;
   }
 
   Future<void> expectWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 }) {
     addSelector(selector);
-    return keepSynchronous();
+    return ks;
   }
 
   
@@ -792,6 +781,7 @@ class AFScreenTestWidgetCollector extends AFSingleScreenTestExecute {
 
   Future<void> expectWidgetValue(dynamic selector, ft.Matcher matcher, { int extraFrames = 0 }) {
     addSelector(selector);
+    return keepSynchronous();
   }
 
   Future<void> applyWidgetValue(dynamic selector, dynamic value, String applyType, { 
@@ -850,13 +840,13 @@ class AFScreenTestWidgetCollector extends AFSingleScreenTestExecute {
     
     screenInfo.resetForUpdate();
 
-    final currentPath = List<Element>();
-    screenInfo.populateChildren(currentInfo.element, currentPath, false, null);
+    final currentPath = <Element>[];
+    screenInfo.populateChildren(currentInfo.element, currentPath, null, underScaffold: false);
     return screenInfo;
   }
 
   AFScreenTestWidgetCollectorScreen _findOrCreateScreenInfo(AFScreenID screenId) {
-    AFScreenTestWidgetCollectorScreen screenInfo = screens[screenId];
+    var screenInfo = screens[screenId];
     if(screenInfo == null) {
       screenInfo = AFScreenTestWidgetCollectorScreen(screenId);
       screens[screenId] = screenInfo;
@@ -906,7 +896,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   }
 
   Future<void> expectWidget(dynamic selector, Function(Element elem) onFound, { int extraFrames = 0 }) async {
-    List<Element> elems = await elementCollector.findWidgetsFor(selector);
+    final elems = await elementCollector.findWidgetsFor(selector);
     this.expect(elems.length, ft.equals(1), extraFrames: extraFrames+1);
     if(elems.length > 0) {
       onFound(elems.first);
@@ -915,20 +905,20 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   }
 
   Future<void> expectWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 }) async {
-    List<Element> elems = await elementCollector.findWidgetsFor(selector);
+    final elems = await elementCollector.findWidgetsFor(selector);
     onFound(elems);
     return keepSynchronous();
   }
 
   Future<void> expectNWidgets(dynamic selector, int n, {int extraFrames = 0, bool scrollIfMissing = true}) async {
-    List<Element> elems = await elementCollector.findWidgetsFor(selector, scrollIfMissing: scrollIfMissing);
+    final elems = await elementCollector.findWidgetsFor(selector, scrollIfMissing: scrollIfMissing);
     this.expect(elems.length, ft.equals(n), extraFrames: extraFrames+1);
     return keepSynchronous();
   }
 
   Future<void> expectWidgetValue(dynamic selectorDyn, ft.Matcher matcher, { String extractType = AFExtractWidgetAction.extractPrimary, int extraFrames = 0 }) async {
     final selector = AFScreenTestWidgetCollector.createSelector(null, selectorDyn);
-    List<Element> elems = await elementCollector.findWidgetsFor(selector);
+    final elems = await elementCollector.findWidgetsFor(selector);
     if(elems.isEmpty) {
       this.expect(elems, ft.isNotEmpty, extraFrames: extraFrames+1);
       return;
@@ -953,7 +943,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
     }) async {
     AFibF.testOnlyClearRecentActions();
     final selector = AFScreenTestWidgetCollector.createSelector(null, selectorDyn);
-    List<Element> elems = await elementCollector.findWidgetsFor(selector);
+    final elems = await elementCollector.findWidgetsFor(selector);
     if(maxWidgets > 0 && maxWidgets < elems.length) {
       throw AFException("Expected at most $maxWidgets widget for selector $selector, found ${elems.length} widgets");
     }
@@ -961,7 +951,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
       throw AFException("applyWidgetValue, no widget found with selector $selectorDyn");
     }
 
-    Element elem = elems.first;
+    final elem = elems.first;
     final tapable = AFibF.screenTests.findApplicator(applyType, elem);
     if(tapable == null) {
       throw AFException("No AFApplyWidgetAction found for ${elem.widget.runtimeType}, you can register one using AFScreenTests.registerApplicator");
@@ -1019,8 +1009,8 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
 
   }
 
-  void testChipSelected(Widget widget, bool expect) {
-    bool selected = false;
+  void testChipSelected(Widget widget, { bool isSel } ) {
+    var selected = false;
     if(widget is ChoiceChip) {
       selected = widget.selected;
     } else if(widget is InputChip) {
@@ -1058,16 +1048,16 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
 
   @override
   Future<void> keepSynchronous() {
-    return Future<void>.delayed(Duration(milliseconds: 0), () {});
+    return null;
   }
 
   void addError(String desc, int depth) {
-    String err = AFBaseTestExecute.composeError(desc, depth);
+    final err = AFBaseTestExecute.composeError(desc, depth);
     dispatcher.dispatch(AFPrototypeScreenTestAddError(this.testId, err));
     AFibD.log?.e(err);
   }
 
-  bool addPassIf(bool test) {
+  bool addPassIf({bool test}) {
     if(test) {
       dispatcher.dispatch(AFPrototypeScreenTestIncrementPassCount(this.testId));
     }
@@ -1120,7 +1110,7 @@ abstract class AFScreenPrototypeTest {
   bool get hasBody;
   AFScreenID get screenId;
   void startScreen(AFDispatcher dispatcher);
-  Future<void> run(AFScreenTestContext context, dynamic params, { Function onEnd});
+  Future<void> run(AFScreenTestContext context, { Function onEnd});
   void onDrawerReset(AFDispatcher dispatcher);
   Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSingleScreenTestState state, Function onEnd);
   void openTestDrawer();
@@ -1172,8 +1162,8 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
     dispatcher.dispatch(AFPrototypeSingleScreenScreen.navigatePush(this, id: this.id));    
   }
 
-  Future<void> run(AFScreenTestExecute context, dynamic params, { Function onEnd, bool useParentCollector = false}) {
-    return body.run(context, params, onEnd: onEnd, useParentCollector: useParentCollector);
+  Future<void> run(AFScreenTestExecute context, { Function onEnd, bool useParentCollector = false}) {
+    return body.run(context, onEnd: onEnd, useParentCollector: useParentCollector);
   }
 
   void onDrawerReset(AFDispatcher dispatcher) {
@@ -1185,7 +1175,7 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
     //final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
     final testContext = prepareRun(dispatcher, prevContext);
     //await testContext.pauseForRender(screenUpdateCount, true);
-    run(testContext, null, onEnd: onEnd);
+    run(testContext, onEnd: onEnd);
     return null;
   }
 
@@ -1194,7 +1184,7 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
   }
 }
 
-typedef AFConnectedWidgetWithParam AFCreateConnectedWidget(
+typedef AFCreateConnectedWidget = AFConnectedWidgetWithParam Function(
   AFDispatcher dispatcher,
   AFFindParamDelegate findParamDelegate,
   AFUpdateParamDelegate updateParamDelegate,
@@ -1236,8 +1226,8 @@ class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
     dispatcher.dispatch(AFPrototypeWidgetScreen.navigatePush(this, id: this.id));    
   }
   
-  Future<void> run(AFScreenTestExecute context, dynamic params, { Function onEnd, bool useParentCollector = false}) {
-    return body.run(context, params, onEnd: onEnd, useParentCollector: useParentCollector);
+  Future<void> run(AFScreenTestExecute context, { Function onEnd, bool useParentCollector = false}) {
+    return body.run(context, onEnd: onEnd, useParentCollector: useParentCollector);
   }
 
   void onDrawerReset(AFDispatcher dispatcher) {
@@ -1248,7 +1238,7 @@ class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
     //final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
     final testContext = prepareRun(dispatcher, prevContext);
     //await testContext.pauseForRender(screenUpdateCount, true);
-    run(testContext, null, onEnd: onEnd);
+    run(testContext, onEnd: onEnd);
     return null;
   }
 }
@@ -1325,7 +1315,6 @@ class AFMultiScreenStatePrototypeTest extends AFScreenPrototypeTest {
     testImpl.execute(stateTestContext);
 
     if(stateTestContext.errors.hasErrors) {
-      // TODO: return.
     }
 
     // then, navigate into the desired path.
@@ -1335,8 +1324,8 @@ class AFMultiScreenStatePrototypeTest extends AFScreenPrototypeTest {
   }
 
 
-  Future<void> run(AFScreenTestContext context, dynamic params, { Function onEnd}) {
-    return body.run(context, params, onEnd: onEnd);
+  Future<void> run(AFScreenTestContext context, { Function onEnd}) {
+    return body.run(context, onEnd: onEnd);
   }
 
   void onDrawerReset(AFDispatcher dispatcher) {
@@ -1345,7 +1334,7 @@ class AFMultiScreenStatePrototypeTest extends AFScreenPrototypeTest {
 
   Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSingleScreenTestState state, Function onEnd) async {
     final testContext = prepareRun(dispatcher, prevContext);
-    return run(testContext, null, onEnd: onEnd);
+    return run(testContext, onEnd: onEnd);
   }
 
 }
@@ -1353,7 +1342,7 @@ class AFMultiScreenStatePrototypeTest extends AFScreenPrototypeTest {
 
 /// Used to register connected or unconnected widget tests.
 class AFWidgetTests<TState> {
-  final _connectedTests = List<AFWidgetPrototypeTest>();
+  final _connectedTests = <AFWidgetPrototypeTest>[];
   
   AFSingleScreenTestBody addConnectedPrototype({
     @required AFTestID   id,
@@ -1362,7 +1351,7 @@ class AFWidgetTests<TState> {
     @required AFRouteParam param,
     String title
   }) {
-    AFConnectedWidgetPrototypeTest instance = AFConnectedWidgetPrototypeTest(
+    final instance = AFConnectedWidgetPrototypeTest(
       id: id,
       data: data,
       param: param,
@@ -1388,10 +1377,9 @@ class AFWidgetTests<TState> {
 /// with specific data for testing and prototyping purposes.
 class AFSingleScreenTests<TState> {
   
-  final namedSections = Map<AFTestSectionID, AFScreenTestBodyExecuteFunc>();
-  final _singleScreenTests = List<AFSingleScreenPrototypeTest>();
-  final extractors = List<AFExtractWidgetAction>();
-  final applicators = List<AFApplyWidgetAction>();
+  final _singleScreenTests = <AFSingleScreenPrototypeTest>[];
+  final extractors = <AFExtractWidgetAction>[];
+  final applicators = <AFApplyWidgetAction>[];
 
   AFSingleScreenTests() {
     registerApplicator(AFFlatButtonAction());
@@ -1459,7 +1447,7 @@ class AFSingleScreenTests<TState> {
     @required dynamic param,
     String title
   }) {
-    AFSingleScreenPrototypeTest instance = AFSingleScreenPrototypeTest(
+    final instance = AFSingleScreenPrototypeTest(
       id: id,
       data: data,
       param: param,
@@ -1488,32 +1476,8 @@ class AFSingleScreenTests<TState> {
   AFSingleScreenPrototypeTest findById(AFTestID id) {
     return _singleScreenTests.firstWhere((test) => test.id == id, orElse: () => null);
   }
-  
-  void defineNamedSection(AFTestSectionID id, AFScreenTestBodyExecuteFunc func) {
-    _addNamedTestSection(id, func);
-  }
-
-  void _addNamedTestSection(AFTestSectionID id, AFScreenTestBodyExecuteFunc func) {
-    if(namedSections.containsKey(id)) {
-      throw new AFException("Attempt to register duplicate test section $id");
-    }
-    namedSections[id] = func;
-  }
-
-  Future<void> executeNamedSection(AFTestSectionID id, AFScreenTestExecute e, dynamic params) async {
-    final section = findNamedTestSection(id);
-    if(section == null) {
-      throw new AFException("Attempt to executing undefined test section $id");
-    }
-    Future<void> fut = section(e, params);
-    await fut;
-    return e.keepSynchronous();
-  }
 
 
-  AFScreenTestBodyExecuteFunc findNamedTestSection(AFTestSectionID id) {    
-    return namedSections[id];
-  }
 
   void registerData(dynamic id, dynamic data) {
     AFibF.testData.register(id, data);
@@ -1523,7 +1487,7 @@ class AFSingleScreenTests<TState> {
     return AFibF.testData.find(id);
   }
 
-  bool addPassIf(bool test) {
+  bool addPassIf({bool test}) {
     if(test) {
       
     }
@@ -1541,9 +1505,8 @@ abstract class AFMultiScreenTestExecute {
 
   Future<void> runScreenTest(AFTestID screenTestId, {
     AFScreenID terminalScreen, 
-    dynamic params, 
     AFTestID queryResults});
-  Future<void> runWidgetTest(AFTestID widgetTestId, AFScreenID originScreen, {AFScreenID terminalScreen, dynamic params, AFTestID queryResults});
+  Future<void> runWidgetTest(AFTestID widgetTestId, AFScreenID originScreen, {AFScreenID terminalScreen, AFTestID queryResults});
   Future<void> onScreen({
     @required AFScreenID startScreen, 
     AFScreenID endScreen, 
@@ -1595,17 +1558,17 @@ class AFMultiScreenTestWidgetCollector extends AFMultiScreenTestExecute {
   }
 
 
-  Future<void> runScreenTest(AFTestID screenTestId, {AFScreenID terminalScreen, dynamic params, AFTestID queryResults}) async {
+  Future<void> runScreenTest(AFTestID screenTestId, {AFScreenID terminalScreen, AFTestID queryResults}) async {
     final screenTest = AFibF.screenTests.findById(screenTestId);
     elementCollector.pushScreen(screenTest.screenId);
-    await screenTest.run(elementCollector, params, useParentCollector: true);
+    await screenTest.run(elementCollector, useParentCollector: true);
     elementCollector.popScreen();
   }
 
-  Future<void> runWidgetTest(AFTestID widgetTestId, AFScreenID originScreen, {AFScreenID terminalScreen, dynamic params, AFTestID queryResults, }) async {
+  Future<void> runWidgetTest(AFTestID widgetTestId, AFScreenID originScreen, {AFScreenID terminalScreen, AFTestID queryResults, }) async {
     final widgetTest = AFibF.widgetTests.findById(widgetTestId);
     elementCollector.pushScreen(originScreen);
-    await widgetTest.run(elementCollector, params, useParentCollector: true);
+    await widgetTest.run(elementCollector, useParentCollector: true);
     elementCollector.popScreen();
   }
 
@@ -1655,7 +1618,7 @@ class AFMultiScreenTestContext extends AFMultiScreenTestExecute {
     final screenTest = AFibF.screenTests.findById(screenTestId);
     final originalScreenID = screenTest.screenId;
     screenContext.pushScreen(originalScreenID);
-    await screenTest.run(screenContext, params, useParentCollector: true);  
+    await screenTest.run(screenContext, useParentCollector: true);  
     screenContext.popScreen();    
     if(terminalScreen != null && originalScreenID != terminalScreen) {
       await screenContext.pauseForRender();
@@ -1663,11 +1626,11 @@ class AFMultiScreenTestContext extends AFMultiScreenTestExecute {
     return keepSynchronous();  
   }
 
-  Future<void> runWidgetTest(AFTestID widgetTestId, AFScreenID originScreen, {AFScreenID terminalScreen, dynamic params, AFTestID queryResults}) async {
+  Future<void> runWidgetTest(AFTestID widgetTestId, AFScreenID originScreen, {AFScreenID terminalScreen, AFTestID queryResults}) async {
     _installQueryResults(queryResults);
     final widgetTest = AFibF.widgetTests.findById(widgetTestId);
     screenContext.pushScreen(originScreen);
-    await widgetTest.run(screenContext, params, useParentCollector: true);  
+    await widgetTest.run(screenContext, useParentCollector: true);  
     screenContext.popScreen();    
   }
 
@@ -1677,7 +1640,7 @@ class AFMultiScreenTestContext extends AFMultiScreenTestExecute {
     AFScreenID endScreen,
     bool verifyScreen = true
   }) {
-      return onScreen(startScreen: startScreen, endScreen: endScreen, verifyScreen: verifyScreen, body: (AFScreenTestExecute ste) async {
+      return onScreen(startScreen: startScreen, endScreen: endScreen, verifyScreen: verifyScreen, body: (ste) async {
         await ste.tap(tap);
 
         return ste.keepSynchronous();
@@ -1747,7 +1710,7 @@ class AFMultiScreenTestContext extends AFMultiScreenTestExecute {
 
     // This causes the query middleware to return results specified in the state test.
     final stateTestContext = AFStateTestContext(stateTest, store, dispatcher, isTrueTestContext: false);
-    AFStateTestContext.setCurrentTest(stateTestContext);    
+    AFStateTestContext.currentTest = stateTestContext;    
   }
 
   Future<void> keepSynchronous() {
@@ -1756,16 +1719,14 @@ class AFMultiScreenTestContext extends AFMultiScreenTestExecute {
 
 }
 
-typedef Future<void> AFMultiScreenTestBodyExecuteFunc(AFMultiScreenTestExecute exec, dynamic params);
+typedef AFMultiScreenTestBodyExecuteFunc = Future<void> Function(AFMultiScreenTestExecute mse);
 
 class AFMultiScreenStateTestBodyWithParam {
   final AFMultiScreenTestBodyExecuteFunc body;
-  final AFTestSectionID id;
-  final dynamic param;
-  AFMultiScreenStateTestBodyWithParam({this.body, this.id, this.param});
+  AFMultiScreenStateTestBodyWithParam(this.body);
 
   Future<void> populateElementCollector(AFScreenTestWidgetCollector elementCollector) {
-    return body(AFMultiScreenTestWidgetCollector(elementCollector), param);
+    return body(AFMultiScreenTestWidgetCollector(elementCollector));
   }
 }
 
@@ -1773,7 +1734,7 @@ class AFMultiScreenStateTestBody {
   final AFMultiScreenStateTests tests;
   final AFScreenTestWidgetCollector elementCollector;
   final AFScreenID initialScreenId;
-  final sections = List<AFMultiScreenStateTestBodyWithParam>();
+  final sections = <AFMultiScreenStateTestBodyWithParam>[];
 
   AFMultiScreenStateTestBody(this.tests, this.initialScreenId, this.elementCollector);
 
@@ -1781,8 +1742,8 @@ class AFMultiScreenStateTestBody {
     return AFMultiScreenStateTestBody(tests, initialScreenId, AFScreenTestWidgetCollector(testId));
   }
 
-  void execute({ AFMultiScreenTestBodyExecuteFunc body, AFTestSectionID id, dynamic param}) async {
-    sections.add(AFMultiScreenStateTestBodyWithParam(id: id, body: body, param: param));
+  void execute(AFMultiScreenTestBodyExecuteFunc body) async {
+    sections.add(AFMultiScreenStateTestBodyWithParam(body));
   }  
 
   Future<void> populateWidgetCollector() async {
@@ -1797,19 +1758,13 @@ class AFMultiScreenStateTestBody {
     scaffold?.openEndDrawer();
   }
 
-  Future<void> run(AFScreenTestContext context, dynamic params, { Function onEnd }) async {
+  Future<void> run(AFScreenTestContext context, { Function onEnd }) async {
     context.setCollector(elementCollector);
     final e = AFMultiScreenTestContext(context);
     for(final section in sections) {
-      var actualParams = params;
-      if(actualParams == null) {
-        actualParams = section.param;
-      }
-
-      await section.body(e, actualParams);
+      await section.body(e);
     }
 
-    // TODO: this doesn't work because we are on a different screen at the end.
     if(onEnd != null) {
       onEnd();
     }
@@ -1823,7 +1778,7 @@ class AFMultiScreenStateTestBody {
 /// These tests by combine an initial state from an [AFStateTest] with a series
 /// of screen manipulations from an [AFScreenTest]
 class AFMultiScreenStateTests {
-  final stateTests = List<AFMultiScreenStatePrototypeTest>();
+  final stateTests = <AFMultiScreenStatePrototypeTest>[];
 
   AFMultiScreenStateTestBody addPrototype({
     @required AFTestID   id,
@@ -1831,7 +1786,7 @@ class AFMultiScreenStateTests {
     @required List<AFNavigatePushAction> initialPath,
     @required AFTestID stateTestId,
   }) {
-    AFMultiScreenStatePrototypeTest instance = AFMultiScreenStatePrototypeTest(
+    final instance = AFMultiScreenStatePrototypeTest(
       id: id,
       title: title,
       initialPath: initialPath,

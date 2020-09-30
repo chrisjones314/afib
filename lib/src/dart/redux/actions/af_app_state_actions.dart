@@ -16,7 +16,7 @@ class AFResetToInitialStateAction {
 /// and use copyWith to propogate the change up to a root object in [AFAppState],
 /// then issue an [AFUpdateAppStateAction]
 class AFUpdateAppStateAction extends AFObjectWithKey {
-  final List<Object> toIntegrate = List<Object>();
+  final toIntegrate = <Object>[];
   
   /// Constructor for use with the [add] method, which allows you to update
   /// several different root objects in the [AFAppState] with a single dispatch.

@@ -41,7 +41,7 @@ class AFCreateProjectFolderStep extends AFCreateFolderStep {
   @override
   void execute(AFCommandContext ctx, AFGeneratedFiles files) {
     super.execute(ctx, files);
-    AFProjectPaths.setExtraParentFolder(projectPath);
+    AFProjectPaths.extraParentFolder = projectPath;
   }
 
 }

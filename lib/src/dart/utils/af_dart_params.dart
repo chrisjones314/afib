@@ -3,7 +3,7 @@ import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
 
-typedef void InitConfiguration(AFConfig config);
+typedef InitConfiguration = void Function(AFConfig config);
 
 /// Application initialization parameters that do not depend on flutter.
 /// 

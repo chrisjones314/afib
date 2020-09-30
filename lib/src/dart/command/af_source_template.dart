@@ -26,10 +26,10 @@ abstract class AFSourceTemplate extends AFItemWithNamespace {
   String get template;
 
   List<AFTemplateReplacementPoint> findReplacementPoints() {
-    String t = template;
-    RegExp exp = new RegExp(r"([ \t]*?)AFRP\((.*?)\)");
-    Iterable<RegExpMatch> matches = exp.allMatches(t);
-    final result = Map<String, AFTemplateReplacementPoint>();
+    final t = template;
+    final exp = RegExp(r"([ \t]*?)AFRP\((.*?)\)");
+    final matches = exp.allMatches(t);
+    final result = <String, AFTemplateReplacementPoint>{};
     for(final match in matches) {
       final indent = match.group(1);
       var id = match.group(2);

@@ -6,7 +6,7 @@ import 'package:afib/src/flutter/utils/afib_f.dart';
 
 /// This reducer handles the default behavior of the app state, which 
 /// is just to set one or more 
-AFAppState afAppStateReducer(AFAppState state, action) {
+AFAppState afAppStateReducer(AFAppState state, dynamic action) {
   if(action is AFUpdateAppStateAction) {
     return state.copyWith(action.toIntegrate);
   }

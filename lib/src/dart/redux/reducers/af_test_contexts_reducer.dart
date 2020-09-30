@@ -5,7 +5,7 @@ import 'package:afib/src/flutter/test/af_test_actions.dart';
 
 /// This reducer handles the default behavior of the app state, which 
 /// is just to set one or more 
-AFTestState afTestStateReducer(AFTestState state, action) {
+AFTestState afTestStateReducer(AFTestState state, dynamic action) {
   if(action is AFStartPrototypeScreenTestContextAction) {
     return state.startTest(action.context);
   } else if(action is AFUpdatePrototypeScreenTestDataAction) {

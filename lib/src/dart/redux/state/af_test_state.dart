@@ -69,8 +69,8 @@ class AFTestState {
   factory AFTestState.initial() {
     return AFTestState(
       activeTestId: null,
-      testContexts: Map<AFTestID, AFScreenTestContext>(), 
-      testStates:Map<AFTestID, AFSingleScreenTestState>()
+      testContexts: <AFTestID, AFScreenTestContext>{}, 
+      testStates:<AFTestID, AFSingleScreenTestState>{}
     );
   }
 
@@ -90,7 +90,7 @@ class AFTestState {
     final revisedContexts = Map<AFTestID, AFScreenTestContext>.from(testContexts);
     revisedContexts[simulator.testId] = simulator;
     final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
-    revisedStates[simulator.testId] = AFSingleScreenTestState(pass: 0, errors: List<String>(), data: null);
+    revisedStates[simulator.testId] = AFSingleScreenTestState(pass: 0, errors: <String>[], data: null);
     
     return copyWith(
       activeTestId: simulator.testId,
@@ -103,7 +103,7 @@ class AFTestState {
     final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
     final currentState = revisedStates[testId];
     if(currentState == null) {
-      revisedStates[testId] = AFSingleScreenTestState(data: data, errors: List<String>(), pass: 0);    
+      revisedStates[testId] = AFSingleScreenTestState(data: data, errors: <String>[], pass: 0);    
     } else {
       revisedStates[testId] = currentState.reviseData(data);
 

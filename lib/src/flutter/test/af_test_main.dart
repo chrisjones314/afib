@@ -22,7 +22,7 @@ class AFibTestsFailedMatcher extends Matcher {
   }
   
   @override
-  bool matches(desc, Map matchState) {
+  bool matches(dynamic desc, Map matchState) {
     return false;
   }
 }

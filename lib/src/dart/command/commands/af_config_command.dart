@@ -60,7 +60,7 @@ abstract class AFConfigEntry extends AFItemWithNamespace {
     
     void writeCommandHelp(AFCommandOutput output, String help, {int indent = 0}) {
       AFCommand.startCommandColumn(output, indent: indent);
-      output.write(namespaceKey + " - ");
+      output.write("$namespaceKey - ");
       AFCommand.startHelpColumn(output);
       output.write(help);
       output.endLine();
@@ -78,7 +78,7 @@ abstract class AFConfigEntry extends AFItemWithNamespace {
 
 class AFConfigEntryList extends AFConfigEntry {
   final List<String> allowed;
-  final help;
+  final String help;
   AFConfigEntryList(String namespace, String key, dynamic defaultValue, {String declaringClass = AFConfigEntries.declaredIn, this.allowed, this.help}): super(namespace, key, defaultValue, declaringClass: declaringClass);
 
   @override
@@ -99,7 +99,7 @@ class AFConfigEntryList extends AFConfigEntry {
   String codeValue(AFConfig config) {
     final sb = StringBuffer("[");
     final vals = config.stringListFor(this);
-    for(int i = 0; i < vals.length; i++) {
+    for(var i = 0; i < vals.length; i++) {
       sb.write('"');
       sb.write(vals[i]);
       sb.write('"');
@@ -149,7 +149,7 @@ class AFConfigEntryEnabledTests extends AFConfigEntryList {
   AFConfigEntryEnabledTests(): super(AFConfigEntries.afNamespace, "enabledTestList", [allTests], help: "Space separated list of areas that should display logging messages [${allAreas.join('|')}|test_id|test_tag]");
 
   bool isAreaEnabled(AFConfig config, String area) {
-    List<String> areas = config.stringListFor(this);
+    final areas = config.stringListFor(this);
     if(hasNoAreas(areas)) {
       return true;
     }
@@ -157,7 +157,7 @@ class AFConfigEntryEnabledTests extends AFConfigEntryList {
   }
 
   bool isTestEnabled(AFConfig config, AFTestID id) {
-    List<String> areas = config.stringListFor(this);
+    final areas = config.stringListFor(this);
     if(hasOnlyAreas(areas)) {
       return true;
     }
@@ -202,7 +202,7 @@ class AFConfigEntryDescription {
 /// Superclass for configuration definitions that offer a list of string values,
 /// for example 'debug', 'production', 'test'
 abstract class AFConfigEntryChoice extends AFConfigEntry {
-  final choices = List<AFConfigEntryDescription>();
+  final choices = <AFConfigEntryDescription>[];
   
   AFConfigEntryChoice(String namespace, String key, dynamic defaultValue, {String declaringClass = AFConfigEntries.declaredIn}): super(namespace, key, defaultValue, declaringClass: declaringClass);
 
@@ -214,7 +214,7 @@ abstract class AFConfigEntryChoice extends AFConfigEntry {
     writeCommandHelp(output, "set the $key configuration value to one of:", indent: indent);
     for(var choice in choices) {
       AFCommand.startCommandColumn(output, indent: indent+1);
-      output.write(choice.choice + " - ");
+      output.write("${choice.choice} - ");
       AFCommand.startHelpColumn(output);
       output.write(choice.help);
       output.endLine();
@@ -245,7 +245,7 @@ class AFConfigEntryBool extends AFConfigEntryChoice {
 
   final String help;
   
-  AFConfigEntryBool(String namespace, String key, bool defaultValue, this.help, {String declaringClass = AFConfigEntries.declaredIn}): super(namespace, key, defaultValue, declaringClass: declaringClass) {
+  AFConfigEntryBool(String namespace, String key,this.help, { bool defaultValue, String declaringClass = AFConfigEntries.declaredIn}): super(namespace, key, defaultValue, declaringClass: declaringClass) {
     addChoice(trueValue, "");
     addChoice(falseValue, "");
   }
@@ -256,7 +256,7 @@ class AFConfigEntryBool extends AFConfigEntryChoice {
 
   void setValueWithString(AFConfig dest, String value) {
     validateWithException(value);
-    bool val = (value == "true");
+    final val = (value == "true");
     dest.putInternal(this, val);
   }
 
@@ -291,11 +291,11 @@ class AFConfigEntryString extends AFConfigEntry {
   }  
 
   String get argumentHelp {
-    bool extraDetails = (maxChars > 0 || minChars > 0 || options != 0);
+    final extraDetails = (maxChars > 0 || minChars > 0 || options != 0);
     final sb = StringBuffer();
     sb.write(help);
     if(extraDetails) {
-      final dets = List<String>();
+      final dets = <String>[];
       if(minChars > 0) {
         dets.add("min: $minChars");
       }
@@ -336,7 +336,7 @@ class AFConfigEntryString extends AFConfigEntry {
 /// Command that displays or modified values from [AFConfig], and
 /// that modifed values under the initialization/afib.g.dart.
 class AFConfigCommand extends AFCommand { 
-  final configs = Map<String, AFConfigEntry>();
+  final configs = <String, AFConfigEntry>{};
   static const cmdKey = "config";
 
   AFConfigCommand(): super(AFConfigEntries.afNamespace, cmdKey, 0, 2) {
@@ -356,7 +356,7 @@ class AFConfigCommand extends AFCommand {
   void writeLongHelp(AFCommandContext ctx, String subCommand) {
     final output = ctx.o;
     writeShortHelp(ctx);
-    List<AFConfigEntry> entries = AFItemWithNamespace.sortIterable<AFConfigEntry>(configs.values);
+    final entries = AFItemWithNamespace.sortIterable<AFConfigEntry>(configs.values);
     for(final entry in entries) {
       entry.writeHelp(output, indent: 2);
     }
@@ -383,13 +383,13 @@ class AFConfigCommand extends AFCommand {
     }
 
     // dump out the current value of a specific argument
-    String configKey = args.first;
+    final configKey = args.first;
     if(args.count == 1) {
       afibConfig.dumpOne(configKey, output);
       return;
     }
 
-    String configVal = args.second;
+    final configVal = args.second;
     final entry = afibConfig.find(configKey);
     if(entry == null) {
       output.writeErrorLine("Unknown configuration entry $configKey");

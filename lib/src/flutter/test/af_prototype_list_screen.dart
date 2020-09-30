@@ -30,15 +30,15 @@ class AFPrototypeTestScreenParam extends AFRouteParam {
     @required String title,
     @required List<AFScreenPrototypeTest> tests
   }) {
-    final groups = Map<String, List<AFScreenPrototypeTest>>();
+    final groups = <String, List<AFScreenPrototypeTest>>{};
     for(final test in tests) {
-      String group = test.id.effectiveGroup;
+      var group = test.id.effectiveGroup;
       if(group == null) {
        group = ungroupedGroup; 
       }
       var tests = groups[group];      
       if(tests == null) {
-        tests = List<AFScreenPrototypeTest>();
+        tests = <AFScreenPrototypeTest>[];
         groups[group] = tests;
       }
 
@@ -130,7 +130,7 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppState, AFStoreConnect
   }
 
   void _addGroup(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam> context, List<Widget> column, String group, List<AFScreenPrototypeTest> tests) {
-    StringBuffer title = StringBuffer(group);
+    final title = StringBuffer(group);
     column.add(createSectionHeader(title.toString()));
 
     for(final test in tests) {

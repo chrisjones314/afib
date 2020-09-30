@@ -40,7 +40,7 @@ class AFibF {
   static InitializeAppState _afInitializeAppState;
   static AppReducer _appReducer;
   static AFStore _afStore;
-  static AFAsyncQueries _afAsyncQueries = AFAsyncQueries();
+  static final AFAsyncQueries _afAsyncQueries = AFAsyncQueries();
   static CreateStartupQueryAction _afCreateStartupQueryAction;
   static AFCreateLifecycleQueryAction _afCreateLifecycleQueryAction;
   static final AFTestDataRegistry _afTestData = AFTestDataRegistry();
@@ -52,14 +52,14 @@ class AFibF {
   static AFScreenMap _afPrototypeScreenMap;
   static CreateAFApp _afCreateApp;
   static AFScreenID forcedStartupScreen;
-  static final testOnlyScreens = Map<AFScreenID, AFibTestOnlyScreenElement>();
-  static Map<String, AFAsyncQueryListenerCustomError> listenerQueries = Map<String, AFAsyncQueryListenerCustomError>();
-  static Map<String, AFDeferredQueryCustomError> deferredQueries = Map<String, AFDeferredQueryCustomError>();
-  static final _recentActions = List<AFActionWithKey>();
+  static final testOnlyScreens = <AFScreenID, AFibTestOnlyScreenElement>{};
+  static Map<String, AFAsyncQueryListenerCustomError> listenerQueries = <String, AFAsyncQueryListenerCustomError>{};
+  static Map<String, AFDeferredQueryCustomError> deferredQueries = <String, AFDeferredQueryCustomError>{};
+  static final _recentActions = <AFActionWithKey>[];
   static int navDepth = 0;
 
   /// a key for referencing the Navigator for the material app.
-  static final GlobalKey<NavigatorState> _afNavigatorKey = new GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> _afNavigatorKey = GlobalKey<NavigatorState>();
 
   static void initialize<AppState>(AFFlutterParams p) {
       _afCreateApp = p.createApp;
@@ -71,7 +71,7 @@ class AFibF {
     AFibF.setCreateStartupQueryAction(p.createStartupQueryAction);
     AFibF.setCreateLifecycleQueryAction(p.createLifecycleQueryAction);
 
-    List<Middleware<AFState>> middleware = List<Middleware<AFState>>();
+    final middleware = <Middleware<AFState>>[];
     middleware.addAll(createRouteMiddleware());
     middleware.add(AFQueryMiddleware());
     
@@ -102,7 +102,7 @@ class AFibF {
     finishStartup();
   }
 
-  static void testOnlyVerifyActiveScreen(AFScreenID screenId, {includePopups = false}) {
+  static void testOnlyVerifyActiveScreen(AFScreenID screenId, {bool includePopups = false}) {
     if(screenId == null) {
       return;
     }
@@ -136,7 +136,7 @@ class AFibF {
     if(navDepth > 1) {
       throw AFException("Unexpected navigation depth greater than 1");
     }
-    NavigatorState navState = AFibF.navigatorKey.currentState;
+    final navState = AFibF.navigatorKey.currentState;
     if(navState != null) {
       underHere(navState);
     }
@@ -274,7 +274,7 @@ class AFibF {
   }
 
   static List<AFScreenPrototypeTest> findTestsForAreas(List<String> areas) {
-    final result = List<AFScreenPrototypeTest>();
+    final result = <AFScreenPrototypeTest>[];
     _addTestsForAreas(screenTests.all, areas, result);
     _addTestsForAreas(multiScreenStateTests.all, areas, result);
     return result;
@@ -408,7 +408,7 @@ class AFibF {
   }
 
   /// Do not call this method, AFApp.initialize will do it for you.
-  static setCreateStartupQueryAction(createStartupQueryAction) {
+  static void setCreateStartupQueryAction(CreateStartupQueryAction createStartupQueryAction) {
     if(_afCreateStartupQueryAction != null) {
       _directCallException();
     }
@@ -417,7 +417,7 @@ class AFibF {
   }
 
   /// Do not call this method, AFApp.initialize will do it for you.
-  static setCreateLifecycleQueryAction(createLifecycleQueryAction) {
+  static void setCreateLifecycleQueryAction(AFCreateLifecycleQueryAction createLifecycleQueryAction) {
     if(_afCreateLifecycleQueryAction != null) {
       _directCallException();
     }

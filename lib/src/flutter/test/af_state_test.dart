@@ -20,7 +20,7 @@ class AFStateTestContext<TState extends AFAppState> extends AFStateTestExecute {
   AFStateTest test;
   final AFStore store;
   final AFDispatcher dispatcher;
-  static AFStateTestContext _currentTest;
+  static AFStateTestContext currentTest;
   final bool isTrueTestContext;
   
   AFStateTestContext(this.test, this.store, this.dispatcher, { @required this.isTrueTestContext} );
@@ -29,21 +29,19 @@ class AFStateTestContext<TState extends AFAppState> extends AFStateTestExecute {
   AFState get afState { return store.state; }
   TState get state { return store.state.app; }
   AFRouteState get route { return store.state.route; }
-  static void setCurrentTest(AFStateTestContext context) { _currentTest = context; }
-  static AFStateTestContext get currentTest { return _currentTest; }
 
   void processQuery(AFAsyncQueryCustomError q) {
     test.processQuery(this, q);
   }
 }
 
-typedef void ProcessQuery(AFStateTestContext context, AFAsyncQueryCustomError query);
-typedef void ProcessTest(AFStateTest test);
-typedef void ProcessVerify(AFStateTestExecute execute, AFAppState stateBefore, AFAppState stateAfter);
+typedef ProcessQuery = void Function(AFStateTestContext context, AFAsyncQueryCustomError query);
+typedef ProcessTest = void Function(AFStateTest test);
+typedef ProcessVerify = void Function(AFStateTestExecute execute, AFAppState stateBefore, AFAppState stateAfter);
 
 class AFStateTests<TState extends AFAppState> {
-  final Map<dynamic, dynamic> data = Map<dynamic, dynamic>();
-  final List<AFStateTest<dynamic>> tests = List<AFStateTest<dynamic>>();
+  final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
+  final List<AFStateTest<dynamic>> tests = <AFStateTest<dynamic>>[];
   AFStateTestContext<dynamic> context;
 
   void queryTest(AFTestID id, AFAsyncQueryCustomError query, ProcessTest handler) {
@@ -69,10 +67,8 @@ class _AFStateResultEntry {
 }
 
 class _AFStateQueryEntry {
-  //final AFAsyncQuery query;
-  final AFTestSectionID id;
   final ProcessVerify verify;
-  _AFStateQueryEntry(this.id, this.verify);
+  _AFStateQueryEntry(this.verify);
 }
 
 class AFStateTest<TState extends AFAppState> {
@@ -80,8 +76,8 @@ class AFStateTest<TState extends AFAppState> {
   final AFTestID id;
   AFTestID idPredecessor;
   final AFAsyncQueryCustomError query;
-  final Map<String, _AFStateResultEntry> results = Map<String, _AFStateResultEntry>();
-  final List<_AFStateQueryEntry> postQueries = List<_AFStateQueryEntry>();
+  final Map<String, _AFStateResultEntry> results = <String, _AFStateResultEntry>{};
+  final List<_AFStateQueryEntry> postQueries = <_AFStateQueryEntry>[];
 
   AFStateTest(this.id, this.query, this.tests);
 
@@ -113,7 +109,7 @@ class AFStateTest<TState extends AFAppState> {
 
   /// 
   void specifySecondaryResponseWithId(AFAsyncQueryCustomError query, dynamic idData) {
-    registerResult(query, (AFStateTestContext context, AFAsyncQueryCustomError query) {
+    registerResult(query, (context, query) {
       final data = AFibF.testData.find(idData);
       query.testFinishAsyncWithResponse(context, data);
     });
@@ -128,33 +124,33 @@ class AFStateTest<TState extends AFAppState> {
   }
 
   void specifySecondaryError(AFAsyncQueryCustomError query, dynamic error) {
-    registerResult(query, (AFStateTestContext context, AFAsyncQueryCustomError query) {
+    registerResult(query, (context, query) {
       query.testFinishAsyncWithError(context, error);
     });
   }
 
-  void verifyStateAfterQuery({AFTestSectionID id, ProcessVerify verify}) {
-    postQueries.add(_AFStateQueryEntry(id, verify));
+  void verifyStateAfterQuery(ProcessVerify verify) {
+    postQueries.add(_AFStateQueryEntry(verify));
   }
 
   /// Execute the test by kicking of its queries, then 
 void execute(AFStateTestContext context) {    
-    AFStateTestContext.setCurrentTest(context);
+    AFStateTestContext.currentTest = context;
     
     // first, execute an predecessor tests.
     if(idPredecessor != null) {
       final test = tests.findById(idPredecessor);
       test.execute(context);
     }
-    final AFAppState stateBefore = context.state;
+    final stateBefore = context.state;
     processQuery(context, this.query);
 
     // basically, we need to go through an execute each query that they specified.
-    postQueries.forEach((q) {
+    for(final q in postQueries) {
       // lookup the result for that query
       AFStateTestExecute e = context;
       q?.verify(e, stateBefore, context.state);
-    });
+    }
   }
 
   /// Process a query by looking up the results we have for that query,

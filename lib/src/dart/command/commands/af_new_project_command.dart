@@ -29,7 +29,7 @@ class AFNewProjectCommand extends AFCommand {
     final projectName = ctx.args.second;
 
     // first, validate that the namespace is valid.
-    String err = AFConfigEntries.appNamespace.validate(namespace);
+    var err = AFConfigEntries.appNamespace.validate(namespace);
     if(err != null) {
       ctx.output.writeErrorLine(err);
       return;

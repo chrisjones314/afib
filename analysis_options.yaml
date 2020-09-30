@@ -1,0 +1,16 @@
+include: package:effective_dart/analysis_options.yaml
+
+linter:
+  rules:
+    always_use_package_imports: true
+    public_member_api_docs: false
+    prefer_relative_imports: false
+    lines_longer_than_80_chars: false
+    unnecessary_this: false
+    prefer_function_declarations_over_variables: false
+    avoid_classes_with_only_static_members: false
+    avoid_returning_this: false
+    avoid_equals_and_hash_code_on_mutable_classes: false
+    unnecessary_lambdas: false
+    use_setters_to_change_properties: false
+    one_member_abstracts: false

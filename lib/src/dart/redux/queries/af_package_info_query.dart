@@ -15,7 +15,7 @@ class AFPackageInfoQuery<TState extends AFAppState> extends AFAsyncQuery<TState,
 
   @override
   void startAsync(AFStartQueryContext<AFPackageInfoState, AFQueryError> context) {
-    PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
+    PackageInfo.fromPlatform().then((packageInfo) {
       final result = AFPackageInfoState(
         appName: packageInfo.appName,
         packageName: packageInfo.packageName,

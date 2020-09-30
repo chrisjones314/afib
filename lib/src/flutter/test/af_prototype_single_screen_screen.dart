@@ -27,7 +27,7 @@ class AFPrototypeSingleScreenRouteParam extends AFRouteParam {
 
   @override
   bool matchesScreen(AFScreenID screenID) {
-    AFSingleScreenPrototypeTest test = AFibF.screenTests.findById(id);
+    final test = AFibF.screenTests.findById(id);
     if(test.screenId == screenID) {
       return true;
     }
@@ -35,13 +35,13 @@ class AFPrototypeSingleScreenRouteParam extends AFRouteParam {
   }
 
   AFScreenID get effectiveScreenId {
-    AFSingleScreenPrototypeTest test = AFibF.screenTests.findById(id);
+    final test = AFibF.screenTests.findById(id);
     return test.screenId;
   }
 
   @override
   AFRouteParam paramFor(AFScreenID screenID) {
-    AFSingleScreenPrototypeTest test = AFibF.screenTests.findById(id);
+    final test = AFibF.screenTests.findById(id);
     if(test.screenId == screenID) {
       return param;
     }
@@ -74,7 +74,7 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppState, AFProt
 
   @override
   AFPrototypeSingleScreenData createStateDataAF(AFState state) {
-    AFSingleScreenTests tests = AFibF.screenTests;
+    final tests = AFibF.screenTests;
     return AFPrototypeSingleScreenData(tests, state.testState);
   }
 
@@ -94,8 +94,8 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppState, AFProt
 
 
   Widget _buildScreen(AFBuildContext<AFPrototypeSingleScreenData, AFPrototypeSingleScreenRouteParam> context) {
-    AFSingleScreenTests tests = context.s.tests;
-    AFSingleScreenPrototypeTest test = tests.findById(context.p.id);
+    final tests = context.s.tests;
+    final test = tests.findById(context.p.id);
     AFRouteParam paramChild = context.p.param ?? test.data.param;
     final testContext = context.s.testState.findContext(test.id);
     final testState = context.s.testState.findState(test.id);

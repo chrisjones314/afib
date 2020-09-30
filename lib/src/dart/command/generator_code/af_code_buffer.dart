@@ -2,7 +2,7 @@
 /// Used to insert code at a particular point in a file.
 class AFCodeBuffer {
   final String indent;
-  final lines = List<String>();
+  final lines = <String>[];
   final currentLine = StringBuffer();
 
   AFCodeBuffer({this.indent = ""});
@@ -22,8 +22,8 @@ class AFCodeBuffer {
     if(currentLine.isNotEmpty) {
       writeLine("");
     }
-    for(int i = 0; i < lines.length; i++) {
-      String line = lines[i];
+    for(var i = 0; i < lines.length; i++) {
+      final line = lines[i];
       if(i > 0) {
         result.write(indent);
       }

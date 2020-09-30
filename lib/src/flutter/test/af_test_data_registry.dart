@@ -1,7 +1,7 @@
 
 /// Just a registry of test data objects which can be used in various test contexts.
 class AFTestDataRegistry {
-  final testData = Map<dynamic, dynamic>();
+  final testData = <dynamic, dynamic>{};
 
   void register(dynamic id, dynamic data) {
     testData[id] = data;
@@ -20,7 +20,7 @@ class AFTestDataRegistry {
   }
 
   List<TData> testDataList<TData>(List<dynamic> ids) {
-    final list = List<TData>();
+    final list = <TData>[];
     for(final id in ids) {
       TData data = find(id);
       list.add(data);

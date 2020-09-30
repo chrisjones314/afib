@@ -30,7 +30,7 @@ void afRegisterAppCommands(AFDartParams params, AFCommands commands) {
 }
 
 void afCommandMain(AFCommands commands, AFDartParams params, AFArgs afArgs) {
-  String command = "help";
+  var command = "help";
   if(afArgs.hasCommand) {
     command = afArgs.command;
   }

@@ -8,8 +8,8 @@ class AFIDCodeGenerator extends AFCodeGeneratorWithTemplate {
     final upcaseKind = AFCodeGenerator.toCapitalFirstLetter(kind);
     final idSnake = AFCodeGenerator.toSnakeCase(id);
     
-    localGenerators.registerGenerator(new AFStaticCodeGenerator(AFConfigEntries.afNamespace, "id_identifier", id));
-    localGenerators.registerGenerator(new AFStaticCodeGenerator(AFConfigEntries.afNamespace, "id_identifier_snake", idSnake));
-    localGenerators.registerGenerator(new AFStaticCodeGenerator(AFConfigEntries.afNamespace, "id_identifier_kind", upcaseKind));    
+    localGenerators.registerGenerator(AFStaticCodeGenerator(AFConfigEntries.afNamespace, "id_identifier", id));
+    localGenerators.registerGenerator(AFStaticCodeGenerator(AFConfigEntries.afNamespace, "id_identifier_snake", idSnake));
+    localGenerators.registerGenerator(AFStaticCodeGenerator(AFConfigEntries.afNamespace, "id_identifier_kind", upcaseKind));    
   }
 }

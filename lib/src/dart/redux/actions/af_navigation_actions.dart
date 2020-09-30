@@ -6,7 +6,7 @@ import 'package:afib/src/flutter/utils/af_custom_popup_route.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
-typedef void AFReturnFunc(dynamic returnData);
+typedef AFReturnFunc = void Function(dynamic returnData);
 
 /// Base class for action that manipulates the route (pushing, popping, replacing)
 /// and determines which screen is showing, and what data is visible.
@@ -101,7 +101,7 @@ class AFNavigatePopAction extends AFNavigateAction {
 
 /// Used to close a popup screen
 class AFNavigatePopPopupAction extends AFNavigatePopAction {
-  BuildContext context;
+  final BuildContext context;
   AFNavigatePopPopupAction(this.context, {AFID id, dynamic returnData}): super(id: id, returnData: returnData);
 }
 

@@ -9,7 +9,7 @@ import 'package:afib/afib_dart.dart';
 class AFScreenMap {
 
   AFScreenID _initialKey;
-  final Map<AFScreenID, WidgetBuilder> _screens = Map<AFScreenID, WidgetBuilder>();
+  final Map<AFScreenID, WidgetBuilder> _screens = <AFScreenID, WidgetBuilder>{};
 
   AFScreenMap() {
     screen(AFUIID.screenStartup, (_) => AFStartupScreenWrapper());

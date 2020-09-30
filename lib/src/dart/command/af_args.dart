@@ -25,8 +25,9 @@ class AFArgs {
 
   /// The number of arguments to the command (not including the command itself)
   int get count {
-    if(args.length == 0)
+    if(args.length == 0) {
       return 0;
+    }
     return args.length - 1;
   }
 
@@ -41,7 +42,7 @@ class AFArgs {
 
   void debugResetTo(String arguments) {
     print("USING DEBUG ARGUMENTS $arguments");
-    List<String> parsed = arguments.split(new RegExp(r"[ \t]"));
+    final parsed = arguments.split(RegExp(r"[ \t]"));
     args.clear();
     args.addAll(parsed);
   }

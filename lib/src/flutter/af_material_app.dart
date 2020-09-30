@@ -7,8 +7,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 class AFNavigatorObserver extends NavigatorObserver {
   void didPop(Route route, Route previousRoute) {
-    // TODO: figure out how to detect unexpected pops for both sliding 
-    // back gesture and clicking outside a popup.
     if(!AFibF.withinMiddewareNavigation) {
       AFibF.correctForFlutterPopNavigation();
     }    

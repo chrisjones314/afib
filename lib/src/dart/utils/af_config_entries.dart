@@ -32,7 +32,7 @@ class AFConfigEntries {
   /// you should use widgets like [AFCircularProgressIndicator], which use this flag,
   /// by way of the utility [AFConfig.isWidgetTesterContext] to return static widgets
   /// instead of an infinite animation in the widget tester context.
-  static final widgetTesterContext = AFConfigEntryBool(afNamespace, "widgetTesterContext", false, "Internal value set to true when we are doing widget tests");
+  static final widgetTesterContext = AFConfigEntryBool(afNamespace, "widgetTesterContext", "Internal value set to true when we are doing widget tests", defaultValue: false);
 
   /// A two or three character value which is used as the namespace for app-specific
   /// commands, and also the prefix on certain app-specific classs names.

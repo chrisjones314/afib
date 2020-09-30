@@ -2,7 +2,7 @@
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:meta/meta.dart';
 
-typedef dynamic InitializeAppState();
+typedef InitializeAppState = dynamic Function();
 
 class AFFlutterParams<AppState> {
   final InitScreenMap         initScreenMap;

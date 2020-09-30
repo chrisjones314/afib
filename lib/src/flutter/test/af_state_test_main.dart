@@ -18,9 +18,9 @@ void afStateTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams par
   }
 
   final tests = AFibF.stateTests;
-  final contexts = List<AFStateTestContext>();
+  final contexts = <AFStateTestContext>[];
 
-  tests.tests.forEach((test) {
+  for(final test in tests.tests) {
     if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
       final store = AFibF.testOnlyStore;
       final dispatcher = AFStoreDispatcher(store);
@@ -30,7 +30,7 @@ void afStateTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams par
       test.execute(context);
       contexts.add(context);
     }
-  });
+  }
 
   final baseContexts = List<AFBaseTestExecute>.of(contexts);
   printTestResults(output, "State", baseContexts, stats);

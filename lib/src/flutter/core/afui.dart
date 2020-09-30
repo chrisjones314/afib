@@ -8,7 +8,7 @@ import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-typedef Future<bool> AFShouldContinueCheck();
+typedef AFShouldContinueCheck = Future<bool> Function();
 
 /// Some very simple user interface utilities.
 class AFUI {
@@ -20,7 +20,7 @@ class AFUI {
   ///    final rows = AFUI.column();
   ///    // instead of
   ///    final rows = List<Widget>();
-  static List<Widget> column() { return List<Widget>(); }
+  static List<Widget> column() { return <Widget>[]; }
 
   /// Creates an empty widget list which will contain rows of widgets,
   /// used for clarity
@@ -29,10 +29,10 @@ class AFUI {
   ///    final cols = AFUI.row();
   ///    // instead of
   ///    final cols = List<Widget>();
-  static List<Widget> row() { return List<Widget>(); }
+  static List<Widget> row() { return <Widget>[]; }
 
 
-  static List<TableRow> tableColumn() { return List<TableRow>(); }
+  static List<TableRow> tableColumn() { return <TableRow>[]; }
 
   static Key keyForWID(AFWidgetID wid) {
     if(wid == null) { return null; }
@@ -71,7 +71,7 @@ class AFUI {
       mainAxisAlignment: mainAxisAlignment);
   }
 
-  static standardOKNoticeDialog({
+  static void standardOKNoticeDialog({
     @required BuildContext context,
     @required String alertTitle,
     @required Widget alertContent,
@@ -88,7 +88,7 @@ class AFUI {
         },
       );
       // set up the AlertDialog
-      AlertDialog alert = AlertDialog(
+      final alert = AlertDialog(
         title: Text(alertTitle),
         content: alertContent,
         actions: [
@@ -99,7 +99,7 @@ class AFUI {
       // show the dialog
       showDialog(
         context: context,
-        builder: (BuildContext context) {
+        builder: (context) {
           return alert;
         },
       );
@@ -136,7 +136,7 @@ class AFUI {
           );
 
           // set up the AlertDialog
-          AlertDialog alert = AlertDialog(
+          final alert = AlertDialog(
             title: Text(alertTitle),
             content: Text(alertQuestion),
             actions: [
@@ -148,7 +148,7 @@ class AFUI {
           // show the dialog
           showDialog(
             context: context,
-            builder: (BuildContext context) {
+            builder: (context) {
               return alert;
             },
           );

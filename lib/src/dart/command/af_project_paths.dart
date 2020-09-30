@@ -35,9 +35,9 @@ class AFProjectPaths {
   }
 
   static String fullPathFor(List<String> relativePath) {
-    Directory current = Directory.current;  
-    List<String> projectRoot = split(current.path);
-    List<String> temp = List<String>.from(projectRoot);
+    final current = Directory.current;  
+    final projectRoot = split(current.path);
+    final temp = List<String>.from(projectRoot);
     // this is used by the 'new' command, which takes place from one folder below the 
     // project folder, which is where most commands are run.
     if(extraParentFolder != null) {
@@ -45,7 +45,7 @@ class AFProjectPaths {
     }
 
     temp.addAll(relativePath);
-    String path = joinAll(temp);
+    final path = joinAll(temp);
     return path;
   }
 
@@ -59,17 +59,13 @@ class AFProjectPaths {
     return false;
   }
 
-  static void setExtraParentFolder(List<String> folder) {
-    extraParentFolder = folder;
-  }
-
   static void createProjectFolder(List<String> projectPath) {
-    String path = fullPathFor(projectPath);
+    final path = fullPathFor(projectPath);
     Directory(path).createSync(recursive: true);
   }
 
   static String relativePathFor(List<String> projectPath, { bool allowExtra = true}) {
-    List<String> temp = List<String>();
+    final temp = <String>[];
 
     // this is used by the 'new' command, which takes place from one folder below the 
     // project folder, which is where most commands are run.

@@ -17,7 +17,7 @@ class AFTestError {
 }
 
 class AFTestErrors {
-  final _errors = List<AFTestError>();
+  final _errors = <AFTestError>[];
   int pass = 0;
 
   List<AFTestError> get errors { return _errors; }
@@ -40,11 +40,11 @@ abstract class AFBaseTestExecute {
   final errors = AFTestErrors();
 
   void expect(dynamic value, flutter_test.Matcher matcher, {int extraFrames = 0}) {
-    final matchState = Map();
-    if(!addPassIf(matcher.matches(value, matchState))) {
+    final matchState = <dynamic, dynamic>{};
+    if(!addPassIf(test: matcher.matches(value, matchState))) {
       final matchDesc = matcher.describe(flutter_test.StringDescription());
       final desc = "Expected $matchDesc, found $value";
-      final int stackFrames = extraFrames + 2;
+      final stackFrames = extraFrames + 2;
       addError(desc, stackFrames);
     }
   }
@@ -62,7 +62,7 @@ abstract class AFBaseTestExecute {
     final suffix = StringBuffer(" passed");
     if(stopwatch != null) {
       suffix.write(" (in ");
-      double total = stopwatch.elapsedMilliseconds / 1000.0;
+      final total = stopwatch.elapsedMilliseconds / 1000.0;
       suffix.write(total.toStringAsFixed(2));
       suffix.write("s)");
     }
@@ -96,7 +96,7 @@ abstract class AFBaseTestExecute {
     output.endLine();
   }
 
-  bool addPassIf(bool test) {
+  bool addPassIf({bool test}) {
     if(test) {
       errors.addPass();
     }
@@ -104,16 +104,16 @@ abstract class AFBaseTestExecute {
   }    
 
   void addError(String desc, int depth) {
-    String err = AFBaseTestExecute.composeError(desc, depth);
+    final err = AFBaseTestExecute.composeError(desc, depth);
     errors.addError(AFTestError(testID, err));
   }
 
   static String composeError(String desc, int depth) {
-    final List<Frame> frames = Trace.current().frames;
-    final Frame f = frames[depth+1];
+    final frames = Trace.current().frames;
+    final f = frames[depth+1];
     final loc = "${f.library}:${f.line}";
 
-    final err = loc + ": " + desc;
+    final err = "$loc: $desc";
     return err;
   }
 
@@ -126,14 +126,14 @@ void printTestResults(AFCommandOutput output, String kind, List<AFBaseTestExecut
   output.writeSeparatorLine();
   output.writeLine("Afib $kind Tests:");
 
-  int totalPass = 0;
+  var totalPass = 0;
   for(var context in baseContexts) {
     totalPass += context.printPassMessages(output);
   }
   AFBaseTestExecute.printTotalPass(output, "TOTAL", totalPass);
   stats.addPasses(totalPass);
 
-  int totalErrors = 0;
+  var totalErrors = 0;
   for(var context in baseContexts) {
     totalErrors += context.printFailMessages(output);
   }

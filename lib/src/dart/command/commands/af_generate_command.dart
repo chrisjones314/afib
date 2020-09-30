@@ -22,7 +22,7 @@ class AFInsertionPoint {
   }
 
   String get fullText {
-    return buildFullText(id, false);
+    return buildFullText(id, forRegex: false);
   }
 
   String get codeText {
@@ -32,7 +32,7 @@ class AFInsertionPoint {
   RegExp get replaceRegexFor {
     final source = StringBuffer();
     source.write("//\\s+");
-    source.write(buildFullText(id, true));
+    source.write(buildFullText(id, forRegex: true));
     source.write(".*");
     return RegExp(source.toString());
   }
@@ -40,7 +40,7 @@ class AFInsertionPoint {
   String findIndentFor(String content) {
     final source = StringBuffer();
     source.write("([\t ]*)//\\s+");
-    source.write(buildFullText(id, true));
+    source.write(buildFullText(id, forRegex: true));
     final re = RegExp(source.toString());
     final matches = re.allMatches(content);
     if(matches.isEmpty) {
@@ -50,8 +50,8 @@ class AFInsertionPoint {
     return first.group(1);
   }
 
-  static String buildFullText(String id, bool forRegex) {
-    final kind = id[0].toUpperCase() + id.substring(1) + "ID";
+  static String buildFullText(String id, { bool forRegex }) {
+    final kind = "${id[0].toUpperCase()}${id.substring(1)}ID";
     final reSource = StringBuffer();
     reSource.write("AFibInsertionPoint");
     reSource.write(forRegex ? "\\(" : "(");
@@ -63,7 +63,7 @@ class AFInsertionPoint {
   static String buildCodeText(String id) {
     final sb = StringBuffer();
     sb.write("// ");
-    sb.write(buildFullText(id, false));
+    sb.write(buildFullText(id, forRegex: false));
     sb.write(" - Do not Delete.");
     return sb.toString();
   }
@@ -106,7 +106,7 @@ class AFGeneratedFile {
     generator.execute(ctx, buffer);
     buffer.writeLine(insert.codeText);
 
-    String indent = insert.findIndentFor(content);
+    final indent = insert.findIndentFor(content);
     final re = insert.replaceRegexFor;
     final toInsert = buffer.withIndent(indent);
     final revised = content.replaceAll(re, toInsert);
@@ -124,7 +124,7 @@ class AFGeneratedFile {
 /// The current state of any files that are being generated or modified during the current
 /// generate command.
 class AFGeneratedFiles {
-  final files = Map<String, AFGeneratedFile>();
+  final files = <String, AFGeneratedFile>{};
 
 
   void saveChangedFiles(AFCommandOutput output) {
@@ -177,7 +177,7 @@ abstract class AFSourceGenerationStep {
 /// A an algorithm that manipulates one or more pieces of code, consisting
 /// of a serious of [AFSourceGenerationStep]
 class AFSourceGenerator extends AFItemWithNamespace {
-  final steps = List<AFSourceGenerationStep>();
+  final steps = <AFSourceGenerationStep>[];
   final String shortHelp;
 
   /// 
@@ -207,7 +207,7 @@ class AFSourceGenerator extends AFItemWithNamespace {
   /// Writes out a single line help statement.
   void writeShortHelp(AFCommandOutput output, {int indent = 0}) {
     AFCommand.startCommandColumn(output, indent: indent);
-    output.write(namespaceKey + " - ");
+    output.write("$namespaceKey - ");
     AFCommand.startHelpColumn(output);
     output.writeLine(shortHelp);
   }
@@ -217,7 +217,7 @@ class AFSourceGenerator extends AFItemWithNamespace {
 /// An extensible command used to generate source code from the command-line.
 class AFGenerateCommand extends AFCommand {
   static const cmdKey = "generate";
-  final generators = Map<String, AFSourceGenerator>();
+  final generators = <String, AFSourceGenerator>{};
 
   AFGenerateCommand(): super(AFConfigEntries.afNamespace, cmdKey, 1, 0) {
     registerGenerator(AFConfigGenerator());

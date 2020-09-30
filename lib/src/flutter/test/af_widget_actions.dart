@@ -12,9 +12,7 @@ import 'package:flutter/widgets.dart';
 /// A superclass for actions that either apply data to or extract it from
 /// a widget.
 abstract class AFWidgetAction {
-
   bool matches(String actionType, Element element);
-
 }
 
 /// A superclass for actions that apply to a widget based on its runtimeType.
@@ -87,7 +85,7 @@ abstract class AFExtractWidgetAction extends AFWidgetByTypeAction {
   static bool isPrimary(String extractType) { return extractType == extractPrimary; }
 
   List<Element> findChildrenWithWidgetType<T>(Element element) {
-    final result = List<Element>();
+    final result = <Element>[];
     element.visitChildren((element) { 
       final childWidget = element.widget;
       if(childWidget is T) {
@@ -210,7 +208,7 @@ class AFRichTextGestureTapAction extends AFApplyTapWidgetAction {
       throw AFException("If you want to tap on text within a RichText widget, you need to specify an AFRichTextGestureTapSpecifier explicitly as your widget specifier.");
     }
     AFRichTextGestureTapSpecifier specifier = selector;
-    String containsText = specifier.containsText;   
+    final containsText = specifier.containsText;   
     if(tapOn is RichText) {
       if(tapIfMatch(tapOn.text, containsText)) {
         return true;            
@@ -222,7 +220,7 @@ class AFRichTextGestureTapAction extends AFApplyTapWidgetAction {
   bool tapIfMatch(InlineSpan span, String containsText) {
     if(span is TextSpan) {
       if(span.text != null && span.text.contains(containsText) && span.recognizer != null) {
-        GestureRecognizer recognizer = span.recognizer;
+        final recognizer = span.recognizer;
         if(recognizer is TapGestureRecognizer) {
           recognizer.onTap();
           return true;
@@ -377,12 +375,12 @@ class AFExtractTextAFTextFieldAction extends AFExtractPrimaryWidgetAction {
     String text;
     final widget = element.widget;
     if(AFExtractWidgetAction.isPrimary(extractType) && widget is AFTextField) {
-      List<Element> children = this.findChildrenWithWidgetType<TextField>(element);
+      final children = this.findChildrenWithWidgetType<TextField>(element);
       if(children.length != 1) {
         throw AFException("AFTextField doesn't have one TextField child?");
       }
 
-      Element elem = children.first;
+      final elem = children.first;
       final childWidget = elem.widget;
       if(childWidget is TextField) {
         text = childWidget.controller.value.text; 

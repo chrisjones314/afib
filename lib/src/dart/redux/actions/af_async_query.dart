@@ -65,8 +65,8 @@ class AFFinishQueryErrorContext<TState, TError> extends AFFinishQueryContext<TSt
   }
 }
 
-typedef void AFOnResponseDelegate<TState, TResponse>(AFFinishQuerySuccessContext<TState, TResponse> context);
-typedef void AFOnErrorDelegate<TState, TError>(AFFinishQueryErrorContext<TState, TError> context);
+typedef AFOnResponseDelegate<TState, TResponse> = void Function(AFFinishQuerySuccessContext<TState, TResponse> context);
+typedef AFOnErrorDelegate<TState, TError> = void Function(AFFinishQueryErrorContext<TState, TError> context);
 
 /// Superclass for a kind of action that queries some data asynchronously, then knows
 /// how to process the result.
@@ -80,7 +80,7 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
   /// Called internally when redux middleware begins processing a query.
   void startAsyncAF(AFDispatcher dispatcher, AFStore store, { Function(dynamic) onResponseExtra, Function(dynamic) onErrorExtra }) {
     final startContext = AFStartQueryContext<TResponse, TError>(
-      onSuccess: (TResponse response) { 
+      onSuccess: (response) { 
         // note: there could be multiple queries outstanding at once, meaning the state
         // might be changed by some other query while we are waiting for a responser.  
         // Consequently, it is important not to make a copy of the state above this point,
@@ -91,7 +91,7 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
           onResponseExtra(successContext);
         }
       }, 
-      onError: (TError error) {
+      onError: (error) {
         final errorContext = AFFinishQueryErrorContext<TState, TError>(dispatcher: dispatcher, state: store.state, error: error);
         finishAsyncWithErrorAF(errorContext);
         if(onErrorExtra != null) {
@@ -246,7 +246,7 @@ class AFConsolidatedQuery<TState> extends AFAsyncQuery<TState, AFConsolidatedQue
   }
 
   List<AFAsyncQuery> get allQueries {
-    final result = List<AFAsyncQuery>();
+    final result = <AFAsyncQuery>[];
     for(final qr in queryResponses.responses) {
       result.add(qr.query);
     }

@@ -87,7 +87,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData, AFRou
   void _buildTitleRow(AFBuildContext<AFTestDrawerData, AFRouteParamUnused> context, List<Widget> col) {
     col.add(Container(
       margin: EdgeInsets.fromLTRB(8, 60, 8, 20),
-      child: Center(child: Text(context.s.test.id.code + " test"))
+      child: Center(child: Text("${context.s.test.id.code} test"))
     ));
   }
 
@@ -122,7 +122,6 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData, AFRou
         color: AFTheme.primaryBackground,
         textColor: AFTheme.primaryText,
         onPressed: ()  {
-          final scaffold = Scaffold.of(context.c);
           Navigator.pop(context.c);
 
           // give the drawer time to close, then 
@@ -153,9 +152,9 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData, AFRou
     } else {
       col.add(_centerText("Run ${testContext.runNumber} at ${timeFormat.format(testContext.lastRun)}"));
       col.add(_centerText(testState.summaryText));
-      for(int i = 0; i < testState.errors.length; i++) {
+      for(var i = 0; i < testState.errors.length; i++) {
         final error = testState.errors[i];
-        final Color background = (i % 2 == 0) ? Colors.grey[300] : Colors.green[50];
+        final background = (i % 2 == 0) ? Colors.grey[300] : Colors.green[50];
         col.add(
           Container(
             padding: EdgeInsets.all(8.0),

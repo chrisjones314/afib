@@ -3,7 +3,7 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:flutter/widgets.dart';
 
-typedef Widget AFWidgetBuilder<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam>(AFBuildContext<TData, TRouteParam> context);
+typedef AFWidgetBuilder<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> = Widget Function(AFBuildContext<TData, TRouteParam> context);
 
 class AFBuilder<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends StatelessWidget {
   final AFBuildContext<TData, TRouteParam> parentContext;

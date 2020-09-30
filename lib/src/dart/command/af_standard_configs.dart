@@ -18,12 +18,12 @@ class AFConfigEntryEnvironment extends AFConfigEntryChoice {
   }
 
   bool requiresPrototypeData(AFConfig config) {
-    String env = config.stringFor(this);
+    final env = config.stringFor(this);
     return env == prototype;
   }
 
   bool requiresTestData(AFConfig config) {
-    String env = config.stringFor(this);
+    final env = config.stringFor(this);
     return (env != production && env != debug);
   }
 

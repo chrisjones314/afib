@@ -47,7 +47,7 @@ void _navigatePushPopupAction(Store<AFState> store, act, NextDispatcher next) {
 
   Future<dynamic> ret = Navigator.push(
         action.context,
-        new AFCustomPopupRoute(
+        AFCustomPopupRoute(
             childBuilder: action.popupBuilder,
             theme: action.theme,
             barrierLabel: action.barrierLabel,
@@ -102,7 +102,7 @@ void _navigatePopNAction(Store<AFState> store, action, NextDispatcher next) {
   }
 
   AFibF.doMiddlewareNavigation( (navState) {
-    for(int i = 0; i < popN.popCount; i++) {
+    for(var i = 0; i < popN.popCount; i++) {
       navState.pop(action.returnData);
     }
   });
@@ -114,14 +114,14 @@ void _navigatePopToAction(Store<AFState> store, action, NextDispatcher next) {
   final AFNavigatePopToAction popTo = action;
   final route = _getRouteState(store);
 
-  int popCountTo = route.popCountToScreen(popTo.popTo);
+  final popCountTo = route.popCountToScreen(popTo.popTo);
   /// If the segment count is 1
   if(popCountTo < 0) {
     throw AFException("Could not pop to ${popTo.popTo} because that screen is not in the route.");
   }
 
   AFibF.doMiddlewareNavigation( (navState) {
-    for(int i = 0; i < popCountTo; i++) {
+    for(var i = 0; i < popCountTo; i++) {
       navState.pop(action.returnData);
     }
   });
@@ -152,7 +152,7 @@ void _navigateReplaceAllAction(Store<AFState> store, action, NextDispatcher next
   final route = _getRouteState(store);
   AFibF.doMiddlewareNavigation((navState) {
     final popCount = route.popCountToRoot;
-    for(int i = 0; i < popCount - 1; i++) {
+    for(var i = 0; i < popCount - 1; i++) {
       navState.pop();
     }
     navState.popAndPushNamed(screen);
@@ -173,7 +173,7 @@ void _navigateExitTestAction(Store<AFState> store, action, NextDispatcher next) 
   final route = _getRouteState(store);
   final popCount = route.popCountToRoot;
   AFibF.doMiddlewareNavigation( (navState) {
-    for(int i = 0; i < popCount; i++) {
+    for(var i = 0; i < popCount; i++) {
       navState.pop();
     }
   });

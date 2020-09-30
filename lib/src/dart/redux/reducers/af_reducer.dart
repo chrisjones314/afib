@@ -11,7 +11,7 @@ import 'package:afib/src/flutter/utils/afib_f.dart';
 /// 
 /// It handles routing and a reset state action, but otherwise delegates to the 
 /// application state reducer specified in [AFApp.initialize]
-AFState afReducer(AFState state, action) {
+AFState afReducer(AFState state, dynamic action) {
 
   if(action is AFResetToInitialStateAction) {
     // In the state/screen test context, we want to reset to the intial

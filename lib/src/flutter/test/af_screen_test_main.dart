@@ -19,9 +19,9 @@ import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams paramsD1, AFFlutterParams paramsF, WidgetTester tester) async {
-  final bool isWidget = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.widgetTests);
-  final bool isSimple = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.screenTests);
-  final bool isMulti  = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.multiScreenTests);
+  final isWidget = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.widgetTests);
+  final isSimple = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.screenTests);
+  final isMulti  = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.multiScreenTests);
   if(!isSimple && !isMulti && !isWidget) {
     return;
   }
@@ -45,7 +45,7 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
   return null;
 }
 
-typedef AFNavigatePushAction AFTestCreatePushAction(AFScreenPrototypeTest test);
+typedef AFTestCreatePushAction = AFNavigatePushAction Function(AFScreenPrototypeTest test);
 
 Future<void> _afStandardScreenTestMain(
   AFCommandOutput output, 
@@ -55,7 +55,7 @@ Future<void> _afStandardScreenTestMain(
   List<AFScreenPrototypeTest> allTests, 
   String sectionTitle,
   AFTestCreatePushAction createPush) async {
-  final simpleContexts = List<AFScreenTestContextWidgetTester>();
+  final simpleContexts = <AFScreenTestContextWidgetTester>[];
 
   for(var test in allTests) {
     if(!test.hasBody) {
@@ -77,7 +77,7 @@ Future<void> _afStandardScreenTestMain(
 
       AFibD.logTest?.d("Finished pumpWidget for ${test.id}");
       //debugDumpApp();
-      await test.run(context, null);
+      await test.run(context);
       AFibD.logTest?.d("Finished ${test.id}");
 
       // pop this test screen off so that we are ready for the next one.
@@ -106,7 +106,7 @@ Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, 
 }
 
 Future<void> _afMultiScreenTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
- final multiContexts = List<AFScreenTestContextWidgetTester>();
+ final multiContexts = <AFScreenTestContextWidgetTester>[];
 
   for(final test in AFibF.multiScreenStateTests.stateTests) {
     if(!test.hasBody) {
@@ -126,7 +126,7 @@ Future<void> _afMultiScreenTestMain(AFCommandOutput output, AFTestStats stats, W
 
       AFibD.logTest?.d("Finished pumpWidget for ${test.id}");
       //debugDumpApp();
-      await test.body.run(context, null);
+      await test.body.run(context);
       AFibD.logTest?.d("Finished ${test.id}");
 
       // pop this test screen off so that we are ready for the next one.

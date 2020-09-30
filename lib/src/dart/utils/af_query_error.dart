@@ -9,7 +9,7 @@ class AFQueryError {
   AFQueryError({this.message, this.code});
 
   String toString() {
-    StringBuffer sb = StringBuffer();
+    final sb = StringBuffer();
     if(code != null) {
       sb.write(code);
       if(message != null) {

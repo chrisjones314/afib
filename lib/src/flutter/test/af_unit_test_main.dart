@@ -17,15 +17,15 @@ void afUnitTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams para
   }
 
   final tests = AFibF.unitTests;
-  final contexts = List<AFUnitTestContext>();
+  final contexts = <AFUnitTestContext>[];
 
-  tests.tests.forEach((test) {
+  for(final test in tests.tests) {
     if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
       final context = AFUnitTestContext(test);
       test.execute(context);
       contexts.add(context);
     }
-  });
+  }
 
   final baseContexts = List<AFBaseTestExecute>.of(contexts);
   printTestResults(output, "Unit", baseContexts, stats);

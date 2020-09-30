@@ -21,16 +21,16 @@ class AFHelpCommand extends AFCommand {
 
     if(args.count == 0) {
       output.writeLine("AFib commands, use afib help <command> for details: ");
-      all.commands.forEach((cmd) {
+      for(final cmd in all.commands) {
         cmd.writeShortHelp(ctx);
-      });
+      }
       return;
     }
 
     if(args.count >= 1) {
-      String command = args.first;
-      String subCommand = args.second;
-      AFCommand cmd = all.find(command);
+      final command = args.first;
+      final subCommand = args.second;
+      final cmd = all.find(command);
       if(cmd == null) {
         output.writeLine("Unknown command: $command");
       } else {

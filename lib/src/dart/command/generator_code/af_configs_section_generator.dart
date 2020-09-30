@@ -13,10 +13,10 @@ class AFConfigsSectionGenerator extends AFCodeGenerator {
   @override
   void execute(AFCommandContext ctx, AFCodeBuffer buffer) {
     final afibConfig = this.source ?? ctx.afibConfig;
-    Iterable<AFConfigEntry> scope = this.entries ?? afibConfig.all;
+    final scope = this.entries ?? afibConfig.all;
     final sorted = AFItemWithNamespace.sortIterable<AFConfigEntry>(scope);
     for(final entry in sorted) {
-      String codeVal = entry.codeValue(afibConfig);
+      final codeVal = entry.codeValue(afibConfig);
       if(codeVal != null) {
         buffer.writeLine("config.setValue(AFConfigEntries.${entry.key}, $codeVal);");
       }

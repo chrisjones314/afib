@@ -87,10 +87,10 @@ class AFRouteState {
 
   /// Creates the default initial state.
   factory AFRouteState.initialState() {
-    final route = List<AFRouteSegment>();
-    final popups = List<AFRouteSegment>();
+    final route = <AFRouteSegment>[];
+    final popups = <AFRouteSegment>[];
     route.add(AFRouteSegment.withScreen(AFibF.effectiveStartupScreenId));
-    return AFRouteState(route: route, popups: popups, priorLastSegment: List<AFRouteSegment>());
+    return AFRouteState(route: route, popups: popups, priorLastSegment: <AFRouteSegment>[]);
   }
 
   bool isActiveScreen(AFScreenID screen, { bool includePopups }) {
@@ -109,14 +109,14 @@ class AFRouteState {
   /// Returns the segment in the current route associated with the 
   /// specified screen.
   AFRouteSegment _findSegmentFor(AFScreenID screen, bool includePrior) {
-    for(int i = route.length - 1; i >= 0; i--) {
+    for(var i = route.length - 1; i >= 0; i--) {
       final segment = route[i];
       if(segment.matchesScreen(screen)) {
         return segment;
       }
     }
     if(includePrior) {
-      for(int i = 0; i < priorLastSegment.length; i++) {
+      for(var i = 0; i < priorLastSegment.length; i++) {
         final seg = priorLastSegment[i];
         if(seg.matchesScreen(screen)) {
           return seg;
@@ -135,8 +135,8 @@ class AFRouteState {
   /// Returns the number of pops to do to replace the entire path, but 
   /// does not replace any afib test screens.
   int get popCountToRoot {
-    int nPop = 0;
-    for(int i = route.length - 1; i >= 0; i--) {
+    var nPop = 0;
+    for(var i = route.length - 1; i >= 0; i--) {
       final segment = route[i];
       // the simple prototype screen is really a test of an app screen, so we do
       // want to pop it off.
@@ -153,8 +153,8 @@ class AFRouteState {
   /// Returns the number of pops to get to the specified screen in the root,
   /// or -1 if that screen isn't in the route.
   int popCountToScreen(AFScreenID screen) {
-    int nPop = 0;
-    for(int i = route.length - 1; i >= 0; i--) {
+    var nPop = 0;
+    for(var i = route.length - 1; i >= 0; i--) {
       final segment = route[i];
       if(!segment.matchesScreen(screen)) {
         return nPop;
@@ -165,7 +165,7 @@ class AFRouteState {
   }
 
   AFRouteParam findPopupParamFor(AFScreenID screen) {
-    for(int i = popups.length - 1; i >= 0; i--) {
+    for(var i = popups.length - 1; i >= 0; i--) {
       final segment = popups[i];
       if(segment.matchesScreen(screen)) {
         return segment.param;
@@ -180,8 +180,8 @@ class AFRouteState {
   /// If [includePrior] is true, it will also include the most recent final segment
   /// in the search.  This is useful when the final segement has been popped off the route,
   /// but still needs to be included in the search.
-  AFRouteParam findParamFor(AFScreenID screen, bool includePrior) {
-    AFRouteSegment seg = _findSegmentFor(screen, includePrior);
+  AFRouteParam findParamFor(AFScreenID screen, { bool includePrior }) {
+    final seg = _findSegmentFor(screen, includePrior);
     if(seg == null) {
       return null;
     }
@@ -190,11 +190,11 @@ class AFRouteState {
 
   /// Returns the list of screen names, from the root to the leaf.
   String fullPath() { 
-    StringBuffer buffer = StringBuffer();
-    route.forEach((AFRouteSegment item) {
+    final buffer = StringBuffer();
+    for(final item in route) {
       buffer.write("/");
       buffer.write(item.screen);
-    });
+    }
     return buffer.toString();
   }
 
@@ -250,7 +250,7 @@ class AFRouteState {
   /// Remove the leaf element from the route, returning back to the parent
   /// screen.
   AFRouteState popTo(AFScreenID screen, dynamic childReturn) {
-    int popCount = popCountToScreen(screen);
+    final popCount = popCountToScreen(screen);
     return popN(popCount, childReturn);
   }
 
@@ -276,8 +276,8 @@ class AFRouteState {
   /// in the route.
   AFRouteState setParam(AFScreenID screen, AFRouteParam param) {
     final revised = copyRoute();
-    for(int i = 0; i < revised.length; i++) {
-      AFRouteSegment seg = revised[i];
+    for(var i = 0; i < revised.length; i++) {
+      final seg = revised[i];
       if(seg.screen == screen) {
         revised[i] = seg.copyWith(param: param);
         break;
@@ -290,8 +290,8 @@ class AFRouteState {
   /// Replaces the route parameter for the specified popup screen.
   AFRouteState setPopupParam(AFScreenID screen, AFRouteParam param) {
     final revised = List<AFRouteSegment>.of(this.popups);
-    for(int i = 0; i < revised.length; i++) {
-      AFRouteSegment seg = revised[i];
+    for(var i = 0; i < revised.length; i++) {
+      final seg = revised[i];
       if(seg.screen == screen) {
         revised[i] = seg.copyWith(param: param);
         break;
@@ -306,7 +306,7 @@ class AFRouteState {
 
     // this prevent us from removing afib test screens.
     final revised = List<AFRouteSegment>.of(route);
-    int popCount = this.popCountToRoot;
+    final popCount = this.popCountToRoot;
     final priorLastSegment = _cyclePrior(revised, popCount);
 
     revised.add(AFRouteSegment.withParam(screen, param));
@@ -336,8 +336,8 @@ class AFRouteState {
     }
 
     // create a new prior segment with all the segments being popped off.
-    final revisedPrior = List<AFRouteSegment>();
-    for(int i = 0; i < popCount; i++) {
+    final revisedPrior = <AFRouteSegment>[];
+    for(var i = 0; i < popCount; i++) {
       final justRemoved = revisedActive.removeLast();
       revisedPrior.insert(0, justRemoved);
     }
@@ -351,7 +351,7 @@ class AFRouteState {
     List<AFRouteSegment> popups,
     List<AFRouteSegment> priorLastSegment
   }) {
-    final revised = new AFRouteState(
+    final revised = AFRouteState(
       route: route ?? this.route,
       popups: popups ?? this.popups,
       priorLastSegment: priorLastSegment ?? this.priorLastSegment

@@ -9,7 +9,7 @@ import 'package:afib/src/dart/command/templates/af_template_registry.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 
-typedef void InitCommands(AFCommands commands);
+typedef InitCommands = void Function(AFCommands commands);
 
 class AFItemWithNamespace {
   /// The namespace used to differentiate third party commands.
@@ -51,7 +51,7 @@ abstract class AFCommand extends AFItemWithNamespace {
 
   /// Returns true of [cmd] matches our command name, optionally prefixed with --
   bool matches(String cmd) {
-    final String withDash = "--" + namespaceKey;
+    final withDash = "--$namespaceKey";
     return namespaceKey == cmd || withDash == cmd;
   }
 
@@ -73,10 +73,10 @@ abstract class AFCommand extends AFItemWithNamespace {
   }
 
   /// Briefly describe command usage.
-  void writeShortHelp(AFCommandContext ctx, { int indent: 0 }) {
+  void writeShortHelp(AFCommandContext ctx, { int indent = 0 }) {
     final output = ctx.o;
     startCommandColumn(output, indent: indent);
-    output.write(namespaceKey + " - ");
+    output.write("$namespaceKey - ");
     startHelpColumn(output);
     output.write(shortHelp);
     output.endLine();
@@ -119,7 +119,7 @@ abstract class AFCommand extends AFItemWithNamespace {
   }
 
   static void startCommandColumn(AFCommandOutput output, { int indent = 0 }) {
-    int width = 20 + (indent * 4);
+    final width = 20 + (indent * 4);
     output.startColumn(alignment: AFOutputAlignment.alignRight, width: width);
   }
 
@@ -152,7 +152,7 @@ class AFCommandContext {
     if(commands.isAfib) {
       return "afib";
     } else {
-      String namespace = afibConfig.stringFor(AFConfigEntries.appNamespace);
+      final namespace = afibConfig.stringFor(AFConfigEntries.appNamespace);
       return "${namespace}_afib";
     }
   }
@@ -161,7 +161,7 @@ class AFCommandContext {
 
 /// The set of all known afib commands.
 class AFCommands {
-  final List<AFCommand> commands = List<AFCommand>();
+  final List<AFCommand> commands = <AFCommand>[];
   static const afCommandAfib = 1;
   static const afCommandApp  = 2;
 
@@ -231,7 +231,7 @@ class AFCommands {
     try {
       final ctx = AFCommandContext(this, afArgs, afibConfig, output, templates, generators);
       cmd.execute(ctx);
-    } catch(e) {
+    } on Exception catch(e) {
       output.writeErrorLine(e.toString());
     }
   }

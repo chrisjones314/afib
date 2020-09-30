@@ -72,10 +72,6 @@ class AFTestDataID extends AFID {
   const AFTestDataID(String code) : super(code);
 }
 
-class AFTestSectionID extends AFID {
-  const AFTestSectionID(String code) : super(code);
-}
-
 class AFQueryTestID extends AFID {
   const AFQueryTestID(String code) : super(code);
 }

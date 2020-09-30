@@ -10,7 +10,7 @@ abstract class AFTestDispatcher extends AFDispatcher {
   final AFDispatcher main;
   AFTestDispatcher(this.main);
 
-  bool isNavigateAction(action) {
+  bool isNavigateAction(dynamic action) {
     return action is AFNavigateAction;
   }
 
@@ -23,7 +23,7 @@ class AFStateScreenTestDispatcher extends AFTestDispatcher {
   ): super(main);
 
   @override
-  void dispatch(action) {
+  void dispatch(dynamic action) {
     // suppress navigation actions.
     if(isNavigateAction(action)) {
       return;
@@ -44,7 +44,7 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
   }
 
   @override
-  void dispatch(action) {
+  void dispatch(dynamic action) {
     final isTestAct = isTestAction(action);
 
     // if the action is a pop, then go ahead and do it.

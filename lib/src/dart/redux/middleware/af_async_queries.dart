@@ -4,7 +4,7 @@ import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 /// data.
 class AFAsyncQueries {
 
-  final List<AFAsyncQuery> queries = List<AFAsyncQuery>();
+  final List<AFAsyncQuery> queries = <AFAsyncQuery>[];
 
   void add(AFAsyncQuery action) {
     queries.add(action);

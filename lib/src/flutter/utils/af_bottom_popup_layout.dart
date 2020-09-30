@@ -14,12 +14,12 @@ class AFBottomPopupLayout extends SingleChildLayoutDelegate {
 
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
-    double maxHeight = theme.containerHeight;
+    var maxHeight = theme.containerHeight;
     if (theme.showTitleActions) {
       maxHeight += theme.titleHeight;
     }
 
-    return new BoxConstraints(
+    return BoxConstraints(
         minWidth: constraints.maxWidth,
         maxWidth: constraints.maxWidth,
         minHeight: 0.0,
@@ -28,8 +28,8 @@ class AFBottomPopupLayout extends SingleChildLayoutDelegate {
 
   @override
   Offset getPositionForChild(Size size, Size childSize) {
-    double height = size.height - childSize.height * progress;
-    return new Offset(0.0, height);
+    final height = size.height - childSize.height * progress;
+    return Offset(0.0, height);
   }
 
   @override

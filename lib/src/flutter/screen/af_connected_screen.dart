@@ -1,4 +1,5 @@
 
+import 'package:quiver/core.dart';
 import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
@@ -23,7 +24,7 @@ abstract class AFDispatcher {
   dynamic dispatch(dynamic action);
 
   bool isTestAction(dynamic action) {
-    bool shouldPop = false;
+    var shouldPop = false;
     if(action is AFNavigatePopAction) {
       shouldPop = action.worksInPrototypeMode;
     }
@@ -58,7 +59,7 @@ class AFStoreDispatcher extends AFDispatcher {
 
 /// A test dispatcher which records actions for later inspection.
 class AFTestDispatcher extends AFDispatcher {
-  List<dynamic> actions = List<dynamic>();
+  List<dynamic> actions = <dynamic>[];
 
   int get actionCount {
     return actions.length;
@@ -100,9 +101,13 @@ class AFStoreConnectorData<TV1, TV2, TV3, TV4> {
   /// Because store connector data is always recreated, it is 
   /// important to implement deep equality so that the screen won't be re-rendered
   /// each time if the data has not changed.
-  bool operator==(o) {
-    bool result = (o is AFStoreConnectorData<TV1, TV2, TV3, TV4> && first == o.first && second == o.second && third == o.third && fourth == o.fourth);
+  bool operator==(dynamic o) {
+    final result = (o is AFStoreConnectorData<TV1, TV2, TV3, TV4> && first == o.first && second == o.second && third == o.third && fourth == o.fourth);
     return result;
+  }
+
+  int get hashCode {
+    return hash4(first.hashCode, second.hashCode, third.hashCode, fourth.hashCode);
   }
 
 }
@@ -117,13 +122,18 @@ class AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> exten
   AFStoreConnectorDataExtended({TV1 first, TV2 second, TV3 third, TV4 fourth, this.fifth, this.sixth, this.seventh, this.eighth}):
     super(first: first, second: second, third: third, fourth: fourth);
 
-  bool operator==(o) {
-    bool result = (o is AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> 
+  bool operator==(dynamic o) {
+    final result = (o is AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> 
       && first == o.first && second == o.second && third == o.third && fourth == o.fourth
       && fifth == o.fifth && sixth == o.sixth && seventh == o.seventh && eighth == o.eighth);
     return result;
   }
 
+  int get hashCode {
+    final start = super.hashCode;
+    final next = hash4(fifth?.hashCode, sixth?.hashCode, seventh?.hashCode, eighth?.hashCode);
+    return hash2(start, next);
+  }
 }
 
 /// Use this if you don't use any data from the store to render your screen.
@@ -214,7 +224,7 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
               screenIdRegister = dataContext.p.effectiveScreenId;
             }
             
-            final info = AFibF.registerTestScreen(screenIdRegister, buildContext);
+            AFibF.registerTestScreen(screenIdRegister, buildContext);
             AFibD.logTest?.d("Rebuilding screen $runtimeType/$screenIdRegister with param ${dataContext.p}");
           }
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p);
@@ -234,7 +244,7 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
     return context;
   }
 
-  AFDispatcher createDispatcher(store) {
+  AFDispatcher createDispatcher(AFStore store) {
     return AFStoreDispatcher(store);
   }
 
@@ -309,14 +319,14 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
 
   /// Find the route parameter for the specified named screen
   AFRouteParam findParam(AFState state) {
-    return state.route?.findParamFor(this.screenId, true);
+    return state.route?.findParamFor(this.screenId, includePrior: true);
   }
 }
 
-typedef AFUpdateParamDelegate<TRouteParam>(AFDispatcher dispatcher, TRouteParam param, { AFID id });
-typedef AFRouteParam AFExtractParamDelegate(AFRouteParam original);
-typedef TData AFCreateDataDelegate<TData, TState>(TState state);
-typedef AFRouteParam AFFindParamDelegate(AFState state);
+typedef AFUpdateParamDelegate<TRouteParam> = Function(AFDispatcher dispatcher, TRouteParam param, { AFID id });
+typedef AFExtractParamDelegate = AFRouteParam Function(AFRouteParam original);
+typedef AFCreateDataDelegate<TData, TState> = TData Function(TState state);
+typedef AFFindParamDelegate = AFRouteParam Function(AFState state);
 
 /// Use this to connect a Widget to the store.  
 /// 
@@ -349,7 +359,7 @@ abstract class AFConnectedWidgetWithParam<TState, TData extends AFStoreConnector
   }
 
   @override
-  AFDispatcher createDispatcher(store) {
+  AFDispatcher createDispatcher(AFStore store) {
     return dispatcher;
   }
 
@@ -421,9 +431,9 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
       },
       child: AnimatedBuilder(
         animation: animation,
-        builder: (BuildContext ctx, Widget child) {
+        builder: (ctx, child) {
           final local = AFBuildContext<TData, TRouteParam>(ctx, context.d, context.s, context.p);
-          final double bottomPadding = MediaQuery.of(local.c).padding.bottom;
+          final bottomPadding = MediaQuery.of(local.c).padding.bottom;
           return ClipRect(
             child: CustomSingleChildLayout(
               delegate: AFBottomPopupLayout(animation.value, theme, bottomPadding: bottomPadding),
@@ -500,9 +510,13 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   BuildContext get c { return context; }
   void dispatch(dynamic action) { dispatcher.dispatch(action); }
 
-  bool operator==(o) {
-    bool result = (o is AFBuildContext<TData, TRouteParam> && param == o.param && storeData == o.storeData);
+  bool operator==(dynamic o) {
+    final result = (o is AFBuildContext<TData, TRouteParam> && param == o.param && storeData == o.storeData);
     return result;
+  }
+
+  int get hashCode {
+    return hash2(param.hashCode, storeData.hashCode);
   }
 
   Widget createDebugDrawer() {

@@ -10,7 +10,7 @@ class AFUnitTestContext extends AFUnitTestExecute {
 
 }
 
-typedef void ProcessCalcTest(AFUnitTestExecute e);
+typedef ProcessCalcTest = void Function(AFUnitTestExecute e);
 
 abstract class AFUnitTestExecute extends AFBaseTestExecute {
 
@@ -30,7 +30,7 @@ class AFUnitTest {
 }
 
 class AFUnitTests {
-  final tests = List<AFUnitTest>();
+  final tests = <AFUnitTest>[];
 
   void addTest(AFTestID id, ProcessCalcTest fnTest) {
     tests.add(AFUnitTest(id, fnTest));

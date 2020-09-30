@@ -14,7 +14,7 @@ class AFStartupScreenWrapper extends StatefulWidget {
 
 }
 
-typedef void AFOnLifecycleEvent(AppLifecycleState newState);
+typedef AFOnLifecycleEvent = void Function(AppLifecycleState newState);
 
 //--------------------------------------------------------------------------------------
 class AFLifecycleEventHandler extends WidgetsBindingObserver {
@@ -55,7 +55,7 @@ class _AFStartupScreenState extends State<AFStartupScreenWrapper> {
   //--------------------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    WidgetBuilder builder = AFibF.screenMap.initialScreenBuilder;
+    final builder = AFibF.screenMap.initialScreenBuilder;
     return builder(context);
   }
 }

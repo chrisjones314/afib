@@ -39,7 +39,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppState, APrototypeHome
 
   @override
   APrototypeHomeScreenData createStateData(AFAppState state) {
-    AFSingleScreenTests tests = AFibF.screenTests;
+    final tests = AFibF.screenTests;
     return APrototypeHomeScreenData(tests);
   }
 
@@ -79,8 +79,8 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppState, APrototypeHome
 
 
   void _buildFilteredSection(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context, List<Widget> rows) {
-    List<String> areas = AFibD.config.stringListFor(AFConfigEntries.enabledTestList);
-    List<AFScreenPrototypeTest> tests = AFibF.findTestsForAreas(areas);
+    final areas = AFibD.config.stringListFor(AFConfigEntries.enabledTestList);
+    final tests = AFibF.findTestsForAreas(areas);
     if(tests == null || tests.isEmpty) {
       return;
     }

@@ -38,7 +38,7 @@ class AFPrototypeWidgetData extends AFStoreConnectorData1<AFTestState> {
   AFTestState get testState { return first; }
 }
 
-typedef Widget AFCreateWidgetWrapperDelegate(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam> context, Widget testWidget);
+typedef AFCreateWidgetWrapperDelegate = Widget Function(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam> context, Widget testWidget);
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
@@ -86,7 +86,7 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppState, AFPrototypeW
     });
     Widget resultWidget;
     if(test is AFConnectedWidgetPrototypeTest && sourceWidget is AFConnectedWidgetWithParam) {
-      AFRouteParam paramChild = context.p.param ?? test.param;
+      final paramChild = context.p.param ?? test.param;
       final dispatcher = AFWidgetScreenTestDispatcher(context: testContext, main: context.d, originalParam: context.p);
       final childContext = sourceWidget.createContext(context.c, dispatcher, testData, paramChild);
       resultWidget = sourceWidget.buildWithContext(childContext);

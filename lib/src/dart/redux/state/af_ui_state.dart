@@ -65,11 +65,11 @@ class AFUIState extends AFObjectWithKey {
   }
 
   factory AFUIState.loading() {
-    return AFUIState(loadingState: kIsLoading, messages: List<AFUIWidgetMessage>());
+    return AFUIState(loadingState: kIsLoading, messages: <AFUIWidgetMessage>[]);
   }
 
   factory AFUIState.notLoading() {
-    return AFUIState(loadingState: kIsNotLoading, messages: List<AFUIWidgetMessage>());
+    return AFUIState(loadingState: kIsNotLoading, messages: <AFUIWidgetMessage>[]);
   }
 
   factory AFUIState.loadingWithStatus(String status) {

@@ -518,7 +518,7 @@ class AFSingleScreenTestBody {
 
   void _checkFutureExists(Future<void> test) {
     if(test == null) {
-      throw AFException("Test section failed to return a future.  Make sure all test sections end with return AFScreenTestExecute.keepSynchronous()");
+      throw AFException("Test section failed to return a future.  You might be missing an async or await");
     }
   }
 
@@ -1642,8 +1642,6 @@ class AFMultiScreenTestContext extends AFMultiScreenTestExecute {
   }) {
       return onScreen(startScreen: startScreen, endScreen: endScreen, verifyScreen: verifyScreen, body: (ste) async {
         await ste.tap(tap);
-
-        return ste.keepSynchronous();
       });
   }
 

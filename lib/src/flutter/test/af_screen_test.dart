@@ -5,7 +5,6 @@ import 'package:quiver/core.dart';
 
 import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
@@ -26,10 +25,6 @@ import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
-
-typedef AFActionListenerDelegate = void Function(List<AFActionWithKey> actions);
-typedef AFParamListenerDelegate = void Function(AFRouteParam param);
-typedef AFAsyncQueryListenerDelegate = void Function(AFAsyncQueryCustomError query);
 
 /// A superclass that declares all the methods which select specific widgets.
 /// This is used by [AFScreenWidgetSelectorCollector] to determine which widgets
@@ -292,12 +287,12 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
     //throw UnimplementedError();
   }
 
-  Future<void> expectOneWidget(dynamic selector) {
-    return expectNWidgets(selector, 1, extraFrames: 1);
+  Future<void> matchOneWidget(dynamic selector) {
+    return visitNWidgets(selector, 1, extraFrames: 1);
   }  
 
-  Future<void> expectMissingWidget(dynamic selector) {
-    return expectNWidgets(selector, 0, extraFrames: 1, scrollIfMissing: false);
+  Future<void> matchMissingWidget(dynamic selector) {
+    return visitNWidgets(selector, 0, extraFrames: 1, scrollIfMissing: false);
   }
 
   /// Any operations applied within the [underHere] callback operate on 
@@ -307,14 +302,14 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   /// pass in a list of selectors.  If you do so, then the operation takes place
   /// under a sparse-path containing all the items in the list.
   Future<void> underWidget(dynamic selector, Future<void> Function() underHere);
-  Future<void> expectNWidgets(dynamic selector, int n, {int extraFrames = 0, bool scrollIfMissing });
+  Future<void> visitNWidgets(dynamic selector, int n, {int extraFrames = 0, bool scrollIfMissing });
 
-  Future<void> expectTextEquals(dynamic selector, String text) {
-    return expectWidgetValue(selector, ft.equals(text), extraFrames: 1);
+  Future<void> matchTextEquals(dynamic selector, String text) {
+    return matchWidgetValue(selector, ft.equals(text), extraFrames: 1);
   }
 
-  Future<void> expectText(dynamic selector, ft.Matcher matcher) {
-    return expectWidgetValue(selector, matcher, extraFrames: 1);
+  Future<void> matchText(dynamic selector, ft.Matcher matcher) {
+    return matchWidgetValue(selector, matcher, extraFrames: 1);
   }
 
   Future<void> underScreen(AFScreenID screen, Function underHere) async {
@@ -342,7 +337,7 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   /// Used to tap on an element that opens a popup of [popupScreenType].
   /// 
   /// You can operate on the controls in the popup from within [underHere]
-  Future<void> tapWithPopup(dynamic selectorTap, final AFScreenID popupScreenId, Future<void> Function() underHere) async {
+  Future<void> tapOpenPopup(dynamic selectorTap, final AFScreenID popupScreenId, Future<void> Function() underHere) async {
     await tap(selectorTap);
     await pauseForRender();
     verifyPopupScreenId(popupScreenId);
@@ -370,14 +365,14 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   /// it is very common to verify that several of them are on or off
   /// at the same time, and passing in a list is a concise way to do
   /// so.
-  Future<void> expectChipSelected(dynamic selector, {bool isSel}) {
-    return expectWidgetValue(selector, ft.equals(isSel), extraFrames: 1);
+  Future<void> matchChipSelected(dynamic selector, {bool isSel}) {
+    return matchWidgetValue(selector, ft.equals(isSel), extraFrames: 1);
   }
 
-  Future<void> expectWidget(dynamic selector, Function(Element elem) onFound, { int extraFrames = 0 });
-  Future<void> expectWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 });
+  Future<void> visitWidget(dynamic selector, Function(Element elem) onFound, { int extraFrames = 0 });
+  Future<void> visitWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 });
 
-  Future<void> expectWidgetValue(dynamic selector, ft.Matcher matcher, { int extraFrames = 0 });
+  Future<void> matchWidgetValue(dynamic selector, ft.Matcher matcher, { int extraFrames = 0 });
 
   /// Verifies that [element] has the expected [key], which can be
   /// either a [String] or an [AFWidgetID].
@@ -475,10 +470,8 @@ abstract class AFSingleScreenTestExecute extends AFScreenTestExecute {
   }
 }
 
-typedef AFScreenTestBodyExecuteFunc = Future<void> Function(AFScreenTestExecute ste);
-
 class AFScreenTestBodyWithParam {
-  final AFScreenTestBodyExecuteFunc body;
+  final AFScreenTestBodyExecuteDelegate body;
   final AFScreenTestWidgetCollector elementCollector;
   AFScreenTestBodyWithParam({this.body, this.elementCollector});
 
@@ -502,7 +495,7 @@ class AFSingleScreenTestBody {
     return sections.isNotEmpty;
   }
 
-  void execute(AFScreenTestBodyExecuteFunc body) async {
+  void execute(AFScreenTestBodyExecuteDelegate body) async {
     final collector = AFScreenTestWidgetCollector(this.testId);
     // in the first section, always add a scaffold widget collector.
   
@@ -763,23 +756,23 @@ class AFScreenTestWidgetCollector extends AFSingleScreenTestExecute {
     return keepSynchronous();
   }
 
-  Future<void> expectWidget(dynamic selector, Function(Element) onFound, { int extraFrames = 0 }) {
+  Future<void> visitWidget(dynamic selector, Function(Element) onFound, { int extraFrames = 0 }) {
     addSelector(selector);
     return null;
   }
 
-  Future<void> expectWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 }) {
+  Future<void> visitWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 }) {
     addSelector(selector);
     return ks;
   }
 
   
-  Future<void> expectNWidgets(dynamic selector, int n, {int extraFrames = 0, bool scrollIfMissing}) {
+  Future<void> visitNWidgets(dynamic selector, int n, {int extraFrames = 0, bool scrollIfMissing}) {
     addSelector(selector);
     return keepSynchronous();
   }
 
-  Future<void> expectWidgetValue(dynamic selector, ft.Matcher matcher, { int extraFrames = 0 }) {
+  Future<void> matchWidgetValue(dynamic selector, ft.Matcher matcher, { int extraFrames = 0 }) {
     addSelector(selector);
     return keepSynchronous();
   }
@@ -895,7 +888,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
     return keepSynchronous();
   }
 
-  Future<void> expectWidget(dynamic selector, Function(Element elem) onFound, { int extraFrames = 0 }) async {
+  Future<void> visitWidget(dynamic selector, Function(Element elem) onFound, { int extraFrames = 0 }) async {
     final elems = await elementCollector.findWidgetsFor(selector);
     this.expect(elems.length, ft.equals(1), extraFrames: extraFrames+1);
     if(elems.length > 0) {
@@ -904,19 +897,19 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
     return keepSynchronous();
   }
 
-  Future<void> expectWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 }) async {
+  Future<void> visitWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 }) async {
     final elems = await elementCollector.findWidgetsFor(selector);
     onFound(elems);
     return keepSynchronous();
   }
 
-  Future<void> expectNWidgets(dynamic selector, int n, {int extraFrames = 0, bool scrollIfMissing = true}) async {
+  Future<void> visitNWidgets(dynamic selector, int n, {int extraFrames = 0, bool scrollIfMissing = true}) async {
     final elems = await elementCollector.findWidgetsFor(selector, scrollIfMissing: scrollIfMissing);
     this.expect(elems.length, ft.equals(n), extraFrames: extraFrames+1);
     return keepSynchronous();
   }
 
-  Future<void> expectWidgetValue(dynamic selectorDyn, ft.Matcher matcher, { String extractType = AFExtractWidgetAction.extractPrimary, int extraFrames = 0 }) async {
+  Future<void> matchWidgetValue(dynamic selectorDyn, ft.Matcher matcher, { String extractType = AFExtractWidgetAction.extractPrimary, int extraFrames = 0 }) async {
     final selector = AFScreenTestWidgetCollector.createSelector(null, selectorDyn);
     final elems = await elementCollector.findWidgetsFor(selector);
     if(elems.isEmpty) {
@@ -974,9 +967,9 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
       verifyParamUpdate(paramInner);
     }
     if(verifyQuery != null) {
-      final AFAsyncQueryCustomError query = AFibF.testOnlyRecentActions.firstWhere( (act) => (act is AFAsyncQueryCustomError), orElse: () => null );
+      final AFAsyncQuery query = AFibF.testOnlyRecentActions.firstWhere( (act) => (act is AFAsyncQuery), orElse: () => null );
       if(query == null) {
-        throw AFException("Passed in verifyQuery, but there was not an AFAsyncQueryCustomError dispatched by action");
+        throw AFException("Passed in verifyQuery, but there was not an AFAsyncQuery dispatched by action");
       }
       verifyQuery(query);
       return keepSynchronous();
@@ -996,29 +989,6 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
     }
     addError("Unexpected type ${obj.runtimeType}", 2);
     return null;
-  }
-
-  void testText(Widget widget, String expect) {
-    if(widget is Text) {
-      this.expect(widget.data, ft.equals(expect));
-    } else if(widget is TextField) {
-      if(widget.controller != null) {
-        this.expect(widget.controller.value.text, ft.equals(expect));
-      } 
-    } 
-
-  }
-
-  void testChipSelected(Widget widget, { bool isSel } ) {
-    var selected = false;
-    if(widget is ChoiceChip) {
-      selected = widget.selected;
-    } else if(widget is InputChip) {
-      selected = widget.selected;
-    } else if(widget is FilterChip) {
-      selected = widget.selected;
-    }
-    this.expect(selected, ft.equals(expect), extraFrames: 4);
   }
   
   @override
@@ -1184,16 +1154,11 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
   }
 }
 
-typedef AFCreateConnectedWidget = AFConnectedWidgetWithParam Function(
-  AFDispatcher dispatcher,
-  AFFindParamDelegate findParamDelegate,
-  AFUpdateParamDelegate updateParamDelegate,
-);
 
 class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
   final dynamic data;
   final AFSingleScreenTestBody body;
-  final AFCreateConnectedWidget createConnectedWidget;
+  final AFCreateConnectedWidgetDelegate createConnectedWidget;
   final AFCreateWidgetWrapperDelegate createWidgetWrapperDelegate;
 
   AFWidgetPrototypeTest({
@@ -1253,7 +1218,7 @@ class AFConnectedWidgetPrototypeTest extends AFWidgetPrototypeTest {
     @required AFTestID id,
     @required dynamic data,
     @required this.param,
-    @required AFCreateConnectedWidget createConnectedWidget,
+    @required AFCreateConnectedWidgetDelegate createConnectedWidget,
     @required AFSingleScreenTestBody body,
     String title
   }): super(id: id, title: title, body: body, data: data, createConnectedWidget: createConnectedWidget);
@@ -1346,7 +1311,7 @@ class AFWidgetTests<TState> {
   
   AFSingleScreenTestBody addConnectedPrototype({
     @required AFTestID   id,
-    @required AFCreateConnectedWidget createConnectedWidget,
+    @required AFCreateConnectedWidgetDelegate createConnectedWidget,
     @required dynamic data,
     @required AFRouteParam param,
     String title
@@ -1717,10 +1682,8 @@ class AFMultiScreenTestContext extends AFMultiScreenTestExecute {
 
 }
 
-typedef AFMultiScreenTestBodyExecuteFunc = Future<void> Function(AFMultiScreenTestExecute mse);
-
 class AFMultiScreenStateTestBodyWithParam {
-  final AFMultiScreenTestBodyExecuteFunc body;
+  final AFMultiScreenTestBodyExecuteDelegate body;
   AFMultiScreenStateTestBodyWithParam(this.body);
 
   Future<void> populateElementCollector(AFScreenTestWidgetCollector elementCollector) {
@@ -1740,7 +1703,7 @@ class AFMultiScreenStateTestBody {
     return AFMultiScreenStateTestBody(tests, initialScreenId, AFScreenTestWidgetCollector(testId));
   }
 
-  void execute(AFMultiScreenTestBodyExecuteFunc body) async {
+  void execute(AFMultiScreenTestBodyExecuteDelegate body) async {
     sections.add(AFMultiScreenStateTestBodyWithParam(body));
   }  
 

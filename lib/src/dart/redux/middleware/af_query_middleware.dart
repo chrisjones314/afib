@@ -12,14 +12,14 @@ class AFQueryMiddleware implements MiddlewareClass<AFState>
 {
   @override
   dynamic call(Store<AFState> store, dynamic query, NextDispatcher next) {
-    if (query is AFAsyncQueryCustomError) {
+    if (query is AFAsyncQuery) {
 
       // keep track of listener queries so we can shut them down at the end.
-      if(query is AFAsyncQueryListenerCustomError) {
+      if(query is AFAsyncQueryListener) {
         AFibF.registerListenerQuery(query);
       }
 
-      if(query is AFDeferredQueryCustomError) {
+      if(query is AFDeferredQuery) {
         AFibF.registerDeferredQuery(query);
       }
 

@@ -14,11 +14,9 @@ class AFStartupScreenWrapper extends StatefulWidget {
 
 }
 
-typedef AFOnLifecycleEvent = void Function(AppLifecycleState newState);
-
 //--------------------------------------------------------------------------------------
 class AFLifecycleEventHandler extends WidgetsBindingObserver {
-  final AFOnLifecycleEvent eventHandler;
+  final AFOnLifecycleEventDelegate eventHandler;
 
   AFLifecycleEventHandler({
     this.eventHandler

@@ -1,5 +1,6 @@
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
+import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 
 
 class AFUnitTestContext extends AFUnitTestExecute {
@@ -10,8 +11,6 @@ class AFUnitTestContext extends AFUnitTestExecute {
 
 }
 
-typedef ProcessCalcTest = void Function(AFUnitTestExecute e);
-
 abstract class AFUnitTestExecute extends AFBaseTestExecute {
 
 }
@@ -19,7 +18,7 @@ abstract class AFUnitTestExecute extends AFBaseTestExecute {
 
 class AFUnitTest {
   final AFTestID id;
-  final ProcessCalcTest fnTest;
+  final AFUnitTestBodyExecuteDelegate fnTest;
 
   AFUnitTest(this.id, this.fnTest);
 
@@ -32,7 +31,7 @@ class AFUnitTest {
 class AFUnitTests {
   final tests = <AFUnitTest>[];
 
-  void addTest(AFTestID id, ProcessCalcTest fnTest) {
+  void addTest(AFTestID id, AFUnitTestBodyExecuteDelegate fnTest) {
     tests.add(AFUnitTest(id, fnTest));
   }
 }

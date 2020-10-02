@@ -9,8 +9,6 @@ import 'package:afib/src/dart/command/templates/af_template_registry.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 
-typedef InitCommands = void Function(AFCommands commands);
-
 class AFItemWithNamespace {
   /// The namespace used to differentiate third party commands.
   final String namespace;

@@ -38,8 +38,6 @@ class AFPrototypeWidgetData extends AFStoreConnectorData1<AFTestState> {
   AFTestState get testState { return first; }
 }
 
-typedef AFCreateWidgetWrapperDelegate = Widget Function(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam> context, Widget testWidget);
-
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
 class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppState, AFPrototypeWidgetData, AFPrototypeWidgetRouteParam>{

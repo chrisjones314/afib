@@ -5,13 +5,14 @@ import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-typedef AFShouldContinueCheck = Future<bool> Function();
-
 /// Some very simple user interface utilities.
 class AFUI {
+  static const shouldStop = 1;
+  static const shouldContinue = 2;
 
   /// Creates an empty widget list which will contain rows of widgets,
   /// used for clarity
@@ -43,14 +44,14 @@ class AFUI {
     AFWidgetID wid = AFUIID.buttonBack,
     IconData icon = Icons.arrow_back,
     String tooltip = "Back",
-    AFShouldContinueCheck shouldContinueCheck,   
+    AFShouldContinueCheckDelegate shouldContinueCheck,   
   }) {
     return IconButton(
         key: AFUI.keyForWID(wid),      
         icon: Icon(Icons.arrow_back),
         tooltip: "Back",
         onPressed: () async {
-          if(shouldContinueCheck == null || await shouldContinueCheck()) {
+          if(shouldContinueCheck == null || await shouldContinueCheck() == shouldContinue) {
             dispatcher.dispatch(AFNavigatePopAction(id: wid));
           }
         }
@@ -106,7 +107,7 @@ class AFUI {
   }
 
 
-  static AFShouldContinueCheck standardShouldContinueAlertCheck({
+  static AFShouldContinueCheckDelegate standardShouldContinueAlertCheck({
     @required BuildContext context,
     @required bool shouldAsk,
     bool isTestContext = false,
@@ -116,7 +117,7 @@ class AFUI {
     String continueButtonText = "Yes, discard changes"
   }) {
     return () {
-        final completer = Completer<bool>();
+        final completer = Completer<int>();
 
         if(shouldAsk && !isTestContext) {
           // set up the buttons
@@ -124,14 +125,14 @@ class AFUI {
             child: Text(stopButtonText),
             onPressed:  () {
               Navigator.of(context).pop(); 
-              completer.complete(false);
+              completer.complete(AFUI.shouldStop);
             },
           );
           Widget discardChangesButton = FlatButton(
             child: Text(continueButtonText),
             onPressed:  () {
               Navigator.of(context).pop(); 
-              completer.complete(true);
+              completer.complete(AFUI.shouldContinue);
             },
           );
 
@@ -153,7 +154,7 @@ class AFUI {
             },
           );
         } else {
-          completer.complete(true);
+          completer.complete(AFUI.shouldContinue);
         }
         return completer.future;    
     };

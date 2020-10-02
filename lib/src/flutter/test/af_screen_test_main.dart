@@ -15,6 +15,7 @@ import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
 import 'package:afib/src/flutter/utils/af_flutter_params.dart';
+import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -45,8 +46,6 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
   return null;
 }
 
-typedef AFTestCreatePushAction = AFNavigatePushAction Function(AFScreenPrototypeTest test);
-
 Future<void> _afStandardScreenTestMain(
   AFCommandOutput output, 
   AFTestStats stats, 
@@ -54,7 +53,7 @@ Future<void> _afStandardScreenTestMain(
   AFApp app,  
   List<AFScreenPrototypeTest> allTests, 
   String sectionTitle,
-  AFTestCreatePushAction createPush) async {
+  AFTestCreatePushActionDelegate createPush) async {
   final simpleContexts = <AFScreenTestContextWidgetTester>[];
 
   for(var test in allTests) {

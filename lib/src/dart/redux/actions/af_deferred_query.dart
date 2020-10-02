@@ -9,13 +9,13 @@ import 'package:afib/src/dart/utils/af_unused.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 
-/// A version of [AFAsyncQueryCustomError] for queries that should be run in the background
+/// A version of [AFAsyncQuery] for queries that should be run in the background
 /// after a delay.  
-abstract class AFDeferredQueryCustomError<TState, TError> extends AFAsyncQueryCustomError<TState, AFUnused, TError> {
+abstract class AFDeferredQuery<TState> extends AFAsyncQuery<TState, AFUnused> {
   Duration nextDelay;
   Timer timer;
 
-  AFDeferredQueryCustomError(this.nextDelay, {AFID id}): super(id: id);
+  AFDeferredQuery(this.nextDelay, {AFID id}): super(id: id);
 
   /// Delays for [nextDelay] and then calls [finishAsyncWithResponse] with null as the value.
   /// 
@@ -24,11 +24,11 @@ abstract class AFDeferredQueryCustomError<TState, TError> extends AFAsyncQueryCu
   /// In addition, any calculations done at the beginning might be based on an
   /// obsolete state by the time onResponse gets called.   Instead, you want to
   /// do your calculations on the state you are handed on [finishAsyncExecute]
-  void startAsync(AFStartQueryContext<AFUnused, TError> context) {
+  void startAsync(AFStartQueryContext<AFUnused, AFQueryError> context) {
     _delayThenExecute(context);
   }
 
-  void _delayThenExecute(AFStartQueryContext<AFUnused, TError> context) {
+  void _delayThenExecute(AFStartQueryContext<AFUnused, AFQueryError> context) {
     timer = Timer(nextDelay, () {
       AFibD.logQuery?.d("Executing finishAsyncExecute for deferred query $this");
       context.onSuccess(null);
@@ -74,9 +74,4 @@ abstract class AFDeferredQueryCustomError<TState, TError> extends AFAsyncQueryCu
       response: null,
     );
   }
-}
-
-/// A version of [AFDeferredQueryCustomError] which users [AFQueryError] for errors.
-abstract class AFDeferredQuery<TState> extends AFDeferredQueryCustomError<TState, AFQueryError> {
-    AFDeferredQuery(Duration initialDelay, {AFID id}): super(initialDelay, id: id);
 }

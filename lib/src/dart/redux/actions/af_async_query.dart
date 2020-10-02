@@ -11,6 +11,7 @@ import 'package:afib/src/dart/utils/af_query_error.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
+import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 
 class AFStartQueryContext<TResponse, TError> {
   final Function(TResponse) onSuccess;
@@ -65,21 +66,18 @@ class AFFinishQueryErrorContext<TState, TError> extends AFFinishQueryContext<TSt
   }
 }
 
-typedef AFOnResponseDelegate<TState, TResponse> = void Function(AFFinishQuerySuccessContext<TState, TResponse> context);
-typedef AFOnErrorDelegate<TState, TError> = void Function(AFFinishQueryErrorContext<TState, TError> context);
-
 /// Superclass for a kind of action that queries some data asynchronously, then knows
 /// how to process the result.
-abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActionWithKey {
+abstract class AFAsyncQuery<TState, TResponse> extends AFActionWithKey {
   final List<dynamic> successActions;
   final AFOnResponseDelegate<TState, TResponse> onSuccessDelegate;
-  final AFOnErrorDelegate<TState, TError> onErrorDelegate;
+  final AFOnErrorDelegate<TState, AFQueryError> onErrorDelegate;
 
-  AFAsyncQueryCustomError({AFID id, this.onSuccessDelegate, this.onErrorDelegate, this.successActions}): super(id: id);
+  AFAsyncQuery({AFID id, this.onSuccessDelegate, this.onErrorDelegate, this.successActions}): super(id: id);
 
   /// Called internally when redux middleware begins processing a query.
   void startAsyncAF(AFDispatcher dispatcher, AFStore store, { Function(dynamic) onResponseExtra, Function(dynamic) onErrorExtra }) {
-    final startContext = AFStartQueryContext<TResponse, TError>(
+    final startContext = AFStartQueryContext<TResponse, AFQueryError>(
       onSuccess: (response) { 
         // note: there could be multiple queries outstanding at once, meaning the state
         // might be changed by some other query while we are waiting for a responser.  
@@ -92,7 +90,7 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
         }
       }, 
       onError: (error) {
-        final errorContext = AFFinishQueryErrorContext<TState, TError>(dispatcher: dispatcher, state: store.state, error: error);
+        final errorContext = AFFinishQueryErrorContext<TState, AFQueryError>(dispatcher: dispatcher, state: store.state, error: error);
         finishAsyncWithErrorAF(errorContext);
         if(onErrorExtra != null) {
           onErrorExtra(errorContext);
@@ -116,7 +114,7 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
     }
   }
 
-  void finishAsyncWithErrorAF(AFFinishQueryErrorContext<TState, TError> context) {
+  void finishAsyncWithErrorAF(AFFinishQueryErrorContext<TState, AFQueryError> context) {
     finishAsyncWithError(context);
     if(onErrorDelegate != null) {
       onErrorDelegate(context);
@@ -128,7 +126,7 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
   /// 
   /// The implementation should call either [AFStartQueryContext.onResponse] or [AFStartQueryContext.onError], which will in turn
   /// call [finishAsyncWithResult] or [finishAsyncWithError].
-  void startAsync(AFStartQueryContext<TResponse, TError> context);
+  void startAsync(AFStartQueryContext<TResponse, AFQueryError> context);
 
   /// Called when the asynchronous process completes with a response  It should merge the results 
   /// into the state (preserving immutability by making copies of the relevant portions of the state using copyWith), 
@@ -137,7 +135,7 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
   void finishAsyncWithResponse(AFFinishQuerySuccessContext<TState, TResponse> context);
 
   
-  void finishAsyncWithError(AFFinishQueryErrorContext<TState, TError> context);
+  void finishAsyncWithError(AFFinishQueryErrorContext<TState, AFQueryError> context);
 
   /// Called during testing to simulate results from an asynchronous call.
   void testFinishAsyncWithResponse(AFStateTestContext context, TResponse response) {
@@ -150,8 +148,8 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
   }
 
   /// Called during testing to simulate results from an asynchronous call.
-  void testFinishAsyncWithError(AFStateTestContext context, TError error) {
-    final errorContext = AFFinishQueryErrorContext<TState, TError>(
+  void testFinishAsyncWithError(AFStateTestContext context, AFQueryError error) {
+    final errorContext = AFFinishQueryErrorContext<TState, AFQueryError>(
       dispatcher: context.dispatcher,
       state: context.afState,
       error: error
@@ -159,13 +157,6 @@ abstract class AFAsyncQueryCustomError<TState, TResponse, TError> extends AFActi
     finishAsyncWithErrorAF(errorContext);
   }
 
-}
-
-/// A default version of [AFAsyncQueryCustomError] with the standard [AFQueryError] type, which is sufficient
-/// in most cases.
-abstract class AFAsyncQuery<TState, TResponse> extends AFAsyncQueryCustomError<TState, TResponse, AFQueryError> {
-  AFAsyncQuery({AFID id, List<dynamic> successActions, AFOnResponseDelegate<TState, TResponse> onSuccessDelegate, AFOnErrorDelegate<TState, AFQueryError> onErrorDelegate}): 
-    super(id: id, successActions: successActions, onSuccessDelegate: onSuccessDelegate, onErrorDelegate: onErrorDelegate);
 }
 
 class AFConsolidatedQueryEntry {
@@ -332,14 +323,14 @@ class AFConsolidatedQuery<TState> extends AFAsyncQuery<TState, AFConsolidatedQue
   }
 }
 
-/// A version of [AFAsyncQueryCustomError] for queries that have some kind of ongoing
+/// A version of [AFAsyncQuery] for queries that have some kind of ongoing
 /// connection or state that needs to be shutdown.  
 /// 
 /// Afib will automatically track these queries when you dispatch them.  You can dispatch the
 /// [AFShutdownQueryListeners] action to call the shutdown method on some or all outstanding
 /// listeners.  
-abstract class AFAsyncQueryListenerCustomError<TState, TResponse, TError> extends AFAsyncQueryCustomError<TState, TResponse, TError> {
-  AFAsyncQueryListenerCustomError({AFID id, List<dynamic> successActions, AFOnResponseDelegate<TState, TResponse> onSuccessDelegate, AFOnErrorDelegate<TState, AFQueryError> onErrorDelegate}): super(id: id, successActions: successActions, onSuccessDelegate: onSuccessDelegate);
+abstract class AFAsyncQueryListener<TState, TResponse> extends AFAsyncQuery<TState, TResponse> {
+  AFAsyncQueryListener({AFID id, List<dynamic> successActions, AFOnResponseDelegate<TState, TResponse> onSuccessDelegate, AFOnErrorDelegate<TState, AFQueryError> onErrorDelegate}): super(id: id, successActions: successActions, onSuccessDelegate: onSuccessDelegate);
 
   void afShutdown() {
     AFibD.logQuery?.d("Shutting down listener query $this");
@@ -347,9 +338,4 @@ abstract class AFAsyncQueryListenerCustomError<TState, TResponse, TError> extend
   }
 
   void shutdown();
-}
-
-/// A version of [AFAsyncQueryListenerCustomError] which users [AFQueryError] for errors.
-abstract class AFAsyncQueryListener<TState, TResponse> extends AFAsyncQueryListenerCustomError<TState, TResponse, AFQueryError> {
-    AFAsyncQueryListener({AFID id, List<dynamic> successActions, AFOnResponseDelegate<TState, TResponse> onSuccessDelegate, AFOnErrorDelegate<TState, AFQueryError> onErrorDelegate}): super(id: id, successActions: successActions, onSuccessDelegate: onSuccessDelegate, onErrorDelegate: onErrorDelegate);
 }

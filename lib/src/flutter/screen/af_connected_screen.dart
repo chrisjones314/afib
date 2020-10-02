@@ -323,11 +323,6 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
   }
 }
 
-typedef AFUpdateParamDelegate<TRouteParam> = Function(AFDispatcher dispatcher, TRouteParam param, { AFID id });
-typedef AFExtractParamDelegate = AFRouteParam Function(AFRouteParam original);
-typedef AFCreateDataDelegate<TData, TState> = TData Function(TState state);
-typedef AFFindParamDelegate = AFRouteParam Function(AFState state);
-
 /// Use this to connect a Widget to the store.  
 /// 
 /// The Widget can still have a route parameter, but it must be passed in

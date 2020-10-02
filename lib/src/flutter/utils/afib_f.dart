@@ -12,7 +12,6 @@ import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
-import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
 import 'package:afib/src/flutter/test/af_init_prototype_screen_map.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -37,11 +36,11 @@ class AFibTestOnlyScreenElement {
 class AFibF {
   static bool _postStartup = false;
   static final AFScreenMap _afScreenMap = AFScreenMap();
-  static InitializeAppState _afInitializeAppState;
-  static AppReducer _appReducer;
+  static AFInitializeAppStateDelegate _afInitializeAppState;
+  static AFAppReducerDelegate _appReducer;
   static AFStore _afStore;
   static final AFAsyncQueries _afAsyncQueries = AFAsyncQueries();
-  static CreateStartupQueryAction _afCreateStartupQueryAction;
+  static AFCreateStartupQueryActionDelegate _afCreateStartupQueryAction;
   static AFCreateLifecycleQueryAction _afCreateLifecycleQueryAction;
   static final AFTestDataRegistry _afTestData = AFTestDataRegistry();
   static final AFSingleScreenTests _afScreenTests = AFSingleScreenTests();
@@ -50,11 +49,11 @@ class AFibF {
   static final AFStateTests _afStateTests = AFStateTests();
   static final AFUnitTests _afUnitTests = AFUnitTests();
   static AFScreenMap _afPrototypeScreenMap;
-  static CreateAFApp _afCreateApp;
+  static AFCreateAFAppDelegate _afCreateApp;
   static AFScreenID forcedStartupScreen;
   static final testOnlyScreens = <AFScreenID, AFibTestOnlyScreenElement>{};
-  static Map<String, AFAsyncQueryListenerCustomError> listenerQueries = <String, AFAsyncQueryListenerCustomError>{};
-  static Map<String, AFDeferredQueryCustomError> deferredQueries = <String, AFDeferredQueryCustomError>{};
+  static Map<String, AFAsyncQueryListener> listenerQueries = <String, AFAsyncQueryListener>{};
+  static Map<String, AFDeferredQuery> deferredQueries = <String, AFDeferredQuery>{};
   static final _recentActions = <AFActionWithKey>[];
   static int navDepth = 0;
 
@@ -241,12 +240,12 @@ class AFibF {
   }
 
   /// Returns a function that creates the initial applications state, used to reset the state.
-  static InitializeAppState get initializeAppState {
+  static AFInitializeAppStateDelegate get initializeAppState {
     return _afInitializeAppState;
   }
 
   /// Returns the a function that creates the query which kicks off the application on startup.
-  static CreateStartupQueryAction get createStartupQueryAction {
+  static AFCreateStartupQueryActionDelegate get createStartupQueryAction {
     return _afCreateStartupQueryAction;
   }
 
@@ -263,7 +262,7 @@ class AFibF {
 
   /// The redux reducer for the entire app.  Give a the current store/state and an action,
   /// it is responsible for producing a new state that reflects the impact of that action.
-  static AppReducer get appReducer {
+  static AFAppReducerDelegate get appReducer {
     return _appReducer;
   }
 
@@ -317,7 +316,7 @@ class AFibF {
     return _afStateTests;
   }
 
-  static CreateAFApp get createApp {
+  static AFCreateAFAppDelegate get createApp {
     return _afCreateApp;
   }
 
@@ -339,7 +338,7 @@ class AFibF {
   /// 
   /// This is used internally by AFib anytime you dispatch a listener query,
   /// you should not call it directly.
-  static void registerListenerQuery(AFAsyncQueryListenerCustomError query) {
+  static void registerListenerQuery(AFAsyncQueryListener query) {
     final key = query.key;
     AFibD.logQuery?.d("Registering listener query $key");
     final current = listenerQueries[key];
@@ -354,7 +353,7 @@ class AFibF {
   /// 
   /// This is used internally by AFib anytime you dispatch a deferred query,
   /// you should not call it directly.
-  static void registerDeferredQuery(AFDeferredQueryCustomError query) {
+  static void registerDeferredQuery(AFDeferredQuery query) {
     final key = query.key;
     AFibD.logQuery?.d("Registering deferred query $key");
     final current = deferredQueries[key];
@@ -364,7 +363,7 @@ class AFibF {
     deferredQueries[key] = query; 
   }
 
-  /// Shutdown all outstanding listener queries using [AFAsyncQueryListenerCustomError.shutdown]
+  /// Shutdown all outstanding listener queries using [AFAsyncQueryListener.shutdown]
   /// 
   /// You might use this to shut down outstanding listener queries when a user logs out.
   static void shutdownOutstandingQueries() {
@@ -379,7 +378,7 @@ class AFibF {
     deferredQueries.clear();
   }
 
-  /// Shutdown a single outstanding listener query using [AFAsyncQueryListnerCustomError.shutdown]
+  /// Shutdown a single outstanding listener query using [AFAsyncQueryListener.shutdown]
   static void shutdownListenerQuery(String key) {
     final query = listenerQueries[key];
     if(query != null) {
@@ -389,7 +388,7 @@ class AFibF {
   }
 
   /// Do not call this method, see AFApp.initialize instead.
-  static void setInitialAppStateFactory(InitializeAppState initialState) {
+  static void setInitialAppStateFactory(AFInitializeAppStateDelegate initialState) {
     if(_afInitializeAppState != null) {
       _directCallException();
     }
@@ -408,7 +407,7 @@ class AFibF {
   }
 
   /// Do not call this method, AFApp.initialize will do it for you.
-  static void setCreateStartupQueryAction(CreateStartupQueryAction createStartupQueryAction) {
+  static void setCreateStartupQueryAction(AFCreateStartupQueryActionDelegate createStartupQueryAction) {
     if(_afCreateStartupQueryAction != null) {
       _directCallException();
     }
@@ -427,7 +426,7 @@ class AFibF {
   }
 
   /// Do not call this method, AFApp.initialize will do it for you.
-  static void setAppReducer<TAppState>(AppReducer<TAppState> reducer) {
+  static void setAppReducer<TAppState>(AFAppReducerDelegate<TAppState> reducer) {
     if(reducer != null) {
       _appReducer = (dynamic state, dynamic action) {
         dynamic d = reducer(state, action);

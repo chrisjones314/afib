@@ -1,12 +1,11 @@
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
+import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/flutter/utils/af_bottom_popup_theme.dart';
-import 'package:afib/src/flutter/utils/af_custom_popup_route.dart';
+import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
-
-typedef AFReturnFunc = void Function(dynamic returnData);
 
 /// Base class for action that manipulates the route (pushing, popping, replacing)
 /// and determines which screen is showing, and what data is visible.
@@ -23,7 +22,7 @@ class AFNavigateAction extends AFActionWithKey {
 }
 
 class AFNavigateActionWithReturn extends AFNavigateAction {
-  final AFReturnFunc onReturn;
+  final AFActionOnReturnDelegate onReturn;
   AFNavigateActionWithReturn({AFID id, AFScreenID screen, AFRouteParam param, this.onReturn}): super(id: id, screen: screen, param: param);
 
 }
@@ -58,14 +57,14 @@ class AFNavigateSetPopupParamAction extends AFNavigateAction {
 /// 
 /// Subsequently, [AFNavigatePopAction] will return you to the parent screen.
 class AFNavigatePushAction extends AFNavigateActionWithReturn {
-  AFNavigatePushAction({AFID id, AFScreenID screen, AFRouteParam param, AFReturnFunc onReturn}): super(id: id, screen: screen, param: param, onReturn: onReturn);
+  AFNavigatePushAction({AFID id, AFScreenID screen, AFRouteParam param, AFActionOnReturnDelegate onReturn}): super(id: id, screen: screen, param: param, onReturn: onReturn);
 }
 
 /// Pushes a popup with a custom route.
 class AFNavigatePushPopupAction extends AFNavigateActionWithReturn {
   final BuildContext context;
   final AFBottomPopupTheme theme;
-  final AFRouteWidgetBuilder popupBuilder;
+  final AFPopupRouteWidgetBuilderDelegate popupBuilder;
   final String barrierLabel;
   
   AFNavigatePushPopupAction({
@@ -73,7 +72,7 @@ class AFNavigatePushPopupAction extends AFNavigateActionWithReturn {
     @required this.context,
     @required AFScreenID screen, 
     AFRouteParam param,
-    AFReturnFunc onReturn,
+    AFActionOnReturnDelegate onReturn,
     this.barrierLabel,
     @required this.theme,
     @required this.popupBuilder}): super(id: id, screen: screen, param: param, onReturn: onReturn);

@@ -1,9 +1,7 @@
 
-import 'package:afib/src/dart/utils/af_config.dart';
+import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
-
-typedef InitConfiguration = void Function(AFConfig config);
 
 /// Application initialization parameters that do not depend on flutter.
 /// 
@@ -11,12 +9,12 @@ typedef InitConfiguration = void Function(AFConfig config);
 /// can still be used from command-line executables.
 @immutable
 class AFDartParams<AppState> {
-  final InitConfiguration initAfib;
-  final InitConfiguration initAppConfig;
-  final InitConfiguration initDebugConfig;
-  final InitConfiguration initProductionConfig;
-  final InitConfiguration initPrototypeConfig;
-  final InitConfiguration initTestConfig;
+  final AFInitConfigurationDelegate initAfib;
+  final AFInitConfigurationDelegate initAppConfig;
+  final AFInitConfigurationDelegate initDebugConfig;
+  final AFInitConfigurationDelegate initProductionConfig;
+  final AFInitConfigurationDelegate initPrototypeConfig;
+  final AFInitConfigurationDelegate initTestConfig;
   final Logger logger;
   final String forceEnv;
    
@@ -38,12 +36,12 @@ class AFDartParams<AppState> {
 
 
   AFDartParams copyWith({
-    InitConfiguration initAfib,
-    InitConfiguration initAppConfig,
-    InitConfiguration initDebugConfig,
-    InitConfiguration initProductionConfig,
-    InitConfiguration initPrototypeConfig,
-    InitConfiguration initTestConfig,
+    AFInitConfigurationDelegate initAfib,
+    AFInitConfigurationDelegate initAppConfig,
+    AFInitConfigurationDelegate initDebugConfig,
+    AFInitConfigurationDelegate initProductionConfig,
+    AFInitConfigurationDelegate initPrototypeConfig,
+    AFInitConfigurationDelegate initTestConfig,
     Logger logger,
     String forceEnv,
   }) {

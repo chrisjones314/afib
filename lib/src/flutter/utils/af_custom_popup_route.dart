@@ -1,14 +1,13 @@
 //--------------------------------------------------------------------------------------
 import 'package:afib/src/flutter/utils/af_bottom_popup_theme.dart';
+import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-
-typedef AFRouteWidgetBuilder = Widget Function(BuildContext ctx, AFCustomPopupRoute route);
 
 class AFCustomPopupRoute<T> extends PopupRoute<T> {
 
   final AFBottomPopupTheme theme;
-  final AFRouteWidgetBuilder childBuilder;
+  final AFPopupRouteWidgetBuilderDelegate childBuilder;
 
   AFCustomPopupRoute({
     @required this.barrierLabel,

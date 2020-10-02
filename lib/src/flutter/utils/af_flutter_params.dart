@@ -1,22 +1,21 @@
 
-import 'package:afib/src/flutter/af_app.dart';
+import 'package:afib/afib_flutter.dart';
+import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:meta/meta.dart';
 
-typedef InitializeAppState = dynamic Function();
-
 class AFFlutterParams<AppState> {
-  final InitScreenMap         initScreenMap;
-  final InitializeAppState       initialAppState;
-  final CreateStartupQueryAction createStartupQueryAction;
+  final AFInitScreenMapDelegate         initScreenMap;
+  final AFInitializeAppStateDelegate       initialAppState;
+  final AFCreateStartupQueryActionDelegate createStartupQueryAction;
   final AFCreateLifecycleQueryAction createLifecycleQueryAction;
-  final CreateAFApp createApp;
-  final InitTestData initTestData;
-  final InitUnitTests initUnitTests;
-  final InitStateTests initStateTests;
-  final InitWidgetTests initWidgetTests;
-  final InitScreenTests initScreenTests;
-  final AppReducer<AppState>  appReducer;
-  final InitMultiScreenStateTests initMultiScreenStateTests;
+  final AFCreateAFAppDelegate createApp;
+  final AFInitTestDataDelegate initTestData;
+  final AFInitUnitTestsDelegate initUnitTests;
+  final AFInitStateTestsDelegate initStateTests;
+  final AFInitWidgetTestsDelegate initWidgetTests;
+  final AFInitScreenTestsDelegate initScreenTests;
+  final AFAppReducerDelegate<AppState>  appReducer;
+  final AFInitMultiScreenStateTestsDelegate initMultiScreenStateTests;
   
   AFFlutterParams({
     @required this.initScreenMap,

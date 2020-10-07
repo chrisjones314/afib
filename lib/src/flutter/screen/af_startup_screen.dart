@@ -1,8 +1,8 @@
 
 //--------------------------------------------------------------------------------------
+import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/widgets.dart';
-
-import '../../../afib_flutter.dart';
 
 //--------------------------------------------------------------------------------------
 class AFStartupScreenWrapper extends StatefulWidget {

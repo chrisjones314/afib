@@ -82,6 +82,22 @@ class AFNavigatePopFromFlutterAction extends AFNavigateAction {
   AFNavigatePopFromFlutterAction({AFID id}): super(id:id, screen:null, param: null);
 }
 
+class AFNavigateActionWithReturnData extends AFNavigateAction {
+  final dynamic returnData;
+  final bool worksInPrototypeMode;
+
+  AFNavigateActionWithReturnData({AFID id, this.returnData, this.worksInPrototypeMode = true}): super(id: id, screen: null, param: null);
+}
+
+/// Used when you only want to call Navigator.pop(context), without updating the 
+/// internal route state.   
+/// 
+/// Note that this should be called instead of calling Navigator.pop(context directly),
+/// because in that case we will catch it and pop the internal route state.
+class AFNavigatePopNavigatorOnlyAction extends AFNavigateAction {
+  AFNavigatePopNavigatorOnlyAction({AFID id}): super(id: id, screen: null, param: null);
+}
+
 /// Action that navigates on screen up in the route, discarding the current leaf route.
 /// 
 /// Important: If you want to navigate up several screens, use [AFNavigatePopNAction] or [AFNavigatePopToAction]
@@ -91,22 +107,20 @@ class AFNavigatePopFromFlutterAction extends AFNavigateAction {
 /// If you want to test for the presence of a pop action in response to an event in 
 /// prototype mode, you can make [worksInPrototypeMode] false.   By default, pop actions
 /// navigate you out of a prototype screen in test mode.
-class AFNavigatePopAction extends AFNavigateAction {
-  final dynamic returnData;
-  final bool worksInPrototypeMode;
+class AFNavigatePopAction extends AFNavigateActionWithReturnData {
   
-  AFNavigatePopAction({AFID id, this.returnData, this.worksInPrototypeMode = true}): super(id: id, screen: null, param: null);
+  AFNavigatePopAction({AFID id, dynamic returnData, bool worksInPrototypeMode = true}): super(id: id, returnData: returnData, worksInPrototypeMode: worksInPrototypeMode);
 }
 
 /// Used to close a popup screen
-class AFNavigatePopPopupAction extends AFNavigatePopAction {
+class AFNavigatePopPopupAction extends AFNavigateActionWithReturnData {
   final BuildContext context;
   AFNavigatePopPopupAction(this.context, {AFID id, dynamic returnData}): super(id: id, returnData: returnData);
 }
 
 
 /// Pops [popCount] screens off the navigation stack.
-class AFNavigatePopNAction extends AFNavigatePopAction {
+class AFNavigatePopNAction extends AFNavigateActionWithReturnData {
   final int popCount;
 
   AFNavigatePopNAction({
@@ -121,7 +135,7 @@ class AFNavigatePopNAction extends AFNavigatePopAction {
     );
 }
 
-class AFNavigatePopToAction extends AFNavigatePopAction {
+class AFNavigatePopToAction extends AFNavigateActionWithReturnData {
   final AFScreenID popTo;
 
   AFNavigatePopToAction({

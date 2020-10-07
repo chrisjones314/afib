@@ -109,3 +109,6 @@ typedef AFOnErrorDelegate<TState, TError> = void Function(AFFinishQueryErrorCont
 
 /// Delegate used to process an [AFAsyncQuery]
 typedef AFAsyncQueryListenerDelegate = void Function(AFAsyncQuery query);
+
+/// Delegate used to fill a list of widgets.
+typedef AFFillWidgetListDelegate = void Function(List<Widget> widgets);

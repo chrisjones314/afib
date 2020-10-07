@@ -1,12 +1,11 @@
 
 import 'package:afib/src/dart/command/af_command.dart';
+import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
-
-import '../af_command_output.dart';
 
 /// Superclass for all configuration definitions.
 abstract class AFConfigEntry extends AFItemWithNamespace {

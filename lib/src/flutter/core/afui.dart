@@ -73,19 +73,16 @@ class AFUI {
   }
 
   static void standardOKNoticeDialog({
-    @required BuildContext context,
+    @required AFBuildContext context,
     @required String alertTitle,
     @required Widget alertContent,
     String okButtonText = "OK",
   }) {
-    final completer = Completer<void>();
-
       // set up the buttons
       Widget okButton = FlatButton(
         child: Text(okButtonText),
         onPressed:  () {
-          Navigator.of(context).pop(); 
-          completer.complete();
+          context.dispatch(AFNavigatePopNavigatorOnlyAction());
         },
       );
       // set up the AlertDialog
@@ -99,7 +96,7 @@ class AFUI {
 
       // show the dialog
       showDialog(
-        context: context,
+        context: context.c,
         builder: (context) {
           return alert;
         },
@@ -108,7 +105,7 @@ class AFUI {
 
 
   static AFShouldContinueCheckDelegate standardShouldContinueAlertCheck({
-    @required BuildContext context,
+    @required AFBuildContext context,
     @required bool shouldAsk,
     bool isTestContext = false,
     String alertTitle = "Discard changes?",
@@ -124,14 +121,14 @@ class AFUI {
           Widget cancelButton = FlatButton(
             child: Text(stopButtonText),
             onPressed:  () {
-              Navigator.of(context).pop(); 
+              context.dispatch(AFNavigatePopNavigatorOnlyAction());
               completer.complete(AFUI.shouldStop);
             },
           );
           Widget discardChangesButton = FlatButton(
             child: Text(continueButtonText),
             onPressed:  () {
-              Navigator.of(context).pop(); 
+              context.dispatch(AFNavigatePopNavigatorOnlyAction());
               completer.complete(AFUI.shouldContinue);
             },
           );
@@ -148,7 +145,7 @@ class AFUI {
 
           // show the dialog
           showDialog(
-            context: context,
+            context: context.c,
             builder: (context) {
               return alert;
             },

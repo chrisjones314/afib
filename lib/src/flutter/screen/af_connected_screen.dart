@@ -31,6 +31,7 @@ abstract class AFDispatcher {
 
     return ( shouldPop ||
              action is AFNavigateExitTestAction || 
+             action is AFNavigatePopNavigatorOnlyAction ||
              action is AFNavigatePushPopupAction ||
              action is AFNavigatePopPopupAction ||
              action is AFUpdatePrototypeScreenTestDataAction || 
@@ -288,7 +289,8 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
 /// the route in order to render itself.
 abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedWidgetBase<TState, TData, TRouteParam> {
   final AFScreenID screenId;
-  AFConnectedScreen(this.screenId): super();
+  AFConnectedScreen(this.screenId, { Key key }): super(key: key)
+  ;
 
   AFScreenID get screenIdForTest {
     return screenId;

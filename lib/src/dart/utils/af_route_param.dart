@@ -1,5 +1,5 @@
+import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:meta/meta.dart';
-import 'af_id.dart';
 
 /// Base class for transient data associated with an [AFScreen], and stored
 /// in the [AFRoute]

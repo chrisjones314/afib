@@ -68,76 +68,41 @@ class AFRouteSegment {
   }
 }
 
-/// The current route, a list of nested screens and the data associated with them.
+/// A list of active route segements, and a list of priorSegements which are
+/// sometimes referenced during navigate pop transitions.
 @immutable
-class AFRouteState {
+class AFRouteStateSegments {
   /// Tracks the segement which was just popped off the route. 
   /// 
   /// When Flutter animates a screen transition, it rebuilds both the current and
   /// new screens.  During this interim period, it is conventient to still have 
   /// access to the data in the route segment that was just popped, even though
   /// it is not the final route segment anymore.  This is where we store that value.
-  final List<AFRouteSegment> priorLastSegment;
-  
-  
-  final List<AFRouteSegment> route;
-  final List<AFRouteSegment> popups;
+  final List<AFRouteSegment> prior;  
+  final List<AFRouteSegment> active;
 
-  AFRouteState({this.route, this.popups, this.priorLastSegment});  
+  AFRouteStateSegments({this.prior, this.active});
 
-  /// Creates the default initial state.
-  factory AFRouteState.initialState() {
-    final route = <AFRouteSegment>[];
-    final popups = <AFRouteSegment>[];
-    route.add(AFRouteSegment.withScreen(AFibF.effectiveStartupScreenId));
-    return AFRouteState(route: route, popups: popups, priorLastSegment: <AFRouteSegment>[]);
+  AFRouteSegment get last {
+    return active.last;
   }
 
-  bool isActiveScreen(AFScreenID screen, { bool includePopups }) {
-    var last = route.last;
-    if(includePopups && popups.isNotEmpty) {
-      last = popups.last;
-    }
-    return last.matchesScreen(screen);
+  bool get isEmpty {
+    return active.isEmpty;
   }
 
-  AFScreenID get activeScreenId {
-    final last = route.last;
-    return last.screenId;
+  bool get isNotEmpty {
+    return !isEmpty;
   }
 
-  /// Returns the segment in the current route associated with the 
-  /// specified screen.
-  AFRouteSegment _findSegmentFor(AFScreenID screen, bool includePrior) {
-    for(var i = route.length - 1; i >= 0; i--) {
-      final segment = route[i];
-      if(segment.matchesScreen(screen)) {
-        return segment;
-      }
-    }
-    if(includePrior) {
-      for(var i = 0; i < priorLastSegment.length; i++) {
-        final seg = priorLastSegment[i];
-        if(seg.matchesScreen(screen)) {
-          return seg;
-        }
-      }
-    }
-    return null;
-
+  int get length {
+    return active.length;
   }
 
-  /// The number of screens in the route.
-  int get segmentCount {
-    return route.length;
-  }
-
-  /// Returns the number of pops to do to replace the entire path, but 
-  /// does not replace any afib test screens.
   int get popCountToRoot {
     var nPop = 0;
-    for(var i = route.length - 1; i >= 0; i--) {
-      final segment = route[i];
+    for(var i = active.length - 1; i >= 0; i--) {
+      final segment = active[i];
       // the simple prototype screen is really a test of an app screen, so we do
       // want to pop it off.
       if(segment.isAFibScreen && 
@@ -148,14 +113,13 @@ class AFRouteState {
       nPop++;
     } 
     return nPop;
+
   }
 
-  /// Returns the number of pops to get to the specified screen in the root,
-  /// or -1 if that screen isn't in the route.
   int popCountToScreen(AFScreenID screen) {
     var nPop = 0;
-    for(var i = route.length - 1; i >= 0; i--) {
-      final segment = route[i];
+    for(var i = active.length - 1; i >= 0; i--) {
+      final segment = active[i];
       if(!segment.matchesScreen(screen)) {
         return nPop;
       }
@@ -164,14 +128,224 @@ class AFRouteState {
     return -1;
   }
 
-  AFRouteParam findPopupParamFor(AFScreenID screen) {
-    for(var i = popups.length - 1; i >= 0; i--) {
-      final segment = popups[i];
+  /// Returns the segment in the current route associated with the 
+  /// specified screen.
+  AFRouteSegment findSegmentFor(AFScreenID screen, { bool includePrior }) {
+    for(var i = active.length - 1; i >= 0; i--) {
+      final segment = active[i];
       if(segment.matchesScreen(screen)) {
-        return segment.param;
+        return segment;
+      }
+    }
+    if(includePrior) {
+      for(var i = 0; i < prior.length; i++) {
+        final seg = prior[i];
+        if(seg.matchesScreen(screen)) {
+          return seg;
+        }
       }
     }
     return null;
+  }
+
+  AFRouteStateSegments copyWith({
+    List<AFRouteSegment> active,
+    List<AFRouteSegment> prior
+  }) {
+
+    return AFRouteStateSegments(
+      active: active ?? this.active,
+      prior: prior ?? this.prior
+    );
+  }
+
+  /// Removes the current leaf from the route, and adds the specified screen
+  /// and data in its place.
+  AFRouteStateSegments popAndPushNamed(AFScreenID screen, AFRouteParam param) {
+    final revised = copyActive();
+    final priorLastSegment = _cyclePrior(revised, 1);
+
+    revised.add(AFRouteSegment.withParam(screen, param));
+    return copyWith(
+      active: revised,
+      prior: priorLastSegment
+    );
+  }
+
+  /// Adds a new screen/data below the current screen in the route.
+  AFRouteStateSegments pushNamed(AFScreenID screen, AFRouteParam param) {
+    final newRoute = copyActive();
+    newRoute.add(AFRouteSegment.withParam(screen, param));
+    return copyWith(
+      active: newRoute
+    );
+  }
+
+  /// Remove the leaf element from the route, returning back to the parent
+  /// screen.
+  AFRouteStateSegments pop(dynamic childReturn) {
+    return popN(1, childReturn);
+  }
+
+  /// Remove the leaf element from the route, returning back to the parent
+  /// screen.
+  AFRouteStateSegments popTo(AFScreenID screen, dynamic childReturn) {
+    final popCount = popCountToScreen(screen);
+    return popN(popCount, childReturn);
+  }
+
+  /// Remove the leaf element from the route, returning back to the parent
+  /// screen.
+  AFRouteStateSegments popN(int popCount, dynamic childReturn) {
+    final revised = copyActive();
+    final priorLastSegment = _cyclePrior(revised, popCount);
+    return copyWith(
+      active: revised,
+      prior: priorLastSegment
+    );
+  }
+
+  /// Pops the route until we get to the first afib test screen.
+  AFRouteStateSegments exitTest() {
+    final popCount = this.popCountToRoot;
+    return popN(popCount, null);
+  }
+
+  /// Replaces the data on the current leaf element without changing the segments
+  /// in the route.
+  AFRouteStateSegments setParam(AFScreenID screen, AFRouteParam param) {
+    final revised = copyActive();
+    for(var i = 0; i < revised.length; i++) {
+      final seg = revised[i];
+      if(seg.screen == screen) {
+        revised[i] = seg.copyWith(param: param);
+        break;
+      }
+    }
+
+    return copyWith(active: revised);
+  }
+
+  /// Removes all existing segments in the route, and adds back the specified screen/data.
+  AFRouteStateSegments replaceAll(AFScreenID screen, AFRouteParam param) {
+
+    // this prevent us from removing afib test screens.
+    final revised = List<AFRouteSegment>.of(active);
+    final popCount = this.popCountToRoot;
+    final priorLastSegment = _cyclePrior(revised, popCount);
+
+    revised.add(AFRouteSegment.withParam(screen, param));
+    return copyWith(
+      active: revised,
+      prior: priorLastSegment
+    );
+  }
+
+  /// Utility to create a copy of the current route, so that it can be manipulated.
+  List<AFRouteSegment> copyActive() {
+    return List<AFRouteSegment>.from(this.active);
+  }
+
+  String toString() {
+    final result = StringBuffer("ACTIVE=[");
+    
+    for(final segment in active) {
+      result.write(segment?.screen?.code);
+      result.write(' / ');
+    }
+    result.write("]");
+
+    if(prior.isNotEmpty) {
+      result.write("PRIOR=[");
+      for(final segment in prior) {
+        result.write(segment?.screen?.code);
+        result.write(' / ');
+      }
+      result.write("]");
+    }
+
+
+    return result.toString();
+  }
+
+
+  List<AFRouteSegment> _cyclePrior(List<AFRouteSegment> revisedActive, int popCount) {
+    // dispose any segments from the prior pop.
+    for(final expiredSegment in this.prior) {
+      // In prototype mode, it is possible to navigate in/out of a screen with a test
+      // parameter containing things like TextEditingControllers.  However, because of the
+      // way the test framework works, the route parameter will be the same each time, whereas
+      // in a real app it would get recreated each time you visit the test screen.   
+      // This can cause stuff in the param to get re-used after it is disposed.  So, in prototype
+      // mode we don't call dispose.
+      if(!AFibD.config.isPrototypeMode) {
+        expiredSegment.dispose();
+      }
+    }
+
+    // create a new prior segment with all the segments being popped off.
+    final revisedPrior = <AFRouteSegment>[];
+    for(var i = 0; i < popCount; i++) {
+      final justRemoved = revisedActive.removeLast();
+      revisedPrior.insert(0, justRemoved);
+    }
+
+    return revisedPrior;
+  }
+
+}
+
+/// The current route, a list of nested screens and the data associated with them.
+@immutable
+class AFRouteState {
+  final AFRouteStateSegments popupSegments;
+  final AFRouteStateSegments screenSegments;
+
+  AFRouteState({this.screenSegments, this.popupSegments});  
+
+  /// Creates the default initial state.
+  factory AFRouteState.initialState() {
+    final screen = <AFRouteSegment>[];
+    screen.add(AFRouteSegment.withScreen(AFibF.effectiveStartupScreenId));
+    final empty = <AFRouteSegment>[];
+    final screenSegs = AFRouteStateSegments(active: screen, prior: empty);
+    final popupSegs  = AFRouteStateSegments(active: empty, prior: empty);
+    return AFRouteState(screenSegments: screenSegs, popupSegments: popupSegs);
+  }
+
+  bool isActiveScreen(AFScreenID screen, { bool includePopups }) {
+    var last = screenSegments.last;
+    if(includePopups && popupSegments.isNotEmpty) {
+      last = popupSegments.last;
+    }
+    return last.matchesScreen(screen);
+  }
+
+  AFScreenID get activeScreenId {
+    final last = screenSegments.last;
+    return last.screenId;
+  }
+
+  /// The number of screens in the route.
+  int get segmentCount {
+    return screenSegments.length;
+  }
+
+  /// Returns the number of pops to do to replace the entire path, but 
+  /// does not replace any afib test screens.
+  int get popCountToRoot {
+    return screenSegments.popCountToRoot;
+  }
+
+  /// Returns the number of pops to get to the specified screen in the root,
+  /// or -1 if that screen isn't in the route.
+  int popCountToScreen(AFScreenID screen) {
+    return screenSegments.popCountToScreen(screen);
+  }
+
+  AFRouteParam findPopupParamFor(AFScreenID screen, { bool includePrior = true }) {
+    final seg = popupSegments.findSegmentFor(screen, includePrior: includePrior);
+    return seg?.param?.paramFor(screen);
   }
 
 
@@ -180,16 +354,15 @@ class AFRouteState {
   /// If [includePrior] is true, it will also include the most recent final segment
   /// in the search.  This is useful when the final segement has been popped off the route,
   /// but still needs to be included in the search.
-  AFRouteParam findParamFor(AFScreenID screen, { bool includePrior }) {
-    final seg = _findSegmentFor(screen, includePrior);
-    if(seg == null) {
-      return null;
-    }
-    return seg.param?.paramFor(screen);
+  AFRouteParam findParamFor(AFScreenID screen, { bool includePrior = true }) {
+    final seg = screenSegments.findSegmentFor(screen, includePrior: includePrior);
+    return seg?.param?.paramFor(screen);
   }
 
   /// Returns the list of screen names, from the root to the leaf.
+  /*
   String fullPath() { 
+
     final buffer = StringBuffer();
     for(final item in route) {
       buffer.write("/");
@@ -197,44 +370,31 @@ class AFRouteState {
     }
     return buffer.toString();
   }
+  */
 
   /// Removes the current leaf from the route, and adds the specified screen
   /// and data in its place.
   AFRouteState popAndPushNamed(AFScreenID screen, AFRouteParam param) {
-    final revised = copyRoute();
-    final priorLastSegment = _cyclePrior(revised, 1);
-
-    revised.add(AFRouteSegment.withParam(screen, param));
-    return copyWith(
-      route: revised,
-      priorLastSegment: priorLastSegment
-    );
+    final revisedScreen = screenSegments.popAndPushNamed(screen, param);
+    return _reviseScreen(revisedScreen);
   }
 
   /// Adds a new screen/data below the current screen in the route.
   AFRouteState pushNamed(AFScreenID screen, AFRouteParam param) {
-    final newRoute = copyRoute();
-    newRoute.add(AFRouteSegment.withParam(screen, param));
-    return copyWith(
-      route: newRoute
-    );
+    return _reviseScreen(screenSegments.pushNamed(screen, param));
   }
 
   AFRouteState pushPopup(AFScreenID popup, AFRouteParam param) {
-    final revisedPopups = List<AFRouteSegment>.of(this.popups);
-    revisedPopups.add(AFRouteSegment.withParam(popup, param));
-    return copyWith(popups: revisedPopups);
+    return _revisePopup(popupSegments.pushNamed(popup, param));
   }
 
   AFRouteState popPopup() {
-    final revisedPopups = List<AFRouteSegment>.of(this.popups);
-    revisedPopups.removeLast();
-    return copyWith(popups: revisedPopups);
+    return _revisePopup(popupSegments.pop(null));
   }
 
   /// 
   AFRouteState popFromFlutter() {
-    if(popups.isNotEmpty) {
+    if(popupSegments.isNotEmpty) {
       return popPopup();
     } else {
       return pop(null);
@@ -257,105 +417,51 @@ class AFRouteState {
   /// Remove the leaf element from the route, returning back to the parent
   /// screen.
   AFRouteState popN(int popCount, dynamic childReturn) {
-    final revised = copyRoute();
-    final priorLastSegment = _cyclePrior(revised, popCount);
-    return copyWith(
-      route: revised,
-      priorLastSegment: priorLastSegment
-    );
+    return _reviseScreen(screenSegments.popN(popCount, childReturn));
   }
 
   /// Pops the route until we get to the first afib test screen.
   AFRouteState exitTest() {
-    final popCount = this.popCountToRoot;
-    return popN(popCount, null);
+    return _reviseScreen(screenSegments.exitTest());
   }
 
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
   AFRouteState setParam(AFScreenID screen, AFRouteParam param) {
-    final revised = copyRoute();
-    for(var i = 0; i < revised.length; i++) {
-      final seg = revised[i];
-      if(seg.screen == screen) {
-        revised[i] = seg.copyWith(param: param);
-        break;
-      }
-    }
-
-    return copyWith(route: revised);
+    return _reviseScreen(screenSegments.setParam(screen, param));
   }
 
   /// Replaces the route parameter for the specified popup screen.
   AFRouteState setPopupParam(AFScreenID screen, AFRouteParam param) {
-    final revised = List<AFRouteSegment>.of(this.popups);
-    for(var i = 0; i < revised.length; i++) {
-      final seg = revised[i];
-      if(seg.screen == screen) {
-        revised[i] = seg.copyWith(param: param);
-        break;
-      }
-    }
-
-    return copyWith(popups: revised);
+    return _revisePopup(popupSegments.setParam(screen, param));
   }
 
   /// Removes all existing segments in the route, and adds back the specified screen/data.
   AFRouteState replaceAll(AFScreenID screen, AFRouteParam param) {
-
-    // this prevent us from removing afib test screens.
-    final revised = List<AFRouteSegment>.of(route);
-    final popCount = this.popCountToRoot;
-    final priorLastSegment = _cyclePrior(revised, popCount);
-
-    revised.add(AFRouteSegment.withParam(screen, param));
-    return copyWith(
-      route: revised,
-      priorLastSegment: priorLastSegment
-    );
+    return _reviseScreen(screenSegments.replaceAll(screen, param));
   }
 
-  /// Utility to create a copy of the current route, so that it can be manipulated.
-  List<AFRouteSegment> copyRoute() {
-    return List<AFRouteSegment>.from(this.route);
+  //---------------------------------------------------------------------------------------
+  AFRouteState _reviseScreen(AFRouteStateSegments screenSegs) {
+    return copyWith(screenSegs: screenSegs);
   }
 
-  List<AFRouteSegment> _cyclePrior(List<AFRouteSegment> revisedActive, int popCount) {
-    // dispose any segments from the prior pop.
-    for(final expiredSegment in this.priorLastSegment) {
-      // In prototype mode, it is possible to navigate in/out of a screen with a test
-      // parameter containing things like TextEditingControllers.  However, because of the
-      // way the test framework works, the route parameter will be the same each time, whereas
-      // in a real app it would get recreated each time you visit the test screen.   
-      // This can cause stuff in the param to get re-used after it is disposed.  So, in prototype
-      // mode we don't call dispose.
-      if(!AFibD.config.isPrototypeMode) {
-        expiredSegment.dispose();
-      }
-    }
-
-    // create a new prior segment with all the segments being popped off.
-    final revisedPrior = <AFRouteSegment>[];
-    for(var i = 0; i < popCount; i++) {
-      final justRemoved = revisedActive.removeLast();
-      revisedPrior.insert(0, justRemoved);
-    }
-
-    return revisedPrior;
+  //---------------------------------------------------------------------------------------
+  AFRouteState _revisePopup(AFRouteStateSegments popupSegs) {
+    return copyWith(popupSegs: popupSegs);
   }
 
   //---------------------------------------------------------------------------------------
   AFRouteState copyWith({
-    List<AFRouteSegment> route,
-    List<AFRouteSegment> popups,
-    List<AFRouteSegment> priorLastSegment
+    AFRouteStateSegments screenSegs,
+    AFRouteStateSegments popupSegs
   }) {
     final revised = AFRouteState(
-      route: route ?? this.route,
-      popups: popups ?? this.popups,
-      priorLastSegment: priorLastSegment ?? this.priorLastSegment
+      screenSegments: screenSegs ?? this.screenSegments,
+      popupSegments: popupSegs ?? this.popupSegments
     );
+
     AFibD.logRoute?.d("Revised Route: $revised");
     return revised;
   }
@@ -363,9 +469,10 @@ class AFRouteState {
   //---------------------------------------------------------------------------------------
   String toString() {
     final result = StringBuffer();
-    for(final segment in route) {
-      result.write(segment?.screen?.code);
-      result.write(' / ');
+    result.write(screenSegments.toString());
+    if(popupSegments.isNotEmpty) {
+      result.write("POPUP PATH ");
+      result.write(popupSegments.toString());
     }
     return result.toString();
   }

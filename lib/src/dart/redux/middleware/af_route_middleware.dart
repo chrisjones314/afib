@@ -21,6 +21,7 @@ List<Middleware<AFState>> createRouteMiddleware() {
     TypedMiddleware<AFState, AFNavigatePopNAction>(_navigatePopNAction),
     TypedMiddleware<AFState, AFNavigatePopToAction>(_navigatePopToAction),
     TypedMiddleware<AFState, AFNavigateExitTestAction>(_navigateExitTestAction),
+    TypedMiddleware<AFState, AFNavigatePopNavigatorOnlyAction>(_navigatePopNavOnlyAction),
   ];
 }
 
@@ -39,6 +40,7 @@ void _navigatePopPopupAction(Store<AFState> store, act, NextDispatcher next) {
     //navState.pop(action.returnData);
     Navigator.pop(action.context);
   });
+  next(action);
 }
 
 //---------------------------------------------------------------------------
@@ -164,6 +166,12 @@ void _navigateReplaceAllAction(Store<AFState> store, action, NextDispatcher next
 
 }
 
+//---------------------------------------------------------------------------
+void _navigatePopNavOnlyAction(Store<AFState> store, action, NextDispatcher next) {
+  AFibF.doMiddlewareNavigation((navState) {
+    navState.pop();
+  });
+}
 
 //---------------------------------------------------------------------------
 void _navigateExitTestAction(Store<AFState> store, action, NextDispatcher next) {

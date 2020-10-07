@@ -7,14 +7,14 @@ final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigateReplaceAction>(_navReplace),
   TypedReducer<AFRouteState, AFNavigateReplaceAllAction>(_navReplaceAll),
   TypedReducer<AFRouteState, AFNavigatePushPopupAction>(_navPushPopup),
+  TypedReducer<AFRouteState, AFNavigatePopPopupAction>(_navPopPopup),
   TypedReducer<AFRouteState, AFNavigatePushAction>(_navPush),
   TypedReducer<AFRouteState, AFNavigatePopAction>(_navPop),
   TypedReducer<AFRouteState, AFNavigatePopNAction>(_navPopN),
   TypedReducer<AFRouteState, AFNavigatePopToAction>(_navPopTo),
-  TypedReducer<AFRouteState, AFNavigateSetParamAction>(_navSetParam),
   TypedReducer<AFRouteState, AFNavigateSetPopupParamAction>(_navSetPopupParam),
+  TypedReducer<AFRouteState, AFNavigateSetParamAction>(_navSetParam),
   TypedReducer<AFRouteState, AFNavigateExitTestAction>(_navExitTest),
-  TypedReducer<AFRouteState, AFNavigatePopPopupAction>(_navPopPopup),
   TypedReducer<AFRouteState, AFNavigatePopFromFlutterAction>(_navPopFromFlutter),
 ]);
 

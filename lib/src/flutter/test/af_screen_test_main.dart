@@ -21,9 +21,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams paramsD1, AFFlutterParams paramsF, WidgetTester tester) async {
   final isWidget = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.widgetTests);
-  final isSimple = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.screenTests);
-  final isMulti  = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.multiScreenTests);
-  if(!isSimple && !isMulti && !isWidget) {
+  final isAll = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.screenTests);
+  final isSingle = isAll || AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.singleScreenTests);
+  final isMulti  = isAll || AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.multiScreenTests);
+  if(!isSingle && !isMulti && !isWidget) {
     return;
   }
 
@@ -35,7 +36,7 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
     await _afWidgetTestMain(output, stats, tester, app);
   }
 
-  if(isSimple) {
+  if(isSingle) {
     await _afSingleScreenTestMain(output, stats, tester, app);
   }
 

@@ -1,5 +1,7 @@
+import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
 import 'package:afib/src/dart/redux/state/af_route_state.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:redux/redux.dart';
 
 //---------------------------------------------------------------------------
@@ -16,6 +18,7 @@ final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigateSetParamAction>(_navSetParam),
   TypedReducer<AFRouteState, AFNavigateExitTestAction>(_navExitTest),
   TypedReducer<AFRouteState, AFNavigatePopFromFlutterAction>(_navPopFromFlutter),
+  TypedReducer<AFRouteState, AFShutdownOngoingQueriesAction>(_shutdownQueries)
 ]);
 
 AFRouteState _navPopFromFlutter(AFRouteState state, AFNavigatePopFromFlutterAction action) {
@@ -78,3 +81,8 @@ AFRouteState _navExitTest(AFRouteState state, AFNavigateExitTestAction action) {
   return state.exitTest();
 }
 
+//---------------------------------------------------------------------------
+AFRouteState _shutdownQueries(AFRouteState state, AFShutdownOngoingQueriesAction action) {
+  AFibF.shutdownOutstandingQueries();
+  return state;
+}

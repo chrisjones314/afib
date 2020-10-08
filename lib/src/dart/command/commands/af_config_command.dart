@@ -140,10 +140,11 @@ class AFConfigEntryEnabledTests extends AFConfigEntryList {
   static const stateTests = "state";
   static const unitTests = "unit";
   static const screenTests = "screen";
+  static const singleScreenTests = "singlescreen";
   static const queryTests = "query";
   static const multiScreenTests = "multiscreen";
   static const widgetTests = "widget";
-  static const allAreas = [allTests, unitTests, stateTests, widgetTests, screenTests, queryTests, multiScreenTests];
+  static const allAreas = [allTests, unitTests, stateTests, widgetTests, screenTests, queryTests, singleScreenTests, multiScreenTests];
 
   AFConfigEntryEnabledTests(): super(AFConfigEntries.afNamespace, "enabledTestList", [allTests], help: "Space separated list of areas that should display logging messages [${allAreas.join('|')}|test_id|test_tag]");
 

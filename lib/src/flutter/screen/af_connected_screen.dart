@@ -177,6 +177,14 @@ class AFStoreConnectorData6<TV1, TV2, TV3, TV4, TV5, TV6> extends AFStoreConnect
   AFStoreConnectorData6({TV1 first, TV2 second, TV3 third, TV4 fourth, TV5 fifth, TV6 sixth}): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth, sixth: sixth);
 }
 
+class AFStoreConnectorData7<TV1, TV2, TV3, TV4, TV5, TV6, TV7> extends AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, AFUnused> {
+  AFStoreConnectorData7({TV1 first, TV2 second, TV3 third, TV4 fourth, TV5 fifth, TV6 sixth, TV7 seventh}): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth, sixth: sixth, seventh: seventh);
+}
+
+class AFStoreConnectorData8<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> extends AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> {
+  AFStoreConnectorData8({TV1 first, TV2 second, TV3 third, TV4 fourth, TV5 fifth, TV6 sixth, TV7 seventh, TV8 eighth}): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth, sixth: sixth, seventh: seventh, eighth: eighth);
+}
+
 /// This common superclass makes it possible to treat all afib Widgets/screens
 /// similarly for testing and prototyping purposes.
 abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends StatelessWidget {

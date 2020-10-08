@@ -688,7 +688,7 @@ class AFScreenTestWidgetCollectorScreen {
 
       // if we got to a point where our current offset is less than our desired offset, we must have scrolled
       // all the way to the bottom, in that case just return the empty set.
-      if(controller.offset < currentPosition) {
+      if(controller.offset <= currentPosition) {
         return <Element>[];
       }
 

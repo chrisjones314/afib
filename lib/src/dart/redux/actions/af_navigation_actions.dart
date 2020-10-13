@@ -57,7 +57,12 @@ class AFNavigateSetPopupParamAction extends AFNavigateAction {
 /// 
 /// Subsequently, [AFNavigatePopAction] will return you to the parent screen.
 class AFNavigatePushAction extends AFNavigateActionWithReturn {
-  AFNavigatePushAction({AFID id, AFScreenID screen, AFRouteParam param, AFActionOnReturnDelegate onReturn}): super(id: id, screen: screen, param: param, onReturn: onReturn);
+  AFNavigatePushAction({
+    AFID id, 
+    @required AFScreenID screen, 
+    @required AFRouteParam param, 
+    AFActionOnReturnDelegate onReturn
+  }): super(id: id, screen: screen, param: param, onReturn: onReturn);
 }
 
 /// Pushes a popup with a custom route.

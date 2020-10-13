@@ -26,7 +26,7 @@ class AFStateTestContext<TState extends AFAppState> extends AFStateTestExecute {
   
   AFStateTestContext(this.test, this.store, this.dispatcher, { @required this.isTrueTestContext} );
 
-  AFTestID get testID { return this.test.id; }
+  AFStateTestID get testID { return this.test.id; }
   AFState get afState { return store.state; }
   TState get state { return store.state.app; }
   AFRouteState get route { return store.state.route; }
@@ -41,13 +41,13 @@ class AFStateTests<TState extends AFAppState> {
   final List<AFStateTest<dynamic>> tests = <AFStateTest<dynamic>>[];
   AFStateTestContext<dynamic> context;
 
-  void queryTest(AFTestID id, AFAsyncQuery query, AFProcessTestDelegate handler) {
+  void queryTest(AFStateTestID id, AFAsyncQuery query, AFProcessTestDelegate handler) {
     final test = AFStateTest<TState>(id, query, this);
     tests.add(test);
     handler(test);
   }
 
-  AFStateTest findById(AFTestID id) {
+  AFStateTest findById(AFStateTestID id) {
     for(var test in tests) {
       if(test.id == id) {
         return test;
@@ -70,19 +70,19 @@ class _AFStateQueryEntry {
 
 class AFStateTest<TState extends AFAppState> {
   final AFStateTests<TState> tests;
-  final AFTestID id;
-  AFTestID idPredecessor;
+  final AFStateTestID id;
+  AFStateTestID idPredecessor;
   final AFAsyncQuery query;
   final Map<String, _AFStateResultEntry> results = <String, _AFStateResultEntry>{};
   final List<_AFStateQueryEntry> postQueries = <_AFStateQueryEntry>[];
 
   AFStateTest(this.id, this.query, this.tests);
 
-  void continuesAfter(AFTestID pred) {
+  void continuesAfter(AFStateTestID pred) {
     idPredecessor = pred;
   }
 
-  void initializeResultsFrom(AFTestID idTest) {
+  void initializeResultsFrom(AFStateTestID idTest) {
     final test = tests.findById(idTest);
     test.results.forEach((key, result) { 
       /// if this is the primary result, then copy it over to the primary result for
@@ -95,7 +95,7 @@ class AFStateTest<TState extends AFAppState> {
     });
   }
 
-  void initializeVerifyFrom(AFTestID idTest) {
+  void initializeVerifyFrom(AFStateTestID idTest) {
     final test = tests.findById(idTest);
     postQueries.addAll(test.postQueries);
   }
@@ -110,6 +110,10 @@ class AFStateTest<TState extends AFAppState> {
       final data = AFibF.testData.find(idData);
       query.testFinishAsyncWithResponse(context, data);
     });
+  }
+
+  void createPrimaryResponseFromQuery(AFProcessQueryDelegate delegate) {
+    registerResult(this.query, delegate);
   }
 
   void specifyPrimaryResponseWithId(dynamic idData) {

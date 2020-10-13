@@ -68,6 +68,18 @@ class AFTestID extends AFIDWithTags {
   const AFTestID(String code, {String group, List<String> tags}) : super(code, tags, group);
 }
 
+class AFStateTestID extends AFTestID {
+  const AFStateTestID(String code, {String group, List<String> tags}) : super(code, tags: tags, group: group);
+}
+
+class AFSingleScreenTestID extends AFTestID {
+  const AFSingleScreenTestID(String code, {String group, List<String> tags}) : super(code, tags: tags, group: group);
+}
+
+class AFMultiScreenTestID extends AFTestID {
+  const AFMultiScreenTestID(String code, {String group, List<String> tags}) : super(code, tags: tags, group: group);
+}
+
 class AFTestDataID extends AFID {
   const AFTestDataID(String code) : super(code);
 }

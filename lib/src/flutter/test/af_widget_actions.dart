@@ -116,6 +116,25 @@ class AFFlatButtonAction extends AFApplyTapWidgetAction {
   }
 }
 
+
+
+class AFSwitchTapAction extends AFApplyTapWidgetAction {
+
+  AFSwitchTapAction(): super(Switch);
+
+  /// [data] is ignored.
+  @override
+  bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
+    final tapOn = elem.widget;
+    if(tapOn is Switch) {
+      tapOn.onChanged(!tapOn.value);
+      return true;
+    } 
+    return false;
+  }
+}
+
+
 class AFListTileTapAction extends AFApplyTapWidgetAction {
 
   AFListTileTapAction(): super(ListTile);

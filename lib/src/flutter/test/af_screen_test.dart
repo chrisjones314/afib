@@ -318,6 +318,13 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
       pushScreen(screen);
       await pauseForRender();
     }
+    
+    // the situation here is something like:
+    // e.underWidget(WidgetID.myWidgetID) {
+    //   e.tapWithPopup(..., () {
+    //      // here, we aren't under myWidgetID any more.
+    //   })
+    // })
     await underHere();
 
     if(shouldPush) {
@@ -328,10 +335,12 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
 
   void pushScreen(AFScreenID screen) {
     activeScreenIDs.add(screen);
+    underPaths.add(null);
   }
 
   void popScreen() {
     activeScreenIDs.removeLast();
+    underPaths.removeLast();
   }
 
   /// Used to tap on an element that opens a popup of [popupScreenType].
@@ -1111,7 +1120,7 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
   final AFScreenID screenId;
 
   AFSingleScreenPrototypeTest({
-    @required AFTestID id,
+    @required AFSingleScreenTestID id,
     @required this.data,
     @required this.param,
     @required this.screenId,
@@ -1229,11 +1238,11 @@ class AFConnectedWidgetPrototypeTest extends AFWidgetPrototypeTest {
 /// (determined by a state test) and an initial screen/route.
 class AFMultiScreenStatePrototypeTest extends AFScreenPrototypeTest {
   final List<AFNavigatePushAction> initialPath;
-  final AFTestID stateTestId;
+  final AFStateTestID stateTestId;
   final AFMultiScreenStateTestBody body;
 
   AFMultiScreenStatePrototypeTest({
-    @required AFTestID id,
+    @required AFMultiScreenTestID id,
     @required this.initialPath,
     @required this.stateTestId,
     @required this.body,
@@ -1358,12 +1367,14 @@ class AFSingleScreenTests<TState> {
     registerApplicator(AFListTileTapAction());
     registerApplicator(AFGestureDetectorTapAction());
     registerApplicator(AFDismissibleSwipeAction());
+    registerApplicator(AFSwitchTapAction());
 
     registerExtractor(AFSelectableChoiceChip());
     registerExtractor(AFExtractTextTextAction());
     registerExtractor(AFExtractTextTextFieldAction());
     registerExtractor(AFExtractTextAFTextFieldAction());
     registerExtractor(AFExtractRichTextAction());
+    
   }
 
   List<AFSingleScreenPrototypeTest> get all {
@@ -1407,7 +1418,7 @@ class AFSingleScreenTests<TState> {
   /// test for the screen.
   AFSingleScreenTestBody addPrototype({
     @required AFScreenID screenId,
-    @required AFTestID   id,
+    @required AFSingleScreenTestID   id,
     @required dynamic data,
     @required dynamic param,
     String title
@@ -1468,9 +1479,9 @@ abstract class AFMultiScreenTestExecute {
     bool verifyScreen = true
   });
 
-  Future<void> runScreenTest(AFTestID screenTestId, {
+  Future<void> runScreenTest(AFSingleScreenTestID screenTestId, {
     AFScreenID terminalScreen, 
-    AFTestID queryResults});
+    AFStateTestID queryResults});
   Future<void> runWidgetTest(AFTestID widgetTestId, AFScreenID originScreen, {AFScreenID terminalScreen, AFTestID queryResults});
   Future<void> onScreen({
     @required AFScreenID startScreen, 
@@ -1742,7 +1753,7 @@ class AFMultiScreenStateTests {
   final stateTests = <AFMultiScreenStatePrototypeTest>[];
 
   AFMultiScreenStateTestBody addPrototype({
-    @required AFTestID   id,
+    @required AFMultiScreenTestID id,
     String title,
     @required List<AFNavigatePushAction> initialPath,
     @required AFTestID stateTestId,

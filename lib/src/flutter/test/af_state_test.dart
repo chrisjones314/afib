@@ -2,8 +2,8 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
+import 'package:afib/src/flutter/test/af_test_data_registry.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
-import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:meta/meta.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_route_state.dart';
@@ -28,8 +28,8 @@ class AFStateTestContext<TState extends AFAppState> extends AFStateTestExecute {
 
   AFStateTestID get testID { return this.test.id; }
   AFState get afState { return store.state; }
-  TState get state { return store.state.app; }
-  AFRouteState get route { return store.state.route; }
+  TState get state { return store.state.public.app; }
+  AFRouteState get route { return store.state.public.route; }
 
   void processQuery(AFAsyncQuery q) {
     test.processQuery(this, q);
@@ -41,8 +41,8 @@ class AFStateTests<TState extends AFAppState> {
   final List<AFStateTest<dynamic>> tests = <AFStateTest<dynamic>>[];
   AFStateTestContext<dynamic> context;
 
-  void queryTest(AFStateTestID id, AFAsyncQuery query, AFProcessTestDelegate handler) {
-    final test = AFStateTest<TState>(id, query, this);
+  void addTest(AFStateTestID id, AFProcessTestDelegate handler) {
+    final test = AFStateTest<TState>(id, this);
     tests.add(test);
     handler(test);
   }
@@ -58,84 +58,85 @@ class AFStateTests<TState extends AFAppState> {
 }
 
 class _AFStateResultEntry {
-  final AFAsyncQuery query;
+  final dynamic querySpecifier;
   final AFProcessQueryDelegate handler;
-  _AFStateResultEntry(this.query, this.handler);
+  _AFStateResultEntry(this.querySpecifier, this.handler);
 }
 
-class _AFStateQueryEntry {
+class _AFStateQueryBody {
+  final AFAsyncQuery query;
   final AFProcessVerifyDelegate verify;
-  _AFStateQueryEntry(this.verify);
+  _AFStateQueryBody(this.query, this.verify);
 }
 
 class AFStateTest<TState extends AFAppState> {
   final AFStateTests<TState> tests;
   final AFStateTestID id;
   AFStateTestID idPredecessor;
-  final AFAsyncQuery query;
   final Map<String, _AFStateResultEntry> results = <String, _AFStateResultEntry>{};
-  final List<_AFStateQueryEntry> postQueries = <_AFStateQueryEntry>[];
+  final List<_AFStateQueryBody> queryBodies = <_AFStateQueryBody>[];
 
-  AFStateTest(this.id, this.query, this.tests);
+  AFStateTest(this.id, this.tests);
 
-  void continuesAfter(AFStateTestID pred) {
-    idPredecessor = pred;
-  }
-
-  void initializeResultsFrom(AFStateTestID idTest) {
+  void extendsTest(AFStateTestID idTest) {
+    idPredecessor = idTest;
     final test = tests.findById(idTest);
-    test.results.forEach((key, result) { 
-      /// if this is the primary result, then copy it over to the primary result for
-      /// our query.
-      if(key == test.query.key) {
-        this.results[this.query.key] = _AFStateResultEntry(this.query, result.handler);
-      } else {
-        this.results[key] = result;
-      }
-    });
+    this.results.addAll(test.results);
   }
 
   void initializeVerifyFrom(AFStateTestID idTest) {
     final test = tests.findById(idTest);
-    postQueries.addAll(test.postQueries);
+    queryBodies.addAll(test.queryBodies);
   }
     
-  void registerResult(AFAsyncQuery query, AFProcessQueryDelegate handler) {
-    results[query.key] = _AFStateResultEntry(query, handler);
+  void registerResult(dynamic querySpecifier, AFProcessQueryDelegate handler) {
+    final key = _specifierToId(querySpecifier);
+    results[key] = _AFStateResultEntry(querySpecifier, handler);
+  }
+
+  String _specifierToId(dynamic querySpecifier) {
+    if(querySpecifier is AFID) {
+      return querySpecifier.code;
+    } else if(querySpecifier is Type) {
+      return querySpecifier.toString();
+    } else if(querySpecifier is AFAsyncQuery) {
+      if(querySpecifier.id != null) {
+        return querySpecifier.id.code;
+      }
+      return querySpecifier.runtimeType.toString();
+    }
+    throw AFException("Unknown query specifier type ${querySpecifier.runtimeType}");
   }
 
   /// 
-  void specifySecondaryResponseWithId(AFAsyncQuery query, dynamic idData) {
-    registerResult(query, (context, query) {
-      final data = AFibF.testData.find(idData);
+  void specifyResponse(dynamic querySpecifier, AFTestDataRegistry testData, dynamic idData) {
+    registerResult(querySpecifier, (context, query) {
+      final data = testData.find(idData);
       query.testFinishAsyncWithResponse(context, data);
     });
   }
 
-  void createPrimaryResponseFromQuery(AFProcessQueryDelegate delegate) {
-    registerResult(this.query, delegate);
+  void createResponse(dynamic querySpecifier, AFCreateQueryResultDelegate delegate) {
+    registerResult(querySpecifier, (context, query) {
+      final result = delegate(context, query);
+      query.testFinishAsyncWithResponse(context, result);
+    });
   }
 
-  void specifyPrimaryResponseWithId(dynamic idData) {
-    specifySecondaryResponseWithId(this.query, idData);
-  }
-
-  void specifyPrimaryError(dynamic error) {
-    specifySecondaryError(this.query, error);
-  }
-
-  void specifySecondaryError(AFAsyncQuery query, dynamic error) {
-    registerResult(query, (context, query) {
+  void specifySecondaryError(dynamic querySpecifier, dynamic error) {
+    registerResult(querySpecifier, (context, query) {
       query.testFinishAsyncWithError(context, error);
     });
   }
 
-  void verifyStateAfterQuery(AFProcessVerifyDelegate verify) {
-    postQueries.add(_AFStateQueryEntry(verify));
+  void executeQuery(AFAsyncQuery query, {
+    AFProcessVerifyDelegate verify
+  }) {
+    queryBodies.add(_AFStateQueryBody(query, verify));
   }
 
   /// Execute the test by kicking of its queries, then 
-void execute(AFStateTestContext context) {    
+  void execute(AFStateTestContext context) {    
     AFStateTestContext.currentTest = context;
     
     // first, execute an predecessor tests.
@@ -143,11 +144,12 @@ void execute(AFStateTestContext context) {
       final test = tests.findById(idPredecessor);
       test.execute(context);
     }
-    final stateBefore = context.state;
-    processQuery(context, this.query);
 
     // basically, we need to go through an execute each query that they specified.
-    for(final q in postQueries) {
+    for(final q in queryBodies) {
+      final stateBefore = context.state;
+      processQuery(context, q.query);
+
       // lookup the result for that query
       AFStateTestExecute e = context;
       q?.verify(e, stateBefore, context.state);
@@ -157,9 +159,9 @@ void execute(AFStateTestContext context) {
   /// Process a query by looking up the results we have for that query,
   /// and then feeding them to its testAsyncResponse method.
   void processQuery(AFStateTestContext context, AFAsyncQuery query) {
-    final h = results[query.key];
+    final key = _specifierToId(query);
+    final h = results[key];
     if(h == null) {
-
       /// deferred queries don't have any results.
       if(query is AFDeferredQuery) {
         final successContext = query.createSuccessContext(
@@ -171,8 +173,9 @@ void execute(AFStateTestContext context) {
         return;
       }
 
-      throw AFException("No results specified for query ${query.key}");
+      throw AFException("No results specified for query ${_specifierToId(query)}");
     }
+
     h.handler(context, query);
   }
 }

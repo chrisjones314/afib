@@ -261,8 +261,18 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
   AFRouteParam findParam(AFState state) { return null; }
 
   TData createStateDataAF(AFState state) {
-    return createStateData(state.app);
+    return createStateDataPublic(state.public);
   }
+
+  /// Override this instead of [createStateData] if you need access
+  /// to the full route state. 
+  /// 
+  /// However, be aware that a full route state does not exist in single
+  /// screen tests.
+  TData createStateDataPublic(AFPublicState public) {
+    return createStateData(public.app);
+  }
+
 
   /// Override this to create an [AFStoreConnectorData] with the required data from the state.
   TData createStateData(TState state);
@@ -329,7 +339,7 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
 
   /// Find the route parameter for the specified named screen
   AFRouteParam findParam(AFState state) {
-    return state.route?.findParamFor(this.screenId, includePrior: true);
+    return state.public.route?.findParamFor(this.screenId, includePrior: true);
   }
 }
 
@@ -409,7 +419,7 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
   /// Find the route parameter for the specified named screen
   @override
   TRouteParam findParam(AFState state) {
-    return state.route?.findPopupParamFor(this.screenId);
+    return state.public.route?.findPopupParamFor(this.screenId);
   }
 
   TData createStateData(TState state) {

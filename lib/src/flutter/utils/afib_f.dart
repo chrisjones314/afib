@@ -56,6 +56,7 @@ class AFibF {
   static Map<String, AFDeferredQuery> deferredQueries = <String, AFDeferredQuery>{};
   static final _recentActions = <AFActionWithKey>[];
   static int navDepth = 0;
+  static bool testOnlyShouldSuppressNavigation = false;
 
   /// a key for referencing the Navigator for the material app.
   static final GlobalKey<NavigatorState> _afNavigatorKey = GlobalKey<NavigatorState>();
@@ -107,7 +108,7 @@ class AFibF {
     }
 
     final state = _afStore.state;
-    final routeState = state.route;
+    final routeState = state.public.route;
 
     if(!routeState.isActiveScreen(screenId, includePopups: includePopups)) {
       throw AFException("Screen $screenId is not the currently active screen in route ${routeState.toString()}");
@@ -122,7 +123,7 @@ class AFibF {
 
   static AFScreenID get testOnlyActiveScreenId {
     final state = _afStore.state;
-    final routeState = state.route;
+    final routeState = state.public.route;
     return routeState.activeScreenId;
   }
 

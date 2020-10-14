@@ -19,6 +19,7 @@ void afStateTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams par
 
   final tests = AFibF.stateTests;
   final contexts = <AFStateTestContext>[];
+  AFibF.testOnlyShouldSuppressNavigation = true;
 
   for(final test in tests.tests) {
     if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
@@ -32,6 +33,7 @@ void afStateTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams par
     }
   }
 
+  AFibF.testOnlyShouldSuppressNavigation = false;
   final baseContexts = List<AFBaseTestExecute>.of(contexts);
   printTestResults(output, "State", baseContexts, stats);
   

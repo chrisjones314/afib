@@ -92,11 +92,14 @@ typedef AFInitStateTestsDelegate = void Function(AFStateTests tests, AFTestDataR
 /// Delegate 
 typedef AFProcessQueryDelegate = void Function(AFStateTestContext context, AFAsyncQuery query);
 
+/// Delegate used in state tests to create a mock result from a query.
+typedef AFCreateQueryResultDelegate = dynamic Function(AFStateTestContext context, AFAsyncQuery query);
+
 /// Delegate used to process a state test.
 typedef AFProcessTestDelegate = void Function(AFStateTest test);
 
 /// Delegate used to verify a state change, from before to after
-typedef AFProcessVerifyDelegate = void Function(AFStateTestExecute execute, AFAppState stateBefore, AFAppState stateAfter);
+typedef AFProcessVerifyDelegate = void Function(AFStateTestExecute execute, AFAppState before, AFAppState after);
 
 /// Delegate used to implement the body of a unit test.
 typedef AFUnitTestBodyExecuteDelegate = void Function(AFUnitTestExecute e);

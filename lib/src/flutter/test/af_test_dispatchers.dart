@@ -24,10 +24,18 @@ class AFStateScreenTestDispatcher extends AFTestDispatcher {
 
   @override
   void dispatch(dynamic action) {
-    // suppress navigation actions.
+    // suppress navigation actions when we are in a state test, 
+    // but note that this dispatcher also gets called during workflow
+    // tests that are based on state tests, and we don't want to 
+    // suppress navigation in that case.
+    //if(AFibF.testOnlyShouldSuppressNavigation) {
+    // return;
+    //}
     if(isNavigateAction(action)) {
-      return;
-    }
+      if(AFibF.testOnlyShouldSuppressNavigation) {
+        return;
+      }
+    } 
 
     main.dispatch(action);
   }

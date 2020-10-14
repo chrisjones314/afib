@@ -2,6 +2,13 @@
 /// Just a registry of test data objects which can be used in various test contexts.
 class AFTestDataRegistry {
   final testData = <dynamic, dynamic>{};
+  static int uniqueIdBase = 1;
+
+  static String get uniqueId {
+    final result = uniqueIdBase.toString();
+    uniqueIdBase++;
+    return result;
+  }
 
   void register(dynamic id, dynamic data) {
     testData[id] = data;

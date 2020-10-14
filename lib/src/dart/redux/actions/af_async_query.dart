@@ -27,7 +27,7 @@ class AFFinishQueryContext<TState> {
   AFFinishQueryContext({this.dispatcher, this.state});
 
   TState get s {
-    return state.app;
+    return state.public.app;
   }
 }
 

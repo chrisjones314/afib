@@ -1286,7 +1286,10 @@ class AFMultiScreenStatePrototypeTest extends AFScreenPrototypeTest {
     final stateDispatcher = AFStateScreenTestDispatcher(mainDispatcher);
 
     final stateTestContext = AFStateTestContext(testImpl, store, stateDispatcher, isTrueTestContext: false);
+    AFibF.testOnlyShouldSuppressNavigation = true;
     testImpl.execute(stateTestContext);
+    AFibF.testOnlyShouldSuppressNavigation = false;
+
 
     if(stateTestContext.errors.hasErrors) {
     }

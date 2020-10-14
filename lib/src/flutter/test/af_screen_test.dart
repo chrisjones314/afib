@@ -1236,13 +1236,13 @@ class AFConnectedWidgetPrototypeTest extends AFWidgetPrototypeTest {
 
 /// The information necessary to start a test with a baseline state
 /// (determined by a state test) and an initial screen/route.
-class AFMultiScreenStatePrototypeTest extends AFScreenPrototypeTest {
+class AFWorkflowStatePrototypeTest extends AFScreenPrototypeTest {
   final List<AFNavigatePushAction> initialPath;
   final AFStateTestID stateTestId;
-  final AFMultiScreenStateTestBody body;
+  final AFWorkflowStateTestBody body;
 
-  AFMultiScreenStatePrototypeTest({
-    @required AFMultiScreenTestID id,
+  AFWorkflowStatePrototypeTest({
+    @required AFWorkflowTestID id,
     @required this.initialPath,
     @required this.stateTestId,
     @required this.body,
@@ -1273,7 +1273,7 @@ class AFMultiScreenStatePrototypeTest extends AFScreenPrototypeTest {
     initializeMultiscreenPrototype(dispatcher, this);
   }
 
-  static void initializeMultiscreenPrototype(AFDispatcher dispatcher, AFMultiScreenStatePrototypeTest test) {
+  static void initializeMultiscreenPrototype(AFDispatcher dispatcher, AFWorkflowStatePrototypeTest test) {
     dispatcher.dispatch(AFResetToInitialStateAction());
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(test));
 
@@ -1474,7 +1474,7 @@ class AFSingleScreenTests<TState> {
   }
 }
 
-abstract class AFMultiScreenTestExecute {
+abstract class AFWorkflowTestExecute {
   Future<void> tapNavigateFromTo({
     @required dynamic tap,
     @required AFScreenID startScreen,
@@ -1508,10 +1508,10 @@ abstract class AFMultiScreenTestExecute {
 }
 
 
-class AFMultiScreenTestWidgetCollector extends AFMultiScreenTestExecute {
+class AFWorkflowTestWidgetCollector extends AFWorkflowTestExecute {
   final AFScreenTestWidgetCollector elementCollector;
 
-  AFMultiScreenTestWidgetCollector(this.elementCollector);
+  AFWorkflowTestWidgetCollector(this.elementCollector);
 
   Future<void> tapNavigateFromTo({
     @required dynamic tap,
@@ -1586,10 +1586,10 @@ class AFMultiScreenTestWidgetCollector extends AFMultiScreenTestExecute {
 }
 
 
-class AFMultiScreenTestContext extends AFMultiScreenTestExecute {
+class AFWorkflowTestContext extends AFWorkflowTestExecute {
   final AFScreenTestContext screenContext;
 
-  AFMultiScreenTestContext(this.screenContext);  
+  AFWorkflowTestContext(this.screenContext);  
 
   /// Execute the specified screen tests, with query-responses provided by the specified state test.
   Future<void> runScreenTest(AFTestID screenTestId,  {AFScreenID terminalScreen, dynamic params, AFTestID queryResults}) async {
@@ -1696,29 +1696,29 @@ class AFMultiScreenTestContext extends AFMultiScreenTestExecute {
 
 }
 
-class AFMultiScreenStateTestBodyWithParam {
-  final AFMultiScreenTestBodyExecuteDelegate body;
-  AFMultiScreenStateTestBodyWithParam(this.body);
+class AFWorkflowStateTestBodyWithParam {
+  final AFWorkflowTestBodyExecuteDelegate body;
+  AFWorkflowStateTestBodyWithParam(this.body);
 
   Future<void> populateElementCollector(AFScreenTestWidgetCollector elementCollector) {
-    return body(AFMultiScreenTestWidgetCollector(elementCollector));
+    return body(AFWorkflowTestWidgetCollector(elementCollector));
   }
 }
 
-class AFMultiScreenStateTestBody {
-  final AFMultiScreenStateTests tests;
+class AFWorkflowStateTestBody {
+  final AFWorkflowStateTests tests;
   final AFScreenTestWidgetCollector elementCollector;
   final AFScreenID initialScreenId;
-  final sections = <AFMultiScreenStateTestBodyWithParam>[];
+  final sections = <AFWorkflowStateTestBodyWithParam>[];
 
-  AFMultiScreenStateTestBody(this.tests, this.initialScreenId, this.elementCollector);
+  AFWorkflowStateTestBody(this.tests, this.initialScreenId, this.elementCollector);
 
-  factory AFMultiScreenStateTestBody.create(AFMultiScreenStateTests tests, AFScreenID initialScreenId, AFTestID testId) {
-    return AFMultiScreenStateTestBody(tests, initialScreenId, AFScreenTestWidgetCollector(testId));
+  factory AFWorkflowStateTestBody.create(AFWorkflowStateTests tests, AFScreenID initialScreenId, AFTestID testId) {
+    return AFWorkflowStateTestBody(tests, initialScreenId, AFScreenTestWidgetCollector(testId));
   }
 
-  void execute(AFMultiScreenTestBodyExecuteDelegate body) async {
-    sections.add(AFMultiScreenStateTestBodyWithParam(body));
+  void execute(AFWorkflowTestBodyExecuteDelegate body) async {
+    sections.add(AFWorkflowStateTestBodyWithParam(body));
   }  
 
   Future<void> populateWidgetCollector() async {
@@ -1735,7 +1735,7 @@ class AFMultiScreenStateTestBody {
 
   Future<void> run(AFScreenTestContext context, { Function onEnd }) async {
     context.setCollector(elementCollector);
-    final e = AFMultiScreenTestContext(context);
+    final e = AFWorkflowTestContext(context);
     for(final section in sections) {
       await section.body(e);
     }
@@ -1752,31 +1752,31 @@ class AFMultiScreenStateTestBody {
 /// 
 /// These tests by combine an initial state from an [AFStateTest] with a series
 /// of screen manipulations from an [AFScreenTest]
-class AFMultiScreenStateTests {
-  final stateTests = <AFMultiScreenStatePrototypeTest>[];
+class AFWorkflowStateTests {
+  final stateTests = <AFWorkflowStatePrototypeTest>[];
 
-  AFMultiScreenStateTestBody addPrototype({
-    @required AFMultiScreenTestID id,
+  AFWorkflowStateTestBody addPrototype({
+    @required AFWorkflowTestID id,
     String title,
     @required List<AFNavigatePushAction> initialPath,
     @required AFTestID stateTestId,
   }) {
-    final instance = AFMultiScreenStatePrototypeTest(
+    final instance = AFWorkflowStatePrototypeTest(
       id: id,
       title: title,
       initialPath: initialPath,
       stateTestId: stateTestId,
-      body: AFMultiScreenStateTestBody.create(this, initialPath.last.screen, id)
+      body: AFWorkflowStateTestBody.create(this, initialPath.last.screen, id)
     );
     stateTests.add(instance);
     return instance.body;
   }
 
-  List<AFMultiScreenStatePrototypeTest> get all {
+  List<AFWorkflowStatePrototypeTest> get all {
     return stateTests;
   }
 
-  AFMultiScreenStatePrototypeTest findById(AFTestID id) {
+  AFWorkflowStatePrototypeTest findById(AFTestID id) {
     for(final test in stateTests) {
       if(test.id == id) {
         return test;

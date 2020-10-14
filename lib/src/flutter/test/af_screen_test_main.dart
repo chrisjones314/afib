@@ -23,7 +23,7 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
   final isWidget = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.widgetTests);
   final isAll = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.screenTests);
   final isSingle = isAll || AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.singleScreenTests);
-  final isMulti  = isAll || AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.multiScreenTests);
+  final isMulti  = isAll || AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.workflowTests);
   if(!isSingle && !isMulti && !isWidget) {
     return;
   }
@@ -41,7 +41,7 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
   }
 
   if(isMulti) {
-    await _afMultiScreenTestMain(output, stats, tester, app);
+    await _afWorkflowTestMain(output, stats, tester, app);
   }
 
   return null;
@@ -105,7 +105,7 @@ Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, 
   });
 }
 
-Future<void> _afMultiScreenTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+Future<void> _afWorkflowTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
  final multiContexts = <AFScreenTestContextWidgetTester>[];
 
   for(final test in AFibF.multiScreenStateTests.stateTests) {
@@ -119,7 +119,7 @@ Future<void> _afMultiScreenTestMain(AFCommandOutput output, AFTestStats stats, W
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id);
       multiContexts.add(context);
 
-      AFMultiScreenStatePrototypeTest.initializeMultiscreenPrototype(dispatcher, test);
+      AFWorkflowStatePrototypeTest.initializeMultiscreenPrototype(dispatcher, test);
       
       // tell the store to go to the correct screen.
       await tester.pumpAndSettle(Duration(seconds: 1));

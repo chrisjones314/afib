@@ -45,7 +45,7 @@ class AFibF {
   static final AFTestDataRegistry _afTestData = AFTestDataRegistry();
   static final AFSingleScreenTests _afScreenTests = AFSingleScreenTests();
   static final AFWidgetTests _afWidgetTests = AFWidgetTests();
-  static final AFMultiScreenStateTests _afMultiScreenStateTests = AFMultiScreenStateTests();
+  static final AFWorkflowStateTests _afWorkflowStateTests = AFWorkflowStateTests();
   static final AFStateTests _afStateTests = AFStateTests();
   static final AFUnitTests _afUnitTests = AFUnitTests();
   static AFScreenMap _afPrototypeScreenMap;
@@ -89,7 +89,7 @@ class AFibF {
       p.initStateTests(AFibF.stateTests, testData);
       p.initWidgetTests(AFibF.widgetTests, testData);
       p.initScreenTests(AFibF.screenTests, testData);
-      p.initMultiScreenStateTests(AFibF.multiScreenStateTests, testData);
+      p.initWorkflowStateTests(AFibF.multiScreenStateTests, testData);
       _populateAllWidgetCollectors();
     }
 
@@ -297,8 +297,8 @@ class AFibF {
 
   /// Retrieves tests which pair an initial state, and then multiple screen/state tests
   /// to produce a higher-level multi-screen test.
-  static AFMultiScreenStateTests get multiScreenStateTests {
-    return _afMultiScreenStateTests;
+  static AFWorkflowStateTests get multiScreenStateTests {
+    return _afWorkflowStateTests;
   }
 
   /// Retrieves unit/calculation tests

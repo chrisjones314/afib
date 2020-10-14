@@ -36,7 +36,7 @@ typedef AFInitWidgetTestsDelegate = void Function(AFWidgetTests tests, AFTestDat
 typedef AFInitScreenTestsDelegate = void Function(AFSingleScreenTests tests, AFTestDataRegistry testData);
 
 /// Delegate used to populate multi-screen tests.
-typedef AFInitMultiScreenStateTestsDelegate = void Function(AFMultiScreenStateTests tests, AFTestDataRegistry testData);
+typedef AFInitWorkflowStateTestsDelegate = void Function(AFWorkflowStateTests tests, AFTestDataRegistry testData);
 
 /// Delegate used to perform an asynchronous operation (like an alert, and say whether it should continue).
 typedef AFShouldContinueCheckDelegate = Future<int> Function();
@@ -72,7 +72,7 @@ typedef AFCreateConnectedWidgetDelegate = AFConnectedWidgetWithParam Function(
 );
 
 /// Delegate used to implement the boyd of a multi screen test.
-typedef AFMultiScreenTestBodyExecuteDelegate = Future<void> Function(AFMultiScreenTestExecute mse);
+typedef AFWorkflowTestBodyExecuteDelegate = Future<void> Function(AFWorkflowTestExecute mse);
 
 /// Delegate used to creatae a widget builder.
 typedef AFWidgetBuilderDelegate<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> = Widget Function(AFBuildContext<TData, TRouteParam> context);

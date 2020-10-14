@@ -76,8 +76,8 @@ class AFSingleScreenTestID extends AFTestID {
   const AFSingleScreenTestID(String code, {String group, List<String> tags}) : super(code, tags: tags, group: group);
 }
 
-class AFMultiScreenTestID extends AFTestID {
-  const AFMultiScreenTestID(String code, {String group, List<String> tags}) : super(code, tags: tags, group: group);
+class AFWorkflowTestID extends AFTestID {
+  const AFWorkflowTestID(String code, {String group, List<String> tags}) : super(code, tags: tags, group: group);
 }
 
 class AFTestDataID extends AFID {

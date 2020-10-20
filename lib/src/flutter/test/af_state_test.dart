@@ -136,13 +136,13 @@ class AFStateTest<TState extends AFAppState> {
   }
 
   /// Execute the test by kicking of its queries, then 
-  void execute(AFStateTestContext context) {    
+  void execute(AFStateTestContext context, { bool shouldVerify = true }) {    
     AFStateTestContext.currentTest = context;
     
     // first, execute an predecessor tests.
     if(idPredecessor != null) {
       final test = tests.findById(idPredecessor);
-      test.execute(context);
+      test.execute(context, shouldVerify: false);
     }
 
     // basically, we need to go through an execute each query that they specified.
@@ -152,7 +152,9 @@ class AFStateTest<TState extends AFAppState> {
 
       // lookup the result for that query
       AFStateTestExecute e = context;
-      q?.verify(e, stateBefore, context.state);
+      if(shouldVerify) {
+        q?.verify(e, stateBefore, context.state);
+      }
     }
   }
 

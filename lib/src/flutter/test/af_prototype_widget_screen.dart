@@ -108,7 +108,8 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppState, AFPrototypeW
           SliverAppBar(
             automaticallyImplyLeading: false,
             title: Text('Widget Test Screen',
-              style: TextStyle(color: AFTheme.primaryText)),
+              style: AFTheme.styleWhite
+            ),
           ),
           SliverList(
             delegate: SliverChildListDelegate(widgets)

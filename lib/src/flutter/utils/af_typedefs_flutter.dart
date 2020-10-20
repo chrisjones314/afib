@@ -64,6 +64,10 @@ typedef AFTestCreatePushActionDelegate = AFNavigatePushAction Function(AFScreenP
 /// Delegate used to implmeent the body of a single screen test.
 typedef AFScreenTestBodyExecuteDelegate = Future<void> Function(AFScreenTestExecute ste);
 
+/// Delegate used to implement the body of a reusable single screen test that 
+typedef AFReusableScreenTestBodyExecuteDelegate = Future<void> Function(AFScreenTestExecute ste, dynamic);
+
+
 /// Delegate used to create a widget in a widget test.
 typedef AFCreateConnectedWidgetDelegate = AFConnectedWidgetWithParam Function(
   AFDispatcher dispatcher,

@@ -99,8 +99,8 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData, AFRou
 
     rowActions.add(FlatButton(
       child: Text('Exit'),
-      color: AFTheme.primaryBackground,
-      textColor: AFTheme.primaryText,
+      color: AFTheme.colorPrimary,
+      textColor: AFTheme.colorWhite,
       onPressed: () {
           Navigator.pop(context.c);
           context.dispatch(AFNavigateExitTestAction());
@@ -109,8 +109,8 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData, AFRou
 
     rowActions.add(FlatButton(
       child: Text('Reset'),
-      color: AFTheme.primaryBackground,
-      textColor: AFTheme.primaryText,
+      color: AFTheme.colorPrimary,
+      textColor: AFTheme.colorWhite,
       onPressed: () {
           Navigator.pop(context.c);
           test.onDrawerReset(context.d);
@@ -120,8 +120,8 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData, AFRou
     if(test.hasBody) {
       rowActions.add(FlatButton(
         child: Text('Run Test'),
-        color: AFTheme.primaryBackground,
-        textColor: AFTheme.primaryText,
+        color: AFTheme.colorPrimary,
+        textColor: AFTheme.colorWhite,
         onPressed: ()  {
           Navigator.pop(context.c);
 

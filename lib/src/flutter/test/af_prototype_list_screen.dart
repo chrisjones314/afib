@@ -118,12 +118,12 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppState, AFStoreConnect
 
   static Widget createSectionHeader(String title) {
     return Card(
-      color: AFTheme.primaryBackground,
+      color: AFTheme.colorPrimary,
       child: Container(
         margin: EdgeInsets.all(8.0),
         child: Text(
           title,
-          style: TextStyle(color: AFTheme.primaryText)
+          style: AFTheme.styleWhite
         )
       )
     );
@@ -140,10 +140,28 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppState, AFStoreConnect
 
   static Widget createTestCard(AFDispatcher dispatcher, AFScreenPrototypeTest instance) {
     final titleText = instance.title ?? instance.id.code;
+    final cols = AFUI.row();
+    cols.add(Text(titleText));
+    if(instance.isReusable) {
+      cols.add(Container(
+        margin: EdgeInsets.only(left: 8.0),
+        padding: EdgeInsets.symmetric(horizontal: 8.0),
+        decoration: BoxDecoration(
+          color: AFTheme.colorPrimary,
+          borderRadius: BorderRadius.circular(4.0),
+        ),
+        child: Text("Reusable", style: AFTheme.styleWhite)
+      ));
+    }
+
+    final titleRow = Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: cols
+    );
     return Card(
       key: Key(instance.id.code),
       child: ListTile(
-        title: Text(titleText),
+        title: titleRow,
         subtitle: Text(instance.id.code),
         dense: true,
         trailing: Icon(Icons.chevron_right),

@@ -261,8 +261,8 @@ class AFRichTextGestureTapAction extends AFApplyTapWidgetAction {
 }
 
 
-class AFToggleChoiceChip extends AFApplyTapWidgetAction {
-  AFToggleChoiceChip(): super(ChoiceChip);
+class AFTapChoiceChip extends AFApplyTapWidgetAction {
+  AFTapChoiceChip(): super(ChoiceChip);
 
   /// Note that [data] is ignored, this toggles the chip state.
   @override
@@ -270,6 +270,25 @@ class AFToggleChoiceChip extends AFApplyTapWidgetAction {
     final widget = element.widget;
     if(widget is ChoiceChip) {
       widget.onSelected(!widget.selected);
+      return true;
+    } 
+    return false;
+  }
+
+}
+
+class AFSetChoiceChip extends AFApplySetValueWidgetAction {
+  AFSetChoiceChip(): super(ChoiceChip);
+
+  /// Note that [data] is ignored, this toggles the chip state.
+  @override
+  bool applyInternal(String applyType, AFWidgetSelector selector, Element element, dynamic data) {
+    final widget = element.widget;
+    if(widget is ChoiceChip) {
+      bool isSel = data;
+      if(widget.selected != isSel) {
+        widget.onSelected(isSel);
+      }
       return true;
     } 
     return false;

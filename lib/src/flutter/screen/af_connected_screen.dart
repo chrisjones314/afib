@@ -224,7 +224,7 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
         },
         builder: (buildContext, dataContext) {
           if(dataContext == null) {
-            return CircularProgressIndicator();
+            return Container(child: Text("Loading..."));
           }
 
           var screenIdRegister = this.screenIdForTest;          
@@ -249,6 +249,10 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
   AFBuildContext<TData, TRouteParam> _createNonBuildContext(AFStore store) {
     final data = createStateDataAF(store.state);
     final param = findParam(store.state);
+    if(param == null && !routeEntryExists(store.state)) {
+      return null;
+    }
+
     final context = createContext(null, createDispatcher(store), data, param);
     return context;
   }
@@ -259,6 +263,8 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
 
   /// Find the route param for this screen. 
   AFRouteParam findParam(AFState state) { return null; }
+
+  bool routeEntryExists(AFState state) { return true; }
 
   TData createStateDataAF(AFState state) {
     return createStateDataPublic(state.public);
@@ -340,6 +346,11 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
   /// Find the route parameter for the specified named screen
   AFRouteParam findParam(AFState state) {
     return state.public.route?.findParamFor(this.screenId, includePrior: true);
+  }
+
+  @override
+  bool routeEntryExists(AFState state) {
+    return state.public.route?.routeEntryExists(this.screenId, includePrior: true);
   }
 }
 

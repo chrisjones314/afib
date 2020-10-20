@@ -223,6 +223,10 @@ class AFConsolidatedQuery<TState> extends AFAsyncQuery<TState, AFConsolidatedQue
   AFConsolidatedQuery(this.queryResponses, {AFID id, AFOnResponseDelegate<TState, AFConsolidatedQueryResponse> onSuccessDelegate, AFOnErrorDelegate<TState, AFQueryError> onErrorDelegate, List<dynamic> successActions}):
     super(id: id, onSuccessDelegate: onSuccessDelegate, onErrorDelegate: onErrorDelegate, successActions: successActions);
 
+  static List<AFAsyncQuery> createList() {
+    return <AFAsyncQuery>[];
+  }
+
   factory AFConsolidatedQuery.createFrom({
     List<AFAsyncQuery> queries,
     List<dynamic> successActions,

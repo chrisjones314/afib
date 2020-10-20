@@ -359,6 +359,11 @@ class AFRouteState {
     return seg?.param?.paramFor(screen);
   }
 
+  bool routeEntryExists(AFScreenID screen, { bool includePrior = true }) {
+    final seg = screenSegments.findSegmentFor(screen, includePrior: includePrior);
+    return (seg != null);
+  }
+
   /// Returns the list of screen names, from the root to the leaf.
   /*
   String fullPath() { 

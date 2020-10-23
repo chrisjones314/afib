@@ -1499,12 +1499,14 @@ class AFSingleScreenTests<TState> {
     registerApplicator(AFGestureDetectorTapAction());
     registerApplicator(AFDismissibleSwipeAction());
     registerApplicator(AFSwitchTapAction());
+    registerApplicator(AFSetSwitchValueAction());
 
     registerExtractor(AFSelectableChoiceChip());
     registerExtractor(AFExtractTextTextAction());
     registerExtractor(AFExtractTextTextFieldAction());
     registerExtractor(AFExtractTextAFTextFieldAction());
     registerExtractor(AFExtractRichTextAction());
+    registerExtractor(AFSwitchExtractor());
     
   }
 

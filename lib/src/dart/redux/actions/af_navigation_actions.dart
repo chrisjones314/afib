@@ -142,9 +142,13 @@ class AFNavigatePopNAction extends AFNavigateActionWithReturnData {
 
 class AFNavigatePopToAction extends AFNavigateActionWithReturnData {
   final AFScreenID popTo;
+  final AFScreenID push;
+  final AFRouteParam pushParam;
 
   AFNavigatePopToAction({
     @required this.popTo,
+    this.push,
+    this.pushParam,
     AFID id, 
     dynamic returnData, 
     bool worksInPrototypeMode = true

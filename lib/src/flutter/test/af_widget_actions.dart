@@ -296,6 +296,25 @@ class AFSetChoiceChip extends AFApplySetValueWidgetAction {
 
 }
 
+class AFSetSwitchValueAction extends AFApplySetValueWidgetAction {
+  AFSetSwitchValueAction(): super(Switch);
+
+  /// Note that [data] is ignored, this toggles the chip state.
+  @override
+  bool applyInternal(String applyType, AFWidgetSelector selector, Element element, dynamic data) {
+    final widget = element.widget;
+    if(widget is Switch) {
+      bool isSel = data;
+      if(widget.value != isSel) {
+        widget.onChanged(isSel);
+      }
+      return true;
+    } 
+    return false;
+  }
+
+}
+
 class AFApplyCupertinoPicker extends AFApplySetValueWidgetAction {
   AFApplyCupertinoPicker(): super(CupertinoPicker);
 
@@ -442,3 +461,19 @@ class AFSelectableChoiceChip extends AFExtractPrimaryWidgetAction {
   }
 
 }
+
+class AFSwitchExtractor extends AFExtractPrimaryWidgetAction {
+
+  AFSwitchExtractor(): super(Switch);
+
+  @override
+  dynamic extractInternal(String extractType, AFWidgetSelector selector, Element element) {
+    final widget = element.widget;
+    if(AFExtractWidgetAction.isPrimary(extractType) && widget is Switch) {
+      return widget.value;
+    } 
+    return false;
+  }
+
+}
+

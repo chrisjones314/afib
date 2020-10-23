@@ -126,6 +126,9 @@ void _navigatePopToAction(Store<AFState> store, action, NextDispatcher next) {
     for(var i = 0; i < popCountTo; i++) {
       navState.pop(action.returnData);
     }
+    if(popTo.push != null) {
+      navState.pushNamed(popTo.push.code);
+    }
   });
   next(action);
 }

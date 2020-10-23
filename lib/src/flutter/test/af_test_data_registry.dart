@@ -3,6 +3,7 @@
 class AFTestDataRegistry {
   final testData = <dynamic, dynamic>{};
   static int uniqueIdBase = 1;
+  static List<String> createdTestIds = <String>[];
 
   static String get uniqueId {
     final result = uniqueIdBase.toString();

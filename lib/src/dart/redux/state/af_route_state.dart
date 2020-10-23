@@ -120,7 +120,7 @@ class AFRouteStateSegments {
     var nPop = 0;
     for(var i = active.length - 1; i >= 0; i--) {
       final segment = active[i];
-      if(!segment.matchesScreen(screen)) {
+      if(segment.matchesScreen(screen)) {
         return nPop;
       }
       nPop++;
@@ -414,9 +414,13 @@ class AFRouteState {
 
   /// Remove the leaf element from the route, returning back to the parent
   /// screen.
-  AFRouteState popTo(AFScreenID screen, dynamic childReturn) {
+  AFRouteState popTo(AFScreenID screen, AFScreenID push, AFRouteParam pushParam, dynamic childReturn) {
     final popCount = popCountToScreen(screen);
-    return popN(popCount, childReturn);
+    var revised = popN(popCount, childReturn);
+    if(push != null) {
+      revised = pushNamed(push, pushParam);
+    }
+    return revised;
   }
 
   /// Remove the leaf element from the route, returning back to the parent

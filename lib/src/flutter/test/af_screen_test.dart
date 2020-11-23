@@ -1191,12 +1191,17 @@ class AFScreenTestContextWidgetTester extends AFScreenTestContext {
 }
 
 abstract class AFScreenPrototypeTest {
+  static const testDrawerSideEnd = 1;
+  static const testDrawerSideBegin = 2;
+
   final AFTestID id;
   final String title;
+  final int testDrawerSide;
 
   AFScreenPrototypeTest({
     @required this.id,
-    this.title
+    this.title,
+    this.testDrawerSide = testDrawerSideEnd
   });
 
   bool get hasBody;
@@ -1208,6 +1213,8 @@ abstract class AFScreenPrototypeTest {
   Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSingleScreenTestState state, Function onEnd);
   void openTestDrawer();
   Future<void> populateWidgetCollector();
+  bool get isTestDrawerEnd { return testDrawerSide == testDrawerSideEnd; }
+  bool get isTestDrawerBegin { return testDrawerSide == testDrawerSideBegin; }
 
 
   AFScreenTestContextSimulator prepareRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext) {

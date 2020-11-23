@@ -1,4 +1,5 @@
 
+import 'package:flutter/gestures.dart';
 import 'package:quiver/core.dart';
 import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
@@ -313,8 +314,7 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
 /// the route in order to render itself.
 abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedWidgetBase<TState, TData, TRouteParam> {
   final AFScreenID screenId;
-  AFConnectedScreen(this.screenId, { Key key }): super(key: key)
-  ;
+  AFConnectedScreen(this.screenId, { Key key }): super(key: key);
 
   AFScreenID get screenIdForTest {
     return screenId;
@@ -345,13 +345,74 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
 
   /// Find the route parameter for the specified named screen
   AFRouteParam findParam(AFState state) {
-    return state.public.route?.findParamFor(this.screenId, includePrior: true);
+    final route = state.public.route;
+    TRouteParam p = route?.findParamFor(this.screenId, includePrior: true);
+    if(p == null && this.screenId == AFibF.actualStartupScreenId) {
+      p = route?.findParamFor(AFUIID.screenStartupWrapper);
+    }
+    return p;
   }
 
   @override
   bool routeEntryExists(AFState state) {
     return state.public.route?.routeEntryExists(this.screenId, includePrior: true);
   }
+
+  Widget createScaffold({
+    Key key,
+    @required AFBuildContext context,
+    PreferredSizeWidget appBar,
+    Widget drawer,
+    Widget body,
+    Widget bottomNavigationBar,
+    Widget floatingActionButton,
+    Color backgroundColor,
+    FloatingActionButtonLocation floatingActionButtonLocation,
+    FloatingActionButtonAnimator floatingActionButtonAnimator,
+    List<Widget> persistentFooterButtons,
+    Widget endDrawer,
+    Widget bottomSheet,
+    bool resizeToAvoidBottomPadding,
+    bool resizeToAvoidBottomInset,
+    bool primary = true,
+    DragStartBehavior drawerDragStartBehavior = DragStartBehavior.start,
+    bool extendBody = false,
+    bool extendBodyBehindAppBar = false,
+    Color drawerScrimColor, 
+    double drawerEdgeDragWidth, 
+    bool drawerEnableOpenDragGesture = true,
+    bool endDrawerEnableOpenDragGesture = true
+    
+  }) {
+      return Scaffold(
+        key: key,
+        drawer: context.createDebugDrawerBegin(drawer),
+        body: body,
+        appBar: appBar,
+        bottomNavigationBar: bottomNavigationBar,
+        floatingActionButton: floatingActionButton,
+        floatingActionButtonLocation: floatingActionButtonLocation,
+        floatingActionButtonAnimator: floatingActionButtonAnimator,
+        backgroundColor: backgroundColor,
+        persistentFooterButtons: persistentFooterButtons,
+        bottomSheet: bottomSheet,
+        resizeToAvoidBottomPadding: resizeToAvoidBottomPadding,
+        resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+        primary: primary,
+        drawerDragStartBehavior: drawerDragStartBehavior,
+        extendBody: extendBody,
+        extendBodyBehindAppBar: extendBodyBehindAppBar,
+        drawerScrimColor: drawerScrimColor,
+        drawerEdgeDragWidth: drawerEdgeDragWidth,
+        drawerEnableOpenDragGesture: drawerEnableOpenDragGesture,
+        endDrawer: context.createDebugDrawerEnd(endDrawer)
+      );
+  }
+}
+
+/// The first screen afib displays when the app starts, shown while the startup query is executing.
+abstract class AFStartupScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreen<TState, TData, TRouteParam> {
+  AFStartupScreen(AFScreenID screenId, { Key key }): super(screenId, key: key);
 }
 
 /// Use this to connect a Widget to the store.  
@@ -430,7 +491,10 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
   /// Find the route parameter for the specified named screen
   @override
   TRouteParam findParam(AFState state) {
-    return state.public.route?.findPopupParamFor(this.screenId);
+
+    final route = state.public.route;
+    TRouteParam p = route?.findPopupParamFor(this.screenId);
+    return p;
   }
 
   TData createStateData(TState state) {
@@ -545,16 +609,27 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
     return hash2(param.hashCode, storeData.hashCode);
   }
 
-  Widget createDebugDrawer() {
+  Widget createDebugDrawerBegin(Widget beginDrawer) {
+    return createDebugDrawer(beginDrawer, AFScreenPrototypeTest.testDrawerSideBegin);
+  }
+
+  Widget createDebugDrawerEnd(Widget endDrawer) {
+    return createDebugDrawer(endDrawer, AFScreenPrototypeTest.testDrawerSideEnd);
+  }
+
+  Widget createDebugDrawer(Widget drawer, int testDrawerSide) {
     final store = AFibF.testOnlyStore;
     final state = store.state;
     final testState = state.testState;
     if(testState.activeTestId != null) {
-      return AFTestDrawer(
-        dispatcher: dispatcher,
-      );
+      final test = AFibF.findScreenTestById(testState.activeTestId);
+      if(test != null && test.testDrawerSide == testDrawerSide) {
+        return AFTestDrawer(
+          dispatcher: dispatcher,
+        );
+      }
     }
-    return null;
+    return drawer;
   }
 
 

@@ -121,3 +121,6 @@ typedef AFAsyncQueryListenerDelegate = void Function(AFAsyncQuery query);
 
 /// Delegate used to fill a list of widgets.
 typedef AFFillWidgetListDelegate = void Function(List<Widget> widgets);
+
+/// Delegate used to register to listen to all queries on success.
+typedef AFQueryListenerDelegate = void Function(AFAsyncQuery query, AFFinishQuerySuccessContext context);

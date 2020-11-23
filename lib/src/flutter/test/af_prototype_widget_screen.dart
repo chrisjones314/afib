@@ -101,7 +101,8 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppState, AFPrototypeW
     }
 
     final widgets = [resultWidget];
-    return Scaffold(
+    return createScaffold(
+      context: context,
       //key: _mainScaffoldKey,
       body: CustomScrollView(
         slivers: [
@@ -115,7 +116,6 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppState, AFPrototypeW
             delegate: SliverChildListDelegate(widgets)
           )
       ]),
-      endDrawer: context.createDebugDrawer()
     );
 
   }

@@ -16,6 +16,7 @@ class AFFlutterParams<AppState> {
   final AFInitScreenTestsDelegate initScreenTests;
   final AFAppReducerDelegate<AppState>  appReducer;
   final AFInitWorkflowStateTestsDelegate initWorkflowStateTests;
+  final AFQueryListenerDelegate queryListenerDelegate;
   
   AFFlutterParams({
     @required this.initScreenMap,
@@ -29,6 +30,7 @@ class AFFlutterParams<AppState> {
     @required this.initStateTests,
     @required this.initScreenTests,
     @required this.initWorkflowStateTests,
+    @required this.queryListenerDelegate,
     this.appReducer
   });
 }

@@ -8,19 +8,23 @@ import 'package:afib/afib_dart.dart';
 /// build the correct screen widget for the leaf element in the route.
 class AFScreenMap {
 
-  AFScreenID _initialKey;
+  AFScreenID _startupScreenId;
+  AFRouteParam _startupScreenParam;
   final Map<AFScreenID, WidgetBuilder> _screens = <AFScreenID, WidgetBuilder>{};
 
   AFScreenMap() {
-    screen(AFUIID.screenStartup, (_) => AFStartupScreenWrapper());
+    screen(AFUIID.screenStartupWrapper, (_) => AFStartupScreenWrapper());
   }
 
-  AFScreenID get afStartupScreenId {
-    return AFUIID.screenStartup;
+  AFScreenID get startupScreenId {
+    if(_startupScreenId == AFUIID.screenPrototypeHome) {
+      return _startupScreenId;
+    }
+    return _startupScreenId;
   }
 
   String get appInitialScreenId { 
-    return _initialKey.code;
+    return _startupScreenId.code;
   }
 
   Map<String, WidgetBuilder> get screens {
@@ -37,12 +41,17 @@ class AFScreenMap {
     return _screens[id](null);
   }
 
-  /// Call [initialScreen] once to specify the initial screen for your app.
-  void initialScreen(AFScreenID screenKey, WidgetBuilder screenBuilder) {
+  AFRouteParam get startupRouteParam {
+    return _startupScreenParam;
+  }
+
+  /// Call [startupScreen] once to specify the initial screen for your app.
+  void startupScreen(AFScreenID screenId, WidgetBuilder screenBuilder, AFRouteParam initialParam) {
     AFibF.verifyNotImmutable();
     
-    _initialKey = screenKey;
-    screen(screenKey, screenBuilder);
+    _startupScreenId = screenId;
+    _startupScreenParam = initialParam;
+    screen(screenId, screenBuilder);
   }
 
   /// Call [screen] multiple times to specify the relationship between 
@@ -54,7 +63,7 @@ class AFScreenMap {
 
   /// Returns the widget builder for the initial screen.
   WidgetBuilder get initialScreenBuilder {
-    return _screens[_initialKey];
+    return _screens[_startupScreenId];
   }
 
   /// Returns the current mapping of routes to screens.

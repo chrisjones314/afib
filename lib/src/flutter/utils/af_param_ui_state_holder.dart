@@ -1,5 +1,4 @@
 
-import 'package:afib/afib_dart.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +24,8 @@ class AFDisposableUIHolder<T> {
 
   void dispose() {
     if(disposed) {
-      throw AFException("A disposable UI element was disposed twice!");
+      //throw AFException("A disposable UI element was disposed twice!");
+      return;
     }
     disposed = true;
     for(final controller in controllers.values) {

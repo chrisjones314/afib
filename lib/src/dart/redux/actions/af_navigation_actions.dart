@@ -2,6 +2,7 @@ import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
+import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/utils/af_bottom_popup_theme.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:flutter/widgets.dart';
@@ -41,12 +42,20 @@ class AFNavigateExitTestAction extends AFNavigateAction {
 /// a single new screen at the root.
 class AFNavigateReplaceAllAction extends AFNavigateAction {
   AFNavigateReplaceAllAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
+
+  factory AFNavigateReplaceAllAction.toStartupScreen({AFRouteParam param}) {
+    return AFNavigateReplaceAllAction(screen: AFUIID.screenStartupWrapper, param: param);
+  }
 }
 
 /// Action that changes the data associated with the current screen, but 
 /// does not change the screen itself.
 class AFNavigateSetParamAction extends AFNavigateAction {
   AFNavigateSetParamAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
+
+  factory AFNavigateSetParamAction.setStartupScreenParam({AFRouteParam param}) {
+    return AFNavigateSetParamAction(param: param, screen: AFUIID.screenStartupWrapper);
+  }
 }
 
 class AFNavigateSetPopupParamAction extends AFNavigateAction {
@@ -142,13 +151,11 @@ class AFNavigatePopNAction extends AFNavigateActionWithReturnData {
 
 class AFNavigatePopToAction extends AFNavigateActionWithReturnData {
   final AFScreenID popTo;
-  final AFScreenID push;
-  final AFRouteParam pushParam;
+  final AFNavigatePushAction push;
 
   AFNavigatePopToAction({
     @required this.popTo,
     this.push,
-    this.pushParam,
     AFID id, 
     dynamic returnData, 
     bool worksInPrototypeMode = true

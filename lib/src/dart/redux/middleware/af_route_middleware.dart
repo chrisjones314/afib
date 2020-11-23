@@ -127,7 +127,7 @@ void _navigatePopToAction(Store<AFState> store, action, NextDispatcher next) {
       navState.pop(action.returnData);
     }
     if(popTo.push != null) {
-      navState.pushNamed(popTo.push.code);
+      navState.pushNamed(popTo.push.screen.code);
     }
   });
   next(action);

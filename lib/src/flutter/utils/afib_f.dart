@@ -57,6 +57,8 @@ class AFibF {
   static final _recentActions = <AFActionWithKey>[];
   static int navDepth = 0;
   static bool testOnlyShouldSuppressNavigation = false;
+  static AFQueryListenerDelegate _afQueryListenerDelegate;
+
 
   /// a key for referencing the Navigator for the material app.
   static final GlobalKey<NavigatorState> _afNavigatorKey = GlobalKey<NavigatorState>();
@@ -70,18 +72,12 @@ class AFibF {
     AFibF.setAppReducer(appReducer);
     AFibF.setCreateStartupQueryAction(p.createStartupQueryAction);
     AFibF.setCreateLifecycleQueryAction(p.createLifecycleQueryAction);
+    _afQueryListenerDelegate = p.queryListenerDelegate;
 
     final middleware = <Middleware<AFState>>[];
     middleware.addAll(createRouteMiddleware());
     middleware.add(AFQueryMiddleware());
     
-    final store = AFStore(
-      afReducer,
-      initialState: AFState.initialState(),
-      middleware: middleware
-    );
-    setStore(store);
-
     if(AFibD.config.requiresTestData) {
       final testData = AFibF.testData;
       p.initTestData(testData);
@@ -92,11 +88,18 @@ class AFibF {
       p.initWorkflowStateTests(AFibF.multiScreenStateTests, testData);
       _populateAllWidgetCollectors();
     }
-
     if(AFibD.config.requiresPrototypeData) {
       afInitPrototypeScreenMap(AFibF.screenMap);
       setPrototypeScreenMap(AFibF.screenMap);
     }
+
+    final store = AFStore(
+      afReducer,
+      initialState: AFState.initialState(),
+      middleware: middleware
+    );
+    setStore(store);
+
 
     // Make sure all the globals in AF are immutable from now on.
     finishStartup();
@@ -230,6 +233,9 @@ class AFibF {
     return _afScreenMap;
   }
 
+  /// returns the screen id of the startup screen.
+  /// 
+  /// This varies depending on the afib mode (e.g. prototype mode has a different starutp screen than debug/production)
   static AFScreenID get effectiveStartupScreenId {
     if(forcedStartupScreen != null) {
       return forcedStartupScreen;
@@ -237,7 +243,16 @@ class AFibF {
     if(AFibD.config.requiresPrototypeData) {
       return AFUIID.screenPrototypeHome;
     }
-    return AFUIID.screenStartup;
+    return AFUIID.screenStartupWrapper;
+  }
+
+  static AFScreenID get actualStartupScreenId {
+    return screenMap.startupScreenId;
+  }
+
+  /// Returns the route parameter used by the startup screen.
+  static AFRouteParam get effectiveStartupRouteParam {
+    return _afScreenMap.startupRouteParam;
   }
 
   /// Returns a function that creates the initial applications state, used to reset the state.
@@ -319,6 +334,14 @@ class AFibF {
 
   static AFCreateAFAppDelegate get createApp {
     return _afCreateApp;
+  }
+
+  /// Called internally when a query finishes successfully, see [AFFlutterParams.querySuccessDelegate] 
+  /// to listen for query success.
+  static void onQuerySuccess(AFAsyncQuery query, AFFinishQuerySuccessContext successContext) {
+    if(_afQueryListenerDelegate != null) {
+      _afQueryListenerDelegate(query, successContext);
+    }
   }
 
   /// The redux store, which contains the application state, NOT FOR PUBLIC USE.

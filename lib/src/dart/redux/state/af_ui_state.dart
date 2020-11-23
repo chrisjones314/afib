@@ -83,5 +83,4 @@ class AFUIState extends AFObjectWithKey {
   factory AFUIState.withPrimaryMessage(int loading, String message, int messageType) {
     return AFUIState(loadingState: kIsLoading, primaryMessage: AFUIWidgetMessage(message: message, messageType: AFUIWidgetMessage.error));
   }
-
 }

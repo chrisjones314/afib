@@ -7,7 +7,7 @@ import 'package:afib/src/flutter/test/af_prototype_single_screen_screen.dart';
 import 'package:afib/src/flutter/test/af_prototype_widget_screen.dart';
 
 void afInitPrototypeScreenMap(AFScreenMap screens) {
-  screens.initialScreen(AFUIID.screenPrototypeHome, (context) => AFPrototypeHomeScreen());
+  screens.startupScreen(AFUIID.screenPrototypeHome, (context) => AFPrototypeHomeScreen(), AFPrototypeHomeScreenParam());
   screens.screen(AFUIID.screenPrototypeSingleScreen, (context) => AFPrototypeSingleScreenScreen());
   screens.screen(AFUIID.screenPrototypeListSingleScreen, (context) => AFPrototypeTestScreen());
   screens.screen(AFUIID.screenPrototypeWidget, (context) => AFPrototypeWidgetScreen());

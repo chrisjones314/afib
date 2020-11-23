@@ -12,6 +12,7 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 
 class AFStartQueryContext<TResponse, TError> {
   final Function(TResponse) onSuccess;
@@ -88,6 +89,7 @@ abstract class AFAsyncQuery<TState, TResponse> extends AFActionWithKey {
         if(onResponseExtra != null) {
           onResponseExtra(successContext);
         }
+        AFibF.onQuerySuccess(this, successContext);
       }, 
       onError: (error) {
         final errorContext = AFFinishQueryErrorContext<TState, AFQueryError>(dispatcher: dispatcher, state: store.state, error: error);

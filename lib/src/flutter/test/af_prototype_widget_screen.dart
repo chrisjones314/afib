@@ -108,6 +108,7 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppState, AFPrototypeW
         slivers: [
           SliverAppBar(
             automaticallyImplyLeading: false,
+            leading: AFUI.standardBackButton(context.d),
             title: Text('Widget Test Screen',
               style: AFTheme.styleWhite
             ),

@@ -124,3 +124,6 @@ typedef AFFillWidgetListDelegate = void Function(List<Widget> widgets);
 
 /// Delegate used to register to listen to all queries on success.
 typedef AFQueryListenerDelegate = void Function(AFAsyncQuery query, AFFinishQuerySuccessContext context);
+
+/// Delegate used to create a route parameter.
+typedef AFCreateRouteParamDelegate = AFRouteParam Function();

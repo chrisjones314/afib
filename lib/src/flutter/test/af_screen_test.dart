@@ -88,6 +88,10 @@ class AFKeySelector extends AFWidgetSelector {
   int get hashCode {
     return key.hashCode;
   }
+
+  String toString() {
+    return "AFKeySelector($key)";
+  }
 }
 
 

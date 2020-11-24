@@ -251,8 +251,8 @@ class AFibF {
   }
 
   /// Returns the route parameter used by the startup screen.
-  static AFRouteParam get effectiveStartupRouteParam {
-    return _afScreenMap.startupRouteParam;
+  static AFCreateRouteParamDelegate get startupRouteParamFactory {
+    return _afScreenMap.startupRouteParamFactory;
   }
 
   /// Returns a function that creates the initial applications state, used to reset the state.
@@ -290,15 +290,18 @@ class AFibF {
 
   static List<AFScreenPrototypeTest> findTestsForAreas(List<String> areas) {
     final result = <AFScreenPrototypeTest>[];
-    _addTestsForAreas(screenTests.all, areas, result);
-    _addTestsForAreas(multiScreenStateTests.all, areas, result);
+    final addAllScreen = areas.contains("screen");
+    final addAllWorkflow  = areas.contains("workflow");
+    _addTestsForAreas(screenTests.all, areas, addAllScreen, result);
+    _addTestsForAreas(multiScreenStateTests.all, areas, addAllWorkflow, result);
     return result;
   }
 
-  static void _addTestsForAreas(List<AFScreenPrototypeTest> tests, List<String> areas, List<AFScreenPrototypeTest> results) {
+  static void _addTestsForAreas(List<AFScreenPrototypeTest> tests, List<String> areas, bool addAll, List<AFScreenPrototypeTest> results) {
+    final reusable = areas.indexWhere((element) => element.startsWith("reuse")) >= 0;
     for(final test in tests) {
-      for(final area in areas) {
-        if(test.id.code == area || test.id.hasTag(area)) {
+      for(final area in areas) {        
+        if((reusable && test.isReusable) || addAll || test.id.code == area || test.id.hasTag(area)) {
           results.add(test);
         }
       }

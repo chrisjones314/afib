@@ -1,4 +1,5 @@
 import 'package:afib/src/dart/utils/af_ui_id.dart';
+import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:afib/src/flutter/screen/af_startup_screen.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,7 @@ import 'package:afib/afib_dart.dart';
 class AFScreenMap {
 
   AFScreenID _startupScreenId;
-  AFRouteParam _startupScreenParam;
+  AFCreateRouteParamDelegate _createStartupScreenParam;
   final Map<AFScreenID, WidgetBuilder> _screens = <AFScreenID, WidgetBuilder>{};
 
   AFScreenMap() {
@@ -41,16 +42,16 @@ class AFScreenMap {
     return _screens[id](null);
   }
 
-  AFRouteParam get startupRouteParam {
-    return _startupScreenParam;
+  AFCreateRouteParamDelegate get startupRouteParamFactory {
+    return _createStartupScreenParam;
   }
 
   /// Call [startupScreen] once to specify the initial screen for your app.
-  void startupScreen(AFScreenID screenId, WidgetBuilder screenBuilder, AFRouteParam initialParam) {
+  void startupScreen(AFScreenID screenId, WidgetBuilder screenBuilder, AFCreateRouteParamDelegate createParam) {
     AFibF.verifyNotImmutable();
     
     _startupScreenId = screenId;
-    _startupScreenParam = initialParam;
+    _createStartupScreenParam = createParam;
     screen(screenId, screenBuilder);
   }
 

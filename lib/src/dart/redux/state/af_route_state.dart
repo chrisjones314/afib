@@ -306,7 +306,7 @@ class AFRouteState {
   /// Creates the default initial state.
   factory AFRouteState.initialState() {
     final screen = <AFRouteSegment>[];
-    screen.add(AFRouteSegment.withParam(AFibF.effectiveStartupScreenId, AFibF.effectiveStartupRouteParam));
+    screen.add(AFRouteSegment.withParam(AFibF.effectiveStartupScreenId, AFibF.startupRouteParamFactory()));
     final empty = <AFRouteSegment>[];
     final screenSegs = AFRouteStateSegments(active: screen, prior: empty);
     final popupSegs  = AFRouteStateSegments(active: empty, prior: empty);

@@ -3,6 +3,7 @@ import 'package:afib/src/flutter/af_app.dart';
 import 'package:flutter/material.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 
 class AFNavigatorObserver extends NavigatorObserver {
@@ -53,7 +54,9 @@ abstract class AFMaterialApp<AppState> extends AFApp<AppState> {
   Widget build(BuildContext context) {
     return StoreProvider(
       store: AFibF.internalOnlyStore,
-      child: buildMaterialApp()
+      child: OverlaySupport(
+        child: buildMaterialApp()
+      )
     );
   }
 

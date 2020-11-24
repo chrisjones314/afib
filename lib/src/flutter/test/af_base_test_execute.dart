@@ -119,6 +119,31 @@ abstract class AFBaseTestExecute {
 
 }
 
+void printTestResult(AFCommandOutput output, String kind, AFBaseTestExecute context, AFTestStats stats) {
+  if(stats.isEmpty) {
+    output.writeSeparatorLine();
+    output.writeLine("Afib $kind Tests:");
+  }
+
+   stats.addPasses(context.printPassMessages(output));
+}
+
+void printTestTotal(AFCommandOutput output, String kind, List<AFBaseTestExecute> baseContexts, AFTestStats stats) {
+  if(stats.isEmpty) {
+    return;
+  }
+
+  final totalPass = stats.totalPasses;
+  AFBaseTestExecute.printTotalPass(output, "TOTAL", totalPass);
+
+  var totalErrors = 0;
+  for(var context in baseContexts) {
+    totalErrors += context.printFailMessages(output);
+  }
+  stats.addErrors(totalErrors);
+}
+
+/*
 void printTestResults(AFCommandOutput output, String kind, List<AFBaseTestExecute> baseContexts, AFTestStats stats) {
   if(baseContexts.isEmpty) {
     return;
@@ -139,3 +164,4 @@ void printTestResults(AFCommandOutput output, String kind, List<AFBaseTestExecut
   }
   stats.addErrors(totalErrors);
 }
+*/

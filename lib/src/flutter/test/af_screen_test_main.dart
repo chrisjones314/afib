@@ -56,6 +56,8 @@ Future<void> _afStandardScreenTestMain(
   String sectionTitle,
   AFTestCreatePushActionDelegate createPush) async {
   final simpleContexts = <AFScreenTestContextWidgetTester>[];
+  final testKind = sectionTitle;
+  final localStats = AFTestStats();
 
   for(var test in allTests) {
     if(!test.hasBody) {
@@ -85,12 +87,14 @@ Future<void> _afStandardScreenTestMain(
       
       dispatcher.setContext(context);
       await tester.pumpAndSettle(Duration(seconds: 1));
+      printTestResult(output, testKind, context, localStats);
+
     }
   }
 
   final baseContexts = List<AFBaseTestExecute>.of(simpleContexts);
-  printTestResults(output, sectionTitle, baseContexts, stats);
-
+  printTestTotal(output, testKind, baseContexts, localStats);
+  stats.mergeIn(localStats);
 }
 
 Future<void> _afWidgetTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
@@ -107,6 +111,8 @@ Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, 
 
 Future<void> _afWorkflowTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
  final multiContexts = <AFScreenTestContextWidgetTester>[];
+  final testKind = "Multi-Screen";
+  final localStats = AFTestStats();
 
   for(final test in AFibF.multiScreenStateTests.stateTests) {
     if(!test.hasBody) {
@@ -137,10 +143,12 @@ Future<void> _afWorkflowTestMain(AFCommandOutput output, AFTestStats stats, Widg
 
       /// Clear out our cache of screen info for the next test.
       AFibF.resetTestScreens();
+      printTestResult(output, testKind, context, localStats);
     }
   }
 
   final baseMultiContexts = List<AFBaseTestExecute>.of(multiContexts);
-  printTestResults(output, "Multi-Screen", baseMultiContexts, stats);
+   printTestTotal(output, testKind, baseMultiContexts, localStats);
+  stats.mergeIn(localStats);
   return null;
 }

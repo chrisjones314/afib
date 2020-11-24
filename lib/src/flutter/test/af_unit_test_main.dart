@@ -18,15 +18,19 @@ void afUnitTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams para
 
   final tests = AFibF.unitTests;
   final contexts = <AFUnitTestContext>[];
+  final testKind = "Unit";
+  final localStats = AFTestStats();
 
   for(final test in tests.tests) {
     if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
       final context = AFUnitTestContext(test);
       test.execute(context);
       contexts.add(context);
+      printTestResult(output, testKind, context, localStats);
     }
   }
 
   final baseContexts = List<AFBaseTestExecute>.of(contexts);
-  printTestResults(output, "Unit", baseContexts, stats);
+  printTestTotal(output, testKind, baseContexts, localStats);
+  stats.mergeIn(localStats);
 }

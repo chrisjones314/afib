@@ -51,11 +51,7 @@ class AFNavigateReplaceAllAction extends AFNavigateAction {
 /// Action that changes the data associated with the current screen, but 
 /// does not change the screen itself.
 class AFNavigateSetParamAction extends AFNavigateAction {
-  AFNavigateSetParamAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
-
-  factory AFNavigateSetParamAction.setStartupScreenParam({AFRouteParam param}) {
-    return AFNavigateSetParamAction(param: param, screen: AFUIID.screenStartupWrapper);
-  }
+  AFNavigateSetParamAction({AFID id, @required AFScreenID screen, @required AFRouteParam param}): super(id: id, screen: screen, param: param);
 }
 
 class AFNavigateSetPopupParamAction extends AFNavigateAction {

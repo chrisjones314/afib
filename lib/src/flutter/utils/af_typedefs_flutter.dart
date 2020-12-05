@@ -127,3 +127,7 @@ typedef AFQueryListenerDelegate = void Function(AFAsyncQuery query, AFFinishQuer
 
 /// Delegate used to create a route parameter.
 typedef AFCreateRouteParamDelegate = AFRouteParam Function();
+
+typedef AFChangedTextDelegate = void Function(String);
+
+typedef AFPressedDelegate = void Function();

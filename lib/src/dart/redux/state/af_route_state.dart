@@ -49,6 +49,9 @@ class AFRouteSegment {
   }
 
   bool get isAFibScreen {
+    if(screen == AFUIID.screenStartupWrapper) {
+      return false;
+    }
     return screen.code.startsWith(AFUIID.afibScreenPrefix);
   }
 
@@ -97,6 +100,10 @@ class AFRouteStateSegments {
 
   int get length {
     return active.length;
+  }
+
+  bool get hasStartupWrapper { 
+    return isNotEmpty && active.first.screen == AFUIID.screenStartupWrapper;
   }
 
   int get popCountToRoot {
@@ -321,6 +328,10 @@ class AFRouteState {
     return last.matchesScreen(screen);
   }
 
+  bool get hasStartupWrapper {
+    return screenSegments.hasStartupWrapper;
+  }
+
   AFScreenID get activeScreenId {
     final last = screenSegments.last;
     return last.screenId;
@@ -355,6 +366,9 @@ class AFRouteState {
   /// in the search.  This is useful when the final segement has been popped off the route,
   /// but still needs to be included in the search.
   AFRouteParam findParamFor(AFScreenID screen, { bool includePrior = true }) {
+    if(hasStartupWrapper && screen == AFibF.screenMap.startupScreenId) {
+      screen = AFUIID.screenStartupWrapper;
+    }
     final seg = screenSegments.findSegmentFor(screen, includePrior: includePrior);
     return seg?.param?.paramFor(screen);
   }
@@ -438,6 +452,9 @@ class AFRouteState {
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
   AFRouteState setParam(AFScreenID screen, AFRouteParam param) {
+    if(hasStartupWrapper && screen == AFibF.screenMap.startupScreenId) {
+      screen = AFUIID.screenStartupWrapper;
+    }
     return _reviseScreen(screenSegments.setParam(screen, param));
   }
 

@@ -3,11 +3,13 @@
 
 import 'dart:async';
 
+import 'package:afib/afib_dart.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
+import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
@@ -27,8 +29,24 @@ class AFFinishQueryContext<TState> {
 
   AFFinishQueryContext({this.dispatcher, this.state});
 
+  void dispatch(dynamic action) {
+    dispatcher.dispatch(action);
+  }
+
+  AFDispatcher get d {
+    return dispatcher;
+  }
+
   TState get s {
     return state.public.app;
+  }
+
+  AFRouteParam findParam(AFScreenID screen) {
+    return state.public.route.findParamFor(screen);
+  }
+
+  void updateScreenParam(AFScreenID screen, AFRouteParam param) {
+    dispatch(AFNavigateSetParamAction(screen: screen, param: param));
   }
 }
 
@@ -41,9 +59,6 @@ class AFFinishQuerySuccessContext<TState, TResponse> extends AFFinishQueryContex
     this.response
   }): super(dispatcher: dispatcher, state: state);
 
-  void dispatch(dynamic action) {
-    dispatcher.dispatch(action);
-  }
 
   TResponse get r {
     return response;
@@ -57,10 +72,6 @@ class AFFinishQueryErrorContext<TState, TError> extends AFFinishQueryContext<TSt
     AFState state, 
     this.error
   }): super(dispatcher: dispatcher, state: state);
-
-  void dispatch(dynamic action) {
-    dispatcher.dispatch(action);
-  }
 
   TError get e {
     return error;

@@ -155,7 +155,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppState, APrototypeHome
         //key: AFUI.keyForWID(DFWidgetID.editSearch),
         controller: searchController,
         obscureText: false,
-        autofocus: true,
+        autofocus: false,
         autocorrect: false,
         textAlign: TextAlign.left,
         onChanged: (value) {

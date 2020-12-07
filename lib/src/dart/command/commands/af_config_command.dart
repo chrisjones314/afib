@@ -81,6 +81,11 @@ class AFConfigEntryList extends AFConfigEntry {
   AFConfigEntryList(String namespace, String key, dynamic defaultValue, {String declaringClass = AFConfigEntries.declaredIn, this.allowed, this.help}): super(namespace, key, defaultValue, declaringClass: declaringClass);
 
   @override
+  String get argumentHelp {
+    return help;
+  }
+
+  @override
   String validate(dynamic value) {
     if(allowed == null) {
       return null;
@@ -140,20 +145,28 @@ class AFConfigEntryEnabledTests extends AFConfigEntryList {
   static const stateTests = "state";
   static const unitTests = "unit";
   static const screenTests = "screen";
-  static const singleScreenTests = "singlescreen";
   static const queryTests = "query";
   static const workflowTests = "workflow";
   static const widgetTests = "widget";
-  static const allAreas = [allTests, unitTests, stateTests, widgetTests, screenTests, queryTests, singleScreenTests, workflowTests];
+  static const allAreas = [allTests, unitTests, stateTests, widgetTests, screenTests, queryTests, workflowTests];
 
-  AFConfigEntryEnabledTests(): super(AFConfigEntries.afNamespace, "enabledTestList", [allTests], help: "Space separated list of areas that should display logging messages [${allAreas.join('|')}|test_id|test_tag]");
+  AFConfigEntryEnabledTests(): super(AFConfigEntries.afNamespace, "enabledTestList", [allTests], help: "Space separated list of areas that should display logging messages [${allAreas.join('|')}|test_id|test_tag|test_area:test_tag]");
 
-  bool isAreaEnabled(AFConfig config, String area) {
+  bool isAreaEnabled(AFConfig config, String areaTest) {
     final areas = config.stringListFor(this);
     if(hasNoAreas(areas)) {
       return true;
     }
-    return areas.contains(area) || areas.contains(allTests);
+    for(final area in areas) {
+      if(area == allTests) {
+        return true;
+      }
+      final actualArea = _extractArea(area);
+      if(areaTest == actualArea) {
+        return true;
+      }
+    }
+    return false;
   }
 
   bool isTestEnabled(AFConfig config, AFTestID id) {
@@ -165,7 +178,8 @@ class AFConfigEntryEnabledTests extends AFConfigEntryList {
       return true;
     }
     for(final area in areas) {
-      if(id.hasTag(area)) {
+      final actualTag = _extractTag(area);
+      if(id.hasTag(actualTag)) {
         return true;
       }
     }
@@ -173,8 +187,9 @@ class AFConfigEntryEnabledTests extends AFConfigEntryList {
   }
 
   bool hasNoAreas(List<String> areas) {
-    for(final area in allAreas) {
-      if(areas.contains(area)) {
+    for(final area in areas) {
+      final actualArea = _extractArea(area);
+      if(allAreas.contains(actualArea)) {
         return false;
       }
     }
@@ -188,6 +203,22 @@ class AFConfigEntryEnabledTests extends AFConfigEntryList {
       }
     }
     return true;
+  }
+
+  String _extractArea(String area) {
+    final idx = area.indexOf(":");
+    if(idx < 0) {
+      return area;
+    }
+    return area.substring(0, idx);
+  }
+
+  String _extractTag(String area) {
+    final idx = area.indexOf(":");
+    if(idx < 0) {
+      return area;
+    }
+    return area.substring(idx+1);
   }
 }
 

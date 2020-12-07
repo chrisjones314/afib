@@ -339,6 +339,9 @@ class AFApplyTextTextFieldAction extends AFApplySetValueWidgetAction {
   bool applyInternal(String applyType, AFWidgetSelector selector, Element element, dynamic data) {
     final widget = element.widget;
     if(widget is TextField && data is String) {
+      if(widget.controller != null) {
+        widget.controller.text = data;
+      }
       widget.onChanged(data);
       return true;
     } 

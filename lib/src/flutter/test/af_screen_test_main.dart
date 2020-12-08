@@ -110,7 +110,7 @@ Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, 
 
 Future<void> _afWorkflowTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
  final multiContexts = <AFScreenTestContextWidgetTester>[];
-  final testKind = "Multi-Screen";
+  final testKind = "Workflow";
   final localStats = AFTestStats();
 
   for(final test in AFibF.workflowTests.stateTests) {

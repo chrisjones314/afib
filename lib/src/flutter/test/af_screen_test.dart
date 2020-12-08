@@ -372,6 +372,14 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
     return matchWidgetValue(selector, matcher, extraFrames: 1);
   }
 
+  Future<void> matchSwitch(dynamic selector, { @required bool enabled }) {
+    return matchWidgetValue(selector, ft.equals(enabled), extraFrames: 1);
+  }
+
+  Future<void> setSwitch(dynamic selector, { @required bool enabled }) {
+    return setValue(selector, enabled, extraFrames: 1);
+  }
+
   Future<void> underScreen(AFScreenID screen, Function underHere) async {
     final shouldPush = true; //activeScreenIDs.isEmpty || activeScreenIDs.last != screen;
     if(shouldPush) {
@@ -1605,7 +1613,7 @@ class AFSingleScreenTests<TState> {
     @required dynamic data,
     dynamic param,
     AFScreenID screenId,
-    AFNavigateAction navigate,
+    AFNavigatePushAction navigate,
     String title
   }) {
     final hasNav    = (navigate != null);
@@ -1677,6 +1685,11 @@ abstract class AFWorkflowTestExecute {
     AFScreenID endScreen,
     bool verifyScreen = true
   });
+
+  Future<void> withState<TState extends AFAppState>( Future<void> Function(TState, AFRouteState) withState) async {
+    final public = AFibF.testOnlyStore.state.public;
+    return withState(public.app, public.route);
+  }
 
   Future<void> runScreenTest(AFSingleScreenTestID screenTestId, {
     dynamic param1,
@@ -2167,7 +2180,7 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
     @required dynamic data,
     dynamic param,
     AFScreenID screenId,
-    AFNavigateAction navigate,
+    AFNavigatePushAction navigate,
     String title
   }) {
     return tests.addPrototype(

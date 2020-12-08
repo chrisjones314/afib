@@ -273,6 +273,9 @@ class AFConsolidatedQuery<TState> extends AFAsyncQuery<TState, AFConsolidatedQue
     return null;
   }
 
+  TQuery findQueryWithType<TQuery extends AFAsyncQuery>() {
+    return findQueryWhere<TQuery>( (q) => true);
+  }
 
   void startAsyncAF(AFDispatcher dispatcher, AFStore store, { Function(dynamic) onResponseExtra, Function(dynamic) onErrorExtra }) {
       final completer = Completer<bool>();

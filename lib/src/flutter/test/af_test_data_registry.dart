@@ -15,8 +15,19 @@ class AFTestDataRegistry {
     testData[id] = data;
   }
 
+  /// Find a test data object by its id, but if the id is not a string,
+  /// just return it.
+  /// 
+  /// If the id you pass in is not a string, then the object you pass in 
+  /// as the id will be returned as the result.   This allows you to
+  /// implement parameterized tests where you can pass in either an
+  /// instance of the object you want, or an id for an intestance of that object
+  /// in the test data registry.
   dynamic find(dynamic id) {
-    return testData[id];
+    if(id is String) {
+      return testData[id];
+    } 
+    return id;
   }
 
   dynamic operator[](dynamic id) {

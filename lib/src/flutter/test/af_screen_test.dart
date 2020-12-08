@@ -1601,12 +1601,27 @@ class AFSingleScreenTests<TState> {
   /// Returns an [AFSingleScreenTestBody], which can be used to create a 
   /// test for the screen.
   AFSingleScreenTestBody addPrototype({
-    @required AFScreenID screenId,
     @required AFSingleScreenTestID   id,
     @required dynamic data,
-    @required dynamic param,
+    dynamic param,
+    AFScreenID screenId,
+    AFNavigateAction navigate,
     String title
   }) {
+    final hasNav    = (navigate != null);
+    final hasParam  = (screenId != null || param != null);
+    if(hasNav && hasParam) {
+      throw AFException("Please specify either the navigate parameter, or the screenId and param parameters, but not both (they are redundant)");
+    }
+    if(!hasNav && !hasParam) {
+      throw AFException("You must specify a screenId and param, either via those parameters, or via the single navigate parameter");
+    }
+
+    if(hasNav) {
+      screenId = navigate.screen;
+      param = navigate.param;
+    }
+
     final instance = AFSingleScreenPrototypeTest(
       id: id,
       data: data,
@@ -2000,3 +2015,232 @@ class AFWorkflowStateTests {
   
 
 }
+
+
+/// Base test definition wrapper, with access to test data.
+/// 
+class AFBaseTestDefinitionContext {
+  final AFTestDataRegistry testData;
+  AFBaseTestDefinitionContext(this.testData);
+
+  /// Looks up the test data defined in your test_data.dart file for a particular
+  /// test data id.
+  dynamic find(dynamic testDataId) {
+    return testData.find(testDataId);
+  }
+}
+
+class AFUnitTestDefinitionContext extends AFBaseTestDefinitionContext {
+  final AFUnitTests tests;
+
+  AFUnitTestDefinitionContext({
+    this.tests,
+    AFTestDataRegistry testData
+  }): super(testData);
+
+  void addTest(AFTestID id, AFUnitTestBodyExecuteDelegate fnTest) {
+    tests.addTest(id, fnTest);
+  }
+}
+
+/// A context wrapper for defining a state test.
+/// 
+/// This class is intended to provide a quick start for the most common
+/// methods in defining state tests, and to enable extensions
+/// later without changing the test definition function profile.
+class AFStateTestDefinitionContext extends AFBaseTestDefinitionContext {
+  final AFStateTests tests;
+
+  AFStateTestDefinitionContext({
+    this.tests,
+    AFTestDataRegistry testData
+  }): super(testData);
+
+  /// Define a state test. 
+  /// 
+  /// The state test should define one or more query results, and then
+  /// execute a query.  Note that state tests are usually built in a 
+  /// kind of tree, with a cumulative state being build from
+  /// a series of query/response cycles across multiple tests.
+  void addTest(AFStateTestID id, AFProcessTestDelegate handler) {
+    tests.addTest(id, handler);
+  }
+
+  /// Specify a response for a particular query.
+  /// 
+  /// When the query 'executes', its [AFAsyncQuery.startAsync] method will be skipped
+  /// and its [AFAsyncQuery.finishAsyncWithResponse] method will be called with the 
+  /// test data with the specified [idData] in the test data registry.
+  void specifyResponse(AFStateTest test, dynamic querySpecifier, dynamic idData) {
+    test.specifyResponse(querySpecifier, this, idData);
+  }
+
+  /// Create a response dynamically for a particular query.
+  /// 
+  /// This method is useful when you have query methods which 'write' data, where often
+  /// the data doesn't change at all when it is writen, or the changes are simple (like 
+  /// a new identifier is returned, or the update-timestamp for the data is created by the server).
+  /// Using this method, in many cases you can cause 'workflow' prototypes to behave very much
+  /// like they have a back end server, despite the fact that they do not.
+  /// 
+  /// When the query 'executes', its [AFAsyncQuery.startAsync] method will be skipped
+  /// and its [AFAsyncQuery.finishAsyncWithResponse] method will be called with the 
+  /// test data that is created by [delegate].
+  void createResponse(AFStateTest test, dynamic querySpecifier, AFCreateQueryResultDelegate delegate) {
+    test.createResponse(querySpecifier, delegate);
+  }
+
+  /// Use this method to execute a query and validate the state change which it causes.
+  void executeQuery(AFStateTest test, AFAsyncQuery query, {
+    AFProcessVerifyDelegate verify
+  }) {
+    test.executeQuery(query, verify: verify);
+  }
+
+}
+
+/// A context wrapper for definining a widget test
+/// 
+/// This class is intended to provide a quick start for the most common
+/// methods in defining widget tests, and to enable extensions
+/// later without changing the test definition function profile.
+class AFWidgetTestDefinitionContext extends AFBaseTestDefinitionContext {
+
+  final AFWidgetTests tests;
+  AFWidgetTestDefinitionContext({
+    this.tests,
+    AFTestDataRegistry testData
+  }): super(testData);
+
+  AFSingleScreenTestBody addConnectedPrototype({
+    @required AFTestID   id,
+    @required AFCreateConnectedWidgetDelegate createConnectedWidget,
+    @required dynamic data,
+    @required AFRouteParam param,
+    String title
+  }) {
+    return tests.addConnectedPrototype(
+      id: id,
+      createConnectedWidget: createConnectedWidget,
+      data: data,
+      param: param,
+      title: title
+    );
+  }
+
+}
+
+/// A context wrapper for defining single screen test. 
+/// 
+/// This class is intended to provide a quick start for the most common
+/// methods in defining single screen tests, and to enable extensions
+/// later without changing the test definition function profile.
+class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
+  final AFSingleScreenTests tests; 
+
+  AFSingleScreenTestDefinitionContext({
+    this.tests,
+    AFTestDataRegistry testData
+  }): super(testData);
+
+  /// Register a way to apply a value to an arbitrary third party widget.
+  /// 
+  /// This is a global definition, it isn't local to a particular test.
+  void registerApplicator(AFApplyWidgetAction apply) {
+    tests.registerApplicator(apply);
+  }
+
+  /// Register a way to extract a value from an arbitrary third party widget.
+  /// 
+  /// This is a global definition, it isn't local to a particular test.
+  void registerExtractor(AFExtractWidgetAction extract) {
+    tests.registerExtractor(extract);
+  }
+
+  /// Define a prototype which shows a  single screen in a particular 
+  /// screen data/route param state.
+  /// 
+  /// As a short cut, rather than passing in param/screenId, you can pass
+  /// in a navigate action, which has both of those values within it.
+  AFSingleScreenTestBody addPrototype({
+    @required AFSingleScreenTestID   id,
+    @required dynamic data,
+    dynamic param,
+    AFScreenID screenId,
+    AFNavigateAction navigate,
+    String title
+  }) {
+    return tests.addPrototype(
+      id: id,
+      data: data,
+      param: param,
+      screenId: screenId,
+      navigate: navigate,
+      title: title
+    );
+  }
+
+  /// Used to define a reusable test which takes a single parameter.
+  /// 
+  /// The test author should write it so that it automatically executes a test
+  /// appropriate for its parameterized values.   The prototype mode UI will show
+  /// the test with a 'reusable' tag.   The intent is that when building multiple
+  /// screen 'workflow' tests, it is useful to be able to assemble several single screen
+  /// tests which were designed to be parameterized into a composite workflow.  This 
+  /// feature is intended to make reusable tests discoverable.
+  /// 
+  /// Defining a reusable test does not execute it, use [executeReusable] to do that.
+  void defineReusable1<TP1>(AFSingleScreenTestID id, AFScreenID screen, AFReusableScreenTestBodyExecuteDelegate1<TP1> body) {
+    tests.defineReusable1<TP1>(id, screen, body);
+  }
+
+  /// Used to define a reusable test which takes a two parameters.
+  /// 
+  /// See [defineReusable1] for more.
+  void defineReusable2<TP1, TP2>(AFSingleScreenTestID id, AFScreenID screen, AFReusableScreenTestBodyExecuteDelegate2<TP1, TP2> body) {
+    tests.defineReusable2<TP1, TP2>(id, screen, body);
+  }
+
+  /// Used to define a reusable test which takes three parameters.
+  /// 
+  /// See [defineReusable1] for more.
+  void defineReusable3<TP1, TP2, TP3>(AFSingleScreenTestID id, AFScreenID screen, AFReusableScreenTestBodyExecuteDelegate3<TP1, TP2, TP3> body) {
+    tests.defineReusable3<TP1, TP2, TP3>(id, screen, body);
+  }
+
+  /// Executes a test defined with [defineResuable1] or one of its variants, allowing
+  /// you to provide values from the 1-3 parameters required by the test.
+  void executeReusable(AFSingleScreenTestBody body, AFSingleScreenTestID bodyId, {
+    dynamic param1,
+    dynamic param2,
+    dynamic param3
+  }) {
+    body.executeReusable(tests, bodyId, param1: param1, param2: param2, param3: param3);
+  }
+
+}
+
+class AFWorkflowTestDefinitionContext extends AFBaseTestDefinitionContext {
+  final AFWorkflowStateTests tests;
+
+  AFWorkflowTestDefinitionContext({
+    this.tests,
+    AFTestDataRegistry testData
+  }): super(testData);
+
+  AFWorkflowStateTestBody addPrototype({
+    @required AFWorkflowTestID id,
+    String title,
+    @required List<AFNavigatePushAction> initialPath,
+    @required AFTestID stateTestId,
+  }) {
+    return tests.addPrototype(
+      id: id,
+      title: title,
+      initialPath: initialPath,
+      stateTestId: stateTestId
+    );
+  }
+}
+
+

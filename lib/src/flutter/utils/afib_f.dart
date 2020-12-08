@@ -80,12 +80,38 @@ class AFibF {
     
     if(AFibD.config.requiresTestData) {
       final testData = AFibF.testData;
+      
       p.initTestData(testData);
-      p.initUnitTests(AFibF.unitTests, testData);
-      p.initStateTests(AFibF.stateTests, testData);
-      p.initWidgetTests(AFibF.widgetTests, testData);
-      p.initScreenTests(AFibF.screenTests, testData);
-      p.initWorkflowStateTests(AFibF.multiScreenStateTests, testData);
+      final unitTestDefineContext = AFUnitTestDefinitionContext(
+        tests: AFibF.unitTests,
+        testData: testData,
+      );
+      p.initUnitTests(unitTestDefineContext);
+      
+      final stateTestDefineContext = AFStateTestDefinitionContext(
+        tests: AFibF.stateTests,
+        testData: testData
+      );
+      p.initStateTests(stateTestDefineContext);
+
+      final widgetTestDefineContext = AFWidgetTestDefinitionContext(
+        tests: AFibF.widgetTests,
+        testData: testData
+      );
+      p.initWidgetTests(widgetTestDefineContext);
+      
+      final singleTestDefineContext = AFSingleScreenTestDefinitionContext(
+        tests: AFibF.screenTests,
+        testData: testData
+      );
+      p.initScreenTests(singleTestDefineContext);
+
+      final workflowTestDefineContext = AFWorkflowTestDefinitionContext(
+        tests: AFibF.workflowTests,
+        testData: testData
+      );
+
+      p.initWorkflowStateTests(workflowTestDefineContext);
       _populateAllWidgetCollectors();
     }
     if(AFibD.config.requiresPrototypeData) {
@@ -170,7 +196,7 @@ class AFibF {
       return single;
     }
 
-    final multi = multiScreenStateTests.findById(testId);
+    final multi = workflowTests.findById(testId);
     if(multi != null) {
       return multi;
     }
@@ -293,7 +319,7 @@ class AFibF {
     final addAllScreen = areas.contains("screen");
     final addAllWorkflow  = areas.contains("workflow");
     _addTestsForAreas(screenTests.all, areas, addAllScreen, result);
-    _addTestsForAreas(multiScreenStateTests.all, areas, addAllWorkflow, result);
+    _addTestsForAreas(workflowTests.all, areas, addAllWorkflow, result);
     return result;
   }
 
@@ -315,7 +341,7 @@ class AFibF {
 
   /// Retrieves tests which pair an initial state, and then multiple screen/state tests
   /// to produce a higher-level multi-screen test.
-  static AFWorkflowStateTests get multiScreenStateTests {
+  static AFWorkflowStateTests get workflowTests {
     return _afWorkflowStateTests;
   }
 
@@ -495,7 +521,7 @@ class AFibF {
     final guard = _AFTestAsyncGuard();
     await _populateWidgetCollectors(guard, AFibF.screenTests.all);
     await _populateWidgetCollectors(guard, AFibF.widgetTests.all);
-    await _populateWidgetCollectors(guard, AFibF.multiScreenStateTests.all);
+    await _populateWidgetCollectors(guard, AFibF.workflowTests.all);
   }
 
   static Future<void> _populateWidgetCollectors(_AFTestAsyncGuard guard, List<AFScreenPrototypeTest> tests) async {

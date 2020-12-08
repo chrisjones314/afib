@@ -104,7 +104,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppState, APrototypeHome
     }));
 
     rows.add(_createKindRow("Multi-Screen Prototypes", () {
-      List<AFScreenPrototypeTest> tests = AFibF.multiScreenStateTests.all;
+      List<AFScreenPrototypeTest> tests = AFibF.workflowTests.all;
       context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
     }));
     

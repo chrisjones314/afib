@@ -2,7 +2,7 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
-import 'package:afib/src/flutter/test/af_test_data_registry.dart';
+import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:meta/meta.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
@@ -109,9 +109,9 @@ class AFStateTest<TState extends AFAppState> {
   }
 
   /// 
-  void specifyResponse(dynamic querySpecifier, AFTestDataRegistry testData, dynamic idData) {
+  void specifyResponse(dynamic querySpecifier, AFStateTestDefinitionContext definitions, dynamic idData) {
     registerResult(querySpecifier, (context, query) {
-      final data = testData.find(idData);
+      final data = definitions.find(idData);
       query.testFinishAsyncWithResponse(context, data);
     });
   }

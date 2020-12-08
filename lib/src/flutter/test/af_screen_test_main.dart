@@ -113,7 +113,7 @@ Future<void> _afWorkflowTestMain(AFCommandOutput output, AFTestStats stats, Widg
   final testKind = "Multi-Screen";
   final localStats = AFTestStats();
 
-  for(final test in AFibF.multiScreenStateTests.stateTests) {
+  for(final test in AFibF.workflowTests.stateTests) {
     if(!test.hasBody) {
       continue;
     }

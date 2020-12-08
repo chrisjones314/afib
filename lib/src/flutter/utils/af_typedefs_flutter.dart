@@ -30,13 +30,13 @@ typedef AFOnLifecycleEventDelegate = void Function(AppLifecycleState newState);
 typedef AFCreateAFAppDelegate = AFApp Function();
 
 /// Delegate used to populate widget tests.
-typedef AFInitWidgetTestsDelegate = void Function(AFWidgetTests tests, AFTestDataRegistry testData);
+typedef AFInitWidgetTestsDelegate = void Function(AFWidgetTestDefinitionContext definitions);
 
 /// Delegate used to populate single-screen tests.
-typedef AFInitScreenTestsDelegate = void Function(AFSingleScreenTests tests, AFTestDataRegistry testData);
+typedef AFInitScreenTestsDelegate = void Function(AFSingleScreenTestDefinitionContext definitions);
 
 /// Delegate used to populate multi-screen tests.
-typedef AFInitWorkflowStateTestsDelegate = void Function(AFWorkflowStateTests tests, AFTestDataRegistry testData);
+typedef AFInitWorkflowStateTestsDelegate = void Function(AFWorkflowTestDefinitionContext definitions);
 
 /// Delegate used to perform an asynchronous operation (like an alert, and say whether it should continue).
 typedef AFShouldContinueCheckDelegate = Future<int> Function();
@@ -90,10 +90,10 @@ typedef AFPopupRouteWidgetBuilderDelegate = Widget Function(BuildContext ctx, AF
 typedef AFInitTestDataDelegate = void Function(AFTestDataRegistry registry);
 
 /// Delegate used to initialize unit tests.
-typedef AFInitUnitTestsDelegate = void Function(AFUnitTests tests, AFTestDataRegistry testData);
+typedef AFInitUnitTestsDelegate = void Function(AFUnitTestDefinitionContext definitions);
 
 /// Delegate used to initialize state tests.
-typedef AFInitStateTestsDelegate = void Function(AFStateTests tests, AFTestDataRegistry testData);
+typedef AFInitStateTestsDelegate = void Function(AFStateTestDefinitionContext definitions);
 
 /// Delegate 
 typedef AFProcessQueryDelegate = void Function(AFStateTestContext context, AFAsyncQuery query);

@@ -65,9 +65,9 @@ typedef AFTestCreatePushActionDelegate = AFNavigatePushAction Function(AFScreenP
 typedef AFScreenTestBodyExecuteDelegate = Future<void> Function(AFScreenTestExecute ste);
 
 /// Delegate used to implement the body of a reusable single screen test that 
-typedef AFReusableScreenTestBodyExecuteDelegate1<TP1> = Future<void> Function(AFScreenTestExecute ste, TP1 param1);
-typedef AFReusableScreenTestBodyExecuteDelegate2<TP1, TP2> = Future<void> Function(AFScreenTestExecute ste, TP1 param1, TP2 param2);
-typedef AFReusableScreenTestBodyExecuteDelegate3<TP1, TP2, TP3> = Future<void> Function(AFScreenTestExecute ste, TP1 param1, TP2 param2, TP3 param3);
+typedef AFReusableScreenTestBodyExecuteDelegate1 = Future<void> Function(AFScreenTestExecute ste, dynamic param1);
+typedef AFReusableScreenTestBodyExecuteDelegate2 = Future<void> Function(AFScreenTestExecute ste, dynamic param1, dynamic param2);
+typedef AFReusableScreenTestBodyExecuteDelegate3 = Future<void> Function(AFScreenTestExecute ste, dynamic param1, dynamic param2, dynamic param3);
 
 
 /// Delegate used to create a widget in a widget test.
@@ -131,3 +131,4 @@ typedef AFCreateRouteParamDelegate = AFRouteParam Function();
 typedef AFChangedTextDelegate = void Function(String);
 
 typedef AFPressedDelegate = void Function();
+typedef AFOnTapDelegate = void Function();

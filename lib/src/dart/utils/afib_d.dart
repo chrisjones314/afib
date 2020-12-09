@@ -9,8 +9,9 @@ import 'package:logger/logger.dart';
 
 class AFibD<AppState> {
     static final AFConfig _afConfig = AFConfig();
-    static Logger _afLogger;
-    //static Logger logInternal;
+    static Logger logAppQuery;
+    static Logger logAppRender;
+    static Logger logAppTest;
     static Logger logQuery;
     static Logger logConfig;
     static Logger logTest;
@@ -55,7 +56,9 @@ class AFibD<AppState> {
       }
 
       final logAreas = AFibD.config.logAreas;    
-      _afLogger        = _createLogger(AFConfigEntryLogArea.app, logAreas);
+      AFibD.logAppQuery = _createLogger(AFConfigEntryLogArea.appQuery, logAreas);
+      AFibD.logAppRender= _createLogger(AFConfigEntryLogArea.appRender, logAreas);
+      AFibD.logAppTest  = _createLogger(AFConfigEntryLogArea.appTest, logAreas);
       AFibD.logQuery   = _createLogger(AFConfigEntryLogArea.query, logAreas);
       AFibD.logConfig  = _createLogger(AFConfigEntryLogArea.config, logAreas);
       AFibD.logTest    = _createLogger(AFConfigEntryLogArea.test, logAreas);
@@ -64,10 +67,6 @@ class AFibD<AppState> {
 
   }
 
-  /// should be used for application-level logging that is not internal to AFib.
-  static Logger get log {
-    return _afLogger;
-  }
 
 
   /// Contains configuration data for the app, specific to test, production, etc.

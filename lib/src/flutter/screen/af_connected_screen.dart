@@ -1,5 +1,6 @@
 
 import 'package:flutter/gestures.dart';
+import 'package:logger/logger.dart';
 import 'package:quiver/core.dart';
 import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
@@ -517,7 +518,7 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
   Widget buildPopupAnimation(AFBuildContext<TData, TRouteParam> context) {
     return GestureDetector(
       onTap: () {
-        AFibD.log?.d("OnTapGestureDetector");
+        context.log?.d("OnTapGestureDetector");
       },
       child: AnimatedBuilder(
         animation: animation,
@@ -599,6 +600,10 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   /// Shorthand for accessing the flutter build context
   BuildContext get c { return context; }
   void dispatch(dynamic action) { dispatcher.dispatch(action); }
+
+  Logger get log { 
+    return AFibD.logAppRender;
+  }
 
   bool operator==(dynamic o) {
     final result = (o is AFBuildContext<TData, TRouteParam> && param == o.param && storeData == o.storeData);

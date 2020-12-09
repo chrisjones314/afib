@@ -442,8 +442,8 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   /// it is very common to verify that several of them are on or off
   /// at the same time, and passing in a list is a concise way to do
   /// so.
-  Future<void> matchChipSelected(dynamic selector, {bool isSel}) {
-    return matchWidgetValue(selector, ft.equals(isSel), extraFrames: 1);
+  Future<void> matchChipSelected(dynamic selector, {@required bool selected}) {
+    return matchWidgetValue(selector, ft.equals(selected), extraFrames: 1);
   }
 
   Future<void> visitWidget(dynamic selector, Function(Element elem) onFound, { int extraFrames = 0 });
@@ -548,7 +548,7 @@ abstract class AFSingleScreenTestExecute extends AFScreenTestExecute {
 }
 
 class AFScreenTestBody {
-  final AFReusableScreenTestBodyExecuteDelegate3<dynamic, dynamic, dynamic> body;
+  final AFReusableScreenTestBodyExecuteDelegate3 body;
   final AFScreenTestWidgetCollector elementCollector;
   final dynamic param1;
   final dynamic param2;
@@ -581,7 +581,7 @@ class AFSingleScreenTestBody {
 
   AFSingleScreenTestBody(this.testId, { this.sections });
 
-  factory AFSingleScreenTestBody.createReusable(AFSingleScreenTestExecute elementCollector, AFReusableScreenTestBodyExecuteDelegate3<dynamic, dynamic, dynamic> body, {
+  factory AFSingleScreenTestBody.createReusable(AFSingleScreenTestExecute elementCollector, AFReusableScreenTestBodyExecuteDelegate3 body, {
     dynamic param1,
     dynamic param2,
     dynamic param3 }) {
@@ -1158,7 +1158,7 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
   void addError(String desc, int depth) {
     final err = AFBaseTestExecute.composeError(desc, depth);
     dispatcher.dispatch(AFPrototypeScreenTestAddError(this.testId, err));
-    AFibD.log?.e(err);
+    //AFibD.log?.e(err);
   }
 
   bool addPassIf({bool test}) {
@@ -1490,7 +1490,7 @@ class AFWidgetTests<TState> {
 @immutable
 class AFSingleScreenReusableBody {
   final AFScreenID screen;
-  final AFReusableScreenTestBodyExecuteDelegate3<dynamic, dynamic, dynamic> body;
+  final AFReusableScreenTestBodyExecuteDelegate3 body;
 
   AFSingleScreenReusableBody(this.screen, this.body);
 }
@@ -1533,39 +1533,33 @@ class AFSingleScreenTests<TState> {
     return _singleScreenTests;
   }
 
-  void defineReusable1<TP1>(AFSingleScreenTestID id, AFScreenID screen, AFReusableScreenTestBodyExecuteDelegate1<TP1> body) {
+  void defineReusable1(AFSingleScreenTestID id, AFScreenID screen, AFReusableScreenTestBodyExecuteDelegate1 body) {
     if(reusable.containsKey(id)) {
       throw AFException("Duplicate definition for $id");
     }
 
     reusable[id] = AFSingleScreenReusableBody(screen, (sse, p1, p2, p3) async {
-      TP1 tp1 = p1;
-      await body(sse, tp1);
+      await body(sse, p1);
     });
   }
 
-  void defineReusable2<TP1, TP2>(AFSingleScreenTestID id, AFScreenID screen, AFReusableScreenTestBodyExecuteDelegate2<TP1, TP2> body) {
+  void defineReusable2(AFSingleScreenTestID id, AFScreenID screen, AFReusableScreenTestBodyExecuteDelegate2 body) {
     if(reusable.containsKey(id)) {
       throw AFException("Duplicate definition for $id");
     }
 
     reusable[id] = AFSingleScreenReusableBody(screen, (sse, p1, p2, p3) async {
-      TP1 tp1 = p1;
-      TP2 tp2 = p2;
-      await body(sse, tp1, tp2);
+     await body(sse, p1, p2);
     });
   }
 
-  void defineReusable3<TP1, TP2, TP3>(AFSingleScreenTestID id, AFScreenID screen, AFReusableScreenTestBodyExecuteDelegate3<TP1, TP2, TP3> body) {
+  void defineReusable3(AFSingleScreenTestID id, AFScreenID screen, AFReusableScreenTestBodyExecuteDelegate3 body) {
     if(reusable.containsKey(id)) {
       throw AFException("Duplicate definition for $id");
     }
 
     reusable[id] = AFSingleScreenReusableBody(screen, (sse, p1, p2, p3) async {
-      TP1 tp1 = p1;
-      TP2 tp2 = p2;
-      TP3 tp3 = p3;
-      await body(sse, tp1, tp2, tp3);
+      await body(sse, p1, p2, p3);
     });
   }
 
@@ -2033,14 +2027,21 @@ class AFWorkflowStateTests {
 /// Base test definition wrapper, with access to test data.
 /// 
 class AFBaseTestDefinitionContext {
-  final AFTestDataRegistry testData;
-  AFBaseTestDefinitionContext(this.testData);
+  final AFTestDataRegistry registry;
+  AFBaseTestDefinitionContext(this.registry);
 
   /// Looks up the test data defined in your test_data.dart file for a particular
   /// test data id.
-  dynamic find(dynamic testDataId) {
-    return testData.find(testDataId);
+  dynamic td(dynamic testDataId) {
+    return registry.find(testDataId);
   }
+
+  /// Looks up the test data defined in your test_data.dart file for a particular
+  /// test data id.
+  dynamic testData(dynamic testDataId) {
+    return registry.find(testDataId);
+  }
+
 }
 
 class AFUnitTestDefinitionContext extends AFBaseTestDefinitionContext {
@@ -2203,22 +2204,22 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
   /// feature is intended to make reusable tests discoverable.
   /// 
   /// Defining a reusable test does not execute it, use [executeReusable] to do that.
-  void defineReusable1<TP1>(AFSingleScreenTestID id, AFScreenID screen, AFReusableScreenTestBodyExecuteDelegate1<TP1> body) {
-    tests.defineReusable1<TP1>(id, screen, body);
+  void defineReusable1(AFSingleScreenTestID id, AFScreenID screen, AFReusableScreenTestBodyExecuteDelegate1 body) {
+    tests.defineReusable1(id, screen, body);
   }
 
   /// Used to define a reusable test which takes a two parameters.
   /// 
   /// See [defineReusable1] for more.
-  void defineReusable2<TP1, TP2>(AFSingleScreenTestID id, AFScreenID screen, AFReusableScreenTestBodyExecuteDelegate2<TP1, TP2> body) {
-    tests.defineReusable2<TP1, TP2>(id, screen, body);
+  void defineReusable2(AFSingleScreenTestID id, AFScreenID screen, AFReusableScreenTestBodyExecuteDelegate2 body) {
+    tests.defineReusable2(id, screen, body);
   }
 
   /// Used to define a reusable test which takes three parameters.
   /// 
   /// See [defineReusable1] for more.
-  void defineReusable3<TP1, TP2, TP3>(AFSingleScreenTestID id, AFScreenID screen, AFReusableScreenTestBodyExecuteDelegate3<TP1, TP2, TP3> body) {
-    tests.defineReusable3<TP1, TP2, TP3>(id, screen, body);
+  void defineReusable3(AFSingleScreenTestID id, AFScreenID screen, AFReusableScreenTestBodyExecuteDelegate3 body) {
+    tests.defineReusable3(id, screen, body);
   }
 
   /// Executes a test defined with [defineResuable1] or one of its variants, allowing

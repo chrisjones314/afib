@@ -15,12 +15,18 @@ import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
+import 'package:logger/logger.dart';
 
 class AFStartQueryContext<TResponse, TError> {
   final Function(TResponse) onSuccess;
   final Function(TError) onError;
 
   AFStartQueryContext({this.onSuccess, this.onError});
+
+  Logger get log {
+    return AFibD.logAppQuery;
+  }
+
 }
 
 class AFFinishQueryContext<TState> {
@@ -43,6 +49,10 @@ class AFFinishQueryContext<TState> {
 
   AFRouteParam findParam(AFScreenID screen) {
     return state.public.route.findParamFor(screen);
+  }
+
+  Logger get log {
+    return AFibD.logAppQuery;
   }
 
   void updateScreenParam(AFScreenID screen, AFRouteParam param) {

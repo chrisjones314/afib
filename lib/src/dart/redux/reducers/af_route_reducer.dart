@@ -63,7 +63,7 @@ AFRouteState _navPopN(AFRouteState state, AFNavigatePopNAction action) {
 
 //---------------------------------------------------------------------------
 AFRouteState _navPopTo(AFRouteState state, AFNavigatePopToAction action) {
-  return state.popTo(action.popTo, action.push.screen, action.push.param, action.returnData);
+  return state.popTo(action.popTo, action.push?.screen, action.push?.param, action.returnData);
 }
 
 //---------------------------------------------------------------------------

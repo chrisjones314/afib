@@ -111,7 +111,7 @@ class AFStateTest<TState extends AFAppState> {
   /// 
   void specifyResponse(dynamic querySpecifier, AFStateTestDefinitionContext definitions, dynamic idData) {
     registerResult(querySpecifier, (context, query) {
-      final data = definitions.find(idData);
+      final data = definitions.td(idData);
       query.testFinishAsyncWithResponse(context, data);
     });
   }

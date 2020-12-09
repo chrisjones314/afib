@@ -45,7 +45,7 @@ class AFNewProjectCommand extends AFCommand {
     ctx.afibConfig.setValue(AFConfigEntries.appNamespace, namespace);
     ctx.afibConfig.setValue(AFConfigEntries.projectName, projectName);
     ctx.afibConfig.setValue(AFConfigEntries.environment, AFConfigEntryEnvironment.debug);
-    ctx.afibConfig.setValue(AFConfigEntries.logAreas, AFConfigEntryLogArea.app);
+    ctx.afibConfig.setValue(AFConfigEntries.logAreas, [AFConfigEntryLogArea.appQuery, AFConfigEntryLogArea.appRender, AFConfigEntryLogArea.appTest]);
     ctx.afibConfig.setValue(AFConfigEntries.enabledTestList, []);
 
     // There is no point in trying to expose this generator for manipulation, because the 

@@ -62,7 +62,7 @@ class AFConfig {
     if(result.length == 0) {
       return <String>[];
     }
-    return result;
+    return result.map((x) => x.toString()).toList();
   }
 
   /// Casts the value for [entry] to a boolean and returns it.

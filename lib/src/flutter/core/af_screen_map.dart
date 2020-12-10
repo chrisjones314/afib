@@ -39,6 +39,9 @@ class AFScreenMap {
   }
 
   Widget createFor(AFScreenID id) {
+    if(!_screens.containsKey(id)) {
+      throw AFException("Please add an entry for $id in screen_map.dart");
+    }
     return _screens[id](null);
   }
 

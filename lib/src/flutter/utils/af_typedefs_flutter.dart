@@ -1,6 +1,7 @@
 
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/flutter/core/af_app_extension_context.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
 import 'package:afib/src/flutter/test/af_unit_tests.dart';
 import 'package:flutter/material.dart';
@@ -105,16 +106,16 @@ typedef AFCreateQueryResultDelegate = dynamic Function(AFStateTestContext contex
 typedef AFProcessTestDelegate = void Function(AFStateTest test);
 
 /// Delegate used to verify a state change, from before to after
-typedef AFProcessVerifyDelegate = void Function(AFStateTestExecute execute, AFAppState before, AFAppState after);
+typedef AFProcessVerifyDelegate = void Function(AFStateTestExecute execute, AFAppStateArea before, AFAppStateArea after);
 
 /// Delegate used to implement the body of a unit test.
 typedef AFUnitTestBodyExecuteDelegate = void Function(AFUnitTestExecute e);
 
 /// Delegate used when an [AFAsyncQuery] results in a successful response.
-typedef AFOnResponseDelegate<TState, TResponse> = void Function(AFFinishQuerySuccessContext<TState, TResponse> context);
+typedef AFOnResponseDelegate<TState extends AFAppStateArea, TResponse> = void Function(AFFinishQuerySuccessContext<TState, TResponse> context);
 
 /// Delegate used when an [AFAsyncQuery] results in an error.
-typedef AFOnErrorDelegate<TState, TError> = void Function(AFFinishQueryErrorContext<TState, TError> context);
+typedef AFOnErrorDelegate<TState extends AFAppStateArea, TError> = void Function(AFFinishQueryErrorContext<TState, TError> context);
 
 /// Delegate used to process an [AFAsyncQuery]
 typedef AFAsyncQueryListenerDelegate = void Function(AFAsyncQuery query);
@@ -123,7 +124,7 @@ typedef AFAsyncQueryListenerDelegate = void Function(AFAsyncQuery query);
 typedef AFFillWidgetListDelegate = void Function(List<Widget> widgets);
 
 /// Delegate used to register to listen to all queries on success.
-typedef AFQueryListenerDelegate = void Function(AFAsyncQuery query, AFFinishQuerySuccessContext context);
+typedef AFQuerySuccessListenerDelegate = void Function(AFAsyncQuery query, AFFinishQuerySuccessContext context);
 
 /// Delegate used to create a route parameter.
 typedef AFCreateRouteParamDelegate = AFRouteParam Function();
@@ -132,3 +133,8 @@ typedef AFChangedTextDelegate = void Function(String);
 
 typedef AFPressedDelegate = void Function();
 typedef AFOnTapDelegate = void Function();
+
+typedef AFExtendAppDelegate = void Function(AFAppExtensionContext context);
+
+/// Create the flutter ThemeData for this app.
+typedef AFCreateThemeDataDelegate = ThemeData Function(dynamic appState);

@@ -9,6 +9,7 @@ import 'package:afib/src/dart/command/commands/af_new_project_command.dart';
 import 'package:afib/src/dart/command/commands/af_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
+import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 /// Initialize commands that are used only from the afib command
@@ -21,27 +22,49 @@ void afRegisterAfibOnlyCommands(AFCommands commands) {
 
 /// Initialize afib comamnds that are used from the application-specific
 /// commamd
-void afRegisterAppCommands(AFDartParams params, AFCommands commands) {
-  commands.register(AFHelpCommand(all: commands));
-  commands.register(AFVersionCommand());
-  commands.register(AFConfigCommand());
-  commands.register(AFGenerateCommand());
-  commands.register(AFTestCommand());
+void afRegisterAppCommands(AFCommandExtensionContext definitions) {
+  definitions.register(AFHelpCommand(all: definitions.commands));
+  definitions.register(AFVersionCommand());
+  definitions.register(AFConfigCommand());
+  definitions.register(AFGenerateCommand());
+  definitions.register(AFTestCommand());
 }
 
-void afCommandMain(AFCommands commands, AFDartParams params, AFArgs afArgs) {
+/// Used to initialize and execute commands available via afib_bootstrap
+void afBootstrapCommandMain(AFDartParams paramsD, AFArgs afArgs) {
+  final commands = AFCommands(command: AFCommands.afCommandAfib);
+
+  _afCommandMain(commands, paramsD, afArgs, [
+    afRegisterAppCommands
+  ]);
+}
+
+void afAppCommandMain(AFDartParams paramsD, AFArgs afArgs, AFExtendCommandsDelegate initApp) {
+  final commands = AFCommands();
+  _afCommandMain(commands, paramsD, afArgs, [
+    afRegisterAppCommands,
+    initApp
+  ]);
+}
+
+void _afCommandMain(AFCommands commands, AFDartParams paramsD, AFArgs afArgs, List<AFExtendCommandsDelegate> inits) {
+  final definitions = AFCommandExtensionContext(commands: commands, paramsD: paramsD);
+  for(final init in inits) {
+    init(definitions);
+  }
+
   var command = "help";
   if(afArgs.hasCommand) {
     command = afArgs.command;
   }
 
   // initialize the stuff that is accessible from dart/the command line.
-  AFibD.initialize(params);
+  AFibD.initialize(paramsD);
   final afibConfig = AFConfig();
-  if(params != null) {
+  if(paramsD != null) {
     final configCmd = commands.findConfigCommand();
     configCmd.initAfibDefaults(afibConfig);
-    params.initAfib(afibConfig);
+    paramsD.initAfib(afibConfig);
   }
 
   commands.execute(command, afArgs, afibConfig);

@@ -6,19 +6,16 @@ import 'package:afib/src/flutter/utils/afib_f.dart';
 
 /// This reducer handles the default behavior of the app state, which 
 /// is just to set one or more 
-AFAppState afAppStateReducer(AFAppState state, dynamic action) {
+AFAppStateAreas afAppAreaStateReducer(AFAppStateAreas areas, dynamic action) {
   if(action is AFResetToInitialStateAction) {
     // In the state/screen test context, we want to reset to the intial
     // app state, but leave the route and test state unchanged.
-    return AFibF.initializeAppState();
+    return AFibF.g.createInitialAppStateAreas();
   }
-
+  
   if(action is AFUpdateAppStateAction) {
-    return state.copyWith(action.toIntegrate);
+    return areas.reviseArea(action.area, action.toIntegrate);
   }
-  if(AFibF.appReducer != null) {
-    return AFibF.appReducer(state, action);
-  }
-  return state;
+  return areas;
 }
 

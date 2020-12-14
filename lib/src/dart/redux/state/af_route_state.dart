@@ -313,7 +313,7 @@ class AFRouteState {
   /// Creates the default initial state.
   factory AFRouteState.initialState() {
     final screen = <AFRouteSegment>[];
-    screen.add(AFRouteSegment.withParam(AFibF.effectiveStartupScreenId, AFibF.startupRouteParamFactory()));
+    screen.add(AFRouteSegment.withParam(AFibF.g.effectiveStartupScreenId, AFibF.g.startupRouteParamFactory()));
     final empty = <AFRouteSegment>[];
     final screenSegs = AFRouteStateSegments(active: screen, prior: empty);
     final popupSegs  = AFRouteStateSegments(active: empty, prior: empty);
@@ -366,7 +366,7 @@ class AFRouteState {
   /// in the search.  This is useful when the final segement has been popped off the route,
   /// but still needs to be included in the search.
   AFRouteParam findParamFor(AFScreenID screen, { bool includePrior = true }) {
-    if(hasStartupWrapper && screen == AFibF.screenMap.startupScreenId) {
+    if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
       screen = AFUIID.screenStartupWrapper;
     }
     final seg = screenSegments.findSegmentFor(screen, includePrior: includePrior);
@@ -452,7 +452,7 @@ class AFRouteState {
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
   AFRouteState setParam(AFScreenID screen, AFRouteParam param) {
-    if(hasStartupWrapper && screen == AFibF.screenMap.startupScreenId) {
+    if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
       screen = AFUIID.screenStartupWrapper;
     }
     return _reviseScreen(screenSegments.setParam(screen, param));

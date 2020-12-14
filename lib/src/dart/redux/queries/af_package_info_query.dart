@@ -2,14 +2,13 @@
 
 
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_package_info_state.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
 import 'package:package_info/package_info.dart';
 
-class AFPackageInfoQuery<TState extends AFAppState> extends AFAsyncQuery<TState, AFPackageInfoState> {
+class AFPackageInfoQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TState, AFPackageInfoState> {
 
   AFPackageInfoQuery({List<dynamic> successActions, AFOnResponseDelegate<TState, AFPackageInfoState> onSuccessDelegate}):
     super(successActions: successActions, onSuccessDelegate: onSuccessDelegate);
@@ -31,8 +30,7 @@ class AFPackageInfoQuery<TState extends AFAppState> extends AFAsyncQuery<TState,
   void finishAsyncWithResponse(AFFinishQuerySuccessContext<TState, AFPackageInfoState> context) {
     final packageInfo = context.r;
   
-    final updateState = AFUpdateAppStateAction.updateOne(packageInfo);
-    context.dispatch(updateState);
+    context.updateAppState1(packageInfo);
   }
 
   @override

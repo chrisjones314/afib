@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
+import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
@@ -12,7 +13,7 @@ import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 
 /// A version of [AFAsyncQuery] for queries that should be run in the background
 /// after a delay.  
-abstract class AFDeferredQuery<TState> extends AFAsyncQuery<TState, AFUnused> {
+abstract class AFDeferredQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TState, AFUnused> {
   Duration nextDelay;
   Timer timer;
 

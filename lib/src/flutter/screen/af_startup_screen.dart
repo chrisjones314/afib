@@ -36,24 +36,21 @@ class _AFStartupScreenState extends State<AFStartupScreenWrapper> {
   void initState() {
     super.initState();
 
-    if(AFibF.createLifecycleQueryAction != null) {
-      WidgetsBinding.instance.addObserver(
-        AFLifecycleEventHandler(eventHandler: (state) {
-          AFibF.internalOnlyStore.dispatch(AFibF.createLifecycleQueryAction(state));
-        })
-      );
-    }
-
+    WidgetsBinding.instance.addObserver(
+      AFLifecycleEventHandler(eventHandler: (state) {
+        AFibF.g.dispatchLifecycleActions(AFibF.g.storeDispatcherInternalOnly, state);
+      })
+    );
 
     // Kick off the app by firing a query.  In a typical app this might check the user's
     // logged in status while a splash screen displays.
-    AFibF.internalOnlyStore.dispatch(AFibF.createStartupQueryAction());
+    AFibF.g.dispatchStartupActions(AFibF.g.storeDispatcherInternalOnly);
   }
 
   //--------------------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    final builder = AFibF.screenMap.initialScreenBuilder;
+    final builder = AFibF.g.screenMap.initialScreenBuilder;
     return builder(context);
   }
 }

@@ -16,24 +16,39 @@ class AFResetToInitialStateAction {
 /// and use copyWith to propogate the change up to a root object in [AFAppState],
 /// then issue an [AFUpdateAppStateAction]
 class AFUpdateAppStateAction extends AFObjectWithKey {
-  final toIntegrate = <Object>[];
+  final Type area;
+  final List<Object> toIntegrate;
   
-  /// Constructor for use with the [add] method, which allows you to update
-  /// several different root objects in the [AFAppState] with a single dispatch.
-  AFUpdateAppStateAction({AFID id}): super(id: id);
+  AFUpdateAppStateAction({AFID id,
+    @required this.area,
+    @required this.toIntegrate
+  }): super(id: id);
+
+  /// A utility for creating a list of revised models.   
+  /// 
+  /// You will repeatedly call .add for all your revised models,
+  /// then use [AFUpdateAppStateAction.updateAll] to create an action
+  /// that updates them all.
+  static List<Object> createModelList() {
+    return <Object>[];
+  }
 
   /// Constructor for updating one object at the root of the [AFAppState]
-  AFUpdateAppStateAction.updateOne(Object o) {
-    toIntegrate.add(o);
+  factory AFUpdateAppStateAction.updateOne(Type area, Object o) {
+    final toIntegrate = [o];
+    return AFUpdateAppStateAction(
+      area: area,
+      toIntegrate: toIntegrate
+    );
   }
 
   /// Constructor for updating multiple objects at the root of the [AFAppState]
-  AFUpdateAppStateAction.updateAll(Iterable<Object> objs) {
-    toIntegrate.addAll(objs);
+  factory AFUpdateAppStateAction.updateAll(Type area, Iterable<Object> objs) {
+    final toIntegrate = objs.toList();
+    return AFUpdateAppStateAction(
+      area: area,
+      toIntegrate: toIntegrate
+    );        
   }
 
-  ///
-  void add(Object o) {
-    toIntegrate.add(o);
-  }
 }

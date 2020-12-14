@@ -1,6 +1,5 @@
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
-import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:afib/src/flutter/screen/af_startup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:afib/afib_dart.dart';
@@ -50,9 +49,7 @@ class AFScreenMap {
   }
 
   /// Call [startupScreen] once to specify the initial screen for your app.
-  void startupScreen(AFScreenID screenId, WidgetBuilder screenBuilder, AFCreateRouteParamDelegate createParam) {
-    AFibF.verifyNotImmutable();
-    
+  void startupScreen(AFScreenID screenId, WidgetBuilder screenBuilder, AFCreateRouteParamDelegate createParam) {    
     _startupScreenId = screenId;
     _createStartupScreenParam = createParam;
     screen(screenId, screenBuilder);
@@ -61,7 +58,6 @@ class AFScreenMap {
   /// Call [screen] multiple times to specify the relationship between 
   /// [screenKey] and screens built by the [WidgetBuilder]
   void screen(AFScreenID screenKey, WidgetBuilder screenBuilder) {
-    AFibF.verifyNotImmutable();
     _screens[screenKey] = screenBuilder;
   }
 

@@ -9,6 +9,7 @@ import 'package:afib/src/dart/redux/middleware/af_route_middleware.dart';
 import 'package:afib/src/dart/redux/reducers/af_reducer.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
+import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
@@ -16,7 +17,6 @@ import 'package:afib/src/flutter/core/af_screen_map.dart';
 import 'package:afib/src/flutter/test/af_init_prototype_screen_map.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_data_registry.dart';
-import 'package:afib/src/flutter/utils/af_flutter_params.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
@@ -28,144 +28,114 @@ class AFibTestOnlyScreenElement {
   AFibTestOnlyScreenElement(this.screenId, this.element);
 }
 
-/// A class for finding accessing global utilities in AFib. 
-/// 
-/// Never use the globals to track or change state in your
-/// application.  Globals contain debugging utilities (e.g. logging)
-/// and configuration that is immutable after startup (e.g. configuration).
-class AFibF {
-  static bool _postStartup = false;
-  static final AFScreenMap _afScreenMap = AFScreenMap();
-  static AFInitializeAppStateDelegate _afInitializeAppState;
-  static AFAppReducerDelegate _appReducer;
-  static AFStore _afStore;
-  static final AFAsyncQueries _afAsyncQueries = AFAsyncQueries();
-  static AFCreateStartupQueryActionDelegate _afCreateStartupQueryAction;
-  static AFCreateLifecycleQueryAction _afCreateLifecycleQueryAction;
-  static final AFTestDataRegistry _afTestData = AFTestDataRegistry();
-  static final AFSingleScreenTests _afScreenTests = AFSingleScreenTests();
-  static final AFWidgetTests _afWidgetTests = AFWidgetTests();
-  static final AFWorkflowStateTests _afWorkflowStateTests = AFWorkflowStateTests();
-  static final AFStateTests _afStateTests = AFStateTests();
-  static final AFUnitTests _afUnitTests = AFUnitTests();
-  static AFScreenMap _afPrototypeScreenMap;
-  static AFCreateAFAppDelegate _afCreateApp;
-  static AFScreenID forcedStartupScreen;
-  static final testOnlyScreens = <AFScreenID, AFibTestOnlyScreenElement>{};
-  static Map<String, AFAsyncQueryListener> listenerQueries = <String, AFAsyncQueryListener>{};
-  static Map<String, AFDeferredQuery> deferredQueries = <String, AFDeferredQuery>{};
-  static final _recentActions = <AFActionWithKey>[];
-  static int navDepth = 0;
-  static bool testOnlyShouldSuppressNavigation = false;
-  static AFQueryListenerDelegate _afQueryListenerDelegate;
+class AFibGlobalState<TState extends AFAppStateArea> {
+  final AFAppExtensionContext appContext;
+
+  final AFScreenMap screenMap = AFScreenMap();
+  final AFAsyncQueries _afAsyncQueries = AFAsyncQueries();
+  final AFTestDataRegistry _afTestData = AFTestDataRegistry();
+  final AFSingleScreenTests _afScreenTests = AFSingleScreenTests();
+  final AFWidgetTests _afWidgetTests = AFWidgetTests();
+  final AFWorkflowStateTests _afWorkflowStateTests = AFWorkflowStateTests<TState>();
+  final AFStateTests _afStateTests = AFStateTests();
+  final AFUnitTests _afUnitTests = AFUnitTests();
+  final testOnlyScreens = <AFScreenID, AFibTestOnlyScreenElement>{};
+  final _recentActions = <AFActionWithKey>[];
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 
-  /// a key for referencing the Navigator for the material app.
-  static final GlobalKey<NavigatorState> _afNavigatorKey = GlobalKey<NavigatorState>();
+  AFScreenMap _afPrototypeScreenMap;
+  AFScreenID forcedStartupScreen;
+  int navDepth = 0;
+  bool testOnlyShouldSuppressNavigation = false;
+  Map<String, AFAsyncQueryListener> listenerQueries = <String, AFAsyncQueryListener>{};
+  Map<String, AFDeferredQuery> deferredQueries = <String, AFDeferredQuery>{};
 
-  static void initialize<AppState>(AFFlutterParams p) {
-      _afCreateApp = p.createApp;
+  /// The redux store, which contains the application state, NOT FOR PUBLIC USE.
+  /// 
+  /// WARNING: You should never
+  /// call this.  AFib's testing and prototyping systems sometimes operate in contexts
+  /// with a specially modified store, without a store at all, or with a special dispatcher.  If you try to access
+  /// the store directly, or dispatch actions on it directly, you will compromise these systems.   
+  /// 
+  /// If you need to dispatch an action, you should typically call [AFBuildContext.dispatch].
+  /// If you need access to items from your reduce state, you should typically override
+  /// [AFConnectedScreen.createStateData] or [AFConnectedWidgetWithParam.createStateData].
+  AFStore storeInternalOnly;
 
-    p.initScreenMap(AFibF.screenMap);
+  /// WARNING: You should never call this.  See [internalOnlyStore] for details.
+  AFStoreDispatcher storeDispatcherInternalOnly;
 
-    AFibF.setInitialAppStateFactory(p.initialAppState);
-    AFibF.setAppReducer(appReducer);
-    AFibF.setCreateStartupQueryAction(p.createStartupQueryAction);
-    AFibF.setCreateLifecycleQueryAction(p.createLifecycleQueryAction);
-    _afQueryListenerDelegate = p.queryListenerDelegate;
+  AFibGlobalState({
+    this.appContext
+  });
+
+  void initialize() {
+    appContext.initScreenMap(screenMap);
 
     final middleware = <Middleware<AFState>>[];
     middleware.addAll(createRouteMiddleware());
     middleware.add(AFQueryMiddleware());
     
-    if(AFibD.config.requiresTestData) {
-      final testData = AFibF.testData;
-      
-      p.initTestData(testData);
-      final unitTestDefineContext = AFUnitTestDefinitionContext(
-        tests: AFibF.unitTests,
-        testData: testData,
+    if(AFibD.config.requiresTestData) {      
+      appContext.test.initialize(
+        testData: testData, 
+        unitTests: unitTests,
+        stateTests: stateTests,
+        widgetTests: widgetTests,
+        screenTests: screenTests,
+        workflowTests: workflowTests,
       );
-      p.initUnitTests(unitTestDefineContext);
-      
-      final stateTestDefineContext = AFStateTestDefinitionContext(
-        tests: AFibF.stateTests,
-        testData: testData
-      );
-      p.initStateTests(stateTestDefineContext);
-
-      final widgetTestDefineContext = AFWidgetTestDefinitionContext(
-        tests: AFibF.widgetTests,
-        testData: testData
-      );
-      p.initWidgetTests(widgetTestDefineContext);
-      
-      final singleTestDefineContext = AFSingleScreenTestDefinitionContext(
-        tests: AFibF.screenTests,
-        testData: testData
-      );
-      p.initScreenTests(singleTestDefineContext);
-
-      final workflowTestDefineContext = AFWorkflowTestDefinitionContext(
-        tests: AFibF.workflowTests,
-        testData: testData
-      );
-
-      p.initWorkflowStateTests(workflowTestDefineContext);
       _populateAllWidgetCollectors();
     }
     if(AFibD.config.requiresPrototypeData) {
-      afInitPrototypeScreenMap(AFibF.screenMap);
-      setPrototypeScreenMap(AFibF.screenMap);
+      afInitPrototypeScreenMap(screenMap);
+      setPrototypeScreenMap(screenMap);
     }
 
-    final store = AFStore(
+    storeInternalOnly = AFStore(
       afReducer,
       initialState: AFState.initialState(),
       middleware: middleware
     );
-    setStore(store);
-
-
-    // Make sure all the globals in AF are immutable from now on.
-    finishStartup();
+    storeDispatcherInternalOnly = AFStoreDispatcher(storeInternalOnly);
   }
 
-  static void testOnlyVerifyActiveScreen(AFScreenID screenId, {bool includePopups = false}) {
+  void testOnlyVerifyActiveScreen(AFScreenID screenId, {bool includePopups = false}) {
     if(screenId == null) {
       return;
     }
 
-    final state = _afStore.state;
+    final state = storeInternalOnly.state;
     final routeState = state.public.route;
 
     if(!routeState.isActiveScreen(screenId, includePopups: includePopups)) {
       throw AFException("Screen $screenId is not the currently active screen in route ${routeState.toString()}");
     }
 
-    var info = testOnlyScreens[screenId];    
+    var info = AFibF.g.testOnlyScreens[screenId];    
     if(info == null || info.element == null) {
       throw AFException("Screen $screenId is active, but has not rendered (as there is no screen element), this might be an intenral problem in Afib.");
     }
 
   }
 
-  static AFScreenID get testOnlyActiveScreenId {
-    final state = _afStore.state;
+  AFScreenID get testOnlyActiveScreenId {
+    final state = AFibF.g.storeInternalOnly.state;
     final routeState = state.public.route;
     return routeState.activeScreenId;
   }
 
-  static void correctForFlutterPopNavigation() {
-    _afStore.dispatch(AFNavigatePopFromFlutterAction());
+  void correctForFlutterPopNavigation() {
+    storeInternalOnly.dispatch(AFNavigatePopFromFlutterAction());
   }
 
-  static void doMiddlewareNavigation( Function(NavigatorState) underHere ) {
+  void doMiddlewareNavigation( Function(NavigatorState) underHere ) {
     navDepth++;
     if(navDepth > 1) {
       throw AFException("Unexpected navigation depth greater than 1");
     }
-    final navState = AFibF.navigatorKey.currentState;
+    final navState = AFibF.g.navigatorKey.currentState;
     if(navState != null) {
       underHere(navState);
     }
@@ -175,12 +145,12 @@ class AFibF {
     }
   }
 
-  static bool get withinMiddewareNavigation {
+  bool get withinMiddewareNavigation {
     return navDepth > 0;
   }
 
   /// Used internally in tests to find widgets on the screen.  Not for public use.
-  static AFibTestOnlyScreenElement registerTestScreen(AFScreenID screenId, BuildContext screenElement) {
+  AFibTestOnlyScreenElement registerTestScreen(AFScreenID screenId, BuildContext screenElement) {
     var info = testOnlyScreens[screenId];
     if(info == null) {
       info = AFibTestOnlyScreenElement(screenId, screenElement);
@@ -190,7 +160,7 @@ class AFibF {
     return info;
   }
 
-  static AFScreenPrototypeTest findScreenTestById(AFTestID testId) {
+  AFScreenPrototypeTest findScreenTestById(AFTestID testId) {
     final single = screenTests.findById(testId);
     if(single != null) {
       return single;
@@ -210,59 +180,44 @@ class AFibF {
   }
 
   /// Used internally to reset widget tracking between tests.
-  static void resetTestScreens() {
+  void resetTestScreens() {
     testOnlyScreens.clear();
     _recentActions.clear();
   }
 
 
   /// Used internally in tests to find widgets on the screen.  Not for public use.
-  static AFibTestOnlyScreenElement findTestScreen(AFScreenID screenId) {
+  AFibTestOnlyScreenElement findTestScreen(AFScreenID screenId) {
     return testOnlyScreens[screenId];
   }
 
   /// Used internally in tests to keep track of recently dispatched actions
   /// so that we can verify their contents.
-  static void testOnlyRegisterRegisterAction(AFActionWithKey action) {
+  void testOnlyRegisterRegisterAction(AFActionWithKey action) {
     _recentActions.add(action);
   }
 
   /// Used internally to get the most recent action with the specified key.
-  static List<AFActionWithKey> get testOnlyRecentActions {
+  List<AFActionWithKey> get testOnlyRecentActions {
     return _recentActions;
   }
 
-  static void testOnlyClearRecentActions() {
+  void testOnlyClearRecentActions() {
     _recentActions.clear();
   }
-
-  /// The navigator key for referencing the Navigator for the material app.
-  static GlobalKey<NavigatorState> get navigatorKey {
-    return _afNavigatorKey;
-  }
-  
-  /// Mapping from string ids to builders for specific screens for the real app.
-  static AFScreenMap get screenMap {
-    return _afScreenMap;
-  }
-
-  /// Static access to the store, should only be used for testing.
-  static AFStore get testOnlyStore {
-    return _afStore;
-  }
-
+ 
   /// The screen map to use given the mode we are running in (its different in prototype mode, for example)
-  static AFScreenMap get effectiveScreenMap {
+  AFScreenMap get effectiveScreenMap {
     if(AFibD.config.requiresPrototypeData) {
       return _afPrototypeScreenMap;
     }
-    return _afScreenMap;
+    return screenMap;
   }
 
   /// returns the screen id of the startup screen.
   /// 
   /// This varies depending on the afib mode (e.g. prototype mode has a different starutp screen than debug/production)
-  static AFScreenID get effectiveStartupScreenId {
+  AFScreenID get effectiveStartupScreenId {
     if(forcedStartupScreen != null) {
       return forcedStartupScreen;
     }
@@ -272,49 +227,53 @@ class AFibF {
     return AFUIID.screenStartupWrapper;
   }
 
-  static AFScreenID get actualStartupScreenId {
+  AFScreenID get actualStartupScreenId {
     return screenMap.startupScreenId;
   }
 
   /// Returns the route parameter used by the startup screen.
-  static AFCreateRouteParamDelegate get startupRouteParamFactory {
-    return _afScreenMap.startupRouteParamFactory;
+  AFCreateRouteParamDelegate get startupRouteParamFactory {
+    return screenMap.startupRouteParamFactory;
   }
 
   /// Returns a function that creates the initial applications state, used to reset the state.
-  static AFInitializeAppStateDelegate get initializeAppState {
-    return _afInitializeAppState;
+  AFAppStateAreas createInitialAppStateAreas() {
+    return appContext.createInitialAppStateAreas();
   }
 
-  /// Returns the a function that creates the query which kicks off the application on startup.
-  static AFCreateStartupQueryActionDelegate get createStartupQueryAction {
-    return _afCreateStartupQueryAction;
+  AFThemeState initializeThemeState(dynamic appState) {
+    //return AFThemeState(
+    //  primary: AFThemeFundamentals.create(flutterTheme));    
+    return null;
   }
 
-  static AFCreateLifecycleQueryAction get createLifecycleQueryAction {
-    return _afCreateLifecycleQueryAction;
+  /// Used internally by the framework.
+  /// 
+  /// If you'd like to dispatch a startup action, see [AFAppExtensionContext.initializeAppFundamentals]
+  /// or [AFAppExtensionContext.addStartupAction]
+  void dispatchStartupActions(AFDispatcher dispatcher) {
+    appContext.dispatchStartupActions(dispatcher);
+  }
+
+  /// Used internally by the framework.
+  void dispatchLifecycleActions(AFDispatcher dispatcher, AppLifecycleState lifecycle) {
+    appContext.dispatchLifecycleActions(dispatcher, lifecycle);
   }
 
   /// A list of asynchronous queries the app uses to retrieve or manipulate remote data.
   /// 
   /// In redux terms, each query is a middleware processor, 
-  static AFAsyncQueries get asyncQueries {
+  AFAsyncQueries get asyncQueries {
     return _afAsyncQueries;
-  }
-
-  /// The redux reducer for the entire app.  Give a the current store/state and an action,
-  /// it is responsible for producing a new state that reflects the impact of that action.
-  static AFAppReducerDelegate get appReducer {
-    return _appReducer;
   }
 
   /// Retrieves screen/data pairings used for prototyping and for screen-specific
   /// testing.
-  static AFSingleScreenTests get screenTests {
+  AFSingleScreenTests get screenTests {
     return _afScreenTests;
   }
 
-  static List<AFScreenPrototypeTest> findTestsForAreas(List<String> areas) {
+  List<AFScreenPrototypeTest> findTestsForAreas(List<String> areas) {
     final result = <AFScreenPrototypeTest>[];
     final addAllScreen = areas.contains("screen");
     final addAllWorkflow  = areas.contains("workflow");
@@ -335,63 +294,47 @@ class AFibF {
   }
 
   /// Retrieves widget/data pairings for connected and unconnected widget tests.
-  static AFWidgetTests get widgetTests {
+  AFWidgetTests get widgetTests {
     return _afWidgetTests;
   }
 
   /// Retrieves tests which pair an initial state, and then multiple screen/state tests
   /// to produce a higher-level multi-screen test.
-  static AFWorkflowStateTests get workflowTests {
+  AFWorkflowStateTests get workflowTests {
     return _afWorkflowStateTests;
   }
 
   /// Retrieves unit/calculation tests
-  static AFUnitTests get unitTests {
+  AFUnitTests get unitTests {
     return _afUnitTests;
   }
 
   /// Mapping from string ids to builders for specific screens for the real app.
-  static AFTestDataRegistry get testData {
+  AFTestDataRegistry get testData {
     return _afTestData;
   }
 
   // Retrieves tests used to manipulate the redux state and verify that it 
   // changed as expected.
-  static AFStateTests get stateTests {
+  AFStateTests get stateTests {
     return _afStateTests;
   }
 
-  static AFCreateAFAppDelegate get createApp {
-    return _afCreateApp;
+  AFCreateAFAppDelegate get createApp {
+    return appContext.createApp;
   }
 
   /// Called internally when a query finishes successfully, see [AFFlutterParams.querySuccessDelegate] 
   /// to listen for query success.
-  static void onQuerySuccess(AFAsyncQuery query, AFFinishQuerySuccessContext successContext) {
-    if(_afQueryListenerDelegate != null) {
-      _afQueryListenerDelegate(query, successContext);
-    }
-  }
-
-  /// The redux store, which contains the application state, NOT FOR PUBLIC USE.
-  /// 
-  /// WARNING: You should never
-  /// call this.  AFib's testing and prototyping systems sometimes operate in contexts
-  /// with a specially modified store, without a store at all, or with a special dispatcher.  If you try to access
-  /// the store directly, or dispatch actions on it directly, you will compromise these systems.   
-  /// 
-  /// If you need to dispatch an action, you should typically call [AFBuildContext.dispatch].
-  /// If you need access to items from your reduce state, you should typically override
-  /// [AFConnectedScreen.createStateData] or [AFConnectedWidgetWithParam.createStateData].
-  static AFStore get internalOnlyStore {
-    return _afStore;
+  void onQuerySuccess(AFAsyncQuery query, AFFinishQuerySuccessContext successContext) {
+    appContext.updateQueryListeners(query, successContext);
   }
 
   /// Register an ongoing listener query which must eventually be shut down.  
   /// 
   /// This is used internally by AFib anytime you dispatch a listener query,
   /// you should not call it directly.
-  static void registerListenerQuery(AFAsyncQueryListener query) {
+  void registerListenerQuery(AFAsyncQueryListener query) {
     final key = query.key;
     AFibD.logQuery?.d("Registering listener query $key");
     final current = listenerQueries[key];
@@ -406,7 +349,7 @@ class AFibF {
   /// 
   /// This is used internally by AFib anytime you dispatch a deferred query,
   /// you should not call it directly.
-  static void registerDeferredQuery(AFDeferredQuery query) {
+  void registerDeferredQuery(AFDeferredQuery query) {
     final key = query.key;
     AFibD.logQuery?.d("Registering deferred query $key");
     final current = deferredQueries[key];
@@ -419,7 +362,7 @@ class AFibF {
   /// Shutdown all outstanding listener queries using [AFAsyncQueryListener.shutdown]
   /// 
   /// You might use this to shut down outstanding listener queries when a user logs out.
-  static void shutdownOutstandingQueries() {
+  void shutdownOutstandingQueries() {
     for(var query in listenerQueries.values) { 
       query.afShutdown();
     }
@@ -432,7 +375,7 @@ class AFibF {
   }
 
   /// Shutdown a single outstanding listener query using [AFAsyncQueryListener.shutdown]
-  static void shutdownListenerQuery(String key) {
+  void shutdownListenerQuery(String key) {
     final query = listenerQueries[key];
     if(query != null) {
       query.shutdown();
@@ -440,88 +383,21 @@ class AFibF {
     }
   }
 
-  /// Do not call this method, see AFApp.initialize instead.
-  static void setInitialAppStateFactory(AFInitializeAppStateDelegate initialState) {
-    if(_afInitializeAppState != null) {
-      _directCallException();
-    }
-    AFibF.verifyNotImmutable();
-    _afInitializeAppState = initialState;
-  }
-
-
-  /// Do not call this method, AFApp.initialize will create the store for you.
-  static void setStore(AFStore store) {
-    if(_afStore != null) {
-      _directCallException();
-    }
-    AFibF.verifyNotImmutable();
-    _afStore = store;
-  }
-
-  /// Do not call this method, AFApp.initialize will do it for you.
-  static void setCreateStartupQueryAction(AFCreateStartupQueryActionDelegate createStartupQueryAction) {
-    if(_afCreateStartupQueryAction != null) {
-      _directCallException();
-    }
-    AFibF.verifyNotImmutable();
-    _afCreateStartupQueryAction = createStartupQueryAction;
-  }
-
-  /// Do not call this method, AFApp.initialize will do it for you.
-  static void setCreateLifecycleQueryAction(AFCreateLifecycleQueryAction createLifecycleQueryAction) {
-    if(_afCreateLifecycleQueryAction != null) {
-      _directCallException();
-    }
-    AFibF.verifyNotImmutable();
-    
-    _afCreateLifecycleQueryAction = createLifecycleQueryAction;
-  }
-
-  /// Do not call this method, AFApp.initialize will do it for you.
-  static void setAppReducer<TAppState>(AFAppReducerDelegate<TAppState> reducer) {
-    if(reducer != null) {
-      _appReducer = (dynamic state, dynamic action) {
-        dynamic d = reducer(state, action);
-        return d;
-      };
-    }
-  }
-  
   /// testOnlySetForcedStartupScreen
-  static void testOnlySetForcedStartupScreen(AFScreenID id) {
+  void testOnlySetForcedStartupScreen(AFScreenID id) {
     forcedStartupScreen = id;
   }
 
   /// Do not call this method, AFApp.initialize will do it for you.
-  static void setPrototypeScreenMap(AFScreenMap screens) {
-    AFibF.verifyNotImmutable();
+  void setPrototypeScreenMap(AFScreenMap screens) {
     _afPrototypeScreenMap = screens;
   }
-
-  /// Throws an exception if called after the startup process completes.  
-  /// 
-  /// Used to enforce immutability post startup.
-  static void verifyNotImmutable() {
-    if(_postStartup) {
-      throw AFException("You cannot perform this operation after startup is complete.  Put mutable state in the application state/store using actions");
-    }
-  }
-
-  /// Utility for error associated with directly calling global setters.
-  static void _directCallException() {
-      throw AFException("Do not call this directly, use AFApp.initialize");
-  }
-
-  static void finishStartup() {
-    _postStartup = true;
-  }
   
-  static void _populateAllWidgetCollectors() async {
+  void _populateAllWidgetCollectors() async {
     final guard = _AFTestAsyncGuard();
-    await _populateWidgetCollectors(guard, AFibF.screenTests.all);
-    await _populateWidgetCollectors(guard, AFibF.widgetTests.all);
-    await _populateWidgetCollectors(guard, AFibF.workflowTests.all);
+    await _populateWidgetCollectors(guard, screenTests.all);
+    await _populateWidgetCollectors(guard, widgetTests.all);
+    await _populateWidgetCollectors(guard, workflowTests.all);
   }
 
   static Future<void> _populateWidgetCollectors(_AFTestAsyncGuard guard, List<AFScreenPrototypeTest> tests) async {
@@ -533,6 +409,28 @@ class AFibF {
     }
 
     return null;
+  }
+
+}
+
+/// A class for finding accessing global utilities in AFib. 
+/// 
+/// Never use the globals to track or change state in your
+/// application.  Globals contain debugging utilities (e.g. logging)
+/// and configuration that is immutable after startup (e.g. configuration).
+class AFibF {
+  static AFibGlobalState global;
+
+  static void initialize<TState extends AFAppStateArea>(AFAppExtensionContext appContext) {
+    global = AFibGlobalState<TState>(
+      appContext: appContext
+    );
+
+    global.initialize();
+  }
+
+  static AFibGlobalState get g { 
+    return global;
   }
 }
 

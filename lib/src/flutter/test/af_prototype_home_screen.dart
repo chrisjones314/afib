@@ -63,18 +63,18 @@ class APrototypeHomeScreenData extends AFStoreConnectorData1<AFSingleScreenTests
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppState, APrototypeHomeScreenData, AFPrototypeHomeScreenParam>{
+class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototypeHomeScreenData, AFPrototypeHomeScreenParam>{
 
   AFPrototypeHomeScreen(): super(AFUIID.screenPrototypeHome);
 
   @override
   APrototypeHomeScreenData createStateDataAF(AFState state) {
-    final tests = AFibF.screenTests;
+    final tests = AFibF.g.screenTests;
     return APrototypeHomeScreenData(tests);
   }
 
   @override
-  APrototypeHomeScreenData createStateData(AFAppState state) {
+  APrototypeHomeScreenData createStateData(AFAppStateArea state) {
     // this should never be called, because createDataAF replaces it.
     throw UnimplementedError();
   }
@@ -90,12 +90,12 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppState, APrototypeHome
     final rows = AFUI.column();
     
     rows.add(_createKindRow("Widget Prototypes", () {
-      List<AFScreenPrototypeTest> tests = AFibF.widgetTests.all;
+      List<AFScreenPrototypeTest> tests = AFibF.g.widgetTests.all;
       context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
     }));
     
     rows.add(_createKindRow("Single Screen Prototypes", () {
-      List<AFScreenPrototypeTest> tests = AFibF.screenTests.all;
+      List<AFScreenPrototypeTest> tests = AFibF.g.screenTests.all;
       context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
     }));
     
@@ -104,12 +104,12 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppState, APrototypeHome
     }));
 
     rows.add(_createKindRow("Workflow Prototypes", () {
-      List<AFScreenPrototypeTest> tests = AFibF.workflowTests.all;
+      List<AFScreenPrototypeTest> tests = AFibF.g.workflowTests.all;
       context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
     }));
     
     final areas = context.p.filter.split(" ");
-    final tests = AFibF.findTestsForAreas(areas);
+    final tests = AFibF.g.findTestsForAreas(areas);
 
     _buildFilterAndRunControls(context, tests, rows);
 
@@ -124,7 +124,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppState, APrototypeHome
       // first, we navigate into the screen.
       test.startScreen(context.d);
 
-      final state = AFibF.testOnlyStore.state;
+      final state = AFibF.g.storeInternalOnly.state;
       final testState = state.testState;
       final testContext = testState.findContext(test.id);
       final testSpecificState = testState.findState(test.id);

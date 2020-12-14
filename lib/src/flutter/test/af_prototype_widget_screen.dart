@@ -40,7 +40,7 @@ class AFPrototypeWidgetData extends AFStoreConnectorData1<AFTestState> {
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppState, AFPrototypeWidgetData, AFPrototypeWidgetRouteParam>{
+class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFPrototypeWidgetData, AFPrototypeWidgetRouteParam>{
 
   AFPrototypeWidgetScreen(): super(AFUIID.screenPrototypeWidget);
 
@@ -58,7 +58,7 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppState, AFPrototypeW
   }
 
   @override
-  AFPrototypeWidgetData createStateData(AFAppState state) {
+  AFPrototypeWidgetData createStateData(AFAppStateArea state) {
     // this should never be called, because createDataAF supercedes it.
     throw UnimplementedError();
   }
@@ -110,7 +110,7 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppState, AFPrototypeW
             automaticallyImplyLeading: false,
             leading: AFUI.standardBackButton(context.d),
             title: Text('Widget Test Screen',
-              style: AFTheme.styleWhite
+              style: AFThemeOld.styleWhite
             ),
           ),
           SliverList(

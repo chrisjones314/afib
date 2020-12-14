@@ -83,6 +83,6 @@ AFRouteState _navExitTest(AFRouteState state, AFNavigateExitTestAction action) {
 
 //---------------------------------------------------------------------------
 AFRouteState _shutdownQueries(AFRouteState state, AFShutdownOngoingQueriesAction action) {
-  AFibF.shutdownOutstandingQueries();
+  AFibF.g.shutdownOutstandingQueries();
   return state;
 }

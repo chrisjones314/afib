@@ -78,7 +78,7 @@ class AFPrototypeTestScreenData extends AFStoreConnectorData1<AFSingleScreenTest
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeTestScreen extends AFConnectedScreen<AFAppState, AFStoreConnectorDataUnused, AFPrototypeTestScreenParam>{
+class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreConnectorDataUnused, AFPrototypeTestScreenParam>{
 
   AFPrototypeTestScreen(): super(AFUIID.screenPrototypeListSingleScreen);
 
@@ -88,7 +88,7 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppState, AFStoreConnect
   }
 
   @override
-  AFStoreConnectorDataUnused createStateData(AFAppState state) {
+  AFStoreConnectorDataUnused createStateData(AFAppStateArea state) {
     return AFStoreConnectorDataUnused();
   }
 
@@ -118,12 +118,12 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppState, AFStoreConnect
 
   static Widget createSectionHeader(String title) {
     return Card(
-      color: AFTheme.colorPrimary,
+      color: AFThemeOld.colorPrimary,
       child: Container(
         margin: EdgeInsets.all(8.0),
         child: Text(
           title,
-          style: AFTheme.styleWhite
+          style: AFThemeOld.styleWhite
         )
       )
     );
@@ -147,10 +147,10 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppState, AFStoreConnect
         margin: EdgeInsets.only(left: 8.0),
         padding: EdgeInsets.symmetric(horizontal: 8.0),
         decoration: BoxDecoration(
-          color: AFTheme.colorPrimary,
+          color: AFThemeOld.colorPrimary,
           borderRadius: BorderRadius.circular(4.0),
         ),
-        child: Text("Reusable", style: AFTheme.styleWhite)
+        child: Text("Reusable", style: AFThemeOld.styleWhite)
       ));
     }
 

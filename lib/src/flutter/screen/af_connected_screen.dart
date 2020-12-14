@@ -51,7 +51,7 @@ class AFStoreDispatcher extends AFDispatcher {
 
   dynamic dispatch(dynamic action) {  
     if(AFibD.config.requiresTestData && !isTestAction(action) && action is AFActionWithKey) {
-      AFibF.testOnlyRegisterRegisterAction(action);
+      AFibF.g.testOnlyRegisterRegisterAction(action);
       AFibD.logTest?.d("Registered action: $action");
     }
 
@@ -203,7 +203,7 @@ abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam
 }
 
 /// A screen that uses data from the store but not from the route.
-abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFBuildableWidget<TData, TRouteParam> {
+abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFBuildableWidget<TData, TRouteParam> {
   //--------------------------------------------------------------------------------------
   AFConnectedWidgetBase({Key key}): super(key: key);
 
@@ -235,7 +235,7 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
               screenIdRegister = dataContext.p.effectiveScreenId;
             }
             
-            AFibF.registerTestScreen(screenIdRegister, buildContext);
+            AFibF.g.registerTestScreen(screenIdRegister, buildContext);
             AFibD.logTest?.d("Rebuilding screen $runtimeType/$screenIdRegister with param ${dataContext.p}");
           }
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p);
@@ -278,7 +278,8 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
   /// However, be aware that a full route state does not exist in single
   /// screen tests.
   TData createStateDataPublic(AFPublicState public) {
-    return createStateData(public.app);
+    final TState state = public.areaStateFor(TState);
+    return createStateData(state);
   }
 
 
@@ -313,7 +314,7 @@ abstract class AFConnectedWidgetBase<TState, TData extends AFStoreConnectorData,
 
 /// Superclass for a screen Widget, which combined data from the store with data from
 /// the route in order to render itself.
-abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedWidgetBase<TState, TData, TRouteParam> {
+abstract class AFConnectedScreen<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedWidgetBase<TState, TData, TRouteParam> {
   final AFScreenID screenId;
   AFConnectedScreen(this.screenId, { Key key }): super(key: key);
 
@@ -348,7 +349,7 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
   AFRouteParam findParam(AFState state) {
     final route = state.public.route;
     TRouteParam p = route?.findParamFor(this.screenId, includePrior: true);
-    if(p == null && this.screenId == AFibF.actualStartupScreenId) {
+    if(p == null && this.screenId == AFibF.g.actualStartupScreenId) {
       p = route?.findParamFor(AFUIID.screenStartupWrapper);
     }
     return p;
@@ -412,7 +413,7 @@ abstract class AFConnectedScreen<TState, TData extends AFStoreConnectorData, TRo
 }
 
 /// The first screen afib displays when the app starts, shown while the startup query is executing.
-abstract class AFStartupScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreen<TState, TData, TRouteParam> {
+abstract class AFStartupScreen<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreen<TState, TData, TRouteParam> {
   AFStartupScreen(AFScreenID screenId, { Key key }): super(screenId, key: key);
 }
 
@@ -420,7 +421,7 @@ abstract class AFStartupScreen<TState, TData extends AFStoreConnectorData, TRout
 /// 
 /// The Widget can still have a route parameter, but it must be passed in
 /// from the parent screen that the Widget is created by.
-abstract class AFConnectedWidgetWithParam<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedWidgetBase<TState, TData, TRouteParam> {
+abstract class AFConnectedWidgetWithParam<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedWidgetBase<TState, TData, TRouteParam> {
   //final TRouteParam parentParam;
   final AFUpdateParamDelegate<TRouteParam> updateParamDelegate;
   final AFExtractParamDelegate extractParamDelegate;
@@ -474,7 +475,7 @@ abstract class AFConnectedWidgetWithParam<TState, TData extends AFStoreConnector
 /// Just like an [AFConnectedScreen], except it is typically displayed as 
 /// a modal overlay on top of an existing screen, and launched using a custom 
 /// AFPopupRoute
-abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreen<TState, TData, TRouteParam> {
+abstract class AFPopupScreen<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedScreen<TState, TData, TRouteParam> {
   final Animation<double> animation;
   final AFBottomPopupTheme theme;
   final AFCreateDataDelegate createDataDelegate;
@@ -549,9 +550,9 @@ abstract class AFPopupScreen<TState, TData extends AFStoreConnectorData, TRouteP
 /// 
 /// Drawers are special because the user can drag in from the left or right to open them.
 /// You cannot trust that you used an [AFNavigatePush] action to open the drawer.  Consequently,
-/// you should only rely on information in your [AFAppState] to render your drawers, and perhaps
+/// you should only rely on information in your [AFAppStateArea] to render your drawers, and perhaps
 /// the full state of the route ()
-abstract class AFConnectedDrawer<TState, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedWidgetWithParam<TState, TData, TRouteParam> {
+abstract class AFConnectedDrawer<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> extends AFConnectedWidgetWithParam<TState, TData, TRouteParam> {
   final AFScreenID screenId;
 
   AFConnectedDrawer({
@@ -623,11 +624,11 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   }
 
   Widget createDebugDrawer(Widget drawer, int testDrawerSide) {
-    final store = AFibF.testOnlyStore;
+    final store = AFibF.g.storeInternalOnly;
     final state = store.state;
     final testState = state.testState;
     if(testState.activeTestId != null) {
-      final test = AFibF.findScreenTestById(testState.activeTestId);
+      final test = AFibF.g.findScreenTestById(testState.activeTestId);
       if(test != null && test.testDrawerSide == testDrawerSide) {
         return AFTestDrawer(
           dispatcher: dispatcher,

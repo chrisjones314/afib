@@ -14,12 +14,11 @@ import 'package:afib/src/flutter/test/af_prototype_single_screen_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
-import 'package:afib/src/flutter/utils/af_flutter_params.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams paramsD1, AFFlutterParams paramsF, WidgetTester tester) async {
+Future<void> afScreenTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTestStats stats, AFDartParams paramsD1, WidgetTester tester) async {
   final isWidget = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.widgetTests);
   final isSingle = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.screenTests);
   final isMulti  = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.workflowTests);
@@ -28,25 +27,25 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
   }
 
   AFibD.config.setValue(AFConfigEntries.widgetTesterContext, AFConfigEntryBool.trueValue);
-  final app = AFibF.createApp();
+  final app = AFibF.g.createApp();
   await tester.pumpWidget(app);
 
   if(isWidget) {
-    await _afWidgetTestMain(output, stats, tester, app);
+    await _afWidgetTestMain<TState>(output, stats, tester, app);
   }
 
   if(isSingle) {
-    await _afSingleScreenTestMain(output, stats, tester, app);
+    await _afSingleScreenTestMain<TState>(output, stats, tester, app);
   }
 
   if(isMulti) {
-    await _afWorkflowTestMain(output, stats, tester, app);
+    await _afWorkflowTestMain<TState>(output, stats, tester, app);
   }
 
   return null;
 }
 
-Future<void> _afStandardScreenTestMain(
+Future<void> _afStandardScreenTestMain<TState extends AFAppStateArea>(
   AFCommandOutput output, 
   AFTestStats stats, 
   WidgetTester tester, 
@@ -63,11 +62,11 @@ Future<void> _afStandardScreenTestMain(
       continue;
     }
     if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
-      AFibF.testOnlyStore.dispatch(createPush(test));
+      AFibF.g.storeInternalOnly.dispatch(createPush(test));
       AFibD.logTest?.d("Starting ${test.id}");
 
       final screenId = test.screenId;
-      final dispatcher = AFSingleScreenTestDispatcher(screenId, AFStoreDispatcher(AFibF.testOnlyStore), null);
+      final dispatcher = AFSingleScreenTestDispatcher(screenId, AFStoreDispatcher(AFibF.g.storeInternalOnly), null);
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id);
       dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context));
       dispatcher.setContext(context);
@@ -82,7 +81,7 @@ Future<void> _afStandardScreenTestMain(
       AFibD.logTest?.d("Finished ${test.id}");
 
       // pop this test screen off so that we are ready for the next one.
-      AFibF.testOnlyStore.dispatch(AFNavigateExitTestAction());
+      AFibF.g.storeInternalOnly.dispatch(AFNavigateExitTestAction());
       
       dispatcher.setContext(context);
       await tester.pumpAndSettle(Duration(seconds: 1));
@@ -96,35 +95,35 @@ Future<void> _afStandardScreenTestMain(
   stats.mergeIn(localStats);
 }
 
-Future<void> _afWidgetTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
-  return _afStandardScreenTestMain(output, stats, tester, app, AFibF.widgetTests.all, "Widget", (test) {
+Future<void> _afWidgetTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.widgetTests.all, "Widget", (test) {
     return AFPrototypeWidgetScreen.navigatePush(test);
   });
 }
 
-Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
-  return _afStandardScreenTestMain(output, stats, tester, app, AFibF.screenTests.all, "Single-Screen", (test) {
+Future<void> _afSingleScreenTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.screenTests.all, "Single-Screen", (test) {
     return AFPrototypeSingleScreenScreen.navigatePush(test);
   });
 }
 
-Future<void> _afWorkflowTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+Future<void> _afWorkflowTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
  final multiContexts = <AFScreenTestContextWidgetTester>[];
   final testKind = "Workflow";
   final localStats = AFTestStats();
 
-  for(final test in AFibF.workflowTests.stateTests) {
+  for(final test in AFibF.g.workflowTests.stateTests) {
     if(!test.hasBody) {
       continue;
     }
     if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
       AFibD.logTest?.d("Starting test ${test.id}");
 
-      final dispatcher = AFStoreDispatcher(AFibF.testOnlyStore);
+      final dispatcher = AFStoreDispatcher(AFibF.g.storeInternalOnly);
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id);
       multiContexts.add(context);
 
-      AFWorkflowStatePrototypeTest.initializeMultiscreenPrototype(dispatcher, test);
+      AFWorkflowStatePrototypeTest.initializeMultiscreenPrototype<TState>(dispatcher, test);
       
       // tell the store to go to the correct screen.
       await tester.pumpAndSettle(Duration(seconds: 1));
@@ -135,13 +134,13 @@ Future<void> _afWorkflowTestMain(AFCommandOutput output, AFTestStats stats, Widg
       AFibD.logTest?.d("Finished ${test.id}");
 
       // pop this test screen off so that we are ready for the next one.
-      AFibF.testOnlyStore.dispatch(AFNavigateExitTestAction());
+      AFibF.g.storeInternalOnly.dispatch(AFNavigateExitTestAction());
       
       //dispatcher.setContext(context);
       await tester.pumpAndSettle(Duration(seconds: 1));
 
       /// Clear out our cache of screen info for the next test.
-      AFibF.resetTestScreens();
+      AFibF.g.resetTestScreens();
       printTestResult(output, testKind, context, localStats);
     }
   }

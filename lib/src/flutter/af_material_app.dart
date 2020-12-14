@@ -8,8 +8,8 @@ import 'package:overlay_support/overlay_support.dart';
 
 class AFNavigatorObserver extends NavigatorObserver {
   void didPop(Route route, Route previousRoute) {
-    if(!AFibF.withinMiddewareNavigation) {
-      AFibF.correctForFlutterPopNavigation();
+    if(!AFibF.g.withinMiddewareNavigation) {
+      AFibF.g.correctForFlutterPopNavigation();
     }    
   }
 
@@ -53,7 +53,7 @@ abstract class AFMaterialApp<AppState> extends AFApp<AppState> {
   @override
   Widget build(BuildContext context) {
     return StoreProvider(
-      store: AFibF.internalOnlyStore,
+      store: AFibF.g.storeInternalOnly,
       child: OverlaySupport(
         child: buildMaterialApp()
       )

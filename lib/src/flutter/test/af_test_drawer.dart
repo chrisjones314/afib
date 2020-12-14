@@ -26,7 +26,7 @@ class AFTestDrawerData extends AFStoreConnectorData3<AFScreenTestContextSimulato
 }
 
 //--------------------------------------------------------------------------------------
-class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData, AFRouteParamUnused> {
+class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, AFRouteParamUnused> {
   final timeFormat = DateFormat('Hms');
 
   //--------------------------------------------------------------------------------------
@@ -53,12 +53,12 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData, AFRou
   @override
   AFTestDrawerData createStateDataAF(AFState state) {
     final testState = state.testState;
-    final test = AFibF.findScreenTestById(testState.activeTestId);
+    final test = AFibF.g.findScreenTestById(testState.activeTestId);
     return AFTestDrawerData(testState.findContext(test.id), testState.findState(test.id), test);
   }
 
   @override
-  AFTestDrawerData createStateData(AFAppState state) {
+  AFTestDrawerData createStateData(AFAppStateArea state) {
     // this should never be called, because createDataAF replaces it.
     throw UnimplementedError();
   }
@@ -99,8 +99,8 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData, AFRou
 
     rowActions.add(FlatButton(
       child: Text('Exit'),
-      color: AFTheme.colorPrimary,
-      textColor: AFTheme.colorWhite,
+      color: AFThemeOld.colorPrimary,
+      textColor: AFThemeOld.colorWhite,
       onPressed: () {
           Navigator.pop(context.c);
           context.dispatch(AFNavigateExitTestAction());
@@ -109,8 +109,8 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData, AFRou
 
     rowActions.add(FlatButton(
       child: Text('Reset'),
-      color: AFTheme.colorPrimary,
-      textColor: AFTheme.colorWhite,
+      color: AFThemeOld.colorPrimary,
+      textColor: AFThemeOld.colorWhite,
       onPressed: () {
           Navigator.pop(context.c);
           test.onDrawerReset(context.d);
@@ -120,8 +120,8 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppState, AFTestDrawerData, AFRou
     if(test.hasBody) {
       rowActions.add(FlatButton(
         child: Text('Run Test'),
-        color: AFTheme.colorPrimary,
-        textColor: AFTheme.colorWhite,
+        color: AFThemeOld.colorPrimary,
+        textColor: AFThemeOld.colorWhite,
         onPressed: ()  {
           Navigator.pop(context.c);
 

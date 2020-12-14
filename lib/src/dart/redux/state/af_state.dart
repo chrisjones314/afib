@@ -1,23 +1,35 @@
+import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
+import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:meta/meta.dart';
 
+/// State meant to be used by the app itself, including the
+/// app-specific state.
 class AFPublicState {
   final AFRouteState route;
-  final dynamic app;
+  final AFThemeState themes;
+  final AFAppStateAreas areas;
 
   AFPublicState({
-    this.route,
-    this.app
+    @required this.route,
+    @required this.themes,
+    @required this.areas
   });
+
+  AFAppStateArea areaStateFor(Type areaType) {
+    return areas.stateFor(areaType);
+  }
 
   AFPublicState copyWith({
     AFRouteState route,
-    dynamic app
+    AFThemeState themes,
+    AFAppStateAreas areas,
   }) {
     return AFPublicState(
-      app: app ?? this.app,
+      areas: areas ?? this.areas,
+      themes: themes ?? this.themes,
       route: route ?? this.route,
     );
   }
@@ -38,11 +50,13 @@ class AFState {
 
   /// 
   factory AFState.initialState() {
+    final areas = AFibF.g.createInitialAppStateAreas();
     return AFState(
       testState: AFTestState.initial(),
       public: AFPublicState(
         route: AFRouteState.initialState(),
-        app: AFibF.initializeAppState()
+        themes: AFibF.g.initializeThemeState(areas),
+        areas: areas
       ),
     );
   }  

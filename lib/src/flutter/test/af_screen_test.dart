@@ -325,9 +325,9 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   AFScreenTestExecute(this.testId);
 
   AFScreenPrototypeTest get test {
-    AFScreenPrototypeTest found = AFibF.screenTests.findById(this.testId);
+    AFScreenPrototypeTest found = AFibF.g.screenTests.findById(this.testId);
     if(found == null) {
-      found = AFibF.widgetTests.findById(this.testId);
+      found = AFibF.g.widgetTests.findById(this.testId);
     }
     return found;
   }
@@ -641,7 +641,7 @@ class AFSingleScreenTestBody {
   }
 
   void openTestDrawer() {
-    final scaffoldState = sections.first.findScaffoldState(AFibF.testOnlyActiveScreenId);
+    final scaffoldState = sections.first.findScaffoldState(AFibF.g.testOnlyActiveScreenId);
     scaffoldState?.openEndDrawer();
   }
 
@@ -852,7 +852,7 @@ class AFScreenTestWidgetCollector extends AFSingleScreenTestExecute {
 
 
   AFScreenTestWidgetCollectorScreen _updateCache() {
-    final info = AFibF.findTestScreen(activeScreenId);
+    final info = AFibF.g.findTestScreen(activeScreenId);
     return _refresh(info);
   }
 
@@ -1052,7 +1052,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
     }
 
     for(final elem in elems) {
-      final selectable = AFibF.screenTests.findExtractor(extractType, elem);
+      final selectable = AFibF.g.screenTests.findExtractor(extractType, elem);
       if(selectable == null) {
         throw AFException("No AFSelectedWidgetTest found for ${elem.widget.runtimeType}, you can register one using AFScreenTests.registerSelectable");
       }
@@ -1068,7 +1068,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
       int maxWidgets = 1, 
       int extraFrames = 0 
     }) async {
-    AFibF.testOnlyClearRecentActions();
+    AFibF.g.testOnlyClearRecentActions();
     final selector = AFScreenTestWidgetCollector.createSelector(null, selectorDyn);
     final elems = await elementCollector.findWidgetsFor(selector);
     if(maxWidgets > 0 && maxWidgets < elems.length) {
@@ -1079,16 +1079,16 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
     }
 
     final elem = elems.first;
-    final tapable = AFibF.screenTests.findApplicator(applyType, elem);
+    final tapable = AFibF.g.screenTests.findApplicator(applyType, elem);
     if(tapable == null) {
       throw AFException("No AFApplyWidgetAction found for ${elem.widget.runtimeType}, you can register one using AFScreenTests.registerApplicator");
     }
     tapable.apply(applyType, selector, elem, value);    
     if(verifyActions != null) {
-      verifyActions(AFibF.testOnlyRecentActions);
+      verifyActions(AFibF.g.testOnlyRecentActions);
     } 
     if(verifyParamUpdate != null) {
-      final AFNavigateSetParamAction setParam = AFibF.testOnlyRecentActions.firstWhere( (act) => (act is AFNavigateSetParamAction), orElse: () => null );
+      final AFNavigateSetParamAction setParam = AFibF.g.testOnlyRecentActions.firstWhere( (act) => (act is AFNavigateSetParamAction), orElse: () => null );
       if(setParam == null) {
         throw AFException("Passed in verifyUpdateParam, but there was not an AFNavigateSetParamAction dispatched by action");
       }
@@ -1101,7 +1101,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
       verifyParamUpdate(paramInner);
     }
     if(verifyQuery != null) {
-      final AFAsyncQuery query = AFibF.testOnlyRecentActions.firstWhere( (act) => (act is AFAsyncQuery), orElse: () => null );
+      final AFAsyncQuery query = AFibF.g.testOnlyRecentActions.firstWhere( (act) => (act is AFAsyncQuery), orElse: () => null );
       if(query == null) {
         throw AFException("Passed in verifyQuery, but there was not an AFAsyncQuery dispatched by action");
       }
@@ -1169,7 +1169,7 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
   }
 
   void verifyPopupScreenId(AFScreenID popupScreenId) {
-    AFibF.testOnlyVerifyActiveScreen(popupScreenId, includePopups: true);
+    AFibF.g.testOnlyVerifyActiveScreen(popupScreenId, includePopups: true);
   }
 }
 
@@ -1197,7 +1197,7 @@ class AFScreenTestContextWidgetTester extends AFScreenTestContext {
   }
 
   void verifyPopupScreenId(AFScreenID popupScreenId) {
-    AFibF.testOnlyVerifyActiveScreen(popupScreenId, includePopups: true);
+    AFibF.g.testOnlyVerifyActiveScreen(popupScreenId, includePopups: true);
   }
 
 }
@@ -1373,7 +1373,7 @@ class AFConnectedWidgetPrototypeTest extends AFWidgetPrototypeTest {
 
 /// The information necessary to start a test with a baseline state
 /// (determined by a state test) and an initial screen/route.
-class AFWorkflowStatePrototypeTest extends AFScreenPrototypeTest {
+class AFWorkflowStatePrototypeTest<TState extends AFAppStateArea> extends AFScreenPrototypeTest {
   final List<AFNavigatePushAction> initialPath;
   final AFStateTestID stateTestId;
   final AFWorkflowStateTestBody body;
@@ -1403,29 +1403,29 @@ class AFWorkflowStatePrototypeTest extends AFScreenPrototypeTest {
   }
 
   AFSingleScreenTests get screenTests {
-    return AFibF.screenTests;
+    return AFibF.g.screenTests;
   }
 
   void startScreen(AFDispatcher dispatcher) {
-    initializeMultiscreenPrototype(dispatcher, this);
+    initializeMultiscreenPrototype<TState>(dispatcher, this);
   }
 
-  static void initializeMultiscreenPrototype(AFDispatcher dispatcher, AFWorkflowStatePrototypeTest test) {
+  static void initializeMultiscreenPrototype<TState extends AFAppStateArea>(AFDispatcher dispatcher, AFWorkflowStatePrototypeTest test) {
     dispatcher.dispatch(AFResetToInitialStateAction());
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(test));
 
     // lookup the test.
-    final testImpl = AFibF.stateTests.findById(test.stateTestId);
+    final testImpl = AFibF.g.stateTests.findById(test.stateTestId);
     
     // then, execute the desired state test to bring us to our desired state.
-    final store = AFibF.testOnlyStore;
+    final store = AFibF.g.storeInternalOnly;
     final mainDispatcher = AFStoreDispatcher(store);    
     final stateDispatcher = AFStateScreenTestDispatcher(mainDispatcher);
 
-    final stateTestContext = AFStateTestContext(testImpl, store, stateDispatcher, isTrueTestContext: false);
-    AFibF.testOnlyShouldSuppressNavigation = true;
+    final stateTestContext = AFStateTestContext<TState>(testImpl, store, stateDispatcher, isTrueTestContext: false);
+    AFibF.g.testOnlyShouldSuppressNavigation = true;
     testImpl.execute(stateTestContext);
-    AFibF.testOnlyShouldSuppressNavigation = false;
+    AFibF.g.testOnlyShouldSuppressNavigation = false;
 
 
     if(stateTestContext.errors.hasErrors) {
@@ -1657,11 +1657,11 @@ class AFSingleScreenTests<TState> {
 
 
   void registerData(dynamic id, dynamic data) {
-    AFibF.testData.register(id, data);
+    AFibF.g.testData.register(id, data);
   }
 
   dynamic findData(dynamic id) {
-    return AFibF.testData.find(id);
+    return AFibF.g.testData.find(id);
   }
 
   bool addPassIf({bool test}) {
@@ -1680,9 +1680,9 @@ abstract class AFWorkflowTestExecute {
     bool verifyScreen = true
   });
 
-  Future<void> withState<TState extends AFAppState>( Future<void> Function(TState, AFRouteState) withState) async {
-    final public = AFibF.testOnlyStore.state.public;
-    return withState(public.app, public.route);
+  Future<void> withState<TState extends AFAppStateArea>( Future<void> Function(TState, AFRouteState) withState) async {
+    final public = AFibF.g.storeInternalOnly.state.public;
+    return withState(public.areaStateFor(TState), public.route);
   }
 
   Future<void> runScreenTest(AFSingleScreenTestID screenTestId, {
@@ -1748,7 +1748,7 @@ class AFWorkflowTestWidgetCollector extends AFWorkflowTestExecute {
   }
 
   static Future<AFScreenID> internalRunScreenTest(AFSingleScreenTestID screenTestId, AFSingleScreenTestExecute sse, AFScreenTestWidgetCollector elementCollector, dynamic param1, dynamic param2, dynamic param3 ) async {
-    final screenTest = AFibF.screenTests.findById(screenTestId);
+    final screenTest = AFibF.g.screenTests.findById(screenTestId);
     var screenId;
     var body;
     if(screenTest != null) {
@@ -1756,7 +1756,7 @@ class AFWorkflowTestWidgetCollector extends AFWorkflowTestExecute {
       body = screenTest.body;
     } else {
       // this might be a re-usable screen test.
-      final reusable = AFibF.screenTests.findReusable(screenTestId);
+      final reusable = AFibF.g.screenTests.findReusable(screenTestId);
       if(reusable == null) {
         throw AFException("Screen test $screenTestId is not defined");
       }
@@ -1771,7 +1771,7 @@ class AFWorkflowTestWidgetCollector extends AFWorkflowTestExecute {
   }
 
   Future<void> runWidgetTest(AFTestID widgetTestId, AFScreenID originScreen, {AFScreenID terminalScreen, AFTestID queryResults, }) async {
-    final widgetTest = AFibF.widgetTests.findById(widgetTestId);
+    final widgetTest = AFibF.g.widgetTests.findById(widgetTestId);
     elementCollector.pushScreen(originScreen);
     await widgetTest.run(elementCollector, useParentCollector: true);
     elementCollector.popScreen();
@@ -1841,7 +1841,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
 
   Future<void> runWidgetTest(AFTestID widgetTestId, AFScreenID originScreen, {AFScreenID terminalScreen, AFTestID queryResults}) async {
     _installQueryResults(queryResults);
-    final widgetTest = AFibF.widgetTests.findById(widgetTestId);
+    final widgetTest = AFibF.g.widgetTests.findById(widgetTestId);
     screenContext.pushScreen(originScreen);
     await widgetTest.run(screenContext, useParentCollector: true);  
     screenContext.popScreen();    
@@ -1889,7 +1889,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     bool verifyScreen = true
   }) async {
     if(verifyScreen) {
-      AFibF.testOnlyVerifyActiveScreen(startScreen);
+      AFibF.g.testOnlyVerifyActiveScreen(startScreen);
     }
     if(endScreen == null) {
       endScreen = startScreen;
@@ -1907,7 +1907,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
 
     await screenContext.pauseForRender();
     if(verifyScreen) {
-      AFibF.testOnlyVerifyActiveScreen(endScreen);
+      AFibF.g.testOnlyVerifyActiveScreen(endScreen);
     }
   }
 
@@ -1915,9 +1915,9 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     if(queryResults == null) {
       return;
     }
-    final stateTest = AFibF.stateTests.findById(queryResults);
-    final store = AFibF.testOnlyStore;
-    final dispatcher = AFStoreDispatcher(store);
+    final stateTest = AFibF.g.stateTests.findById(queryResults);
+    final store = AFibF.g.storeInternalOnly;
+    final dispatcher = AFibF.g.storeDispatcherInternalOnly;
 
     // This causes the query middleware to return results specified in the state test.
     final stateTestContext = AFStateTestContext(stateTest, store, dispatcher, isTrueTestContext: false);
@@ -1963,7 +1963,7 @@ class AFWorkflowStateTestBody {
   }
 
   void openTestDrawer() {
-    final scaffold = elementCollector.findScaffoldState(AFibF.testOnlyActiveScreenId);
+    final scaffold = elementCollector.findScaffoldState(AFibF.g.testOnlyActiveScreenId);
     scaffold?.openEndDrawer();
   }
 
@@ -1986,7 +1986,7 @@ class AFWorkflowStateTestBody {
 /// 
 /// These tests by combine an initial state from an [AFStateTest] with a series
 /// of screen manipulations from an [AFScreenTest]
-class AFWorkflowStateTests {
+class AFWorkflowStateTests<TState extends AFAppStateArea> {
   final stateTests = <AFWorkflowStatePrototypeTest>[];
 
   AFWorkflowStateTestBody addPrototype({
@@ -1995,7 +1995,7 @@ class AFWorkflowStateTests {
     @required List<AFNavigatePushAction> initialPath,
     @required AFTestID stateTestId,
   }) {
-    final instance = AFWorkflowStatePrototypeTest(
+    final instance = AFWorkflowStatePrototypeTest<TState>(
       id: id,
       title: title,
       initialPath: initialPath,

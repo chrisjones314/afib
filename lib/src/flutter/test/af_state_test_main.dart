@@ -8,26 +8,25 @@ import 'package:afib/src/dart/utils/af_dart_params.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
-import 'package:afib/src/flutter/utils/af_flutter_params.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 
 /// The main function which executes the store test defined in your initStateTests function.
-void afStateTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams paramsD, AFFlutterParams paramsF) {
+void afStateTestMain<TState extends AFAppStateArea> (AFCommandOutput output, AFTestStats stats, AFDartParams paramsD) {
   if(!AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.stateTests)) {
     return;
   }
 
-  final tests = AFibF.stateTests;
+  final tests = AFibF.g.stateTests;
   final contexts = <AFStateTestContext>[];
-  AFibF.testOnlyShouldSuppressNavigation = true;
+  AFibF.g.testOnlyShouldSuppressNavigation = true;
   final testKind = "State";
   final localStats = AFTestStats();
 
   for(final test in tests.tests) {
     if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
-      final store = AFibF.testOnlyStore;
+      final store = AFibF.g.storeInternalOnly;
       final dispatcher = AFStoreDispatcher(store);
-      final context = AFStateTestContext(test, store, dispatcher, isTrueTestContext: true);
+      final context = AFStateTestContext<TState>(test, store, dispatcher, isTrueTestContext: true);
       
       context.store.dispatch(AFResetToInitialStateAction());
       test.execute(context);
@@ -36,7 +35,7 @@ void afStateTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams par
     }
   }
 
-  AFibF.testOnlyShouldSuppressNavigation = false;
+  AFibF.g.testOnlyShouldSuppressNavigation = false;
   final baseContexts = List<AFBaseTestExecute>.of(contexts);
   printTestTotal(output, testKind, baseContexts, localStats);
   stats.mergeIn(localStats);

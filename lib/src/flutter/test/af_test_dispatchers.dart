@@ -32,7 +32,7 @@ class AFStateScreenTestDispatcher extends AFTestDispatcher {
     // return;
     //}
     if(isNavigateAction(action)) {
-      if(AFibF.testOnlyShouldSuppressNavigation) {
+      if(AFibF.g.testOnlyShouldSuppressNavigation) {
         return;
       }
     } 
@@ -65,7 +65,7 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
 
     // if this is a test action, then remember it so that we can 
     if(!isTestAct && action is AFObjectWithKey) {
-      AFibF.testOnlyRegisterRegisterAction(action);
+      AFibF.g.testOnlyRegisterRegisterAction(action);
       AFibD.logTest?.d("Registered action: $action");
     }
   }

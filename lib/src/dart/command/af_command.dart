@@ -235,3 +235,17 @@ class AFCommands {
   }
 
 }
+
+class AFCommandExtensionContext {
+  final AFDartParams paramsD;
+  final AFCommands commands;
+
+  AFCommandExtensionContext({this.paramsD, this.commands});
+
+  /// Used to register a new [AFCommand] that can be executed via the 
+  /// command line.
+  void register(AFCommand command) {
+    commands.register(command);
+  }
+
+}

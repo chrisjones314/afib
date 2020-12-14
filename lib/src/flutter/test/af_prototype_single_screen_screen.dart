@@ -27,7 +27,7 @@ class AFPrototypeSingleScreenRouteParam extends AFRouteParam {
 
   @override
   bool matchesScreen(AFScreenID screenID) {
-    final test = AFibF.screenTests.findById(id);
+    final test = AFibF.g.screenTests.findById(id);
     if(test.screenId == screenID) {
       return true;
     }
@@ -35,13 +35,13 @@ class AFPrototypeSingleScreenRouteParam extends AFRouteParam {
   }
 
   AFScreenID get effectiveScreenId {
-    final test = AFibF.screenTests.findById(id);
+    final test = AFibF.g.screenTests.findById(id);
     return test.screenId;
   }
 
   @override
   AFRouteParam paramFor(AFScreenID screenID) {
-    final test = AFibF.screenTests.findById(id);
+    final test = AFibF.g.screenTests.findById(id);
     if(test.screenId == screenID) {
       return param;
     }
@@ -60,7 +60,7 @@ class AFPrototypeSingleScreenData extends AFStoreConnectorData2<AFSingleScreenTe
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppState, AFPrototypeSingleScreenData, AFPrototypeSingleScreenRouteParam>{
+class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppStateArea, AFPrototypeSingleScreenData, AFPrototypeSingleScreenRouteParam>{
 
   AFPrototypeSingleScreenScreen(): super(AFUIID.screenPrototypeSingleScreen);
 
@@ -74,12 +74,12 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppState, AFProt
 
   @override
   AFPrototypeSingleScreenData createStateDataAF(AFState state) {
-    final tests = AFibF.screenTests;
+    final tests = AFibF.g.screenTests;
     return AFPrototypeSingleScreenData(tests, state.testState);
   }
 
   @override
-  AFPrototypeSingleScreenData createStateData(AFAppState state) {
+  AFPrototypeSingleScreenData createStateData(AFAppStateArea state) {
     // this should never be called, because createDataAF supercedes it.
     throw UnimplementedError();
   }
@@ -101,7 +101,7 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppState, AFProt
     final testState = context.s.testState.findState(test.id);
     final testData = testState?.data ?? test.data;
     final dispatcher = AFSingleScreenTestDispatcher(context.p.id, context.d, testContext);
-    final screenMap = AFibF.screenMap;
+    final screenMap = AFibF.g.screenMap;
     final AFConnectedWidgetBase screen = screenMap.createFor(test.screenId);
     final childContext = screen.createContext(context.c, dispatcher, testData, paramChild);
     return screen.buildWithContext(childContext);

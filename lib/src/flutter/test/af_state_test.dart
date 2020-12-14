@@ -17,7 +17,7 @@ abstract class AFStateTestExecute extends AFBaseTestExecute {
   
 }
 
-class AFStateTestContext<TState extends AFAppState> extends AFStateTestExecute {
+class AFStateTestContext<TState extends AFAppStateArea> extends AFStateTestExecute {
   AFStateTest test;
   final AFStore store;
   final AFDispatcher dispatcher;
@@ -28,7 +28,7 @@ class AFStateTestContext<TState extends AFAppState> extends AFStateTestExecute {
 
   AFStateTestID get testID { return this.test.id; }
   AFState get afState { return store.state; }
-  TState get state { return store.state.public.app; }
+  TState get state { return store.state.public.areaStateFor(TState); }
   AFRouteState get route { return store.state.public.route; }
 
   void processQuery(AFAsyncQuery q) {
@@ -36,7 +36,7 @@ class AFStateTestContext<TState extends AFAppState> extends AFStateTestExecute {
   }
 }
 
-class AFStateTests<TState extends AFAppState> {
+class AFStateTests<TState extends AFAppStateArea> {
   final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
   final List<AFStateTest<dynamic>> tests = <AFStateTest<dynamic>>[];
   AFStateTestContext<dynamic> context;
@@ -69,14 +69,18 @@ class _AFStateQueryBody {
   _AFStateQueryBody(this.query, this.verify);
 }
 
-class AFStateTest<TState extends AFAppState> {
+class AFStateTest<TState extends AFAppStateArea> {
   final AFStateTests<TState> tests;
   final AFStateTestID id;
   AFStateTestID idPredecessor;
   final Map<String, _AFStateResultEntry> results = <String, _AFStateResultEntry>{};
   final List<_AFStateQueryBody> queryBodies = <_AFStateQueryBody>[];
 
-  AFStateTest(this.id, this.tests);
+  AFStateTest(this.id, this.tests) {
+    if(TState.runtimeType == AFAppStateArea) {
+      throw AFException("You must explicitly specify your app state on AFStateTest instances");
+    }
+  }
 
   void extendsTest(AFStateTestID idTest) {
     idPredecessor = idTest;

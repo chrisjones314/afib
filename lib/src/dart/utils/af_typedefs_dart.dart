@@ -1,6 +1,8 @@
 
 
+import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
+import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 
@@ -23,4 +25,7 @@ typedef AFActionListenerDelegate = void Function(List<AFActionWithKey> actions);
 typedef AFParamListenerDelegate = void Function(AFRouteParam param);
 
 /// Delegate used to create the initial applications state.
-typedef AFInitializeAppStateDelegate = dynamic Function();
+typedef AFInitializeAppStateDelegate = AFAppStateArea Function();
+
+/// Delegate use to define commands that are part of the afib command-line app.
+typedef AFExtendCommandsDelegate = void Function(AFCommandExtensionContext context);

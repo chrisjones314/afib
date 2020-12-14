@@ -29,7 +29,7 @@ class AFStartQueryContext<TResponse, TError> {
 
 }
 
-class AFFinishQueryContext<TState> {
+class AFFinishQueryContext<TState extends AFAppStateArea> {
   final AFDispatcher dispatcher;
   final AFState state;
 
@@ -44,7 +44,7 @@ class AFFinishQueryContext<TState> {
   }
 
   TState get s {
-    return state.public.app;
+    return state.public.areaStateFor(TState);
   }
 
   AFRouteParam findParam(AFScreenID screen) {
@@ -55,13 +55,26 @@ class AFFinishQueryContext<TState> {
     return AFibD.logAppQuery;
   }
 
+  /// Dispatches an action that updates the route parameter for the specified screen.
   void updateScreenParam(AFScreenID screen, AFRouteParam param) {
     dispatch(AFNavigateSetParamAction(screen: screen, param: param));
+  }
+
+  /// Dispatches an action that updates a single value in the app state area associated
+  /// with the [TState] type parameter.
+  void updateAppState1(Object toIntegrate) {
+    dispatch(AFUpdateAppStateAction(area: TState, toIntegrate: [toIntegrate]));
+  }
+
+  /// Dispatches an action that updates several blaues in the app state area associated
+  /// with the [TState] type parameter.
+  void updateAppStateN(List<Object> toIntegrate) {
+    dispatch(AFUpdateAppStateAction(area: TState, toIntegrate: toIntegrate));
   }
 }
 
 
-class AFFinishQuerySuccessContext<TState, TResponse> extends AFFinishQueryContext<TState> {
+class AFFinishQuerySuccessContext<TState extends AFAppStateArea, TResponse> extends AFFinishQueryContext<TState> {
   final TResponse response;
   AFFinishQuerySuccessContext({
     AFDispatcher dispatcher, 
@@ -75,7 +88,7 @@ class AFFinishQuerySuccessContext<TState, TResponse> extends AFFinishQueryContex
   }
 }
 
-class AFFinishQueryErrorContext<TState, TError> extends AFFinishQueryContext<TState> {
+class AFFinishQueryErrorContext<TState extends AFAppStateArea, TError> extends AFFinishQueryContext<TState> {
   final TError error;
   AFFinishQueryErrorContext({
     AFDispatcher dispatcher, 
@@ -90,7 +103,7 @@ class AFFinishQueryErrorContext<TState, TError> extends AFFinishQueryContext<TSt
 
 /// Superclass for a kind of action that queries some data asynchronously, then knows
 /// how to process the result.
-abstract class AFAsyncQuery<TState, TResponse> extends AFActionWithKey {
+abstract class AFAsyncQuery<TState extends AFAppStateArea, TResponse> extends AFActionWithKey {
   final List<dynamic> successActions;
   final AFOnResponseDelegate<TState, TResponse> onSuccessDelegate;
   final AFOnErrorDelegate<TState, AFQueryError> onErrorDelegate;
@@ -110,7 +123,7 @@ abstract class AFAsyncQuery<TState, TResponse> extends AFActionWithKey {
         if(onResponseExtra != null) {
           onResponseExtra(successContext);
         }
-        AFibF.onQuerySuccess(this, successContext);
+        AFibF.g.onQuerySuccess(this, successContext);
       }, 
       onError: (error) {
         final errorContext = AFFinishQueryErrorContext<TState, AFQueryError>(dispatcher: dispatcher, state: store.state, error: error);
@@ -237,7 +250,7 @@ class AFConsolidatedQueryResponse {
   }
 }
 
-class AFConsolidatedQuery<TState> extends AFAsyncQuery<TState, AFConsolidatedQueryResponse> {
+class AFConsolidatedQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TState, AFConsolidatedQueryResponse> {
   static const queryFailedCode = 792;
   static const queryFailedMessage = "At least one query in a consolidated query failed.";
 
@@ -359,7 +372,7 @@ class AFConsolidatedQuery<TState> extends AFAsyncQuery<TState, AFConsolidatedQue
 /// Afib will automatically track these queries when you dispatch them.  You can dispatch the
 /// [AFShutdownQueryListeners] action to call the shutdown method on some or all outstanding
 /// listeners.  
-abstract class AFAsyncQueryListener<TState, TResponse> extends AFAsyncQuery<TState, TResponse> {
+abstract class AFAsyncQueryListener<TState extends AFAppStateArea, TResponse> extends AFAsyncQuery<TState, TResponse> {
   AFAsyncQueryListener({AFID id, List<dynamic> successActions, AFOnResponseDelegate<TState, TResponse> onSuccessDelegate, AFOnErrorDelegate<TState, AFQueryError> onErrorDelegate}): super(id: id, successActions: successActions, onSuccessDelegate: onSuccessDelegate);
 
   void afShutdown() {

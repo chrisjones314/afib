@@ -16,11 +16,11 @@ class AFQueryMiddleware implements MiddlewareClass<AFState>
 
       // keep track of listener queries so we can shut them down at the end.
       if(query is AFAsyncQueryListener) {
-        AFibF.registerListenerQuery(query);
+        AFibF.g.registerListenerQuery(query);
       }
 
       if(query is AFDeferredQuery) {
-        AFibF.registerDeferredQuery(query);
+        AFibF.g.registerDeferredQuery(query);
       }
 
       final testContext = AFStateTestContext.currentTest;

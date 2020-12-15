@@ -2182,12 +2182,15 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
     dynamic param,
     AFScreenID screenId,
     AFNavigatePushAction navigate,
-    String title
+    String title,
   }) {
+    final dataActual = testData(data);
+    final paramActual = testData(param);
+    
     return tests.addPrototype(
       id: id,
-      data: data,
-      param: param,
+      data: dataActual,
+      param: paramActual,
       screenId: screenId,
       navigate: navigate,
       title: title
@@ -2229,9 +2232,11 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
     dynamic param2,
     dynamic param3
   }) {
-    body.executeReusable(tests, bodyId, param1: param1, param2: param2, param3: param3);
+    final p1 = td(param1);
+    final p2 = td(param2);
+    final p3 = td(param3);
+    body.executeReusable(tests, bodyId, param1: p1, param2: p2, param3: p3);
   }
-
 }
 
 class AFWorkflowTestDefinitionContext extends AFBaseTestDefinitionContext {

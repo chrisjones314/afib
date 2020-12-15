@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter    
   redux: ^4.0.0
   flutter_redux: ^0.6.0
   intl: ^0.16.1
@@ -28,4 +30,4 @@ dev_dependencies:
   effective_dart: ^1.2.0  
   
 executables:
-  afib:
+  afib_bootstrap:

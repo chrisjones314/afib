@@ -7,6 +7,7 @@ import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/test/af_test.dart';
+import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
@@ -50,17 +51,18 @@ class AFPrototypeSingleScreenRouteParam extends AFRouteParam {
 }
 
 /// Data used to render the screen
-class AFPrototypeSingleScreenData extends AFStoreConnectorData2<AFSingleScreenTests, AFTestState> {
-  AFPrototypeSingleScreenData(AFSingleScreenTests tests, AFTestState testState): 
-    super(first: tests, second: testState);
+class AFPrototypeSingleScreenData extends AFStoreConnectorData3<AFSingleScreenTests, AFTestState, AFThemeState> {
+  AFPrototypeSingleScreenData(AFSingleScreenTests tests, AFTestState testState, AFThemeState themeState): 
+    super(first: tests, second: testState, third: themeState);
   
   AFSingleScreenTests get tests { return first; }
   AFTestState get testState { return second; }
+  AFThemeState get themeState { return third; }
 }
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppStateArea, AFPrototypeSingleScreenData, AFPrototypeSingleScreenRouteParam>{
+class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppStateArea, AFPrototypeSingleScreenData, AFPrototypeSingleScreenRouteParam, AFPrototypeTheme>{
 
   AFPrototypeSingleScreenScreen(): super(AFUIID.screenPrototypeSingleScreen);
 
@@ -75,7 +77,7 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppStateArea, AF
   @override
   AFPrototypeSingleScreenData createStateDataAF(AFState state) {
     final tests = AFibF.g.screenTests;
-    return AFPrototypeSingleScreenData(tests, state.testState);
+    return AFPrototypeSingleScreenData(tests, state.testState, state.public.themes);
   }
 
   @override
@@ -85,7 +87,7 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppStateArea, AF
   }
 
   @override
-  Widget buildWithContext(AFBuildContext<AFPrototypeSingleScreenData, AFPrototypeSingleScreenRouteParam> context) {
+  Widget buildWithContext(AFBuildContext<AFPrototypeSingleScreenData, AFPrototypeSingleScreenRouteParam, AFPrototypeTheme> context) {
     
     /// Remember what screen we are on for testing purposes.  Maybe eventually try to do this in navigator observer.
     AFTest.currentScreen = context.c;
@@ -93,7 +95,7 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppStateArea, AF
   }
 
 
-  Widget _buildScreen(AFBuildContext<AFPrototypeSingleScreenData, AFPrototypeSingleScreenRouteParam> context) {
+  Widget _buildScreen(AFBuildContext<AFPrototypeSingleScreenData, AFPrototypeSingleScreenRouteParam, AFPrototypeTheme> context) {
     final tests = context.s.tests;
     final test = tests.findById(context.p.id);
     AFRouteParam paramChild = context.p.param ?? test.data.param;
@@ -103,7 +105,9 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppStateArea, AF
     final dispatcher = AFSingleScreenTestDispatcher(context.p.id, context.d, testContext);
     final screenMap = AFibF.g.screenMap;
     final AFConnectedWidgetBase screen = screenMap.createFor(test.screenId);
-    final childContext = screen.createContext(context.c, dispatcher, testData, paramChild);
+    final themeChild = screen.findTheme(context.s.themeState);
+
+    final childContext = screen.createContext(context.c, dispatcher, testData, paramChild, themeChild);
     return screen.buildWithContext(childContext);
     
   }

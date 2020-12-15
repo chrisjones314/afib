@@ -13,5 +13,15 @@ class AFUIID {
   static const screenPrototypeHome = AFScreenID("${afibScreenPrefix}prototype_home");
   static const screenPrototypeWidget = AFScreenID("${afibScreenPrefix}prototype_widget");
   static const buttonBack = AFWidgetID("${afibScreenPrefix}button_back");  
+
 }
 
+class AFPrimaryThemeID {
+  static const fundamentalTheme = AFThemeID("${AFUIID.afibScreenPrefix}fundamental", "Fundamental Theme");
+  static const prototypeTheme = AFThemeID("${AFUIID.afibScreenPrefix}prototype", "Prototype Theme");
+  
+  static const primaryColor = AFThemeID("primaryColor", "Primary color");
+  static const textOnPrimaryColor = AFThemeID("textOnPrimaryColor", "Text on primary color");
+  static const primaryColorLight = AFThemeID("primaryColorLight", "Primary Color Light");
+  static const primaryColorDark = AFThemeID("primaryColorDark", "Primary Color Dark");
+}

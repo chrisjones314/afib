@@ -2,10 +2,15 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/utils/af_ui_id.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_test_data_registry.dart';
+import 'package:afib/src/flutter/theme/af_prototype_area.dart';
+import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
@@ -128,10 +133,12 @@ class AFPluginExtensionContext {
   final initScreenMaps = <AFInitScreenMapDelegate>[];
   final initialAppStates = <AFInitializeAppStateDelegate>[];
   final createStartupQueryActions = <AFCreateStartupQueryActionDelegate>[];
-  final createThemeDatas = <AFCreateThemeDataDelegate>[];
   final createLifecycleQueryActions = <AFCreateLifecycleQueryAction>[];
   final querySuccessListenerDelegates = <AFQuerySuccessListenerDelegate>[];
   final test = AFTestExtensionContext();
+  final initConceptualThemes = <AFCreateConceptualThemeDelegate>[];
+  final initFundamentalThemeAreas = <AFCreateFundamentalThemeAreaDelegate>[];
+
 
   /// Used by third parties to register extra query actions they'd like to take.
   void addPluginStartupAction(AFCreateStartupQueryActionDelegate createStartupQueryAction) {
@@ -143,14 +150,18 @@ class AFPluginExtensionContext {
     initScreenMaps.add(initScreenMap);
   }
 
+  /// Used by third parties to register screens that can be used by the app.
+  void addPluginFundamentalThemeArea(AFCreateFundamentalThemeAreaDelegate initArea) {
+    initFundamentalThemeAreas.add(initArea);
+  }
+
   /// Used by third parties to add an app state for themselves.
   void addPluginInitAppState(AFInitializeAppStateDelegate initAppState) {
     initialAppStates.add(initAppState);
   }
 
-  /// Used by third parties to create their own theme data.
-  void addPluginCreateThemeData(AFCreateThemeDataDelegate createThemeData) {
-    createThemeDatas.add(createThemeData);    
+  void addCreateConceptualTheme(AFCreateConceptualThemeDelegate init) {
+    initConceptualThemes.add(init);
   }
 
   /// Used by the app or third parties to create a query that runs on lifecycle actions.
@@ -162,30 +173,33 @@ class AFPluginExtensionContext {
   void addQuerySuccessListener(AFQuerySuccessListenerDelegate queryListenerDelegate) {
     querySuccessListenerDelegates.add(queryListenerDelegate);
   }
+
+  
 }
-
-
 
 /// Enables you, or third parties, to register extensions
 //  recognized by AFib.
 class AFAppExtensionContext extends AFPluginExtensionContext {
   AFCreateAFAppDelegate createApp;
+  AFInitFundamentalThemeAreaDelegate initFundamentalThemeArea;
 
   /// Used by the app to specify fundamental configuration/functionality
   /// that AFib requires.
   void initializeAppFundamentals({
     @required AFInitScreenMapDelegate initScreenMap,
-    @required AFCreateThemeDataDelegate createThemeData,
+    @required AFInitFundamentalThemeAreaDelegate initFundamentalThemeArea,
     @required AFInitializeAppStateDelegate initializeAppState,
     @required AFCreateStartupQueryActionDelegate createStartupQueryAction,
     @required AFCreateAFAppDelegate createApp,
+    @required AFCreateConceptualThemeDelegate createPrimaryTheme
   }) {
     this.initScreenMaps.add(initScreenMap);
     this.initialAppStates.add(initializeAppState);
-    this.createThemeDatas.add(createThemeData);
     this.createStartupQueryActions.add(createStartupQueryAction);
     this.createApp = createApp;
-    _verifyNotNull(createThemeData, "createThemeData");
+    this.initConceptualThemes.add(createPrimaryTheme);
+    this.initFundamentalThemeArea = initFundamentalThemeArea;
+    _verifyNotNull(initFundamentalThemeArea, "initFundamentalTheme");
     _verifyNotNull(initScreenMap, "initScreenMap");
     _verifyNotNull(initializeAppState, "initializeAppState");
     _verifyNotNull(createStartupQueryAction, "createStartupQueryAction");
@@ -223,7 +237,38 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
   }
 
   void updateQueryListeners(AFAsyncQuery query, AFFinishQuerySuccessContext successContext) {
+    for(final listener in querySuccessListenerDelegates) {
+      listener(query, successContext);
+    }
+  }
+
+  AFFundamentalTheme createFundamentalTheme(AFFundamentalDeviceTheme device, AFAppStateAreas areas) {
+    final primaryArea = AFFundamentalThemeArea(id: AFPrimaryThemeID.fundamentalTheme);
+    this.initFundamentalThemeArea(device, areas, primaryArea);
+    final result = AFFundamentalTheme(device: device, primary: primaryArea);
+
+    for(final init in this.initFundamentalThemeAreas) {
+      result.addArea(init(device, areas));
+    }
+
+    if(AFibD.config.requiresPrototypeData) {
+      result.addArea(createPrototypeThemeArea(device, areas));      
+    }
     
+    return result;
+  }
+
+  List<AFConceptualTheme> initializeConceptualThemes(AFFundamentalTheme fundamentals) {
+    final result = <AFConceptualTheme>[];
+    for(final init in initConceptualThemes) {
+      result.add(init(fundamentals));
+    }
+
+    if(AFibD.config.requiresPrototypeData) {
+      result.add(AFPrototypeTheme(fundamentals));
+    }
+
+    return result;
   }
 
   AFAppStateAreas createInitialAppStateAreas() {

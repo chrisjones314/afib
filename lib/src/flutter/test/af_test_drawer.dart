@@ -8,6 +8,7 @@ import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/core/afui.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
 import 'package:afib/src/flutter/utils/af_theme.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
@@ -26,7 +27,7 @@ class AFTestDrawerData extends AFStoreConnectorData3<AFScreenTestContextSimulato
 }
 
 //--------------------------------------------------------------------------------------
-class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, AFRouteParamUnused> {
+class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, AFRouteParamUnused, AFPrototypeTheme> {
   final timeFormat = DateFormat('Hms');
 
   //--------------------------------------------------------------------------------------
@@ -65,12 +66,12 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
 
   //--------------------------------------------------------------------------------------
   @override
-  Widget buildWithContext(AFBuildContext<AFTestDrawerData, AFRouteParamUnused> context) {
+  Widget buildWithContext(AFBuildContext<AFTestDrawerData, AFRouteParamUnused, AFPrototypeTheme> context) {
     return _buildDrawer(context);
   }
 
   //--------------------------------------------------------------------------------------
-  Widget _buildDrawer(AFBuildContext<AFTestDrawerData, AFRouteParamUnused> context) {
+  Widget _buildDrawer(AFBuildContext<AFTestDrawerData, AFRouteParamUnused, AFPrototypeTheme> context) {
     final col = AFUI.column();
     
     _buildTitleRow(context, col);
@@ -85,7 +86,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
   }
 
   //--------------------------------------------------------------------------------------
-  void _buildTitleRow(AFBuildContext<AFTestDrawerData, AFRouteParamUnused> context, List<Widget> col) {
+  void _buildTitleRow(AFBuildContext<AFTestDrawerData, AFRouteParamUnused, AFPrototypeTheme> context, List<Widget> col) {
     col.add(Container(
       margin: EdgeInsets.fromLTRB(8, 60, 8, 20),
       child: Center(child: Text("${context.s.test.id.code} test"))
@@ -93,7 +94,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
   }
 
   //--------------------------------------------------------------------------------------
-  void _buildControlRow(AFBuildContext<AFTestDrawerData, AFRouteParamUnused> context, List<Widget> col) {
+  void _buildControlRow(AFBuildContext<AFTestDrawerData, AFRouteParamUnused, AFPrototypeTheme> context, List<Widget> col) {
     final rowActions = AFUI.row();
     final test = context.s.test;
 
@@ -141,7 +142,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
     ));
   }
 
-  void _buildTestReport(AFBuildContext<AFTestDrawerData, AFRouteParamUnused> context, List<Widget> col) {
+  void _buildTestReport(AFBuildContext<AFTestDrawerData, AFRouteParamUnused, AFPrototypeTheme> context, List<Widget> col) {
     final testContext = context.s.testContext;
     final testState = context.s.testState;
     col.add(Container(

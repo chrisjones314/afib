@@ -5,6 +5,7 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_prototype_list_screen.dart';
+import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
@@ -63,7 +64,7 @@ class APrototypeHomeScreenData extends AFStoreConnectorData1<AFSingleScreenTests
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototypeHomeScreenData, AFPrototypeHomeScreenParam>{
+class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme>{
 
   AFPrototypeHomeScreen(): super(AFUIID.screenPrototypeHome);
 
@@ -81,12 +82,12 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
 
 
   @override
-  Widget buildWithContext(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context) {
+  Widget buildWithContext(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context) {
     return _buildHome(context);
   }
 
   /// 
-  Widget _buildHome(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context) {
+  Widget _buildHome(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context) {
     final rows = AFUI.column();
     
     rows.add(_createKindRow("Widget Prototypes", () {
@@ -99,9 +100,11 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
       context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
     }));
     
+    /*
     rows.add(_createKindRow("Wireframe Prototypes", () {
       
     }));
+    */
 
     rows.add(_createKindRow("Workflow Prototypes", () {
       List<AFScreenPrototypeTest> tests = AFibF.g.workflowTests.all;
@@ -119,7 +122,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     return buildPrototypeScaffold('AFib Prototype mode', rows);
   }
 
-  void _onRunTests(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests) async { 
+  void _onRunTests(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context, List<AFScreenPrototypeTest> tests) async { 
     for(final test in tests) {
       // first, we navigate into the screen.
       test.startScreen(context.d);
@@ -139,13 +142,13 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     }
   }
 
-  void _updateFilter(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context, String value) {
+  void _updateFilter(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context, String value) {
     final revised = context.p.reviseFilter(value);
     updateParam(context, revised);
   }
 
-  void _buildFilterAndRunControls(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests, List<Widget> rows) {
-    rows.add(AFPrototypeTestScreen.createSectionHeader("Filter and Run"));
+  void _buildFilterAndRunControls(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context, List<AFScreenPrototypeTest> tests, List<Widget> rows) {
+    rows.add(context.t.createSectionHeader("Filter and Run"));
     
     final searchController = context.p.textControllers.syncText(AFPrototypeHomeScreenParam.filterTextId, context.p.filter);
 
@@ -180,13 +183,13 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
   }
 
 
-  void _buildFilteredSection(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests, List<Widget> rows, ) {
+  void _buildFilteredSection(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context, List<AFScreenPrototypeTest> tests, List<Widget> rows, ) {
     if(tests == null || tests.isEmpty) {
       return;
     }
 
     for(final test in tests) {
-      rows.add(AFPrototypeTestScreen.createTestCard(context.d, test));
+      rows.add(context.t.createTestCard(context.d, test));
     }
   }
 

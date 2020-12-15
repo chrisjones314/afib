@@ -1,9 +1,11 @@
 
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/flutter/core/af_app_extension_context.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
 import 'package:afib/src/flutter/test/af_unit_tests.dart';
+import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
 import 'package:flutter/material.dart';
 
 import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
@@ -57,7 +59,7 @@ typedef AFFindParamDelegate = AFRouteParam Function(AFState state);
 
 /// Delegate used in widget testing to wrap additional widgets around the widget being tested 
 /// (e.g. to position that widget on the screen, limit its width, etc.)
-typedef AFCreateWidgetWrapperDelegate = Widget Function(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam> context, Widget testWidget);
+typedef AFCreateWidgetWrapperDelegate = Widget Function(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam, AFPrototypeTheme> context, Widget testWidget);
 
 /// Delegate used to create a push action that moves us into a test screen.
 typedef AFTestCreatePushActionDelegate = AFNavigatePushAction Function(AFScreenPrototypeTest test);
@@ -82,7 +84,7 @@ typedef AFCreateConnectedWidgetDelegate = AFConnectedWidgetWithParam Function(
 typedef AFWorkflowTestBodyExecuteDelegate = Future<void> Function(AFWorkflowTestExecute mse);
 
 /// Delegate used to creatae a widget builder.
-typedef AFWidgetBuilderDelegate<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam> = Widget Function(AFBuildContext<TData, TRouteParam> context);
+typedef AFWidgetBuilderDelegate<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> = Widget Function(AFBuildContext<TData, TRouteParam, TTheme> context);
 
 /// Used to create a widget from a custom popup route.
 typedef AFPopupRouteWidgetBuilderDelegate = Widget Function(BuildContext ctx, AFCustomPopupRoute route);
@@ -137,4 +139,12 @@ typedef AFOnTapDelegate = void Function();
 typedef AFExtendAppDelegate = void Function(AFAppExtensionContext context);
 
 /// Create the flutter ThemeData for this app.
-typedef AFCreateThemeDataDelegate = ThemeData Function(dynamic appState);
+typedef AFCreateFundamentalThemeAreaDelegate = AFFundamentalThemeArea Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState);
+
+/// Populate the main fundamental theme that third parties work from by default, though they can also register their own fundamental
+/// themes with more obscure settings.
+typedef AFInitFundamentalThemeAreaDelegate = void Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState, AFFundamentalThemeArea area);
+
+/// Create a conceptual theme used by a subset of the app, or used by a third party plugin.
+typedef AFCreateConceptualThemeDelegate = AFConceptualTheme Function(AFFundamentalTheme fundamentals);
+

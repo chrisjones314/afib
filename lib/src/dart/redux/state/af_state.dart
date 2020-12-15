@@ -55,7 +55,7 @@ class AFState {
       testState: AFTestState.initial(),
       public: AFPublicState(
         route: AFRouteState.initialState(),
-        themes: AFibF.g.initializeThemeState(areas),
+      themes: AFibF.g.initializeThemeState(areas),
         areas: areas
       ),
     );

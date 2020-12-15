@@ -4,6 +4,7 @@
 /// Be careful not to reference this library from integration tests.
 library afib_flutter;
 
+export 'src/dart/redux/state/af_theme_state.dart';
 export 'src/flutter/af_main.dart';
 export 'src/flutter/af_material_app.dart';
 export 'src/flutter/core/af_app_extension_context.dart';

@@ -5,7 +5,7 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_prototype_home_screen.dart';
-import 'package:afib/src/flutter/utils/af_theme.dart';
+import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
@@ -78,7 +78,7 @@ class AFPrototypeTestScreenData extends AFStoreConnectorData1<AFSingleScreenTest
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreConnectorDataUnused, AFPrototypeTestScreenParam>{
+class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreConnectorDataUnused, AFPrototypeTestScreenParam, AFPrototypeTheme>{
 
   AFPrototypeTestScreen(): super(AFUIID.screenPrototypeListSingleScreen);
 
@@ -93,7 +93,7 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreCon
   }
 
   @override
-  Widget buildWithContext(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam> context) {
+  Widget buildWithContext(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context) {
     return _buildList(context);
   }
 
@@ -103,7 +103,7 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreCon
     return result;
   }
 
-  Widget _buildList(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam> context) {
+  Widget _buildList(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context) {
 
     final rows = AFUI.column();
     final groups = _sortIterable(context.p.screenTestsByGroup.keys);
@@ -116,59 +116,13 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreCon
     return AFPrototypeHomeScreen.buildPrototypeScaffold("Screen Prototypes", rows, leading: leading);
   }
 
-  static Widget createSectionHeader(String title) {
-    return Card(
-      color: AFThemeOld.colorPrimary,
-      child: Container(
-        margin: EdgeInsets.all(8.0),
-        child: Text(
-          title,
-          style: AFThemeOld.styleWhite
-        )
-      )
-    );
-  }
-
-  void _addGroup(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam> context, List<Widget> column, String group, List<AFScreenPrototypeTest> tests) {
+  void _addGroup(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context, List<Widget> column, String group, List<AFScreenPrototypeTest> tests) {
     final title = StringBuffer(group);
-    column.add(createSectionHeader(title.toString()));
+    column.add(context.t.createSectionHeader(title.toString()));
 
     for(final test in tests) {
-      column.add(createTestCard(context.d, test));
+      column.add(context.t.createTestCard(context.d, test));
     }
-  }
-
-  static Widget createTestCard(AFDispatcher dispatcher, AFScreenPrototypeTest instance) {
-    final titleText = instance.title ?? instance.id.code;
-    final cols = AFUI.row();
-    cols.add(Text(titleText));
-    if(instance.isReusable) {
-      cols.add(Container(
-        margin: EdgeInsets.only(left: 8.0),
-        padding: EdgeInsets.symmetric(horizontal: 8.0),
-        decoration: BoxDecoration(
-          color: AFThemeOld.colorPrimary,
-          borderRadius: BorderRadius.circular(4.0),
-        ),
-        child: Text("Reusable", style: AFThemeOld.styleWhite)
-      ));
-    }
-
-    final titleRow = Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: cols
-    );
-    return Card(
-      key: Key(instance.id.code),
-      child: ListTile(
-        title: titleRow,
-        subtitle: Text(instance.id.code),
-        dense: true,
-        trailing: Icon(Icons.chevron_right),
-        onTap: () {
-          instance.startScreen(dispatcher);
-        }
-    ));
   }
 
 }

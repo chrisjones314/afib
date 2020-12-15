@@ -91,3 +91,14 @@ class AFQueryTestID extends AFID {
 class AFQueryID extends AFID {
   const AFQueryID(String code): super(code);
 }
+
+class AFThemeID extends AFID {
+  final String description;
+  const AFThemeID(
+    String code,
+    this.description): super(code);   
+}
+
+class AFLangID extends AFID {
+  const AFLangID(String code): super(code);
+}

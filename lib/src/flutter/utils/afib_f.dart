@@ -241,10 +241,14 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     return appContext.createInitialAppStateAreas();
   }
 
-  AFThemeState initializeThemeState(dynamic appState) {
-    //return AFThemeState(
-    //  primary: AFThemeFundamentals.create(flutterTheme));    
-    return null;
+  AFThemeState initializeThemeState(AFAppStateAreas areas) {
+    final device = AFFundamentalDeviceTheme.create();
+    final fundamentals = appContext.createFundamentalTheme(device, areas);
+    final conceptuals = appContext.initializeConceptualThemes(fundamentals);  
+    return AFThemeState.create(
+      fundamentals: fundamentals,
+      conceptuals: conceptuals
+    );
   }
 
   /// Used internally by the framework.

@@ -5,6 +5,7 @@ import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/test/af_test.dart';
+import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
 import 'package:afib/src/flutter/utils/af_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -31,16 +32,17 @@ class AFPrototypeWidgetRouteParam extends AFRouteParam {
 }
 
 /// Data used to render the screen
-class AFPrototypeWidgetData extends AFStoreConnectorData1<AFTestState> {
-  AFPrototypeWidgetData(AFTestState testState): 
-    super(first: testState);
+class AFPrototypeWidgetData extends AFStoreConnectorData2<AFTestState, AFThemeState> {
+  AFPrototypeWidgetData(AFTestState testState, AFThemeState themes): 
+    super(first: testState, second: themes);
   
   AFTestState get testState { return first; }
+  AFThemeState get themeState { return second; }
 }
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFPrototypeWidgetData, AFPrototypeWidgetRouteParam>{
+class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFPrototypeWidgetData, AFPrototypeWidgetRouteParam, AFPrototypeTheme>{
 
   AFPrototypeWidgetScreen(): super(AFUIID.screenPrototypeWidget);
 
@@ -54,7 +56,7 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFProtot
 
   @override
   AFPrototypeWidgetData createStateDataAF(AFState state) {
-    return AFPrototypeWidgetData(state.testState);
+    return AFPrototypeWidgetData(state.testState, state.public.themes);
   }
 
   @override
@@ -64,13 +66,13 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFProtot
   }
 
   @override
-  Widget buildWithContext(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam> context) {    
+  Widget buildWithContext(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam, AFPrototypeTheme> context) {    
     /// Remember what screen we are on for testing purposes.  Maybe eventually try to do this in navigator observer.
     AFTest.currentScreen = context.c;
     return _buildScreen(context);
   }
 
-  Widget _buildScreen(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam> context) {
+  Widget _buildScreen(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam, AFPrototypeTheme> context) {
     final test = context.p.test;
     final testContext = context.s.testState.findContext(test.id);
     final testState = context.s.testState.findState(test.id);
@@ -86,7 +88,9 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFProtot
     if(test is AFConnectedWidgetPrototypeTest && sourceWidget is AFConnectedWidgetWithParam) {
       final paramChild = context.p.param ?? test.param;
       final dispatcher = AFWidgetScreenTestDispatcher(context: testContext, main: context.d, originalParam: context.p);
-      final childContext = sourceWidget.createContext(context.c, dispatcher, testData, paramChild);
+
+      final themeChild = sourceWidget.findTheme(context.s.themeState);
+      final childContext = sourceWidget.createContext(context.c, dispatcher, testData, paramChild, themeChild);
       resultWidget = sourceWidget.buildWithContext(childContext);
     } else {
       resultWidget = sourceWidget;
@@ -95,7 +99,7 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFProtot
     return _createScaffold(context, resultWidget);
   }
 
-  Widget _createScaffold(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam> context, Widget resultWidget) {
+  Widget _createScaffold(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam, AFPrototypeTheme> context, Widget resultWidget) {
     if(context.p.test.createWidgetWrapperDelegate != null) {
       return context.p.test.createWidgetWrapperDelegate(context, resultWidget);
     }

@@ -29,12 +29,13 @@ class AFibTestsFailedMatcher extends Matcher {
 }
 
 /// The main function which executes the store test defined in your initStateTests function.
-Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendAppDelegate extendApp, AFDartParams paramsD, WidgetTester widgetTester) async {
+Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendAppDelegate extendApp, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
   final stopwatch = Stopwatch();
   stopwatch.start();
 
   final context = AFAppExtensionContext();
   extendApp(context);
+  extendTest(context.test);
 
   final paramsTest = paramsD.forceEnvironment(AFConfigEntryEnvironment.prototype);
   AFibD.initialize(paramsTest);

@@ -9,8 +9,8 @@ class AFPrototypeTheme extends AFConceptualTheme {
     AFPrototypeTheme(AFFundamentalTheme fundamentals): super(fundamentals: fundamentals, primaryThemeArea: AFPrimaryThemeID.prototypeTheme);
 
     Widget createSectionHeader(String title) {
-      final background = color(AFPrimaryThemeID.primaryColor);
-      final foreground = textStyle(AFPrimaryThemeID.textOnPrimaryColor);
+      final background = color(AFPrimaryThemeID.colorPrimary);
+      final foreground = textStyle(AFPrimaryThemeID.styleTextOnPrimary);
       return Card(
         color: background,
         child: Container(
@@ -24,8 +24,8 @@ class AFPrototypeTheme extends AFConceptualTheme {
     }
 
     Widget createReusableTag() {
-      final background = color(AFPrimaryThemeID.primaryColor);
-      final foreground = textStyle(AFPrimaryThemeID.textOnPrimaryColor);
+      final background = color(AFPrimaryThemeID.colorPrimary);
+      final foreground = textStyle(AFPrimaryThemeID.styleTextOnPrimary);
       return Container(
         margin: EdgeInsets.fromLTRB(8.0, 16.0, 0, 0),
         padding: EdgeInsets.symmetric(horizontal: 8.0),

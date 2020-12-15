@@ -3,6 +3,7 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
+import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/redux/middleware/af_async_queries.dart';
 import 'package:afib/src/dart/redux/middleware/af_query_middleware.dart';
 import 'package:afib/src/dart/redux/middleware/af_route_middleware.dart';
@@ -28,6 +29,41 @@ class AFibTestOnlyScreenElement {
   AFibTestOnlyScreenElement(this.screenId, this.element);
 }
 
+class AFWidgetsBindingObserver extends WidgetsBindingObserver {
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    AFibF.g.dispatchLifecycleActions(AFibF.g.storeDispatcherInternalOnly, state);    
+  }
+
+  @override 
+  void didChangeMetrics() {
+    rebuildTheme();
+  }
+
+  @override
+  void didChangeLocales(List<Locale> locale) {
+    rebuildTheme();
+  }
+
+  @override 
+  void didChangePlatformBrightness() {
+    rebuildTheme();
+  }
+
+  @override 
+  void didChangeTextScaleFactor() {
+    rebuildTheme();
+  }
+
+  void rebuildTheme() {
+    // rebuild our theme with the new values, and then update it.
+    final revisedTheme = AFibF.g.initializeThemeState();
+    AFibF.g.storeDispatcherInternalOnly.dispatch(AFUpdateThemeStateAction(revisedTheme));    
+  }
+}
+
+
 class AFibGlobalState<TState extends AFAppStateArea> {
   final AFAppExtensionContext appContext;
 
@@ -42,7 +78,9 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   final testOnlyScreens = <AFScreenID, AFibTestOnlyScreenElement>{};
   final _recentActions = <AFActionWithKey>[];
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
+  final testExtractors = <AFExtractWidgetAction>[];
+  final testApplicators = <AFApplyWidgetAction>[];
+  final widgetsBindingObserver = AFWidgetsBindingObserver();
 
   AFScreenMap _afPrototypeScreenMap;
   AFScreenID forcedStartupScreen;
@@ -86,6 +124,8 @@ class AFibGlobalState<TState extends AFAppStateArea> {
         screenTests: screenTests,
         workflowTests: workflowTests,
       );
+      testExtractors.addAll(appContext.test.extractors);
+      testApplicators.addAll(appContext.test.applicators);
       _populateAllWidgetCollectors();
     }
     if(AFibD.config.requiresPrototypeData) {
@@ -241,7 +281,11 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     return appContext.createInitialAppStateAreas();
   }
 
-  AFThemeState initializeThemeState(AFAppStateAreas areas) {
+
+  AFThemeState initializeThemeState({AFAppStateAreas areas}) {
+    if(areas == null) {
+      areas = storeInternalOnly.state.public.areas;
+    }
     final device = AFFundamentalDeviceTheme.create();
     final fundamentals = appContext.createFundamentalTheme(device, areas);
     final conceptuals = appContext.initializeConceptualThemes(fundamentals);  

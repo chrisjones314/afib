@@ -20,8 +20,9 @@ class AFPrimaryThemeID {
   static const fundamentalTheme = AFThemeID("${AFUIID.afibScreenPrefix}fundamental", "Fundamental Theme");
   static const prototypeTheme = AFThemeID("${AFUIID.afibScreenPrefix}prototype", "Prototype Theme");
   
-  static const primaryColor = AFThemeID("primaryColor", "Primary color");
-  static const textOnPrimaryColor = AFThemeID("textOnPrimaryColor", "Text on primary color");
-  static const primaryColorLight = AFThemeID("primaryColorLight", "Primary Color Light");
-  static const primaryColorDark = AFThemeID("primaryColorDark", "Primary Color Dark");
+  static const colorPrimary = AFThemeID("color_primary", "Primary color");
+  static const styleTextOnPrimary = AFThemeID("style_text_on_primary", "Text on primary color");
+  static const colorPrimaryLight = AFThemeID("color_primary_light", "Primary Color Light");
+  static const colorPrimaryDark = AFThemeID("color_primary_dark", "Primary Color Dark");
+  static const colorSecondary = AFThemeID("color_secondary", "Secondary Color");
 }

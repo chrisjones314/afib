@@ -1500,34 +1500,9 @@ class AFSingleScreenReusableBody {
 class AFSingleScreenTests<TState> {
   
   final _singleScreenTests = <AFSingleScreenPrototypeTest>[];
-  final extractors = <AFExtractWidgetAction>[];
-  final applicators = <AFApplyWidgetAction>[];
   final reusable = <AFSingleScreenTestID, AFSingleScreenReusableBody>{};
 
-  AFSingleScreenTests() {
-    registerApplicator(AFFlatButtonAction());
-    registerApplicator(AFRaisedButtonAction());
-    registerApplicator(AFTapChoiceChip());
-    registerApplicator(AFSetChoiceChip());
-    registerApplicator(AFApplyTextTextFieldAction());
-    registerApplicator(AFApplyTextAFTextFieldAction());
-    registerApplicator(AFRichTextGestureTapAction());
-    registerApplicator(AFApplyCupertinoPicker());
-    registerApplicator(AFIconButtonAction());
-    registerApplicator(AFListTileTapAction());
-    registerApplicator(AFGestureDetectorTapAction());
-    registerApplicator(AFDismissibleSwipeAction());
-    registerApplicator(AFSwitchTapAction());
-    registerApplicator(AFSetSwitchValueAction());
-
-    registerExtractor(AFSelectableChoiceChip());
-    registerExtractor(AFExtractTextTextAction());
-    registerExtractor(AFExtractTextTextFieldAction());
-    registerExtractor(AFExtractTextAFTextFieldAction());
-    registerExtractor(AFExtractRichTextAction());
-    registerExtractor(AFSwitchExtractor());
-    
-  }
+  AFSingleScreenTests();
 
   List<AFSingleScreenPrototypeTest> get all {
     return _singleScreenTests;
@@ -1567,20 +1542,8 @@ class AFSingleScreenTests<TState> {
     return reusable[id];
   }
 
-  /// Register a way to tap on a particular kind of widget.
-  /// 
-  /// The intent is to allow the testing framework to be extended for
-  /// arbitrary widgets that might get tapped.
-  void registerApplicator(AFApplyWidgetAction apply) {
-    applicators.add(apply);
-  }
-
-  void registerExtractor(AFExtractWidgetAction extract) {
-    extractors.add(extract);
-  }
-
   AFExtractWidgetAction findExtractor(String actionType, Element elem) {
-    for(final extractor in extractors) {
+    for(final extractor in AFibF.g.testExtractors) {
       if(extractor.matches(actionType, elem)) {
         return extractor;
       }
@@ -1589,7 +1552,7 @@ class AFSingleScreenTests<TState> {
   }
 
   AFApplyWidgetAction findApplicator(String actionType, Element elem) {
-    for(final apply in applicators) {
+    for(final apply in AFibF.g.testApplicators) {
       if(apply.matches(actionType, elem)) {
         return apply;
       }
@@ -2157,19 +2120,6 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
     AFTestDataRegistry testData
   }): super(testData);
 
-  /// Register a way to apply a value to an arbitrary third party widget.
-  /// 
-  /// This is a global definition, it isn't local to a particular test.
-  void registerApplicator(AFApplyWidgetAction apply) {
-    tests.registerApplicator(apply);
-  }
-
-  /// Register a way to extract a value from an arbitrary third party widget.
-  /// 
-  /// This is a global definition, it isn't local to a particular test.
-  void registerExtractor(AFExtractWidgetAction extract) {
-    tests.registerExtractor(extract);
-  }
 
   /// Define a prototype which shows a  single screen in a particular 
   /// screen data/route param state.

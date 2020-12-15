@@ -9,9 +9,10 @@ import 'package:flutter/material.dart';
 
 
 /// [afMain] handles startup, execution, and shutdown sequence for an afApp
-void afMain<TState extends AFAppStateArea>(AFDartParams paramsD, AFExtendAppDelegate extendApp) {
+void afMain<TState extends AFAppStateArea>(AFDartParams paramsD, AFExtendAppDelegate extendApp, AFExtendTestDelegate extendTest) {
   final context = AFAppExtensionContext();
   extendApp(context);
+  extendTest(context.test);
 
   AFibD.initialize(paramsD);
   AFibF.initialize<TState>(context);

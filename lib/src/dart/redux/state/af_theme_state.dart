@@ -88,6 +88,10 @@ class AFFundamentalThemeArea {
     }    
   }
 
+  Color color(AFThemeID id) {
+    return findValue(id);
+  }
+
   dynamic findValue(AFThemeID id) {
     final val = values[id];
     if(val != null) {
@@ -118,11 +122,13 @@ class AFFundamentalThemeArea {
 class AFFundamentalTheme {
   final AFFundamentalDeviceTheme device;
   final AFFundamentalThemeArea primary;
+  final ThemeData themeData;
   final areas = <AFThemeID, AFFundamentalThemeArea>{};
   
   AFFundamentalTheme({
     @required this.device,
     @required this.primary,
+    @required this.themeData
   });  
 
   void addArea(AFFundamentalThemeArea area) {

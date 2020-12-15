@@ -53,15 +53,27 @@ abstract class AFMaterialApp<AppState> extends AFApp<AppState> {
   @override
   Widget build(BuildContext context) {
     return StoreProvider(
-      store: AFibF.g.storeInternalOnly,
+      store: AFibF.g.storeInternalOnly,      
       child: OverlaySupport(
-        child: buildMaterialApp()
+        child: _buildMaterialApp(context)
       )
     );
   }
 
+  Widget _buildMaterialApp(BuildContext context) {
+    return StoreConnector<AFState, ThemeData>(
+        converter: (store) {
+          return store.state.public.themes.fundamentals.themeData;
+        },
+        distinct: true,
+        builder: (buildContext, themeData) {
+          return buildMaterialApp(themeData);
+        }
+    );
+  }
+
   /// Build a [MaterialApp] for the application
-  Widget buildMaterialApp();
+  Widget buildMaterialApp(ThemeData themeData);
 
   AFNavigatorObserver createAFNavigatorObserver() {
     return AFNavigatorObserver();

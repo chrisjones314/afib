@@ -28,7 +28,6 @@ class AFLifecycleEventHandler extends WidgetsBindingObserver {
   }
 }
 
-
 //--------------------------------------------------------------------------------------
 class _AFStartupScreenState extends State<AFStartupScreenWrapper> {
   //--------------------------------------------------------------------------------------
@@ -36,16 +35,19 @@ class _AFStartupScreenState extends State<AFStartupScreenWrapper> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addObserver(
-      AFLifecycleEventHandler(eventHandler: (state) {
-        AFibF.g.dispatchLifecycleActions(AFibF.g.storeDispatcherInternalOnly, state);
-      })
-    );
+    WidgetsBinding.instance.addObserver(AFibF.g.widgetsBindingObserver);
 
     // Kick off the app by firing a query.  In a typical app this might check the user's
     // logged in status while a splash screen displays.
     AFibF.g.dispatchStartupActions(AFibF.g.storeDispatcherInternalOnly);
   }
+
+  //--------------------------------------------------------------------------------------
+  @override 
+  void dispose() {
+    super.dispose();
+  }
+
 
   //--------------------------------------------------------------------------------------
   @override

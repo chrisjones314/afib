@@ -23,6 +23,61 @@ class AFTestExtensionContext {
   final initWidgetTests = <AFInitWidgetTestsDelegate>[];
   final initScreenTests = <AFInitScreenTestsDelegate>[];
   final initWorkflowStateTests = <AFInitWorkflowStateTestsDelegate>[];
+  final extractors = <AFExtractWidgetAction>[];
+  final applicators = <AFApplyWidgetAction>[];
+
+  void initializeTestFundamentals({
+    @required AFInitTestDataDelegate initTestData,
+    @required AFInitUnitTestsDelegate initUnitTests,
+    @required AFInitStateTestsDelegate initStateTests,
+    @required AFInitWidgetTestsDelegate initWidgetTests,
+    @required AFInitScreenTestsDelegate initScreenTests,
+    @required AFInitWorkflowStateTestsDelegate initWorkflowStateTests,
+  }) {
+    _registerDefaultApplicators();
+    addInitTestData(initTestData);
+    addInitUnitTest(initUnitTests);
+    addInitStateTest(initStateTests);
+    addInitWidgetTest(initWidgetTests);
+    addInitScreenTest(initScreenTests);
+    addInitWorkflowStateTest(initWorkflowStateTests);
+  }
+
+  void _registerDefaultApplicators() {
+    registerApplicator(AFFlatButtonAction());
+    registerApplicator(AFRaisedButtonAction());
+    registerApplicator(AFTapChoiceChip());
+    registerApplicator(AFSetChoiceChip());
+    registerApplicator(AFApplyTextTextFieldAction());
+    registerApplicator(AFApplyTextAFTextFieldAction());
+    registerApplicator(AFRichTextGestureTapAction());
+    registerApplicator(AFApplyCupertinoPicker());
+    registerApplicator(AFIconButtonAction());
+    registerApplicator(AFListTileTapAction());
+    registerApplicator(AFGestureDetectorTapAction());
+    registerApplicator(AFDismissibleSwipeAction());
+    registerApplicator(AFSwitchTapAction());
+    registerApplicator(AFSetSwitchValueAction());
+
+    registerExtractor(AFSelectableChoiceChip());
+    registerExtractor(AFExtractTextTextAction());
+    registerExtractor(AFExtractTextTextFieldAction());
+    registerExtractor(AFExtractTextAFTextFieldAction());
+    registerExtractor(AFExtractRichTextAction());
+    registerExtractor(AFSwitchExtractor());    
+  }
+
+  /// Register a way to tap or set a value on a particular kind of widget.
+  /// 
+  /// The intent is to allow the testing framework to be extended for
+  /// arbitrary widgets that might get tapped.
+  void registerApplicator(AFApplyWidgetAction apply) {
+    applicators.add(apply);
+  }
+
+  void registerExtractor(AFExtractWidgetAction extract) {
+    extractors.add(extract);
+  }
 
   void addInitTestData(AFInitTestDataDelegate init) {
     initTestDatas.add(init);
@@ -172,9 +227,7 @@ class AFPluginExtensionContext {
   /// Used by app or third parties to listen in to all successful queries.
   void addQuerySuccessListener(AFQuerySuccessListenerDelegate queryListenerDelegate) {
     querySuccessListenerDelegates.add(queryListenerDelegate);
-  }
-
-  
+  } 
 }
 
 /// Enables you, or third parties, to register extensions
@@ -182,6 +235,7 @@ class AFPluginExtensionContext {
 class AFAppExtensionContext extends AFPluginExtensionContext {
   AFCreateAFAppDelegate createApp;
   AFInitFundamentalThemeAreaDelegate initFundamentalThemeArea;
+  AFOverrideCreateThemeDataDelegate overrideCreateThemeData;
 
   /// Used by the app to specify fundamental configuration/functionality
   /// that AFib requires.
@@ -191,7 +245,8 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     @required AFInitializeAppStateDelegate initializeAppState,
     @required AFCreateStartupQueryActionDelegate createStartupQueryAction,
     @required AFCreateAFAppDelegate createApp,
-    @required AFCreateConceptualThemeDelegate createPrimaryTheme
+    @required AFCreateConceptualThemeDelegate createPrimaryTheme,
+    AFOverrideCreateThemeDataDelegate overrideCreateThemeData,
   }) {
     this.initScreenMaps.add(initScreenMap);
     this.initialAppStates.add(initializeAppState);
@@ -199,27 +254,12 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     this.createApp = createApp;
     this.initConceptualThemes.add(createPrimaryTheme);
     this.initFundamentalThemeArea = initFundamentalThemeArea;
+    this.overrideCreateThemeData = overrideCreateThemeData;
     _verifyNotNull(initFundamentalThemeArea, "initFundamentalTheme");
     _verifyNotNull(initScreenMap, "initScreenMap");
     _verifyNotNull(initializeAppState, "initializeAppState");
     _verifyNotNull(createStartupQueryAction, "createStartupQueryAction");
     _verifyNotNull(createApp, "createApp");
-  }
-
-  void initializeTestFundamentals({
-    @required AFInitTestDataDelegate initTestData,
-    @required AFInitUnitTestsDelegate initUnitTests,
-    @required AFInitStateTestsDelegate initStateTests,
-    @required AFInitWidgetTestsDelegate initWidgetTests,
-    @required AFInitScreenTestsDelegate initScreenTests,
-    @required AFInitWorkflowStateTestsDelegate initWorkflowStateTests,
-  }) {
-    test.addInitTestData(initTestData);
-    test.addInitUnitTest(initUnitTests);
-    test.addInitStateTest(initStateTests);
-    test.addInitWidgetTest(initWidgetTests);
-    test.addInitScreenTest(initScreenTests);
-    test.addInitWorkflowStateTest(initWorkflowStateTests);
   }
 
   void dispatchStartupActions(AFDispatcher dispatcher) {
@@ -242,10 +282,31 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     }
   }
 
+
+  ThemeData createThemeData(AFFundamentalDeviceTheme device, AFAppStateAreas areas, AFFundamentalThemeArea primaryArea) {
+    if(overrideCreateThemeData != null) {
+      return overrideCreateThemeData(device, areas, primaryArea);
+    }
+
+    final colorPrimary = primaryArea.color(AFPrimaryThemeID.colorPrimary);
+    final colorPrimaryDark = primaryArea.color(AFPrimaryThemeID.colorPrimaryDark);
+    final colorPrimaryLight = primaryArea.color(AFPrimaryThemeID.colorPrimaryLight);
+    final colorSecondary = primaryArea.color(AFPrimaryThemeID.colorSecondary);
+
+    return ThemeData(
+      primaryColor: colorPrimary,
+      primaryColorDark: colorPrimaryDark,
+      primaryColorLight: colorPrimaryLight,
+      accentColor: colorSecondary,
+    );
+  }
+
   AFFundamentalTheme createFundamentalTheme(AFFundamentalDeviceTheme device, AFAppStateAreas areas) {
     final primaryArea = AFFundamentalThemeArea(id: AFPrimaryThemeID.fundamentalTheme);
     this.initFundamentalThemeArea(device, areas, primaryArea);
-    final result = AFFundamentalTheme(device: device, primary: primaryArea);
+    final themeData = createThemeData(device, areas, primaryArea);
+
+    final result = AFFundamentalTheme(device: device, primary: primaryArea, themeData: themeData);
 
     for(final init in this.initFundamentalThemeAreas) {
       result.addArea(init(device, areas));

@@ -17,7 +17,6 @@ export "src/dart/redux/state/af_app_state.dart";
 export "src/dart/redux/state/af_package_info_state.dart";
 export "src/dart/redux/state/af_route_state.dart";
 export "src/dart/redux/state/af_state.dart";
-export "src/dart/redux/state/af_ui_state.dart";
 export "src/dart/utils/af_config.dart";  // ok
 export 'src/dart/utils/af_config_entries.dart'; // ok
 export "src/dart/utils/af_exception.dart"; // ok

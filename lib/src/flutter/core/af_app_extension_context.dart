@@ -192,7 +192,7 @@ class AFPluginExtensionContext {
   final querySuccessListenerDelegates = <AFQuerySuccessListenerDelegate>[];
   final test = AFTestExtensionContext();
   final initConceptualThemes = <AFCreateConceptualThemeDelegate>[];
-  final initFundamentalThemeAreas = <AFCreateFundamentalThemeAreaDelegate>[];
+  final initFundamentalThemeAreas = <AFInitPluginFundamentalThemeDelegate>[];
 
 
   /// Used by third parties to register extra query actions they'd like to take.
@@ -206,7 +206,7 @@ class AFPluginExtensionContext {
   }
 
   /// Used by third parties to register screens that can be used by the app.
-  void addPluginFundamentalThemeArea(AFCreateFundamentalThemeAreaDelegate initArea) {
+  void addPluginFundamentalThemeArea(AFInitPluginFundamentalThemeDelegate initArea) {
     initFundamentalThemeAreas.add(initArea);
   }
 
@@ -234,14 +234,14 @@ class AFPluginExtensionContext {
 //  recognized by AFib.
 class AFAppExtensionContext extends AFPluginExtensionContext {
   AFCreateAFAppDelegate createApp;
-  AFInitFundamentalThemeAreaDelegate initFundamentalThemeArea;
+  AFInitAppFundamentalThemeDelegate initFundamentalThemeArea;
   AFOverrideCreateThemeDataDelegate overrideCreateThemeData;
 
   /// Used by the app to specify fundamental configuration/functionality
   /// that AFib requires.
   void initializeAppFundamentals({
     @required AFInitScreenMapDelegate initScreenMap,
-    @required AFInitFundamentalThemeAreaDelegate initFundamentalThemeArea,
+    @required AFInitAppFundamentalThemeDelegate initFundamentalThemeArea,
     @required AFInitializeAppStateDelegate initializeAppState,
     @required AFCreateStartupQueryActionDelegate createStartupQueryAction,
     @required AFCreateAFAppDelegate createApp,
@@ -288,10 +288,10 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
       return overrideCreateThemeData(device, areas, primaryArea);
     }
 
-    final colorPrimary = primaryArea.color(AFPrimaryThemeID.colorPrimary);
-    final colorPrimaryDark = primaryArea.color(AFPrimaryThemeID.colorPrimaryDark);
-    final colorPrimaryLight = primaryArea.color(AFPrimaryThemeID.colorPrimaryLight);
-    final colorSecondary = primaryArea.color(AFPrimaryThemeID.colorSecondary);
+    final colorPrimary = primaryArea.color(AFFundamentalThemeID.colorPrimary);
+    final colorPrimaryDark = primaryArea.color(AFFundamentalThemeID.colorPrimaryDarker);
+    final colorPrimaryLight = primaryArea.color(AFFundamentalThemeID.colorPrimaryLighter);
+    final colorSecondary = primaryArea.color(AFFundamentalThemeID.colorSecondary);
 
     return ThemeData(
       primaryColor: colorPrimary,
@@ -302,20 +302,21 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
   }
 
   AFFundamentalTheme createFundamentalTheme(AFFundamentalDeviceTheme device, AFAppStateAreas areas) {
-    final primaryArea = AFFundamentalThemeArea(id: AFPrimaryThemeID.fundamentalTheme);
-    this.initFundamentalThemeArea(device, areas, primaryArea);
-    final themeData = createThemeData(device, areas, primaryArea);
-
-    final result = AFFundamentalTheme(device: device, primary: primaryArea, themeData: themeData);
+    final builder = AFAppFundamentalThemeAreaBuilder();
+    this.initFundamentalThemeArea(device, areas, builder);
 
     for(final init in this.initFundamentalThemeAreas) {
-      result.addArea(init(device, areas));
+      init(device, areas, builder);
     }
 
     if(AFibD.config.requiresPrototypeData) {
-      result.addArea(createPrototypeThemeArea(device, areas));      
+      initPrototypeThemeArea(device, areas, builder);      
     }
     
+    final primaryArea = builder.create();
+    final themeData = createThemeData(device, areas, primaryArea);
+    final result = AFFundamentalTheme(device: device, area: primaryArea, themeData: themeData);
+    result.resolve();
     return result;
   }
 

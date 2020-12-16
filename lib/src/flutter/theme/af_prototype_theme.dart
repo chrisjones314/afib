@@ -6,36 +6,32 @@ import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:flutter/material.dart';
 
 class AFPrototypeTheme extends AFConceptualTheme {
-    AFPrototypeTheme(AFFundamentalTheme fundamentals): super(fundamentals: fundamentals, primaryThemeArea: AFPrimaryThemeID.prototypeTheme);
+  AFPrototypeTheme(AFFundamentalTheme fundamentals): super(fundamentals: fundamentals);
 
-    Widget createSectionHeader(String title) {
-      final background = color(AFPrimaryThemeID.colorPrimary);
-      final foreground = textStyle(AFPrimaryThemeID.styleTextOnPrimary);
-      return Card(
+  Widget createSectionHeader(dynamic title) {
+    final background = color(AFFundamentalThemeID.colorPrimary);
+    return Card(
+      color: background,
+      child: Container(
+        margin: EdgeInsets.all(8.0),
+        child: this.createText(null, title, AFFundamentalThemeID.styleMajorCardTitle)
+      )
+    );
+  }
+
+  Widget createReusableTag() {
+    final background = color(AFFundamentalThemeID.colorPrimary);
+    final foreground = textStyle(AFFundamentalThemeID.styleMajorCardTitle);
+    return Container(
+      margin: EdgeInsets.fromLTRB(8.0, 16.0, 0, 0),
+      padding: EdgeInsets.symmetric(horizontal: 8.0),
+      decoration: BoxDecoration(
         color: background,
-        child: Container(
-          margin: EdgeInsets.all(8.0),
-          child: Text(
-            title,
-            style: foreground
-          )
-        )
-      );
-    }
-
-    Widget createReusableTag() {
-      final background = color(AFPrimaryThemeID.colorPrimary);
-      final foreground = textStyle(AFPrimaryThemeID.styleTextOnPrimary);
-      return Container(
-        margin: EdgeInsets.fromLTRB(8.0, 16.0, 0, 0),
-        padding: EdgeInsets.symmetric(horizontal: 8.0),
-        decoration: BoxDecoration(
-          color: background,
-          borderRadius: BorderRadius.circular(4.0),
-        ),
-        child: Text("Reusable", style: foreground)
-      );
-    }    
+        borderRadius: BorderRadius.circular(4.0),
+      ),
+      child: Text("Reusable", style: foreground)
+    );
+  }    
 
   Widget createTestCard(AFDispatcher dispatcher, AFScreenPrototypeTest instance) {
     final titleText = instance.title ?? instance.id.code;
@@ -60,6 +56,21 @@ class AFPrototypeTheme extends AFConceptualTheme {
           instance.startScreen(dispatcher);
         }
     ));
+  }
+
+  Widget buildPrototypeScaffold(dynamic title, List<Widget> rows, { Widget leading }) {
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(        
+            leading: leading,
+            automaticallyImplyLeading: false,
+            title: this.createText(null, title, AFFundamentalThemeID.styleScreenTitle),
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate(rows),)
+      ])    
+    );
   }
 
 }

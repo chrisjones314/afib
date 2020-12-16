@@ -89,24 +89,18 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
   /// 
   Widget _buildHome(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context) {
     final rows = AFUI.column();
-    
-    rows.add(_createKindRow("Widget Prototypes", () {
+
+    rows.add(_createKindRow(context, "Widget Prototypes", () {
       List<AFScreenPrototypeTest> tests = AFibF.g.widgetTests.all;
       context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
     }));
     
-    rows.add(_createKindRow("Single Screen Prototypes", () {
+    rows.add(_createKindRow(context, "Screen Prototypes", () {
       List<AFScreenPrototypeTest> tests = AFibF.g.screenTests.all;
       context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
     }));
     
-    /*
-    rows.add(_createKindRow("Wireframe Prototypes", () {
-      
-    }));
-    */
-
-    rows.add(_createKindRow("Workflow Prototypes", () {
+    rows.add(_createKindRow(context, "Workflow Prototypes", () {
       List<AFScreenPrototypeTest> tests = AFibF.g.workflowTests.all;
       context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
     }));
@@ -115,11 +109,9 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     final tests = AFibF.g.findTestsForAreas(areas);
 
     _buildFilterAndRunControls(context, tests, rows);
-
     _buildFilteredSection(context, tests, rows);
 
-
-    return buildPrototypeScaffold('AFib Prototype mode', rows);
+    return context.t.buildPrototypeScaffold("AFib Prototype Mode", rows);
   }
 
   void _onRunTests(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context, List<AFScreenPrototypeTest> tests) async { 
@@ -153,12 +145,15 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     final searchController = context.p.textControllers.syncText(AFPrototypeHomeScreenParam.filterTextId, context.p.filter);
 
     final searchText = Container(
-      margin: EdgeInsets.symmetric(horizontal: 8.0), 
+      margin: context.t.scaledMarginInsets(horizontal: 0.5),
       child: TextField(
-        //key: AFUI.keyForWID(DFWidgetID.editSearch),
         controller: searchController,
         obscureText: false,
         autofocus: false,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: "Search"
+        ),
         autocorrect: false,
         textAlign: TextAlign.left,
         onChanged: (value) {
@@ -193,25 +188,10 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     }
   }
 
-  static Widget buildPrototypeScaffold(String title, List<Widget> rows, { Widget leading }) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(        
-            leading: leading,
-            automaticallyImplyLeading: false,
-            title: Text(title),
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate(rows),)
-      ])    
-    );
-  }
-
-  Widget _createKindRow(String title, Function onTap) {
+  Widget _createKindRow(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context, String langId, Function onTap) {
     return Card(
       child: ListTile(
-        title: Text(title),
+        title: context.t.createText(null, langId, AFFundamentalThemeID.styleCardBodyNormal),
         dense: true,
         trailing: Icon(Icons.chevron_right),
         onTap: onTap

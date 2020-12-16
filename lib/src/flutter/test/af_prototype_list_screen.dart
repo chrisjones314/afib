@@ -4,7 +4,6 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
-import 'package:afib/src/flutter/test/af_prototype_home_screen.dart';
 import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -113,7 +112,7 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreCon
     }
 
     final leading = AFUI.standardBackButton(context.d);
-    return AFPrototypeHomeScreen.buildPrototypeScaffold("Screen Prototypes", rows, leading: leading);
+    return context.t.buildPrototypeScaffold("Screen Prototypes", rows, leading: leading);
   }
 
   void _addGroup(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context, List<Widget> column, String group, List<AFScreenPrototypeTest> tests) {

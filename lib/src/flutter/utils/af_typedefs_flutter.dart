@@ -139,15 +139,16 @@ typedef AFOnTapDelegate = void Function();
 typedef AFExtendAppDelegate = void Function(AFAppExtensionContext context);
 typedef AFExtendTestDelegate = void Function(AFTestExtensionContext context);
 
-/// Create the flutter ThemeData for this app.
-typedef AFCreateFundamentalThemeAreaDelegate = AFFundamentalThemeArea Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState);
+/// Allows plug-ins to contribute fundamental theme values
+typedef AFInitPluginFundamentalThemeDelegate = void Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState, AFPluginFundamentalThemeAreaBuilder builder);
 
-/// Populate the main fundamental theme that third parties work from by default, though they can also register their own fundamental
-/// themes with more obscure settings.
-typedef AFInitFundamentalThemeAreaDelegate = void Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState, AFFundamentalThemeArea area);
+/// Allows the app to contribute fundamental theme values
+typedef AFInitAppFundamentalThemeDelegate = void Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState, AFAppFundamentalThemeAreaBuilder builder);
 
 /// Create a conceptual theme used by a subset of the app, or used by a third party plugin.
 typedef AFCreateConceptualThemeDelegate = AFConceptualTheme Function(AFFundamentalTheme fundamentals);
 
 /// Optional delegate used to create the flutter ThemeData, rather than allowing AFib to do it for you based on the primary fundamental theme.
 typedef AFOverrideCreateThemeDataDelegate = ThemeData Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState, AFFundamentalThemeArea primary);
+
+typedef AFCreateDynamicDelegate = dynamic Function();

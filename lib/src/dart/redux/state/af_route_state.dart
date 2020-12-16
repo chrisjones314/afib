@@ -52,7 +52,7 @@ class AFRouteSegment {
     if(screen == AFUIID.screenStartupWrapper) {
       return false;
     }
-    return screen.code.startsWith(AFUIID.afibScreenPrefix);
+    return screen.code.startsWith(AFUIID.afibIDPrefix);
   }
 
   /// called when the segment goes fully out of scope.

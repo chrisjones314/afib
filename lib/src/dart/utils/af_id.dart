@@ -43,6 +43,11 @@ class AFIDWithTags extends AFID {
   }
 }
 
+class AFIDWithTag extends AFID {
+  final String tag;
+  const AFIDWithTag(String code, this.tag): super(code);
+}
+
 class AFScreenID extends AFID {
   const AFScreenID(String code) : super(code);
 }
@@ -92,13 +97,10 @@ class AFQueryID extends AFID {
   const AFQueryID(String code): super(code);
 }
 
-class AFThemeID extends AFID {
+class AFThemeID extends AFIDWithTag {
   final String description;
   const AFThemeID(
     String code,
-    this.description): super(code);   
-}
-
-class AFLangID extends AFID {
-  const AFLangID(String code): super(code);
+    String tag,
+    this.description): super(code, tag);   
 }

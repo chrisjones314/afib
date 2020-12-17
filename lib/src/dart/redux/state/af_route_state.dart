@@ -307,8 +307,13 @@ class AFRouteStateSegments {
 class AFRouteState {
   final AFRouteStateSegments popupSegments;
   final AFRouteStateSegments screenSegments;
+  final Map<AFScreenID, AFRouteParam> drawerParams;
 
-  AFRouteState({this.screenSegments, this.popupSegments});  
+  AFRouteState({
+    @required this.screenSegments, 
+    @required this.popupSegments,
+    @required this.drawerParams,
+  });  
 
   /// Creates the default initial state.
   factory AFRouteState.initialState() {
@@ -317,7 +322,8 @@ class AFRouteState {
     final empty = <AFRouteSegment>[];
     final screenSegs = AFRouteStateSegments(active: screen, prior: empty);
     final popupSegs  = AFRouteStateSegments(active: empty, prior: empty);
-    return AFRouteState(screenSegments: screenSegs, popupSegments: popupSegs);
+    final drawerParams = <AFScreenID, AFRouteParam>{};
+    return AFRouteState(screenSegments: screenSegs, popupSegments: popupSegs, drawerParams: drawerParams);
   }
 
   bool isActiveScreen(AFScreenID screen, { bool includePopups }) {
@@ -359,7 +365,6 @@ class AFRouteState {
     return seg?.param?.paramFor(screen);
   }
 
-
   /// Finds the data associated with the specified [screen] in the current route.
   /// 
   /// If [includePrior] is true, it will also include the most recent final segment
@@ -371,6 +376,14 @@ class AFRouteState {
     }
     final seg = screenSegments.findSegmentFor(screen, includePrior: includePrior);
     return seg?.param?.paramFor(screen);
+  }
+
+  /// Finds a drawer param for the drawer with the specified screen id. 
+  /// 
+  /// This may return null, in which case you should use the drawer's createRouteParam method
+  /// to create an initial value.
+  AFRouteParam findDrawerParam(AFScreenID screen) {
+    return drawerParams[screen];
   }
 
   bool routeEntryExists(AFScreenID screen, { bool includePrior = true }) {
@@ -448,7 +461,6 @@ class AFRouteState {
     return _reviseScreen(screenSegments.exitTest());
   }
 
-
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
   AFRouteState setParam(AFScreenID screen, AFRouteParam param) {
@@ -456,6 +468,14 @@ class AFRouteState {
       screen = AFUIID.screenStartupWrapper;
     }
     return _reviseScreen(screenSegments.setParam(screen, param));
+  }
+
+  /// Replaces the data on the current leaf element without changing the segments
+  /// in the route.
+  AFRouteState setDrawerParam(AFScreenID screen, AFRouteParam param) {
+    final revised = Map<AFScreenID, AFRouteParam>.from(drawerParams);
+    revised[screen] = param;
+    return copyWith(drawerParams: revised);
   }
 
   /// Replaces the route parameter for the specified popup screen.
@@ -481,11 +501,13 @@ class AFRouteState {
   //---------------------------------------------------------------------------------------
   AFRouteState copyWith({
     AFRouteStateSegments screenSegs,
-    AFRouteStateSegments popupSegs
+    AFRouteStateSegments popupSegs,
+    Map<AFScreenID, AFRouteParam> drawerParams,
   }) {
     final revised = AFRouteState(
       screenSegments: screenSegs ?? this.screenSegments,
-      popupSegments: popupSegs ?? this.popupSegments
+      popupSegments: popupSegs ?? this.popupSegments,
+      drawerParams: drawerParams ?? this.drawerParams,
     );
 
     AFibD.logRoute?.d("Revised Route: $revised");

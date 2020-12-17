@@ -22,6 +22,10 @@ class AFNavigateAction extends AFActionWithKey {
   }): super(id: id);
 }
 
+class AFNavigateSetDrawerParamAction extends AFNavigateAction {
+  AFNavigateSetDrawerParamAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
+}
+
 class AFNavigateActionWithReturn extends AFNavigateAction {
   final AFActionOnReturnDelegate onReturn;
   AFNavigateActionWithReturn({AFID id, AFScreenID screen, AFRouteParam param, this.onReturn}): super(id: id, screen: screen, param: param);

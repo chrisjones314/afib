@@ -108,20 +108,21 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreCon
     final groups = _sortIterable(context.p.screenTestsByGroup.keys);
     for(final group in groups) {
       final tests = context.p.screenTestsByGroup[group];
-      _addGroup(context, rows, group, tests);
+      rows.add(_addGroup(context, group, tests));
     }
 
     final leading = AFUI.standardBackButton(context.d);
     return context.t.buildPrototypeScaffold("Screen Prototypes", rows, leading: leading);
   }
 
-  void _addGroup(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context, List<Widget> column, String group, List<AFScreenPrototypeTest> tests) {
-    final title = StringBuffer(group);
-    column.add(context.t.createSectionHeader(title.toString()));
-
+  Widget _addGroup(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context, String group, List<AFScreenPrototypeTest> tests) {
+    final t = context.t;
+    final rows = t.column();
     for(final test in tests) {
-      column.add(context.t.createTestCard(context.d, test));
+      rows.add(t.createTestListTile(context.d, test));
     }
+
+    return t.buildHeaderCard(context, group, rows);
   }
 
 }

@@ -18,9 +18,11 @@ final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigateSetParamAction>(_navSetParam),
   TypedReducer<AFRouteState, AFNavigateExitTestAction>(_navExitTest),
   TypedReducer<AFRouteState, AFNavigatePopFromFlutterAction>(_navPopFromFlutter),
-  TypedReducer<AFRouteState, AFShutdownOngoingQueriesAction>(_shutdownQueries)
+  TypedReducer<AFRouteState, AFShutdownOngoingQueriesAction>(_shutdownQueries),
+  TypedReducer<AFRouteState, AFNavigateSetDrawerParamAction>(_navSetDrawerParam)
 ]);
 
+//---------------------------------------------------------------------------
 AFRouteState _navPopFromFlutter(AFRouteState state, AFNavigatePopFromFlutterAction action) {
   return state.popFromFlutter();
 }
@@ -69,6 +71,11 @@ AFRouteState _navPopTo(AFRouteState state, AFNavigatePopToAction action) {
 //---------------------------------------------------------------------------
 AFRouteState _navSetParam(AFRouteState state, AFNavigateSetParamAction action) {
   return state.setParam(action.screen, action.param);
+}
+
+//---------------------------------------------------------------------------
+AFRouteState _navSetDrawerParam(AFRouteState state, AFNavigateSetDrawerParamAction action) {
+  return state.setDrawerParam(action.screen, action.param);
 }
 
 //---------------------------------------------------------------------------

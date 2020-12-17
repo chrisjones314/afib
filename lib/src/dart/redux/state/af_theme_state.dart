@@ -77,7 +77,6 @@ class AFFundamentalDeviceTheme {
     double ts = fundamentals.findValue(AFFundamentalThemeID.textScaleFactor);
     return ts ?? textScaleFactorValue;
   }
-
 }
 
 /// A value which can be exposed to and edited by the
@@ -124,45 +123,57 @@ class AFTextStyle extends AFThemeResolvableValue {
   }
 }
 
-/// A summary of colors used to make adjusting to dark mode easier.
-/// 
-/// You can register one of these, and then automatically get the 
-/// correct color with [AFConcpetualTheme.colorForeground] and
-/// [AFConceptualTheme.colorBackground]
-class AFColorScheme extends AFThemeResolvableValue {
-  final AFThemeID foreground;
-  final AFThemeID background;
-  final AFThemeID foregroundDarkMode;
-  final AFThemeID backgroundDarkMode;
+/// A pairing of each color and its dark mode variant.
+class AFColor extends AFThemeResolvableValue {
+  final AFThemeID colorLight;
+  final AFThemeID colorDark;
 
-  Color foregroundCache;
-  Color backgroundCache;  
-  Color foregroundDarkModeCache;
-  Color backgroundDarkModeCache;
+  Color colorLightCache;
+  Color colorDarkCache;
 
-  AFColorScheme({
-    @required this.foreground,
-    @required this.background,
-    @required this.foregroundDarkMode,
-    @required this.backgroundDarkMode,
+  AFColor({
+    @required this.colorLight,
+    @required this.colorDark,
   });
 
-  
-  
+  factory AFColor.createWithOne(AFThemeID color) {
+    return AFColor(colorLight: color, colorDark: color);
+  }
+
+  Color color(Brightness brightness) { return brightness == Brightness.light ? colorLightCache : colorDarkCache; }
+
+  void resolve(AFFundamentalTheme theme) {
+    colorLightCache = theme.color(colorLight);
+    colorDarkCache = theme.color(colorDark);
+  }
+
+} 
+
+/// A pairing of [AFColor] for foreground and background.
+/// 
+/// You can register one of these, and then automatically get the 
+/// correct color with [AFConceptualTheme.colorForeground] and
+/// [AFConceptualTheme.colorBackground]
+class AFColorPairing extends AFThemeResolvableValue {
+  final AFColor foreground;
+  final AFColor background;
+
+  AFColorPairing({
+    @required this.foreground,
+    @required this.background,
+  });
 
   Color forgroundColor(Brightness brightness) {
-    return (brightness == Brightness.light) ? foregroundCache : foregroundDarkModeCache;
+    return foreground.color(brightness);
   }
 
   Color backgroundColor(Brightness brightness) {
-    return (brightness == Brightness.light) ? backgroundCache : backgroundDarkModeCache;
+    return background.color(brightness);
   }
 
   void resolve(AFFundamentalTheme theme) {
-    foregroundCache = theme.color(foreground);
-    backgroundCache = theme.color(background);
-    foregroundDarkModeCache = theme.color(foregroundDarkMode);
-    backgroundDarkModeCache = theme.color(backgroundDarkMode);
+    foreground.resolve(theme);
+    background.resolve(theme);
   }
 }
 
@@ -171,13 +182,21 @@ class AFColorScheme extends AFThemeResolvableValue {
 /// drawer.
 @immutable
 class AFFundamentalThemeArea with AFThemeAreaUtilties {
+  final ThemeData themeLight;
+  final ThemeData themeDark;
   final Map<AFThemeID, AFFundamentalThemeValue> values;
   final Map<Locale, AFTranslationSet> translationSet;
 
   AFFundamentalThemeArea({
+    @required this.themeLight,
+    @required this.themeDark,
     @required this.values, 
     @required this.translationSet,
   });
+
+  ThemeData themeData(Brightness brightness) {
+    return brightness == Brightness.light ? themeLight : themeDark;
+  }
 
   String translate(String idOrText, Locale locale) {
     var result = translation(idOrText, locale);
@@ -285,7 +304,13 @@ class AFPluginFundamentalThemeAreaBuilder {
 }
 
 mixin AFThemeAreaUtilties {
-  double size(AFThemeID id, { double scale = 1.0 }) {
+  double size(dynamic id, { double scale = 1.0 }) {
+    if(id == null) {
+      return null;
+    }
+    if(id is double) {
+      return id;
+    }
     final val = value(id);
     var number;
     if(val is double) {
@@ -298,7 +323,36 @@ mixin AFThemeAreaUtilties {
     return number * scale;
   }
 
+  Widget icon(dynamic idOrIcon, {
+    dynamic iconColor, 
+    dynamic iconSize
+  }) { 
+    if(idOrIcon is Widget) {
+      return idOrIcon;
+    }
+    final val = value(idOrIcon);
+    if(val is Widget) {
+      return val;
+    } else if(val is IconData) {
+      final c = color(iconColor);
+      final s = size(iconSize);
+
+      return Icon(
+        val,
+        size: s,
+        color: c
+      );
+    } else {
+      _throwUnsupportedType(idOrIcon, val);
+    }
+    return null;
+  }
+
+
   TextStyle textStyle(dynamic idOrTextStyle) {
+    if(idOrTextStyle == null) {
+      return null;
+    }
     if(idOrTextStyle is TextStyle) {
       return idOrTextStyle;
     }
@@ -314,7 +368,10 @@ mixin AFThemeAreaUtilties {
     return result;
   }
 
-  FontWeight weight(AFThemeID id) {
+  FontWeight weight(dynamic id) {
+    if(id is FontWeight) {
+      return id;
+    }
     final val = value(id);
     var result;
     if(val is FontWeight) {
@@ -332,7 +389,7 @@ mixin AFThemeAreaUtilties {
       color = val;
     } else if(val is TextStyle) {
       color = val.color;
-    } else if(val is AFColorScheme) {
+    } else if(val is AFColorPairing) {
       color = val.forgroundColor(brightness);
     } else {
       _throwUnsupportedType(id, val);
@@ -347,7 +404,7 @@ mixin AFThemeAreaUtilties {
       color = val;
     } else if(val is TextStyle) {
       color = val.color;
-    } else if(val is AFColorScheme) {
+    } else if(val is AFColorPairing) {
       color = val.backgroundColor(brightness);
     } else {
       _throwUnsupportedType(id, val);
@@ -374,7 +431,13 @@ mixin AFThemeAreaUtilties {
     return result;
   }
 
-  Color color(AFThemeID id) {
+  Color color(dynamic id) {
+    if(id is Color) {
+      return id;
+    }
+    if(id == null) {
+      return null;
+    }
     final val = value(id);
     var color;
     if(val is Color) {
@@ -387,10 +450,10 @@ mixin AFThemeAreaUtilties {
     return color;
   }
 
-  AFColorScheme colors(AFThemeID id) {
+  AFColorPairing colors(AFThemeID id) {
     final val = value(id);
     var result;
-    if(val is AFColorScheme) {
+    if(val is AFColorPairing) {
       result = val;
     } else {
       _throwUnsupportedType(id, val);
@@ -406,7 +469,7 @@ mixin AFThemeAreaUtilties {
     return darken(c, percent);    
   }
 
-  Color lighterColor(AFThemeID id, { int percent = 10 }) {
+  Color lighterColor(dynamic id, { int percent = 10 }) {
     final c = color(id);
     if(c == null) {
       throw AFException("$id must be a valid color");
@@ -417,7 +480,7 @@ mixin AFThemeAreaUtilties {
   dynamic value(AFThemeID id);
   String translation(String idOrText, Locale locale);  
 
-  void _throwUnsupportedType(AFThemeID id, dynamic val) {
+  void _throwUnsupportedType(dynamic id, dynamic val) {
     throw AFException("In fundamental theme, $id has unsupported type ${val.runtimeType}");
   }
 
@@ -445,12 +508,35 @@ mixin AFThemeAreaUtilties {
 }
 
 class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuilder with AFThemeAreaUtilties {
-  bool hasSetFundamentals = false;
+  ThemeData themeLight;
+  ThemeData themeDark;
+  
+  /// The app must call this method, or [setFundamentalThemeData] in order
+  /// to establish the basic theme of the app.
+  void setFundamentals({
+    ColorScheme colorSchemeLight,
+    ColorScheme colorSchemeDark,
+    TextTheme textTheme,
+  }) {
+    themeLight = ThemeData.from(colorScheme: colorSchemeLight, textTheme: textTheme);
+    themeDark = ThemeData.from(colorScheme: colorSchemeDark, textTheme: textTheme);
+  }
+
+  /// Most apps should use [setFundamentals], but this method gives you more control
+  /// to create the theme data exactly as you wish.
+  void setFundamentalThemeData({
+    ThemeData themeLight,
+    ThemeData themeDark
+  }) {
+    this.themeLight = themeLight;
+    this.themeDark = themeDark;
+  }
+
   /// The app must call this method to establish some fundamental theme values that both 
   /// flutter and AFib expect.  
   /// 
   /// Values which are not specified will be derived intelligently.
-  void setFundamentals({
+  void setFundamentalsOld({
     @required Color colorPrimary,
     @required Color colorPrimaryForeground,
     Color colorPrimaryDarkMode,
@@ -470,6 +556,7 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     Color colorTapableDarkMode,
     Color colorMuted = Colors.grey,
     Color colorMutedDarkMode,
+    Color colorDrawerTitle,
     @required double sizeBodyText,
     double sizeMargin = 8.0,
     double sizeAppTitle,
@@ -479,21 +566,22 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     double sizeTinyText,
     FontWeight weightNormal = FontWeight.normal,
     FontWeight weightBold = FontWeight.bold,
-    AFColorScheme colorsSplashScreen,
-    AFColorScheme colorsScreenTitle,
-    AFColorScheme colorsAppBackground,
-    AFColorScheme colorsCardTitle,
-    AFColorScheme colorsCardBody,
-    AFColorScheme colorsDrawerTitle,
-    AFColorScheme colorsDrawerBody,
-    AFColorScheme colorsBottomBar,
-    AFColorScheme colorsActionButton,
+    AFColorPairing colorsSplashScreen,
+    AFColorPairing colorsScreenTitle,
+    AFColorPairing colorsAppBackground,
+    AFColorPairing colorsCardTitle,
+    AFColorPairing colorsCardBody,
+    AFColorPairing colorsDrawerTitle,
+    AFColorPairing colorsDrawerBody,
+    AFColorPairing colorsBottomBar,
+    AFColorPairing colorsActionButton,
     dynamic styleAppTitleSplash,
     dynamic styleScreenTitle,
     dynamic styleCardBodyNormal,
     dynamic styleCardBodyBold,
+    IconData iconBack = Icons.arrow_back,
+    IconData iconNavDown = Icons.chevron_right,
   }) {
-    hasSetFundamentals = true;
 
     // colors.
     setValue(AFFundamentalThemeID.colorPrimary, colorPrimary);
@@ -529,6 +617,10 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     // weights
     setValue(AFFundamentalThemeID.weightNormal, weightNormal);
     setValue(AFFundamentalThemeID.weightBold, weightBold);
+
+    // icons
+    setValue(AFFundamentalThemeID.iconBack, iconBack);
+    setValue(AFFundamentalThemeID.iconNavDown, iconNavDown);
 
     // color themes
     setValue(AFFundamentalThemeID.colorsSplashScreen, colorsScreenTitle, 
@@ -568,25 +660,21 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     );
   }
 
-
-  AFColorScheme defaultColors(AFThemeID b, AFThemeID f, AFThemeID bd, AFThemeID fd) {
-    return AFColorScheme(
-      foreground: f,
-      background: b,
-      foregroundDarkMode: fd,
-      backgroundDarkMode: bd,
+  AFColorPairing defaultColors(AFThemeID b, AFThemeID f, AFThemeID bd, AFThemeID fd) {
+    return AFColorPairing(
+      foreground: AFColor(colorLight: f, colorDark: fd),
+      background: AFColor(colorLight: b, colorDark: bd),
     );
   }
 
-
   AFFundamentalThemeArea create() {
     validate();
-    return AFFundamentalThemeArea(values: this.values, translationSet: translationSet);
+    return AFFundamentalThemeArea(themeLight: themeLight, themeDark: themeDark, values: this.values, translationSet: translationSet);
   }
 
   @override 
   void validate() {
-    if(!hasSetFundamentals) {
+    if(themeLight == null || themeDark == null) {
       throw AFException("You must call setFundamentals in fundamental_theme.dart");
     }
   }
@@ -608,21 +696,92 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
 class AFFundamentalTheme {
   final AFFundamentalDeviceTheme device;
   final AFFundamentalThemeArea area;
-  final ThemeData themeData;
   
   AFFundamentalTheme({
     @required this.device,
-    @required this.area,
-    @required this.themeData
+    @required this.area
   });    
 
   String translate(dynamic idOrText) {
     return area.translate(idOrText, device.locale(this));
   }
 
+  ThemeData get themeData {
+    return area.themeData(device.brightness(this));
+  }
+
   /// Used for flags that determine UI layout.  For example, maybe a 'compact' vs 'spacious' flag.
   int flag(AFThemeID id) {
     return area.flag(id);
+  }
+
+  Color get colorPrimary {
+    return themeData.colorScheme.primary;
+  }
+
+  Color get colorOnPrimary {
+    return themeData.colorScheme.onPrimary;
+  }
+
+  Color get colorPrimaryVariant {
+    return themeData.colorScheme.primaryVariant;
+  }
+
+  Color get colorSecondaryVariant {
+    return themeData.colorScheme.secondaryVariant;
+  }
+
+  Color get colorBackground {
+    return themeData.colorScheme.background;
+  }
+
+  Color get colorOnBackground {
+    return themeData.colorScheme.onBackground;
+  }
+
+  Color get colorError {
+    return themeData.colorScheme.error;
+  }
+
+  Color get colorOnError {
+    return themeData.colorScheme.onError;
+  }
+
+  Color get colorSurface {
+    return themeData.colorScheme.surface;
+  }
+
+  Color get colorOnSurface {
+    return themeData.colorScheme.onSurface;
+  }
+
+  Color get colorPrimaryLight {
+    return themeData.primaryColorLight;
+  }
+
+  Color get colorSecondary {
+    return themeData.colorScheme.secondary;
+  }
+
+  /// This indicates whether this is a bright or dark color scheme,
+  /// use [deviceBrightness] to find out the current mode of the device.
+  /// 
+  /// Note that the primary 'bright' color scheme could still be 'dark'
+  /// in nature.
+  Brightness get colorSchemeBrightness {
+    return themeData.colorScheme.brightness;
+  }
+
+  TextTheme get textOnCard {
+    return themeData.textTheme;
+  }
+
+  TextTheme get textOnPrimary {
+    return themeData.primaryTextTheme;
+  }
+
+  TextTheme get textOnAccent {
+    return themeData.accentTextTheme;
   }
 
   Color color(AFThemeID id) {
@@ -639,6 +798,13 @@ class AFFundamentalTheme {
 
   double size(AFThemeID id, { double scale = 1.0 }) {
     return area.size(id, scale: scale);
+  }
+
+  Widget icon(dynamic idOrValue, {
+    dynamic iconColor, 
+    dynamic iconSize
+  }) {
+    return area.icon(idOrValue, iconColor: iconColor, iconSize: iconSize);
   }
 
   TextStyle textStyle(dynamic idOrTextStyle) {
@@ -685,6 +851,7 @@ class AFFundamentalTheme {
 /// type, and that theme will be accessible via the context.theme and
 /// context.t methods.
 class AFConceptualTheme extends AFTheme {
+
   final AFFundamentalTheme fundamentals;
   AFConceptualTheme({
     @required this.fundamentals
@@ -698,7 +865,7 @@ class AFConceptualTheme extends AFTheme {
   /// ```
   List<Widget> row() { return <Widget>[]; }
 
-  /// A utikity for creating a list of widgets in a column.
+  /// A utility for creating a list of widgets in a column.
   /// 
   /// This allows for a reasonable syntax like:
   /// ```dart
@@ -706,9 +873,74 @@ class AFConceptualTheme extends AFTheme {
   /// ```
   List<Widget> column() { return <Widget>[]; }
 
+
+  /// A utility for create a list of table rows in a table.
+  List<TableRow> tableColumn() { return <TableRow>[]; }
+
+  // The primary color from [ThemeData], adjusted for light/dark mode.
+  Color get colorPrimary {
+    return fundamentals.colorPrimary;
+  }
+
+  /// The foreground color on a primary background from [ThemeData]
+  Color get colorOnPrimary {
+    return fundamentals.colorOnPrimary;
+  }
+
+  Color get colorPrimaryVariant {
+    return fundamentals.colorPrimaryVariant;
+  }
+
+  Color get colorSecondaryVariant {
+    return fundamentals.colorSecondaryVariant;
+  }
+
+  Color get colorSurface {
+    return fundamentals.colorSurface;
+  }
+
+  Color get colorBackground {
+    return fundamentals.colorBackground;
+  }
+
+  Color get colorOnSurface {
+    return fundamentals.colorOnSurface;
+  }
+
+  Color get colorOnBackground {
+    return fundamentals.colorOnBackground;
+  }
+
+  Color get colorError {
+    return fundamentals.colorError;
+  }
+
+  Color get colorOnError {
+    return fundamentals.colorOnError;
+  }
+
+  Brightness get colorSchemeBrightness {
+    return fundamentals.colorSchemeBrightness;
+  }
+
   /// Whether the device is in light or dark mode.
   Brightness get brightness { 
     return fundamentals.device.brightness(fundamentals);
+  }
+
+  /// See [TextTheme], text theme to use on a card background
+  TextTheme get textOnCard {
+    return fundamentals.textOnCard;
+  }
+
+  /// See [TextTheme], text theme to use on a primary color background
+  TextTheme get textOnPrimary {
+    return fundamentals.textOnPrimary;
+  }
+
+  /// See [TextTheme], text theme to use on an accent color backgroun
+  TextTheme get textOnAccent {
+    return fundamentals.textOnAccent;
   }
 
   /// Whether times should use a 24 hour format.
@@ -719,11 +951,11 @@ class AFConceptualTheme extends AFTheme {
   /// Translate the specified string id and return it.
   /// 
   /// See also [textBuilder] and [richTextBuilder]
-  String translate(dynamic textOrId) {
-    return fundamentals.translate(textOrId);
+  String translate(dynamic text) {
+    return fundamentals.translate(text);
   }
 
-  AFRichTextBuilder createRichTextBuilder({
+  AFRichTextBuilder richTextBuilder({
     AFWidgetID wid,
     dynamic idOrTextStyleNormal = AFFundamentalThemeID.styleCardBodyNormal,
     dynamic idOrTextStyleBold = AFFundamentalThemeID.styleCardBodyBold,
@@ -745,11 +977,11 @@ class AFConceptualTheme extends AFTheme {
     );
   }
 
-  AFTextBuilder createTextBuilder({
+  AFTextBuilder textBuilder({
     AFWidgetID wid,
-    dynamic idOrTextStyle = AFFundamentalThemeID.styleCardBodyNormal,
+    dynamic textStyle
   }) {
-    final style = idOrTextStyle != null ? textStyle(idOrTextStyle) : null;
+    final style = textStyle != null ? textStyle(textStyle) : null;
     return AFTextBuilder(
       theme: fundamentals,
       wid: wid,
@@ -758,20 +990,33 @@ class AFConceptualTheme extends AFTheme {
   }
 
 
-  Text createText(AFWidgetID wid, dynamic textOrLangID, dynamic styleOrStyleId) {
-    final text = translate(textOrLangID);
-    final style = textStyle(styleOrStyleId);
-    return Text(text, 
+  Text text(dynamic text, {
+    AFWidgetID wid, 
+    dynamic style,
+    dynamic textColor,
+    dynamic size,
+    TextAlign textAlign,
+  }) {
+    var styleS;
+    if(textColor != null) {
+      styleS = TextStyle(color: color(textColor));
+    } else {
+      styleS = textStyle(style);
+    }
+    final textT = translate(text);
+    return Text(textT, 
       key: keyForWID(wid),
-      style: style,
-      textScaleFactor: textScaleFactor,
+      style: styleS,
+      textAlign: textAlign,
+      textScaleFactor: deviceTextScaleFactor,
     );
   }
+
 
   /// The locale for the device.
   /// 
   /// See also the [translate] function.
-  Locale get locale {
+  Locale get deviceLocale {
     return fundamentals.device.locale(fundamentals);
   }
 
@@ -779,27 +1024,27 @@ class AFConceptualTheme extends AFTheme {
   /// 
   /// This value updates automatically when the
   /// device switches from landscape to portrait.
-  Size get physicalSize {
+  Size get devicePhysicalSize {
     return fundamentals.device.physicalSize;
   }
 
   /// The text scale factor for the device.
-  double get textScaleFactor {
+  double get deviceTextScaleFactor {
     return fundamentals.device.textScaleFactor(fundamentals);
   }
 
   /// See Flutter [Window]
-  WindowPadding get padding {
+  WindowPadding get devicePadding {
     return fundamentals.device.padding;
   }
 
   /// See Flutter [Window]
-  WindowPadding get viewInsets {
+  WindowPadding get deviceViewInsets {
     return fundamentals.device.viewInsets;
   }
   
   /// See Flutter [Window]
-  WindowPadding get viewPadding {
+  WindowPadding get deviceViewPadding {
     return fundamentals.device.viewPadding;
   }
   
@@ -808,11 +1053,31 @@ class AFConceptualTheme extends AFTheme {
     return AFUI.keyForWID(wid);
   }
 
-  Color color(AFThemeID id) {
-    return fundamentals.color(id);
+  Color color(dynamic idOrColor) {
+    if(idOrColor is Color) {
+      return idOrColor;
+    }
+    return fundamentals.color(idOrColor);
+  }
+
+  Color foreground(dynamic idOrColor) {
+    if(idOrColor is Color) {
+      return idOrColor;
+    }
+    return fundamentals.foreground(idOrColor);
+  }
+
+  Color background(dynamic idOrColor) {
+    if(idOrColor is Color) {
+      return idOrColor;
+    }
+    return fundamentals.background(idOrColor);
   }
 
   TextStyle textStyle(dynamic idOrTextStyle) {
+    if(idOrTextStyle is TextStyle) {
+      return idOrTextStyle;
+    }
     return fundamentals.textStyle(idOrTextStyle);
   }
 
@@ -824,13 +1089,24 @@ class AFConceptualTheme extends AFTheme {
     return fundamentals.size(AFFundamentalThemeID.sizeMargin);
   }
 
+  Widget icon(dynamic id, {
+    dynamic iconColor,
+    dynamic iconSize
+  }) {
+    return fundamentals.icon(id, iconColor: iconColor, iconSize: iconSize);
+  }
+
+  Color get colorSecondary {
+    return fundamentals.colorSecondary;
+  }
+
   /// Important: the values you are passing in are scale factors on the
   /// value specified by [AFFundamentalThemeID.sizeMargin], they are not
   /// absolute measurements.
   /// 
   /// For example, if the default margin is 8.0, and you pass in all: 2,
   /// you will get 16 all the way around.
-  EdgeInsets scaledPaddingInsets({
+  EdgeInsets paddingScaled({
     double horizontal,
     double vertical,
     double top,
@@ -839,7 +1115,7 @@ class AFConceptualTheme extends AFTheme {
     double right,
     double all
   }) {
-    return scaledMarginInsets(
+    return marginScaled(
       horizontal: horizontal,
       vertical: vertical,
       top: top,
@@ -856,7 +1132,7 @@ class AFConceptualTheme extends AFTheme {
   /// 
   /// For example, if the default margin is 8.0, and you pass in all: 2,
   /// you will get 16 all the way around.
-  EdgeInsets scaledMarginInsets({
+  EdgeInsets marginScaled({
     double horizontal,
     double vertical,
     double top,
@@ -903,6 +1179,25 @@ class AFConceptualTheme extends AFTheme {
     return EdgeInsets.fromLTRB(l, t, r, b);
   }
     
+  Widget standardBackButton(AFDispatcher dispatcher, {
+    AFWidgetID wid = AFUIID.buttonBack,
+    dynamic iconIdOrWidget = AFFundamentalThemeID.iconBack,
+    dynamic iconColor,
+    dynamic iconSize,
+    String tooltip = "Back",
+    AFShouldContinueCheckDelegate shouldContinueCheck,   
+  }) {
+    return IconButton(
+        key: keyForWID(wid),      
+        icon: icon(iconIdOrWidget, iconColor: iconColor, iconSize: iconSize),
+        tooltip: translate(tooltip),
+        onPressed: () async {
+          if(shouldContinueCheck == null || await shouldContinueCheck() == AFFundamentalThemeID.shouldContinue) {
+            dispatcher.dispatch(AFNavigatePopAction(id: wid));
+          }
+        }
+    );
+  }
 
 }
 

@@ -4,7 +4,6 @@ import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
-import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
@@ -235,7 +234,6 @@ class AFPluginExtensionContext {
 class AFAppExtensionContext extends AFPluginExtensionContext {
   AFCreateAFAppDelegate createApp;
   AFInitAppFundamentalThemeDelegate initFundamentalThemeArea;
-  AFOverrideCreateThemeDataDelegate overrideCreateThemeData;
 
   /// Used by the app to specify fundamental configuration/functionality
   /// that AFib requires.
@@ -246,7 +244,6 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     @required AFCreateStartupQueryActionDelegate createStartupQueryAction,
     @required AFCreateAFAppDelegate createApp,
     @required AFCreateConceptualThemeDelegate createPrimaryTheme,
-    AFOverrideCreateThemeDataDelegate overrideCreateThemeData,
   }) {
     this.initScreenMaps.add(initScreenMap);
     this.initialAppStates.add(initializeAppState);
@@ -254,7 +251,6 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     this.createApp = createApp;
     this.initConceptualThemes.add(createPrimaryTheme);
     this.initFundamentalThemeArea = initFundamentalThemeArea;
-    this.overrideCreateThemeData = overrideCreateThemeData;
     _verifyNotNull(initFundamentalThemeArea, "initFundamentalTheme");
     _verifyNotNull(initScreenMap, "initScreenMap");
     _verifyNotNull(initializeAppState, "initializeAppState");
@@ -282,25 +278,6 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     }
   }
 
-
-  ThemeData createThemeData(AFFundamentalDeviceTheme device, AFAppStateAreas areas, AFFundamentalThemeArea primaryArea) {
-    if(overrideCreateThemeData != null) {
-      return overrideCreateThemeData(device, areas, primaryArea);
-    }
-
-    final colorPrimary = primaryArea.color(AFFundamentalThemeID.colorPrimary);
-    final colorPrimaryDark = primaryArea.color(AFFundamentalThemeID.colorPrimaryDarker);
-    final colorPrimaryLight = primaryArea.color(AFFundamentalThemeID.colorPrimaryLighter);
-    final colorSecondary = primaryArea.color(AFFundamentalThemeID.colorSecondary);
-
-    return ThemeData(
-      primaryColor: colorPrimary,
-      primaryColorDark: colorPrimaryDark,
-      primaryColorLight: colorPrimaryLight,
-      accentColor: colorSecondary,
-    );
-  }
-
   AFFundamentalTheme createFundamentalTheme(AFFundamentalDeviceTheme device, AFAppStateAreas areas) {
     final builder = AFAppFundamentalThemeAreaBuilder();
     this.initFundamentalThemeArea(device, areas, builder);
@@ -314,8 +291,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     }
     
     final primaryArea = builder.create();
-    final themeData = createThemeData(device, areas, primaryArea);
-    final result = AFFundamentalTheme(device: device, area: primaryArea, themeData: themeData);
+    final result = AFFundamentalTheme(device: device, area: primaryArea);
     result.resolve();
     return result;
   }

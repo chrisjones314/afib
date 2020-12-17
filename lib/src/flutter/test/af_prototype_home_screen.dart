@@ -88,29 +88,36 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
 
   /// 
   Widget _buildHome(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context) {
-    final rows = AFUI.column();
+    final t = context.t;
 
-    rows.add(_createKindRow(context, "Widget Prototypes", () {
+    final protoRows = t.column();
+    protoRows.add(_createKindRow(context, "Widget Prototypes", () {
       List<AFScreenPrototypeTest> tests = AFibF.g.widgetTests.all;
       context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
     }));
     
-    rows.add(_createKindRow(context, "Screen Prototypes", () {
+    protoRows.add(_createKindRow(context, "Screen Prototypes", () {
       List<AFScreenPrototypeTest> tests = AFibF.g.screenTests.all;
       context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
     }));
     
-    rows.add(_createKindRow(context, "Workflow Prototypes", () {
+    protoRows.add(_createKindRow(context, "Workflow Prototypes", () {
       List<AFScreenPrototypeTest> tests = AFibF.g.workflowTests.all;
       context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
     }));
     
+
     final areas = context.p.filter.split(" ");
     final tests = AFibF.g.findTestsForAreas(areas);
 
-    _buildFilterAndRunControls(context, tests, rows);
-    _buildFilteredSection(context, tests, rows);
+    final filterRows = t.column();
+    filterRows.add(_buildFilterAndRunControls(context, tests));
+    _buildFilteredSection(context, tests, filterRows);
 
+    final rows = t.column();
+    rows.add(t.buildHeaderCard(context, "Prototypes and Tests", protoRows));    
+    rows.add(t.buildHeaderCard(context, "Search and Run", filterRows));
+    
     return context.t.buildPrototypeScaffold("AFib Prototype Mode", rows);
   }
 
@@ -139,13 +146,13 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     updateParam(context, revised);
   }
 
-  void _buildFilterAndRunControls(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context, List<AFScreenPrototypeTest> tests, List<Widget> rows) {
-    rows.add(context.t.createSectionHeader("Filter and Run"));
-    
+  Widget _buildFilterAndRunControls(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context, List<AFScreenPrototypeTest> tests) {
+    final t = context.t;
     final searchController = context.p.textControllers.syncText(AFPrototypeHomeScreenParam.filterTextId, context.p.filter);
 
+    final rows = t.column();
+
     final searchText = Container(
-      margin: context.t.scaledMarginInsets(horizontal: 0.5),
       child: TextField(
         controller: searchController,
         obscureText: false,
@@ -166,15 +173,22 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
 
     if(tests.isNotEmpty) {
       rows.add(Container(
-        margin: EdgeInsets.symmetric(horizontal: 8.0),
-        child: RaisedButton(
-          child: Text("Run All"),
+        child: FlatButton(
+          child: t.text("Run All", style: t.textOnPrimary.bodyText1),
+          color: t.colorPrimary,
           onPressed: () {
             _onRunTests(context, tests);
           }
         )
       ));
     }
+
+    return Container(
+      margin: context.t.marginScaled(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: rows,
+      ));
   }
 
 
@@ -184,18 +198,16 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     }
 
     for(final test in tests) {
-      rows.add(context.t.createTestCard(context.d, test));
+      rows.add(context.t.createTestListTile(context.d, test));
     }
   }
 
-  Widget _createKindRow(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context, String langId, Function onTap) {
-    return Card(
-      child: ListTile(
-        title: context.t.createText(null, langId, AFFundamentalThemeID.styleCardBodyNormal),
-        dense: true,
-        trailing: Icon(Icons.chevron_right),
-        onTap: onTap
-      )
+  Widget _createKindRow(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context, String text, Function onTap) {
+    return ListTile(
+      title: context.t.text(text),
+      dense: true,
+      trailing: context.t.icon(AFFundamentalThemeID.iconNavDown),
+      onTap: onTap
     );
   }
 }

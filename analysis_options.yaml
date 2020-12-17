@@ -19,3 +19,4 @@ linter:
     use_setters_to_change_properties: false
     one_member_abstracts: false
     prefer_mixin: false
+    avoid_returning_null: false

@@ -543,27 +543,47 @@ abstract class AFPopupScreen<TState extends AFAppStateArea, TData extends AFStor
 /// You cannot trust that you used an [AFNavigatePush] action to open the drawer.  Consequently,
 /// you should only rely on information in your [AFAppStateArea] to render your drawers, and perhaps
 /// the full state of the route ()
-abstract class AFConnectedDrawer<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedWidgetWithParam<TState, TData, TRouteParam, TTheme> {
-  final AFScreenID screenId;
+abstract class AFConnectedDrawer<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TData, TRouteParam, TTheme> {
   final Type themeType = TTheme;
 
-  AFConnectedDrawer({
-    @required this.screenId,
+  AFConnectedDrawer(
+    AFScreenID screenId,
+    /*
     @required AFDispatcher dispatcher,
     @required AFUpdateParamDelegate<TRouteParam> updateParamDelegate,
     @required AFExtractParamDelegate extractParamDelegate,
     @required AFCreateDataDelegate createDataDelegate,
     @required AFFindParamDelegate findParamDelegate,
-  }): super(
-    dispatcher: dispatcher,
-    updateParamDelegate: updateParamDelegate,
-    extractParamDelegate: extractParamDelegate,
-    createDataDelegate: createDataDelegate,
-    findParamDelegate: findParamDelegate
-  );
+    */
+  ): super(screenId);
 
+  /*
   AFScreenID get screenIdForTest {
     return screenId;
+  }
+  */
+
+  TRouteParam findParam(AFState state) {
+    var current = state.public.route.findDrawerParam(screenId);
+    if(current == null) {
+      current = createRouteParam(state);
+    }
+    return current;
+  }
+
+  /// Create the initial default route parameter for the drawer.
+  /// 
+  /// This is necessary if the drawer is dragged onto the screen using
+  TRouteParam createRouteParam(AFState state);
+
+  /// Because the drawer can be dragged onto the screen without an 
+  /// explicit navigation inside our app, we need to track it in a special area.
+  void updateParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
+    dispatcher.dispatch(AFNavigateSetDrawerParamAction(
+      id: id,
+      screen: this.screenId, 
+      param: revised)
+    );
   }
 
 }
@@ -632,9 +652,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
     if(testState.activeTestId != null) {
       final test = AFibF.g.findScreenTestById(testState.activeTestId);
       if(test != null && test.testDrawerSide == testDrawerSide) {
-        return AFTestDrawer(
-          dispatcher: dispatcher,
-        );
+        return AFTestDrawer();
       }
     }
     return drawer;

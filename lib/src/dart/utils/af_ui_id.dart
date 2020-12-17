@@ -22,6 +22,11 @@ class AFUIID {
 /// 
 /// These identifiers can be used by third parties, and are usually the values used to create the flutter ThemeData.
 class AFFundamentalThemeID {
+  /// constant used by [AFConceptualTheme.standardBackButton]
+  static const shouldStop = 1;
+  /// constant used by [AFConceptualTheme.standardBackButton]
+  static const shouldContinue = 2;
+
   static const tagFundamental = "${AFUIID.afibIDPrefix}fundamental";
   static const tagDeviceOverride = "${AFUIID.afibIDPrefix}device_override";
   
@@ -120,6 +125,10 @@ class AFFundamentalThemeID {
   static const colorsActionButton = AFThemeID("colors_action_button", tagFundamental, "Colors action button");
 
 
+  static const iconBack = AFThemeID("icon_back", tagFundamental, "Icon Back");
+  static const iconNavDown = AFThemeID("icon_nav_down", tagFundamental, "Icon used to navigate to additional details");
+
+
   static const styleAppTitleSplash = AFThemeID("style_app_title_splash", tagFundamental, "Text style for app title on splash screen");
   static const styleScreenTitle = AFThemeID("style_screen_title", tagFundamental, "Text style for screen title");
   static const styleMajorCardTitle = AFThemeID("style_major_card_title", tagFundamental, "Text style for a major heading in a card title");
@@ -137,9 +146,4 @@ class AFFundamentalThemeID {
 
   static const Locale localeDefault = Locale('en', 'US');
 
-}
-
-/// Language translation ids used in the afib prototype screens.
-class AFPrototypeLangID {
-  static final prototypeTag = "${AFUIID.afibIDPrefix}prototype";
 }

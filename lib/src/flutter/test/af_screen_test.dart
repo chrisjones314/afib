@@ -1508,7 +1508,8 @@ class AFWorkflowStatePrototypeTest<TState extends AFAppStateArea> extends AFScre
   }
 
   void onDrawerReset(AFDispatcher dispatcher) {
-    //throw UnimplementedError();
+    dispatcher.dispatch(AFNavigateExitTestAction());
+    initializeMultiscreenPrototype<TState>(dispatcher, this);
   }
 
   @override

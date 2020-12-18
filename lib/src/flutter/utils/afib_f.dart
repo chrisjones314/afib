@@ -334,7 +334,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     final reusable = areas.indexWhere((element) => element.startsWith("reuse")) >= 0;
     for(final test in tests) {
       for(final area in areas) {        
-        if((reusable && test.isReusable) || addAll || test.id.code == area || test.id.hasTag(area)) {
+        if((reusable && test.hasReusable) || addAll || test.id.code == area || test.id.hasTag(area)) {
           results.add(test);
         }
       }

@@ -54,7 +54,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
     final titleText = instance.id.code;
     final cols = row();
     cols.add(text(titleText));
-    if(instance.isReusable) {
+    if(instance.hasReusable) {
       cols.add(createReusableTag());
     }
 

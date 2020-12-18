@@ -78,6 +78,9 @@ class AFStateTestID extends AFTestID {
 }
 
 class AFReusableTestID extends AFTestID {
+  static const smokeTestId = AFReusableTestID("smoke");
+  static const allTestId = AFReusableTestID("all");
+  static const workflowTestId = AFReusableTestID("workflow");
   const AFReusableTestID(String code, {String group, List<String> tags}) : super(code, tags: tags, group: group);
 }
 

@@ -6,7 +6,6 @@ import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/test/af_test.dart';
 import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
-import 'package:afib/src/flutter/utils/af_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
@@ -104,6 +103,8 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFProtot
       return context.p.test.createWidgetWrapperDelegate(context, resultWidget);
     }
 
+    final t = context.t;
+
     final widgets = [resultWidget];
     return createScaffold(
       context: context,
@@ -112,9 +113,9 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFProtot
         slivers: [
           SliverAppBar(
             automaticallyImplyLeading: false,
-            leading: AFUI.standardBackButton(context.d),
-            title: Text('Widget Test Screen',
-              style: AFThemeOld.styleWhite
+            leading: t.standardBackButton(context.d),
+            title: t.text('Widget Test Screen',
+              style: t.textOnPrimary.headline4,
             ),
           ),
           SliverList(

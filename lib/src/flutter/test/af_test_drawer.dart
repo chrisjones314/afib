@@ -222,32 +222,86 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
     return _areaContentCard(context, content);
   }
 
-  Widget _buildTestContent(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context) {
+  void _onRun(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context, AFReusableTestID id) {
+    final test = context.s.test;
+    Navigator.pop(context.c);
+    Timer(Duration(seconds: 1), () async {            
+      await test.onDrawerRun(context.d, context.s.testContext, context.s.testState, id, () {
+        test.openTestDrawer(id);
+      });
+    });    
+  }
+
+  Widget _buildRunButton(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context) {
     final t = context.t;
     final test = context.s.test;
+    final sectionIds = test.sectionIds;
+
+    final cols = t.row();
+
+    final hasMultiple = sectionIds.length > 1;
+    final firstId = sectionIds.first;
+    var defaultRunId = firstId;
+    var rowAlign = MainAxisAlignment.start;
+    if(hasMultiple) {
+      defaultRunId = AFReusableTestID.allTestId;
+      rowAlign = MainAxisAlignment.spaceBetween;
+    }
+
+    cols.add(t.text('Run $defaultRunId'));
+
+    if(hasMultiple) {
+      cols.add(PopupMenuButton<AFReusableTestID>(
+        onSelected: (id) { 
+          _onRun(context, id);
+        },
+        itemBuilder: (context) {
+          final result = <PopupMenuEntry<AFReusableTestID>>[];
+          for(final id in sectionIds) {
+            result.add(PopupMenuItem<AFReusableTestID>(
+              value: id,
+              child: t.text(id.toString())
+            ));
+          }
+
+          return result;
+        }
+      ));
+    }
+
+    final buttonContent = Row(
+      mainAxisAlignment: rowAlign,
+      children: cols,
+    );
+
+    return FlatButton(
+      child: buttonContent,
+      color: t.colorSecondary,
+      textColor: t.colorOnPrimary,
+      onPressed: ()  {
+        _onRun(context, defaultRunId);
+      }
+    );
+
+
+    
+      
+    
+  }
+
+  Widget _buildTestContent(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context) {
+    final t = context.t;
     var content;
     if(context.s.test.hasBody) {
       final rows = t.column();
-      rows.add(FlatButton(
-        child: t.text('Run Test'),
-        color: t.colorSecondary,
-        textColor: t.colorOnPrimary,
-        onPressed: ()  {
-          Navigator.pop(context.c);
-          Timer(Duration(seconds: 1), () async {            
-            test.onDrawerRun(context.d, context.s.testContext, context.s.testState, () {
-              test.openTestDrawer();
-            });
-          });
-        }
-      ));
+      rows.add(_buildRunButton(context));
       _buildTestReport(context, rows);
       content = Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: rows
       );
     } else {
-      content = t.testExplanationText("This test does not have a test body.  To add one, see body.execute() on the value returned by AFSingleScreenTestDefinitionContext. addPrototype");
+      content = t.testExplanationText("This test does not have a test body.  To add one, see definitions.addSmokeTest or definitions.addReusableTest1...");
     }
 
     return _areaContentCard(context, content);
@@ -264,42 +318,46 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
     final t = context.t;
     final test = context.s.test;
     var content;
-    if(test.isReusable) {
-      final reusableId = test.reusableTestId;
-      final rows = t.column();
+    if(test.hasReusable) {
 
-      if(reusableId != null) {
-        rows.add(Container(
-          margin: t.marginScaled(bottom: 2, all: 0),
-          child: t.text('ID: ${reusableId.toString()}', textAlign: TextAlign.left)
-        ));
+      for(final reusableId in test.sectionIds) {
+        final rows = t.column();
+        if(reusableId == AFReusableTestID.smokeTestId) {
+          continue;
+        }
+
+        if(reusableId != null) {
+          rows.add(Container(
+            margin: t.marginScaled(bottom: 2, all: 0),
+            child: t.text('Reusable: ${reusableId.toString()}', textAlign: TextAlign.left)
+          ));
+        }
+        final params = test.paramDescriptions(reusableId);
+
+        final tableRows = t.tableColumn();
+        final headerCols = t.row();
+        headerCols.add(_testResultTableHeader(context, "#", TextAlign.left));
+        headerCols.add(_testResultTableHeader(context, "Param Description", TextAlign.left));
+        tableRows.add(TableRow(children: headerCols));
+        
+        for(var i = 0; i < params.length; i++) {
+          final param = params[i];
+          final resultCols = t.row();
+          resultCols.add(_testResultTableValue(context, (i+1).toString(), TextAlign.right));
+          resultCols.add(_testResultTableValue(context, param, TextAlign.left));
+          tableRows.add(TableRow(children: resultCols));
+        }
+
+        rows.add(Table(children: tableRows, columnWidths: columnWidthsForNumValueTable));
+        content = Container(
+          margin: t.marginScaled(horizontal: 0, top: 1),
+          child: Column(
+            children: rows
+          )
+        );
       }
-      final params = test.paramDescriptions;
-
-      final tableRows = t.tableColumn();
-      final headerCols = t.row();
-      headerCols.add(_testResultTableHeader(context, "#", TextAlign.left));
-      headerCols.add(_testResultTableHeader(context, "Param Description", TextAlign.left));
-      tableRows.add(TableRow(children: headerCols));
-      
-      for(var i = 0; i < params.length; i++) {
-        final param = params[i];
-        final resultCols = t.row();
-        resultCols.add(_testResultTableValue(context, (i+1).toString(), TextAlign.right));
-        resultCols.add(_testResultTableValue(context, param, TextAlign.left));
-        tableRows.add(TableRow(children: resultCols));
-      }
-
-      rows.add(Table(children: tableRows, columnWidths: columnWidthsForNumValueTable));
-      content = Container(
-        margin: t.marginScaled(horizontal: 0, top: 1),
-        child: Column(
-          children: rows
-        )
-      );
-
     } else {
-      content = t.testExplanationText("This test is not reusable.  To make it reusable, see AFSingleScreenTestDefinitionContext. defineReusable.");
+      content = t.testExplanationText("This test has no reusable sections.  To add on, see definitions.defineReusable1...");
     }
     return _areaContentCard(context, content);
   }

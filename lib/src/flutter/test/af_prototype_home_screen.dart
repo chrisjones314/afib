@@ -133,7 +133,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
 
       await Future.delayed(Duration(milliseconds: 500));
       
-      await test.onDrawerRun(context.d, testContext, testSpecificState, () {
+      await test.onDrawerRun(context.d, testContext, testSpecificState, AFReusableTestID.allTestId, () {
         context.dispatch(AFNavigateExitTestAction());
       });
 

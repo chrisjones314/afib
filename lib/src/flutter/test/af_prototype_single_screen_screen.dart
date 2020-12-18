@@ -16,7 +16,7 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 /// Parameter uses to filter the tests shown on the screen.
 @immutable
 class AFPrototypeSingleScreenRouteParam extends AFRouteParam {
-  final AFID id;
+  final AFTestID id;
   final AFRouteParam param;
   final dynamic data;
 

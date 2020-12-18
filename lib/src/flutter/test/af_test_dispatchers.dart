@@ -74,18 +74,18 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
 }
 
 class AFSingleScreenTestDispatcher extends AFScreenTestDispatcher {
-  final AFID screenId;
+  final AFTestID testId;
   
   
   AFSingleScreenTestDispatcher(
-    this.screenId, 
+    this.testId, 
     AFDispatcher main, 
     AFScreenTestContext testContext): super(main, testContext);
 
   void processSetParam(AFNavigateSetParamAction action) {
     main.dispatch(
       AFNavigateSetParamAction(screen: AFUIID.screenPrototypeSingleScreen,
-        param: AFPrototypeSingleScreenRouteParam(id: screenId, param: action.param)
+        param: AFPrototypeSingleScreenRouteParam(id: testId, param: action.param)
     ));      
   }
 }

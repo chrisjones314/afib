@@ -1330,7 +1330,16 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
     return body.run(context, onEnd: onEnd, useParentCollector: useParentCollector, param1: param1, param2: param2, param3: param3);
   }
 
+  static void resetTestParam(AFDispatcher dispatcher, AFTestID testId, AFScreenID screenId, dynamic param) {
+    final d = AFSingleScreenTestDispatcher(testId, dispatcher, null);
+    d.processSetParam(AFNavigateSetParamAction(
+      param: param,
+      screen: screenId,
+    ));
+  }
+
   void onDrawerReset(AFDispatcher dispatcher) {
+    AFSingleScreenPrototypeTest.resetTestParam(dispatcher, this.id, this.screenId, this.param);
     dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.id, this.data));
   }
 

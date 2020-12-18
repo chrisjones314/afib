@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
+import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
@@ -21,14 +22,38 @@ class AFTestDrawerRouteParam extends AFRouteParam {
   static const viewTest  = 2;
   static const viewReuse = 3;
   final int view;
+  final Map<int, bool> themeExpanded;
 
-  AFTestDrawerRouteParam({this.view});
+  static const expandThemeDevice = 0;
+
+  AFTestDrawerRouteParam({
+    @required this.view, 
+    @required this.themeExpanded
+  });
+
+  factory AFTestDrawerRouteParam.createOncePerScreen(int view) {
+    final themeExpanded = <int, bool>{};
+    themeExpanded[expandThemeDevice] = false;
+    return AFTestDrawerRouteParam(view: view, themeExpanded: themeExpanded);
+  }
+
+  bool isExpanded(int area) {
+    return themeExpanded[area];
+  }
+
+  AFTestDrawerRouteParam reviseExpanded(int area, { bool expanded }) {
+    final revised = Map<int, bool>.from(themeExpanded);
+    revised[area] = expanded;
+    return copyWith(themeExpanded: revised);
+  }
 
   AFTestDrawerRouteParam copyWith({
-    int view
+    int view,
+    Map<int, bool> themeExpanded
   }) {
     return AFTestDrawerRouteParam(
-      view: view ?? this.view
+      view: view ?? this.view,
+      themeExpanded: themeExpanded ?? this.themeExpanded
     );
   }
 }
@@ -41,16 +66,11 @@ class AFTestDrawerData extends AFStoreConnectorData3<AFScreenTestContextSimulato
   AFScreenTestContextSimulator get testContext { return first; }
   AFSingleScreenTestState get testState { return second; }
   AFScreenPrototypeTest get test { return third; }
-
 }
 
 //--------------------------------------------------------------------------------------
 class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> {
   static final timeFormat = DateFormat('Hms');
-  static const columnWidthsForNumValueTable = {
-      0: FixedColumnWidth(20.0),
-      1: FlexColumnWidth(),
-    };
 
   //--------------------------------------------------------------------------------------
   AFTestDrawer(): super(AFUIID.screenTestDrawer);
@@ -70,9 +90,8 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
 
   //--------------------------------------------------------------------------------------
   AFTestDrawerRouteParam createRouteParam(AFState state) {
-    return AFTestDrawerRouteParam(view: AFTestDrawerRouteParam.viewTest);
+    return AFTestDrawerRouteParam.createOncePerScreen(AFTestDrawerRouteParam.viewTest);
   }
-
 
   //--------------------------------------------------------------------------------------
   @override
@@ -112,7 +131,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
       margin: t.marginScaled(left: 0),
       child: t.text(
         "AFib Test Drawer",
-        style: t.textOnPrimary.headline2
+        style: t.styleOnPrimary.headline2
       )
     ));
 
@@ -120,7 +139,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
       margin: t.marginScaled(left: 0),
       child: t.text(
           context.s.test.id.toString(), 
-          style: t.textOnPrimary.headline6
+          style: t.styleOnPrimary.headline6
       )
     ));
 
@@ -217,9 +236,80 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
       );
   }
 
+  TableRow _createAttributeRow(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context, String title, Widget Function() buildValue) {
+    final t = context.t;    
+    final cols = t.row();
+    cols.add(t.testResultTableValue(context, title, TextAlign.right));
+    cols.add(buildValue());
+    return TableRow(children: cols);
+  }
+
+  Widget _buildDeviceThemeBody(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context) {
+    final t = context.t;    
+    // build a table that has different values, like 
+    final headerCols = t.row();
+    headerCols.add(t.testResultTableHeader(context, "Attr", TextAlign.right));
+    headerCols.add(t.testResultTableHeader(context, "Value", TextAlign.left));
+    final tableRows = t.tableColumn();
+    tableRows.add(TableRow(children: headerCols));       
+
+    tableRows.add(_createAttributeRow(context, "Size", () {
+      final text = StringBuffer();
+      final size = t.devicePhysicalSize;
+      text.write(size.width);
+      text.write(" x ");
+      text.write(size.height);
+
+      return t.testResultTableValue(context, text.toString(), TextAlign.left);
+    }));
+
+    tableRows.add(_createAttributeRow(context, "Dark Mode", () {
+      final isDark = t.deviceBrightness == Brightness.dark;
+      return Container(
+        child: Switch(
+          value: isDark,
+          onChanged: (isDarkNow) {
+            final reversedBrightness = isDarkNow ? Brightness.dark : Brightness.light;
+            context.dispatch(AFOverrideThemeValueAction(
+              id: AFFundamentalThemeID.brightness,
+              value: reversedBrightness
+            ));
+          }
+        )
+      );
+    }));
+
+
+
+    return Table(
+      children: tableRows
+    );
+  }
+
   Widget _buildThemeContent(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context) {
-    final content = context.t.testExplanationText("TODO: Theme");
-    return _areaContentCard(context, content);
+    final t = context.t;
+    final content = ExpansionPanelList(
+      expansionCallback: (index, isExpanded) {
+        updateParam(context, context.p.reviseExpanded(index, expanded: !isExpanded));
+      },
+      children: [
+        ExpansionPanel(
+          isExpanded: context.p.isExpanded(AFTestDrawerRouteParam.expandThemeDevice),
+          headerBuilder: (context, isExpanded) {
+            return ListTile(
+              title: Text('Device'),
+              dense: true,
+            );
+          },
+          body: _buildDeviceThemeBody(context),
+        ),
+      ],
+    );
+
+    return Container(
+      margin: t.marginScaled(),
+      child: content
+    );
   }
 
   void _onRun(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context, AFReusableTestID id) {
@@ -336,19 +426,19 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
 
         final tableRows = t.tableColumn();
         final headerCols = t.row();
-        headerCols.add(_testResultTableHeader(context, "#", TextAlign.left));
-        headerCols.add(_testResultTableHeader(context, "Param Description", TextAlign.left));
+        headerCols.add(t.testResultTableHeader(context, "#", TextAlign.left));
+        headerCols.add(t.testResultTableHeader(context, "Param Description", TextAlign.left));
         tableRows.add(TableRow(children: headerCols));
         
         for(var i = 0; i < params.length; i++) {
           final param = params[i];
           final resultCols = t.row();
-          resultCols.add(_testResultTableValue(context, (i+1).toString(), TextAlign.right));
-          resultCols.add(_testResultTableValue(context, param, TextAlign.left));
+          resultCols.add(t.testResultTableValue(context, (i+1).toString(), TextAlign.right));
+          resultCols.add(t.testResultTableValue(context, param, TextAlign.left));
           tableRows.add(TableRow(children: resultCols));
         }
 
-        rows.add(Table(children: tableRows, columnWidths: columnWidthsForNumValueTable));
+        rows.add(Table(children: tableRows, columnWidths: AFPrototypeTheme.columnWidthsForNumValueTable));
         content = Container(
           margin: t.marginScaled(horizontal: 0, top: 1),
           child: Column(
@@ -371,50 +461,29 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
       return;
     }
 
-    if(testState.errors.isNotEmpty) {
-      final headerColsErrors = t.row();
-      headerColsErrors.add(_testResultTableValue(context, "#", TextAlign.left, showError: true));
-      headerColsErrors.add(_testResultTableValue(context, "Error", TextAlign.left, showError: true));
-      
-      final tableRowsErrors = t.tableColumn();
-      tableRowsErrors.add(TableRow(children: headerColsErrors));
-
-      for(var i = 0; i < testState.errors.length; i++) {
-        final error = _stripErrorPath(testState.errors[i]);
-        final errorCols = t.row();
-        errorCols.add(_testResultTableErrorLine(context, t.text((i+1).toString()), i));
-        errorCols.add(_testResultTableErrorLine(context, t.text(error), i));
-        tableRowsErrors.add(TableRow(children: errorCols));
-      }
-
-      final columnWidths = columnWidthsForNumValueTable;
-      rows.add(Container(
-        margin: t.marginScaled(horizontal: 0, top: 1),
-        child: Table(children: tableRowsErrors, columnWidths: columnWidths)
-      ));
-    }
+    rows.add(t.buildErrorsSection(context, testState.errors));
 
     final headerCols = t.row();
-    headerCols.add(_testResultTableHeader(context, "Run", TextAlign.right));
-    headerCols.add(_testResultTableHeader(context, "At", TextAlign.left));
-    headerCols.add(_testResultTableHeader(context, "Pass", TextAlign.right));
-    headerCols.add(_testResultTableHeader(context, "Fail", TextAlign.right));
+    headerCols.add(t.testResultTableHeader(context, "Run", TextAlign.right));
+    headerCols.add(t.testResultTableHeader(context, "At", TextAlign.left));
+    headerCols.add(t.testResultTableHeader(context, "Pass", TextAlign.right));
+    headerCols.add(t.testResultTableHeader(context, "Fail", TextAlign.right));
 
     final resultCols = t.row();
-    resultCols.add(_testResultTableValue(context, testContext.runNumber.toString(), TextAlign.right));
-    resultCols.add(_testResultTableValue(context, timeFormat.format(testContext.lastRun), TextAlign.left));
-    resultCols.add(_testResultTableValue(context, testState.pass.toString(), TextAlign.right));
-    resultCols.add(_testResultTableValue(context, testState.errors.length.toString(), TextAlign.right, showError: (testState.errors.isNotEmpty)));
+    resultCols.add(t.testResultTableValue(context, testContext.runNumber.toString(), TextAlign.right));
+    resultCols.add(t.testResultTableValue(context, timeFormat.format(testContext.lastRun), TextAlign.left));
+    resultCols.add(t.testResultTableValue(context, testState.pass.toString(), TextAlign.right));
+    resultCols.add(t.testResultTableValue(context, testState.errors.length.toString(), TextAlign.right, showError: (testState.errors.isNotEmpty)));
     
     final tableRows = t.tableColumn();
     tableRows.add(TableRow(children: headerCols));
     tableRows.add(TableRow(children: resultCols));
 
-    const columnWidths = {
-      0: FixedColumnWidth(50.0),
+    final columnWidths = {
+      0: FixedColumnWidth(t.resultColumnWidth),
       1: FlexColumnWidth(),
-      2: FixedColumnWidth(50.0),
-      3: FixedColumnWidth(50.0),
+      2: FixedColumnWidth(t.resultColumnWidth),
+      3: FixedColumnWidth(t.resultColumnWidth),
     };
 
     rows.add(Container(
@@ -422,48 +491,4 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
       child: Table(children: tableRows, columnWidths: columnWidths)
     ));
   }
-
-  Widget _testResultTableHeader(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context, String text, TextAlign textAlign) {
-    final t = context.t;
-    return Container(
-      padding: t.paddingScaled(),
-      color: t.colorPrimary,
-      child: t.text(text, textColor: t.colorOnPrimary, textAlign: textAlign)
-    );
-  }
-
-  Widget _testResultTableErrorLine(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context, Widget text, int row) {
-    final color = (row % 2 == 0) ? Colors.white : Colors.grey[350];
-    return Container(
-      padding: context.t.paddingScaled(all: 0.5),
-      color: color,
-      child: text
-    );
-  }
-
-  Widget _testResultTableValue(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context, String text, TextAlign textAlign, {
-    bool showError = false
-  }) {
-    final t = context.t;
-    var color;
-    var colorText;
-    if(showError) {
-      color = t.colorError;
-      colorText = t.colorOnError;
-    }
-    return Container(
-      color: color,
-      padding: t.paddingScaled(),
-      child: t.text(text, textColor: colorText, textAlign: textAlign)
-    );
-  }
-
-  String _stripErrorPath(String err) {
-    final idx = err.lastIndexOf('/');
-    if(idx < 0) {
-      return err;
-    }
-    return err.substring(idx+1);
-  }
-
 }

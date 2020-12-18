@@ -108,7 +108,7 @@ class AFTextStyle extends AFThemeResolvableValue {
   AFTextStyle({
     @required this.color,
     @required this.fontSize,
-    this.weight = AFFundamentalThemeID.weightNormal,
+    this.weight,
   });
 
   void resolve(AFFundamentalTheme theme) {
@@ -186,13 +186,39 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
   final ThemeData themeDark;
   final Map<AFThemeID, AFFundamentalThemeValue> values;
   final Map<Locale, AFTranslationSet> translationSet;
+  final Map<AFThemeID, AFFundamentalThemeValue> overrides;
 
   AFFundamentalThemeArea({
     @required this.themeLight,
     @required this.themeDark,
     @required this.values, 
     @required this.translationSet,
+    @required this.overrides,
   });
+
+  AFFundamentalThemeArea reviseOverrideThemeValue(AFThemeID id, dynamic value) {
+    final revised = Map<AFThemeID, AFFundamentalThemeValue>.from(overrides);
+    revised[id] = AFFundamentalThemeValue(id: id, value: value);
+    return copyWith(
+      overrides: revised
+    );
+  }
+
+  AFFundamentalThemeArea copyWith({
+    ThemeData themeLight,
+    ThemeData themeDark,
+    Map<AFThemeID, AFFundamentalThemeValue> values,
+    Map<Locale, AFTranslationSet> translationSet,
+    Map<AFThemeID, AFFundamentalThemeValue> overrides,
+  }) {
+    return AFFundamentalThemeArea(
+      themeLight: themeLight ?? this.themeLight,
+      themeDark: themeDark ?? this.themeDark,
+      values: values ?? this.values,
+      translationSet: translationSet ?? this.translationSet,
+      overrides: overrides ?? this.overrides
+    );
+  }
 
   ThemeData themeData(Brightness brightness) {
     return brightness == Brightness.light ? themeLight : themeDark;
@@ -222,11 +248,11 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
   }
 
   dynamic findValue(AFThemeID id) {
-    final val = values[id];
-    if(val != null) {
-      return val.value;
+    var val = overrides[id];
+    if(val == null) {
+      val = values[id];
     }
-    return null;
+    return val?.value;
   }
 }
 
@@ -369,6 +395,9 @@ mixin AFThemeAreaUtilties {
   }
 
   FontWeight weight(dynamic id) {
+    if(id == null ) {
+      return null;
+    }
     if(id is FontWeight) {
       return id;
     }
@@ -513,7 +542,7 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
   
   /// The app must call this method, or [setFundamentalThemeData] in order
   /// to establish the basic theme of the app.
-  void setFundamentals({
+  void setFlutterFundamentals({
     ColorScheme colorSchemeLight,
     ColorScheme colorSchemeDark,
     TextTheme textTheme,
@@ -522,7 +551,7 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     themeDark = ThemeData.from(colorScheme: colorSchemeDark, textTheme: textTheme);
   }
 
-  /// Most apps should use [setFundamentals], but this method gives you more control
+  /// Most apps should use [setFlutterFundamentals], but this method gives you more control
   /// to create the theme data exactly as you wish.
   void setFundamentalThemeData({
     ThemeData themeLight,
@@ -536,111 +565,15 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
   /// flutter and AFib expect.  
   /// 
   /// Values which are not specified will be derived intelligently.
-  void setFundamentalsOld({
-    @required Color colorPrimary,
-    @required Color colorPrimaryForeground,
-    Color colorPrimaryDarkMode,
-    Color colorPrimaryForegroundDarkMode,
-    int lighterPercent = 30,
-    int darkerPercent = 30,
-    Color colorPrimaryDarker,
-    Color colorPrimaryLighter,
-    @required Color colorSecondary,
-    Color colorSecondaryDarker,
-    Color colorSecondaryLighter,
-    Color colorCardBody,
-    Color colorCardBodyForeground,
-    Color colorCardBodyDarkMode,
-    Color colorCardBodyForegroundDarkMode,
-    Color colorTapable = Colors.blueAccent,
-    Color colorTapableDarkMode,
-    Color colorMuted = Colors.grey,
-    Color colorMutedDarkMode,
-    Color colorDrawerTitle,
-    @required double sizeBodyText,
-    double sizeMargin = 8.0,
-    double sizeAppTitle,
-    double sizeScreenTitle,
-    double sizeHeadingMajor,
-    double sizeHeadingMinor,
-    double sizeTinyText,
-    FontWeight weightNormal = FontWeight.normal,
-    FontWeight weightBold = FontWeight.bold,
-    AFColorPairing colorsSplashScreen,
-    AFColorPairing colorsScreenTitle,
-    AFColorPairing colorsAppBackground,
-    AFColorPairing colorsCardTitle,
-    AFColorPairing colorsCardBody,
-    AFColorPairing colorsDrawerTitle,
-    AFColorPairing colorsDrawerBody,
-    AFColorPairing colorsBottomBar,
-    AFColorPairing colorsActionButton,
-    dynamic styleAppTitleSplash,
-    dynamic styleScreenTitle,
-    dynamic styleCardBodyNormal,
-    dynamic styleCardBodyBold,
+  void setAfibFundamentals({
+    double margin = 8.0,
     IconData iconBack = Icons.arrow_back,
     IconData iconNavDown = Icons.chevron_right,
   }) {
-
-    // colors.
-    setValue(AFFundamentalThemeID.colorPrimary, colorPrimary);
-    setValue(AFFundamentalThemeID.colorPrimaryDarkMode, colorPrimaryDarkMode, defaultCalculation: () => Colors.black);
-    setValue(AFFundamentalThemeID.colorPrimaryForeground, colorPrimaryForeground);
-    setValue(AFFundamentalThemeID.colorPrimaryForegroundDarkMode, colorPrimaryForegroundDarkMode, defaultCalculation: () => color(AFFundamentalThemeID.colorPrimaryForeground));
-    setValue(AFFundamentalThemeID.colorPrimaryDarker, colorPrimaryDarker, defaultCalculation: () => darkerColor(AFFundamentalThemeID.colorPrimary, percent: lighterPercent));
-    setValue(AFFundamentalThemeID.colorPrimaryLighter, colorPrimaryLighter, defaultCalculation: () => lighterColor(AFFundamentalThemeID.colorPrimary, percent: darkerPercent));
-    setValue(AFFundamentalThemeID.colorSecondary, colorSecondary);
-    setValue(AFFundamentalThemeID.colorSecondaryDarker, colorSecondaryDarker, defaultCalculation: () => darkerColor(AFFundamentalThemeID.colorSecondary, percent: lighterPercent));
-    setValue(AFFundamentalThemeID.colorSecondaryLighter, colorSecondaryLighter, defaultCalculation: () => lighterColor(AFFundamentalThemeID.colorSecondary, percent: darkerPercent));
-
-    setValue(AFFundamentalThemeID.colorTapable, colorTapable);
-    setValue(AFFundamentalThemeID.colorMuted, colorMuted);
-    setValue(AFFundamentalThemeID.colorTapableDarkMode, colorTapableDarkMode, defaultCalculation: () => colorTapable);
-    setValue(AFFundamentalThemeID.colorMutedDarkMode, colorMutedDarkMode, defaultCalculation: () => colorMuted);
-
-
-    setValue(AFFundamentalThemeID.colorCardBody, colorCardBody, defaultCalculation: () => Colors.white);
-    setValue(AFFundamentalThemeID.colorCardBodyForeground, colorCardBodyForeground, defaultCalculation: () => Colors.black);
-    setValue(AFFundamentalThemeID.colorCardBodyDarkMode, colorCardBodyDarkMode, defaultCalculation: () => Colors.black);
-    setValue(AFFundamentalThemeID.colorCardBodyForegroundDarkMode, colorCardBodyForegroundDarkMode, defaultCalculation: () => Colors.white);
-
-    // sizes.
-    setValue(AFFundamentalThemeID.sizeBodyText, sizeBodyText);
-    setValue(AFFundamentalThemeID.sizeAppTitle, sizeAppTitle, defaultCalculation: () => size(AFFundamentalThemeID.sizeBodyText, scale: 2.5));
-    setValue(AFFundamentalThemeID.sizeScreenTitle, sizeScreenTitle, defaultCalculation: () => size(AFFundamentalThemeID.sizeBodyText, scale: 1.7));
-    setValue(AFFundamentalThemeID.sizeHeadingMajor, sizeHeadingMajor, defaultCalculation: () => size(AFFundamentalThemeID.sizeBodyText, scale: 1.4));
-    setValue(AFFundamentalThemeID.sizeHeadingMinor, sizeHeadingMinor, defaultCalculation: () => size(AFFundamentalThemeID.sizeBodyText, scale: 1.0));
-    setValue(AFFundamentalThemeID.sizeTinyText, sizeTinyText, defaultCalculation: () => size(AFFundamentalThemeID.sizeBodyText, scale: 0.7));
-    setValue(AFFundamentalThemeID.sizeMargin, sizeMargin, defaultCalculation: () => 8);
-
-    // weights
-    setValue(AFFundamentalThemeID.weightNormal, weightNormal);
-    setValue(AFFundamentalThemeID.weightBold, weightBold);
-
     // icons
+    setValue(AFFundamentalThemeID.sizeMargin, margin);
     setValue(AFFundamentalThemeID.iconBack, iconBack);
     setValue(AFFundamentalThemeID.iconNavDown, iconNavDown);
-
-    // color themes
-    setValue(AFFundamentalThemeID.colorsSplashScreen, colorsScreenTitle, 
-      defaultCalculation: () => defaultColors(AFFundamentalThemeID.colorPrimary, AFFundamentalThemeID.colorPrimaryForeground, AFFundamentalThemeID.colorPrimaryDarkMode, AFFundamentalThemeID.colorPrimaryForegroundDarkMode));
-    setValue(AFFundamentalThemeID.colorsScreenTitle, colorsScreenTitle, 
-      defaultCalculation: () => colors(AFFundamentalThemeID.colorsSplashScreen));
-    setValue(AFFundamentalThemeID.colorsCardBody, colorsCardBody, 
-      defaultCalculation: () => defaultColors(AFFundamentalThemeID.colorCardBody, AFFundamentalThemeID.colorCardBodyForeground, AFFundamentalThemeID.colorCardBodyDarkMode, AFFundamentalThemeID.colorCardBodyForegroundDarkMode));
-
-    // text styles
-    setValue(AFFundamentalThemeID.styleAppTitleSplash, styleAppTitleSplash, 
-      defaultCalculation: () => defaultTextStyle(AFFundamentalThemeID.colorsSplashScreen, AFFundamentalThemeID.sizeAppTitle, AFFundamentalThemeID.weightBold));
-    setValue(AFFundamentalThemeID.styleScreenTitle, styleScreenTitle, 
-      defaultCalculation: () => defaultTextStyle(AFFundamentalThemeID.colorsScreenTitle, AFFundamentalThemeID.sizeScreenTitle, AFFundamentalThemeID.weightBold));
-    setValue(AFFundamentalThemeID.styleMajorCardTitle, styleAppTitleSplash, 
-      defaultCalculation: () => defaultTextStyle(AFFundamentalThemeID.colorsSplashScreen, AFFundamentalThemeID.sizeHeadingMajor, AFFundamentalThemeID.weightBold));
-    setValue(AFFundamentalThemeID.styleCardBodyNormal, styleCardBodyNormal, 
-      defaultCalculation: () => defaultTextStyle(AFFundamentalThemeID.colorsCardBody, AFFundamentalThemeID.sizeBodyText, AFFundamentalThemeID.weightNormal));
-    setValue(AFFundamentalThemeID.styleCardBodyBold, styleCardBodyBold, 
-      defaultCalculation: () => defaultTextStyle(AFFundamentalThemeID.colorsCardBody, AFFundamentalThemeID.sizeBodyText, AFFundamentalThemeID.weightBold));
   }
 
   dynamic value(AFThemeID id) {
@@ -669,13 +602,22 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
 
   AFFundamentalThemeArea create() {
     validate();
-    return AFFundamentalThemeArea(themeLight: themeLight, themeDark: themeDark, values: this.values, translationSet: translationSet);
+    return AFFundamentalThemeArea(
+      themeLight: themeLight, 
+      themeDark: themeDark, 
+      values: this.values, 
+      translationSet: translationSet,
+      overrides: <AFThemeID, AFFundamentalThemeValue>{}
+    );
   }
 
   @override 
   void validate() {
     if(themeLight == null || themeDark == null) {
-      throw AFException("You must call setFundamentals in fundamental_theme.dart");
+      throw AFException("You must call setFlutterFundamentals in fundamental_theme.dart");
+    }
+    if(values.isEmpty) {
+      throw AFException("You must call setAFibFundamentals in fundamental_theme.dart");
     }
   }
 }
@@ -696,11 +638,30 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
 class AFFundamentalTheme {
   final AFFundamentalDeviceTheme device;
   final AFFundamentalThemeArea area;
+
   
   AFFundamentalTheme({
     @required this.device,
     @required this.area
   });    
+
+  AFFundamentalTheme reviseOverrideThemeValue(AFThemeID id, dynamic value) {
+
+    return copyWith(
+      device: device,
+      area: area.reviseOverrideThemeValue(id, value)
+    );
+  }
+
+  AFFundamentalTheme copyWith({
+    AFFundamentalDeviceTheme device,
+    AFFundamentalThemeArea area,
+  }) {
+    return AFFundamentalTheme(
+      area: area ?? this.area,
+      device: device ?? this.device
+    );
+  }
 
   String translate(dynamic idOrText) {
     return area.translate(idOrText, device.locale(this));
@@ -772,15 +733,15 @@ class AFFundamentalTheme {
     return themeData.colorScheme.brightness;
   }
 
-  TextTheme get textOnCard {
+  TextTheme get styleOnCard {
     return themeData.textTheme;
   }
 
-  TextTheme get textOnPrimary {
+  TextTheme get styleOnPrimary {
     return themeData.primaryTextTheme;
   }
 
-  TextTheme get textOnAccent {
+  TextTheme get styleOnAccent {
     return themeData.accentTextTheme;
   }
 
@@ -811,7 +772,7 @@ class AFFundamentalTheme {
     return area.textStyle(idOrTextStyle);
   }
 
-  FontWeight weight(AFThemeID id) {
+  FontWeight weight(dynamic id) {
     return area.weight(id);
   } 
 
@@ -929,18 +890,86 @@ class AFConceptualTheme extends AFTheme {
   }
 
   /// See [TextTheme], text theme to use on a card background
-  TextTheme get textOnCard {
-    return fundamentals.textOnCard;
+  TextTheme get styleOnCard {
+    return fundamentals.styleOnCard;
   }
 
   /// See [TextTheme], text theme to use on a primary color background
-  TextTheme get textOnPrimary {
-    return fundamentals.textOnPrimary;
+  TextTheme get styleOnPrimary {
+    return fundamentals.styleOnPrimary;
   }
 
   /// See [TextTheme], text theme to use on an accent color backgroun
-  TextTheme get textOnAccent {
-    return fundamentals.textOnAccent;
+  TextTheme get styleOnAccent {
+    return fundamentals.styleOnAccent;
+  }
+
+  Radius radiusCircular(double r) {
+    return Radius.circular(r);
+  }
+
+  BorderRadius borderRadiusScaled({
+    double all,
+    double left,
+    double right,
+    double top,
+    double bottom,
+    double leftTop,
+    double leftBottom,
+    double rightTop,
+    double rightBottom,
+    Radius Function(double) createRadius,
+  }) {
+    // by default, the radius is half the margin.
+    final base = margin * 0.5;
+    var lt = base;
+    var lb = lt;
+    var rt = lt;
+    var rb = lt;
+    if(all != null) {
+      lt = base * all;
+      lb = base * all;
+      rt = base * all;
+      rb = base * all;
+    }
+    if(left != null) {
+      lt = base * left;
+      lb = base * left;
+    }
+    if(right != null) {
+      rt = base * right;
+      rb = base * right;
+    }
+    if(top != null) {
+      lt = base * top;
+      rt = base * top;
+    }   
+    if(bottom != null) {
+      lb = base * bottom;
+      rb = base * bottom;
+    }
+    if(leftTop !=  null) {
+      lt = base * leftTop;
+    }
+    if(leftBottom != null) {
+      lb = base * leftBottom;
+    }
+    if(rightTop != null) {
+      rt = base * rightTop;
+    }
+    if(rightBottom != null) {
+      rb = base * rightBottom;
+    }
+    if(createRadius == null) {
+      createRadius = radiusCircular;
+    }
+
+    return BorderRadius.only(
+      topLeft: createRadius(lt),
+      bottomLeft: createRadius(lb),
+      topRight: createRadius(rt),
+      bottomRight: createRadius(rb)
+    );
   }
 
   /// Whether times should use a 24 hour format.
@@ -955,12 +984,16 @@ class AFConceptualTheme extends AFTheme {
     return fundamentals.translate(text);
   }
 
+  FontWeight weight(dynamic weight) {
+    return fundamentals.weight(weight);
+  }
+
   AFRichTextBuilder richTextBuilder({
     AFWidgetID wid,
-    dynamic idOrTextStyleNormal = AFFundamentalThemeID.styleCardBodyNormal,
-    dynamic idOrTextStyleBold = AFFundamentalThemeID.styleCardBodyBold,
-    dynamic idOrTextStyleTapable = AFFundamentalThemeID.styleCardBodyTapable,
-    dynamic idOrTextStyleMuted = AFFundamentalThemeID.styleCardBodyMuted
+    dynamic idOrTextStyleNormal,
+    dynamic idOrTextStyleBold,
+    dynamic idOrTextStyleTapable,
+    dynamic idOrTextStyleMuted,
   }) {
     final normal = idOrTextStyleNormal != null ? textStyle(idOrTextStyleNormal) : null;
     final bold = idOrTextStyleBold != null ? textStyle(idOrTextStyleBold) : null;
@@ -994,15 +1027,23 @@ class AFConceptualTheme extends AFTheme {
     AFWidgetID wid, 
     dynamic style,
     dynamic textColor,
-    dynamic size,
+    dynamic fontSize,
+    dynamic fontWeight,
     TextAlign textAlign,
   }) {
-    var styleS;
-    if(textColor != null) {
-      styleS = TextStyle(color: color(textColor));
-    } else {
+    TextStyle styleS;
+    if(style != null) {
       styleS = textStyle(style);
     }
+
+    if(textColor != null || fontSize != null || fontWeight != null) {
+      styleS = TextStyle(
+        color: color(textColor) ?? styleS?.color,
+        fontSize: size(fontSize) ?? styleS?.fontSize,
+        fontWeight: weight(fontWeight) ?? styleS?.fontWeight
+      );
+    }
+
     final textT = translate(text);
     return Text(textT, 
       key: keyForWID(wid),
@@ -1031,6 +1072,11 @@ class AFConceptualTheme extends AFTheme {
   /// The text scale factor for the device.
   double get deviceTextScaleFactor {
     return fundamentals.device.textScaleFactor(fundamentals);
+  }
+
+  Brightness get deviceBrightness {
+    return fundamentals.device.brightness(fundamentals);
+
   }
 
   /// See Flutter [Window]
@@ -1081,7 +1127,10 @@ class AFConceptualTheme extends AFTheme {
     return fundamentals.textStyle(idOrTextStyle);
   }
 
-  double size(AFThemeID id, { double scale = 1.0 }) {
+  double size(dynamic id, { double scale = 1.0 }) {
+    if(id is double) {
+      return id * scale;
+    }
     return fundamentals.size(id, scale: scale);
   }
 
@@ -1239,6 +1288,23 @@ class AFThemeState {
     return AFThemeState(
       fundamentals: fundamentals,
       conceptuals: map
+    );
+  }
+
+  AFThemeState reviseOverrideThemeValue(AFThemeID id, dynamic value) {
+    final revised = fundamentals.reviseOverrideThemeValue(id, value);
+    return copyWith(
+      fundamentals: revised,
+      conceptuals: AFibF.g.createConceptualThemes(revised));
+  }
+
+  AFThemeState copyWith({
+    AFFundamentalTheme fundamentals,
+    List<AFConceptualTheme> conceptuals,
+  }) {
+    return AFThemeState.create(
+      conceptuals: conceptuals ?? this.conceptuals,
+      fundamentals: fundamentals ?? this.fundamentals
     );
   }
 

@@ -1336,9 +1336,7 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
 
   @override
   Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSingleScreenTestState state, AFReusableTestID id, Function onEnd) async {
-    //final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
     final testContext = prepareRun(dispatcher, prevContext);
-    //await testContext.pauseForRender(screenUpdateCount, true);
     return run(testContext, onEnd: onEnd);
   }
 

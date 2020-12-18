@@ -41,6 +41,19 @@ class AFIDWithTags extends AFID {
   bool hasTag(String tag) {
     return tags != null && tags.contains(tag);
   }
+
+  bool hasTagLike(String tag) {
+    if(tag.length < 2 || tags == null) {
+      return false;
+    }
+    for(final test in tags) {
+      if(test.contains(tag)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 }
 
 class AFIDWithTag extends AFID {
@@ -105,9 +118,7 @@ class AFQueryID extends AFID {
 }
 
 class AFThemeID extends AFIDWithTag {
-  final String description;
   const AFThemeID(
     String code,
-    String tag,
-    this.description): super(code, tag);   
+    String tag): super(code, tag);   
 }

@@ -7,5 +7,8 @@ AFThemeState afThemeStateReducer(AFThemeState theme, dynamic action) {
   if(action is AFUpdateThemeStateAction) {
     return action.themes;
   }
+  if(action is AFOverrideThemeValueAction) {
+    return theme.reviseOverrideThemeValue(action.id, action.value);
+  }
   return theme;
 }

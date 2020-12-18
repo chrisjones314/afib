@@ -281,6 +281,9 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     return appContext.createInitialAppStateAreas();
   }
 
+  List<AFConceptualTheme> createConceptualThemes(AFFundamentalTheme fundamentals) {
+    return appContext.initializeConceptualThemes(fundamentals); 
+  }  
 
   AFThemeState initializeThemeState({AFAppStateAreas areas}) {
     if(areas == null) {
@@ -334,7 +337,8 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     final reusable = areas.indexWhere((element) => element.startsWith("reuse")) >= 0;
     for(final test in tests) {
       for(final area in areas) {        
-        if((reusable && test.hasReusable) || addAll || test.id.code == area || test.id.hasTag(area)) {
+        final testCode = test.id.code;
+        if((reusable && test.hasReusable) || addAll || (area.length > 2 && testCode.contains(area)) || test.id.hasTagLike(area)) {
           results.add(test);
         }
       }

@@ -1355,7 +1355,7 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
 }
 
 
-class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
+abstract class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
   final dynamic data;
   final AFSingleScreenPrototype body;
   final AFCreateConnectedWidgetDelegate createConnectedWidget;
@@ -1395,10 +1395,6 @@ class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
     return body.run(context, onEnd: onEnd, useParentCollector: useParentCollector);
   }
 
-  void onDrawerReset(AFDispatcher dispatcher) {
-    dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.id, this.data));
-  }
-
   @override
   Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSingleScreenTestState state, AFReusableTestID id, Function onEnd) async {
     //final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
@@ -1428,6 +1424,15 @@ class AFConnectedWidgetPrototypeTest extends AFWidgetPrototypeTest {
   List<AFReusableTestID> get sectionIds {
     return body.sectionIds;
   }
+
+  void onDrawerReset(AFDispatcher dispatcher) {
+    dispatcher.dispatch(AFNavigateSetParamAction(
+      screen: this.screenId,
+      param: AFPrototypeWidgetRouteParam(test: this, param: this.param)
+    ));
+    dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.id, this.data));
+  }
+
 }
 
 

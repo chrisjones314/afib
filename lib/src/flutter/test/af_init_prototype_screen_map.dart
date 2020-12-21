@@ -9,8 +9,8 @@ import 'package:afib/src/flutter/test/af_prototype_widget_screen.dart';
 
 void afInitPrototypeScreenMap(AFScreenMap screens) {
   final enabledTests = AFibD.config.stringListFor(AFConfigEntries.enabledTestList);
-  screens.startupScreen(AFUIID.screenPrototypeHome, (context) => AFPrototypeHomeScreen(), () => AFPrototypeHomeScreenParam.createOncePerScreen(filter: enabledTests.join(" ")));
-  screens.screen(AFUIID.screenPrototypeSingleScreen, (context) => AFPrototypeSingleScreenScreen());
-  screens.screen(AFUIID.screenPrototypeListSingleScreen, (context) => AFPrototypeTestScreen());
-  screens.screen(AFUIID.screenPrototypeWidget, (context) => AFPrototypeWidgetScreen());
+  screens.startupScreen(AFUIScreenID.screenPrototypeHome, (context) => AFPrototypeHomeScreen(), () => AFPrototypeHomeScreenParam.createOncePerScreen(filter: enabledTests.join(" ")));
+  screens.screen(AFUIScreenID.screenPrototypeSingleScreen, (context) => AFPrototypeSingleScreenScreen());
+  screens.screen(AFUIScreenID.screenPrototypeListSingleScreen, (context) => AFPrototypeTestScreen());
+  screens.screen(AFUIScreenID.screenPrototypeWidget, (context) => AFPrototypeWidgetScreen());
 }

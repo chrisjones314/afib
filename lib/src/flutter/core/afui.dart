@@ -41,7 +41,7 @@ class AFUI {
   }
 
   static Widget standardBackButton(AFDispatcher dispatcher, {
-    AFWidgetID wid = AFUIID.buttonBack,
+    AFWidgetID wid = AFUIWidgetID.buttonBack,
     IconData icon = Icons.arrow_back,
     String tooltip = "Back",
     AFShouldContinueCheckDelegate shouldContinueCheck,   

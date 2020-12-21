@@ -1,5 +1,6 @@
 
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:flutter/material.dart';
@@ -13,20 +14,20 @@ class AFPrototypeTheme extends AFConceptualTheme {
   AFPrototypeTheme(AFFundamentalTheme fundamentals): super(fundamentals: fundamentals);
 
   Widget testExplanationText(String explanation) {
-    return text(explanation);
+    return childText(explanation);
   }
 
   double get resultColumnWidth {
     return 50.0;
   }
 
-  Widget buildHeaderCard(AFBuildContext context, String title, List<Widget> rows) {
+  Widget buildHeaderCard(AFBuildContext context, AFWidgetID wid, String title, List<Widget> rows) {
     final radius = Radius.circular(4.0);
-    final content = column();
+    final content = childrenColumn();
     content.add(Container(
         padding: paddingScaled(),
         child: Row(
-          children: [text(title, style: styleOnPrimary.subtitle1)],
+          children: [childText(title, style: styleOnPrimary.subtitle1)],
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(topLeft: radius, topRight: radius),
@@ -35,12 +36,11 @@ class AFPrototypeTheme extends AFConceptualTheme {
       )
     );
 
-    content.addAll(ListTile.divideTiles(
-      context: context.c,
-      tiles: rows,
-    ));
+    content.addAll(childrenDivideWidgets(rows, wid));
+
 
     return Card(
+      key: this.keyForWID(wid),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: content),
@@ -55,14 +55,14 @@ class AFPrototypeTheme extends AFConceptualTheme {
         color: colorPrimary,
         borderRadius: BorderRadius.circular(4.0),
       ),
-      child: text("Reusable", style: this.styleOnPrimary.bodyText1)
+      child: childText("Reusable", style: this.styleOnPrimary.bodyText1)
     );
   }    
 
   Widget createTestListTile(AFDispatcher dispatcher, AFScreenPrototypeTest instance) {
     final titleText = instance.id.code;
-    final cols = row();
-    cols.add(text(titleText));
+    final cols = childrenRow();
+    cols.add(childText(titleText));
     if(instance.hasReusable) {
       cols.add(createReusableTag());
     }
@@ -71,7 +71,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: cols
     );
-    final tagsText = this.textBuilder();
+    final tagsText = this.childTextBuilder();
     tagsText.write("tags: ");
     tagsText.write(instance.id.tagsText);
     return Container(
@@ -94,7 +94,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
           SliverAppBar(        
             leading: leading,
             automaticallyImplyLeading: false,
-            title: this.text(title)
+            title: this.childText(title)
           ),
           SliverList(
             delegate: SliverChildListDelegate(rows),)
@@ -105,18 +105,18 @@ class AFPrototypeTheme extends AFConceptualTheme {
   Widget buildErrorsSection(AFBuildContext context, List<String> errors) {
     var content;
     if(errors.isNotEmpty) {
-      final headerColsErrors = row();
+      final headerColsErrors = childrenRow();
       headerColsErrors.add(testResultTableValue(context, "#", TextAlign.left, showError: true));
       headerColsErrors.add(testResultTableValue(context, "Errors", TextAlign.left, showError: true));
       
-      final tableRowsErrors = tableColumn();
+      final tableRowsErrors = childrenTable();
       tableRowsErrors.add(TableRow(children: headerColsErrors));
 
       for(var i = 0; i < errors.length; i++) {
         final error = stripErrorPath(errors[i]);
-        final errorCols = row();
-        errorCols.add(testResultTableErrorLine(context, text((i+1).toString()), i));
-        errorCols.add(testResultTableErrorLine(context, text(error), i));
+        final errorCols = childrenRow();
+        errorCols.add(testResultTableErrorLine(context, childText((i+1).toString()), i));
+        errorCols.add(testResultTableErrorLine(context, childText(error), i));
         tableRowsErrors.add(TableRow(children: errorCols));
       }
 
@@ -129,7 +129,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
           borderRadius: borderRadiusScaled(),
         ),
         padding: paddingScaled(),
-        child: text("All Tests Passed", textColor: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold, textAlign: TextAlign.center)
+        child: childText("All Tests Passed", textColor: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold, textAlign: TextAlign.center)
       );
     }
 
@@ -144,7 +144,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
     return Container(
       padding: t.paddingScaled(),
       color: t.colorPrimary,
-      child: t.text(text, textColor: t.colorOnPrimary, textAlign: textAlign)
+      child: t.childText(text, textColor: t.colorOnPrimary, textAlign: textAlign)
     );
   }
 
@@ -170,7 +170,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
     return Container(
       color: color,
       padding: t.paddingScaled(),
-      child: t.text(text, textColor: colorText, textAlign: textAlign)
+      child: t.childText(text, textColor: colorText, textAlign: textAlign)
     );
   }
 

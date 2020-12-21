@@ -49,10 +49,10 @@ class AFRouteSegment {
   }
 
   bool get isAFibScreen {
-    if(screen == AFUIID.screenStartupWrapper) {
+    if(screen == AFUIScreenID.screenStartupWrapper) {
       return false;
     }
-    return screen.code.startsWith(AFUIID.afibIDPrefix);
+    return screen.code.startsWith(AFUIWidgetID.afibIDPrefix);
   }
 
   /// called when the segment goes fully out of scope.
@@ -103,7 +103,7 @@ class AFRouteStateSegments {
   }
 
   bool get hasStartupWrapper { 
-    return isNotEmpty && active.first.screen == AFUIID.screenStartupWrapper;
+    return isNotEmpty && active.first.screen == AFUIScreenID.screenStartupWrapper;
   }
 
   int get popCountToRoot {
@@ -113,8 +113,8 @@ class AFRouteStateSegments {
       // the simple prototype screen is really a test of an app screen, so we do
       // want to pop it off.
       if(segment.isAFibScreen && 
-        segment.screen != AFUIID.screenPrototypeSingleScreen &&
-        segment.screen != AFUIID.screenPrototypeWidget) {
+        segment.screen != AFUIScreenID.screenPrototypeSingleScreen &&
+        segment.screen != AFUIScreenID.screenPrototypeWidget) {
         return nPop;
       }
       nPop++;
@@ -372,7 +372,7 @@ class AFRouteState {
   /// but still needs to be included in the search.
   AFRouteParam findParamFor(AFScreenID screen, { bool includePrior = true }) {
     if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
-      screen = AFUIID.screenStartupWrapper;
+      screen = AFUIScreenID.screenStartupWrapper;
     }
     final seg = screenSegments.findSegmentFor(screen, includePrior: includePrior);
     return seg?.param?.paramFor(screen);
@@ -465,7 +465,7 @@ class AFRouteState {
   /// in the route.
   AFRouteState setParam(AFScreenID screen, AFRouteParam param) {
     if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
-      screen = AFUIID.screenStartupWrapper;
+      screen = AFUIScreenID.screenStartupWrapper;
     }
     return _reviseScreen(screenSegments.setParam(screen, param));
   }

@@ -79,10 +79,10 @@ class AFPrototypeTestScreenData extends AFStoreConnectorData1<AFSingleScreenTest
 /// and display them in a list.
 class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreConnectorDataUnused, AFPrototypeTestScreenParam, AFPrototypeTheme>{
 
-  AFPrototypeTestScreen(): super(AFUIID.screenPrototypeListSingleScreen);
+  AFPrototypeTestScreen(): super(AFUIScreenID.screenPrototypeListSingleScreen);
 
   static AFNavigatePushAction navigateTo(List<AFScreenPrototypeTest> tests) {
-    return AFNavigatePushAction(screen: AFUIID.screenPrototypeListSingleScreen,
+    return AFNavigatePushAction(screen: AFUIScreenID.screenPrototypeListSingleScreen,
       param: AFPrototypeTestScreenParam.createFromList(title: "Single Screen Prototypes", tests: tests));
   }
 
@@ -108,21 +108,21 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreCon
     final groups = _sortIterable(context.p.screenTestsByGroup.keys);
     for(final group in groups) {
       final tests = context.p.screenTestsByGroup[group];
-      rows.add(_addGroup(context, group, tests));
+      rows.add(_addGroup(context, AFUIWidgetID.cardTestGroup.with1(group), group, tests));
     }
 
     final leading = AFUI.standardBackButton(context.d);
     return context.t.buildPrototypeScaffold("Screen Prototypes", rows, leading: leading);
   }
 
-  Widget _addGroup(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context, String group, List<AFScreenPrototypeTest> tests) {
+  Widget _addGroup(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context, AFWidgetID widGroup, String group, List<AFScreenPrototypeTest> tests) {
     final t = context.t;
-    final rows = t.column();
+    final rows = t.childrenColumn();
     for(final test in tests) {
       rows.add(t.createTestListTile(context.d, test));
     }
 
-    return t.buildHeaderCard(context, group, rows);
+    return t.buildHeaderCard(context, widGroup, group, rows);
   }
 
 }

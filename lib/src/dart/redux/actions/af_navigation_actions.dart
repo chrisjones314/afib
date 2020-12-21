@@ -48,7 +48,7 @@ class AFNavigateReplaceAllAction extends AFNavigateAction {
   AFNavigateReplaceAllAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
 
   factory AFNavigateReplaceAllAction.toStartupScreen({AFRouteParam param}) {
-    return AFNavigateReplaceAllAction(screen: AFUIID.screenStartupWrapper, param: param);
+    return AFNavigateReplaceAllAction(screen: AFUIScreenID.screenStartupWrapper, param: param);
   }
 }
 

@@ -1371,7 +1371,7 @@ abstract class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
   }): super(id: id, title: title);
 
   AFScreenID get screenId {
-    return AFUIID.screenPrototypeWidget;
+    return AFUIScreenID.screenPrototypeWidget;
   }
 
   Future<void> populateWidgetCollector() {

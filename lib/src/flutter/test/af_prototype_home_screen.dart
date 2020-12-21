@@ -88,7 +88,7 @@ class APrototypeHomeScreenData extends AFStoreConnectorData1<AFSingleScreenTests
 /// and display them in a list.
 class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme>{
 
-  AFPrototypeHomeScreen(): super(AFUIID.screenPrototypeHome);
+  AFPrototypeHomeScreen(): super(AFUIScreenID.screenPrototypeHome);
 
   @override
   APrototypeHomeScreenData createStateDataAF(AFState state) {
@@ -112,7 +112,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
   Widget _buildHome(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context) {
     final t = context.t;
 
-    final protoRows = t.column();
+    final protoRows = t.childrenColumn();
     protoRows.add(_createKindRow(context, "Widget Prototypes", () {
       List<AFScreenPrototypeTest> tests = AFibF.g.widgetTests.all;
       context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
@@ -132,7 +132,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     final areas = context.p.filter.split(" ");
     final tests = AFibF.g.findTestsForAreas(areas);
 
-    final filterRows = t.column();
+    final filterRows = t.childrenColumn();
     filterRows.add(_buildFilterAndRunControls(context, tests));
     
     if(context.p.view == AFPrototypeHomeScreenParam.viewFilter) {
@@ -141,9 +141,9 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
       _buildResultsSection(context, tests, filterRows);
     }
 
-    final rows = t.column();
-    rows.add(t.buildHeaderCard(context, "Prototypes and Tests", protoRows));    
-    rows.add(t.buildHeaderCard(context, "Search and Run", filterRows));
+    final rows = t.childrenColumn();
+    rows.add(t.buildHeaderCard(context, AFUIWidgetID.cardTestHomeHeader, "Prototypes and Tests", protoRows));    
+    rows.add(t.buildHeaderCard(context, AFUIWidgetID.cardTestHomeSearchAndRun, "Search and Run", filterRows));
     
     return context.t.buildPrototypeScaffold("AFib Prototype Mode", rows);
   }
@@ -191,11 +191,11 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     final t = context.t;
     final searchController = context.p.textControllers.syncText(AFPrototypeHomeScreenParam.filterTextId, context.p.filter);
 
-    final rows = t.column();
+    final rows = t.childrenColumn();
 
     final searchText = Container(
       child: TextField(
-        key: t.keyForWID(AFUIID.testTextSearch),
+        key: t.keyForWID(AFUIWidgetID.textTestSearch),
         controller: searchController,
         obscureText: false,
         autofocus: false,
@@ -214,7 +214,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     rows.add(searchText);
 
     if(tests.isNotEmpty) {
-      final colsAction = t.row();
+      final colsAction = t.childrenRow();
       final view = context.p.view;
       final isFilter = view == AFPrototypeHomeScreenParam.viewFilter;
       final colorSearch = isFilter ? t.colorSecondary : t.colorBackground;
@@ -225,7 +225,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
 
       colsAction.add(Container(
         child: FlatButton(
-          child: t.text("Search Results", textColor: colorSearchText),
+          child: t.childText("Search Results", textColor: colorSearchText),
           color: colorSearch,
           onPressed: () {
             updateParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewFilter));
@@ -235,7 +235,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
 
       colsAction.add(Container(
         child: FlatButton(
-          child: t.text("Test Results", textColor: colorResultsText),
+          child: t.childText("Test Results", textColor: colorResultsText),
           color: colorResults,
           onPressed: () {
             updateParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewResults));
@@ -244,7 +244,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
 
       colsAction.add(Container(
         child: FlatButton(
-          child: t.text("Run All", style: t.styleOnPrimary.bodyText1),
+          child: t.childText("Run All", style: t.styleOnPrimary.bodyText1),
           color: t.colorPrimary,
           onPressed: () {
             _onRunTests(context, tests);
@@ -259,6 +259,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     }
 
     return Container(
+      key: t.keyForWID(AFUIWidgetID.contTestSearchControls),
       margin: context.t.marginScaled(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -283,7 +284,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     if(results.isEmpty) {
       rows.add(Container(
         margin: t.marginScaled(all: 2),
-        child: t.text("No results yet.")
+        child: t.childText("No results yet.")
       ));
       return;
     }
@@ -295,18 +296,18 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     ));
   
     // this is a table showing all the results by test.
-    final headerCols = t.row();
+    final headerCols = t.childrenRow();
     headerCols.add(t.testResultTableHeader(context, "Test", TextAlign.right));
     headerCols.add(t.testResultTableHeader(context, "Pass", TextAlign.right));
     headerCols.add(t.testResultTableHeader(context, "Fail", TextAlign.right));
-    final tableRows = t.tableColumn();
+    final tableRows = t.childrenTable();
     tableRows.add(TableRow(children: headerCols));
 
     var totalPass = 0;
     var totalFail = 0;
 
     for(final result in results) {
-      final resultCols = t.row();
+      final resultCols = t.childrenRow();
       final testContext = result.context;
       final testState = result.state;
       final pass = testState.pass;
@@ -319,7 +320,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
       tableRows.add(TableRow(children: resultCols));
     }
 
-    final totalCols = t.row();
+    final totalCols = t.childrenRow();
     totalCols.add(t.testResultTableValue(context, "TOTAL", TextAlign.right));
     totalCols.add(t.testResultTableValue(context, totalPass.toString(), TextAlign.right));
     totalCols.add(t.testResultTableValue(context, totalFail.toString(), TextAlign.right, showError: (totalFail > 0)));      
@@ -348,9 +349,9 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
 
   Widget _createKindRow(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context, String text, Function onTap) {
     return ListTile(
-      title: context.t.text(text),
+      title: context.t.childText(text),
       dense: true,
-      trailing: context.t.icon(AFFundamentalThemeID.iconNavDown),
+      trailing: context.t.icon(AFUIThemeID.iconNavDown),
       onTap: onTap
     );
   }

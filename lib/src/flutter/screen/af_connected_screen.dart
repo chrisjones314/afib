@@ -1,4 +1,5 @@
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:logger/logger.dart';
 import 'package:quiver/core.dart';
@@ -231,7 +232,8 @@ abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extend
             AFibD.logTest?.d("Rebuilding screen $runtimeType/$screenIdRegister with param ${dataContext.p}");
           }
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p, dataContext.theme);
-          return buildWithContext(withContext);
+          final widgetResult = buildWithContext(withContext);
+          return widgetResult;
         }
     );
   }
@@ -341,7 +343,7 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TData extends AF
     final route = state.public.route;
     TRouteParam p = route?.findParamFor(this.screenId, includePrior: true);
     if(p == null && this.screenId == AFibF.g.actualStartupScreenId) {
-      p = route?.findParamFor(AFUIID.screenStartupWrapper);
+      p = route?.findParamFor(AFUIScreenID.screenStartupWrapper);
     }
     return p;
   }

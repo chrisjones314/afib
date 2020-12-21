@@ -64,13 +64,13 @@ class AFPrototypeSingleScreenData extends AFStoreConnectorData3<AFSingleScreenTe
 /// and display them in a list.
 class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppStateArea, AFPrototypeSingleScreenData, AFPrototypeSingleScreenRouteParam, AFPrototypeTheme>{
 
-  AFPrototypeSingleScreenScreen(): super(AFUIID.screenPrototypeSingleScreen);
+  AFPrototypeSingleScreenScreen(): super(AFUIScreenID.screenPrototypeSingleScreen);
 
   static AFNavigateAction navigatePush(AFSingleScreenPrototypeTest instance, {AFID id}) {
     return AFNavigatePushAction(
       id: id,
       param: AFPrototypeSingleScreenRouteParam(id: instance.id, param: instance.param),
-      screen: AFUIID.screenPrototypeSingleScreen,
+      screen: AFUIScreenID.screenPrototypeSingleScreen,
     );
   }
 

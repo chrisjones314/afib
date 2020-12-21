@@ -58,23 +58,38 @@ class AFFundamentalDeviceTheme {
     );
   }
 
+  dynamic findDeviceValue(AFThemeID id) {
+    if(id == AFUIThemeID.brightness) {
+      return this.brightnessValue;
+    } else if(id == AFUIThemeID.alwaysUse24HourFormat) {
+      return this.alwaysUse24HourFormatValue;
+    } else if(id == AFUIThemeID.textScaleFactor) {
+      return this.textScaleFactorValue;
+    } else if(id == AFUIThemeID.locale) {
+      return this.localeValue;
+    } else if(id == AFUIThemeID.physicalSize) {
+      return this.physicalSize;
+    }
+    throw AFException("Unknown device theme value: $id");
+  }
+
   Brightness brightness(AFFundamentalTheme fundamentals) {
-    Brightness b = fundamentals.findValue(AFFundamentalThemeID.brightness);
+    Brightness b = fundamentals.findValue(AFUIThemeID.brightness);
     return b ?? brightnessValue;
   }
 
   bool alwaysUse24HourFormat(AFFundamentalTheme fundamentals) {
-    bool b = fundamentals.findValue(AFFundamentalThemeID.alwaysUse24HourFormat);
+    bool b = fundamentals.findValue(AFUIThemeID.alwaysUse24HourFormat);
     return b ?? alwaysUse24HourFormatValue;
   }
 
   Locale locale(AFFundamentalTheme fundamentals) {
-    Locale l = fundamentals.findValue(AFFundamentalThemeID.locale);
+    Locale l = fundamentals.findValue(AFUIThemeID.locale);
     return l ?? localeValue;
   }
 
   double textScaleFactor(AFFundamentalTheme fundamentals) {
-    double ts = fundamentals.findValue(AFFundamentalThemeID.textScaleFactor);
+    double ts = fundamentals.findValue(AFUIThemeID.textScaleFactor);
     return ts ?? textScaleFactorValue;
   }
 }
@@ -187,6 +202,7 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
   final Map<AFThemeID, AFFundamentalThemeValue> values;
   final Map<Locale, AFTranslationSet> translationSet;
   final Map<AFThemeID, AFFundamentalThemeValue> overrides;
+  final Map<AFThemeID, List<dynamic>> optionsForType;
 
   AFFundamentalThemeArea({
     @required this.themeLight,
@@ -194,6 +210,7 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     @required this.values, 
     @required this.translationSet,
     @required this.overrides,
+    @required this.optionsForType,
   });
 
   AFFundamentalThemeArea reviseOverrideThemeValue(AFThemeID id, dynamic value) {
@@ -216,8 +233,36 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
       themeDark: themeDark ?? this.themeDark,
       values: values ?? this.values,
       translationSet: translationSet ?? this.translationSet,
-      overrides: overrides ?? this.overrides
+      overrides: overrides ?? this.overrides,
+      optionsForType: this.optionsForType,
     );
+  }
+
+  List<String> get areaList {
+    final map = <String, bool>{};
+    for(final val in this.values.values) {
+      map[val.id.tag] = true;
+    }
+    final result = map.keys.toList();
+    result.insert(0, AFUIThemeID.tagDevice);
+    return result;
+  }
+
+  List<AFThemeID> attrsForArea(String area) {
+    final result = <AFThemeID>[];
+    for(final val in this.values.values) {
+      if(val.id.tag == area) {
+        result.add(val.id);
+      }
+    }
+
+    if(area == AFUIThemeID.tagDevice) {
+      result.add(AFUIThemeID.brightness);
+      result.add(AFUIThemeID.alwaysUse24HourFormat);
+      result.add(AFUIThemeID.textScaleFactor);
+      result.add(AFUIThemeID.locale);
+    }
+    return result;
   }
 
   ThemeData themeData(Brightness brightness) {
@@ -239,7 +284,7 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
   String translation(String textOrId, Locale locale) {
     var setT = translationSet[locale];
     if(setT == null) {
-      setT = translationSet[AFFundamentalThemeID.localeDefault];
+      setT = translationSet[AFUIThemeID.localeDefault];
     }
     if(setT == null) {
       return textOrId;
@@ -282,8 +327,12 @@ class AFTranslationSet {
 class AFPluginFundamentalThemeAreaBuilder {
   final values = <AFThemeID, AFFundamentalThemeValue>{};
   final translationSet = <Locale, AFTranslationSet>{};
+  Map<AFThemeID, List<dynamic>> optionsForType;
 
-    
+  AFPluginFundamentalThemeAreaBuilder(
+    this.optionsForType
+  );
+
   /// Set a fundamental value.
   /// 
   /// If the value exists, it is not overwritten.  Because the app
@@ -302,6 +351,12 @@ class AFPluginFundamentalThemeAreaBuilder {
       }
       values[id] = AFFundamentalThemeValue(id: id, value: value);
     }
+  }
+
+  /// Used to specify a list of string values that can be selected
+  /// in the test drawer/theme panel for a given AFThemeID.
+  void setOptionsForType(AFThemeID id, List<dynamic> values) {
+    optionsForType[id] = values;
   }
 
   /// Use to set multiple values, usually from a statically
@@ -539,6 +594,16 @@ mixin AFThemeAreaUtilties {
 class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuilder with AFThemeAreaUtilties {
   ThemeData themeLight;
   ThemeData themeDark;
+
+  AFAppFundamentalThemeAreaBuilder({
+    @required Map<AFThemeID, List<dynamic>> optionsForType
+  }): super(optionsForType);
+
+  factory AFAppFundamentalThemeAreaBuilder.create() {
+    final options = <AFThemeID, List<dynamic>>{};
+    options[AFUIThemeID.brightness] = Brightness.values;
+    return AFAppFundamentalThemeAreaBuilder(optionsForType: options);
+  }
   
   /// The app must call this method, or [setFundamentalThemeData] in order
   /// to establish the basic theme of the app.
@@ -571,10 +636,11 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     IconData iconNavDown = Icons.chevron_right,
   }) {
     // icons
-    setValue(AFFundamentalThemeID.sizeMargin, margin);
-    setValue(AFFundamentalThemeID.iconBack, iconBack);
-    setValue(AFFundamentalThemeID.iconNavDown, iconNavDown);
+    setValue(AFUIThemeID.sizeMargin, margin);
+    setValue(AFUIThemeID.iconBack, iconBack);
+    setValue(AFUIThemeID.iconNavDown, iconNavDown);
   }
+
 
   dynamic value(AFThemeID id) {
     return values[id]?.value;
@@ -607,7 +673,8 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
       themeDark: themeDark, 
       values: this.values, 
       translationSet: translationSet,
-      overrides: <AFThemeID, AFFundamentalThemeValue>{}
+      overrides: <AFThemeID, AFFundamentalThemeValue>{},
+      optionsForType: optionsForType,
     );
   }
 
@@ -645,6 +712,10 @@ class AFFundamentalTheme {
     @required this.area
   });    
 
+  List<dynamic> optionsForType(AFThemeID id) {
+    return area.optionsForType[id];
+  }
+
   AFFundamentalTheme reviseOverrideThemeValue(AFThemeID id, dynamic value) {
 
     return copyWith(
@@ -669,6 +740,14 @@ class AFFundamentalTheme {
 
   ThemeData get themeData {
     return area.themeData(device.brightness(this));
+  }
+
+  List<String> get areaList {
+    return area.areaList;
+  }
+
+  List<AFThemeID> attrsForArea(String area) {
+    return this.area.attrsForArea(area);
   }
 
   /// Used for flags that determine UI layout.  For example, maybe a 'compact' vs 'spacious' flag.
@@ -777,7 +856,11 @@ class AFFundamentalTheme {
   } 
 
   dynamic findValue(AFThemeID id) {
-    return area.findValue(id);
+    var result = area.findValue(id);
+    if(result == null && id.tag == AFUIThemeID.tagDevice) {
+      result = device.findDeviceValue(id);
+    }
+    return result;
   }
 
   void resolve() {
@@ -822,21 +905,33 @@ class AFConceptualTheme extends AFTheme {
   /// 
   /// This allows for a readable syntax like:
   /// ```dart
-  /// final cols = context.t.row();
+  /// final cols = context.t.childrenRow();
   /// ```
-  List<Widget> row() { return <Widget>[]; }
+  List<Widget> childrenRow() { return <Widget>[]; }
 
   /// A utility for creating a list of widgets in a column.
   /// 
   /// This allows for a reasonable syntax like:
   /// ```dart
-  /// final rows = context.t.column();
+  /// final rows = context.t.childrenColumn();
   /// ```
-  List<Widget> column() { return <Widget>[]; }
+  List<Widget> childrenColumn() { return <Widget>[]; }
 
+
+  /// A utility for creating a list of child widgets
+  /// 
+  /// This allows for a readable syntax like:
+  /// ```dart
+  /// final cols = context.t.children();
+  /// ```
+  List<Widget> children() { return <Widget>[]; }
 
   /// A utility for create a list of table rows in a table.
-  List<TableRow> tableColumn() { return <TableRow>[]; }
+  List<TableRow> childrenTable() { return <TableRow>[]; }
+
+  /// A utility for creating a list of expansion panels in an expansion list.
+  List<ExpansionPanel> childrenExpansionList() { return <ExpansionPanel>[]; }
+
 
   // The primary color from [ThemeData], adjusted for light/dark mode.
   Color get colorPrimary {
@@ -882,11 +977,6 @@ class AFConceptualTheme extends AFTheme {
 
   Brightness get colorSchemeBrightness {
     return fundamentals.colorSchemeBrightness;
-  }
-
-  /// Whether the device is in light or dark mode.
-  Brightness get brightness { 
-    return fundamentals.device.brightness(fundamentals);
   }
 
   /// See [TextTheme], text theme to use on a card background
@@ -979,7 +1069,7 @@ class AFConceptualTheme extends AFTheme {
 
   /// Translate the specified string id and return it.
   /// 
-  /// See also [textBuilder] and [richTextBuilder]
+  /// See also [childTextBuilder] and [childRichTextBuilder]
   String translate(dynamic text) {
     return fundamentals.translate(text);
   }
@@ -988,17 +1078,17 @@ class AFConceptualTheme extends AFTheme {
     return fundamentals.weight(weight);
   }
 
-  AFRichTextBuilder richTextBuilder({
+  AFRichTextBuilder childRichTextBuilder({
     AFWidgetID wid,
     dynamic idOrTextStyleNormal,
     dynamic idOrTextStyleBold,
     dynamic idOrTextStyleTapable,
     dynamic idOrTextStyleMuted,
   }) {
-    final normal = idOrTextStyleNormal != null ? textStyle(idOrTextStyleNormal) : null;
-    final bold = idOrTextStyleBold != null ? textStyle(idOrTextStyleBold) : null;
-    final tapable = idOrTextStyleTapable != null ? textStyle(idOrTextStyleTapable) : null;
-    final muted = idOrTextStyleMuted != null ? textStyle(idOrTextStyleMuted) : null;
+    final normal = idOrTextStyleNormal != null ? styleText(idOrTextStyleNormal) : null;
+    final bold = idOrTextStyleBold != null ? styleText(idOrTextStyleBold) : null;
+    final tapable = idOrTextStyleTapable != null ? styleText(idOrTextStyleTapable) : null;
+    final muted = idOrTextStyleMuted != null ? styleText(idOrTextStyleMuted) : null;
 
     return AFRichTextBuilder(
       theme: fundamentals,
@@ -1010,7 +1100,7 @@ class AFConceptualTheme extends AFTheme {
     );
   }
 
-  AFTextBuilder textBuilder({
+  AFTextBuilder childTextBuilder({
     AFWidgetID wid,
     dynamic textStyle
   }) {
@@ -1023,7 +1113,7 @@ class AFConceptualTheme extends AFTheme {
   }
 
 
-  Text text(dynamic text, {
+  Text childText(dynamic text, {
     AFWidgetID wid, 
     dynamic style,
     dynamic textColor,
@@ -1033,7 +1123,7 @@ class AFConceptualTheme extends AFTheme {
   }) {
     TextStyle styleS;
     if(style != null) {
-      styleS = textStyle(style);
+      styleS = styleText(style);
     }
 
     if(textColor != null || fontSize != null || fontWeight != null) {
@@ -1061,6 +1151,17 @@ class AFConceptualTheme extends AFTheme {
     return fundamentals.device.locale(fundamentals);
   }
 
+  /// The orientation of the device.
+  Orientation get deviceOrientation {
+    final dSize = devicePhysicalSize;
+    return (dSize.height >= dSize.width) ? Orientation.portrait : Orientation.landscape;
+  }
+
+  // Whether to always use 24-hour time format.
+  bool get deviceAlwaysUse24HourFormat {
+    return fundamentals.device.alwaysUse24HourFormat(fundamentals);
+  }
+ 
   /// The physical size of the screen.
   /// 
   /// This value updates automatically when the
@@ -1074,6 +1175,7 @@ class AFConceptualTheme extends AFTheme {
     return fundamentals.device.textScaleFactor(fundamentals);
   }
 
+  /// The light/dark mode setting of the device.
   Brightness get deviceBrightness {
     return fundamentals.device.brightness(fundamentals);
 
@@ -1106,7 +1208,7 @@ class AFConceptualTheme extends AFTheme {
     return fundamentals.color(idOrColor);
   }
 
-  Color foreground(dynamic idOrColor) {
+  Color colorForeground(dynamic idOrColor) {
     if(idOrColor is Color) {
       return idOrColor;
     }
@@ -1120,7 +1222,7 @@ class AFConceptualTheme extends AFTheme {
     return fundamentals.background(idOrColor);
   }
 
-  TextStyle textStyle(dynamic idOrTextStyle) {
+  TextStyle styleText(dynamic idOrTextStyle) {
     if(idOrTextStyle is TextStyle) {
       return idOrTextStyle;
     }
@@ -1135,7 +1237,7 @@ class AFConceptualTheme extends AFTheme {
   }
 
   double get margin { 
-    return fundamentals.size(AFFundamentalThemeID.sizeMargin);
+    return fundamentals.size(AFUIThemeID.sizeMargin);
   }
 
   Widget icon(dynamic id, {
@@ -1145,12 +1247,26 @@ class AFConceptualTheme extends AFTheme {
     return fundamentals.icon(id, iconColor: iconColor, iconSize: iconSize);
   }
 
+  Widget iconNavDown({
+    dynamic iconColor,
+    dynamic iconSize
+  }) {
+    return icon(AFUIThemeID.iconNavDown, iconColor: iconColor, iconSize: iconSize);
+  }
+
+  Widget iconBack({
+    dynamic iconColor,
+    dynamic iconSize
+  }) {
+    return icon(AFUIThemeID.iconBack, iconColor: iconColor, iconSize: iconSize);
+  }
+
   Color get colorSecondary {
     return fundamentals.colorSecondary;
   }
 
   /// Important: the values you are passing in are scale factors on the
-  /// value specified by [AFFundamentalThemeID.sizeMargin], they are not
+  /// value specified by [AFUIThemeID.sizeMargin], they are not
   /// absolute measurements.
   /// 
   /// For example, if the default margin is 8.0, and you pass in all: 2,
@@ -1176,7 +1292,7 @@ class AFConceptualTheme extends AFTheme {
   }
 
   /// Important: the values you are passing in are scale factors on the
-  /// value specified by [AFFundamentalThemeID.sizeMargin], they are not
+  /// value specified by [AFUIThemeID.sizeMargin], they are not
   /// absolute measurements.
   /// 
   /// For example, if the default margin is 8.0, and you pass in all: 2,
@@ -1228,9 +1344,9 @@ class AFConceptualTheme extends AFTheme {
     return EdgeInsets.fromLTRB(l, t, r, b);
   }
     
-  Widget standardBackButton(AFDispatcher dispatcher, {
-    AFWidgetID wid = AFUIID.buttonBack,
-    dynamic iconIdOrWidget = AFFundamentalThemeID.iconBack,
+  Widget childStandardBackButton(AFDispatcher dispatcher, {
+    AFWidgetID wid = AFUIWidgetID.buttonBack,
+    dynamic iconIdOrWidget = AFUIThemeID.iconBack,
     dynamic iconColor,
     dynamic iconSize,
     String tooltip = "Back",
@@ -1241,13 +1357,46 @@ class AFConceptualTheme extends AFTheme {
         icon: icon(iconIdOrWidget, iconColor: iconColor, iconSize: iconSize),
         tooltip: translate(tooltip),
         onPressed: () async {
-          if(shouldContinueCheck == null || await shouldContinueCheck() == AFFundamentalThemeID.shouldContinue) {
+          if(shouldContinueCheck == null || await shouldContinueCheck() == AFUIThemeID.shouldContinue) {
             dispatcher.dispatch(AFNavigatePopAction(id: wid));
           }
         }
     );
   }
 
+  /// Replaces ListTile.divideTiles, including a key based on [widBase]
+  /// for each one.
+  /// 
+  /// When I tried ListTile.divideTiles, it didn't seem to maintain a key
+  /// on the dividers, which caused text widgets in the list to lose focus
+  /// when the list was re-rendered.
+  List<Widget> childrenDivideWidgets(List<Widget> rows, AFWidgetID widBase, {
+    dynamic colorLine,
+    dynamic thickness,
+    dynamic height,
+    dynamic indent
+
+  }) {
+    final c = color(colorLine);
+    final thick = size(thickness);
+    final h = size(height);
+    final ind = size(indent);
+    final result = childrenColumn();
+    for(var i = 0; i < rows.length; i++) {
+      final widget = rows[i];
+      result.add(widget);
+      if(i+1 < rows.length) {
+        result.add(Divider(
+          key: keyForWID(widBase.with2("divider", i.toString())),
+          color: c,
+          height: h,
+          thickness: thick,
+          indent: ind,
+        ));
+      }
+    }
+    return result;
+  }
 }
 
 /// Can be used as a template parameter when you don't want a theme.

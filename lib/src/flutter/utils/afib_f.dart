@@ -262,9 +262,9 @@ class AFibGlobalState<TState extends AFAppStateArea> {
       return forcedStartupScreen;
     }
     if(AFibD.config.requiresPrototypeData) {
-      return AFUIID.screenPrototypeHome;
+      return AFUIScreenID.screenPrototypeHome;
     }
-    return AFUIID.screenStartupWrapper;
+    return AFUIScreenID.screenStartupWrapper;
   }
 
   AFScreenID get actualStartupScreenId {

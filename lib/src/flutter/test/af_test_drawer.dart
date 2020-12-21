@@ -22,9 +22,7 @@ class AFTestDrawerRouteParam extends AFRouteParam {
   static const viewTest  = 2;
   static const viewReuse = 3;
   final int view;
-  final Map<int, bool> themeExpanded;
-
-  static const expandThemeDevice = 0;
+  final Map<String, bool> themeExpanded;
 
   AFTestDrawerRouteParam({
     @required this.view, 
@@ -32,24 +30,24 @@ class AFTestDrawerRouteParam extends AFRouteParam {
   });
 
   factory AFTestDrawerRouteParam.createOncePerScreen(int view) {
-    final themeExpanded = <int, bool>{};
-    themeExpanded[expandThemeDevice] = false;
+    final themeExpanded = <String, bool>{};
     return AFTestDrawerRouteParam(view: view, themeExpanded: themeExpanded);
   }
 
-  bool isExpanded(int area) {
-    return themeExpanded[area];
+  bool isExpanded(String area) {
+    final result = themeExpanded[area];
+    return result ?? false;
   }
 
-  AFTestDrawerRouteParam reviseExpanded(int area, { bool expanded }) {
-    final revised = Map<int, bool>.from(themeExpanded);
+  AFTestDrawerRouteParam reviseExpanded(String area, { bool expanded }) {
+    final revised = Map<String, bool>.from(themeExpanded);
     revised[area] = expanded;
     return copyWith(themeExpanded: revised);
   }
 
   AFTestDrawerRouteParam copyWith({
     int view,
-    Map<int, bool> themeExpanded
+    Map<String, bool> themeExpanded
   }) {
     return AFTestDrawerRouteParam(
       view: view ?? this.view,
@@ -73,7 +71,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
   static final timeFormat = DateFormat('Hms');
 
   //--------------------------------------------------------------------------------------
-  AFTestDrawer(): super(AFUIID.screenTestDrawer);
+  AFTestDrawer(): super(AFUIScreenID.screenTestDrawer);
 
   //--------------------------------------------------------------------------------------
   AFScreenID get screenIdForTest {
@@ -124,12 +122,12 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
   //--------------------------------------------------------------------------------------
   Widget _buildHeader(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context) {
     final t = context.t;
-    final rows = t.column();
+    final rows = t.childrenColumn();
     final test = context.s.test;
 
     rows.add(Container(
       margin: t.marginScaled(left: 0),
-      child: t.text(
+      child: t.childText(
         "AFib Test Drawer",
         style: t.styleOnPrimary.headline2
       )
@@ -137,15 +135,15 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
 
     rows.add(Container(
       margin: t.marginScaled(left: 0),
-      child: t.text(
+      child: t.childText(
           context.s.test.id.toString(), 
           style: t.styleOnPrimary.headline6
       )
     ));
 
-    final cols = t.row();
+    final cols = t.childrenRow();
     cols.add(FlatButton(
-      child: t.text('Exit'),
+      child: t.childText('Exit'),
       color: t.colorOnPrimary,
       textColor: t.colorSecondary,
       onPressed: () {
@@ -193,7 +191,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
     final colorText = isActive ? t.colorOnPrimary : t.colorOnBackground;
 
     return FlatButton(
-      child: t.text(title),
+      child: t.childText(title),
       color: color,
       textColor: colorText,
       shape: RoundedRectangleBorder(),
@@ -207,7 +205,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
   Widget _buildChoiceRow(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context) {
     final t = context.t;
 
-    final cols = t.row();
+    final cols = t.childrenRow();
 
     cols.add(_buildChoiceButton(context, "Theme", AFTestDrawerRouteParam.viewTheme));
     cols.add(_buildChoiceButton(context, "Test", AFTestDrawerRouteParam.viewTest));
@@ -229,81 +227,136 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
       item = _buildReuseContent(context);
     }
 
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [item]
-      );
+    return Expanded(
+      child: MediaQuery.removePadding(
+        context: context.c, 
+        removeTop: true,
+        child: ListView(
+          children: [Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [item]
+          )]
+        )
+    ));
   }
 
-  TableRow _createAttributeRow(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context, String title, Widget Function() buildValue) {
+  TableRow _createAttributeRow(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context, AFThemeID title, Widget Function() buildValue) {
     final t = context.t;    
-    final cols = t.row();
-    cols.add(t.testResultTableValue(context, title, TextAlign.right));
+    final cols = t.childrenRow();
+    cols.add(t.testResultTableValue(context, title.toString(), TextAlign.right));
     cols.add(buildValue());
     return TableRow(children: cols);
   }
 
-  Widget _buildDeviceThemeBody(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context) {
-    final t = context.t;    
-    // build a table that has different values, like 
-    final headerCols = t.row();
-    headerCols.add(t.testResultTableHeader(context, "Attr", TextAlign.right));
-    headerCols.add(t.testResultTableHeader(context, "Value", TextAlign.left));
-    final tableRows = t.tableColumn();
-    tableRows.add(TableRow(children: headerCols));       
+  Widget _buildEnumAttributeRowValue(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context, AFThemeID attr, dynamic attrValue) {
+    final t = context.t;
+    final rows = t.childrenColumn();
 
-    tableRows.add(_createAttributeRow(context, "Size", () {
-      final text = StringBuffer();
-      final size = t.devicePhysicalSize;
-      text.write(size.width);
-      text.write(" x ");
-      text.write(size.height);
-
-      return t.testResultTableValue(context, text.toString(), TextAlign.left);
-    }));
-
-    tableRows.add(_createAttributeRow(context, "Dark Mode", () {
-      final isDark = t.deviceBrightness == Brightness.dark;
-      return Container(
-        child: Switch(
-          value: isDark,
-          onChanged: (isDarkNow) {
-            final reversedBrightness = isDarkNow ? Brightness.dark : Brightness.light;
-            context.dispatch(AFOverrideThemeValueAction(
-              id: AFFundamentalThemeID.brightness,
-              value: reversedBrightness
-            ));
+    final values = t.fundamentals.optionsForType(attr);
+    if(values == null) {
+      rows.add(t.childText(attrValue.toString()));
+    } else {
+      for(final value in values) {
+        var text = value.toString();
+        final idxOfDot = text.indexOf(".");
+        if(idxOfDot > 0) {
+          text = text.substring(idxOfDot+1);
+        }
+        final isSel = value == attrValue;
+        rows.add(ChoiceChip(
+          selected: isSel,
+          label: t.childText(text),
+          onSelected: (val) {
+            if(val) {
+              context.dispatch(AFOverrideThemeValueAction(
+                id: attr,
+                value: value,
+              ));            
+            }
           }
-        )
-      );
-    }));
-
-
-
-    return Table(
-      children: tableRows
+        ));
+      }
+    }
+    
+    return Column(
+      children: rows
     );
   }
 
+
+  bool _isEnum(dynamic attrVal) {
+   final split = attrVal.toString().split('.');
+   return split.length > 1 && split[0] == attrVal.runtimeType.toString();
+  }
+
+  Widget _buildThemeAreaBody(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context, String area) {
+    final t = context.t;    
+    // build a table that has different values, like 
+    final headerCols = t.childrenRow();
+    headerCols.add(t.testResultTableHeader(context, "Attr", TextAlign.right));
+    headerCols.add(t.testResultTableHeader(context, "Value", TextAlign.left));
+    final tableRows = t.childrenTable();
+    tableRows.add(TableRow(children: headerCols));       
+
+    for(final attr in t.fundamentals.attrsForArea(area)) {
+      tableRows.add(_createAttributeRow(context, attr, () {
+          final attrVal = t.fundamentals.findValue(attr);
+          if(attrVal is IconData) {
+            return Icon(attrVal);
+          }
+          if(attrVal is bool) {
+            return Row(children: [Switch(          
+              value: attrVal,
+              onChanged: (attrValNow) {
+                context.dispatch(AFOverrideThemeValueAction(
+                  id: attr,
+                  value: attrValNow,
+                ));
+              }
+            )]);
+          }
+          if(_isEnum(attrVal)) {
+            return _buildEnumAttributeRowValue(context, attr, attrVal);
+          }
+
+          return t.childText(attrVal.toString());        
+      }));
+    }
+
+    return Table(
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      children: tableRows
+    );
+
+  }
+
   Widget _buildThemeContent(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context) {
+    
     final t = context.t;
+    final panels = t.childrenExpansionList();
+    final areaList = t.fundamentals.areaList;
+
+    for(final area in areaList) {
+      panels.add(ExpansionPanel(
+
+        isExpanded: context.p.isExpanded(area),
+        headerBuilder: (context, isExpanded) {
+          return ListTile(
+            title: t.childText("Area: $area"),
+            dense: true,
+          );
+        },
+        body: _buildThemeAreaBody(context, area)
+      ));
+    }
+
     final content = ExpansionPanelList(
       expansionCallback: (index, isExpanded) {
-        updateParam(context, context.p.reviseExpanded(index, expanded: !isExpanded));
+        final area = areaList[index];
+        updateParam(context, context.p.reviseExpanded(area, expanded: !isExpanded));
       },
-      children: [
-        ExpansionPanel(
-          isExpanded: context.p.isExpanded(AFTestDrawerRouteParam.expandThemeDevice),
-          headerBuilder: (context, isExpanded) {
-            return ListTile(
-              title: Text('Device'),
-              dense: true,
-            );
-          },
-          body: _buildDeviceThemeBody(context),
-        ),
-      ],
+      children: panels,
     );
 
     return Container(
@@ -327,7 +380,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
     final test = context.s.test;
     final sectionIds = test.sectionIds;
 
-    final cols = t.row();
+    final cols = t.childrenRow();
 
     final hasMultiple = sectionIds.length > 1;
     final firstId = sectionIds.first;
@@ -338,7 +391,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
       rowAlign = MainAxisAlignment.spaceBetween;
     }
 
-    cols.add(t.text('Run $defaultRunId'));
+    cols.add(t.childText('Run $defaultRunId'));
 
     if(hasMultiple) {
       cols.add(PopupMenuButton<AFReusableTestID>(
@@ -350,7 +403,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
           for(final id in sectionIds) {
             result.add(PopupMenuItem<AFReusableTestID>(
               value: id,
-              child: t.text(id.toString())
+              child: t.childText(id.toString())
             ));
           }
 
@@ -383,7 +436,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
     final t = context.t;
     var content;
     if(context.s.test.hasBody) {
-      final rows = t.column();
+      final rows = t.childrenColumn();
       rows.add(_buildRunButton(context));
       _buildTestReport(context, rows);
       content = Column(
@@ -411,7 +464,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
     if(test.hasReusable) {
 
       for(final reusableId in test.sectionIds) {
-        final rows = t.column();
+        final rows = t.childrenColumn();
         if(reusableId == AFReusableTestID.smokeTestId) {
           continue;
         }
@@ -419,20 +472,20 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
         if(reusableId != null) {
           rows.add(Container(
             margin: t.marginScaled(bottom: 2, all: 0),
-            child: t.text('Reusable: ${reusableId.toString()}', textAlign: TextAlign.left)
+            child: t.childText('Reusable: ${reusableId.toString()}', textAlign: TextAlign.left)
           ));
         }
         final params = test.paramDescriptions(reusableId);
 
-        final tableRows = t.tableColumn();
-        final headerCols = t.row();
+        final tableRows = t.childrenTable();
+        final headerCols = t.childrenRow();
         headerCols.add(t.testResultTableHeader(context, "#", TextAlign.left));
         headerCols.add(t.testResultTableHeader(context, "Param Description", TextAlign.left));
         tableRows.add(TableRow(children: headerCols));
         
         for(var i = 0; i < params.length; i++) {
           final param = params[i];
-          final resultCols = t.row();
+          final resultCols = t.childrenRow();
           resultCols.add(t.testResultTableValue(context, (i+1).toString(), TextAlign.right));
           resultCols.add(t.testResultTableValue(context, param, TextAlign.left));
           tableRows.add(TableRow(children: resultCols));
@@ -463,19 +516,19 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
 
     rows.add(t.buildErrorsSection(context, testState.errors));
 
-    final headerCols = t.row();
+    final headerCols = t.childrenRow();
     headerCols.add(t.testResultTableHeader(context, "Run", TextAlign.right));
     headerCols.add(t.testResultTableHeader(context, "At", TextAlign.left));
     headerCols.add(t.testResultTableHeader(context, "Pass", TextAlign.right));
     headerCols.add(t.testResultTableHeader(context, "Fail", TextAlign.right));
 
-    final resultCols = t.row();
+    final resultCols = t.childrenRow();
     resultCols.add(t.testResultTableValue(context, testContext.runNumber.toString(), TextAlign.right));
     resultCols.add(t.testResultTableValue(context, timeFormat.format(testContext.lastRun), TextAlign.left));
     resultCols.add(t.testResultTableValue(context, testState.pass.toString(), TextAlign.right));
     resultCols.add(t.testResultTableValue(context, testState.errors.length.toString(), TextAlign.right, showError: (testState.errors.isNotEmpty)));
     
-    final tableRows = t.tableColumn();
+    final tableRows = t.childrenTable();
     tableRows.add(TableRow(children: headerCols));
     tableRows.add(TableRow(children: resultCols));
 

@@ -13,11 +13,11 @@ class AFScreenMap {
   final Map<AFScreenID, WidgetBuilder> _screens = <AFScreenID, WidgetBuilder>{};
 
   AFScreenMap() {
-    screen(AFUIID.screenStartupWrapper, (_) => AFStartupScreenWrapper());
+    screen(AFUIScreenID.screenStartupWrapper, (_) => AFStartupScreenWrapper());
   }
 
   AFScreenID get startupScreenId {
-    if(_startupScreenId == AFUIID.screenPrototypeHome) {
+    if(_startupScreenId == AFUIScreenID.screenPrototypeHome) {
       return _startupScreenId;
     }
     return _startupScreenId;

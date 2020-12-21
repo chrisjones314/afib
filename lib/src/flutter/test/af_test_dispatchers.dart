@@ -84,7 +84,7 @@ class AFSingleScreenTestDispatcher extends AFScreenTestDispatcher {
 
   void processSetParam(AFNavigateSetParamAction action) {
     main.dispatch(
-      AFNavigateSetParamAction(screen: AFUIID.screenPrototypeSingleScreen,
+      AFNavigateSetParamAction(screen: AFUIScreenID.screenPrototypeSingleScreen,
         param: AFPrototypeSingleScreenRouteParam(id: testId, param: action.param)
     ));      
   }
@@ -101,7 +101,7 @@ class AFWidgetScreenTestDispatcher extends AFScreenTestDispatcher {
 
    void processSetParam(AFNavigateSetParamAction action) {
     main.dispatch(
-      AFNavigateSetParamAction(screen: AFUIID.screenPrototypeWidget,
+      AFNavigateSetParamAction(screen: AFUIScreenID.screenPrototypeWidget,
         param: originalParam.copyWith(param: action.param)
     ));      
   }

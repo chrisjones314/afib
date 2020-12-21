@@ -43,13 +43,13 @@ class AFPrototypeWidgetData extends AFStoreConnectorData2<AFTestState, AFThemeSt
 /// and display them in a list.
 class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFPrototypeWidgetData, AFPrototypeWidgetRouteParam, AFPrototypeTheme>{
 
-  AFPrototypeWidgetScreen(): super(AFUIID.screenPrototypeWidget);
+  AFPrototypeWidgetScreen(): super(AFUIScreenID.screenPrototypeWidget);
 
   static AFNavigateAction navigatePush(AFWidgetPrototypeTest test, {AFID id}) {
     return AFNavigatePushAction(
       id: id,
       param: AFPrototypeWidgetRouteParam(test: test),
-      screen: AFUIID.screenPrototypeWidget,
+      screen: AFUIScreenID.screenPrototypeWidget,
     );
   }
 
@@ -113,8 +113,8 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFProtot
         slivers: [
           SliverAppBar(
             automaticallyImplyLeading: false,
-            leading: t.standardBackButton(context.d),
-            title: t.text('Widget Test Screen',
+            leading: t.childStandardBackButton(context.d),
+            title: t.childText('Widget Test Screen',
               style: t.styleOnPrimary.headline4,
             ),
           ),

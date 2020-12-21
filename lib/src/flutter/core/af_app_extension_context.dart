@@ -279,7 +279,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
   }
 
   AFFundamentalTheme createFundamentalTheme(AFFundamentalDeviceTheme device, AFAppStateAreas areas) {
-    final builder = AFAppFundamentalThemeAreaBuilder();
+    final builder = AFAppFundamentalThemeAreaBuilder.create();
     this.initFundamentalThemeArea(device, areas, builder);
 
     for(final init in this.initFundamentalThemeAreas) {

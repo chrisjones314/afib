@@ -27,7 +27,7 @@ class AFUpdateAppStateAction extends AFObjectWithKey {
   /// A utility for creating a list of revised models.   
   /// 
   /// You will repeatedly call .add for all your revised models,
-  /// then use [AFUpdateAppStateAction.updateAll] to create an action
+  /// then use [AFUpdateAppStateAction..updateMany] to create an action
   /// that updates them all.
   static List<Object> createModelList() {
     return <Object>[];
@@ -43,7 +43,7 @@ class AFUpdateAppStateAction extends AFObjectWithKey {
   }
 
   /// Constructor for updating multiple objects at the root of the [AFAppState]
-  factory AFUpdateAppStateAction.updateAll(Type area, Iterable<Object> objs) {
+  factory AFUpdateAppStateAction.updateMany(Type area, Iterable<Object> objs) {
     final toIntegrate = objs.toList();
     return AFUpdateAppStateAction(
       area: area,

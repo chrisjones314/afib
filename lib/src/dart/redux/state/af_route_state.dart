@@ -1,4 +1,5 @@
 
+import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
@@ -382,7 +383,7 @@ class AFRouteState {
   /// 
   /// This may return null, in which case you should use the drawer's createRouteParam method
   /// to create an initial value.
-  AFRouteParam findDrawerParam(AFScreenID screen) {
+  AFRouteParam findGlobalParam(AFScreenID screen) {
     return drawerParams[screen];
   }
 
@@ -463,16 +464,20 @@ class AFRouteState {
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteState setParam(AFScreenID screen, AFRouteParam param) {
-    if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
-      screen = AFUIScreenID.screenStartupWrapper;
+  AFRouteState setParam(AFScreenID screen, AFRouteParam param, AFNavigateRoute route) {
+    if(route == AFNavigateRoute.routeHierarchy) {
+      if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
+        screen = AFUIScreenID.screenStartupWrapper;
+      }
+      return _reviseScreen(screenSegments.setParam(screen, param));
+    } else {
+      return setGlobalPoolParam(screen, param);
     }
-    return _reviseScreen(screenSegments.setParam(screen, param));
   }
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteState setDrawerParam(AFScreenID screen, AFRouteParam param) {
+  AFRouteState setGlobalPoolParam(AFScreenID screen, AFRouteParam param) {
     final revised = Map<AFScreenID, AFRouteParam>.from(drawerParams);
     revised[screen] = param;
     return copyWith(drawerParams: revised);

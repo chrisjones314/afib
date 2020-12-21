@@ -1335,6 +1335,7 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
     d.processSetParam(AFNavigateSetParamAction(
       param: param,
       screen: screenId,
+      route: AFNavigateRoute.routeHierarchy
     ));
   }
 
@@ -1428,7 +1429,8 @@ class AFConnectedWidgetPrototypeTest extends AFWidgetPrototypeTest {
   void onDrawerReset(AFDispatcher dispatcher) {
     dispatcher.dispatch(AFNavigateSetParamAction(
       screen: this.screenId,
-      param: AFPrototypeWidgetRouteParam(test: this, param: this.param)
+      param: AFPrototypeWidgetRouteParam(test: this, param: this.param),
+      route: AFNavigateRoute.routeHierarchy
     ));
     dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.id, this.data));
   }

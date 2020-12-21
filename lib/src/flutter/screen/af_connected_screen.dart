@@ -328,8 +328,9 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TData extends AF
     dispatcher.dispatch(AFNavigateSetParamAction(
       id: id,
       screen: this.screenId, 
-      param: revised)
-    );
+      param: revised,
+      route: AFNavigateRoute.routeHierarchy
+    ));
   }
 
   /// Utility method which updates the parameter, but takes a build context
@@ -403,11 +404,6 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TData extends AF
         endDrawer: context.createDebugDrawerEnd(endDrawer)
       );
   }
-}
-
-/// The first screen afib displays when the app starts, shown while the startup query is executing.
-abstract class AFStartupScreen<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TData, TRouteParam, TTheme> {
-  AFStartupScreen(AFScreenID screenId, { Key key }): super(screenId, key: key);
 }
 
 /// Use this to connect a Widget to the store.  
@@ -536,58 +532,72 @@ abstract class AFPopupScreen<TState extends AFAppStateArea, TData extends AFStor
   }
 
   Widget buildPopupContents(AFBuildContext<TData, TRouteParam, TTheme> context, AFBottomPopupTheme theme);
-
 }
 
-/// Use this to connect a drawer to the store.
-/// 
-/// Drawers are special because the user can drag in from the left or right to open them.
-/// You cannot trust that you used an [AFNavigatePush] action to open the drawer.  Consequently,
-/// you should only rely on information in your [AFAppStateArea] to render your drawers, and perhaps
-/// the full state of the route ()
-abstract class AFConnectedDrawer<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TData, TRouteParam, TTheme> {
-  final Type themeType = TTheme;
 
-  AFConnectedDrawer(
+abstract class AFConnectedScreenWithGlobalParam<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TData, TRouteParam, TTheme> {
+  AFConnectedScreenWithGlobalParam(
     AFScreenID screenId,
-    /*
-    @required AFDispatcher dispatcher,
-    @required AFUpdateParamDelegate<TRouteParam> updateParamDelegate,
-    @required AFExtractParamDelegate extractParamDelegate,
-    @required AFCreateDataDelegate createDataDelegate,
-    @required AFFindParamDelegate findParamDelegate,
-    */
   ): super(screenId);
 
-  /*
-  AFScreenID get screenIdForTest {
-    return screenId;
-  }
-  */
-
+  /// Look for this screens route parameter in the global pool, 
+  /// rather than in the navigational hierarchy
+  @override
   TRouteParam findParam(AFState state) {
-    var current = state.public.route.findDrawerParam(screenId);
+    var current = state.public.route.findGlobalParam(screenId);
     if(current == null) {
       current = createRouteParam(state);
     }
     return current;
   }
 
-  /// Create the initial default route parameter for the drawer.
+  /// Create the initial default route parameter for the screen.
   /// 
-  /// This is necessary if the drawer is dragged onto the screen using
+  /// This is necessary because the screen might appear without being explicitly 
+  /// pushed (this happens with drawers, for example).  If there is no entry in the 
+  /// global route param pool, this function is called to create one.
   TRouteParam createRouteParam(AFState state);
 
-  /// Because the drawer can be dragged onto the screen without an 
-  /// explicit navigation inside our app, we need to track it in a special area.
+  /// Update this screens route parameter in the global pool, rather than in the
+  /// route hiearchy.
+  @override
   void updateParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
-    dispatcher.dispatch(AFNavigateSetDrawerParamAction(
+    dispatcher.dispatch(AFNavigateSetParamAction(
       id: id,
       screen: this.screenId, 
-      param: revised)
+      param: revised,
+      route: AFNavigateRoute.routeGlobalPool)
     );
   }
+}
 
+/// Use this to connect a drawer to the store.
+/// 
+/// Drawers are special because the user can drag in from the left or right to open them.
+/// Consequently, you will need to override [AFConnectedScreenWithGlobalParam.createRouteParam],
+/// which will be used to create your route parameter if the drawer was dragged onto the
+/// screen without you explicitly calling [AFBuildContext.openDrawer].
+abstract class AFConnectedDrawer<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreenWithGlobalParam<TState, TData, TRouteParam, TTheme> {
+  AFConnectedDrawer(
+    AFScreenID screenId,
+  ): super(screenId);
+}
+
+
+/// Use this to connect a dialog to the store.
+/// 
+/// You can open a dialog with 
+abstract class AFConnectedDialog<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreenWithGlobalParam<TState, TData, TRouteParam, TTheme> {
+  AFConnectedDialog(
+    AFScreenID screenId,
+  ): super(screenId);
+
+  @override
+  Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context) {
+    return buildDialogWithContext(context);
+  }
+
+  Dialog buildDialogWithContext(AFBuildContext<TData, TRouteParam, TTheme> context);
 }
 
 /// A utility class which you can use when you have a complex screen which passes the dispatcher,
@@ -621,6 +631,136 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
 
   /// Dispatch an action or query.
   void dispatch(dynamic action) { dispatcher.dispatch(action); }
+
+  /// Update the parameter for the specified screen, but favor calling
+  /// updateParam in your screen directly.
+  /// 
+  /// This method is here for discoverability, rather than calling 
+  /// ```dart
+  /// context.updateRouteParam(this, revisedParam)
+  /// ```
+  /// from within a screen/widget, I recommend calling 
+  /// [AFConnectedWidgetBase.updateParam] directly in your screen.
+  /// 
+  /// ```dart
+  /// updateParam(context, revisedParam);
+  /// ```
+  /// That said, there are other contexts, like when a query completes, 
+  /// where you can call
+  /// ```dart
+  /// context.updateRouteParam(screenId, revisedParam)
+  /// ```
+  /// So, in a sense this is more consistent with that method.  They all function
+  /// in the same way.
+  void updateRouteParam(AFConnectedWidgetBase widget, TRouteParam revised, { AFID id }) {
+    widget.updateParam(this, revised, id: id);
+  }
+
+  /// Update one object at the root of the application state.
+  /// 
+  /// Note that you must specify your root application state type as a type parameter:
+  /// ```dart
+  /// context.updateAppStateOne<YourRootState>(oneObjectWithinYourRootState);
+  /// ```
+  void updateAppStateOne<TState extends AFAppStateArea>(Object toUpdate) {
+    dispatcher.dispatch(AFUpdateAppStateAction.updateOne(TState, toUpdate));
+  }
+
+  /// Update several objects at the root of the application state.
+  /// 
+  /// Note that you must specify your root application state type as a type parameter:
+  /// ```dart
+  /// context.updateAppStateMany<YourRootState>([oneObjectWithinYourRootState, anotherObjectWithinYourRootState]);
+  /// ```
+  void updateAppStateMany<TState extends AFAppStateArea>(List<Object> toUpdate) {
+    dispatcher.dispatch(AFUpdateAppStateAction.updateMany(TState, toUpdate));
+  } 
+
+  /// Open the drawer that you specified for your [Scaffold].
+  /// 
+  /// You may optionally specify the optional screenId (which must match the screen id of the drawer
+  /// you specified to the scaffold) and param.   The route parameter for a drawer is stored in the global
+  /// pool.    The first time your drawer is shown, it will use the [param] you pass to this function, or if you omit it,
+  /// then your [AFConnectedDrawer.createRouteParam]
+  /// method will be called to create it the very first time the drawer is shown.  Subsequently, it will
+  /// use the param you pass to this function, or if you omit it, the value that is already in the global route pool.
+  void openDrawer({
+    AFScreenID screenId,
+    AFRouteParam param,
+  }) {
+    _updateOptionalGlobalParam(screenId, param);
+    final scaffold = Scaffold.of(context);
+    if(scaffold == null) {
+      throw AFException("Could not find a scaffold, you probably need to add an AFBuilder just under the scaffold but above the widget that calls this function");
+    }
+    scaffold.openDrawer();
+  }
+
+  /// Open the end drawer that you specified for your [Scaffold].
+  void openEndDrawer({
+    AFScreenID screenId,
+    AFRouteParam param,
+  }) {
+    _updateOptionalGlobalParam(screenId, param);
+    final scaffold = Scaffold.of(context);
+    if(scaffold == null) {
+      throw AFException("Could not find a scaffold, you probably need to add an AFBuilder just under the scaffold but above the widget that calls this function");
+    }
+    scaffold.openEndDrawer();
+  }
+
+  void _updateOptionalGlobalParam(AFScreenID screenId, AFRouteParam param) {
+    if(param == null)  {
+      return;
+    }
+    dispatch(AFNavigateSetParamAction(
+      screen: screenId, 
+      param: param, route: AFNavigateRoute.routeGlobalPool
+    ));
+  }
+
+  /// Called to close a drawer.
+  /// 
+  /// Important: If you call this method, and a drawer isn't open, it will
+  /// pop the current screen and mess up the navigational state.   This method
+  /// is usally called from within a drawer, in response to a user action that should
+  /// close the drawer, and then do something else, like navigate to a new screen.
+  void closeDrawer() {
+    Navigator.pop(c);
+  }
+
+  /// Open a dialog with the specified screen id.   
+  /// 
+  /// The dialogs route param will be that specified by [param].
+  void openDialog({
+    @required AFScreenID screenId,
+    @required AFRouteParam param,
+    AFOnRouteParamDelegate onReturn,
+  }) async {
+    _updateOptionalGlobalParam(screenId, param);
+
+    final builder = AFibF.g.screenMap.findBy(screenId);
+    if(builder == null) {
+      throw AFException("The screen $screenId is not registered in the screen map");
+    }
+    final result = await showDialog<AFRouteParam>(
+      context: c,
+      builder: builder
+    );
+
+    if(onReturn != null) {
+      onReturn(result);
+    }
+  }
+  /// Closes the dialog, and returns the [returnValue] to the callback function that was
+  /// passed to [openDialog].
+  /// 
+  /// This is intended to be called from within an AFConnectedDialog.  If you call it 
+  /// and a dialog is not open, it will mess up the navigation state.
+  void closeDialog(AFRouteParam returnValue) {
+    Navigator.pop(context, returnValue); 
+  }
+
 
   /// Log to the appRender topic.  
   /// 

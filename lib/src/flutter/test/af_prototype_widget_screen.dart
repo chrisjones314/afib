@@ -80,7 +80,8 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFProtot
       dispatcher.dispatch(AFNavigateSetParamAction(
         id: id,
         screen: this.screenId, 
-        param: param)
+        param: param,
+        route: AFNavigateRoute.routeHierarchy)
       );
     });
     Widget resultWidget;

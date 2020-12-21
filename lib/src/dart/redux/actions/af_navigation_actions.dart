@@ -22,9 +22,32 @@ class AFNavigateAction extends AFActionWithKey {
   }): super(id: id);
 }
 
-class AFNavigateSetDrawerParamAction extends AFNavigateAction {
-  AFNavigateSetDrawerParamAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
+/// The two different 'route' types in AFib.
+enum AFNavigateRoute {
+  /// The primary hierarchical route, as you push screens using [AFNavigatePushAction],
+  /// this route gets longer/deeper.   As you pop them with [AFNavigatePopAction] it gets
+  /// shorter/shallower.
+  routeHierarchy,
+
+  /// The global pool just a pool of route paramaters organized by screen id.  This is used
+  /// for things like drawers that can be dragged onto the screen, dialogs and popups, and 
+  /// third party widgets that want to maintain a global root parameter across many different
+  /// screens.
+  routeGlobalPool
 }
+
+/// Action that changes the data associated with the current screen, but 
+/// does not change the screen itself.
+class AFNavigateSetParamAction extends AFNavigateAction {
+  final AFNavigateRoute route;
+  AFNavigateSetParamAction({
+    AFID id, 
+    @required AFScreenID screen, 
+    @required AFRouteParam param,
+    @required this.route 
+  }): super(id: id, screen: screen, param: param);
+}
+
 
 class AFNavigateActionWithReturn extends AFNavigateAction {
   final AFActionOnReturnDelegate onReturn;
@@ -50,12 +73,6 @@ class AFNavigateReplaceAllAction extends AFNavigateAction {
   factory AFNavigateReplaceAllAction.toStartupScreen({AFRouteParam param}) {
     return AFNavigateReplaceAllAction(screen: AFUIScreenID.screenStartupWrapper, param: param);
   }
-}
-
-/// Action that changes the data associated with the current screen, but 
-/// does not change the screen itself.
-class AFNavigateSetParamAction extends AFNavigateAction {
-  AFNavigateSetParamAction({AFID id, @required AFScreenID screen, @required AFRouteParam param}): super(id: id, screen: screen, param: param);
 }
 
 class AFNavigateSetPopupParamAction extends AFNavigateAction {

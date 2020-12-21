@@ -152,3 +152,5 @@ typedef AFCreateConceptualThemeDelegate = AFConceptualTheme Function(AFFundament
 typedef AFOverrideCreateThemeDataDelegate = ThemeData Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState, AFFundamentalThemeArea primary);
 
 typedef AFCreateDynamicDelegate = dynamic Function();
+
+typedef AFOnRouteParamDelegate = void Function(AFRouteParam param);

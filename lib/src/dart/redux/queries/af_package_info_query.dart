@@ -30,7 +30,7 @@ class AFPackageInfoQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TSt
   void finishAsyncWithResponse(AFFinishQuerySuccessContext<TState, AFPackageInfoState> context) {
     final packageInfo = context.r;
   
-    context.updateAppState1(packageInfo);
+    context.updateAppStateOne(packageInfo);
   }
 
   @override

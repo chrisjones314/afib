@@ -56,19 +56,19 @@ class AFFinishQueryContext<TState extends AFAppStateArea> {
   }
 
   /// Dispatches an action that updates the route parameter for the specified screen.
-  void updateScreenParam(AFScreenID screen, AFRouteParam param) {
-    dispatch(AFNavigateSetParamAction(screen: screen, param: param));
+  void updateRouteParam(AFScreenID screen, AFRouteParam param) {
+    dispatch(AFNavigateSetParamAction(screen: screen, param: param, route: AFNavigateRoute.routeHierarchy));
   }
 
   /// Dispatches an action that updates a single value in the app state area associated
   /// with the [TState] type parameter.
-  void updateAppState1(Object toIntegrate) {
+  void updateAppStateOne(Object toIntegrate) {
     dispatch(AFUpdateAppStateAction(area: TState, toIntegrate: [toIntegrate]));
   }
 
   /// Dispatches an action that updates several blaues in the app state area associated
   /// with the [TState] type parameter.
-  void updateAppStateN(List<Object> toIntegrate) {
+  void updateAppStateMany(List<Object> toIntegrate) {
     dispatch(AFUpdateAppStateAction(area: TState, toIntegrate: toIntegrate));
   }
 }

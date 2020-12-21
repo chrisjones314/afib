@@ -147,7 +147,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
       color: t.colorOnPrimary,
       textColor: t.colorSecondary,
       onPressed: () {
-          Navigator.pop(context.c);
+          context.closeDrawer();
           context.dispatch(AFNavigateExitTestAction());
       }
     ));
@@ -160,7 +160,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
         color: t.colorOnPrimary,
         textColor: t.colorSecondary,
         onPressed: () {
-            Navigator.pop(context.c);
+            context.closeDrawer();
             test.onDrawerReset(context.d);
         }
       )
@@ -367,7 +367,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
 
   void _onRun(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context, AFReusableTestID id) {
     final test = context.s.test;
-    Navigator.pop(context.c);
+    context.closeDrawer();
     Timer(Duration(seconds: 1), () async {            
       await test.onDrawerRun(context.d, context.s.testContext, context.s.testState, id, () {
         test.openTestDrawer(id);

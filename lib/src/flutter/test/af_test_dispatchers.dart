@@ -59,7 +59,11 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
     if(isTestAct) {
       main.dispatch(action);
     } else if(action is AFNavigateSetParamAction) {
-      processSetParam(action);
+      if(action.route == AFNavigateRoute.routeHierarchy) {
+        processSetParam(action);
+      } else {
+        main.dispatch(action);
+      }
       // change this into a set param action for the prototype.
     } 
 

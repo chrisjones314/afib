@@ -1,4 +1,6 @@
 
+import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
+import 'package:afib/src/dart/utils/af_context_dispatcher_mixin.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:logger/logger.dart';
@@ -18,7 +20,7 @@ import 'package:afib/src/flutter/utils/af_bottom_popup_layout.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_drawer.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as material;
 import 'package:flutter_redux/flutter_redux.dart';
 
 /// Used to dispatch actions to the store, with a level of indirection
@@ -190,15 +192,15 @@ class AFStoreConnectorData8<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> extends AFSt
 
 /// This common superclass makes it possible to treat all afib Widgets/screens
 /// similarly for testing and prototyping purposes.
-abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends StatelessWidget {
+abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends material.StatelessWidget {
   AFBuildableWidget({Key key}): super(key: key);
 
 
     /// Builds a Widget using the data extracted from the state.
-  Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context);
+  material.Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context);
 
   /// Wrap all four pieces of data needed during a build in a single utility object.
-  AFBuildContext createContext(BuildContext context, AFDispatcher dispatcher, TData data, TRouteParam param, TTheme theme) {
+  AFBuildContext createContext(material.BuildContext context, AFDispatcher dispatcher, TData data, TRouteParam param, TTheme theme) {
     return AFBuildContext<TData, TRouteParam, TTheme>(context, dispatcher, data, param, theme);
   }
 }
@@ -210,7 +212,7 @@ abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extend
 
   //--------------------------------------------------------------------------------------
   @override
-  Widget build(BuildContext context) {
+  material.Widget build(material.BuildContext context) {
     return StoreConnector<AFState, AFBuildContext>(
         converter: (store) {
           final context = _createNonBuildContext(store);
@@ -219,7 +221,7 @@ abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extend
         distinct: true,
         builder: (buildContext, dataContext) {
           if(dataContext == null) {
-            return Container(child: Text("Loading..."));
+            return material.Container(child: material.Text("Loading..."));
           }
 
           var screenIdRegister = this.screenIdForTest;          
@@ -286,7 +288,7 @@ abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extend
   TData createStateData(TState state);
 
   /// Builds a Widget using the data extracted from the state.
-  Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context);
+  material.Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context);
 
   /// Called to update the route parameter and re-render the screen.
   /// 
@@ -295,14 +297,13 @@ abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extend
   /// the ability to reference/update the AFRouteParam of their parent screen.
   /// This is here to create a single consistent mechanism for performing updates
   /// even in cases where that specific widget does not have its own route entry.
-  void updateParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id });
+  void updateRouteParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id });
 
-  /// Like [updateParamD], but takes a build context
+  /// Like [updateRouteParamD], but takes a build context
   /// rather than a dispatcher for convenience.
-  void updateParam(AFBuildContext context,TRouteParam revised, { AFID id }) {
-    return updateParamD(context.dispatcher, revised, id: id);
+  void updatRouteParam(AFBuildContext context,TRouteParam revised, { AFID id }) {
+    return updateRouteParamD(context.dispatcher, revised, id: id);
   }
-
 }
 
 /// Superclass for a screen Widget, which combined data from the store with data from
@@ -324,7 +325,7 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TData extends AF
   /// ### Example
   ///   final revisedParam = screenData.param.copyWith(someField: myRevisedValue);
   ///   updateParam(screenData, revisedParam);
-  void updateParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
+  void updateRouteParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
     dispatcher.dispatch(AFNavigateSetParamAction(
       id: id,
       screen: this.screenId, 
@@ -335,8 +336,8 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TData extends AF
 
   /// Utility method which updates the parameter, but takes a build context
   /// rather than a dispatcher for convenience
-  void updateParam(AFBuildContext context,TRouteParam revised, { AFID id }) {
-    return updateParamD(context.dispatcher, revised, id: id);
+  void updatRouteParam(AFBuildContext context,TRouteParam revised, { AFID id }) {
+    return updateRouteParamD(context.dispatcher, revised, id: id);
   }
 
   /// Find the route parameter for the specified named screen
@@ -354,33 +355,33 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TData extends AF
     return state.public.route?.routeEntryExists(this.screenId, includePrior: true);
   }
 
-  Widget createScaffold({
+  material.Widget createScaffold({
     Key key,
     @required AFBuildContext context,
-    PreferredSizeWidget appBar,
-    Widget drawer,
-    Widget body,
-    Widget bottomNavigationBar,
-    Widget floatingActionButton,
-    Color backgroundColor,
-    FloatingActionButtonLocation floatingActionButtonLocation,
-    FloatingActionButtonAnimator floatingActionButtonAnimator,
-    List<Widget> persistentFooterButtons,
-    Widget endDrawer,
-    Widget bottomSheet,
+    material.PreferredSizeWidget appBar,
+    material.Widget drawer,
+    material.Widget body,
+    material.Widget bottomNavigationBar,
+    material.Widget floatingActionButton,
+    material.Color backgroundColor,
+    material.FloatingActionButtonLocation floatingActionButtonLocation,
+    material.FloatingActionButtonAnimator floatingActionButtonAnimator,
+    List<material.Widget> persistentFooterButtons,
+    material.Widget endDrawer,
+    material.Widget bottomSheet,
     bool resizeToAvoidBottomPadding,
     bool resizeToAvoidBottomInset,
     bool primary = true,
     DragStartBehavior drawerDragStartBehavior = DragStartBehavior.start,
     bool extendBody = false,
     bool extendBodyBehindAppBar = false,
-    Color drawerScrimColor, 
+    material.Color drawerScrimColor, 
     double drawerEdgeDragWidth, 
     bool drawerEnableOpenDragGesture = true,
     bool endDrawerEnableOpenDragGesture = true
     
   }) {
-      return Scaffold(
+      return material.Scaffold(
         key: key,
         drawer: context.createDebugDrawerBegin(drawer),
         body: body,
@@ -454,7 +455,7 @@ abstract class AFConnectedWidgetWithParam<TState extends AFAppStateArea, TData e
   }
 
   /// Updates the parameter for the parent screen, rather than updating a parameter for our screen (which has no route entry).
-  void updateParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
+  void updateRouteParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
     updateParamDelegate(dispatcher, revised, id: id);
   }
 
@@ -465,7 +466,7 @@ abstract class AFConnectedWidgetWithParam<TState extends AFAppStateArea, TData e
 /// a modal overlay on top of an existing screen, and launched using a custom 
 /// AFPopupRoute
 abstract class AFPopupScreen<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TData, TRouteParam, TTheme> {
-  final Animation<double> animation;
+  final material.Animation<double> animation;
   final AFBottomPopupTheme theme;
   final AFCreateDataDelegate createDataDelegate;
   AFPopupScreen({
@@ -492,7 +493,7 @@ abstract class AFPopupScreen<TState extends AFAppStateArea, TData extends AFStor
     return this.createDataDelegate(state);
   }
 
-  void updateParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
+  void updateRouteParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
     dispatcher.dispatch(AFNavigateSetPopupParamAction(
       id: id,
       screen: this.screenId, 
@@ -501,26 +502,26 @@ abstract class AFPopupScreen<TState extends AFAppStateArea, TData extends AFStor
   }
 
   @override
-  Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context) {
+  material.Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context) {
     return buildPopupAnimation(context);
   }
 
-  Widget buildPopupAnimation(AFBuildContext<TData, TRouteParam, TTheme> context) {
-    return GestureDetector(
+  material.Widget buildPopupAnimation(AFBuildContext<TData, TRouteParam, TTheme> context) {
+    return material.GestureDetector(
       onTap: () {
         context.log?.d("OnTapGestureDetector");
       },
-      child: AnimatedBuilder(
+      child: material.AnimatedBuilder(
         animation: animation,
         builder: (ctx, child) {
           final local = AFBuildContext<TData, TRouteParam, TTheme>(ctx, context.d, context.s, context.p, context.t);
-          final bottomPadding = MediaQuery.of(local.c).padding.bottom;
-          return ClipRect(
-            child: CustomSingleChildLayout(
+          final bottomPadding = material.MediaQuery.of(local.c).padding.bottom;
+          return material.ClipRect(
+            child: material.CustomSingleChildLayout(
               delegate: AFBottomPopupLayout(animation.value, theme, bottomPadding: bottomPadding),
-              child: GestureDetector(
-                child: Material(
-                  color: theme.backgroundColor ?? Colors.white,
+              child: material.GestureDetector(
+                child: material.Material(
+                  color: theme.backgroundColor ?? material.Colors.white,
                   child: buildPopupContents(local, theme),
                 ),
               ),
@@ -531,7 +532,7 @@ abstract class AFPopupScreen<TState extends AFAppStateArea, TData extends AFStor
     );
   }
 
-  Widget buildPopupContents(AFBuildContext<TData, TRouteParam, TTheme> context, AFBottomPopupTheme theme);
+  material.Widget buildPopupContents(AFBuildContext<TData, TRouteParam, TTheme> context, AFBottomPopupTheme theme);
 }
 
 
@@ -545,23 +546,13 @@ abstract class AFConnectedScreenWithGlobalParam<TState extends AFAppStateArea, T
   @override
   TRouteParam findParam(AFState state) {
     var current = state.public.route.findGlobalParam(screenId);
-    if(current == null) {
-      current = createRouteParam(state);
-    }
     return current;
   }
-
-  /// Create the initial default route parameter for the screen.
-  /// 
-  /// This is necessary because the screen might appear without being explicitly 
-  /// pushed (this happens with drawers, for example).  If there is no entry in the 
-  /// global route param pool, this function is called to create one.
-  TRouteParam createRouteParam(AFState state);
 
   /// Update this screens route parameter in the global pool, rather than in the
   /// route hiearchy.
   @override
-  void updateParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
+  void updateRouteParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
     dispatcher.dispatch(AFNavigateSetParamAction(
       id: id,
       screen: this.screenId, 
@@ -574,38 +565,78 @@ abstract class AFConnectedScreenWithGlobalParam<TState extends AFAppStateArea, T
 /// Use this to connect a drawer to the store.
 /// 
 /// Drawers are special because the user can drag in from the left or right to open them.
-/// Consequently, you will need to override [AFConnectedScreenWithGlobalParam.createRouteParam],
+/// Consequently, you will need to override [AFConnectedScreenWithGlobalParam.createDefaultRouteParam],
 /// which will be used to create your route parameter if the drawer was dragged onto the
 /// screen without you explicitly calling [AFBuildContext.openDrawer].
 abstract class AFConnectedDrawer<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreenWithGlobalParam<TState, TData, TRouteParam, TTheme> {
   AFConnectedDrawer(
     AFScreenID screenId,
   ): super(screenId);
+
+  /// Look for this screens route parameter in the global pool, 
+  /// rather than in the navigational hierarchy.
+  @override
+  TRouteParam findParam(AFState state) {
+    var current = super.findParam(state);
+    // Note that because the user can slide a drawer on screen without the
+    // application explictly opening it, we need to have the drawer create a default
+    // route parameter if one does not already exist. 
+    if(current == null) {
+      current = createDefaultRouteParam(state);
+    }
+    return current;
+  }
+
+  /// Create the initial default route parameter for the screen.
+  /// 
+  /// Note that because the user can slide a drawer on screen without the
+  /// application explictly opening it, we need to have the drawer create a default
+  /// route parameter if one does not already exist. 
+  TRouteParam createDefaultRouteParam(AFState state);
+
 }
 
 
 /// Use this to connect a dialog to the store.
 /// 
-/// You can open a dialog with 
+/// You can open a dialog with [AFBuildContext.showDialog].
 abstract class AFConnectedDialog<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreenWithGlobalParam<TState, TData, TRouteParam, TTheme> {
   AFConnectedDialog(
     AFScreenID screenId,
   ): super(screenId);
 
   @override
-  Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context) {
+  material.Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context) {
     return buildDialogWithContext(context);
   }
 
-  Dialog buildDialogWithContext(AFBuildContext<TData, TRouteParam, TTheme> context);
+  material.Widget buildDialogWithContext(AFBuildContext<TData, TRouteParam, TTheme> context);
 }
+
+/// Use this to connect a bottom sheet to the store.
+/// 
+/// You can open a bottom sheet with [AFBuildContext.showBottomSheet]
+/// or [AFBuildContext.showModalBottomSheeet].
+abstract class AFConnectedBottomSheet<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreenWithGlobalParam<TState, TData, TRouteParam, TTheme> {
+  AFConnectedBottomSheet(
+    AFScreenID screenId,
+  ): super(screenId);
+
+  @override
+  material.Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context) {
+    return buildBottomSheetWithContext(context);
+  }
+
+  material.Widget buildBottomSheetWithContext(AFBuildContext<TData, TRouteParam, TTheme> context);
+}
+
 
 /// A utility class which you can use when you have a complex screen which passes the dispatcher,
 /// screen data and param to many functions, to make things more concise.  
 /// 
 /// The framework cannot pass you this itself because 
-class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> {
-  BuildContext context;
+class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> with AFContextDispatcherMixin {
+  material.BuildContext context;
   AFDispatcher dispatcher;
   TData storeData;
   TRouteParam param;
@@ -627,7 +658,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   AFDispatcher get d { return dispatcher; }
 
   /// Shorthand for accessing the flutter build context
-  BuildContext get c { return context; }
+  material.BuildContext get c { return context; }
 
   /// Dispatch an action or query.
   void dispatch(dynamic action) { dispatcher.dispatch(action); }
@@ -640,10 +671,10 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   /// context.updateRouteParam(this, revisedParam)
   /// ```
   /// from within a screen/widget, I recommend calling 
-  /// [AFConnectedWidgetBase.updateParam] directly in your screen.
+  /// [AFConnectedWidgetBase.updatRouteParam] directly in your screen.
   /// 
   /// ```dart
-  /// updateParam(context, revisedParam);
+  /// updateRouteParam(context, revisedParam);
   /// ```
   /// That said, there are other contexts, like when a query completes, 
   /// where you can call
@@ -653,7 +684,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   /// So, in a sense this is more consistent with that method.  They all function
   /// in the same way.
   void updateRouteParam(AFConnectedWidgetBase widget, TRouteParam revised, { AFID id }) {
-    widget.updateParam(this, revised, id: id);
+    widget.updatRouteParam(this, revised, id: id);
   }
 
   /// Update one object at the root of the application state.
@@ -681,7 +712,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   /// You may optionally specify the optional screenId (which must match the screen id of the drawer
   /// you specified to the scaffold) and param.   The route parameter for a drawer is stored in the global
   /// pool.    The first time your drawer is shown, it will use the [param] you pass to this function, or if you omit it,
-  /// then your [AFConnectedDrawer.createRouteParam]
+  /// then your [AFConnectedDrawer.createDefaultRouteParam]
   /// method will be called to create it the very first time the drawer is shown.  Subsequently, it will
   /// use the param you pass to this function, or if you omit it, the value that is already in the global route pool.
   void openDrawer({
@@ -689,7 +720,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
     AFRouteParam param,
   }) {
     _updateOptionalGlobalParam(screenId, param);
-    final scaffold = Scaffold.of(context);
+    final scaffold = material.Scaffold.of(context);
     if(scaffold == null) {
       throw AFException("Could not find a scaffold, you probably need to add an AFBuilder just under the scaffold but above the widget that calls this function");
     }
@@ -702,7 +733,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
     AFRouteParam param,
   }) {
     _updateOptionalGlobalParam(screenId, param);
-    final scaffold = Scaffold.of(context);
+    final scaffold = material.Scaffold.of(context);
     if(scaffold == null) {
       throw AFException("Could not find a scaffold, you probably need to add an AFBuilder just under the scaffold but above the widget that calls this function");
     }
@@ -726,41 +757,186 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   /// is usally called from within a drawer, in response to a user action that should
   /// close the drawer, and then do something else, like navigate to a new screen.
   void closeDrawer() {
-    Navigator.pop(c);
+    AFibF.g.doMiddlewareNavigation( (navState) {
+      material.Navigator.pop(c);
+    });
   }
 
-  /// Open a dialog with the specified screen id.   
+  /// Open a dialog with the specified screen id and param
   /// 
-  /// The dialogs route param will be that specified by [param].
-  void openDialog({
-    @required AFScreenID screenId,
-    @required AFRouteParam param,
-    AFOnRouteParamDelegate onReturn,
+  /// You must either specify a screen id and param, or you
+  /// can specify an AFNavigatePushAction that contains those 
+  /// two items instead.
+  /// 
+  /// Note that you will close the bottom sheet inside your bottomsheet screen
+  /// using [AFBuildContext.closeDialog] and pass it a return value.  You
+  /// can capture that return value by passing in an onReturn delegate to this
+  /// function.
+  /// 
+  /// A very common pattern is to pass back the route parameter for the bottom 
+  /// sheet, which looks like:
+  /// ```dart
+  /// context.closeDialog(context.p);
+  /// ```
+  /// inside the dialog screen.
+  void showDialog({
+    AFScreenID screenId,
+    AFRouteParam param,
+    AFNavigatePushAction navigate,
+    AFReturnValueDelegate onReturn,
+    bool barrierDismissible = true,
+    material.Color barrierColor,
+    bool useSafeArea = true,
+    bool useRootNavigator = true,
+    material.RouteSettings routeSettings
   }) async {
+    if(navigate != null) {
+      assert(screenId == null);
+      assert(param == null);
+      screenId = navigate.screen;
+      param = navigate.param;
+    }
+
     _updateOptionalGlobalParam(screenId, param);
 
     final builder = AFibF.g.screenMap.findBy(screenId);
     if(builder == null) {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
-    final result = await showDialog<AFRouteParam>(
+    final result = await material.showDialog<AFRouteParam>(
       context: c,
-      builder: builder
+      builder: builder,
+      barrierDismissible: barrierDismissible,
+      barrierColor: barrierColor,
+      useSafeArea: useSafeArea,
+      useRootNavigator: useRootNavigator,
+      routeSettings: routeSettings
     );
 
+    AFibF.g.testOnlyDialogRegisterReturn(screenId, result);
     if(onReturn != null) {
       onReturn(result);
     }
   }
+
+  /// Show a modal bottom sheet.
+  /// 
+  /// Note that you will close the bottom sheet inside your bottomsheet screen
+  /// using [AFBuildContext.closeBottomSheet] and pass it a return value.  You
+  /// can capture that return value by passing in an onReturn delegate to this
+  /// function.
+  /// 
+  /// A very common pattern is to pass back the route parameter for the bottom 
+  /// sheet, which looks like:
+  /// ```dart
+  /// context.closeBottomSheet(context.p);
+  /// ```
+  /// inside the bottom sheet screen.
+  void showModalBottomSheet({
+    AFScreenID screenId,
+    AFRouteParam param,
+    AFNavigatePushAction navigate,
+    AFReturnValueDelegate onReturn,
+    material.Color backgroundColor,
+    double elevation,
+    material.ShapeBorder shape,
+    material.Clip clipBehavior,
+    material.Color barrierColor,
+    bool isScrollControlled = false,
+    bool useRootNavigator = false,
+    bool isDismissible = true,
+    bool enableDrag = true,
+    material.RouteSettings routeSettings,  
+  }) async {
+    if(navigate != null) {
+      assert(screenId == null);
+      assert(param == null);
+      screenId = navigate.screen;
+      param = navigate.param;
+    }
+
+    _updateOptionalGlobalParam(screenId, param);
+
+    final builder = AFibF.g.screenMap.findBy(screenId);
+    if(builder == null) {
+      throw AFException("The screen $screenId is not registered in the screen map");
+    }
+
+    final result = await material.showModalBottomSheet<AFRouteParam>(
+      context: c,
+      builder: builder,
+      backgroundColor: backgroundColor,
+      elevation: elevation,
+      shape: shape,
+      clipBehavior: clipBehavior,
+      barrierColor: barrierColor,
+      isScrollControlled: isScrollControlled,
+      useRootNavigator: useRootNavigator,
+      isDismissible: isDismissible,
+      enableDrag: enableDrag,
+      routeSettings: routeSettings,
+    );
+    if(onReturn != null) {
+      onReturn(result);
+    }
+  }
+
+  /// Shows a bottom sheet
+  /// 
+  /// See also [showModalBottomSheet].
+  void showBottomSheet({
+    AFScreenID screenId,
+    AFRouteParam param,
+    AFNavigatePushAction navigate,
+    material.Color backgroundColor,
+    double elevation,
+    material.ShapeBorder shape,
+    material.Clip clipBehavior,
+  }) async {
+    if(navigate != null) {
+      assert(screenId == null);
+      assert(param == null);
+      screenId = navigate.screen;
+      param = navigate.param;
+    }
+
+    _updateOptionalGlobalParam(screenId, param);
+
+    final builder = AFibF.g.screenMap.findBy(screenId);
+    if(builder == null) {
+      throw AFException("The screen $screenId is not registered in the screen map");
+    }
+
+    material.Scaffold.of(c).showBottomSheet<AFRouteParam>(
+      builder,
+      backgroundColor: backgroundColor,
+      elevation: elevation,
+      shape: shape,
+      clipBehavior: clipBehavior,
+    );
+  }
+
   /// Closes the dialog, and returns the [returnValue] to the callback function that was
-  /// passed to [openDialog].
+  /// passed to [showDialog].
   /// 
   /// This is intended to be called from within an AFConnectedDialog.  If you call it 
   /// and a dialog is not open, it will mess up the navigation state.
-  void closeDialog(AFRouteParam returnValue) {
-    Navigator.pop(context, returnValue); 
+  void closeDialog(dynamic returnValue) {
+    AFibF.g.doMiddlewareNavigation( (navState) {
+      material.Navigator.pop(context, returnValue); 
+    });
   }
 
+  /// Closes the dialog, and returns the [returnValue] to the callback function that was
+  /// passed to [showDialog].
+  /// 
+  /// This is intended to be called from within an AFConnectedDialog.  If you call it 
+  /// and a dialog is not open, it will mess up the navigation state.
+  void closeBottomSheet(dynamic returnValue) {
+    AFibF.g.doMiddlewareNavigation( (navState) {
+      material.Navigator.pop(context, returnValue); 
+    });
+  }
 
   /// Log to the appRender topic.  
   /// 
@@ -779,15 +955,21 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
     return hash2(param.hashCode, storeData.hashCode);
   }
 
-  Widget createDebugDrawerBegin(Widget beginDrawer) {
+  /// As long as you are calling [AFConnectedScreen.createScaffold], you don't need
+  /// to worry about this, it will be done for you.
+  material.Widget createDebugDrawerBegin(material.Widget beginDrawer) {
     return createDebugDrawer(beginDrawer, AFScreenPrototypeTest.testDrawerSideBegin);
   }
 
-  Widget createDebugDrawerEnd(Widget endDrawer) {
+  /// As long as you are calling [AFConnectedScreen.createScaffold], you don't need
+  /// to worry about this, it will be done for you.
+  material.Widget createDebugDrawerEnd(material.Widget endDrawer) {
     return createDebugDrawer(endDrawer, AFScreenPrototypeTest.testDrawerSideEnd);
   }
 
-  Widget createDebugDrawer(Widget drawer, int testDrawerSide) {
+  /// As long as you are calling [AFConnectedScreen.createScaffold], you don't need
+  /// to worry about this, it will be done for you.
+  material.Widget createDebugDrawer(material.Widget drawer, int testDrawerSide) {
     final store = AFibF.g.storeInternalOnly;
     final state = store.state;
     final testState = state.testState;
@@ -800,6 +982,18 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
     return drawer;
   }
 
-
+  /// This rebuilds the entire theme state. 
+  /// 
+  /// It  should almost never be used, if you are using
+  /// it regularly, something is wrong.   It should be used only if:
+  /// 
+  /// 1. Your fundamental theme state depends on some setting in your application state (for example, a compact mode setting)
+  /// 2. The user has just changed that value in the application state (e.g. from the settings area of the app)
+  /// 
+  /// In that case, the theme state won't refresh automatically, and you need to call this method to force
+  /// it to refresh.
+  void updateRebuildThemeState() {
+    dispatch(AFRebuildThemeState());
+  }
 }
 

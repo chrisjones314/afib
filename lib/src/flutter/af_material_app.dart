@@ -8,9 +8,11 @@ import 'package:overlay_support/overlay_support.dart';
 
 class AFNavigatorObserver extends NavigatorObserver {
   void didPop(Route route, Route previousRoute) {
-    if(!AFibF.g.withinMiddewareNavigation) {
-      AFibF.g.correctForFlutterPopNavigation();
-    }    
+    // with the notion of global route parameters for 
+    // things like drawers, I don't think this is necessary.
+    //if(!AFibF.g.withinMiddewareNavigation) {
+    // AFibF.g.correctForFlutterPopNavigation();
+    //}    
   }
 
   void didPush(Route route, Route previousRoute) {

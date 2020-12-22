@@ -44,7 +44,7 @@ class AFUI {
     AFWidgetID wid = AFUIWidgetID.buttonBack,
     IconData icon = Icons.arrow_back,
     String tooltip = "Back",
-    AFShouldContinueCheckDelegate shouldContinueCheck,   
+    AFShouldContinueCheckDelegateObsolete shouldContinueCheck,   
   }) {
     return IconButton(
         key: AFUI.keyForWID(wid),      
@@ -104,7 +104,7 @@ class AFUI {
   }
 
 
-  static AFShouldContinueCheckDelegate standardShouldContinueAlertCheck({
+  static AFShouldContinueCheckDelegateObsolete standardShouldContinueAlertCheck({
     @required AFBuildContext context,
     @required bool shouldAsk,
     bool isTestContext = false,

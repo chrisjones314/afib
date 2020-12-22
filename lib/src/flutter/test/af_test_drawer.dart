@@ -87,7 +87,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
   }
 
   //--------------------------------------------------------------------------------------
-  AFTestDrawerRouteParam createRouteParam(AFState state) {
+  AFTestDrawerRouteParam createDefaultRouteParam(AFState state) {
     return AFTestDrawerRouteParam.createOncePerScreen(AFTestDrawerRouteParam.viewTest);
   }
 
@@ -196,7 +196,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
       textColor: colorText,
       shape: RoundedRectangleBorder(),
       onPressed: () {
-        updateParam(context, context.p.copyWith(view: view));
+        updatRouteParam(context, context.p.copyWith(view: view));
       },
     );
   }
@@ -354,7 +354,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
     final content = ExpansionPanelList(
       expansionCallback: (index, isExpanded) {
         final area = areaList[index];
-        updateParam(context, context.p.reviseExpanded(area, expanded: !isExpanded));
+        updatRouteParam(context, context.p.reviseExpanded(area, expanded: !isExpanded));
       },
       children: panels,
     );

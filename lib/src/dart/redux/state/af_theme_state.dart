@@ -1,4 +1,5 @@
 
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:afib/afib_dart.dart';
@@ -1344,7 +1345,11 @@ class AFConceptualTheme extends AFTheme {
     return EdgeInsets.fromLTRB(l, t, r, b);
   }
     
-  Widget childStandardBackButton(AFDispatcher dispatcher, {
+  /// Creates a standard back button, which navigates up the screen hierarchy.
+  /// 
+  /// The back button can optionally display a dialog which checks whether the user
+  /// should continue, see [standardShouldContinueAlertCheck] for more.
+  Widget childStandardBackButton(AFBuildContext context, {
     AFWidgetID wid = AFUIWidgetID.buttonBack,
     dynamic iconIdOrWidget = AFUIThemeID.iconBack,
     dynamic iconColor,
@@ -1357,12 +1362,53 @@ class AFConceptualTheme extends AFTheme {
         icon: icon(iconIdOrWidget, iconColor: iconColor, iconSize: iconSize),
         tooltip: translate(tooltip),
         onPressed: () async {
-          if(shouldContinueCheck == null || await shouldContinueCheck() == AFUIThemeID.shouldContinue) {
-            dispatcher.dispatch(AFNavigatePopAction(id: wid));
+          if(shouldContinueCheck == null || await shouldContinueCheck() == AFShouldContinue.yesContinue) {
+            context.dispatchNavigate(AFNavigatePopAction(id: wid));
           }
         }
     );
   }
+  
+  /// 
+  AFShouldContinueCheckDelegate standardShouldContinueAlertCheck({
+    @required AFBuildContext context,
+    @required bool shouldAsk,
+    AFScreenID screen,
+    AFRouteParam param,
+    AFNavigatePushAction navigate
+  }) {
+    return () {
+        final completer = Completer<AFShouldContinue>();
+        if(navigate != null) {
+          screen = navigate.screen;
+          param = navigate.param;
+        }
+
+        assert(screen != null);
+        assert(param != null);
+
+        if(shouldAsk && !AFibD.config.isTestContext) {
+          // set up the buttons
+          // show the dialog
+          context.showDialog(
+            screenId: screen,
+            param: param,
+            onReturn: (param) {
+              if(param is! AFShouldContinueRouteParam) {
+                throw AFException("The dialog for standardShouldContinueAlertCheck must return an AFShouldContinueRouteParam");
+              }
+              final AFShouldContinueRouteParam should = param;
+              completer.complete(should.shouldContinue);
+            }
+          );
+        } else {
+          completer.complete(AFShouldContinue.yesContinue);
+        }
+        
+        return completer.future;    
+    };
+  }
+
 
   /// Replaces ListTile.divideTiles, including a key based on [widBase]
   /// for each one.
@@ -1445,6 +1491,10 @@ class AFThemeState {
     return copyWith(
       fundamentals: revised,
       conceptuals: AFibF.g.createConceptualThemes(revised));
+  }
+
+  AFThemeState reviseRebuildAll() {
+    return AFibF.g.initializeThemeState();
   }
 
   AFThemeState copyWith({

@@ -264,14 +264,13 @@ class AFRouteStateSegments {
     result.write("]");
 
     if(prior.isNotEmpty) {
-      result.write("PRIOR=[");
+      result.write(" PRIOR=[");
       for(final segment in prior) {
         result.write(segment?.screen?.code);
         result.write(' / ');
       }
       result.write("]");
     }
-
 
     return result.toString();
   }
@@ -480,6 +479,7 @@ class AFRouteState {
   AFRouteState setGlobalPoolParam(AFScreenID screen, AFRouteParam param) {
     final revised = Map<AFScreenID, AFRouteParam>.from(drawerParams);
     revised[screen] = param;
+    AFibD.logRoute?.d("Set global param for $screen to $param");
     return copyWith(drawerParams: revised);
   }
 
@@ -515,7 +515,9 @@ class AFRouteState {
       drawerParams: drawerParams ?? this.drawerParams,
     );
 
-    AFibD.logRoute?.d("Revised Route: $revised");
+    if(screenSegs != null) {
+      AFibD.logRoute?.d("Revised Nav Hierarchy: $revised");
+    }
     return revised;
   }
 
@@ -523,10 +525,6 @@ class AFRouteState {
   String toString() {
     final result = StringBuffer();
     result.write(screenSegments.toString());
-    if(popupSegments.isNotEmpty) {
-      result.write("POPUP PATH ");
-      result.write(popupSegments.toString());
-    }
     return result.toString();
   }
 

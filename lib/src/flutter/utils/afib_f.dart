@@ -81,6 +81,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   final testExtractors = <AFExtractWidgetAction>[];
   final testApplicators = <AFApplyWidgetAction>[];
   final widgetsBindingObserver = AFWidgetsBindingObserver();
+  final testOnlyDialogReturn = <AFScreenID, dynamic>{};
 
   AFScreenMap _afPrototypeScreenMap;
   AFScreenID forcedStartupScreen;
@@ -187,6 +188,10 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 
   bool get withinMiddewareNavigation {
     return navDepth > 0;
+  }
+
+  void testOnlyDialogRegisterReturn(AFScreenID screen, dynamic result) {
+    this.testOnlyDialogReturn[screen] = result;
   }
 
   /// Used internally in tests to find widgets on the screen.  Not for public use.

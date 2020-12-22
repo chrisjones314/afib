@@ -26,6 +26,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
 
+typedef AFTestScreenExecuteDelegate = Future<void> Function(AFScreenTestExecute ste);
+typedef AFVerifyReturnValueDelegate = void Function(dynamic value);
+
 /// A superclass that declares all the methods which select specific widgets.
 /// This is used by [AFScreenWidgetSelectorCollector] to determine which widgets
 /// it needs to track for each test.
@@ -433,6 +436,27 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
   /// wait for a render.
   Future<void> tapClosePopup(dynamic selector) async {
     return tap(selector);
+  }
+
+  /// Tap on the specified widget, then expect a dialog which you can interact with via the onDialog parameter.
+  Future<void> tapExpectDialog(dynamic selectorTap, final AFScreenID dialogScreenId, AFTestScreenExecuteDelegate onDialog, {
+    AFVerifyReturnValueDelegate verifyReturn
+  }) async {
+    await tap(selectorTap);
+    await pauseForRender();
+    
+    await this.underScreen(dialogScreenId, () async {
+      await onDialog(this);
+      return keepSynchronous();
+    });
+
+    final result = AFibF.g.testOnlyDialogReturn[dialogScreenId];
+    if(verifyReturn != null) {
+      verifyReturn(result);
+    }
+    
+    return null;
+
   }
 
   /// Expect that a [Chip] is selected or not selected.

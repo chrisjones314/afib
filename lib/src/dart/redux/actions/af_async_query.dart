@@ -7,6 +7,7 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
+import 'package:afib/src/dart/utils/af_context_dispatcher_mixin.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
@@ -29,7 +30,7 @@ class AFStartQueryContext<TResponse, TError> {
 
 }
 
-class AFFinishQueryContext<TState extends AFAppStateArea> {
+class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatcherMixin {
   final AFDispatcher dispatcher;
   final AFState state;
 
@@ -74,7 +75,7 @@ class AFFinishQueryContext<TState extends AFAppStateArea> {
 }
 
 
-class AFFinishQuerySuccessContext<TState extends AFAppStateArea, TResponse> extends AFFinishQueryContext<TState> {
+class AFFinishQuerySuccessContext<TState extends AFAppStateArea, TResponse> extends AFFinishQueryContext<TState>  {
   final TResponse response;
   AFFinishQuerySuccessContext({
     AFDispatcher dispatcher, 

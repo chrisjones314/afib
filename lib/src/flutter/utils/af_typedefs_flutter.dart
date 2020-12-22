@@ -2,6 +2,7 @@
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
+import 'package:afib/src/dart/utils/af_should_continue_route_param.dart';
 import 'package:afib/src/flutter/core/af_app_extension_context.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
 import 'package:afib/src/flutter/test/af_unit_tests.dart';
@@ -19,6 +20,7 @@ import 'package:afib/src/flutter/test/af_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_data_registry.dart';
 import 'package:afib/src/flutter/utils/af_custom_popup_route.dart';
+
 
 /// Delegate used to populate the screen map used to associate keys with screens.
 typedef AFInitScreenMapDelegate = void Function(AFScreenMap map);
@@ -42,7 +44,8 @@ typedef AFInitScreenTestsDelegate = void Function(AFSingleScreenTestDefinitionCo
 typedef AFInitWorkflowStateTestsDelegate = void Function(AFWorkflowTestDefinitionContext definitions);
 
 /// Delegate used to perform an asynchronous operation (like an alert, and say whether it should continue).
-typedef AFShouldContinueCheckDelegate = Future<int> Function();
+typedef AFShouldContinueCheckDelegate = Future<AFShouldContinue> Function();
+typedef AFShouldContinueCheckDelegateObsolete = Future<int> Function();
 
 /// Delegate used to update the route param
 typedef AFUpdateParamDelegate<TRouteParam> = Function(AFDispatcher dispatcher, TRouteParam param, { AFID id });
@@ -153,4 +156,4 @@ typedef AFOverrideCreateThemeDataDelegate = ThemeData Function(AFFundamentalDevi
 
 typedef AFCreateDynamicDelegate = dynamic Function();
 
-typedef AFOnRouteParamDelegate = void Function(AFRouteParam param);
+typedef AFReturnValueDelegate = void Function(dynamic param);

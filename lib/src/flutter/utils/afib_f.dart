@@ -82,6 +82,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   final testApplicators = <AFApplyWidgetAction>[];
   final widgetsBindingObserver = AFWidgetsBindingObserver();
   final testOnlyDialogReturn = <AFScreenID, dynamic>{};
+  final testOnlyBottomSheetReturn = <AFScreenID, dynamic>{};
 
   AFScreenMap _afPrototypeScreenMap;
   AFScreenID forcedStartupScreen;
@@ -191,7 +192,15 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   }
 
   void testOnlyDialogRegisterReturn(AFScreenID screen, dynamic result) {
-    this.testOnlyDialogReturn[screen] = result;
+    if(AFibD.config.isTestContext) {
+      this.testOnlyDialogReturn[screen] = result;
+    }
+  }
+
+  void testOnlyBottomSheetRegisterReturn(AFScreenID screen, dynamic result) {
+    if(AFibD.config.isTestContext) {
+      this.testOnlyBottomSheetReturn[screen] = result;
+    }
   }
 
   /// Used internally in tests to find widgets on the screen.  Not for public use.

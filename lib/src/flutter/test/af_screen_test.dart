@@ -459,6 +459,27 @@ abstract class AFScreenTestExecute extends AFScreenTestWidgetSelector {
 
   }
 
+  /// Tap on the specified widget, then expect a dialog which you can interact with via the onSheet parameter.
+  Future<void> tapExpectModalBottomSheet(dynamic selectorTap, final AFScreenID dialogScreenId, AFTestScreenExecuteDelegate onSheet, {
+    AFVerifyReturnValueDelegate verifyReturn
+  }) async {
+    await tap(selectorTap);
+    await pauseForRender();
+    
+    await this.underScreen(dialogScreenId, () async {
+      await onSheet(this);
+      return keepSynchronous();
+    });
+
+    final result = AFibF.g.testOnlyBottomSheetReturn[dialogScreenId];
+    if(verifyReturn != null) {
+      verifyReturn(result);
+    }
+    
+    return null;
+
+  }
+
   /// Expect that a [Chip] is selected or not selected.
   /// 
   /// Note that in addition to the standard options, 

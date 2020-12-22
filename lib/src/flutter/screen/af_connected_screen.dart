@@ -876,6 +876,9 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
       enableDrag: enableDrag,
       routeSettings: routeSettings,
     );
+
+    AFibF.g.testOnlyBottomSheetRegisterReturn(screenId, result);
+
     if(onReturn != null) {
       onReturn(result);
     }

@@ -20,6 +20,7 @@ class AFBuilder<TData extends AFStoreConnectorData, TRouteParam extends AFRouteP
       parentContext.d,
       parentContext.s,
       parentContext.p,
+      parentContext.paramWithChildren,
       parentContext.t);
       
     return builder(childContextAF);

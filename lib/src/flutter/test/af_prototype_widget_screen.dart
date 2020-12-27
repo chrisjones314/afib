@@ -90,7 +90,7 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFProtot
       final dispatcher = AFWidgetScreenTestDispatcher(context: testContext, main: context.d, originalParam: context.p);
 
       final themeChild = sourceWidget.findTheme(context.s.themeState);
-      final childContext = sourceWidget.createContext(context.c, dispatcher, testData, paramChild, themeChild);
+      final childContext = sourceWidget.createContext(context.c, dispatcher, testData, paramChild, null, themeChild);
       resultWidget = sourceWidget.buildWithContext(childContext);
     } else {
       resultWidget = sourceWidget;

@@ -200,8 +200,8 @@ abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam
   material.Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context);
 
   /// Wrap all four pieces of data needed during a build in a single utility object.
-  AFBuildContext createContext(material.BuildContext context, AFDispatcher dispatcher, TData data, TRouteParam param, TTheme theme) {
-    return AFBuildContext<TData, TRouteParam, TTheme>(context, dispatcher, data, param, theme);
+  AFBuildContext createContext(material.BuildContext context, AFDispatcher dispatcher, TData data, TRouteParam param, AFRouteParamWithChildren paramWithChildren, TTheme theme) {
+    return AFBuildContext<TData, TRouteParam, TTheme>(context, dispatcher, data, param, paramWithChildren, theme);
   }
 }
 
@@ -233,7 +233,7 @@ abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extend
             AFibF.g.registerTestScreen(screenIdRegister, buildContext);
             AFibD.logTest?.d("Rebuilding screen $runtimeType/$screenIdRegister with param ${dataContext.p}");
           }
-          final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p, dataContext.theme);
+          final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p, dataContext.paramWithChildren, dataContext.theme);
           final widgetResult = buildWithContext(withContext);
           return widgetResult;
         }
@@ -247,12 +247,13 @@ abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extend
   AFBuildContext<TData, TRouteParam, TTheme> _createNonBuildContext(AFStore store) {
     final data = createStateDataAF(store.state);
     final param = findParam(store.state);
+    final paramWithChildren = findParamWithChildren(store.state);
     if(param == null && !routeEntryExists(store.state)) {
       return null;
     }
     final theme = findTheme(store.state.public.themes);
 
-    final context = createContext(null, createDispatcher(store), data, param, theme);
+    final context = createContext(null, createDispatcher(store), data, param, paramWithChildren, theme);
     return context;
   }
 
@@ -262,6 +263,9 @@ abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extend
 
   /// Find the route param for this screen. 
   AFRouteParam findParam(AFState state) { return null; }
+
+  /// Find the route param for this screen. 
+  AFRouteParamWithChildren findParamWithChildren(AFState state) { return null; }
 
   TTheme findTheme(AFThemeState themes) {
     return themes.findByType(TTheme);
@@ -301,7 +305,7 @@ abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extend
 
   /// Like [updateRouteParamD], but takes a build context
   /// rather than a dispatcher for convenience.
-  void updatRouteParam(AFBuildContext context,TRouteParam revised, { AFID id }) {
+  void updateRouteParam(AFBuildContext context,TRouteParam revised, { AFID id }) {
     return updateRouteParamD(context.dispatcher, revised, id: id);
   }
 }
@@ -324,7 +328,7 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TData extends AF
   /// 
   /// ### Example
   ///   final revisedParam = screenData.param.copyWith(someField: myRevisedValue);
-  ///   updateParam(screenData, revisedParam);
+  ///   updateRouteParam(screenData, revisedParam);
   void updateRouteParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
     dispatcher.dispatch(AFNavigateSetParamAction(
       id: id,
@@ -336,7 +340,7 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TData extends AF
 
   /// Utility method which updates the parameter, but takes a build context
   /// rather than a dispatcher for convenience
-  void updatRouteParam(AFBuildContext context,TRouteParam revised, { AFID id }) {
+  void updateRouteParam(AFBuildContext context,TRouteParam revised, { AFID id }) {
     return updateRouteParamD(context.dispatcher, revised, id: id);
   }
 
@@ -406,6 +410,69 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TData extends AF
       );
   }
 }
+
+abstract class AFConnectedWidgetWithParent<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedWidgetBase<TState, TData, TRouteParam, TTheme> { 
+  final AFScreenID parentScreen;
+  final AFWidgetID widChild;
+  final AFNavigateRoute route;
+  
+  AFConnectedWidgetWithParent({
+    @required this.parentScreen,
+    @required this.widChild,
+    this.route = AFNavigateRoute.routeHierarchy,
+  }): super(key: AFUI.keyForWID(widChild));
+
+
+  AFScreenID get screenIdForTest {
+    return this.parentScreen;
+  }
+
+  /// Find the route param for this child widget.
+  /// 
+  /// The parent screen must have a route param of type AFRouteParamWithChildren.
+  /// Which this widget used to find its specific child route param in that screen's
+  /// overall route param.
+  AFRouteParam findParam(AFState state) { 
+    return findChildParam(state, this.parentScreen, this.widChild);
+  }
+
+  static AFRouteParam findChildParam(AFState state, AFScreenID screen, AFWidgetID widChild) {
+    final route = state.public.route;
+    final paramParent = route?.findParamFor(screen);
+    if(paramParent is! AFRouteParamWithChildren) {
+      throw AFException("The parent screen must use AFRouteParamWithChildren as its route parameter");
+    }
+    final AFRouteParamWithChildren pp = paramParent;
+    return pp.findByWidget(widChild);
+  }  
+
+  void updateRouteParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
+    updateChildRouteParam(dispatcher, revised, this.parentScreen, this.widChild, this.route, id: id);
+  }
+
+  static void updateChildRouteParam(AFDispatcher dispatcher, AFRouteParam revised, AFScreenID parentScreen, AFWidgetID widChild, AFNavigateRoute route, { AFID id } ) {
+    /// TODO: I don't think this is test-friendly.
+    final state = AFibF.g.storeInternalOnly.state;
+    final routeState = state.public.route;
+    final paramParent = route == AFNavigateRoute.routeHierarchy ? routeState?.findParamFor(parentScreen) : routeState.findGlobalParam(parentScreen);
+    if(paramParent is! AFRouteParamWithChildren) {
+      throw AFException("The parent screen must use AFRouteParamWithChildren as its route parameter");
+    }
+
+    final AFRouteParamWithChildren pp = paramParent;
+    final revisedParent = pp.reviseChild(widChild, revised);    
+    dispatcher.dispatch(AFNavigateSetParamAction(
+      id: id,
+      screen: parentScreen, 
+      param: revisedParent,
+      route: route,
+    ));
+
+  }
+
+}
+
+
 
 /// Use this to connect a Widget to the store.  
 /// 
@@ -514,7 +581,7 @@ abstract class AFPopupScreen<TState extends AFAppStateArea, TData extends AFStor
       child: material.AnimatedBuilder(
         animation: animation,
         builder: (ctx, child) {
-          final local = AFBuildContext<TData, TRouteParam, TTheme>(ctx, context.d, context.s, context.p, context.t);
+          final local = AFBuildContext<TData, TRouteParam, TTheme>(ctx, context.d, context.s, context.p, context.paramWithChildren, context.t);
           final bottomPadding = material.MediaQuery.of(local.c).padding.bottom;
           return material.ClipRect(
             child: material.CustomSingleChildLayout(
@@ -533,6 +600,46 @@ abstract class AFPopupScreen<TState extends AFAppStateArea, TData extends AFStor
   }
 
   material.Widget buildPopupContents(AFBuildContext<TData, TRouteParam, TTheme> context, AFBottomPopupTheme theme);
+}
+
+abstract class AFConnectedScreenWithConnectedChildren<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TData, TRouteParam, TTheme> {
+  final AFWidgetID primaryParam;
+  final AFNavigateRoute route;
+
+  AFConnectedScreenWithConnectedChildren({
+    @required AFScreenID screenId,
+    @required this.primaryParam,
+    this.route = AFNavigateRoute.routeHierarchy,
+  }): super(screenId);
+
+  AFRouteParam findParam(AFState state) { 
+    return AFConnectedWidgetWithParent.findChildParam(state, this.screenId, this.primaryParam);
+  }
+  
+  void updateRouteParamD(AFDispatcher dispatcher, AFRouteParam revised, { AFID id }) {
+    AFConnectedWidgetWithParent.updateChildRouteParam(dispatcher, revised, this.screenId, this.primaryParam, this.route, id: id);
+  }
+
+  /// Find the route param for this screen. 
+  AFRouteParamWithChildren findParamWithChildren(AFState state) { 
+    final route = state.public.route;
+    final param = route?.findParamFor(this.screenId);
+    if(param is! AFRouteParamWithChildren) {
+      throw AFException("When using AFConnectedScreenWithConnectedChildren, you must create an AFRouteParamWithChildren parameter and use that when you navigate to the screen");
+    }
+
+    return param;   
+  }
+
+  void updateRouteParamWithChildren(AFBuildContext context, AFRouteParamWithChildren revised, { AFID id }) {
+    context.dispatcher.dispatch(AFNavigateSetParamAction(
+      id: id,
+      screen: this.screenId, 
+      param: revised,
+      route: AFNavigateRoute.routeHierarchy
+    ));
+  }
+
 }
 
 
@@ -640,10 +747,11 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   AFDispatcher dispatcher;
   TData storeData;
   TRouteParam param;
+  AFRouteParamWithChildren paramWithChildren;
   AFScreenPrototypeTest screenTest;
   TTheme theme;
 
-  AFBuildContext(this.context, this.dispatcher, this.storeData, this.param, this.theme);
+  AFBuildContext(this.context, this.dispatcher, this.storeData, this.param, this.paramWithChildren, this.theme,);
 
   /// Shorthand for accessing the route param.
   TRouteParam get p { return param; }
@@ -671,7 +779,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   /// context.updateRouteParam(this, revisedParam)
   /// ```
   /// from within a screen/widget, I recommend calling 
-  /// [AFConnectedWidgetBase.updatRouteParam] directly in your screen.
+  /// [AFConnectedWidgetBase.updateRouteParam] directly in your screen.
   /// 
   /// ```dart
   /// updateRouteParam(context, revisedParam);
@@ -684,7 +792,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   /// So, in a sense this is more consistent with that method.  They all function
   /// in the same way.
   void updateRouteParam(AFConnectedWidgetBase widget, TRouteParam revised, { AFID id }) {
-    widget.updatRouteParam(this, revised, id: id);
+    widget.updateRouteParam(this, revised, id: id);
   }
 
   /// Update one object at the root of the application state.
@@ -950,7 +1058,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   }
 
   bool operator==(dynamic o) {
-    final result = (o is AFBuildContext<TData, TRouteParam, TTheme> && param == o.param && storeData == o.storeData && theme == o.theme);
+    final result = (o is AFBuildContext<TData, TRouteParam, TTheme> && param == o.param && paramWithChildren == o.paramWithChildren && storeData == o.storeData && theme == o.theme);
     return result;
   }
 
@@ -998,5 +1106,69 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   void updateRebuildThemeState() {
     dispatch(AFRebuildThemeState());
   }
+
+
+  List<material.Widget> childrenRenderConnected<TChildRouteParam extends AFRouteParam>({
+    @required  material.Widget Function(AFWidgetID widChild) render,
+    int Function(TChildRouteParam, TChildRouteParam) sort,
+  }) {
+    final result = <material.Widget>[];
+    if(paramWithChildren == null) {
+      throw AFException("paramWithChildren was null while rendering connected children.   Most likely your parent screen did not derive from AFConnectedScreenWithChildren");
+    }
+    var children = paramWithChildren.children;
+    if(sort != null) {
+      final sortable = <AFRouteParamChild>[];
+      for(final child in children) {
+        if(child.param is TChildRouteParam) {
+          sortable.add(child);
+        }
+      }
+      sortable.sort((l, r) {
+        return sort(l.param, r.param);
+      });      
+      children = sortable;
+    }
+    for(final child in children) {
+      if(child.param is TChildRouteParam) {
+        final widChild = child.widgetId;
+        final widget = render(widChild);
+        if(widget is! AFConnectedWidgetWithParent) {
+          throw AFException("When rendering children of a AFConnectedScreenWithConnectedChildren, the children must be subclasses of AFConnectedWidgetWithParent");
+        }
+        result.add(widget);
+      }
+    }    
+    return result;
+  }
+
+  ///
+  void updateAddConnectedChild({
+    @required AFScreenID screen,
+    @required AFWidgetID widget, 
+    @required AFRouteParam param,
+    AFNavigateRoute route = AFNavigateRoute.routeHierarchy
+  }) {
+    dispatch(AFNavigateAddConnectedChildAction(
+      screen: screen,
+      widget: widget,
+      param: param,
+      route: route,
+    ));
+  }
+
+  void updateRemoveConnectedChild({
+    @required AFScreenID screen,
+    @required AFWidgetID widget,    
+    AFNavigateRoute route = AFNavigateRoute.routeHierarchy
+  }) {
+    dispatch(AFNavigateRemoveConnectedChildAction(
+      screen: screen,
+      widget: widget,
+      route: route,
+    ));
+  }
+
+
 }
 

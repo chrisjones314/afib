@@ -18,7 +18,9 @@ final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigateSetParamAction>(_navSetParam),
   TypedReducer<AFRouteState, AFNavigateExitTestAction>(_navExitTest),
   TypedReducer<AFRouteState, AFNavigatePopFromFlutterAction>(_navPopFromFlutter),
-  TypedReducer<AFRouteState, AFShutdownOngoingQueriesAction>(_shutdownQueries)
+  TypedReducer<AFRouteState, AFShutdownOngoingQueriesAction>(_shutdownQueries),
+  TypedReducer<AFRouteState, AFNavigateAddConnectedChildAction>(_addConnectedChild),
+  TypedReducer<AFRouteState, AFNavigateRemoveConnectedChildAction>(_removeConnectedChild),
 ]);
 
 //---------------------------------------------------------------------------
@@ -86,4 +88,14 @@ AFRouteState _navExitTest(AFRouteState state, AFNavigateExitTestAction action) {
 AFRouteState _shutdownQueries(AFRouteState state, AFShutdownOngoingQueriesAction action) {
   AFibF.g.shutdownOutstandingQueries();
   return state;
+}
+
+//---------------------------------------------------------------------------
+AFRouteState _addConnectedChild(AFRouteState state, AFNavigateAddConnectedChildAction action) {
+  return state.addConnectedChild(action.screen, action.widget, action.route, action.param);
+}
+
+//---------------------------------------------------------------------------
+AFRouteState _removeConnectedChild(AFRouteState state, AFNavigateRemoveConnectedChildAction action) {
+  return state.removeConnectedChild(action.screen, action.widget, action.route);
 }

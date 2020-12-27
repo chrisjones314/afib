@@ -196,7 +196,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
       textColor: colorText,
       shape: RoundedRectangleBorder(),
       onPressed: () {
-        updatRouteParam(context, context.p.copyWith(view: view));
+        updateRouteParam(context, context.p.copyWith(view: view));
       },
     );
   }
@@ -354,7 +354,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
     final content = ExpansionPanelList(
       expansionCallback: (index, isExpanded) {
         final area = areaList[index];
-        updatRouteParam(context, context.p.reviseExpanded(area, expanded: !isExpanded));
+        updateRouteParam(context, context.p.reviseExpanded(area, expanded: !isExpanded));
       },
       children: panels,
     );

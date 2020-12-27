@@ -1,5 +1,6 @@
 
 import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
+import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
@@ -473,6 +474,38 @@ class AFRouteState {
       return setGlobalPoolParam(screen, param);
     }
   }
+
+  /// Replaces the data on the current leaf element without changing the segments
+  /// in the route.
+  AFRouteState addConnectedChild(AFScreenID screen, AFWidgetID widget, AFNavigateRoute route, AFRouteParam param) {
+    // TODO: change so route is handles consistently in all cases.
+    assert(route == AFNavigateRoute.routeHierarchy);
+    final segment = screenSegments.findSegmentFor(screen);
+    final p = segment.param;
+    if(p is! AFRouteParamWithChildren) {
+      throw AFException("Cannot add connected child unless the route parameter is AFRouteParamWithChildren");
+    }
+    final AFRouteParamWithChildren pwc = p;
+    final revisedParam = pwc.reviseAddChild(widget, param);
+    return _reviseScreen(screenSegments.setParam(screen, revisedParam));    
+  }
+
+  /// Replaces the data on the current leaf element without changing the segments
+  /// in the route.
+  AFRouteState removeConnectedChild(AFScreenID screen, AFWidgetID widget, AFNavigateRoute route) {
+    // TODO: change so route is handles consistently in all cases.
+    assert(route == AFNavigateRoute.routeHierarchy);
+
+    final segment = screenSegments.findSegmentFor(screen);
+    final p = segment.param;
+    if(p is! AFRouteParamWithChildren) {
+      throw AFException("Cannot remove connected child unless the route parameter is AFRouteParamWithChildren");
+    }
+    final AFRouteParamWithChildren pwc = p;
+    final revisedParam = pwc.reviseRemoveChild(widget);
+    return _reviseScreen(screenSegments.setParam(screen, revisedParam));    
+  }
+
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.

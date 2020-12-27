@@ -107,7 +107,7 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppStateArea, AF
     final AFConnectedWidgetBase screen = screenMap.createFor(test.screenId);
     final themeChild = screen.findTheme(context.s.themeState);
 
-    final childContext = screen.createContext(context.c, dispatcher, testData, paramChild, themeChild);
+    final childContext = screen.createContext(context.c, dispatcher, testData, paramChild, null, themeChild);
     return screen.buildWithContext(childContext);
     
   }

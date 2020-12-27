@@ -182,3 +182,26 @@ class AFNavigatePopToAction extends AFNavigateActionWithReturnData {
     worksInPrototypeMode: worksInPrototypeMode
   );
 }
+
+class AFNavigateAddConnectedChildAction extends AFNavigateAction {
+  final AFNavigateRoute route;
+  final AFWidgetID widget;
+  AFNavigateAddConnectedChildAction({
+    AFID id, 
+    @required AFScreenID screen, 
+    @required AFRouteParam param, 
+    @required this.route,
+    @required this.widget,
+  }): super(id: id, screen: screen, param: param); 
+}
+
+class AFNavigateRemoveConnectedChildAction extends AFNavigateAction {
+  final AFNavigateRoute route;
+  final AFWidgetID widget;
+  AFNavigateRemoveConnectedChildAction({
+    AFID id, 
+    @required AFScreenID screen, 
+    @required this.route,
+    @required this.widget,
+  }): super(id: id, screen: screen, param: null); 
+}

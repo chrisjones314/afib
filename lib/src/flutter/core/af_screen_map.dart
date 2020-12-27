@@ -11,6 +11,7 @@ class AFScreenMap {
   AFScreenID _startupScreenId;
   AFCreateRouteParamDelegate _createStartupScreenParam;
   final Map<AFScreenID, WidgetBuilder> _screens = <AFScreenID, WidgetBuilder>{};
+  final Map<AFWidgetID, WidgetBuilder> _widgets = <AFWidgetID, WidgetBuilder>{};
 
   AFScreenMap() {
     screen(AFUIScreenID.screenStartupWrapper, (_) => AFStartupScreenWrapper());
@@ -69,5 +70,9 @@ class AFScreenMap {
   /// Returns the current mapping of routes to screens.
   Map<AFID, WidgetBuilder> get screenMap {
     return _screens;
+  }
+
+  void widget(AFWidgetID widget, WidgetBuilder widgetBuilder) {
+    _widgets[widget] = widgetBuilder;
   }
 }

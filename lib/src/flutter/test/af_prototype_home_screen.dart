@@ -179,12 +179,12 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
       
     }
 
-    updatRouteParam(context, context.p.copyWith(results: results, view: AFPrototypeHomeScreenParam.viewResults));
+    updateRouteParam(context, context.p.copyWith(results: results, view: AFPrototypeHomeScreenParam.viewResults));
   }
 
   void _updateFilter(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context, String value) {
     final revised = context.p.reviseFilter(value);
-    updatRouteParam(context, revised);
+    updateRouteParam(context, revised);
   }
 
   Widget _buildFilterAndRunControls(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context, List<AFScreenPrototypeTest> tests) {
@@ -228,7 +228,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
           child: t.childText("Search Results", textColor: colorSearchText),
           color: colorSearch,
           onPressed: () {
-            updatRouteParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewFilter));
+            updateRouteParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewFilter));
           },
         )
       ));
@@ -238,7 +238,7 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
           child: t.childText("Test Results", textColor: colorResultsText),
           color: colorResults,
           onPressed: () {
-            updatRouteParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewResults));
+            updateRouteParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewResults));
           }
       )));
 

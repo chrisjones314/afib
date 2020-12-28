@@ -22,6 +22,7 @@ final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigateAddConnectedChildAction>(_addConnectedChild),
   TypedReducer<AFRouteState, AFNavigateRemoveConnectedChildAction>(_removeConnectedChild),
   TypedReducer<AFRouteState, AFNavigateSortConnectedChildrenAction>(_sortConnectedChildren),
+  TypedReducer<AFRouteState, AFNavigateSetChildParamAction>(_setChildParam),
 ]);
 
 //---------------------------------------------------------------------------
@@ -93,15 +94,22 @@ AFRouteState _shutdownQueries(AFRouteState state, AFShutdownOngoingQueriesAction
 
 //---------------------------------------------------------------------------
 AFRouteState _addConnectedChild(AFRouteState state, AFNavigateAddConnectedChildAction action) {
-  return state.addConnectedChild(action.screen, action.widget, action.route, action.param);
+  return state.addConnectedChild(action.screen, action.widget, action.param);
 }
 
 //---------------------------------------------------------------------------
 AFRouteState _removeConnectedChild(AFRouteState state, AFNavigateRemoveConnectedChildAction action) {
-  return state.removeConnectedChild(action.screen, action.widget, action.route);
+  return state.removeConnectedChild(action.screen, action.widget);
 }
 
 //---------------------------------------------------------------------------
 AFRouteState _sortConnectedChildren(AFRouteState state, AFNavigateSortConnectedChildrenAction action) {
-  return state.sortConnectedChildren(action.screen, action.route, action.sort, action.typeToSort);
+  return state.sortConnectedChildren(action.screen, action.sort, action.typeToSort);
 }
+
+//---------------------------------------------------------------------------
+AFRouteState _setChildParam(AFRouteState state, AFNavigateSetChildParamAction action) {
+  return state.setConnectedChildParam(action.screen, action.widget, action.param);
+}
+
+

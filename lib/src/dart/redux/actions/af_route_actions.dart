@@ -184,37 +184,42 @@ class AFNavigatePopToAction extends AFNavigateActionWithReturnData {
 }
 
 class AFNavigateAddConnectedChildAction extends AFNavigateAction {
-  final AFNavigateRoute route;
   final AFWidgetID widget;
   AFNavigateAddConnectedChildAction({
     AFID id, 
     @required AFScreenID screen, 
     @required AFRouteParam param, 
-    @required this.route,
     @required this.widget,
   }): super(id: id, screen: screen, param: param); 
 }
 
 class AFNavigateRemoveConnectedChildAction extends AFNavigateAction {
-  final AFNavigateRoute route;
   final AFWidgetID widget;
   AFNavigateRemoveConnectedChildAction({
     AFID id, 
     @required AFScreenID screen, 
-    @required this.route,
     @required this.widget,
   }): super(id: id, screen: screen, param: null); 
 }
 
 class AFNavigateSortConnectedChildrenAction extends AFNavigateAction {
-  final AFNavigateRoute route;
   final AFTypedSortDelegate sort;
   final Type typeToSort;
   AFNavigateSortConnectedChildrenAction({
     AFID id, 
     @required AFScreenID screen, 
-    @required this.route,
     @required this.sort,
     @required this.typeToSort,
   }): super(id: id, screen: screen, param: null); 
 }
+
+class AFNavigateSetChildParamAction extends AFNavigateAction {
+  final AFID widget;
+  AFNavigateSetChildParamAction({
+    AFID id, 
+    @required AFScreenID screen, 
+    @required this.widget,
+    @required AFRouteParam param,
+  }): super(id: id, screen: screen, param: param); 
+}
+

@@ -207,6 +207,7 @@ abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam
 
 /// A screen that uses data from the store but not from the route.
 abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFBuildableWidget<TData, TRouteParam, TTheme> {
+    
   //--------------------------------------------------------------------------------------
   AFConnectedWidgetBase({Key key}): super(key: key);
 
@@ -314,7 +315,9 @@ abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extend
 /// the route in order to render itself.
 abstract class AFConnectedScreen<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedWidgetBase<TState, TData, TRouteParam, TTheme> {
   final AFScreenID screenId;
-  AFConnectedScreen(this.screenId, { Key key }): super(key: key);
+    final AFNavigateRoute route;
+
+  AFConnectedScreen(this.screenId, { Key key, this.route = AFNavigateRoute.routeHierarchy }): super(key: key);
 
   AFScreenID get screenIdForTest {
     return screenId;
@@ -334,7 +337,7 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TData extends AF
       id: id,
       screen: this.screenId, 
       param: revised,
-      route: AFNavigateRoute.routeHierarchy
+      route: route
     ));
   }
 
@@ -414,12 +417,10 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TData extends AF
 abstract class AFConnectedWidgetWithParent<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedWidgetBase<TState, TData, TRouteParam, TTheme> { 
   final AFScreenID parentScreen;
   final AFWidgetID widChild;
-  final AFNavigateRoute route;
   
   AFConnectedWidgetWithParent({
     @required this.parentScreen,
     @required this.widChild,
-    this.route = AFNavigateRoute.routeHierarchy,
   }): super(key: AFUI.keyForWID(widChild));
 
 
@@ -447,25 +448,15 @@ abstract class AFConnectedWidgetWithParent<TState extends AFAppStateArea, TData 
   }  
 
   void updateRouteParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
-    updateChildRouteParam(dispatcher, revised, this.parentScreen, this.widChild, this.route, id: id);
+    updateChildRouteParam(dispatcher, revised, this.parentScreen, this.widChild, id: id);
   }
 
-  static void updateChildRouteParam(AFDispatcher dispatcher, AFRouteParam revised, AFScreenID parentScreen, AFID widChild, AFNavigateRoute route, { AFID id } ) {
-    /// TODO: I don't think this is test-friendly.
-    final state = AFibF.g.storeInternalOnly.state;
-    final routeState = state.public.route;
-    final paramParent = route == AFNavigateRoute.routeHierarchy ? routeState?.findParamFor(parentScreen) : routeState.findGlobalParam(parentScreen);
-    if(paramParent is! AFRouteParamWithChildren) {
-      throw AFException("The parent screen must use AFRouteParamWithChildren as its route parameter");
-    }
-
-    final AFRouteParamWithChildren pp = paramParent;
-    final revisedParent = pp.reviseChild(widChild, revised);    
-    dispatcher.dispatch(AFNavigateSetParamAction(
+  static void updateChildRouteParam(AFDispatcher dispatcher, AFRouteParam revised, AFScreenID parentScreen, AFID widChild, { AFID id } ) {
+    dispatcher.dispatch(AFNavigateSetChildParamAction(
       id: id,
       screen: parentScreen, 
-      param: revisedParent,
-      route: route,
+      param: revised,
+      widget: widChild
     ));
 
   }
@@ -603,19 +594,18 @@ abstract class AFPopupScreen<TState extends AFAppStateArea, TData extends AFStor
 }
 
 abstract class AFConnectedScreenWithConnectedChildren<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TData, TRouteParam, TTheme> {
-  final AFNavigateRoute route;
 
   AFConnectedScreenWithConnectedChildren({
     @required AFScreenID screenId,
-    this.route = AFNavigateRoute.routeHierarchy,
-  }): super(screenId);
+    AFNavigateRoute route = AFNavigateRoute.routeHierarchy,
+  }): super(screenId, route: route);
 
   AFRouteParam findParam(AFState state) { 
     return AFConnectedWidgetWithParent.findChildParam(state, this.screenId, this.screenId);
   }
   
   void updateRouteParamD(AFDispatcher dispatcher, AFRouteParam revised, { AFID id }) {
-    AFConnectedWidgetWithParent.updateChildRouteParam(dispatcher, revised, this.screenId, this.screenId, this.route, id: id);
+    AFConnectedWidgetWithParent.updateChildRouteParam(dispatcher, revised, this.screenId, this.screenId, id: id);
   }
 
   /// Find the route param for this screen. 
@@ -634,7 +624,7 @@ abstract class AFConnectedScreenWithConnectedChildren<TState extends AFAppStateA
       id: id,
       screen: this.screenId, 
       param: revised,
-      route: AFNavigateRoute.routeHierarchy
+      route: route,
     ));
   }
 
@@ -644,7 +634,7 @@ abstract class AFConnectedScreenWithConnectedChildren<TState extends AFAppStateA
 abstract class AFConnectedScreenWithGlobalParam<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TData, TRouteParam, TTheme> {
   AFConnectedScreenWithGlobalParam(
     AFScreenID screenId,
-  ): super(screenId);
+  ): super(screenId, route: AFNavigateRoute.routeGlobalPool);
 
   /// Look for this screens route parameter in the global pool, 
   /// rather than in the navigational hierarchy
@@ -1105,28 +1095,37 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
     dispatch(AFRebuildThemeState());
   }
 
+  /// Renders a single connected child.
+  /// 
+  /// If your [AFRouteParamWithChildren] contains exactly one value of type [TChildRouteParam], you can 
+  /// render it using this method.
+  material.Widget childRenderConnected<TChildRouteParam extends AFRouteParam>({
+    @required AFRenderChildByIDDelegate render
+  }) {
+    final children = paramWithChildren.children.where( (test) => test.param is TChildRouteParam);
+    if(children.isEmpty || children.length > 1) {
+      throw AFException("You can only use childRenderConnected if there is exactly one child route param of the specified type, there were ${children.length}");
+    }
 
+    final widChild = children.toList().first.widgetId;
+    final widget = render(widChild);
+    if(widget is! AFConnectedWidgetWithParent) {
+      throw AFException("When rendering children of a AFConnectedScreenWithConnectedChildren, the children must be subclasses of AFConnectedWidgetWithParent");
+    }
+    return widget;
+  }
+
+
+  /// Renders a list of connected children, one for reach child parameter in
+  /// the parent's [AFRouteParamWithChildren] that also has the type [TChildRouteParam].
   List<material.Widget> childrenRenderConnected<TChildRouteParam extends AFRouteParam>({
-    @required  material.Widget Function(AFWidgetID widChild) render,
-    int Function(TChildRouteParam, TChildRouteParam) sort,
+    @required  AFRenderChildByIDDelegate render
   }) {
     final result = <material.Widget>[];
     if(paramWithChildren == null) {
       throw AFException("paramWithChildren was null while rendering connected children.   Most likely your parent screen did not derive from AFConnectedScreenWithChildren");
     }
     var children = paramWithChildren.children;
-    if(sort != null) {
-      final sortable = <AFRouteParamChild>[];
-      for(final child in children) {
-        if(child.param is TChildRouteParam) {
-          sortable.add(child);
-        }
-      }
-      sortable.sort((l, r) {
-        return sort(l.param, r.param);
-      });      
-      children = sortable;
-    }
     for(final child in children) {
       if(child.param is TChildRouteParam) {
         final widChild = child.widgetId;
@@ -1140,41 +1139,50 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
     return result;
   }
 
-  ///
+  /// Returns the number of connected children that have a route parameter
+  /// of the specified type.
+  int childrenCountConnected<TChildRouteParam extends AFRouteParam>() {
+    return paramWithChildren.countOfChildren<TChildRouteParam>();
+  }
+
+  /// Adds a new connected child into the [AFRouteParamWithChildren] of this screen.
+  /// 
+  /// The parent screen will automatically re-render with the new child.
   void updateAddConnectedChild({
     @required AFScreenID screen,
     @required AFWidgetID widget, 
-    @required AFRouteParam param,
-    AFNavigateRoute route = AFNavigateRoute.routeHierarchy
+    @required AFRouteParam param
   }) {
     dispatch(AFNavigateAddConnectedChildAction(
       screen: screen,
       widget: widget,
-      param: param,
-      route: route,
+      param: param
     ));
   }
 
+  /// Removes the connected child with the specified widget id from the [AFRouteParamWithChildren] of this screen.
+  /// 
+  /// The parent screen will automatically re-render.
   void updateRemoveConnectedChild({
     @required AFScreenID screen,
-    @required AFWidgetID widget,    
-    AFNavigateRoute route = AFNavigateRoute.routeHierarchy
+    @required AFWidgetID widget
   }) {
     dispatch(AFNavigateRemoveConnectedChildAction(
       screen: screen,
       widget: widget,
-      route: route,
     ));
   }
 
+  /// Changes the sort order for connected children of thype [TChildRouteParam] in the [AFRouteParamWithChildren] of this screen.
+  /// 
+  /// Note that the sort order is stored in the state and is maintained dynamically.   If you add a new connected
+  /// child later, the parent screen will automatically re-sort using the previously specified sort order.
   void updateSortConnectedChildren<TChildRouteParam extends AFRouteParam>({
     @required AFScreenID screen,
-    @required AFTypedSortDelegate<TChildRouteParam> sort,
-    AFNavigateRoute route = AFNavigateRoute.routeHierarchy
+    @required AFTypedSortDelegate<TChildRouteParam> sort
   }) {
     dispatch(AFNavigateSortConnectedChildrenAction(
       screen: screen,
-      route: route,
       sort: (l, r) {
         return sort(l, r);
       },

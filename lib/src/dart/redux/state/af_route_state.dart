@@ -309,12 +309,12 @@ class AFRouteStateSegments {
 class AFRouteState {
   final AFRouteStateSegments popupSegments;
   final AFRouteStateSegments screenSegments;
-  final Map<AFScreenID, AFRouteParam> drawerParams;
+  final Map<AFScreenID, AFRouteParam> globalPool;
 
   AFRouteState({
     @required this.screenSegments, 
     @required this.popupSegments,
-    @required this.drawerParams,
+    @required this.globalPool,
   });  
 
   /// Creates the default initial state.
@@ -325,7 +325,7 @@ class AFRouteState {
     final screenSegs = AFRouteStateSegments(active: screen, prior: empty);
     final popupSegs  = AFRouteStateSegments(active: empty, prior: empty);
     final drawerParams = <AFScreenID, AFRouteParam>{};
-    return AFRouteState(screenSegments: screenSegs, popupSegments: popupSegs, drawerParams: drawerParams);
+    return AFRouteState(screenSegments: screenSegs, popupSegments: popupSegs, globalPool: drawerParams);
   }
 
   bool isActiveScreen(AFScreenID screen, { bool includePopups }) {
@@ -373,6 +373,9 @@ class AFRouteState {
   /// in the search.  This is useful when the final segement has been popped off the route,
   /// but still needs to be included in the search.
   AFRouteParam findParamFor(AFScreenID screen, { bool includePrior = true }) {
+    if(globalPool != null && globalPool.containsKey(screen)) {
+      return globalPool[screen];
+    }
     if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
       screen = AFUIScreenID.screenStartupWrapper;
     }
@@ -385,7 +388,7 @@ class AFRouteState {
   /// This may return null, in which case you should use the drawer's createRouteParam method
   /// to create an initial value.
   AFRouteParam findGlobalParam(AFScreenID screen) {
-    return drawerParams[screen];
+    return globalPool[screen];
   }
 
   bool routeEntryExists(AFScreenID screen, { bool includePrior = true }) {
@@ -478,49 +481,55 @@ class AFRouteState {
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteState addConnectedChild(AFScreenID screen, AFWidgetID widget, AFNavigateRoute route, AFRouteParam param) {
-    // TODO: change so route is handles consistently in all cases.
-    assert(route == AFNavigateRoute.routeHierarchy);
-    final segment = screenSegments.findSegmentFor(screen);
-    final p = segment.param;
-    if(p is! AFRouteParamWithChildren) {
-      throw AFException("Cannot add connected child unless the route parameter is AFRouteParamWithChildren");
-    }
-    final AFRouteParamWithChildren pwc = p;
-    final revisedParam = pwc.reviseAddChild(widget, param);
-    return _reviseScreen(screenSegments.setParam(screen, revisedParam));    
+  AFRouteState addConnectedChild(AFScreenID screen, AFWidgetID widget, AFRouteParam param) {
+    return _reviseParamWithChildren(screen, (pwc) => pwc.reviseAddChild(widget, param));
   }
 
   /// Removes the route parameter for the specified child widget from the screen.
-  AFRouteState removeConnectedChild(AFScreenID screen, AFWidgetID widget, AFNavigateRoute route) {
-    // TODO: change so route is handles consistently in all cases.
-    assert(route == AFNavigateRoute.routeHierarchy);
-
-    final segment = screenSegments.findSegmentFor(screen);
-    final p = segment.param;
-    if(p is! AFRouteParamWithChildren) {
-      throw AFException("Cannot remove connected child unless the route parameter is AFRouteParamWithChildren");
-    }
-    final AFRouteParamWithChildren pwc = p;
-    final revisedParam = pwc.reviseRemoveChild(widget);
-    return _reviseScreen(screenSegments.setParam(screen, revisedParam));    
+  AFRouteState removeConnectedChild(AFScreenID screen, AFWidgetID widget) {
+    return _reviseParamWithChildren(screen, (pwc) => pwc.reviseRemoveChild(widget));
   }
 
-  AFRouteState sortConnectedChildren(AFScreenID screen, AFNavigateRoute route, AFTypedSortDelegate sort, Type typeToSort) {
-    final segment = screenSegments.findSegmentFor(screen);
-    final p = segment.param;
+  AFRouteState setConnectedChildParam(AFScreenID screen, AFID widget, AFRouteParam param) {
+    return _reviseParamWithChildren(screen, (pwc) => pwc.reviseChild(widget, param));
+  }
+
+  
+  AFRouteState sortConnectedChildren(AFScreenID screen, AFTypedSortDelegate sort, Type typeToSort) {
+    return _reviseParamWithChildren(screen, (pwc) => pwc.reviseSortChildren(typeToSort, sort));
+  }
+
+  AFRouteState _reviseParamWithChildren(AFScreenID screen, AFRouteParamWithChildren Function(AFRouteParamWithChildren original) revise) { 
+    final p = _findParamInHierOrPool(screen);
     if(p is! AFRouteParamWithChildren) {
-      throw AFException("Cannot remove connected child unless the route parameter is AFRouteParamWithChildren");
+      throw AFException("Expected screen $screen to have a route parameter withi type AFRouteParamWithChildren");
     }
     final AFRouteParamWithChildren pwc = p;
-    final revisedParam = pwc.reviseSortChildren(typeToSort, sort);
-    return _reviseScreen(screenSegments.setParam(screen, revisedParam));    
+    final revisedParam = revise(pwc);
+    return _setParamInHierOrPool(screen, revisedParam);
+  }
+
+  AFRouteState _setParamInHierOrPool(AFScreenID screen, AFRouteParam revised) {
+    if(globalPool.containsKey(screen)) {
+      return setGlobalPoolParam(screen, revised);
+    } else {
+      return _reviseScreen(screenSegments.setParam(screen, revised));    
+    }
+  }
+
+  AFRouteParam _findParamInHierOrPool(AFScreenID screen) {
+    var p = globalPool[screen];
+    if(p == null) {
+      final segment = screenSegments.findSegmentFor(screen);
+      p = segment?.param;
+    }
+    return p;
   }
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
   AFRouteState setGlobalPoolParam(AFScreenID screen, AFRouteParam param) {
-    final revised = Map<AFScreenID, AFRouteParam>.from(drawerParams);
+    final revised = Map<AFScreenID, AFRouteParam>.from(globalPool);
     revised[screen] = param;
     AFibD.logRoute?.d("Set global param for $screen to $param");
     return copyWith(drawerParams: revised);
@@ -555,7 +564,7 @@ class AFRouteState {
     final revised = AFRouteState(
       screenSegments: screenSegs ?? this.screenSegments,
       popupSegments: popupSegs ?? this.popupSegments,
-      drawerParams: drawerParams ?? this.drawerParams,
+      globalPool: drawerParams ?? this.globalPool,
     );
 
     if(screenSegs != null) {
@@ -563,6 +572,7 @@ class AFRouteState {
     }
     return revised;
   }
+
 
   //---------------------------------------------------------------------------------------
   String toString() {

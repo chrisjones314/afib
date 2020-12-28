@@ -157,3 +157,5 @@ typedef AFOverrideCreateThemeDataDelegate = ThemeData Function(AFFundamentalDevi
 typedef AFCreateDynamicDelegate = dynamic Function();
 
 typedef AFReturnValueDelegate = void Function(dynamic param);
+
+typedef AFRenderChildByIDDelegate = Widget Function(AFWidgetID widChild);

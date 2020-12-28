@@ -10,7 +10,7 @@ export "src/dart/redux/actions/af_action_with_key.dart";
 export "src/dart/redux/actions/af_app_state_actions.dart";
 export "src/dart/redux/actions/af_async_query.dart";
 export "src/dart/redux/actions/af_deferred_query.dart";
-export "src/dart/redux/actions/af_navigation_actions.dart";
+export 'src/dart/redux/actions/af_route_actions.dart';
 export "src/dart/redux/middleware/af_async_queries.dart";
 export "src/dart/redux/queries/af_package_info_query.dart";
 export "src/dart/redux/state/af_app_state.dart";

@@ -205,3 +205,16 @@ class AFNavigateRemoveConnectedChildAction extends AFNavigateAction {
     @required this.widget,
   }): super(id: id, screen: screen, param: null); 
 }
+
+class AFNavigateSortConnectedChildrenAction extends AFNavigateAction {
+  final AFNavigateRoute route;
+  final AFTypedSortDelegate sort;
+  final Type typeToSort;
+  AFNavigateSortConnectedChildrenAction({
+    AFID id, 
+    @required AFScreenID screen, 
+    @required this.route,
+    @required this.sort,
+    @required this.typeToSort,
+  }): super(id: id, screen: screen, param: null); 
+}

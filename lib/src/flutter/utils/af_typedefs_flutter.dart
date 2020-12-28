@@ -9,7 +9,7 @@ import 'package:afib/src/flutter/test/af_unit_tests.dart';
 import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
 import 'package:flutter/material.dart';
 
-import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
+import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';

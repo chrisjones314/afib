@@ -1,6 +1,6 @@
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
-import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
+import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 
 mixin AFContextDispatcherMixin {
 

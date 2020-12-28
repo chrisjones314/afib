@@ -6,7 +6,7 @@ import 'package:quiver/core.dart';
 import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
-import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
+import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';

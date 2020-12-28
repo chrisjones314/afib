@@ -1,5 +1,6 @@
 
-import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
+import 'package:afib/afib_dart.dart';
+import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
@@ -490,8 +491,7 @@ class AFRouteState {
     return _reviseScreen(screenSegments.setParam(screen, revisedParam));    
   }
 
-  /// Replaces the data on the current leaf element without changing the segments
-  /// in the route.
+  /// Removes the route parameter for the specified child widget from the screen.
   AFRouteState removeConnectedChild(AFScreenID screen, AFWidgetID widget, AFNavigateRoute route) {
     // TODO: change so route is handles consistently in all cases.
     assert(route == AFNavigateRoute.routeHierarchy);
@@ -506,6 +506,16 @@ class AFRouteState {
     return _reviseScreen(screenSegments.setParam(screen, revisedParam));    
   }
 
+  AFRouteState sortConnectedChildren(AFScreenID screen, AFNavigateRoute route, AFTypedSortDelegate sort, Type typeToSort) {
+    final segment = screenSegments.findSegmentFor(screen);
+    final p = segment.param;
+    if(p is! AFRouteParamWithChildren) {
+      throw AFException("Cannot remove connected child unless the route parameter is AFRouteParamWithChildren");
+    }
+    final AFRouteParamWithChildren pwc = p;
+    final revisedParam = pwc.reviseSortChildren(typeToSort, sort);
+    return _reviseScreen(screenSegments.setParam(screen, revisedParam));    
+  }
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.

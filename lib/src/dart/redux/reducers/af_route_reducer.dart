@@ -1,5 +1,5 @@
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
-import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
+import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_route_state.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:redux/redux.dart';
@@ -21,6 +21,7 @@ final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFShutdownOngoingQueriesAction>(_shutdownQueries),
   TypedReducer<AFRouteState, AFNavigateAddConnectedChildAction>(_addConnectedChild),
   TypedReducer<AFRouteState, AFNavigateRemoveConnectedChildAction>(_removeConnectedChild),
+  TypedReducer<AFRouteState, AFNavigateSortConnectedChildrenAction>(_sortConnectedChildren),
 ]);
 
 //---------------------------------------------------------------------------
@@ -98,4 +99,9 @@ AFRouteState _addConnectedChild(AFRouteState state, AFNavigateAddConnectedChildA
 //---------------------------------------------------------------------------
 AFRouteState _removeConnectedChild(AFRouteState state, AFNavigateRemoveConnectedChildAction action) {
   return state.removeConnectedChild(action.screen, action.widget, action.route);
+}
+
+//---------------------------------------------------------------------------
+AFRouteState _sortConnectedChildren(AFRouteState state, AFNavigateSortConnectedChildrenAction action) {
+  return state.sortConnectedChildren(action.screen, action.route, action.sort, action.typeToSort);
 }

@@ -1,5 +1,7 @@
+
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:meta/meta.dart';
 import 'package:quiver/core.dart';
 
@@ -37,7 +39,7 @@ class AFRouteParamUnused extends AFRouteParam {
 }
 
 class AFRouteParamChild {
-  final AFWidgetID widgetId;
+  final AFID widgetId;
   final AFRouteParam param;
   
   AFRouteParamChild({
@@ -61,8 +63,9 @@ class AFRouteParamChild {
 class AFRouteParamWithChildrenBuilder {
   AFRouteParamChild primary;
   final children = <AFRouteParamChild>[];
+  final activeSort = <Type, dynamic>{};
 
-  void setPrimary(AFWidgetID wid, AFRouteParam child) {
+  void setPrimary(AFScreenID wid, AFRouteParam child) {
     primary = AFRouteParamChild(
       widgetId: wid,
       param: child
@@ -76,8 +79,15 @@ class AFRouteParamWithChildrenBuilder {
     ));
   }
 
+  void sortBy({
+    @required Type typeToSort,
+    @required dynamic sort
+  }) {
+    activeSort[typeToSort] = sort;
+  }
+
   AFRouteParamWithChildren create() {
-    return AFRouteParamWithChildren(children: children, primary: primary);
+    return AFRouteParamWithChildren(children: children, primary: primary, activeSort: activeSort);
   }
 }
 
@@ -88,15 +98,17 @@ class AFRouteParamWithChildrenBuilder {
 class AFRouteParamWithChildren extends AFRouteParam {
   final AFRouteParamChild primary;
   final List<AFRouteParamChild> children;
+  final Map<Type, dynamic> activeSort;
   
   AFRouteParamWithChildren({
     @required this.primary,
-    @required this.children
+    @required this.children,
+    @required this.activeSort,
   });
 
   static AFRouteParamWithChildrenBuilder createBuilder() { return AFRouteParamWithChildrenBuilder(); }
 
-  AFRouteParam findByWidget(AFWidgetID wid) {
+  AFRouteParam findByWidget(AFID wid) {
     if(wid == primary.widgetId) {
       return primary.param;
     }
@@ -112,7 +124,7 @@ class AFRouteParamWithChildren extends AFRouteParam {
   int countOfChildren<TChildParam extends AFRouteParam>() {
     var count = 0;
     for(final child in children) {
-      if(child is TChildParam) {
+      if(child.param is TChildParam) {
         count++;
       }
     }
@@ -131,7 +143,33 @@ class AFRouteParamWithChildren extends AFRouteParam {
     return copyWith(children: revisedChildren);
   }
 
-  AFRouteParamWithChildren reviseChild(AFWidgetID wid, AFRouteParam revised) {
+  AFRouteParamWithChildren reviseSortChildren(Type typeToSort, AFTypedSortDelegate sort) {
+    final revisedSort = Map<Type, dynamic>.from(this.activeSort);
+    revisedSort[typeToSort] = sort;
+    return copyWith(activeSort: revisedSort);
+  }
+  
+
+  List<AFRouteParamChild> _sortChildren(Type typeToSort, AFTypedSortDelegate sort, List<AFRouteParamChild> currentChildren) {
+    final toSort = <AFRouteParamChild>[];
+    final notSort = <AFRouteParamChild>[];
+    for(final child in currentChildren) {
+      if(child.param.runtimeType == typeToSort) {
+        toSort.add(child);
+      } else {
+        notSort.add(child);
+      }
+    }
+    
+    toSort.sort((l, r) {
+      return sort(l.param, r.param);
+    });
+
+    notSort.addAll(toSort);
+    return notSort;
+  }
+
+  AFRouteParamWithChildren reviseChild(AFID wid, AFRouteParam revised) {
     if(wid == primary.widgetId) {
       return copyWith(primary: primary.reviseParam(revised));
     }
@@ -147,14 +185,23 @@ class AFRouteParamWithChildren extends AFRouteParam {
     throw AFException("Did not find child widget $wid in order to update param");
   }
 
-
   AFRouteParamWithChildren copyWith({
     AFRouteParamChild primary,
-    List<AFRouteParamChild> children
+    List<AFRouteParamChild> children,
+    Map<Type, dynamic> activeSort
   }) {
+    var currentChildren = children ?? this.children;
+    final currentSort = activeSort ?? this.activeSort;
+    if(currentSort.isNotEmpty) {
+      currentSort.forEach( (typeToSort, sorter) {
+        currentChildren = _sortChildren(typeToSort, sorter, currentChildren);
+      });
+    }
+
     return AFRouteParamWithChildren(
       primary: primary ?? this.primary,
-      children: children ?? this.children
+      children: currentChildren,
+      activeSort: currentSort,
     );
   }
 

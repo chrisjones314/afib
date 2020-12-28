@@ -1,5 +1,3 @@
-
-
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
@@ -29,3 +27,6 @@ typedef AFInitializeAppStateDelegate = AFAppStateArea Function();
 
 /// Delegate use to define commands that are part of the afib command-line app.
 typedef AFExtendCommandsDelegate = void Function(AFCommandExtensionContext context);
+
+/// Just a typed sort function.
+typedef AFTypedSortDelegate<TSort> = int Function(TSort left, TSort right);

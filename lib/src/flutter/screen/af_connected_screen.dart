@@ -7,7 +7,7 @@ import 'package:logger/logger.dart';
 import 'package:quiver/core.dart';
 import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
+import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
@@ -436,7 +436,7 @@ abstract class AFConnectedWidgetWithParent<TState extends AFAppStateArea, TData 
     return findChildParam(state, this.parentScreen, this.widChild);
   }
 
-  static AFRouteParam findChildParam(AFState state, AFScreenID screen, AFWidgetID widChild) {
+  static AFRouteParam findChildParam(AFState state, AFScreenID screen, AFID widChild) {
     final route = state.public.route;
     final paramParent = route?.findParamFor(screen);
     if(paramParent is! AFRouteParamWithChildren) {
@@ -450,7 +450,7 @@ abstract class AFConnectedWidgetWithParent<TState extends AFAppStateArea, TData 
     updateChildRouteParam(dispatcher, revised, this.parentScreen, this.widChild, this.route, id: id);
   }
 
-  static void updateChildRouteParam(AFDispatcher dispatcher, AFRouteParam revised, AFScreenID parentScreen, AFWidgetID widChild, AFNavigateRoute route, { AFID id } ) {
+  static void updateChildRouteParam(AFDispatcher dispatcher, AFRouteParam revised, AFScreenID parentScreen, AFID widChild, AFNavigateRoute route, { AFID id } ) {
     /// TODO: I don't think this is test-friendly.
     final state = AFibF.g.storeInternalOnly.state;
     final routeState = state.public.route;
@@ -603,21 +603,19 @@ abstract class AFPopupScreen<TState extends AFAppStateArea, TData extends AFStor
 }
 
 abstract class AFConnectedScreenWithConnectedChildren<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TData, TRouteParam, TTheme> {
-  final AFWidgetID primaryParam;
   final AFNavigateRoute route;
 
   AFConnectedScreenWithConnectedChildren({
     @required AFScreenID screenId,
-    @required this.primaryParam,
     this.route = AFNavigateRoute.routeHierarchy,
   }): super(screenId);
 
   AFRouteParam findParam(AFState state) { 
-    return AFConnectedWidgetWithParent.findChildParam(state, this.screenId, this.primaryParam);
+    return AFConnectedWidgetWithParent.findChildParam(state, this.screenId, this.screenId);
   }
   
   void updateRouteParamD(AFDispatcher dispatcher, AFRouteParam revised, { AFID id }) {
-    AFConnectedWidgetWithParent.updateChildRouteParam(dispatcher, revised, this.screenId, this.primaryParam, this.route, id: id);
+    AFConnectedWidgetWithParent.updateChildRouteParam(dispatcher, revised, this.screenId, this.screenId, this.route, id: id);
   }
 
   /// Find the route param for this screen. 
@@ -1166,6 +1164,21 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
       screen: screen,
       widget: widget,
       route: route,
+    ));
+  }
+
+  void updateSortConnectedChildren<TChildRouteParam extends AFRouteParam>({
+    @required AFScreenID screen,
+    @required AFTypedSortDelegate<TChildRouteParam> sort,
+    AFNavigateRoute route = AFNavigateRoute.routeHierarchy
+  }) {
+    dispatch(AFNavigateSortConnectedChildrenAction(
+      screen: screen,
+      route: route,
+      sort: (l, r) {
+        return sort(l, r);
+      },
+      typeToSort: TChildRouteParam,
     ));
   }
 

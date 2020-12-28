@@ -1,7 +1,7 @@
 
 import 'dart:async';
 
-import 'package:afib/src/dart/redux/actions/af_navigation_actions.dart';
+import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';

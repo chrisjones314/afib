@@ -3,7 +3,6 @@ import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_object_with_key.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
-import 'package:afib/src/flutter/test/af_prototype_single_screen_screen.dart';
 import 'package:afib/src/flutter/test/af_prototype_widget_screen.dart';
 
 abstract class AFTestDispatcher extends AFDispatcher {
@@ -58,12 +57,16 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
     // if the action is a pop, then go ahead and do it.
     if(isTestAct) {
       main.dispatch(action);
-    } else if(action is AFNavigateSetParamAction) {
-      if(action.route == AFNavigateRoute.routeHierarchy) {
-        processSetParam(action);
-      } else {
+    } else if(action is AFNavigateSetParamAction || 
+      action is AFNavigateSetChildParamAction ||
+      action is AFNavigateAddConnectedChildAction ||
+      action is AFNavigateRemoveConnectedChildAction ||
+      action is AFNavigateSortConnectedChildrenAction) {
+      //if(action.route == AFNavigateRoute.routeHierarchy) {
+        //processSetParam(action);
+      //} else {
         main.dispatch(action);
-      }
+      //}
       // change this into a set param action for the prototype.
     } 
 
@@ -74,7 +77,7 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
     }
   }
 
-  void processSetParam(AFNavigateSetParamAction action);
+  void processSetParam(AFNavigateAction action);
 }
 
 class AFSingleScreenTestDispatcher extends AFScreenTestDispatcher {
@@ -86,13 +89,15 @@ class AFSingleScreenTestDispatcher extends AFScreenTestDispatcher {
     AFDispatcher main, 
     AFScreenTestContext testContext): super(main, testContext);
 
-  void processSetParam(AFNavigateSetParamAction action) {
+  void processSetParam(AFNavigateAction action) {
+    /*
     main.dispatch(
       AFNavigateSetParamAction(
         screen: AFUIScreenID.screenPrototypeSingleScreen,
-        param: AFPrototypeSingleScreenRouteParam(id: testId, param: action.param),
+        param: AFPrototypeSingleScreenRouteParam(id: testId, param: revisedParam),
         route: AFNavigateRoute.routeHierarchy,
     ));      
+    */
   }
 }
 
@@ -105,7 +110,7 @@ class AFWidgetScreenTestDispatcher extends AFScreenTestDispatcher {
     this.originalParam
   }): super(main, context);
 
-   void processSetParam(AFNavigateSetParamAction action) {
+   void processSetParam(AFNavigateAction action) {
     main.dispatch(
       AFNavigateSetParamAction(
         screen: AFUIScreenID.screenPrototypeWidget,

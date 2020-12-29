@@ -25,6 +25,11 @@ class AFUIWidgetID {
   static const cardTestGroup = AFWidgetID("${afibIDPrefix}card_test_group");
 }
 
+class AFUITestID {
+  static const smokeTest = AFSingleScreenTestID("smoke");
+}
+
+
 /// Identifiers for the fundamental theme
 /// 
 /// These identifiers can be used by third parties, and are usually the values used to create the flutter ThemeData.

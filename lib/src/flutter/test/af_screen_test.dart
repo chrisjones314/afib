@@ -596,6 +596,7 @@ class AFScreenTestBody {
   final AFReusableScreenTestBodyExecuteDelegate3 body;
   final AFSingleScreenReusableBody bodyReusable;
   final AFScreenTestWidgetCollector elementCollector;
+  final String disabled;
   final dynamic param1;
   final dynamic param2;
   final dynamic param3;
@@ -608,10 +609,18 @@ class AFScreenTestBody {
     @required this.param1,
     @required this.param2,
     @required this.param3,
+    @required this.disabled,
   });
 
   bool get isReusable {
     return bodyReusable != null;
+  }
+
+  AFID get sectionId {
+    if(bodyReusable != null) {
+      return bodyReusable.id;
+    }
+    return AFUITestID.smokeTest;
   }
 
   Future<void> populateElementCollector() {
@@ -631,11 +640,12 @@ class AFSingleScreenPrototype {
   AFSingleScreenPrototype(this.testId,  { this.screenId });
 
   factory AFSingleScreenPrototype.createReusable(AFReusableTestID reusableId, AFSingleScreenTestExecute elementCollector, AFReusableScreenTestBodyExecuteDelegate3 body, {
+    String disabled,
     dynamic param1,
     dynamic param2,
     dynamic param3 
   }) {
-    final bodyTest = AFScreenTestBody(elementCollector: elementCollector, param1: param1, param2: param2, param3: param3, bodyReusable: null, body: body);
+    final bodyTest = AFScreenTestBody(elementCollector: elementCollector, disabled: disabled, param1: param1, param2: param2, param3: param3, bodyReusable: null, body: body);
     final proto = AFSingleScreenPrototype(null);
     proto.addReusable(reusableId, bodyTest);
     return proto;
@@ -663,11 +673,11 @@ class AFSingleScreenPrototype {
     sections[reusableId] = body;
   }
 
-  void defineSmokeTest(AFScreenTestBodyExecuteDelegate body) async {
+  void defineSmokeTest(AFScreenTestBodyExecuteDelegate body, { String disabled }) async {
     final collector = AFScreenTestWidgetCollector(this.testId);
     // in the first section, always add a scaffold widget collector.
   
-    addSmokeTest(AFScreenTestBody(elementCollector: collector, param1: null, param2: null, param3: null, bodyReusable: null, body: (sse, p1, p2, p3) async {
+    addSmokeTest(AFScreenTestBody(elementCollector: collector, disabled: disabled, param1: null, param2: null, param3: null, bodyReusable: null, body: (sse, p1, p2, p3) async {
       await body(sse);
     }));
   }
@@ -699,7 +709,7 @@ class AFSingleScreenPrototype {
     if(body == null) {
       throw AFException("The reusable test $bodyId must be defined using tests.defineReusable");
     }
-    final bodyTest = AFScreenTestBody(elementCollector: collector, body: body.body, bodyReusable: body, param1: param1, param2: param2, param3: param3);;
+    final bodyTest = AFScreenTestBody(elementCollector: collector, disabled: null, body: body.body, bodyReusable: body, param1: param1, param2: param2, param3: param3);;
     addReusable(bodyId, bodyTest);
   }
 
@@ -726,6 +736,11 @@ class AFSingleScreenPrototype {
     var sectionGuard = 0;
     var sectionPrev;
     for(final section in sections.values) {
+      if(section.disabled != null) {
+        context.markDisabled(section);
+        continue; 
+      }
+
       sectionGuard++;
       if(sectionGuard > 1) {
         throw AFException("Test section ${sectionPrev.id} is missing an await!");
@@ -734,15 +749,19 @@ class AFSingleScreenPrototype {
       if(!useParentCollector) {
         context.setCollector(section.elementCollector);
       }
+
+
       if(param1 == null) {
         param1 = section.param1;
         param2 = section.param2;
         param3 = section.param3;
       }
 
+      context.startSection(section);
       final fut = section.body(context, param1, param2, param3);
       _checkFutureExists(fut);
       await fut;
+      context.endSection(section);
       sectionGuard--;
     }
     if(onEnd != null) {
@@ -2336,8 +2355,10 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
   /// 
   /// A smoke test manipulates the screen thoroughly and validates 
   /// it in various states, it is not intended to be reused.
-  void defineSmokeTest(AFSingleScreenPrototype prototype, AFScreenTestBodyExecuteDelegate body) {
-    prototype.defineSmokeTest(body);
+  void defineSmokeTest(AFSingleScreenPrototype prototype, AFScreenTestBodyExecuteDelegate body, {
+    String disabled
+  }) {
+    prototype.defineSmokeTest(body, disabled: disabled);
   }
 
   /// Used to define a reusable test which takes a single parameter.

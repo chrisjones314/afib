@@ -425,7 +425,7 @@ abstract class AFConnectedWidgetWithParent<TState extends AFAppStateArea, TData 
 
 
   AFScreenID get screenIdForTest {
-    return this.parentScreen;
+    return null;
   }
 
   /// Find the route param for this child widget.
@@ -1130,6 +1130,9 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
       if(child.param is TChildRouteParam) {
         final widChild = child.widgetId;
         final widget = render(widChild);
+        if(widget == null) {
+          continue;
+        }
         if(widget is! AFConnectedWidgetWithParent) {
           throw AFException("When rendering children of a AFConnectedScreenWithConnectedChildren, the children must be subclasses of AFConnectedWidgetWithParent");
         }

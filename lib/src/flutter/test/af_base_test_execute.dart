@@ -1,6 +1,8 @@
 
+import 'package:afib/afib_dart.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
 import 'package:colorize/colorize.dart';
 import 'package:flutter_test/flutter_test.dart' as flutter_test;
@@ -16,13 +18,21 @@ class AFTestError {
   }
 }
 
+
 class AFTestErrors {
+  final AFID section;
   final _errors = <AFTestError>[];
   int pass = 0;
+  String disabled;
+
+  AFTestErrors(this.section);
 
   List<AFTestError> get errors { return _errors; }
   bool get hasErrors { return _errors.isNotEmpty; }
   int get errorCount { return _errors.length; }
+  void markDisabled(String msg) {
+    disabled = msg;
+  }
 
   void addPass() {
     pass++;
@@ -31,13 +41,16 @@ class AFTestErrors {
   void addError(AFTestError err) {
     _errors.add(err);
   }
+
 }
 
 
 
 abstract class AFBaseTestExecute {
 
-  final errors = AFTestErrors();
+  final sectionErrors = <AFID, AFTestErrors>{};
+  AFID currentSection;
+  AFTestErrors defaultErrors = AFTestErrors(null);
 
   void expect(dynamic value, flutter_test.Matcher matcher, {int extraFrames = 0}) {
     final matchState = <dynamic, dynamic>{};
@@ -49,24 +62,76 @@ abstract class AFBaseTestExecute {
     }
   }
 
-  AFTestID get testID;
-
-  int printPassMessages(AFCommandOutput output) {
-    if(!errors.hasErrors) {
-      _writeTestResult(output, "${testID.code}:", errors.pass, " passed", Styles.GREEN, tags: testID.tagsText);
-    }
-    return errors.pass;
+  void startSection(AFScreenTestBody body) {
+    currentSection = body.sectionId;
+    var current = sectionErrors[currentSection];
+    if(current == null) {
+      current = AFTestErrors(currentSection);
+      sectionErrors[currentSection] = current;
+    }    
   }
 
-  static void printTotalPass(AFCommandOutput output, String title, int pass, { Stopwatch stopwatch}) {
-    final suffix = StringBuffer(" passed");
-    if(stopwatch != null) {
-      suffix.write(" (in ");
-      final total = stopwatch.elapsedMilliseconds / 1000.0;
-      suffix.write(total.toStringAsFixed(2));
-      suffix.write("s)");
+  void markDisabled(AFScreenTestBody body) {
+    startSection(body);
+    errors.markDisabled(body.disabled);
+    endSection(body);
+  }
+
+  void endSection(AFScreenTestBody body) {
+    currentSection = null;
+  }
+
+  AFTestID get testID;
+
+  AFTestErrors get errors {
+    if(currentSection != null) {
+      return sectionErrors[currentSection];
     }
-      _writeTestResult(output, "$title:", pass, suffix.toString(), Styles.GREEN);
+    return defaultErrors;
+  }
+
+  void printPassMessages(AFCommandOutput output, AFTestStats stats) {
+    if(sectionErrors.isNotEmpty) {
+      final sectionErrorSmoke = sectionErrors.values.where((section) => section.section == AFUITestID.smokeTest);
+      final sectionErrorReusable = sectionErrors.values.where((section) => section.section != AFUITestID.smokeTest);
+      if(sectionErrorSmoke.isNotEmpty) {
+        _writePassed(output, "$testID/s", sectionErrorSmoke.first, stats);
+      }
+
+      if(sectionErrorReusable.isNotEmpty) {
+        for(final sectionError in sectionErrorReusable) {
+          if(!sectionError.hasErrors) {
+            _writePassed(output, "${sectionError.section}/r", sectionError, stats);
+          }
+        }
+      }
+    } 
+    
+    if(!defaultErrors.hasErrors && defaultErrors.pass > 0) {
+      _writePassed(output, testID, defaultErrors, stats);
+    }
+  }
+
+  void _writePassed(AFCommandOutput output, dynamic testName, AFTestErrors errors, AFTestStats stats) {
+    var pass = errors.pass;
+    if(errors.disabled != null) {
+      _writeTestResult(output, "$testName:", null, " Disabled: ${errors.disabled}", Styles.YELLOW);
+      stats.addDisabled(1);
+    } else {
+      _writeTestResult(output, "$testName:", pass, " passed", Styles.GREEN, tags: testID.tagsText);
+      stats.addPasses(pass);
+    }
+  }
+
+  static void printTotalPass(AFCommandOutput output, String title, int pass, { Stopwatch stopwatch, Styles style = Styles.GREEN, String suffix = "passed" }) {
+    final suffixFull = StringBuffer(" $suffix");
+    if(stopwatch != null) {
+      suffixFull.write(" (in ");
+      final total = stopwatch.elapsedMilliseconds / 1000.0;
+      suffixFull.write(total.toStringAsFixed(2));
+      suffixFull.write("s)");
+    }
+    _writeTestResult(output, "$title:", pass, suffixFull.toString(), style);
   }
 
   int printFailMessages(AFCommandOutput output) {
@@ -83,12 +148,16 @@ abstract class AFBaseTestExecute {
   }
 
   static void _writeTestResult(AFCommandOutput output, String title, int count, String suffix, Styles color, { String tags }) {
-    output.startColumn(alignment: AFOutputAlignment.alignRight, width: 35);
+    output.startColumn(alignment: AFOutputAlignment.alignRight, width: 48);
     output.write(title);
     output.startColumn(alignment: AFOutputAlignment.alignRight, color: color, width: 5);
-    output.write(count.toString());
+    if(count != null) {
+      output.write(count.toString());
+    }
     output.startColumn(alignment: AFOutputAlignment.alignLeft, color: color, width: 8);
-    output.write(suffix);
+    if(suffix != null) {
+      output.write(suffix);
+    }
     if(tags != null) {
       output.startColumn(alignment: AFOutputAlignment.alignLeft);
       output.write(tags);
@@ -125,7 +194,7 @@ void printTestResult(AFCommandOutput output, String kind, AFBaseTestExecute cont
     output.writeLine("Afib $kind Tests:");
   }
 
-   stats.addPasses(context.printPassMessages(output));
+   context.printPassMessages(output, stats);
 }
 
 void printTestTotal(AFCommandOutput output, String kind, List<AFBaseTestExecute> baseContexts, AFTestStats stats) {

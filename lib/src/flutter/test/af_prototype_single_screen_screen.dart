@@ -22,8 +22,16 @@ class AFPrototypeSingleScreenRouteParam extends AFRouteParam {
 
   AFPrototypeSingleScreenRouteParam({this.id, this.param, this.data});
 
-  AFPrototypeSingleScreenRouteParam copyWith() {
-    return AFPrototypeSingleScreenRouteParam();
+  AFPrototypeSingleScreenRouteParam copyWith({
+    AFTestID id,
+    AFRouteParam param,
+    dynamic data,
+  }) {
+    return AFPrototypeSingleScreenRouteParam(
+      id: id ?? this.id,
+      param: param ?? this.param,
+      data: data ?? this.data,
+    );
   }
 
   @override
@@ -99,6 +107,7 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppStateArea, AF
     final tests = context.s.tests;
     final test = tests.findById(context.p.id);
     AFRouteParam paramChild = context.p.param ?? test.data.param;
+    AFRouteParamWithChildren paramWithChildren;
     final testContext = context.s.testState.findContext(test.id);
     final testState = context.s.testState.findState(test.id);
     final testData = testState?.data ?? test.data;
@@ -107,7 +116,13 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppStateArea, AF
     final AFConnectedWidgetBase screen = screenMap.createFor(test.screenId);
     final themeChild = screen.findTheme(context.s.themeState);
 
-    final childContext = screen.createContext(context.c, dispatcher, testData, paramChild, null, themeChild);
+    if(paramChild is AFRouteParamWithChildren) {
+      paramWithChildren = paramChild;
+      paramChild = paramWithChildren.primary.param;
+    }
+    
+
+    final childContext = screen.createContext(context.c, dispatcher, testData, paramChild, paramWithChildren, themeChild);
     return screen.buildWithContext(childContext);
     
   }

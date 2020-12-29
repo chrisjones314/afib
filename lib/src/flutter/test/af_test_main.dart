@@ -12,6 +12,7 @@ import 'package:afib/src/flutter/test/af_test_stats.dart';
 import 'package:afib/src/flutter/test/af_unit_test_main.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
+import 'package:colorize/colorize.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class AFibTestsFailedMatcher extends Matcher {
@@ -64,6 +65,9 @@ Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendAppDelegate exten
   } else {
     output.writeSeparatorLine();
     AFBaseTestExecute.printTotalPass(output, "GRAND TOTAL", stats.totalPasses, stopwatch: stopwatch);
+    if(stats.totalDisabled > 0) {
+      AFBaseTestExecute.printTotalPass(output, "DISABLED", stats.totalDisabled, style: Styles.YELLOW, suffix: "disabled");
+    }
     output.writeSeparatorLine();   
   }
   return null;

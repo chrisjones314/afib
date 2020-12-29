@@ -23,6 +23,8 @@ class AFUIWidgetID {
   static const contTestSearchControls = AFWidgetID("${afibIDPrefix}cont_test_search_controls");
   static const cardTestHomeSearchAndRun = AFWidgetID("${afibIDPrefix}card_test_home_search_and_run");
   static const cardTestGroup = AFWidgetID("${afibIDPrefix}card_test_group");
+  static const buttonOK = AFWidgetID("${afibIDPrefix}button_ok");
+  static const buttonCancel = AFWidgetID("${afibIDPrefix}button_cancel");
 }
 
 class AFUITestID {

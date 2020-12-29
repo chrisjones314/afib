@@ -460,10 +460,13 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   }
   
   void _populateAllWidgetCollectors() async {
+    /*
     final guard = _AFTestAsyncGuard();
+  
     await _populateWidgetCollectors(guard, screenTests.all);
     await _populateWidgetCollectors(guard, widgetTests.all);
     await _populateWidgetCollectors(guard, workflowTests.all);
+    */
   }
 
   static Future<void> _populateWidgetCollectors(_AFTestAsyncGuard guard, List<AFScreenPrototypeTest> tests) async {

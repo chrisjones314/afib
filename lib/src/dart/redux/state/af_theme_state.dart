@@ -1079,6 +1079,10 @@ class AFConceptualTheme extends AFTheme {
     return fundamentals.weight(weight);
   }
 
+  Widget childDivider() {
+    return Divider();
+  }
+
   AFRichTextBuilder childRichTextBuilder({
     AFWidgetID wid,
     dynamic idOrTextStyleNormal,

@@ -715,9 +715,11 @@ class AFSingleScreenPrototype {
 
 
   Future<void> populateWidgetCollector() async {
+    /*
     for(final section in sections.values) {
       await section.populateElementCollector();
     }
+    */
     return null;
   }
 
@@ -879,6 +881,46 @@ class AFScreenTestWidgetCollectorScreen {
     currentPath.removeLast();
   }
 
+  // Go though all the children of [current], having the parent path [currentPath],
+  // and add path entries for any widgets with keys.
+  void populateChildrenDirect(Element currentElem, List<Element> currentPath, AFWidgetSelector selector, AFScreenTestWidgetCollectorScrollableSubpath parentScrollable, { bool underScaffold }) {
+
+    // add the current element.
+    currentPath.add(currentElem);
+
+    final widget = currentElem.widget;
+    if(widget is Scrollable) {
+      parentScrollable = addScrollableAt(currentPath);
+    }
+
+    if(underScaffold && !hasScaffoldState) {
+      final scaffoldState = Scaffold.of(currentElem);
+      if(scaffoldState != null) {
+        this.scaffoldState = scaffoldState;
+      }
+    }
+
+    if(selector.matchesPath(currentPath)) {
+      final activeElement = selector.activeElementForPath(currentPath);
+      if(!selector.contains(activeElement)) {
+        selector.add(activeElement);
+      }
+    
+      if(parentScrollable != null) {
+        selector.parentScrollable = parentScrollable;
+      }
+    }
+
+    // do this same process recursively on the childrne.
+    currentElem.visitChildren((child) {
+      final nowUnderScaffold = underScaffold || currentElem.widget is Scaffold;
+      populateChildrenDirect(child, currentPath, selector, parentScrollable, underScaffold: nowUnderScaffold);
+    });
+
+    // maintain the path as we go back up.
+    currentPath.removeLast();
+  }
+
   Future<List<Element>> scrollUntilFound(AFWidgetSelector selector) async {
     for(final scrollable in scrollables) {
       final found = await scrollOneUntilFound(scrollable, selector);
@@ -958,7 +1000,18 @@ class AFScreenTestWidgetCollector extends AFSingleScreenTestExecute {
     return screen?.scaffoldState;
   }
 
-  Future<List<Element>> findWidgetsFor(dynamic selector, { bool scrollIfMissing = true }) async {
+  Future<List<Element>> findWidgetsFor(dynamic selector, { bool scrollIfMissing = true}) async {
+    final sel = createSelector(activeSelectorPath, selector);
+    final info = AFibF.g.findTestScreen(activeScreenId);
+    final screenInfo = _findOrCreateScreenInfo(info.screenId);
+    final currentPath = <Element>[];
+    screenInfo.populateChildrenDirect(info.element, currentPath, sel, null, underScaffold: false);
+    return sel.elements;
+  }
+
+  
+
+  Future<List<Element>> findWidgetsForOriginal(dynamic selector, { bool scrollIfMissing = true }) async {
     final screenInfo = _updateCache();
     final sel = createSelector(activeSelectorPath, selector);
     return screenInfo.findElementsForSelector(sel, scrollIfMissing: scrollIfMissing);
@@ -2120,9 +2173,11 @@ class AFWorkflowStateTestPrototype {
   }  
 
   Future<void> populateWidgetCollector() async {
+    /*
     for(final section in sections) {
       await section.populateElementCollector(elementCollector);
     }
+    */
     return null;
   }
 

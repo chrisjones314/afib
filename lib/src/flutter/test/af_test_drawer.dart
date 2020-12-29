@@ -391,7 +391,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
       rowAlign = MainAxisAlignment.spaceBetween;
     }
 
-    cols.add(t.childText('Run $defaultRunId'));
+    cols.add(t.childText('Run $defaultRunId test'));
 
     if(hasMultiple) {
       cols.add(PopupMenuButton<AFReusableTestID>(

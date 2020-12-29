@@ -179,7 +179,7 @@ void _navigatePopNavOnlyAction(Store<AFState> store, action, NextDispatcher next
 //---------------------------------------------------------------------------
 void _navigateExitTestAction(Store<AFState> store, action, NextDispatcher next) {
   /// Clear out our cache of screen info for the next test.
-  AFibF.g.resetTestScreens();
+  //AFibF.g.resetTestScreens();
 
   final route = _getRouteState(store);
   final popCount = route.popCountToRoot;

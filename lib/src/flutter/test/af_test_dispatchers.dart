@@ -2,7 +2,6 @@
 import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_object_with_key.dart';
-import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/test/af_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 
@@ -63,12 +62,7 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
       action is AFNavigateAddConnectedChildAction ||
       action is AFNavigateRemoveConnectedChildAction ||
       action is AFNavigateSortConnectedChildrenAction) {
-      //if(action.route == AFNavigateRoute.routeHierarchy) {
-        //processSetParam(action);
-      //} else {
         main.dispatch(action);
-      //}
-      // change this into a set param action for the prototype.
     } 
 
     // if this is a test action, then remember it so that we can 
@@ -77,8 +71,6 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
       AFibD.logTest?.d("Registered action: $action");
     }
   }
-
-  void processSetParam(AFNavigateAction action);
 }
 
 class AFSingleScreenTestDispatcher extends AFScreenTestDispatcher {
@@ -89,17 +81,6 @@ class AFSingleScreenTestDispatcher extends AFScreenTestDispatcher {
     this.testId, 
     AFDispatcher main, 
     AFScreenTestContext testContext): super(main, testContext);
-
-  void processSetParam(AFNavigateAction action) {
-    /*
-    main.dispatch(
-      AFNavigateSetParamAction(
-        screen: AFUIScreenID.screenPrototypeSingleScreen,
-        param: AFPrototypeSingleScreenRouteParam(id: testId, param: revisedParam),
-        route: AFNavigateRoute.routeHierarchy,
-    ));      
-    */
-  }
 }
 
 class AFWidgetScreenTestDispatcher extends AFScreenTestDispatcher {
@@ -111,12 +92,4 @@ class AFWidgetScreenTestDispatcher extends AFScreenTestDispatcher {
     this.originalParam
   }): super(main, context);
 
-   void processSetParam(AFNavigateAction action) {
-    main.dispatch(
-      AFNavigateSetParamAction(
-        screen: AFUIScreenID.screenPrototypeWidget,
-        param: originalParam.copyWith(param: action.param),
-        route: AFNavigateRoute.routeHierarchy,
-    ));      
-  }
 }

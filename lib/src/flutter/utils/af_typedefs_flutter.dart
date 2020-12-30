@@ -11,7 +11,6 @@ import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/material.dart';
 
-import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
@@ -67,7 +66,7 @@ typedef AFFindParamDelegate = AFRouteParam Function(AFState state);
 typedef AFCreateWidgetWrapperDelegate = Widget Function(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam, AFPrototypeTheme> context, Widget testWidget);
 
 /// Delegate used to create a push action that moves us into a test screen.
-typedef AFTestCreatePushActionDelegate = AFNavigatePushAction Function(AFScreenPrototypeTest test);
+typedef AFTestCreatePushActionDelegate = List<dynamic> Function(AFScreenPrototypeTest test);
 
 /// Delegate used to implmeent the body of a single screen test.
 typedef AFScreenTestBodyExecuteDelegate = Future<void> Function(AFScreenTestExecute ste);

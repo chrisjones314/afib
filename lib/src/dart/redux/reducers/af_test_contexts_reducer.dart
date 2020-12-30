@@ -7,7 +7,7 @@ import 'package:afib/src/flutter/test/af_test_actions.dart';
 /// is just to set one or more 
 AFTestState afTestStateReducer(AFTestState state, dynamic action) {
   if(action is AFStartPrototypeScreenTestContextAction) {
-    return state.startTest(action.context);
+    return state.startTest(action.context, action.param, action.data, action.screen);
   } else if(action is AFUpdatePrototypeScreenTestDataAction) {
     return state.updateStateData(action.testId, action.data);
   } else if(action is AFPrototypeScreenTestIncrementPassCount) {
@@ -15,7 +15,7 @@ AFTestState afTestStateReducer(AFTestState state, dynamic action) {
   } else if(action is AFPrototypeScreenTestAddError) {
     return state.addError(action.testId, action.err);
   } else if(action is AFStartPrototypeScreenTestAction) {
-    return state.navigateToTest(action.test);
+    return state.navigateToTest(action.test, action.param, action.data, action.screen);
   }
 
 

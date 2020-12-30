@@ -7,12 +7,18 @@ import 'package:afib/src/flutter/test/af_screen_test.dart';
 /// by both the prototype screen and the debug drawer
 class AFStartPrototypeScreenTestContextAction {
     final AFScreenTestContext context;
-    AFStartPrototypeScreenTestContextAction(this.context);
+    final dynamic param;
+    final dynamic data;
+    final AFScreenID screen;
+    AFStartPrototypeScreenTestContextAction(this.context, { this.param, this.data, this.screen });
 }
 
 class AFStartPrototypeScreenTestAction {
     final AFScreenPrototypeTest test;
-    AFStartPrototypeScreenTestAction(this.test);
+    final dynamic param;
+    final dynamic data;
+    final AFScreenID screen;
+    AFStartPrototypeScreenTestAction(this.test, { this.param, this.data, this.screen });
 }
 
 

@@ -16,7 +16,6 @@ import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
-import 'package:afib/src/flutter/test/af_prototype_single_screen_screen.dart';
 import 'package:afib/src/flutter/test/af_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
@@ -710,12 +709,6 @@ class AFScreenTestBody {
     }
     return AFUITestID.smokeTest;
   }
-
-  ScaffoldState findScaffoldState(AFScreenID screenId) {
-    //return elementCollector.findScaffoldState(screenId);
-    // TODO: fix this.
-    return null;
-  }
 }
 
 class AFSingleScreenPrototype {
@@ -947,9 +940,6 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
       }
       var paramOuter = setParam.param;
       var paramInner = paramOuter;
-      if(paramOuter is AFPrototypeSingleScreenRouteParam) {
-        paramInner = paramOuter.param;
-      }
 
       verifyParamUpdate(paramInner);
     }
@@ -1079,6 +1069,8 @@ abstract class AFScreenPrototypeTest {
   void onDrawerReset(AFDispatcher dispatcher);
   Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSingleScreenTestState state, AFReusableTestID testId, Function onEnd);
   void openTestDrawer(AFReusableTestID id);
+  dynamic get routeParam { return null; }
+  dynamic get stateView { return null; }
   bool get isTestDrawerEnd { return testDrawerSide == testDrawerSideEnd; }
   bool get isTestDrawerBegin { return testDrawerSide == testDrawerSideBegin; }
 
@@ -1125,6 +1117,16 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
   }
 
   @override
+  dynamic get routeParam { 
+    return param;
+  }
+
+  @override
+  dynamic get stateView { 
+    return data;
+  }
+
+  @override
   List<AFReusableTestID> get sectionIds {
     return body.sectionIds;
   }
@@ -1135,8 +1137,11 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
   }
 
   void startScreen(AFDispatcher dispatcher) {
-    dispatcher.dispatch(AFStartPrototypeScreenTestAction(this));
-    dispatcher.dispatch(AFPrototypeSingleScreenScreen.navigatePush(this, id: this.id));    
+    dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, param: param, data: data, screen: screenId));
+    dispatcher.dispatch(AFNavigatePushAction(
+      screen: this.screenId,
+      param: this.param
+    ));
   }
 
   Future<void> run(AFScreenTestExecute context, { dynamic param1, dynamic param2, dynamic param3, Function onEnd}) {
@@ -1145,7 +1150,7 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
 
   static void resetTestParam(AFDispatcher dispatcher, AFTestID testId, AFScreenID screenId, dynamic param) {
     final d = AFSingleScreenTestDispatcher(testId, dispatcher, null);
-    d.processSetParam(AFNavigateSetParamAction(
+    d.dispatch(AFNavigateSetParamAction(
       param: param,
       screen: screenId,
       route: AFNavigateRoute.routeHierarchy
@@ -1974,20 +1979,20 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
 
 
   /// Define a prototype which shows a  single screen in a particular 
-  /// screen data/route param state.
+  /// screen view state/route param state.
   /// 
-  /// As a short cut, rather than passing in param/screenId, you can pass
+  /// As a short cut, rather than passing in routeParam/screenId, you can pass
   /// in a navigate action, which has both of those values within it.
   AFSingleScreenPrototype definePrototype({
     @required AFSingleScreenTestID   id,
-    @required dynamic data,
-    dynamic param,
+    @required dynamic viewState,
+    dynamic routeParam,
     AFScreenID screenId,
     AFNavigatePushAction navigate,
     String title,
   }) {
-    final dataActual = testData(data);
-    final paramActual = testData(param);
+    final dataActual = testData(viewState);
+    final paramActual = testData(routeParam);
     
     return tests.addPrototype(
       id: id,

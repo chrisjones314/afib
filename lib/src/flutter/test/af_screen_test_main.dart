@@ -9,7 +9,6 @@ import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
-import 'package:afib/src/flutter/test/af_prototype_single_screen_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
@@ -62,7 +61,10 @@ Future<void> _afStandardScreenTestMain<TState extends AFAppStateArea>(
       continue;
     }
     if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
-      AFibF.g.storeInternalOnly.dispatch(createPush(test));
+      final startActions = createPush(test);
+      for(final action in startActions) {
+        AFibF.g.storeInternalOnly.dispatch(action);
+      }
       AFibD.logTest?.d("Starting ${test.id}");
   
 
@@ -97,13 +99,19 @@ Future<void> _afStandardScreenTestMain<TState extends AFAppStateArea>(
 
 Future<void> _afWidgetTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
   return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.widgetTests.all, "Widget", (test) {
-    return AFPrototypeWidgetScreen.navigatePush(test);
+    return [AFPrototypeWidgetScreen.navigatePush(test)];
   });
 }
 
 Future<void> _afSingleScreenTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
   return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.screenTests.all, "Single-Screen", (test) {
-    return AFPrototypeSingleScreenScreen.navigatePush(test);
+    return [
+      AFStartPrototypeScreenTestAction(test, param: test.routeParam, data: test.stateView, screen: test.screenId),
+      AFNavigatePushAction(
+        screen: test.screenId,
+        param: test.routeParam
+      )
+    ];
   });
 }
 

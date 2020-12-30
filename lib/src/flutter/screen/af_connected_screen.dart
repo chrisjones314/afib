@@ -1,6 +1,7 @@
 
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/utils/af_context_dispatcher_mixin.dart';
+import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/foundation.dart';
@@ -15,7 +16,6 @@ import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:afib/src/flutter/test/af_prototype_single_screen_screen.dart';
 import 'package:afib/src/flutter/utils/af_bottom_popup_layout.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -55,9 +55,11 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TStateView exten
 
           var screenIdRegister = this.screenIdForTest;          
           if(screenIdRegister != null) {
+            /*
             if(dataContext.p != null && dataContext.p is AFPrototypeSingleScreenRouteParam) {
               screenIdRegister = dataContext.p.effectiveScreenId;
             }
+            */
             
             AFibF.g.registerTestScreen(screenIdRegister, buildContext, this);
             AFibD.logTest?.d("Rebuilding screen $runtimeType/$screenIdRegister with param ${dataContext.p}");
@@ -76,16 +78,15 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TStateView exten
   /// Screens that have their own element tree in testing must return their screen id here,
   /// otherwise return null.
   AFScreenID get screenIdForTest;
+  bool get isPopupScreen { return false; }
 
   AFBuildContext<TStateView, TRouteParam, TTheme> _createNonBuildContext(AFStore store) {
-    /*
     if(AFibD.config.isTestContext) {
       final testContext = _createTestContext(store);
       if(testContext != null) {
         return testContext;
       }
     }
-    */
 
     final data = createStateDataAF(store.state);
     final param = findParam(store.state);
@@ -97,6 +98,56 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TStateView exten
 
     final context = createContext(null, createDispatcher(store), data, param, paramWithChildren, theme);
     return context;
+  }
+
+  AFBuildContext<TStateView, TRouteParam, TTheme> _createTestContext(AFStore store) {
+    // find the test state.
+    final testState = store.state.testState;
+    final activeTestId = testState.activeTestId;
+    if(activeTestId == null) {
+      return null;
+    }
+
+    
+    final testContext = testState.findContext(activeTestId);
+    final activeState = testState.findState(activeTestId);
+    if(activeState == null) {
+      return null;
+    }
+
+    final screen = activeState.screen;
+    if(!this.isPopupScreen && screen != this.screenIdForTest) {
+      return null;
+    }
+    if(this.screenIdForTest == null) {
+      return null;
+    }
+    if(this is AFTestDrawer) {
+      return null;
+    }
+
+    final param = findParam(store.state);
+    final paramWithChildren = findParamWithChildren(store.state);
+
+    var data = activeState.findViewStateFor<TStateView>();
+
+    if(data == null) {
+      return null;
+    }
+
+    final mainDispatcher = AFStoreDispatcher(store);
+    final dispatcher = AFSingleScreenTestDispatcher(activeTestId, mainDispatcher, testContext);
+    final theme = findTheme(store.state.public.themes);
+
+    /*
+    if(paramChild is AFRouteParamWithChildren) {
+      paramWithChildren = paramChild;
+      paramChild = paramWithChildren.primary.param;
+    }
+    */
+    
+
+    return createContext(null, dispatcher, data, param, paramWithChildren, theme);
   }
 
   AFDispatcher createDispatcher(AFStore store) {
@@ -353,6 +404,8 @@ abstract class AFConnectedScreenWithGlobalParam<TState extends AFAppStateArea, T
   AFConnectedScreenWithGlobalParam(
     AFScreenID screenId,
   ): super(screenId, route: AFNavigateRoute.routeGlobalPool);
+
+  bool get isPopupScreen { return true; }
 
   /// Look for this screens route parameter in the global pool, 
   /// rather than in the navigational hierarchy

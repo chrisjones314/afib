@@ -1,5 +1,6 @@
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:meta/meta.dart';
 
 @immutable 
@@ -7,8 +8,10 @@ class AFSingleScreenTestState {
   final int pass;
   final List<String> errors;
   final dynamic data;
+  final dynamic param;
+  final AFScreenID screen;
 
-  AFSingleScreenTestState({this.pass, this.errors, this.data});
+  AFSingleScreenTestState({this.pass, this.errors, this.data, this.param, this.screen});
 
   AFSingleScreenTestState reviseData(dynamic data) {
     return copyWith(data: data);
@@ -23,6 +26,22 @@ class AFSingleScreenTestState {
     final revised = List<String>.from(errors);
     revised.add(err);
     return copyWith(errors: revised);
+  }
+
+  TStateView findViewStateFor<TStateView extends AFStateView>() {
+    if(data is TStateView) {
+      return data;
+    }
+
+    if(data is Iterable) {
+      for(final testData in data) {
+        if(testData is TStateView) {
+          return testData;
+        }
+      }
+    } 
+
+    return null;    
   }
 
   String get summaryText {
@@ -82,16 +101,26 @@ class AFTestState {
     return testStates[id];
   }
 
-  AFTestState navigateToTest(AFScreenPrototypeTest test) {
-    return copyWith(activeTestId: test.id);
+  AFTestState navigateToTest(AFScreenPrototypeTest test, dynamic param, dynamic data, AFScreenID screen) {
+    final revisedStates = _createTestState(test.id, param, data, screen);
+    return copyWith(activeTestId: test.id, testStates: revisedStates);
   }
 
-  AFTestState startTest(AFScreenTestContext simulator) {
-    final revisedContexts = Map<AFTestID, AFScreenTestContext>.from(testContexts);
-    revisedContexts[simulator.testId] = simulator;
+  Map<AFTestID, AFSingleScreenTestState> _createTestState(AFTestID testId, dynamic param, dynamic data, AFScreenID screen) {
+    if(testStates.containsKey(testId)) {
+      return testStates;
+    }
     final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
-    revisedStates[simulator.testId] = AFSingleScreenTestState(pass: 0, errors: <String>[], data: null);
-    
+    revisedStates[testId] = AFSingleScreenTestState(pass: 0, errors: <String>[], data: data, param: param, screen: screen);
+    return revisedStates;
+
+  }
+
+  AFTestState startTest(AFScreenTestContext simulator, dynamic param, dynamic data, AFScreenID screen) {
+    final testId = simulator.testId;
+    final revisedContexts = Map<AFTestID, AFScreenTestContext>.from(testContexts);
+    revisedContexts[testId] = simulator;
+    final revisedStates = _createTestState(testId, param, data, screen);
     return copyWith(
       activeTestId: simulator.testId,
       testContexts: revisedContexts,

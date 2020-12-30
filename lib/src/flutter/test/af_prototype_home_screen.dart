@@ -113,19 +113,22 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     final t = context.t;
 
     final protoRows = t.childrenColumn();
-    protoRows.add(_createKindRow(context, "Widget Prototypes", () {
+    final titleWidget = "Widget Prototypes";
+    protoRows.add(_createKindRow(context, titleWidget, () {
       List<AFScreenPrototypeTest> tests = AFibF.g.widgetTests.all;
-      context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
+      context.dispatch(AFPrototypeTestScreen.navigateTo(tests, titleWidget));
     }));
     
-    protoRows.add(_createKindRow(context, "Screen Prototypes", () {
+    final titleScreen = "Screen Prototypes";
+    protoRows.add(_createKindRow(context, titleScreen, () {
       List<AFScreenPrototypeTest> tests = AFibF.g.screenTests.all;
-      context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
+      context.dispatch(AFPrototypeTestScreen.navigateTo(tests, titleScreen));
     }));
     
-    protoRows.add(_createKindRow(context, "Workflow Prototypes", () {
+    final titleWorkflow = "Workflow Prototypes";
+    protoRows.add(_createKindRow(context, titleWorkflow, () {
       List<AFScreenPrototypeTest> tests = AFibF.g.workflowTests.all;
-      context.dispatch(AFPrototypeTestScreen.navigateTo(tests));
+      context.dispatch(AFPrototypeTestScreen.navigateTo(tests, titleWorkflow));
     }));
     
 

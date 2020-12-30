@@ -231,7 +231,7 @@ abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extend
               screenIdRegister = dataContext.p.effectiveScreenId;
             }
             
-            AFibF.g.registerTestScreen(screenIdRegister, buildContext);
+            AFibF.g.registerTestScreen(screenIdRegister, buildContext, this);
             AFibD.logTest?.d("Rebuilding screen $runtimeType/$screenIdRegister with param ${dataContext.p}");
           }
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p, dataContext.paramWithChildren, dataContext.theme);

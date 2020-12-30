@@ -81,9 +81,9 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreCon
 
   AFPrototypeTestScreen(): super(AFUIScreenID.screenPrototypeListSingleScreen);
 
-  static AFNavigatePushAction navigateTo(List<AFScreenPrototypeTest> tests) {
+  static AFNavigatePushAction navigateTo(List<AFScreenPrototypeTest> tests, String title) {
     return AFNavigatePushAction(screen: AFUIScreenID.screenPrototypeListSingleScreen,
-      param: AFPrototypeTestScreenParam.createFromList(title: "Single Screen Prototypes", tests: tests));
+      param: AFPrototypeTestScreenParam.createFromList(title: title, tests: tests));
   }
 
   @override
@@ -112,7 +112,7 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreCon
     }
 
     final leading = AFUI.standardBackButton(context.d);
-    return context.t.buildPrototypeScaffold("Screen Prototypes", rows, leading: leading);
+    return context.t.buildPrototypeScaffold(context.p.title, rows, leading: leading);
   }
 
   Widget _addGroup(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context, AFWidgetID widGroup, String group, List<AFScreenPrototypeTest> tests) {

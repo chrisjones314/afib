@@ -76,6 +76,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   final AFStateTests _afStateTests = AFStateTests();
   final AFUnitTests _afUnitTests = AFUnitTests();
   final testOnlyScreens = <AFScreenID, AFibTestOnlyScreenElement>{};
+  AFibTestOnlyScreenElement testOnlyMostRecentScreen;
   final _recentActions = <AFActionWithKey>[];
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   final testExtractors = <AFExtractWidgetAction>[];
@@ -128,7 +129,6 @@ class AFibGlobalState<TState extends AFAppStateArea> {
       );
       testExtractors.addAll(appContext.test.extractors);
       testApplicators.addAll(appContext.test.applicators);
-      _populateAllWidgetCollectors();
     }
     if(AFibD.config.requiresPrototypeData) {
       afInitPrototypeScreenMap(screenMap);
@@ -204,13 +204,16 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   }
 
   /// Used internally in tests to find widgets on the screen.  Not for public use.
-  AFibTestOnlyScreenElement registerTestScreen(AFScreenID screenId, BuildContext screenElement) {
+  AFibTestOnlyScreenElement registerTestScreen(AFScreenID screenId, BuildContext screenElement, AFConnectedWidgetBase source) {
     var info = testOnlyScreens[screenId];
     if(info == null) {
       info = AFibTestOnlyScreenElement(screenId, screenElement);
       testOnlyScreens[screenId] = info;
     }
     info.element = screenElement;
+    if(source is AFConnectedScreen && source is! AFConnectedDrawer) {
+      testOnlyMostRecentScreen = info;
+    }
     return info;
   }
 
@@ -457,29 +460,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   /// Do not call this method, AFApp.initialize will do it for you.
   void setPrototypeScreenMap(AFScreenMap screens) {
     _afPrototypeScreenMap = screens;
-  }
-  
-  void _populateAllWidgetCollectors() async {
-    /*
-    final guard = _AFTestAsyncGuard();
-  
-    await _populateWidgetCollectors(guard, screenTests.all);
-    await _populateWidgetCollectors(guard, widgetTests.all);
-    await _populateWidgetCollectors(guard, workflowTests.all);
-    */
-  }
-
-  static Future<void> _populateWidgetCollectors(_AFTestAsyncGuard guard, List<AFScreenPrototypeTest> tests) async {
-
-    for(final test in tests) {
-      guard.startTest(test.id);
-      await test.populateWidgetCollector();
-      guard.finishTest();
-    }
-
-    return null;
-  }
-
+  }  
 }
 
 /// A class for finding accessing global utilities in AFib. 
@@ -501,19 +482,4 @@ class AFibF {
   static AFibGlobalState get g { 
     return global;
   }
-}
-
-class _AFTestAsyncGuard {
-  AFTestID activeTest;
-
-  void startTest(AFTestID test) {
-    if(activeTest != null) {
-      throw AFException("The test $activeTest is missing an await somewhere, causing it to execute with asynchronous breaks.  Look for places you were calling a test API that required an await");
-    }
-    activeTest = test;
-  }
-
-  void finishTest() {
-    activeTest = null;
-  } 
 }

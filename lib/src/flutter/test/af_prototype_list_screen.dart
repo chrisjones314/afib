@@ -5,6 +5,7 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
+import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
@@ -68,7 +69,7 @@ class AFPrototypeTestScreenParam extends AFRouteParam {
 }
 
 /// Data used to render the screen
-class AFPrototypeTestScreenData extends AFStoreConnectorData1<AFSingleScreenTests> {
+class AFPrototypeTestScreenData extends AFStateView1<AFSingleScreenTests> {
   AFPrototypeTestScreenData(AFSingleScreenTests tests): 
     super(first: tests);
   
@@ -77,7 +78,7 @@ class AFPrototypeTestScreenData extends AFStoreConnectorData1<AFSingleScreenTest
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreConnectorDataUnused, AFPrototypeTestScreenParam, AFPrototypeTheme>{
+class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStateViewUnused, AFPrototypeTestScreenParam, AFPrototypeTheme>{
 
   AFPrototypeTestScreen(): super(AFUIScreenID.screenPrototypeListSingleScreen);
 
@@ -87,12 +88,12 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreCon
   }
 
   @override
-  AFStoreConnectorDataUnused createStateData(AFAppStateArea state) {
-    return AFStoreConnectorDataUnused();
+  AFStateViewUnused createStateData(AFAppStateArea state) {
+    return AFStateViewUnused();
   }
 
   @override
-  Widget buildWithContext(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context) {
+  Widget buildWithContext(AFBuildContext<AFStateViewUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context) {
     return _buildList(context);
   }
 
@@ -102,7 +103,7 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreCon
     return result;
   }
 
-  Widget _buildList(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context) {
+  Widget _buildList(AFBuildContext<AFStateViewUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context) {
 
     final rows = AFUI.column();
     final groups = _sortIterable(context.p.screenTestsByGroup.keys);
@@ -115,7 +116,7 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStoreCon
     return context.t.buildPrototypeScaffold(context.p.title, rows, leading: leading);
   }
 
-  Widget _addGroup(AFBuildContext<AFStoreConnectorDataUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context, AFWidgetID widGroup, String group, List<AFScreenPrototypeTest> tests) {
+  Widget _addGroup(AFBuildContext<AFStateViewUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context, AFWidgetID widGroup, String group, List<AFScreenPrototypeTest> tests) {
     final t = context.t;
     final rows = t.childrenColumn();
     for(final test in tests) {

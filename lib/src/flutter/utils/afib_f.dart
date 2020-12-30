@@ -204,7 +204,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   }
 
   /// Used internally in tests to find widgets on the screen.  Not for public use.
-  AFibTestOnlyScreenElement registerTestScreen(AFScreenID screenId, BuildContext screenElement, AFConnectedWidgetBase source) {
+  AFibTestOnlyScreenElement registerTestScreen(AFScreenID screenId, BuildContext screenElement, AFConnectedUIBase source) {
     var info = testOnlyScreens[screenId];
     if(info == null) {
       info = AFibTestOnlyScreenElement(screenId, screenElement);

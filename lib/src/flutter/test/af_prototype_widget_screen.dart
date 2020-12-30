@@ -31,7 +31,7 @@ class AFPrototypeWidgetRouteParam extends AFRouteParam {
 }
 
 /// Data used to render the screen
-class AFPrototypeWidgetData extends AFStoreConnectorData2<AFTestState, AFThemeState> {
+class AFPrototypeWidgetData extends AFStateView2<AFTestState, AFThemeState> {
   AFPrototypeWidgetData(AFTestState testState, AFThemeState themes): 
     super(first: testState, second: themes);
   

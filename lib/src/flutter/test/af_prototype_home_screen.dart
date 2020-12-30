@@ -7,6 +7,7 @@ import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_prototype_list_screen.dart';
 import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
+import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
@@ -77,7 +78,7 @@ class AFPrototypeHomeScreenParam extends AFRouteParam {
 }
 
 /// Data used to render the screen
-class APrototypeHomeScreenData extends AFStoreConnectorData1<AFSingleScreenTests> {
+class APrototypeHomeScreenData extends AFStateView1<AFSingleScreenTests> {
   APrototypeHomeScreenData(AFSingleScreenTests tests): 
     super(first: tests);
   

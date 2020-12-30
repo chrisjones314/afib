@@ -4,6 +4,7 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_object_with_key.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/test/af_prototype_widget_screen.dart';
+import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 
 abstract class AFTestDispatcher extends AFDispatcher {
   final AFDispatcher main;

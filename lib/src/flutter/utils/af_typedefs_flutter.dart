@@ -7,6 +7,8 @@ import 'package:afib/src/flutter/core/af_app_extension_context.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
 import 'package:afib/src/flutter/test/af_unit_tests.dart';
 import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
+import 'package:afib/src/flutter/utils/af_dispatcher.dart';
+import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
@@ -55,7 +57,7 @@ typedef AFUpdateParamDelegate<TRouteParam> = Function(AFDispatcher dispatcher, T
 typedef AFExtractParamDelegate = AFRouteParam Function(AFRouteParam original);
 
 /// Delegate used to create data used by a screen or widget from the application state.
-typedef AFCreateDataDelegate<TData, TState> = TData Function(TState state);
+typedef AFCreateDataDelegate<TStateView, TState> = TStateView Function(TState state);
 
 /// Delegate used to find the route parameter for a screen within the AFState
 typedef AFFindParamDelegate = AFRouteParam Function(AFState state);
@@ -87,7 +89,7 @@ typedef AFCreateConnectedWidgetDelegate = AFConnectedWidgetWithParam Function(
 typedef AFWorkflowTestBodyExecuteDelegate = Future<void> Function(AFWorkflowTestExecute mse);
 
 /// Delegate used to creatae a widget builder.
-typedef AFWidgetBuilderDelegate<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> = Widget Function(AFBuildContext<TData, TRouteParam, TTheme> context);
+typedef AFWidgetBuilderDelegate<TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> = Widget Function(AFBuildContext<TStateView, TRouteParam, TTheme> context);
 
 /// Used to create a widget from a custom popup route.
 typedef AFPopupRouteWidgetBuilderDelegate = Widget Function(BuildContext ctx, AFCustomPopupRoute route);

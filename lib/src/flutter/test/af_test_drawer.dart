@@ -57,7 +57,7 @@ class AFTestDrawerRouteParam extends AFRouteParam {
 }
 
 //--------------------------------------------------------------------------------------
-class AFTestDrawerData extends AFStoreConnectorData3<AFScreenTestContextSimulator, AFSingleScreenTestState, AFScreenPrototypeTest> {
+class AFTestDrawerData extends AFStateView3<AFScreenTestContextSimulator, AFSingleScreenTestState, AFScreenPrototypeTest> {
   AFTestDrawerData(AFScreenTestContextSimulator testContext, AFSingleScreenTestState testState, AFScreenPrototypeTest test): 
     super(first: testContext, second: testState, third: test);
 

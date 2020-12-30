@@ -9,7 +9,7 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
 import 'package:afib/src/dart/utils/af_unused.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:afib/src/flutter/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 
 /// A version of [AFAsyncQuery] for queries that should be run in the background
 /// after a delay.  

@@ -8,6 +8,7 @@ import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/test/af_test.dart';
 import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
+import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
@@ -59,7 +60,7 @@ class AFPrototypeSingleScreenRouteParam extends AFRouteParam {
 }
 
 /// Data used to render the screen
-class AFPrototypeSingleScreenData extends AFStoreConnectorData3<AFSingleScreenTests, AFTestState, AFThemeState> {
+class AFPrototypeSingleScreenData extends AFStateView3<AFSingleScreenTests, AFTestState, AFThemeState> {
   AFPrototypeSingleScreenData(AFSingleScreenTests tests, AFTestState testState, AFThemeState themeState): 
     super(first: tests, second: testState, third: themeState);
   
@@ -113,7 +114,7 @@ class AFPrototypeSingleScreenScreen extends AFConnectedScreen<AFAppStateArea, AF
     final testData = testState?.data ?? test.data;
     final dispatcher = AFSingleScreenTestDispatcher(context.p.id, context.d, testContext);
     final screenMap = AFibF.g.screenMap;
-    final AFConnectedWidgetBase screen = screenMap.createFor(test.screenId);
+    final AFConnectedUIBase screen = screenMap.createFor(test.screenId);
     final themeChild = screen.findTheme(context.s.themeState);
 
     if(paramChild is AFRouteParamWithChildren) {

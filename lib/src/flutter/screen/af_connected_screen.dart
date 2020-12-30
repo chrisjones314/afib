@@ -1,6 +1,8 @@
 
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/utils/af_context_dispatcher_mixin.dart';
+import 'package:afib/src/flutter/utils/af_dispatcher.dart';
+import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:logger/logger.dart';
@@ -12,10 +14,8 @@ import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
-import 'package:afib/src/dart/utils/af_unused.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/test/af_prototype_single_screen_screen.dart';
-import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/utils/af_bottom_popup_layout.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -23,193 +23,21 @@ import 'package:afib/src/flutter/test/af_test_drawer.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_redux/flutter_redux.dart';
 
-/// Used to dispatch actions to the store, with a level of indirection
-/// for testing.
-abstract class AFDispatcher {
-  dynamic dispatch(dynamic action);
 
-  bool isTestAction(dynamic action) {
-    var shouldPop = false;
-    if(action is AFNavigatePopAction) {
-      shouldPop = action.worksInPrototypeMode;
-    }
-
-    return ( shouldPop ||
-             action is AFNavigateExitTestAction || 
-             action is AFNavigatePopNavigatorOnlyAction ||
-             action is AFNavigatePushPopupAction ||
-             action is AFNavigatePopPopupAction ||
-             action is AFUpdatePrototypeScreenTestDataAction || 
-             action is AFPrototypeScreenTestAddError ||
-             action is AFPrototypeScreenTestIncrementPassCount ||
-             action is AFStartPrototypeScreenTestContextAction );
-  }
-}
-
-/// The production dispatcher which dispatches actions to the store.
-class AFStoreDispatcher extends AFDispatcher {
-
-  AFStore store;
-  AFStoreDispatcher(this.store);
-
-  dynamic dispatch(dynamic action) {  
-    if(AFibD.config.requiresTestData && !isTestAction(action) && action is AFActionWithKey) {
-      AFibF.g.testOnlyRegisterRegisterAction(action);
-      AFibD.logTest?.d("Registered action: $action");
-    }
-
-    return store.dispatch(action);
-  }
-
-}
-
-/// A test dispatcher which records actions for later inspection.
-class AFTestDispatcher extends AFDispatcher {
-  List<dynamic> actions = <dynamic>[];
-
-  int get actionCount {
-    return actions.length;
-  }
-
-  dynamic get first {
-    return actions[0];
-  }
-
-  dynamic nth(int i ) {
-    return actions[i];
-  } 
-
-  void clear() {
-    actions.clear();
-  }
-
-  dynamic dispatch(dynamic action) {
-    actions.add(action);
-    return null;
-  }
-
-}
-
-/// Used utility class used to capture pieces of data from the
-/// store and expose them to a screen.  
+/// Base call for all screens, widgets, drawers, dialogs and bottom sheets
+/// that connect to the store/state.
 /// 
-/// This allows screens to be populated with data without ever
-/// having a store in tests.
-@immutable
-class AFStoreConnectorData<TV1, TV2, TV3, TV4> {
-  final TV1 first;
-  final TV2 second;
-  final TV3 third;
-  final TV4 fourth;
-
-  AFStoreConnectorData({this.first, this.second, this.third, this.fourth});
-
-  /// Because store connector data is always recreated, it is 
-  /// important to implement deep equality so that the screen won't be re-rendered
-  /// each time if the data has not changed.
-  bool operator==(dynamic o) {
-    final result = (o is AFStoreConnectorData<TV1, TV2, TV3, TV4> && first == o.first && second == o.second && third == o.third && fourth == o.fourth);
-    return result;
-  }
-
-  int get hashCode {
-    return hash4(first.hashCode, second.hashCode, third.hashCode, fourth.hashCode);
-  }
-
-}
-
-@immutable
-class AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> extends AFStoreConnectorData<TV1, TV2, TV3, TV4> {
-  final TV5 fifth;
-  final TV6 sixth;
-  final TV7 seventh;
-  final TV8 eighth;
-
-  AFStoreConnectorDataExtended({TV1 first, TV2 second, TV3 third, TV4 fourth, this.fifth, this.sixth, this.seventh, this.eighth}):
-    super(first: first, second: second, third: third, fourth: fourth);
-
-  bool operator==(dynamic o) {
-    final result = (o is AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> 
-      && first == o.first && second == o.second && third == o.third && fourth == o.fourth
-      && fifth == o.fifth && sixth == o.sixth && seventh == o.seventh && eighth == o.eighth);
-    return result;
-  }
-
-  int get hashCode {
-    final start = super.hashCode;
-    final next = hash4(fifth?.hashCode, sixth?.hashCode, seventh?.hashCode, eighth?.hashCode);
-    return hash2(start, next);
-  }
-}
-
-/// Use this if you don't use any data from the store to render your screen.
-@immutable 
-class AFStoreConnectorDataUnused extends AFStoreConnectorData<AFUnused, AFUnused, AFUnused, AFUnused> {
-  AFStoreConnectorDataUnused({AFDispatcher dispatcher, AFRouteParam param}): super();
-}
-
-/// Use this version of [AFStoreConnectorData] if you only need one piece of data from the store.
-@immutable 
-class AFStoreConnectorData1<TV1> extends AFStoreConnectorData<TV1, AFUnused, AFUnused, AFUnused> {
-  AFStoreConnectorData1({AFDispatcher dispatcher, AFRouteParam param, TV1 first}): super(first: first);
-}
-
-/// Use this version of [AFStoreConnectorData] if you need two pieces of data from the store.
-@immutable 
-class AFStoreConnectorData2<TV1, TV2> extends AFStoreConnectorData<TV1, TV2, AFUnused, AFUnused> {
-  AFStoreConnectorData2({AFDispatcher dispatcher, AFRouteParam param, TV1 first, TV2 second}): super(first: first, second: second);
-}
-
-/// Use this version of [AFStoreConnectorData] if you need three pieces of data from the store.
-@immutable 
-class AFStoreConnectorData3<TV1, TV2, TV3> extends AFStoreConnectorData<TV1, TV2, TV3, AFUnused> {
-  AFStoreConnectorData3({AFDispatcher dispatcher, AFRouteParam param, TV1 first, TV2 second, TV3 third}): super(first: first, second: second, third: third);
-}
-
-/// Use this version of [AFStoreConnectorData] if you need four pieces of data from the store.
-@immutable 
-class AFStoreConnectorData4<TV1, TV2, TV3, TV4> extends AFStoreConnectorData<TV1, TV2, TV3, TV4> {
-  AFStoreConnectorData4({TV1 first, TV2 second, TV3 third, TV4 fourth}): super(first: first, second: second, third: third, fourth: fourth);
-}
-
-/// User this version of [AFStoreConnectorDataExtended] if you need five pieces of data from the store.
-class AFStoreConnectorData5<TV1, TV2, TV3, TV4, TV5> extends AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, AFUnused, AFUnused, AFUnused> {
-  AFStoreConnectorData5({TV1 first, TV2 second, TV3 third, TV4 fourth, TV5 fifth}): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth);
-
-}
-
-class AFStoreConnectorData6<TV1, TV2, TV3, TV4, TV5, TV6> extends AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, TV6, AFUnused, AFUnused> {
-  AFStoreConnectorData6({TV1 first, TV2 second, TV3 third, TV4 fourth, TV5 fifth, TV6 sixth}): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth, sixth: sixth);
-}
-
-class AFStoreConnectorData7<TV1, TV2, TV3, TV4, TV5, TV6, TV7> extends AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, AFUnused> {
-  AFStoreConnectorData7({TV1 first, TV2 second, TV3 third, TV4 fourth, TV5 fifth, TV6 sixth, TV7 seventh}): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth, sixth: sixth, seventh: seventh);
-}
-
-class AFStoreConnectorData8<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> extends AFStoreConnectorDataExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> {
-  AFStoreConnectorData8({TV1 first, TV2 second, TV3 third, TV4 fourth, TV5 fifth, TV6 sixth, TV7 seventh, TV8 eighth}): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth, sixth: sixth, seventh: seventh, eighth: eighth);
-}
-
-/// This common superclass makes it possible to treat all afib Widgets/screens
-/// similarly for testing and prototyping purposes.
-abstract class AFBuildableWidget<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends material.StatelessWidget {
-  AFBuildableWidget({Key key}): super(key: key);
-
-
-    /// Builds a Widget using the data extracted from the state.
-  material.Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context);
-
-  /// Wrap all four pieces of data needed during a build in a single utility object.
-  AFBuildContext createContext(material.BuildContext context, AFDispatcher dispatcher, TData data, TRouteParam param, AFRouteParamWithChildren paramWithChildren, TTheme theme) {
-    return AFBuildContext<TData, TRouteParam, TTheme>(context, dispatcher, data, param, paramWithChildren, theme);
-  }
-}
-
-/// A screen that uses data from the store but not from the route.
-abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFBuildableWidget<TData, TRouteParam, TTheme> {
+/// You should usually subclass on of its subclasses:
+/// * [AFConnectedScreen]
+/// * [AFConnectedWidget]
+/// * [AFConnectedScreenWithConnectedChildren] - used for screens containing connected widgets
+/// * [AFConnectedDrawer]
+/// * [AFConnectedDialog]
+/// * [AFConnectedBottomSheet]
+abstract class AFConnectedUIBase<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends material.StatelessWidget {
     
   //--------------------------------------------------------------------------------------
-  AFConnectedWidgetBase({Key key}): super(key: key);
+  AFConnectedUIBase({Key key}): super(key: key);
 
   //--------------------------------------------------------------------------------------
   @override
@@ -241,11 +69,24 @@ abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extend
     );
   }
 
+  AFBuildContext createContext(material.BuildContext context, AFDispatcher dispatcher, TStateView data, TRouteParam param, AFRouteParamWithChildren paramWithChildren, TTheme theme) {
+    return AFBuildContext<TStateView, TRouteParam, TTheme>(context, dispatcher, data, param, paramWithChildren, theme);
+  }
+
   /// Screens that have their own element tree in testing must return their screen id here,
   /// otherwise return null.
   AFScreenID get screenIdForTest;
 
-  AFBuildContext<TData, TRouteParam, TTheme> _createNonBuildContext(AFStore store) {
+  AFBuildContext<TStateView, TRouteParam, TTheme> _createNonBuildContext(AFStore store) {
+    /*
+    if(AFibD.config.isTestContext) {
+      final testContext = _createTestContext(store);
+      if(testContext != null) {
+        return testContext;
+      }
+    }
+    */
+
     final data = createStateDataAF(store.state);
     final param = findParam(store.state);
     final paramWithChildren = findParamWithChildren(store.state);
@@ -274,7 +115,7 @@ abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extend
 
   bool routeEntryExists(AFState state) { return true; }
 
-  TData createStateDataAF(AFState state) {
+  TStateView createStateDataAF(AFState state) {
     return createStateDataPublic(state.public);
   }
 
@@ -283,17 +124,17 @@ abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extend
   /// 
   /// However, be aware that a full route state does not exist in single
   /// screen tests.
-  TData createStateDataPublic(AFPublicState public) {
+  TStateView createStateDataPublic(AFPublicState public) {
     final TState state = public.areaStateFor(TState);
     return createStateData(state);
   }
 
 
-  /// Override this to create an [AFStoreConnectorData] with the required data from the state.
-  TData createStateData(TState state);
+  /// Override this to create an [AFStateView] with the required data from the state.
+  TStateView createStateData(TState state);
 
   /// Builds a Widget using the data extracted from the state.
-  material.Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context);
+  material.Widget buildWithContext(AFBuildContext<TStateView, TRouteParam, TTheme> context);
 
   /// Called to update the route parameter and re-render the screen.
   /// 
@@ -313,7 +154,7 @@ abstract class AFConnectedWidgetBase<TState extends AFAppStateArea, TData extend
 
 /// Superclass for a screen Widget, which combined data from the store with data from
 /// the route in order to render itself.
-abstract class AFConnectedScreen<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedWidgetBase<TState, TData, TRouteParam, TTheme> {
+abstract class AFConnectedScreen<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedUIBase<TState, TStateView, TRouteParam, TTheme> {
   final AFScreenID screenId;
     final AFNavigateRoute route;
 
@@ -414,11 +255,11 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TData extends AF
   }
 }
 
-abstract class AFConnectedWidgetWithParent<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedWidgetBase<TState, TData, TRouteParam, TTheme> { 
+abstract class AFConnectedWidget<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedUIBase<TState, TStateView, TRouteParam, TTheme> { 
   final AFScreenID parentScreen;
   final AFWidgetID widChild;
   
-  AFConnectedWidgetWithParent({
+  AFConnectedWidget({
     @required this.parentScreen,
     @required this.widChild,
   }): super(key: AFUI.keyForWID(widChild));
@@ -464,136 +305,13 @@ abstract class AFConnectedWidgetWithParent<TState extends AFAppStateArea, TData 
 }
 
 
-
-/// Use this to connect a Widget to the store.  
+/// Use this, coupled with [AFRouteParamWithChildren] for screens which 
+/// render connected widgets.  
 /// 
-/// The Widget can still have a route parameter, but it must be passed in
-/// from the parent screen that the Widget is created by.
-abstract class AFConnectedWidgetWithParam<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedWidgetBase<TState, TData, TRouteParam, TTheme> {
-  //final TRouteParam parentParam;
-  final AFUpdateParamDelegate<TRouteParam> updateParamDelegate;
-  final AFExtractParamDelegate extractParamDelegate;
-  final AFCreateDataDelegate createDataDelegate;
-  final AFFindParamDelegate findParamDelegate;
-  final AFDispatcher dispatcher;
-
-  AFConnectedWidgetWithParam({
-    Key key,
-    @required this.dispatcher,
-    @required this.findParamDelegate,
-    @required this.updateParamDelegate,
-    @required this.extractParamDelegate,
-    @required this.createDataDelegate
-  }): super(key: key);
-
-  AFScreenID get screenIdForTest {
-    return null;
-  }
-
-  @override
-  TData createStateData(TState state) {
-    return this.createDataDelegate(state);
-  }
-
-  @override
-  AFDispatcher createDispatcher(AFStore store) {
-    return dispatcher;
-  }
-
-  /// Finds the parameter for the parent screen, since a popup screen had not route entry.
-  TRouteParam findParam(AFState state) {
-    AFRouteParam orig;
-    if(findParamDelegate != null) {
-       orig = this.findParamDelegate(state);
-    }
-    if(orig != null && this.extractParamDelegate != null) {
-      orig = this.extractParamDelegate(orig);
-    }
-    return orig;
-  }
-
-  /// Updates the parameter for the parent screen, rather than updating a parameter for our screen (which has no route entry).
-  void updateRouteParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
-    updateParamDelegate(dispatcher, revised, id: id);
-  }
-
-}
-
-
-/// Just like an [AFConnectedScreen], except it is typically displayed as 
-/// a modal overlay on top of an existing screen, and launched using a custom 
-/// AFPopupRoute
-abstract class AFPopupScreen<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TData, TRouteParam, TTheme> {
-  final material.Animation<double> animation;
-  final AFBottomPopupTheme theme;
-  final AFCreateDataDelegate createDataDelegate;
-  AFPopupScreen({
-    AFScreenID screenId,
-    @required this.animation, 
-    @required this.theme,
-    @required this.createDataDelegate
-  }): super(screenId);
-
-  AFScreenID get screenIdForTest {
-    return screenId;
-  }
-  
-  /// Find the route parameter for the specified named screen
-  @override
-  TRouteParam findParam(AFState state) {
-
-    final route = state.public.route;
-    TRouteParam p = route?.findPopupParamFor(this.screenId);
-    return p;
-  }
-
-  TData createStateData(TState state) {
-    return this.createDataDelegate(state);
-  }
-
-  void updateRouteParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
-    dispatcher.dispatch(AFNavigateSetPopupParamAction(
-      id: id,
-      screen: this.screenId, 
-      param: revised)
-    );
-  }
-
-  @override
-  material.Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context) {
-    return buildPopupAnimation(context);
-  }
-
-  material.Widget buildPopupAnimation(AFBuildContext<TData, TRouteParam, TTheme> context) {
-    return material.GestureDetector(
-      onTap: () {
-        context.log?.d("OnTapGestureDetector");
-      },
-      child: material.AnimatedBuilder(
-        animation: animation,
-        builder: (ctx, child) {
-          final local = AFBuildContext<TData, TRouteParam, TTheme>(ctx, context.d, context.s, context.p, context.paramWithChildren, context.t);
-          final bottomPadding = material.MediaQuery.of(local.c).padding.bottom;
-          return material.ClipRect(
-            child: material.CustomSingleChildLayout(
-              delegate: AFBottomPopupLayout(animation.value, theme, bottomPadding: bottomPadding),
-              child: material.GestureDetector(
-                child: material.Material(
-                  color: theme.backgroundColor ?? material.Colors.white,
-                  child: buildPopupContents(local, theme),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  material.Widget buildPopupContents(AFBuildContext<TData, TRouteParam, TTheme> context, AFBottomPopupTheme theme);
-}
-
-abstract class AFConnectedScreenWithConnectedChildren<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TData, TRouteParam, TTheme> {
+/// See also:
+/// * [AFBuildContext.childrenRenderConnected]
+/// * various update... methods related to connected children on [AFBuildContext]
+abstract class AFConnectedScreenWithConnectedChildren<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TStateView, TRouteParam, TTheme> {
 
   AFConnectedScreenWithConnectedChildren({
     @required AFScreenID screenId,
@@ -601,11 +319,11 @@ abstract class AFConnectedScreenWithConnectedChildren<TState extends AFAppStateA
   }): super(screenId, route: route);
 
   AFRouteParam findParam(AFState state) { 
-    return AFConnectedWidgetWithParent.findChildParam(state, this.screenId, this.screenId);
+    return AFConnectedWidget.findChildParam(state, this.screenId, this.screenId);
   }
   
   void updateRouteParamD(AFDispatcher dispatcher, AFRouteParam revised, { AFID id }) {
-    AFConnectedWidgetWithParent.updateChildRouteParam(dispatcher, revised, this.screenId, this.screenId, id: id);
+    AFConnectedWidget.updateChildRouteParam(dispatcher, revised, this.screenId, this.screenId, id: id);
   }
 
   /// Find the route param for this screen. 
@@ -631,7 +349,7 @@ abstract class AFConnectedScreenWithConnectedChildren<TState extends AFAppStateA
 }
 
 
-abstract class AFConnectedScreenWithGlobalParam<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TData, TRouteParam, TTheme> {
+abstract class AFConnectedScreenWithGlobalParam<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TStateView, TRouteParam, TTheme> {
   AFConnectedScreenWithGlobalParam(
     AFScreenID screenId,
   ): super(screenId, route: AFNavigateRoute.routeGlobalPool);
@@ -663,7 +381,7 @@ abstract class AFConnectedScreenWithGlobalParam<TState extends AFAppStateArea, T
 /// Consequently, you will need to override [AFConnectedScreenWithGlobalParam.createDefaultRouteParam],
 /// which will be used to create your route parameter if the drawer was dragged onto the
 /// screen without you explicitly calling [AFBuildContext.openDrawer].
-abstract class AFConnectedDrawer<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreenWithGlobalParam<TState, TData, TRouteParam, TTheme> {
+abstract class AFConnectedDrawer<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreenWithGlobalParam<TState, TStateView, TRouteParam, TTheme> {
   AFConnectedDrawer(
     AFScreenID screenId,
   ): super(screenId);
@@ -695,34 +413,34 @@ abstract class AFConnectedDrawer<TState extends AFAppStateArea, TData extends AF
 /// Use this to connect a dialog to the store.
 /// 
 /// You can open a dialog with [AFBuildContext.showDialog].
-abstract class AFConnectedDialog<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreenWithGlobalParam<TState, TData, TRouteParam, TTheme> {
+abstract class AFConnectedDialog<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreenWithGlobalParam<TState, TStateView, TRouteParam, TTheme> {
   AFConnectedDialog(
     AFScreenID screenId,
   ): super(screenId);
 
   @override
-  material.Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context) {
+  material.Widget buildWithContext(AFBuildContext<TStateView, TRouteParam, TTheme> context) {
     return buildDialogWithContext(context);
   }
 
-  material.Widget buildDialogWithContext(AFBuildContext<TData, TRouteParam, TTheme> context);
+  material.Widget buildDialogWithContext(AFBuildContext<TStateView, TRouteParam, TTheme> context);
 }
 
 /// Use this to connect a bottom sheet to the store.
 /// 
 /// You can open a bottom sheet with [AFBuildContext.showBottomSheet]
 /// or [AFBuildContext.showModalBottomSheeet].
-abstract class AFConnectedBottomSheet<TState extends AFAppStateArea, TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreenWithGlobalParam<TState, TData, TRouteParam, TTheme> {
+abstract class AFConnectedBottomSheet<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreenWithGlobalParam<TState, TStateView, TRouteParam, TTheme> {
   AFConnectedBottomSheet(
     AFScreenID screenId,
   ): super(screenId);
 
   @override
-  material.Widget buildWithContext(AFBuildContext<TData, TRouteParam, TTheme> context) {
+  material.Widget buildWithContext(AFBuildContext<TStateView, TRouteParam, TTheme> context) {
     return buildBottomSheetWithContext(context);
   }
 
-  material.Widget buildBottomSheetWithContext(AFBuildContext<TData, TRouteParam, TTheme> context);
+  material.Widget buildBottomSheetWithContext(AFBuildContext<TStateView, TRouteParam, TTheme> context);
 }
 
 
@@ -730,22 +448,22 @@ abstract class AFConnectedBottomSheet<TState extends AFAppStateArea, TData exten
 /// screen data and param to many functions, to make things more concise.  
 /// 
 /// The framework cannot pass you this itself because 
-class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> with AFContextDispatcherMixin {
+class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> with AFContextDispatcherMixin {
   material.BuildContext context;
   AFDispatcher dispatcher;
-  TData storeData;
+  TStateView stateView;
   TRouteParam param;
   AFRouteParamWithChildren paramWithChildren;
   AFScreenPrototypeTest screenTest;
   TTheme theme;
 
-  AFBuildContext(this.context, this.dispatcher, this.storeData, this.param, this.paramWithChildren, this.theme,);
+  AFBuildContext(this.context, this.dispatcher, this.stateView, this.param, this.paramWithChildren, this.theme,);
 
   /// Shorthand for accessing the route param.
   TRouteParam get p { return param; }
 
   /// Shorthand for accessing data from the store
-  TData get s { return storeData; }
+  TStateView get s { return stateView; }
 
   /// Shorthand for accessing the theme
   TTheme get t { return theme; }
@@ -767,7 +485,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   /// context.updateRouteParam(this, revisedParam)
   /// ```
   /// from within a screen/widget, I recommend calling 
-  /// [AFConnectedWidgetBase.updateRouteParam] directly in your screen.
+  /// [AFConnectedUIBase.updateRouteParam] directly in your screen.
   /// 
   /// ```dart
   /// updateRouteParam(context, revisedParam);
@@ -779,7 +497,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   /// ```
   /// So, in a sense this is more consistent with that method.  They all function
   /// in the same way.
-  void updateRouteParam(AFConnectedWidgetBase widget, TRouteParam revised, { AFID id }) {
+  void updateRouteParam(AFConnectedUIBase widget, TRouteParam revised, { AFID id }) {
     widget.updateRouteParam(this, revised, id: id);
   }
 
@@ -1046,12 +764,12 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
   }
 
   bool operator==(dynamic o) {
-    final result = (o is AFBuildContext<TData, TRouteParam, TTheme> && param == o.param && paramWithChildren == o.paramWithChildren && storeData == o.storeData && theme == o.theme);
+    final result = (o is AFBuildContext<TStateView, TRouteParam, TTheme> && param == o.param && paramWithChildren == o.paramWithChildren && stateView == o.stateView && theme == o.theme);
     return result;
   }
 
   int get hashCode {
-    return hash2(param.hashCode, storeData.hashCode);
+    return hash2(param.hashCode, stateView.hashCode);
   }
 
   /// As long as you are calling [AFConnectedScreen.createScaffold], you don't need
@@ -1109,7 +827,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
 
     final widChild = children.toList().first.widgetId;
     final widget = render(widChild);
-    if(widget is! AFConnectedWidgetWithParent) {
+    if(widget is! AFConnectedWidget) {
       throw AFException("When rendering children of a AFConnectedScreenWithConnectedChildren, the children must be subclasses of AFConnectedWidgetWithParent");
     }
     return widget;
@@ -1133,7 +851,7 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
         if(widget == null) {
           continue;
         }
-        if(widget is! AFConnectedWidgetWithParent) {
+        if(widget is! AFConnectedWidget) {
           throw AFException("When rendering children of a AFConnectedScreenWithConnectedChildren, the children must be subclasses of AFConnectedWidgetWithParent");
         }
         result.add(widget);
@@ -1196,3 +914,130 @@ class AFBuildContext<TData extends AFStoreConnectorData, TRouteParam extends AFR
 
 }
 
+/// Use this to connect a Widget to the store.  
+/// 
+/// The Widget can still have a route parameter, but it must be passed in
+/// from the parent screen that the Widget is created by.
+abstract class AFConnectedWidgetWithParam<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedUIBase<TState, TStateView, TRouteParam, TTheme> {
+  //final TRouteParam parentParam;
+  final AFUpdateParamDelegate<TRouteParam> updateParamDelegate;
+  final AFExtractParamDelegate extractParamDelegate;
+  final AFCreateDataDelegate createDataDelegate;
+  final AFFindParamDelegate findParamDelegate;
+  final AFDispatcher dispatcher;
+
+  AFConnectedWidgetWithParam({
+    Key key,
+    @required this.dispatcher,
+    @required this.findParamDelegate,
+    @required this.updateParamDelegate,
+    @required this.extractParamDelegate,
+    @required this.createDataDelegate
+  }): super(key: key);
+
+  AFScreenID get screenIdForTest {
+    return null;
+  }
+
+  @override
+  TStateView createStateData(TState state) {
+    return this.createDataDelegate(state);
+  }
+
+  @override
+  AFDispatcher createDispatcher(AFStore store) {
+    return dispatcher;
+  }
+
+  /// Finds the parameter for the parent screen, since a popup screen had not route entry.
+  TRouteParam findParam(AFState state) {
+    AFRouteParam orig;
+    if(findParamDelegate != null) {
+       orig = this.findParamDelegate(state);
+    }
+    if(orig != null && this.extractParamDelegate != null) {
+      orig = this.extractParamDelegate(orig);
+    }
+    return orig;
+  }
+
+  /// Updates the parameter for the parent screen, rather than updating a parameter for our screen (which has no route entry).
+  void updateRouteParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
+    updateParamDelegate(dispatcher, revised, id: id);
+  }
+
+}
+
+
+/// Just like an [AFConnectedScreen], except it is typically displayed as 
+/// a modal overlay on top of an existing screen, and launched using a custom 
+/// AFPopupRoute
+abstract class AFPopupScreen<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TStateView, TRouteParam, TTheme> {
+  final material.Animation<double> animation;
+  final AFBottomPopupTheme theme;
+  final AFCreateDataDelegate createDataDelegate;
+  AFPopupScreen({
+    AFScreenID screenId,
+    @required this.animation, 
+    @required this.theme,
+    @required this.createDataDelegate
+  }): super(screenId);
+
+  AFScreenID get screenIdForTest {
+    return screenId;
+  }
+  
+  /// Find the route parameter for the specified named screen
+  @override
+  TRouteParam findParam(AFState state) {
+
+    final route = state.public.route;
+    TRouteParam p = route?.findPopupParamFor(this.screenId);
+    return p;
+  }
+
+  TStateView createStateData(TState state) {
+    return this.createDataDelegate(state);
+  }
+
+  void updateRouteParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id }) {
+    dispatcher.dispatch(AFNavigateSetPopupParamAction(
+      id: id,
+      screen: this.screenId, 
+      param: revised)
+    );
+  }
+
+  @override
+  material.Widget buildWithContext(AFBuildContext<TStateView, TRouteParam, TTheme> context) {
+    return buildPopupAnimation(context);
+  }
+
+  material.Widget buildPopupAnimation(AFBuildContext<TStateView, TRouteParam, TTheme> context) {
+    return material.GestureDetector(
+      onTap: () {
+        context.log?.d("OnTapGestureDetector");
+      },
+      child: material.AnimatedBuilder(
+        animation: animation,
+        builder: (ctx, child) {
+          final local = AFBuildContext<TStateView, TRouteParam, TTheme>(ctx, context.d, context.s, context.p, context.paramWithChildren, context.t);
+          final bottomPadding = material.MediaQuery.of(local.c).padding.bottom;
+          return material.ClipRect(
+            child: material.CustomSingleChildLayout(
+              delegate: AFBottomPopupLayout(animation.value, theme, bottomPadding: bottomPadding),
+              child: material.GestureDetector(
+                child: material.Material(
+                  color: theme.backgroundColor ?? material.Colors.white,
+                  child: buildPopupContents(local, theme),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  material.Widget buildPopupContents(AFBuildContext<TStateView, TRouteParam, TTheme> context, AFBottomPopupTheme theme);
+}

@@ -28,6 +28,8 @@ export "src/flutter/utils/af_bottom_popup_layout.dart";
 export "src/flutter/utils/af_bottom_popup_theme.dart";
 export "src/flutter/utils/af_builder.dart";
 export "src/flutter/utils/af_custom_popup_route.dart";
+export 'src/flutter/utils/af_dispatcher.dart';
 export 'src/flutter/utils/af_param_ui_state_holder.dart';
+export 'src/flutter/utils/af_state_view.dart';
 export "src/flutter/utils/af_typedefs_flutter.dart";
 export 'src/flutter/utils/afib_f.dart';

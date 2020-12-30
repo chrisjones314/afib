@@ -3,6 +3,7 @@ import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:flutter/material.dart';
 
 class AFPrototypeTheme extends AFConceptualTheme {

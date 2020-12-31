@@ -1,8 +1,8 @@
 
 
 import 'package:afib/afib_dart.dart';
+import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
-import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
 import 'package:afib/src/flutter/core/af_app_extension_context.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
@@ -38,7 +38,7 @@ Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendAppDelegate exten
   extendApp(context);
   extendTest(context.test);
 
-  final paramsTest = paramsD.forceEnvironment(AFConfigEntryEnvironment.prototype);
+  final paramsTest = paramsD.forceEnvironment(AFEnvironment.prototype);
   AFibD.initialize(paramsTest);
   AFibF.initialize<TState>(context);
 

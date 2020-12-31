@@ -1,6 +1,7 @@
 
 import 'dart:core';
 import 'package:afib/src/dart/command/af_command.dart';
+import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/generator_code/af_code_generator.dart';
@@ -43,8 +44,8 @@ class AFConfig {
   }
 
   /// Returns a text-version of the current AFConfigConstants.environmentKey value.
-  String get environment  {
-    return stringFor(AFConfigEntries.environment);
+  AFEnvironment get environment  {
+    return valueFor(AFConfigEntries.environment);
   }
 
   /// 
@@ -119,7 +120,7 @@ class AFConfig {
   void dumpOne(String key, AFCommandOutput output) {
     final entry = find(key);
     if(entry == null) {
-      output.writeErrorLine("No conifguration value for $key");
+      output.writeErrorLine("No configuration value for $key");
       return;
     }
     dumpEntry(entry, output);

@@ -1,5 +1,5 @@
 
-import 'package:afib/src/dart/command/af_standard_configs.dart';
+import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
@@ -43,13 +43,13 @@ class AFibD<AppState> {
         }
         p.initAppConfig(AFibD.config);
         final env = AFibD.config.environment;
-        if(env == AFConfigEntryEnvironment.debug) {
+        if(env == AFEnvironment.debug) {
           p.initDebugConfig(AFibD.config);
-        } else if(env == AFConfigEntryEnvironment.production) {
+        } else if(env == AFEnvironment.production) {
           p.initProductionConfig(AFibD.config);
-        } else if(env == AFConfigEntryEnvironment.prototype) {
+        } else if(env == AFEnvironment.prototype) {
           p.initPrototypeConfig(AFibD.config);
-        } else if(env == AFConfigEntryEnvironment.testStore) {
+        } else if(env == AFEnvironment.test) {
           p.initTestConfig(AFibD.config);
         }
 

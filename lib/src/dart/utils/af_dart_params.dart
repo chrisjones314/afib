@@ -1,4 +1,5 @@
 
+import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
@@ -30,7 +31,7 @@ class AFDartParams<AppState> {
     this.forceEnv
   });
 
-  AFDartParams forceEnvironment(String env) {
+  AFDartParams forceEnvironment(AFEnvironment env) {
     return copyWith(forceEnv: env);
   }
 
@@ -43,7 +44,7 @@ class AFDartParams<AppState> {
     AFInitConfigurationDelegate initPrototypeConfig,
     AFInitConfigurationDelegate initTestConfig,
     Logger logger,
-    String forceEnv,
+    AFEnvironment forceEnv,
   }) {
     return AFDartParams(
       initAfib: initAfib ?? this.initAfib,

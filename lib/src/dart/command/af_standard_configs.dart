@@ -1,30 +1,27 @@
 
+import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 
-class AFConfigEntryEnvironment extends AFConfigEntryChoice {
-  static const production = "production";
-  static const debug = "debug";
-  static const prototype = "prototype";
-  static const testStore = "test_store";
-  static const allEnvironments = [production, debug, prototype, testStore];
+class AFConfigEntryEnvironment extends AFConfigEntryEnumChoice<AFEnvironment> {
+  static const allEnvironments = AFEnvironment.values;
 
-  AFConfigEntryEnvironment(): super(AFConfigEntries.afNamespace, "environment", production) {
-    addChoice(debug, "");
-    addChoice(production, "");
-    addChoice(prototype, "Display a list of prototype screens, see initialization/test/screen_tests.dart");
-    addChoice(testStore, "Used internally when doing state tests, typically not selected explicitly");
+  AFConfigEntryEnvironment(): super(AFConfigEntries.afNamespace, "environment", AFEnvironment.production) {
+    addChoice(AFEnvironment.debug, "For debugging");
+    addChoice(AFEnvironment.production, "For production");
+    addChoice(AFEnvironment.prototype, "Interact with prototype screens, and run tests against them on the simulator");
+    addChoice(AFEnvironment.test, "Used internally when command-line tests are executing");
   }
 
   bool requiresPrototypeData(AFConfig config) {
-    final env = config.stringFor(this);
-    return env == prototype;
+    final env = config.valueFor(this);
+    return env == AFEnvironment.prototype;
   }
 
   bool requiresTestData(AFConfig config) {
-    final env = config.stringFor(this);
-    return (env != production && env != debug);
+    final env = config.valueFor(this);
+    return (env != AFEnvironment.production && env != AFEnvironment.debug);
   }
 
 }

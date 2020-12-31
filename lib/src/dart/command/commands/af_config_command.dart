@@ -1,4 +1,5 @@
 
+import 'package:meta/meta.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
@@ -226,9 +227,14 @@ class AFConfigEntryEnabledTests extends AFConfigEntryList {
 
 /// Used to define choices for a configuration value.
 class AFConfigEntryDescription {
-  String choice;
-  String help;
-  AFConfigEntryDescription(this.choice, this.help);
+  final String choice;
+  final dynamic value;
+  final String help;
+  AFConfigEntryDescription({
+    @required this.choice, 
+    @required this.help,
+    @required this.value,
+  });
 
 }
 
@@ -240,7 +246,11 @@ abstract class AFConfigEntryChoice extends AFConfigEntry {
   AFConfigEntryChoice(String namespace, String key, dynamic defaultValue, {String declaringClass = AFConfigEntries.declaredIn}): super(namespace, key, defaultValue, declaringClass: declaringClass);
 
   void addChoice(String choice, String help) {
-    choices.add(AFConfigEntryDescription(choice, help));
+    choices.add(AFConfigEntryDescription(
+      choice: choice, 
+      value: choice,
+      help: help
+    ));
   }  
 
   void writeHelp(AFCommandOutput output, { int indent = 0 }) {
@@ -251,6 +261,62 @@ abstract class AFConfigEntryChoice extends AFConfigEntry {
       AFCommand.startHelpColumn(output);
       output.write(choice.help);
       output.endLine();
+    }
+  }
+
+  String validate(dynamic value) {
+    final choice = findChoice(value);
+    if(choice == null) {
+      return "$value is not a valid choice for $namespaceKey";
+    }
+    return null;
+  }
+
+  AFConfigEntryDescription findChoice(String val) {
+    for(var choice in choices) {
+      if(choice.choice == val) {
+        return choice;
+      }
+    }
+    return null;
+  }
+}
+
+/// Superclass for configuration definitions that offer a list of string values,
+/// for example 'debug', 'production', 'test'
+abstract class AFConfigEntryEnumChoice<TEnum> extends AFConfigEntry {
+  final choices = <AFConfigEntryDescription>[];
+  
+  AFConfigEntryEnumChoice(String namespace, String key, TEnum defaultValue, {String declaringClass = AFConfigEntries.declaredIn}): super(namespace, key, defaultValue, declaringClass: declaringClass);
+
+  void addChoice(TEnum choice, String help) {
+    final full = choice.toString();
+    final idx = full.indexOf(".");
+    final str = full.substring(idx+1);
+    choices.add(AFConfigEntryDescription(
+      choice: str, 
+      value: choice,
+      help: help
+    ));
+  }  
+
+  void writeHelp(AFCommandOutput output, { int indent = 0 }) {
+    writeCommandHelp(output, "set the $key configuration value to one of:", indent: indent);
+    for(var choice in choices) {
+      AFCommand.startCommandColumn(output, indent: indent+1);
+      output.write("${choice.choice} - ");
+      AFCommand.startHelpColumn(output);
+      output.write(choice.help);
+      output.endLine();
+    }
+  }
+
+  void setValueWithString(AFConfig dest, String value) {
+    validateWithException(value);
+    for(final choice in choices) {
+      if(choice.choice == value) {
+        dest.putInternal(this, choice.value);
+      }
     }
   }
 

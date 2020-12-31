@@ -75,7 +75,7 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFProtot
     final test = context.p.test;
     final testContext = context.s.testState.findContext(test.id);
     final testState = context.s.testState.findState(test.id);
-    final testData = testState?.data ?? test.data;
+    final testData = testState?.stateView ?? test.data;
     final sourceWidget = test.createConnectedWidget(context.d, findParam, (dispatcher, param, { id }) {
       dispatcher.dispatch(AFNavigateSetParamAction(
         id: id,

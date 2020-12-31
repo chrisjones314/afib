@@ -70,7 +70,7 @@ Future<void> _afStandardScreenTestMain<TState extends AFAppStateArea>(
 
       final dispatcher = AFSingleScreenTestDispatcher(test.id, AFStoreDispatcher(AFibF.g.storeInternalOnly), null);
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id);
-      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context));
+      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, stateView: test.stateView, screen: test.screenId, param: test.routeParam));
       dispatcher.setContext(context);
       simpleContexts.add(context);
 
@@ -106,7 +106,7 @@ Future<void> _afWidgetTestMain<TState extends AFAppStateArea>(AFCommandOutput ou
 Future<void> _afSingleScreenTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
   return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.screenTests.all, "Single-Screen", (test) {
     return [
-      AFStartPrototypeScreenTestAction(test, param: test.routeParam, data: test.stateView, screen: test.screenId),
+      AFStartPrototypeScreenTestAction(test, param: test.routeParam, stateView: test.stateView, screen: test.screenId),
       AFNavigatePushAction(
         screen: test.screenId,
         param: test.routeParam

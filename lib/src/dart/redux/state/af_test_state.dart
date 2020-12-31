@@ -1,3 +1,4 @@
+import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
@@ -7,14 +8,20 @@ import 'package:meta/meta.dart';
 class AFSingleScreenTestState {
   final int pass;
   final List<String> errors;
-  final dynamic data;
+  final dynamic stateView;
   final dynamic param;
   final AFScreenID screen;
 
-  AFSingleScreenTestState({this.pass, this.errors, this.data, this.param, this.screen});
+  AFSingleScreenTestState({
+    @required this.pass, 
+    @required this.errors, 
+    @required this.stateView, 
+    @required this.param, 
+    @required this.screen
+  });
 
-  AFSingleScreenTestState reviseData(dynamic data) {
-    return copyWith(data: data);
+  AFSingleScreenTestState reviseStateView(dynamic data) {
+    return copyWith(stateView: data);
   }
 
   AFSingleScreenTestState incrementPassCount() {
@@ -29,12 +36,12 @@ class AFSingleScreenTestState {
   }
 
   TStateView findViewStateFor<TStateView extends AFStateView>() {
-    if(data is TStateView) {
-      return data;
+    if(stateView is TStateView) {
+      return stateView;
     }
 
-    if(data is Iterable) {
-      for(final testData in data) {
+    if(stateView is Iterable) {
+      for(final testData in stateView) {
         if(testData is TStateView) {
           return testData;
         }
@@ -63,12 +70,14 @@ class AFSingleScreenTestState {
   AFSingleScreenTestState copyWith({
     int pass, 
     List<String> errors, 
-    dynamic data
+    dynamic stateView
   }) {
     return AFSingleScreenTestState(
-      data: data ?? this.data,
+      stateView: stateView ?? this.stateView,
       errors: errors ?? this.errors,
-      pass: pass ?? this.pass
+      pass: pass ?? this.pass,
+      param: this.param,
+      screen: this.screen,
     );
   }
 }
@@ -111,7 +120,7 @@ class AFTestState {
       return testStates;
     }
     final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
-    revisedStates[testId] = AFSingleScreenTestState(pass: 0, errors: <String>[], data: data, param: param, screen: screen);
+    revisedStates[testId] = AFSingleScreenTestState(pass: 0, errors: <String>[], stateView: data, param: param, screen: screen);
     return revisedStates;
 
   }
@@ -128,13 +137,13 @@ class AFTestState {
     );
   }
 
-  AFTestState updateStateView(AFTestID testId, dynamic data) {
+  AFTestState updateStateView(AFTestID testId, dynamic stateView) {
     final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
     final currentState = revisedStates[testId];
     if(currentState == null) {
-      revisedStates[testId] = AFSingleScreenTestState(data: data, errors: <String>[], pass: 0);    
+      throw AFException("Internal error, calling updateStateView when there is no test state for $testId");
     } else {
-      revisedStates[testId] = currentState.reviseData(data);
+      revisedStates[testId] = currentState.reviseStateView(stateView);
 
     }
     return copyWith(

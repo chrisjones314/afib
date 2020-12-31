@@ -1,6 +1,6 @@
 
 import 'package:afib/src/dart/command/af_command.dart';
-import 'package:afib/src/dart/command/af_standard_configs.dart';
+import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/generators/af_new_project_generator.dart';
@@ -44,7 +44,7 @@ class AFNewProjectCommand extends AFCommand {
     /// setup the defaults.
     ctx.afibConfig.setValue(AFConfigEntries.appNamespace, namespace);
     ctx.afibConfig.setValue(AFConfigEntries.projectName, projectName);
-    ctx.afibConfig.setValue(AFConfigEntries.environment, AFConfigEntryEnvironment.debug);
+    ctx.afibConfig.setValue(AFConfigEntries.environment, AFEnvironment.debug);
     ctx.afibConfig.setValue(AFConfigEntries.logAreas, [AFConfigEntryLogArea.appQuery, AFConfigEntryLogArea.appRender, AFConfigEntryLogArea.appTest]);
     ctx.afibConfig.setValue(AFConfigEntries.enabledTestList, []);
 

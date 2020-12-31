@@ -341,6 +341,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
   AFTestID testId;
   final underPaths = <AFSparsePathWidgetSelector>[];
   final activeScreenIDs = <AFScreenID>[];
+  int slowOnScreenMillis = 0;
   
   AFScreenTestExecute(this.testId);
 
@@ -602,11 +603,25 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
   }
 
   Future<List<Element>> findWidgetsFor(dynamic selector, { bool scrollIfMissing = true}) async {
+    if(slowOnScreenMillis > 0 && !AFibD.config.isWidgetTesterContext) {
+      await Future<void>.delayed(Duration(milliseconds: slowOnScreenMillis));
+    }
     final sel = AFWidgetSelector.createSelector(activeSelectorPath, selector);
     final info = AFibF.g.findTestScreen(activeScreenId);
     final currentPath = <Element>[];
     _populateChildrenDirect(info.element, currentPath, sel, null, underScaffold: false);
     return sel.elements;
+  }
+
+  /// A debugging utility which slows down every widget lookup in a test under the function [f].
+  /// 
+  /// This only works when debugging on-screen.   It can be used to make it easier to see what the test
+  /// is doing.   This function is not intended to help resolve subtle timing issues.   If you are experiencing
+  /// subtle timing issues, please review your code, and if the problem appears AFib-related, submit a bug.
+  Future<void> debugSlowOnScreen(Future<void> Function() f, { int delayMillis = 500 }) async {
+    slowOnScreenMillis = delayMillis;
+    await f();
+    slowOnScreenMillis = 0;
   }
 
 
@@ -1082,7 +1097,7 @@ abstract class AFScreenPrototypeTest {
     }
 
     final testContext = AFScreenTestContextSimulator(dispatcher, this.id, runNumber);
-    dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(testContext));
+    dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(testContext, param: this.routeParam, stateView: this.stateView, screen: this.screenId));
     return testContext;
   }
 
@@ -1135,7 +1150,7 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
   }
 
   void startScreen(AFDispatcher dispatcher) {
-    dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, param: param, data: data, screen: screenId));
+    dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, param: param, stateView: data, screen: screenId));
     dispatcher.dispatch(AFNavigatePushAction(
       screen: this.screenId,
       param: this.param
@@ -1200,7 +1215,7 @@ abstract class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
   }
 
   void startScreen(AFDispatcher dispatcher) {
-    dispatcher.dispatch(AFStartPrototypeScreenTestAction(this));
+    dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, stateView: data, screen: AFUIScreenID.screenPrototypeWidget, param: this.routeParam));
     dispatcher.dispatch(AFPrototypeWidgetScreen.navigatePush(this, id: this.id));    
   }
   
@@ -1296,7 +1311,7 @@ class AFWorkflowStatePrototypeTest<TState extends AFAppStateArea> extends AFScre
       screen: screenMap.trueAppStartupScreenId,
       param: screenMap.trueCreateStartupScreenParam()
     ));
-    dispatcher.dispatch(AFStartPrototypeScreenTestAction(test));
+    dispatcher.dispatch(AFStartPrototypeScreenTestAction(test, screen: test.screenId));
 
     // lookup the test.
     final testImpl = AFibF.g.stateTests.findById(test.stateTestId);

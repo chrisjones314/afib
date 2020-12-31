@@ -101,10 +101,17 @@ class AFRouteStateSegments {
   final List<AFRouteSegment> prior;  
   final List<AFRouteSegment> active;
 
-  AFRouteStateSegments({this.prior, this.active});
+  AFRouteStateSegments({
+    @required this.prior, 
+    @required this.active
+  });
 
   AFRouteSegment get last {
     return active.last;
+  }
+
+  AFRouteSegment get first {
+    return active.first;
   }
 
   bool get isEmpty {
@@ -170,6 +177,16 @@ class AFRouteStateSegments {
       }
     }
     return null;
+  }
+
+  AFRouteStateSegments cleanTestRoute() {
+    final revisedActive = _cleanTestRoute(active);
+    final revisedPrior = _cleanTestRoute(prior);
+    return copyWith(active: revisedActive, prior: revisedPrior);
+  }
+
+  List<AFRouteSegment> _cleanTestRoute(List<AFRouteSegment> original) {
+    return original.where((seg) => !seg.isAFibScreen).toList();
   }
 
   AFRouteStateSegments copyWith({
@@ -321,8 +338,11 @@ class AFRouteStateSegments {
 /// The current route, a list of nested screens and the data associated with them.
 @immutable
 class AFRouteState {
+  static const emptySegments = <AFRouteSegment>[];
+
   final AFRouteStateSegments popupSegments;
   final AFRouteStateSegments screenSegments;
+
   final Map<AFScreenID, AFRouteParam> globalPool;
 
   AFRouteState({
@@ -335,11 +355,10 @@ class AFRouteState {
   factory AFRouteState.initialState() {
     final screen = <AFRouteSegment>[];
     screen.add(AFRouteSegment.withParam(AFibF.g.effectiveStartupScreenId, AFibF.g.startupRouteParamFactory()));
-    final empty = <AFRouteSegment>[];
-    final screenSegs = AFRouteStateSegments(active: screen, prior: empty);
-    final popupSegs  = AFRouteStateSegments(active: empty, prior: empty);
-    final drawerParams = <AFScreenID, AFRouteParam>{};
-    return AFRouteState(screenSegments: screenSegs, popupSegments: popupSegs, globalPool: drawerParams);
+    final screenSegs = AFRouteStateSegments(active: screen, prior: emptySegments);
+    final popupSegs  = AFRouteStateSegments(active: emptySegments, prior: emptySegments);
+    final globalPool = <AFScreenID, AFRouteParam>{};
+    return AFRouteState(screenSegments: screenSegs, popupSegments: popupSegs, globalPool: globalPool);
   }
 
   bool isActiveScreen(AFScreenID screen, { bool includePopups }) {
@@ -350,6 +369,13 @@ class AFRouteState {
     return last.matchesScreen(screen);
   }
 
+  /// Used internally to convert a test route, which has the prototype screens at its base, into 
+  /// a route that looks like what the app would have without the test stuff.
+  AFRouteState cleanTestRoute() {
+    final revisedSegments = screenSegments.cleanTestRoute();
+    return copyWith(screenSegs: revisedSegments);
+  }
+
   bool get hasStartupWrapper {
     return screenSegments.hasStartupWrapper;
   }
@@ -357,6 +383,19 @@ class AFRouteState {
   AFScreenID get activeScreenId {
     final last = screenSegments.last;
     return last.screenId;
+  }
+
+  AFScreenID get rootScreenId {
+    final first = screenSegments.first;
+    return first.screenId;
+  }
+
+  AFRouteSegment get rootScreen {
+    return screenSegments.first;
+  }
+
+  AFRouteSegment get activeScreen {
+    return screenSegments.last;
   }
 
   /// The number of screens in the route.
@@ -493,6 +532,20 @@ class AFRouteState {
     }
   }
 
+  AFRouteState resetToInitialRoute() {
+    final popCount = screenSegments.popCountToRoot;
+    final revisedRootSegs = this.screenSegments.popN(popCount, null);
+    final screenMap = AFibF.g.screenMap;
+
+    final revisedSegs = revisedRootSegs.pushNamed(screenMap.trueAppStartupScreenId, screenMap.trueCreateStartupScreenParam());
+
+    return copyWith(
+      globalPool: <AFScreenID, AFRouteParam>{},
+      popupSegs: AFRouteStateSegments(active: emptySegments, prior: emptySegments),
+      screenSegs: revisedSegs
+    );
+  }
+
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
   AFRouteState addConnectedChild(AFScreenID screen, AFWidgetID widget, AFRouteParam param) {
@@ -547,7 +600,7 @@ class AFRouteState {
     final revised = Map<AFScreenID, AFRouteParam>.from(globalPool);
     revised[screen] = param;
     AFibD.logRoute?.d("Set global param for $screen to $param");
-    return copyWith(drawerParams: revised);
+    return copyWith(globalPool: revised);
   }
 
   /// Replaces the route parameter for the specified popup screen.
@@ -574,12 +627,12 @@ class AFRouteState {
   AFRouteState copyWith({
     AFRouteStateSegments screenSegs,
     AFRouteStateSegments popupSegs,
-    Map<AFScreenID, AFRouteParam> drawerParams,
+    Map<AFScreenID, AFRouteParam> globalPool,
   }) {
     final revised = AFRouteState(
       screenSegments: screenSegs ?? this.screenSegments,
       popupSegments: popupSegs ?? this.popupSegments,
-      globalPool: drawerParams ?? this.globalPool,
+      globalPool: globalPool ?? this.globalPool,
     );
 
     if(screenSegs != null) {

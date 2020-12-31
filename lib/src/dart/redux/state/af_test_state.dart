@@ -128,7 +128,7 @@ class AFTestState {
     );
   }
 
-  AFTestState updateStateData(AFTestID testId, dynamic data) {
+  AFTestState updateStateView(AFTestID testId, dynamic data) {
     final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
     final currentState = revisedStates[testId];
     if(currentState == null) {

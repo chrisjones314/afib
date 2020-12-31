@@ -88,7 +88,7 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TStateView exten
       }
     }
 
-    final data = createStateDataAF(store.state);
+    final data = createStateViewAF(store.state);
     final param = findParam(store.state);
     final paramWithChildren = findParamWithChildren(store.state);
     if(param == null && !routeEntryExists(store.state)) {
@@ -166,23 +166,23 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TStateView exten
 
   bool routeEntryExists(AFState state) { return true; }
 
-  TStateView createStateDataAF(AFState state) {
-    return createStateDataPublic(state.public);
+  TStateView createStateViewAF(AFState state) {
+    return createStateViewPublic(state.public);
   }
 
-  /// Override this instead of [createStateData] if you need access
+  /// Override this instead of [createStateView] if you need access
   /// to the full route state. 
   /// 
   /// However, be aware that a full route state does not exist in single
   /// screen tests.
-  TStateView createStateDataPublic(AFPublicState public) {
+  TStateView createStateViewPublic(AFPublicState public) {
     final TState state = public.areaStateFor(TState);
-    return createStateData(state);
+    return createStateView(state);
   }
 
 
   /// Override this to create an [AFStateView] with the required data from the state.
-  TStateView createStateData(TState state);
+  TStateView createStateView(TState state);
 
   /// Builds a Widget using the data extracted from the state.
   material.Widget buildWithContext(AFBuildContext<TStateView, TRouteParam, TTheme> context);
@@ -993,7 +993,7 @@ abstract class AFConnectedWidgetWithParam<TState extends AFAppStateArea, TStateV
   }
 
   @override
-  TStateView createStateData(TState state) {
+  TStateView createStateView(TState state) {
     return this.createDataDelegate(state);
   }
 
@@ -1049,7 +1049,7 @@ abstract class AFPopupScreen<TState extends AFAppStateArea, TStateView extends A
     return p;
   }
 
-  TStateView createStateData(TState state) {
+  TStateView createStateView(TState state) {
     return this.createDataDelegate(state);
   }
 

@@ -1,5 +1,6 @@
 import 'package:afib/afib_dart.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -15,6 +16,53 @@ abstract class AFStateTestExecute extends AFBaseTestExecute {
 
   AFStateTestExecute();
   
+}
+
+class AFStateTestDifference {
+  final AFState afStateBefore;
+  final AFState afStateAfter;
+  AFStateTestDifference({
+    @required this.afStateBefore,
+    @required this.afStateAfter,
+  });
+
+  TAppState stateBefore<TAppState extends AFAppStateArea>() {
+    return _findAppState(afStateBefore);
+  }
+
+  TAppState stateAfter<TAppState extends AFAppStateArea>() {
+    return _findAppState(afStateAfter);
+  }
+
+  TAppTheme themeBefore<TAppTheme extends AFConceptualTheme>() {
+    return _findAppTheme(afStateBefore);
+  }
+
+  TAppTheme themeAfter<TAppTheme extends AFConceptualTheme>() {
+    return _findAppTheme(afStateAfter);
+  }
+
+  AFRouteState get routeBefore {
+    return _routeFor(afStateBefore);
+  }
+
+  AFRouteState get routeAfter {
+    return _routeFor(afStateAfter);
+  }
+
+  TAppState _findAppState<TAppState extends AFAppStateArea>(AFState state) {
+    final areas = state.public.areas;
+    return areas.stateFor(TAppState);
+  }
+
+  TAppTheme _findAppTheme<TAppTheme extends AFConceptualTheme>(AFState state) {
+    final themes = state.public.themes;
+    return themes.findByType(TAppTheme);
+  }
+
+  AFRouteState _routeFor(AFState state) {
+    return state.public.route.cleanTestRoute();
+  }
 }
 
 class AFStateTestContext<TState extends AFAppStateArea> extends AFStateTestExecute {
@@ -65,7 +113,7 @@ class _AFStateResultEntry {
 
 class _AFStateQueryBody {
   final AFAsyncQuery query;
-  final AFProcessVerifyDelegate verify;
+  final AFProcessVerifyDifferenceDelegate verify;
   _AFStateQueryBody(this.query, this.verify);
 }
 
@@ -134,15 +182,15 @@ class AFStateTest<TState extends AFAppStateArea> {
   }
 
   void executeQuery(AFAsyncQuery query, {
-    AFProcessVerifyDelegate verify
+    AFProcessVerifyDifferenceDelegate verifyState
   }) {
-    queryBodies.add(_AFStateQueryBody(query, verify));
+    queryBodies.add(_AFStateQueryBody(query, verifyState));
   }
 
   /// Execute the test by kicking of its queries, then 
   void execute(AFStateTestContext context, { bool shouldVerify = true }) {    
     AFStateTestContext.currentTest = context;
-    
+  
     // first, execute an predecessor tests.
     if(idPredecessor != null) {
       final test = tests.findById(idPredecessor);
@@ -151,13 +199,17 @@ class AFStateTest<TState extends AFAppStateArea> {
 
     // basically, we need to go through an execute each query that they specified.
     for(final q in queryBodies) {
-      final stateBefore = context.state;
+      final stateBefore = context.afState;
       processQuery(context, q.query);
 
       // lookup the result for that query
       AFStateTestExecute e = context;
       if(shouldVerify) {
-        q?.verify(e, stateBefore, context.state);
+        final diff = AFStateTestDifference(
+          afStateBefore: stateBefore,
+          afStateAfter: context.afState,
+        );
+        q?.verify(e, diff);
       }
     }
   }

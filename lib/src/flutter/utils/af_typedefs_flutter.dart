@@ -112,7 +112,7 @@ typedef AFCreateQueryResultDelegate = dynamic Function(AFStateTestContext contex
 typedef AFProcessTestDelegate = void Function(AFStateTest test);
 
 /// Delegate used to verify a state change, from before to after
-typedef AFProcessVerifyDelegate = void Function(AFStateTestExecute execute, AFAppStateArea before, AFAppStateArea after);
+typedef AFProcessVerifyDifferenceDelegate = void Function(AFStateTestExecute execute, AFStateTestDifference diff);
 
 /// Delegate used to implement the body of a unit test.
 typedef AFUnitTestBodyExecuteDelegate = void Function(AFUnitTestExecute e);

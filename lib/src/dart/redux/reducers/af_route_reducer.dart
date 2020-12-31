@@ -1,3 +1,4 @@
+import 'package:afib/afib_dart.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_route_state.dart';
@@ -23,6 +24,7 @@ final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigateRemoveConnectedChildAction>(_removeConnectedChild),
   TypedReducer<AFRouteState, AFNavigateSortConnectedChildrenAction>(_sortConnectedChildren),
   TypedReducer<AFRouteState, AFNavigateSetChildParamAction>(_setChildParam),
+  TypedReducer<AFRouteState, AFResetToInitialRouteAction>(_resetToInitialRoute),
 ]);
 
 //---------------------------------------------------------------------------
@@ -112,4 +114,8 @@ AFRouteState _setChildParam(AFRouteState state, AFNavigateSetChildParamAction ac
   return state.setConnectedChildParam(action.screen, action.widget, action.param);
 }
 
+//---------------------------------------------------------------------------
+AFRouteState _resetToInitialRoute(AFRouteState state, AFResetToInitialRouteAction action) {
+  return state.resetToInitialRoute();
+}
 

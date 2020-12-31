@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:quiver/core.dart';
+import 'package:meta/meta.dart';
 
 import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
@@ -1255,13 +1256,13 @@ class AFConnectedWidgetPrototypeTest extends AFWidgetPrototypeTest {
 /// The information necessary to start a test with a baseline state
 /// (determined by a state test) and an initial screen/route.
 class AFWorkflowStatePrototypeTest<TState extends AFAppStateArea> extends AFScreenPrototypeTest {
-  final List<AFNavigatePushAction> initialPath;
+  final dynamic subpath;
   final AFStateTestID stateTestId;
   final AFWorkflowStateTestPrototype body;
 
   AFWorkflowStatePrototypeTest({
     @required AFWorkflowTestID id,
-    @required this.initialPath,
+    @required this.subpath,
     @required this.stateTestId,
     @required this.body,
     String title
@@ -1294,6 +1295,11 @@ class AFWorkflowStatePrototypeTest<TState extends AFAppStateArea> extends AFScre
 
   static void initializeMultiscreenPrototype<TState extends AFAppStateArea>(AFDispatcher dispatcher, AFWorkflowStatePrototypeTest test) {
     dispatcher.dispatch(AFResetToInitialStateAction());
+    final screenMap = AFibF.g.screenMap;
+    dispatcher.dispatch(AFNavigatePushAction(
+      screen: screenMap.trueAppStartupScreenId,
+      param: screenMap.trueCreateStartupScreenParam()
+    ));
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(test));
 
     // lookup the test.
@@ -1305,17 +1311,22 @@ class AFWorkflowStatePrototypeTest<TState extends AFAppStateArea> extends AFScre
     final stateDispatcher = AFStateScreenTestDispatcher(mainDispatcher);
 
     final stateTestContext = AFStateTestContext<TState>(testImpl, store, stateDispatcher, isTrueTestContext: false);
-    AFibF.g.testOnlyShouldSuppressNavigation = true;
     testImpl.execute(stateTestContext);
-    AFibF.g.testOnlyShouldSuppressNavigation = false;
 
 
     if(stateTestContext.errors.hasErrors) {
     }
 
     // then, navigate into the desired path.
-    for(final push in test.initialPath) {
-      dispatcher.dispatch(push);
+    final subpath = test.subpath;
+    if(subpath is AFNavigatePushAction) {
+      dispatcher.dispatch(subpath);
+    } else if(subpath is List) {
+      for(final push in subpath) {
+        if(push is AFNavigatePushAction) {
+          dispatcher.dispatch(push);
+        }
+      }
     }
   }
 
@@ -1809,18 +1820,39 @@ class AFWorkflowStateTests<TState extends AFAppStateArea> {
   AFWorkflowStateTestPrototype addPrototype({
     @required AFWorkflowTestID id,
     String title,
-    @required List<AFNavigatePushAction> initialPath,
+    @required dynamic subpath,
     @required AFTestID stateTestId,
   }) {
+    final screenId = _initialScreenIdFromSubpath(subpath);
     final instance = AFWorkflowStatePrototypeTest<TState>(
       id: id,
       title: title,
-      initialPath: initialPath,
+      subpath: subpath,
       stateTestId: stateTestId,
-      body: AFWorkflowStateTestPrototype.create(this, initialPath.last.screen, id)
+      body: AFWorkflowStateTestPrototype.create(this, screenId, id)
     );
     stateTests.add(instance);
     return instance.body;
+  }
+
+  AFScreenID _initialScreenIdFromSubpath(dynamic subpath) {
+    if(subpath is AFScreenID) {
+      return subpath;
+    }
+    if(subpath is AFNavigatePushAction) {
+      return subpath.screen;
+    }
+    if(subpath is List) {
+      final last = subpath.last;
+      if(last is AFScreenID) {
+        return last;
+      }
+      if(last is AFNavigatePushAction) {
+        return last.screen;
+      }
+    }
+
+    throw AFException("Unexpected type ${subpath.runtimeType} specified as subpath");
   }
 
   List<AFWorkflowStatePrototypeTest> get all {
@@ -1902,7 +1934,7 @@ class AFStateTestDefinitionContext extends AFBaseTestDefinitionContext {
   /// When the query 'executes', its [AFAsyncQuery.startAsync] method will be skipped
   /// and its [AFAsyncQuery.finishAsyncWithResponse] method will be called with the 
   /// test data with the specified [idData] in the test data registry.
-  void specifyResponse(AFStateTest test, dynamic querySpecifier, dynamic idData) {
+  void specifyFixedResponse(AFStateTest test, dynamic querySpecifier, dynamic idData) {
     test.specifyResponse(querySpecifier, this, idData);
   }
 
@@ -1917,15 +1949,15 @@ class AFStateTestDefinitionContext extends AFBaseTestDefinitionContext {
   /// When the query 'executes', its [AFAsyncQuery.startAsync] method will be skipped
   /// and its [AFAsyncQuery.finishAsyncWithResponse] method will be called with the 
   /// test data that is created by [delegate].
-  void createResponse(AFStateTest test, dynamic querySpecifier, AFCreateQueryResultDelegate delegate) {
+  void specifyDynamicResponse(AFStateTest test, dynamic querySpecifier, AFCreateQueryResultDelegate delegate) {
     test.createResponse(querySpecifier, delegate);
   }
 
   /// Use this method to execute a query and validate the state change which it causes.
   void executeQuery(AFStateTest test, AFAsyncQuery query, {
-    AFProcessVerifyDelegate verify
+    AFProcessVerifyDifferenceDelegate verify
   }) {
-    test.executeQuery(query, verify: verify);
+    test.executeQuery(query, verifyState: verify);
   }
 
 }
@@ -2115,13 +2147,13 @@ class AFWorkflowTestDefinitionContext extends AFBaseTestDefinitionContext {
   AFWorkflowStateTestPrototype definePrototype({
     @required AFWorkflowTestID id,
     String title,
-    @required List<AFNavigatePushAction> initialPath,
+    @required dynamic subpath,
     @required AFTestID stateTestId,
   }) {
     return tests.addPrototype(
       id: id,
       title: title,
-      initialPath: initialPath,
+      subpath: subpath,
       stateTestId: stateTestId
     );
   }

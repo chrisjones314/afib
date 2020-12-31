@@ -10,6 +10,12 @@ class AFResetToInitialStateAction {
 
 }
 
+/// This is typically not used by the application, it is used during testing
+/// to revert to the initial application route.
+class AFResetToInitialRouteAction {
+
+}
+
 /// Action used to update one or more of the root objects in the [AFAppState].
 /// 
 /// If you have nested data that you need to update, update the leaf objects

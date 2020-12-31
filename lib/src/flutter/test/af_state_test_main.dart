@@ -19,7 +19,6 @@ void afStateTestMain<TState extends AFAppStateArea> (AFCommandOutput output, AFT
 
   final tests = AFibF.g.stateTests;
   final contexts = <AFStateTestContext>[];
-  AFibF.g.testOnlyShouldSuppressNavigation = true;
   final testKind = "State";
   final localStats = AFTestStats();
 
@@ -30,13 +29,13 @@ void afStateTestMain<TState extends AFAppStateArea> (AFCommandOutput output, AFT
       final context = AFStateTestContext<TState>(test, store, dispatcher, isTrueTestContext: true);
       
       context.store.dispatch(AFResetToInitialStateAction());
+      context.store.dispatch(AFResetToInitialRouteAction());
       test.execute(context);
       contexts.add(context);
       printTestResult(output, testKind, context, localStats);
     }
   }
 
-  AFibF.g.testOnlyShouldSuppressNavigation = false;
   final baseContexts = List<AFBaseTestExecute>.of(contexts);
   printTestTotal(output, testKind, baseContexts, localStats);
   stats.mergeIn(localStats);

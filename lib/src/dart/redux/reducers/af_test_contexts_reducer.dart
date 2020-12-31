@@ -9,7 +9,7 @@ AFTestState afTestStateReducer(AFTestState state, dynamic action) {
   if(action is AFStartPrototypeScreenTestContextAction) {
     return state.startTest(action.context, action.param, action.data, action.screen);
   } else if(action is AFUpdatePrototypeScreenTestDataAction) {
-    return state.updateStateData(action.testId, action.data);
+    return state.updateStateView(action.testId, action.data);
   } else if(action is AFPrototypeScreenTestIncrementPassCount) {
     return state.incrementPassCount(action.testId);
   } else if(action is AFPrototypeScreenTestAddError) {

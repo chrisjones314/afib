@@ -10,6 +10,8 @@ class AFScreenMap {
 
   AFScreenID _startupScreenId;
   AFCreateRouteParamDelegate _createStartupScreenParam;
+  AFScreenID trueAppStartupScreenId;
+  AFCreateRouteParamDelegate trueCreateStartupScreenParam;
   final Map<AFScreenID, WidgetBuilder> _screens = <AFScreenID, WidgetBuilder>{};
   final Map<AFWidgetID, WidgetBuilder> _widgets = <AFWidgetID, WidgetBuilder>{};
 
@@ -51,6 +53,10 @@ class AFScreenMap {
 
   /// Call [startupScreen] once to specify the initial screen for your app.
   void startupScreen(AFScreenID screenId, WidgetBuilder screenBuilder, AFCreateRouteParamDelegate createParam) {    
+    if(_startupScreenId == null) {
+      trueAppStartupScreenId = screenId;
+      trueCreateStartupScreenParam = createParam;
+    }
     _startupScreenId = screenId;
     _createStartupScreenParam = createParam;
     screen(screenId, screenBuilder);

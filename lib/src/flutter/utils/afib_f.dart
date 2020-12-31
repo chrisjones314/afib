@@ -88,7 +88,6 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   AFScreenMap _afPrototypeScreenMap;
   AFScreenID forcedStartupScreen;
   int navDepth = 0;
-  bool testOnlyShouldSuppressNavigation = false;
   Map<String, AFAsyncQueryListener> listenerQueries = <String, AFAsyncQueryListener>{};
   Map<String, AFDeferredQuery> deferredQueries = <String, AFDeferredQuery>{};
 
@@ -101,7 +100,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   /// 
   /// If you need to dispatch an action, you should typically call [AFBuildContext.dispatch].
   /// If you need access to items from your reduce state, you should typically override
-  /// [AFConnectedScreen.createStateData] or [AFConnectedWidgetWithParam.createStateData].
+  /// [AFConnectedScreen.createStateView] or [AFConnectedWidgetWithParam.createStateView].
   AFStore storeInternalOnly;
 
   /// WARNING: You should never call this.  See [internalOnlyStore] for details.

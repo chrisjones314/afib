@@ -1051,12 +1051,10 @@ abstract class AFScreenPrototypeTest {
   static const testDrawerSideBegin = 2;
 
   final AFTestID id;
-  final String title;
   final int testDrawerSide;
 
   AFScreenPrototypeTest({
     @required this.id,
-    this.title,
     this.testDrawerSide = testDrawerSideEnd
   });
 
@@ -1105,8 +1103,7 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
     @required this.param,
     @required this.screenId,
     @required this.body,
-    String title
-  }): super(id: id, title: title);
+  }): super(id: id);
 
   bool get hasBody {
     return body.isNotEmpty;
@@ -1188,7 +1185,7 @@ abstract class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
     @required this.createConnectedWidget,
     this.createWidgetWrapperDelegate,
     String title
-  }): super(id: id, title: title);
+  }): super(id: id);
 
   AFScreenID get screenId {
     return AFUIScreenID.screenPrototypeWidget;
@@ -1265,8 +1262,7 @@ class AFWorkflowStatePrototypeTest<TState extends AFAppStateArea> extends AFScre
     @required this.subpath,
     @required this.stateTestId,
     @required this.body,
-    String title
-  }): super(id: id, title: title);
+  }): super(id: id);
 
   bool get hasBody {
     return body != null;
@@ -1528,8 +1524,7 @@ class AFSingleScreenTests<TState> {
     @required dynamic data,
     dynamic param,
     AFScreenID screenId,
-    AFNavigatePushAction navigate,
-    String title
+    AFNavigatePushAction navigate
   }) {
     final hasNav    = (navigate != null);
     final hasParam  = (screenId != null || param != null);
@@ -1550,7 +1545,6 @@ class AFSingleScreenTests<TState> {
       data: data,
       param: param,
       screenId: screenId,
-      title: title,
       body: AFSingleScreenPrototype(id, screenId: screenId)
     );
     _singleScreenTests.add(instance);
@@ -1819,14 +1813,12 @@ class AFWorkflowStateTests<TState extends AFAppStateArea> {
 
   AFWorkflowStateTestPrototype addPrototype({
     @required AFWorkflowTestID id,
-    String title,
     @required dynamic subpath,
     @required AFTestID stateTestId,
   }) {
     final screenId = _initialScreenIdFromSubpath(subpath);
     final instance = AFWorkflowStatePrototypeTest<TState>(
       id: id,
-      title: title,
       subpath: subpath,
       stateTestId: stateTestId,
       body: AFWorkflowStateTestPrototype.create(this, screenId, id)
@@ -2032,7 +2024,6 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
       param: paramActual,
       screenId: screenId,
       navigate: navigate,
-      title: title
     );
   }
 
@@ -2152,7 +2143,6 @@ class AFWorkflowTestDefinitionContext extends AFBaseTestDefinitionContext {
   }) {
     return tests.addPrototype(
       id: id,
-      title: title,
       subpath: subpath,
       stateTestId: stateTestId
     );

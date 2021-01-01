@@ -137,15 +137,7 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TStateView exten
 
     final mainDispatcher = AFStoreDispatcher(store);
     final dispatcher = AFSingleScreenTestDispatcher(activeTestId, mainDispatcher, testContext);
-    final theme = findTheme(store.state.public.themes);
-
-    /*
-    if(paramChild is AFRouteParamWithChildren) {
-      paramWithChildren = paramChild;
-      paramChild = paramWithChildren.primary.param;
-    }
-    */
-    
+    final theme = findTheme(store.state.public.themes);    
 
     return createContext(null, dispatcher, data, param, paramWithChildren, theme);
   }

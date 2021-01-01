@@ -17,7 +17,7 @@ class AFDartParams<AppState> {
   final AFInitConfigurationDelegate initPrototypeConfig;
   final AFInitConfigurationDelegate initTestConfig;
   final Logger logger;
-  final String forceEnv;
+  final AFEnvironment forceEnv;
    
   
   AFDartParams({

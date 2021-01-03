@@ -7,6 +7,7 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/core/afui.dart';
 import 'package:afib/src/flutter/theme/af_text_builders.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 /// Consolidating base class for [AFFundamentalTheme] and [AFConceptualTheme]
@@ -546,22 +547,6 @@ mixin AFThemeAreaUtilties {
     return result;
   }
 
-  Color darkerColor(AFThemeID id, { int percent = 10 }) {
-    final c = color(id);
-    if(c == null) {
-      throw AFException("$id must be a valid color");
-    }
-    return darken(c, percent);    
-  }
-
-  Color lighterColor(dynamic id, { int percent = 10 }) {
-    final c = color(id);
-    if(c == null) {
-      throw AFException("$id must be a valid color");
-    }
-    return brighten(c, percent);
-  }
-
   dynamic value(AFThemeID id);
   String translation(String idOrText, Locale locale);  
 
@@ -569,7 +554,7 @@ mixin AFThemeAreaUtilties {
     throw AFException("In fundamental theme, $id has unsupported type ${val.runtimeType}");
   }
 
-  Color darken(Color c, int percent) {
+  static Color colorDarker(Color c, int percent) {
     assert(1 <= percent && percent <= 100);
     var f = 1 - percent / 100;
     return Color.fromARGB(
@@ -580,7 +565,7 @@ mixin AFThemeAreaUtilties {
     );
   }
 
-  Color brighten(Color c, int percent) {
+  static Color colorLighter(Color c, int percent) {
       assert(1 <= percent && percent <= 100);
       var p = percent / 100;
       return Color.fromARGB(
@@ -611,10 +596,11 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
   void setFlutterFundamentals({
     ColorScheme colorSchemeLight,
     ColorScheme colorSchemeDark,
-    TextTheme textTheme,
+    TextTheme textThemeLight,
+    TextTheme textThemeDark,
   }) {
-    themeLight = ThemeData.from(colorScheme: colorSchemeLight, textTheme: textTheme);
-    themeDark = ThemeData.from(colorScheme: colorSchemeDark, textTheme: textTheme);
+    themeLight = ThemeData.from(colorScheme: colorSchemeLight, textTheme: textThemeLight);
+    themeDark = ThemeData.from(colorScheme: colorSchemeDark, textTheme: textThemeDark);
   }
 
   /// Most apps should use [setFlutterFundamentals], but this method gives you more control
@@ -739,8 +725,16 @@ class AFFundamentalTheme {
     return area.translate(idOrText, device.locale(this));
   }
 
-  ThemeData get themeData {
+  ThemeData get themeDataActive {
     return area.themeData(device.brightness(this));
+  }
+
+  ThemeData get themeDataLight {
+    return area.themeData(Brightness.light);
+  }
+
+  ThemeData get themeDataDark {
+    return area.themeData(Brightness.dark);
   }
 
   List<String> get areaList {
@@ -757,51 +751,51 @@ class AFFundamentalTheme {
   }
 
   Color get colorPrimary {
-    return themeData.colorScheme.primary;
+    return themeDataActive.colorScheme.primary;
   }
 
   Color get colorOnPrimary {
-    return themeData.colorScheme.onPrimary;
+    return themeDataActive.colorScheme.onPrimary;
   }
 
   Color get colorPrimaryVariant {
-    return themeData.colorScheme.primaryVariant;
+    return themeDataActive.colorScheme.primaryVariant;
   }
 
   Color get colorSecondaryVariant {
-    return themeData.colorScheme.secondaryVariant;
+    return themeDataActive.colorScheme.secondaryVariant;
   }
 
   Color get colorBackground {
-    return themeData.colorScheme.background;
+    return themeDataActive.colorScheme.background;
   }
 
   Color get colorOnBackground {
-    return themeData.colorScheme.onBackground;
+    return themeDataActive.colorScheme.onBackground;
   }
 
   Color get colorError {
-    return themeData.colorScheme.error;
+    return themeDataActive.colorScheme.error;
   }
 
   Color get colorOnError {
-    return themeData.colorScheme.onError;
+    return themeDataActive.colorScheme.onError;
   }
 
   Color get colorSurface {
-    return themeData.colorScheme.surface;
+    return themeDataActive.colorScheme.surface;
   }
 
   Color get colorOnSurface {
-    return themeData.colorScheme.onSurface;
+    return themeDataActive.colorScheme.onSurface;
   }
 
   Color get colorPrimaryLight {
-    return themeData.primaryColorLight;
+    return themeDataActive.primaryColorLight;
   }
 
   Color get colorSecondary {
-    return themeData.colorScheme.secondary;
+    return themeDataActive.colorScheme.secondary;
   }
 
   /// This indicates whether this is a bright or dark color scheme,
@@ -810,19 +804,19 @@ class AFFundamentalTheme {
   /// Note that the primary 'bright' color scheme could still be 'dark'
   /// in nature.
   Brightness get colorSchemeBrightness {
-    return themeData.colorScheme.brightness;
+    return themeDataActive.colorScheme.brightness;
   }
 
   TextTheme get styleOnCard {
-    return themeData.textTheme;
+    return themeDataActive.textTheme;
   }
 
   TextTheme get styleOnPrimary {
-    return themeData.primaryTextTheme;
+    return themeDataActive.primaryTextTheme;
   }
 
   TextTheme get styleOnAccent {
-    return themeData.accentTextTheme;
+    return themeDataActive.accentTextTheme;
   }
 
   Color color(AFThemeID id) {
@@ -933,6 +927,22 @@ class AFConceptualTheme extends AFTheme {
   /// A utility for creating a list of expansion panels in an expansion list.
   List<ExpansionPanel> childrenExpansionList() { return <ExpansionPanel>[]; }
 
+  Color colorDarker(dynamic color, { int percent = 10 }) {
+    final c = color(color);
+    if(c == null) {
+      throw AFException("$color must be a valid color");
+    }
+    return AFThemeAreaUtilties.colorDarker(c, percent);    
+  }
+
+  Color colorLighter(dynamic c, { int percent = 10 }) {
+    final cFound = color(c);
+    if(cFound == null) {
+      throw AFException("$color must be a valid color");
+    }
+    return AFThemeAreaUtilties.colorLighter(cFound, percent);
+  }
+
 
   // The primary color from [ThemeData], adjusted for light/dark mode.
   Color get colorPrimary {
@@ -994,6 +1004,12 @@ class AFConceptualTheme extends AFTheme {
   TextTheme get styleOnAccent {
     return fundamentals.styleOnAccent;
   }
+
+  /// Merges bold into whatever the style would have been.
+  TextStyle get styleBold { 
+    return TextStyle(fontWeight: FontWeight.bold);
+  }
+
 
   Radius radiusCircular(double r) {
     return Radius.circular(r);
@@ -1117,6 +1133,114 @@ class AFConceptualTheme extends AFTheme {
     );
   }
 
+  /// As long as you are calling [AFConceptualTheme.childScaffold], you don't need
+  /// to worry about this, it will be done for you.
+  Widget childDebugDrawerBegin(Widget beginDrawer) {
+    return _createDebugDrawer(beginDrawer, AFScreenPrototypeTest.testDrawerSideBegin);
+  }
+
+  /// As long as you are calling [AFConceptualTheme.childScaffold], you don't need
+  /// to worry about this, it will be done for you.
+  Widget childDebugDrawerEnd(Widget endDrawer) {
+    return _createDebugDrawer(endDrawer, AFScreenPrototypeTest.testDrawerSideEnd);
+  }
+
+  Widget childColumnCard(List<Widget> rows, {
+    EdgeInsets margin,
+    CrossAxisAlignment align
+  }) {
+    return Card(
+      child: Container(
+        margin: margin,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: rows,
+        )
+      )
+    );
+  }
+
+  /// As long as you are calling [AFConceptualTheme.childScaffold], you don't need
+  /// to worry about this, it will be done for you.
+  Widget _createDebugDrawer(Widget drawer, int testDrawerSide) {
+    final store = AFibF.g.storeInternalOnly;
+    final state = store.state;
+    final testState = state.testState;
+    if(testState.activeTestId != null) {
+      final test = AFibF.g.findScreenTestById(testState.activeTestId);
+      if(test != null && test.testDrawerSide == testDrawerSide) {
+        return AFTestDrawer();
+      }
+    }
+    return drawer;
+  }
+
+  /// A method used to create a standard scaffold, please use this instead of creating you scaffold
+  /// manually with return Scaffold(...
+  /// 
+  /// This method does a few nice things for you:
+  /// *  It automatically attaches the AFib prototype drawer in prototype mode.
+  /// *  If you use the [bodyUnderScaffold] instead of [body], it will automatically use a builder to 
+  ///    enable you to do Scaffold.of(context.c) to retrieve the Scaffold lower in the tree.  Note that if you
+  ///    do pass in bodyUnderScaffold, you need to provide the 3 type parameters, which will be the same paramters
+  ///    your [AFBuildContext] has.
+  /// 
+  /// You will most likely want to create one or more app-specific version of this method in your own app's 
+  /// conceptual theme, which might fill in many of the parameters (e.g. appBar) with standard values, rather than 
+  /// duplicating them on every screen.
+  Widget childScaffold<TData extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme>({
+    Key key,
+    @required AFBuildContext context,
+    PreferredSizeWidget appBar,
+    Widget drawer,
+    AFBuildBodyDelegate<TData, TRouteParam, TTheme> bodyUnderScaffold,
+    Widget body,
+    Widget bottomNavigationBar,
+    Widget floatingActionButton,
+    Color backgroundColor,
+    FloatingActionButtonLocation floatingActionButtonLocation,
+    FloatingActionButtonAnimator floatingActionButtonAnimator,
+    List<Widget> persistentFooterButtons,
+    Widget endDrawer,
+    Widget bottomSheet,
+    bool resizeToAvoidBottomPadding,
+    bool resizeToAvoidBottomInset,
+    bool primary = true,
+    DragStartBehavior drawerDragStartBehavior = DragStartBehavior.start,
+    bool extendBody = false,
+    bool extendBodyBehindAppBar = false,
+    Color drawerScrimColor, 
+    double drawerEdgeDragWidth, 
+    bool drawerEnableOpenDragGesture = true,
+    bool endDrawerEnableOpenDragGesture = true    
+  }) {
+      assert(body == null || bodyUnderScaffold == null, "You cannot specify both body and bodyUnderScaffold");
+      assert(body != null || bodyUnderScaffold != null, "You must specify exactly one of body or bodyUnderScaffold");
+
+      return Scaffold(
+        key: key,
+        drawer: childDebugDrawerBegin(drawer),
+        body: body ?? AFBuilder<TData, TRouteParam, TTheme>(parentContext: context, builder: (scaffoldContext) => bodyUnderScaffold(scaffoldContext)),
+        appBar: appBar,
+        bottomNavigationBar: bottomNavigationBar,
+        floatingActionButton: floatingActionButton,
+        floatingActionButtonLocation: floatingActionButtonLocation,
+        floatingActionButtonAnimator: floatingActionButtonAnimator,
+        backgroundColor: backgroundColor,
+        persistentFooterButtons: persistentFooterButtons,
+        bottomSheet: bottomSheet,
+        resizeToAvoidBottomPadding: resizeToAvoidBottomPadding,
+        resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+        primary: primary,
+        drawerDragStartBehavior: drawerDragStartBehavior,
+        extendBody: extendBody,
+        extendBodyBehindAppBar: extendBodyBehindAppBar,
+        drawerScrimColor: drawerScrimColor,
+        drawerEdgeDragWidth: drawerEdgeDragWidth,
+        drawerEnableOpenDragGesture: drawerEnableOpenDragGesture,
+        endDrawer: childDebugDrawerEnd(endDrawer)
+      );
+  }
 
   Text childText(dynamic text, {
     AFWidgetID wid, 
@@ -1348,7 +1472,38 @@ class AFConceptualTheme extends AFTheme {
 
     return EdgeInsets.fromLTRB(l, t, r, b);
   }
-    
+  
+  /// Create a widget that has the [bottomControls] and [topControls] permenantly
+  /// affixed above/below the [main] widget.
+  Widget childTopBottomHostedControls(BuildContext context, Widget main, {
+    Widget bottomControls,
+    Widget topControls,
+    double topHeight = 0.0
+  }) {
+    final stackChildren = childrenColumn();
+
+    if(topControls != null) {
+      stackChildren.add(Positioned(
+        top: 0, left:0, right: 0,
+        child: topControls
+      ));
+    }
+
+    stackChildren.add(Positioned(
+      top: topHeight, left: 0, bottom: 0, right: 0,
+      child: main));
+
+    if(bottomControls != null) {
+      stackChildren.add(Positioned(
+        left: 0, right: 0, bottom: 0,
+        child: bottomControls
+      ));
+    }
+    return Container(
+      margin: EdgeInsets.all(4.0),
+      child: Stack(children: stackChildren));
+  }
+
   /// Creates a standard back button, which navigates up the screen hierarchy.
   /// 
   /// The back button can optionally display a dialog which checks whether the user

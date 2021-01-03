@@ -107,7 +107,7 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFProtot
     final t = context.t;
 
     final widgets = [resultWidget];
-    return createScaffold(
+    return context.t.childScaffold(
       context: context,
       //key: _mainScaffoldKey,
       body: CustomScrollView(

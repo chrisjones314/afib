@@ -266,7 +266,8 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
         final isSel = value == attrValue;
         rows.add(ChoiceChip(
           selected: isSel,
-          label: t.childText(text),
+          label: t.childText(text, textColor: t.colorOnPrimary),
+          selectedColor: t.colorPrimary,
           onSelected: (val) {
             if(val) {
               context.dispatch(AFOverrideThemeValueAction(
@@ -343,7 +344,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
         isExpanded: context.p.isExpanded(area),
         headerBuilder: (context, isExpanded) {
           return ListTile(
-            title: t.childText("Area: $area"),
+            title: t.childText("Area: $area" ),
             dense: true,
           );
         },

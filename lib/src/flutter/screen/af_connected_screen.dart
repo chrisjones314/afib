@@ -5,7 +5,7 @@ import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:quiver/core.dart';
 import 'package:afib/afib_dart.dart';
@@ -264,56 +264,6 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TStateView exten
     return state.public.route?.routeEntryExists(this.screenId, includePrior: true);
   }
 
-  material.Widget createScaffold({
-    Key key,
-    @required AFBuildContext context,
-    material.PreferredSizeWidget appBar,
-    material.Widget drawer,
-    material.Widget body,
-    material.Widget bottomNavigationBar,
-    material.Widget floatingActionButton,
-    material.Color backgroundColor,
-    material.FloatingActionButtonLocation floatingActionButtonLocation,
-    material.FloatingActionButtonAnimator floatingActionButtonAnimator,
-    List<material.Widget> persistentFooterButtons,
-    material.Widget endDrawer,
-    material.Widget bottomSheet,
-    bool resizeToAvoidBottomPadding,
-    bool resizeToAvoidBottomInset,
-    bool primary = true,
-    DragStartBehavior drawerDragStartBehavior = DragStartBehavior.start,
-    bool extendBody = false,
-    bool extendBodyBehindAppBar = false,
-    material.Color drawerScrimColor, 
-    double drawerEdgeDragWidth, 
-    bool drawerEnableOpenDragGesture = true,
-    bool endDrawerEnableOpenDragGesture = true
-    
-  }) {
-      return material.Scaffold(
-        key: key,
-        drawer: context.createDebugDrawerBegin(drawer),
-        body: body,
-        appBar: appBar,
-        bottomNavigationBar: bottomNavigationBar,
-        floatingActionButton: floatingActionButton,
-        floatingActionButtonLocation: floatingActionButtonLocation,
-        floatingActionButtonAnimator: floatingActionButtonAnimator,
-        backgroundColor: backgroundColor,
-        persistentFooterButtons: persistentFooterButtons,
-        bottomSheet: bottomSheet,
-        resizeToAvoidBottomPadding: resizeToAvoidBottomPadding,
-        resizeToAvoidBottomInset: resizeToAvoidBottomInset,
-        primary: primary,
-        drawerDragStartBehavior: drawerDragStartBehavior,
-        extendBody: extendBody,
-        extendBodyBehindAppBar: extendBodyBehindAppBar,
-        drawerScrimColor: drawerScrimColor,
-        drawerEdgeDragWidth: drawerEdgeDragWidth,
-        drawerEnableOpenDragGesture: drawerEnableOpenDragGesture,
-        endDrawer: context.createDebugDrawerEnd(endDrawer)
-      );
-  }
 }
 
 abstract class AFConnectedWidget<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedUIBase<TState, TStateView, TRouteParam, TTheme> { 
@@ -651,6 +601,15 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
     }
   }
 
+  /// Show a snackbar.
+  /// 
+  /// Shows a snackbar containing the specified [text].   
+  /// 
+  /// See also [showSnackbarWidget]
+  void showSnackbarText(String text) {
+    ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text(text), duration: Duration(seconds: 3)));
+  }
+
   /// Show a modal bottom sheet.
   /// 
   /// Note that you will close the bottom sheet inside your bottomsheet screen
@@ -788,33 +747,6 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
 
   int get hashCode {
     return hash2(param.hashCode, stateView.hashCode);
-  }
-
-  /// As long as you are calling [AFConnectedScreen.createScaffold], you don't need
-  /// to worry about this, it will be done for you.
-  material.Widget createDebugDrawerBegin(material.Widget beginDrawer) {
-    return createDebugDrawer(beginDrawer, AFScreenPrototypeTest.testDrawerSideBegin);
-  }
-
-  /// As long as you are calling [AFConnectedScreen.createScaffold], you don't need
-  /// to worry about this, it will be done for you.
-  material.Widget createDebugDrawerEnd(material.Widget endDrawer) {
-    return createDebugDrawer(endDrawer, AFScreenPrototypeTest.testDrawerSideEnd);
-  }
-
-  /// As long as you are calling [AFConnectedScreen.createScaffold], you don't need
-  /// to worry about this, it will be done for you.
-  material.Widget createDebugDrawer(material.Widget drawer, int testDrawerSide) {
-    final store = AFibF.g.storeInternalOnly;
-    final state = store.state;
-    final testState = state.testState;
-    if(testState.activeTestId != null) {
-      final test = AFibF.g.findScreenTestById(testState.activeTestId);
-      if(test != null && test.testDrawerSide == testDrawerSide) {
-        return AFTestDrawer();
-      }
-    }
-    return drawer;
   }
 
   /// This rebuilds the entire theme state. 

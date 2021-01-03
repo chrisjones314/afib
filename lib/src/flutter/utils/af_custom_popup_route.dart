@@ -48,7 +48,7 @@ class AFCustomPopupRoute<T> extends PopupRoute<T> {
       removeTop: true,
       child: childBuilder(context, this),
     );
-    final inheritTheme = Theme.of(context, shadowThemeOnly: true);
+    final inheritTheme = Theme.of(context);
     if (inheritTheme != null) {
       bottomSheet = Theme(data: inheritTheme, child: bottomSheet);
     }

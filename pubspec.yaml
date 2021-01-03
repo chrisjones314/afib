@@ -6,12 +6,11 @@ homepage: https://afibframework.org
 documentation: https://afibframework.org/docs
 environment:
   sdk: ">=2.7.0 <3.0.0"
+publish_to: none
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_localizations:
-    sdk: flutter    
   redux: ^4.0.0
   flutter_redux: ^0.6.0
   intl: ^0.16.1

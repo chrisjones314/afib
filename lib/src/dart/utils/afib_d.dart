@@ -20,7 +20,7 @@ class AFibD<AppState> {
     static Logger logRoute;
 
     static _createLogger(String area, List<String> areas) {
-      if(areas.contains(area) || area.contains(AFConfigEntryLogArea.all)) {
+      if(areas.contains(area) || areas.contains(AFConfigEntryLogArea.all)) {
         return Logger(
             printer: AFLogPrinter(area),
         );

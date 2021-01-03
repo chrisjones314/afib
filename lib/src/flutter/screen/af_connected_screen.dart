@@ -23,14 +23,12 @@ import 'package:afib/src/flutter/test/af_test_drawer.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_redux/flutter_redux.dart';
 
-
 /// Base call for all screens, widgets, drawers, dialogs and bottom sheets
 /// that connect to the store/state.
 /// 
 /// You should usually subclass on of its subclasses:
 /// * [AFConnectedScreen]
 /// * [AFConnectedWidget]
-/// * [AFConnectedScreenWithConnectedChildren] - used for screens containing connected widgets
 /// * [AFConnectedDrawer]
 /// * [AFConnectedDialog]
 /// * [AFConnectedBottomSheet]
@@ -228,17 +226,37 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TStateView exten
   /// Utility method which updates the parameter, but takes a build context
   /// rather than a dispatcher for convenience
   void updateRouteParam(AFBuildContext context,TRouteParam revised, { AFID id }) {
-    return updateRouteParamD(context.dispatcher, revised, id: id);
+    if(context.paramWithChildren != null) {
+      AFConnectedWidget.updateChildRouteParam(context.dispatcher, revised, this.screenId, this.screenId, id: id);
+    } else {
+      updateRouteParamD(context.dispatcher, revised, id: id);
+    }
   }
 
   /// Find the route parameter for the specified named screen
   AFRouteParam findParam(AFState state) {
     final route = state.public.route;
-    TRouteParam p = route?.findParamFor(this.screenId, includePrior: true);
+    final pTest = route?.findParamFor(this.screenId, includePrior: true);
+    if(pTest is AFRouteParamWithChildren) {
+      return AFConnectedWidget.findChildParam(state, this.screenId, this.screenId);
+    }
+
+    TRouteParam p = pTest;
     if(p == null && this.screenId == AFibF.g.actualStartupScreenId) {
       p = route?.findParamFor(AFUIScreenID.screenStartupWrapper);
     }
     return p;
+  }
+
+  @override
+  AFRouteParamWithChildren findParamWithChildren(AFState state) { 
+    final route = state.public.route;
+    final param = route?.findParamFor(this.screenId, includePrior: true);
+    if(param is AFRouteParamWithChildren) {
+      return param;
+    }
+
+    return null;   
   }
 
   @override
@@ -346,51 +364,6 @@ abstract class AFConnectedWidget<TState extends AFAppStateArea, TStateView exten
   }
 
 }
-
-
-/// Use this, coupled with [AFRouteParamWithChildren] for screens which 
-/// render connected widgets.  
-/// 
-/// See also:
-/// * [AFBuildContext.childrenRenderConnected]
-/// * various update... methods related to connected children on [AFBuildContext]
-abstract class AFConnectedScreenWithConnectedChildren<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TStateView, TRouteParam, TTheme> {
-
-  AFConnectedScreenWithConnectedChildren({
-    @required AFScreenID screenId,
-    AFNavigateRoute route = AFNavigateRoute.routeHierarchy,
-  }): super(screenId, route: route);
-
-  AFRouteParam findParam(AFState state) { 
-    return AFConnectedWidget.findChildParam(state, this.screenId, this.screenId);
-  }
-  
-  void updateRouteParamD(AFDispatcher dispatcher, AFRouteParam revised, { AFID id }) {
-    AFConnectedWidget.updateChildRouteParam(dispatcher, revised, this.screenId, this.screenId, id: id);
-  }
-
-  /// Find the route param for this screen. 
-  AFRouteParamWithChildren findParamWithChildren(AFState state) { 
-    final route = state.public.route;
-    final param = route?.findParamFor(this.screenId);
-    if(param is! AFRouteParamWithChildren) {
-      throw AFException("When using AFConnectedScreenWithConnectedChildren, you must create an AFRouteParamWithChildren parameter and use that when you navigate to the screen");
-    }
-
-    return param;   
-  }
-
-  void updateRouteParamWithChildren(AFBuildContext context, AFRouteParamWithChildren revised, { AFID id }) {
-    context.dispatcher.dispatch(AFNavigateSetParamAction(
-      id: id,
-      screen: this.screenId, 
-      param: revised,
-      route: route,
-    ));
-  }
-
-}
-
 
 abstract class AFConnectedScreenWithGlobalParam<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedScreen<TState, TStateView, TRouteParam, TTheme> {
   AFConnectedScreenWithGlobalParam(
@@ -873,7 +846,7 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
     final widChild = children.toList().first.widgetId;
     final widget = render(widChild);
     if(widget is! AFConnectedWidget) {
-      throw AFException("When rendering children of a AFConnectedScreenWithConnectedChildren, the children must be subclasses of AFConnectedWidgetWithParent");
+      throw AFException("When rendering children of a AFConnectedScreen, the children must be subclasses of AFConnectedWidget");
     }
     return widget;
   }
@@ -897,7 +870,7 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
           continue;
         }
         if(widget is! AFConnectedWidget) {
-          throw AFException("When rendering children of a AFConnectedScreenWithConnectedChildren, the children must be subclasses of AFConnectedWidgetWithParent");
+          throw AFException("When rendering children of a AFConnectedScreen, the children must be subclasses of AFConnectedWidget");
         }
         result.add(widget);
       }

@@ -122,7 +122,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
   //--------------------------------------------------------------------------------------
   Widget _buildHeader(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context) {
     final t = context.t;
-    final rows = t.childrenColumn();
+    final rows = t.column();
     final test = context.s.test;
 
     rows.add(Container(
@@ -141,7 +141,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
       )
     ));
 
-    final cols = t.childrenRow();
+    final cols = t.row();
     cols.add(FlatButton(
       child: t.childText('Exit'),
       color: t.colorOnPrimary,
@@ -205,7 +205,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
   Widget _buildChoiceRow(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context) {
     final t = context.t;
 
-    final cols = t.childrenRow();
+    final cols = t.row();
 
     cols.add(_buildChoiceButton(context, "Theme", AFTestDrawerRouteParam.viewTheme));
     cols.add(_buildChoiceButton(context, "Test", AFTestDrawerRouteParam.viewTest));
@@ -243,7 +243,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
 
   TableRow _createAttributeRow(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context, AFThemeID title, Widget Function() buildValue) {
     final t = context.t;    
-    final cols = t.childrenRow();
+    final cols = t.row();
     cols.add(t.testResultTableValue(context, title.toString(), TextAlign.right));
     cols.add(buildValue());
     return TableRow(children: cols);
@@ -251,7 +251,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
 
   Widget _buildEnumAttributeRowValue(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context, AFThemeID attr, dynamic attrValue) {
     final t = context.t;
-    final rows = t.childrenColumn();
+    final rows = t.column();
 
     final values = t.fundamentals.optionsForType(attr);
     if(values == null) {
@@ -294,7 +294,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
   Widget _buildThemeAreaBody(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context, String area) {
     final t = context.t;    
     // build a table that has different values, like 
-    final headerCols = t.childrenRow();
+    final headerCols = t.row();
     headerCols.add(t.testResultTableHeader(context, "Attr", TextAlign.right));
     headerCols.add(t.testResultTableHeader(context, "Value", TextAlign.left));
     final tableRows = t.childrenTable();
@@ -381,7 +381,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
     final test = context.s.test;
     final sectionIds = test.sectionIds;
 
-    final cols = t.childrenRow();
+    final cols = t.row();
 
     final hasMultiple = sectionIds.length > 1;
     final firstId = sectionIds.first;
@@ -437,7 +437,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
     final t = context.t;
     var content;
     if(context.s.test.hasBody) {
-      final rows = t.childrenColumn();
+      final rows = t.column();
       rows.add(_buildRunButton(context));
       _buildTestReport(context, rows);
       content = Column(
@@ -465,7 +465,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
     if(test.hasReusable) {
 
       for(final reusableId in test.sectionIds) {
-        final rows = t.childrenColumn();
+        final rows = t.column();
         if(reusableId == AFReusableTestID.smokeTestId) {
           continue;
         }
@@ -479,14 +479,14 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
         final params = test.paramDescriptions(reusableId);
 
         final tableRows = t.childrenTable();
-        final headerCols = t.childrenRow();
+        final headerCols = t.row();
         headerCols.add(t.testResultTableHeader(context, "#", TextAlign.left));
         headerCols.add(t.testResultTableHeader(context, "Param Description", TextAlign.left));
         tableRows.add(TableRow(children: headerCols));
         
         for(var i = 0; i < params.length; i++) {
           final param = params[i];
-          final resultCols = t.childrenRow();
+          final resultCols = t.row();
           resultCols.add(t.testResultTableValue(context, (i+1).toString(), TextAlign.right));
           resultCols.add(t.testResultTableValue(context, param, TextAlign.left));
           tableRows.add(TableRow(children: resultCols));
@@ -517,13 +517,13 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
 
     rows.add(t.buildErrorsSection(context, testState.errors));
 
-    final headerCols = t.childrenRow();
+    final headerCols = t.row();
     headerCols.add(t.testResultTableHeader(context, "Run", TextAlign.right));
     headerCols.add(t.testResultTableHeader(context, "At", TextAlign.left));
     headerCols.add(t.testResultTableHeader(context, "Pass", TextAlign.right));
     headerCols.add(t.testResultTableHeader(context, "Fail", TextAlign.right));
 
-    final resultCols = t.childrenRow();
+    final resultCols = t.row();
     resultCols.add(t.testResultTableValue(context, testContext.runNumber.toString(), TextAlign.right));
     resultCols.add(t.testResultTableValue(context, timeFormat.format(testContext.lastRun), TextAlign.left));
     resultCols.add(t.testResultTableValue(context, testState.pass.toString(), TextAlign.right));

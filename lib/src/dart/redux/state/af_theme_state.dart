@@ -10,11 +10,6 @@ import 'package:afib/src/flutter/theme/af_text_builders.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-/// Consolidating base class for [AFFundamentalTheme] and [AFConceptualTheme]
-class AFTheme {
-
-}
-
 /// These are fundamental values for theming derived from the device
 /// and operating system itself.
 class AFFundamentalDeviceTheme {
@@ -889,11 +884,12 @@ class AFFundamentalTheme {
 /// Each [AFConnectedWidget] is parmeterized with a conceptual theme
 /// type, and that theme will be accessible via the context.theme and
 /// context.t methods.
-class AFConceptualTheme extends AFTheme {
+class AFConceptualTheme {
+  static const afibPassthroughSuffix = "_afib_passthough";
 
   final AFFundamentalTheme fundamentals;
   AFConceptualTheme({
-    @required this.fundamentals
+    @required this.fundamentals,
   });
 
   /// A utility for creating a list of widgets in a row.   
@@ -902,7 +898,7 @@ class AFConceptualTheme extends AFTheme {
   /// ```dart
   /// final cols = context.t.childrenRow();
   /// ```
-  List<Widget> childrenRow() { return <Widget>[]; }
+  List<Widget> row() { return <Widget>[]; }
 
   /// A utility for creating a list of widgets in a column.
   /// 
@@ -910,8 +906,14 @@ class AFConceptualTheme extends AFTheme {
   /// ```dart
   /// final rows = context.t.childrenColumn();
   /// ```
-  List<Widget> childrenColumn() { return <Widget>[]; }
+  List<Widget> column() { return <Widget>[]; }
 
+
+  /// Identical to [row], except prefixed with children to enhance discoverability
+  List<Widget> childrenRow() { return <Widget>[]; }
+
+  /// Identical to [column], except prefixed with children to enhance discoverability
+  List<Widget> childrenColumn() { return <Widget>[]; }
 
   /// A utility for creating a list of child widgets
   /// 
@@ -942,7 +944,6 @@ class AFConceptualTheme extends AFTheme {
     }
     return AFThemeAreaUtilties.colorLighter(cFound, percent);
   }
-
 
   // The primary color from [ThemeData], adjusted for light/dark mode.
   Color get colorPrimary {
@@ -1006,10 +1007,25 @@ class AFConceptualTheme extends AFTheme {
   }
 
   /// Merges bold into whatever the style would have been.
-  TextStyle get styleBold { 
+  TextStyle styleBold() { 
     return TextStyle(fontWeight: FontWeight.bold);
   }
 
+  TextStyle hintStyle() {
+    return TextStyle(color: Colors.grey);
+  }
+
+  TextStyle styleHint() {
+    return hintStyle();
+  }
+
+  TextStyle errorStyle() {
+    return TextStyle(color: colorOnError);
+  }
+
+  TextStyle styleError() { 
+    return errorStyle();    
+  }
 
   Radius radiusCircular(double r) {
     return Radius.circular(r);
@@ -1101,23 +1117,23 @@ class AFConceptualTheme extends AFTheme {
 
   AFRichTextBuilder childRichTextBuilder({
     AFWidgetID wid,
-    dynamic idOrTextStyleNormal,
-    dynamic idOrTextStyleBold,
-    dynamic idOrTextStyleTapable,
-    dynamic idOrTextStyleMuted,
+    dynamic styleNormal,
+    dynamic styleBold,
+    dynamic styleTapable,
+    dynamic styleMuted,
   }) {
-    final normal = idOrTextStyleNormal != null ? styleText(idOrTextStyleNormal) : null;
-    final bold = idOrTextStyleBold != null ? styleText(idOrTextStyleBold) : null;
-    final tapable = idOrTextStyleTapable != null ? styleText(idOrTextStyleTapable) : null;
-    final muted = idOrTextStyleMuted != null ? styleText(idOrTextStyleMuted) : null;
+    final normal = styleText(styleNormal);
+    final bold = styleText(styleBold);
+    final tapable = styleText(styleTapable);
+    final muted = styleText(styleMuted);
 
     return AFRichTextBuilder(
       theme: fundamentals,
       wid: wid,
-      normal: normal,
-      bold: bold,
-      tapable: tapable,
-      muted: muted
+      styleNormal: normal,
+      styleBold: bold,
+      styleTapable: tapable,
+      styleMuted: muted
     );
   }
 
@@ -1132,6 +1148,36 @@ class AFConceptualTheme extends AFTheme {
       style: style
     );
   }
+
+  /// Create a button that the user is most likely to click.
+  Widget childButtonPrimary({
+    AFWidgetID wid,
+    Widget child,
+    AFPressedDelegate onPressed,
+  }) {
+    return FlatButton(
+      key: keyForWID(wid),
+      child: child,
+      color: colorPrimary,
+      textColor: colorOnPrimary,
+      onPressed: onPressed
+    );
+  }
+
+  /// Create a button that the user is most likely to click.
+  Widget childButtonPrimaryText({
+    AFWidgetID wid,
+    String text,
+    AFPressedDelegate onPressed,
+  }) {
+    return childButtonPrimary(
+      wid: wid,
+      child: childText(text),
+      onPressed: onPressed
+    );
+  }
+
+
 
   /// As long as you are calling [AFConceptualTheme.childScaffold], you don't need
   /// to worry about this, it will be done for you.
@@ -1242,6 +1288,35 @@ class AFConceptualTheme extends AFTheme {
       );
   }
 
+  Widget childSwitch({
+    AFWidgetID wid,
+    bool value,
+    AFOnChangedBoolDelegate onChanged
+  }) {
+    return Switch(
+      key: keyForWID(wid),
+      value: value,
+      onChanged: onChanged,
+      activeTrackColor: colorLighter(colorPrimary),
+      activeColor: colorPrimary,
+    );
+  }
+
+  Widget childChoiceChip({
+    AFWidgetID wid,
+    Widget label,
+    bool selected,
+    AFOnChangedBoolDelegate onSelected,
+  }) {
+    return ChoiceChip(
+      key: keyForWID(wid),
+      label: label,
+      selectedColor: selected ? colorPrimary : null,
+      selected: selected,
+      onSelected: onSelected
+    );
+  }
+
   Text childText(dynamic text, {
     AFWidgetID wid, 
     dynamic style,
@@ -1330,6 +1405,10 @@ class AFConceptualTheme extends AFTheme {
     return AFUI.keyForWID(wid);
   }
 
+  static Key keyForWIDStatic(AFWidgetID wid) {
+    return AFUI.keyForWID(wid);
+  }
+
   Color color(dynamic idOrColor) {
     if(idOrColor is Color) {
       return idOrColor;
@@ -1352,6 +1431,9 @@ class AFConceptualTheme extends AFTheme {
   }
 
   TextStyle styleText(dynamic idOrTextStyle) {
+    if(idOrTextStyle == null) {
+      return null;
+    }
     if(idOrTextStyle is TextStyle) {
       return idOrTextStyle;
     }
@@ -1472,7 +1554,101 @@ class AFConceptualTheme extends AFTheme {
 
     return EdgeInsets.fromLTRB(l, t, r, b);
   }
-  
+
+  /// Show the text in a snackbar. 
+  /// 
+  /// You might prefer [AFBuildContext.showSnackbarText], as it 
+  /// cooresponds [AFFinishQueryContext.showSnackbarText] more clearly.
+  void showSnackbarText(AFBuildContext context, String text) {
+    context.showSnackbarText(text);
+  }
+
+  /// See [AFBuildContext.showDialog], this is just a one line call to that method
+  /// for discoverability.
+  void showDialog({
+    @required AFBuildContext context,
+    AFScreenID screenId,
+    AFRouteParam param,
+    AFNavigatePushAction navigate,
+    AFReturnValueDelegate onReturn,
+    bool barrierDismissible = true,
+    Color barrierColor,
+    bool useSafeArea = true,
+    bool useRootNavigator = true,
+    RouteSettings routeSettings
+  }) {
+    context.showDialog(
+      screenId: screenId,
+      param: param,
+      navigate: navigate,
+      onReturn: onReturn,
+      barrierDismissible: barrierDismissible,
+      barrierColor: barrierColor,
+      useSafeArea: useSafeArea,
+      useRootNavigator: useRootNavigator,
+      routeSettings: routeSettings,
+    );
+  }
+
+  /// See [AFBuildContext.showModalBottomSheet], this is a one line call to that method, here for discoverability.
+  void showModalBottomSheet({
+    @required AFBuildContext context,
+    AFScreenID screenId,
+    AFRouteParam param,
+    AFNavigatePushAction navigate,
+    AFReturnValueDelegate onReturn,
+    Color backgroundColor,
+    double elevation,
+    ShapeBorder shape,
+    Clip clipBehavior,
+    Color barrierColor,
+    bool isScrollControlled = false,
+    bool useRootNavigator = false,
+    bool isDismissible = true,
+    bool enableDrag = true,
+    RouteSettings routeSettings,  
+  }) {
+    return context.showModalBottomSheet(
+      screenId: screenId,
+      param: param,
+      navigate: navigate,
+      onReturn: onReturn,
+      backgroundColor: backgroundColor,
+      elevation: elevation,
+      shape: shape,
+      clipBehavior: clipBehavior,
+      barrierColor: barrierColor,
+      isScrollControlled: isScrollControlled,
+      useRootNavigator: useRootNavigator,
+      isDismissible: isDismissible,
+      enableDrag: enableDrag,
+      routeSettings: routeSettings,
+    );
+  }
+
+  /// See [AFBuildContext.showBottomSheet], this is a one line call to that method, here for discoverability.
+  void showBottomSheet({
+    @required AFBuildContext context,
+    AFScreenID screenId,
+    AFRouteParam param,
+    AFNavigatePushAction navigate,
+    Color backgroundColor,
+    double elevation,
+    ShapeBorder shape,
+    Clip clipBehavior,
+  }) {
+    return context.showBottomSheet(
+      screenId: screenId,
+      param: param,
+      navigate: navigate,
+      backgroundColor: backgroundColor,
+      elevation: elevation,
+      shape: shape,
+      clipBehavior: clipBehavior,
+    );
+  }
+
+
   /// Create a widget that has the [bottomControls] and [topControls] permenantly
   /// affixed above/below the [main] widget.
   Widget childTopBottomHostedControls(BuildContext context, Widget main, {
@@ -1480,7 +1656,7 @@ class AFConceptualTheme extends AFTheme {
     Widget topControls,
     double topHeight = 0.0
   }) {
-    final stackChildren = childrenColumn();
+    final stackChildren = column();
 
     if(topControls != null) {
       stackChildren.add(Positioned(
@@ -1508,7 +1684,7 @@ class AFConceptualTheme extends AFTheme {
   /// 
   /// The back button can optionally display a dialog which checks whether the user
   /// should continue, see [standardShouldContinueAlertCheck] for more.
-  Widget childStandardBackButton(AFBuildContext context, {
+  Widget childButtonStandardBack(AFBuildContext context, {
     AFWidgetID wid = AFUIWidgetID.buttonBack,
     dynamic iconIdOrWidget = AFUIThemeID.iconBack,
     dynamic iconColor,
@@ -1528,6 +1704,17 @@ class AFConceptualTheme extends AFTheme {
     );
   }
   
+  /// Create a list of connected children.  
+  /// 
+  /// The calling context must have a [AFRouteParamWithChildren] as its route parameter.   This method
+  /// will iterate through all children with route parameters of the specified type, and will call your
+  /// render function once for each one.   You must use the widget id passed to you by the render function.
+  List<Widget> childrenConnectedRender<TRouteParam extends AFRouteParam>(AFBuildContext context, {
+     @required  AFRenderChildByIDDelegate render
+  }) {
+    return context.childrenConnectedRender(render: render);
+  }
+
   /// 
   AFShouldContinueCheckDelegate standardShouldContinueAlertCheck({
     @required AFBuildContext context,
@@ -1586,7 +1773,7 @@ class AFConceptualTheme extends AFTheme {
     final thick = size(thickness);
     final h = size(height);
     final ind = size(indent);
-    final result = childrenColumn();
+    final result = column();
     for(var i = 0; i < rows.length; i++) {
       final widget = rows[i];
       result.add(widget);

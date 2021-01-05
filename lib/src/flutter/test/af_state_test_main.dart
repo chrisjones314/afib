@@ -22,10 +22,10 @@ void afStateTestMain<TState extends AFAppStateArea> (AFCommandOutput output, AFT
   final testKind = "State";
   final localStats = AFTestStats();
 
+  final store = AFibF.g.storeInternalOnly;
+  final dispatcher = AFStoreDispatcher(store);
   for(final test in tests.tests) {
     if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
-      final store = AFibF.g.storeInternalOnly;
-      final dispatcher = AFStoreDispatcher(store);
       final context = AFStateTestContext<TState>(test, store, dispatcher, isTrueTestContext: true);
       
       context.store.dispatch(AFResetToInitialStateAction());
@@ -35,6 +35,8 @@ void afStateTestMain<TState extends AFAppStateArea> (AFCommandOutput output, AFT
       printTestResult(output, testKind, context, localStats);
     }
   }
+
+  store.dispatch(AFNavigateExitTestAction());
 
   final baseContexts = List<AFBaseTestExecute>.of(contexts);
   printTestTotal(output, testKind, baseContexts, localStats);

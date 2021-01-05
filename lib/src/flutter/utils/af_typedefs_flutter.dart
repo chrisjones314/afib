@@ -162,3 +162,5 @@ typedef AFReturnValueDelegate = void Function(dynamic param);
 typedef AFRenderChildByIDDelegate = Widget Function(AFWidgetID widChild);
 
 typedef AFBuildBodyDelegate<TData extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> = Widget Function(AFBuildContext<TData, TRouteParam, TTheme> context);
+
+typedef AFOnChangedBoolDelegate = void Function(bool);

@@ -24,7 +24,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
 
   Widget buildHeaderCard(AFBuildContext context, AFWidgetID wid, String title, List<Widget> rows) {
     final radius = Radius.circular(4.0);
-    final content = childrenColumn();
+    final content = column();
     content.add(Container(
         padding: paddingScaled(),
         child: Row(
@@ -62,7 +62,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
 
   Widget createTestListTile(AFDispatcher dispatcher, AFScreenPrototypeTest instance) {
     final titleText = instance.id.code;
-    final cols = childrenRow();
+    final cols = row();
     cols.add(childText(titleText));
     if(instance.hasReusable) {
       cols.add(createReusableTag());
@@ -106,7 +106,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
   Widget buildErrorsSection(AFBuildContext context, List<String> errors) {
     var content;
     if(errors.isNotEmpty) {
-      final headerColsErrors = childrenRow();
+      final headerColsErrors = row();
       headerColsErrors.add(testResultTableValue(context, "#", TextAlign.left, showError: true));
       headerColsErrors.add(testResultTableValue(context, "Errors", TextAlign.left, showError: true));
       
@@ -115,7 +115,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
 
       for(var i = 0; i < errors.length; i++) {
         final error = stripErrorPath(errors[i]);
-        final errorCols = childrenRow();
+        final errorCols = row();
         errorCols.add(testResultTableErrorLine(context, childText((i+1).toString()), i));
         errorCols.add(testResultTableErrorLine(context, childText(error), i));
         tableRowsErrors.add(TableRow(children: errorCols));

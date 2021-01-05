@@ -9,7 +9,7 @@ import 'package:afib/src/dart/utils/af_config_entries.dart';
 class AFTestCommand extends AFCommand { 
   static const cmdKey = "test";
 
-  AFTestCommand(): super(AFConfigEntries.afNamespace, cmdKey, 0, 2);
+  AFTestCommand(): super(AFConfigEntries.afNamespace, cmdKey, 0, 10);
 
   @override
   String get shortHelp => "Run afib tests conveniently";

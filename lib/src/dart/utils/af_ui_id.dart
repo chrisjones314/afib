@@ -37,9 +37,9 @@ class AFUITestID {
 /// These identifiers can be used by third parties, and are usually the values used to create the flutter ThemeData.
 class AFUIThemeID {
 
-  /// constant used by [AFConceptualTheme.childStandardBackButton]
+  /// constant used by [AFConceptualTheme.childButtonStandardBack]
   static const shouldStop = 1;
-  /// constant used by [AFConceptualTheme.childStandardBackButton]
+  /// constant used by [AFConceptualTheme.childButtonStandardBack]
   static const shouldContinue = 2;
 
   static const tagFundamental = "${AFUIWidgetID.afibIDPrefix}fundamental";

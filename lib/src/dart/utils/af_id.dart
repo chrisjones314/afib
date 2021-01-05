@@ -11,6 +11,28 @@ class AFID {
   int compareTo(AFID other) {
     return code.compareTo(other.code);
   }
+
+  bool operator==(Object other) {
+    return (other is AFID && other.code == code);
+  }
+
+  AFWidgetID with1(dynamic item) {
+    return AFWidgetID("${code}_${item.toString()}");
+  }
+
+  AFWidgetID with2(dynamic first, dynamic second) {
+    final key = StringBuffer(code);
+    key.write("_${first.toString()}");
+    if(second != null) {
+      key.write("_${second.toString()}");
+    }
+    return AFWidgetID(key.toString());
+  }
+
+  bool endsWith(String ends) {
+    return code.endsWith(ends);
+  }
+
 }
 
 class AFIDWithTags extends AFID {
@@ -67,19 +89,6 @@ class AFScreenID extends AFID {
 
 class AFWidgetID extends AFID {
   const AFWidgetID(String code) : super(code);
-
-  AFWidgetID with1(dynamic item) {
-    return AFWidgetID("${code}_${item.toString()}");
-  }
-
-  AFWidgetID with2(dynamic first, dynamic second) {
-    final key = StringBuffer(code);
-    key.write("_${first.toString()}");
-    if(second != null) {
-      key.write("_${second.toString()}");
-    }
-    return AFWidgetID(key.toString());
-  }
 }
 
 class AFTestID extends AFIDWithTags {

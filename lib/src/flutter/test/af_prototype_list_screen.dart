@@ -118,7 +118,7 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStateVie
 
   Widget _addGroup(AFBuildContext<AFStateViewUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context, AFWidgetID widGroup, String group, List<AFScreenPrototypeTest> tests) {
     final t = context.t;
-    final rows = t.childrenColumn();
+    final rows = t.column();
     for(final test in tests) {
       rows.add(t.createTestListTile(context.d, test));
     }

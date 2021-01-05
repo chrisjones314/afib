@@ -14,9 +14,13 @@ mixin AFContextDispatcherMixin {
 
   /// Pop up to the next less detailed screen.
   /// 
-  /// This is just here for discoverability, it is not different from
-  /// dispatch(action).
-  void dispatchNavigatePop(AFNavigatePopAction action) {
+  /// This is just here for discoverability, it is no different from
+  /// dispatch(action).  You can manually specify the [action], or 
+  /// if you don't, a default pop without a a return value is created for you.
+  void dispatchNavigatePop({AFNavigatePopAction action}) {
+    if(action == null) {
+      action = AFNavigatePopAction();
+    }
     dispatch(action);
   }
 

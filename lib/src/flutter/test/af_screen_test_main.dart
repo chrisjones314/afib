@@ -67,9 +67,10 @@ Future<void> _afStandardScreenTestMain<TState extends AFAppStateArea>(
       }
       AFibD.logTest?.d("Starting ${test.id}");
   
-
-      final dispatcher = AFSingleScreenTestDispatcher(test.id, AFStoreDispatcher(AFibF.g.storeInternalOnly), null);
+      final storeDispatcher = AFStoreDispatcher(AFibF.g.storeInternalOnly);
+      final dispatcher = AFSingleScreenTestDispatcher(test.id, storeDispatcher, null);
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id);
+      storeDispatcher.dispatch(AFResetToInitialStateAction());
       dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, stateView: test.stateView, screen: test.screenId, param: test.routeParam));
       dispatcher.setContext(context);
       simpleContexts.add(context);

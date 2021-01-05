@@ -1241,12 +1241,12 @@ class AFConnectedWidgetPrototypeTest extends AFWidgetPrototypeTest {
 
   AFConnectedWidgetPrototypeTest({
     @required AFTestID id,
-    @required dynamic data,
+    @required dynamic stateView,
     @required this.param,
     @required AFCreateConnectedWidgetDelegate createConnectedWidget,
     @required AFSingleScreenPrototype body,
     String title
-  }): super(id: id, title: title, body: body, data: data, createConnectedWidget: createConnectedWidget);
+  }): super(id: id, title: title, body: body, data: stateView, createConnectedWidget: createConnectedWidget);
 
   @override
   List<AFReusableTestID> get sectionIds {
@@ -1373,7 +1373,7 @@ class AFWidgetTests<TState> {
   }) {
     final instance = AFConnectedWidgetPrototypeTest(
       id: id,
-      data: data,
+      stateView: data,
       param: param,
 
       createConnectedWidget: createConnectedWidget,

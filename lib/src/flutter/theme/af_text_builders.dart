@@ -9,20 +9,20 @@ import 'package:flutter/material.dart';
 class AFRichTextBuilder {
   final AFFundamentalTheme theme;
   final AFWidgetID wid;
-  final TextStyle bold;
-  final TextStyle normal;
-  final TextStyle tapable;
-  final TextStyle muted;
+  final TextStyle styleBold;
+  final TextStyle styleNormal;
+  final TextStyle styleTapable;
+  final TextStyle styleMuted;
   
   final spans = <TextSpan>[];
 
   AFRichTextBuilder({
     @required this.theme,
     this.wid,
-    this.bold,
-    this.normal,
-    this.tapable,
-    this.muted,
+    this.styleBold,
+    this.styleNormal,
+    this.styleTapable,
+    this.styleMuted,
   });
 
   bool get isEmpty {
@@ -35,22 +35,22 @@ class AFRichTextBuilder {
 
   void insertNormal(int idx, dynamic idOrText) {
     final text = theme.translate(idOrText);
-    spans.insert(idx, TextSpan(text: text, style: normal));
+    spans.insert(idx, TextSpan(text: text, style: styleNormal));
   }
 
   void writeTapable(dynamic idOrText, TapGestureRecognizer recognizer) {
     final text = theme.translate(idOrText);
-    spans.add(TextSpan(text: text, style: tapable, recognizer: recognizer));
+    spans.add(TextSpan(text: text, style: styleTapable, recognizer: recognizer));
   }
 
   void writeBold(dynamic idOrText) {
     final text = theme.translate(idOrText);
-    spans.add(TextSpan(text: text, style: bold));
+    spans.add(TextSpan(text: text, style: styleBold));
   }
 
   void writeMuted(dynamic idOrText) {
     final text = theme.translate(idOrText);
-    spans.add(TextSpan(text: text, style: muted));
+    spans.add(TextSpan(text: text, style: styleMuted));
   }
 
   void writeNormal(dynamic idOrText) {
@@ -59,11 +59,11 @@ class AFRichTextBuilder {
   }
 
   void write(String text) {
-    spans.add(TextSpan(text: text, style: normal));
+    spans.add(TextSpan(text: text, style: styleNormal));
   }
 
   /// Creates a rich text widget with the specified content.
-  Widget create() {
+  Widget toRichText() {
     return RichText(
         key: AFUI.keyForWID(wid),
         text: TextSpan(

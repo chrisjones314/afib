@@ -86,7 +86,7 @@ class AFRouteParamWithChildrenBuilder {
     activeSort[typeToSort] = sort;
   }
 
-  AFRouteParamWithChildren create() {
+  AFRouteParamWithChildren toParam() {
     return AFRouteParamWithChildren(children: children, primary: primary, activeSort: activeSort);
   }
 }
@@ -99,7 +99,7 @@ class AFRouteParamWithChildren extends AFRouteParam {
   final AFRouteParamChild primary;
   final List<AFRouteParamChild> children;
   final Map<Type, dynamic> activeSort;
-  
+    
   AFRouteParamWithChildren({
     @required this.primary,
     @required this.children,
@@ -107,6 +107,8 @@ class AFRouteParamWithChildren extends AFRouteParam {
   });
 
   static AFRouteParamWithChildrenBuilder createBuilder() { return AFRouteParamWithChildrenBuilder(); }
+
+  TRouteParam primaryParam<TRouteParam extends AFRouteParam>() { return primary.param; }
 
   AFRouteParam findByWidget(AFID wid) {
     if(wid == primary.widgetId) {
@@ -129,6 +131,20 @@ class AFRouteParamWithChildren extends AFRouteParam {
       }
     }
     return count;
+  }
+
+  AFRouteParamWithChildren revisePrimary(AFRouteParam param) {
+    return copyWith(primary: primary.reviseParam(param));
+  }
+
+  List<TChildParam> paramsOfType<TChildParam extends AFRouteParam>() {
+    final result = <TChildParam>[];
+    for(final child in children) {
+      if(child.param is TChildParam) {
+        result.add(child.param);
+      }
+    }
+    return result;
   }
 
   AFRouteParamWithChildren reviseRemoveChild(AFWidgetID wid) {
@@ -229,6 +245,10 @@ class AFRouteParamWithChildren extends AFRouteParam {
       final c = children[i];
       final co = op.children[i];
       if(c.widgetId != co.widgetId) {
+        return false;
+      }
+
+      if(c.param != co.param) {
         return false;
       }
     }    

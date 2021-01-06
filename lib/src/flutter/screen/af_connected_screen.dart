@@ -183,11 +183,7 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TStateView exten
 
   /// Called to update the route parameter and re-render the screen.
   /// 
-  /// It is strange to have a route-parameter method here (in a AFConnectedScreenWithoutRoute).
-  /// However, subclasses of this like [AFPopupScreen] and [AFConnectedWidgetWithParam] have
-  /// the ability to reference/update the AFRouteParam of their parent screen.
-  /// This is here to create a single consistent mechanism for performing updates
-  /// even in cases where that specific widget does not have its own route entry.
+  /// Prefer [updateRouteParam] which takes a [AFBuildContext].
   void updateRouteParamD(AFDispatcher dispatcher, TRouteParam revised, { AFID id });
 
   /// Like [updateRouteParamD], but takes a build context
@@ -325,7 +321,7 @@ abstract class AFConnectedWidget<TState extends AFAppStateArea, TStateView exten
     @required this.parentScreen,
     @required this.widChild,
     this.route = AFNavigateRoute.routeHierarchy,
-  }): super(key: AFUI.keyForWID(widChild));
+  }): super(key: AFConceptualTheme.keyForWIDStatic(widChild));
 
   AFScreenID get screenIdForTest {
     return null;

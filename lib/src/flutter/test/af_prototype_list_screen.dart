@@ -104,15 +104,15 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStateVie
   }
 
   Widget _buildList(AFBuildContext<AFStateViewUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context) {
-
-    final rows = AFUI.column();
+    final t = context.t;
+    final rows = t.column();
     final groups = _sortIterable(context.p.screenTestsByGroup.keys);
     for(final group in groups) {
       final tests = context.p.screenTestsByGroup[group];
       rows.add(_addGroup(context, AFUIWidgetID.cardTestGroup.with1(group), group, tests));
     }
 
-    final leading = AFUI.standardBackButton(context.d);
+    final leading = t.childButtonStandardBack(context);
     return context.t.buildPrototypeScaffold(context.p.title, rows, leading: leading);
   }
 

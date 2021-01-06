@@ -5,7 +5,6 @@ import 'dart:ui';
 import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
-import 'package:afib/src/flutter/core/afui.dart';
 import 'package:afib/src/flutter/theme/af_text_builders.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -1340,6 +1339,18 @@ class AFConceptualTheme {
     );
   }
 
+  Widget childMargin({
+    AFWidgetID wid, 
+    Widget child,
+    EdgeInsets margin,  
+  }) {
+    return Container(
+      key: keyForWID(wid),
+      margin: margin,
+      child: child
+    );
+  }
+
   /// Create a text field with the specified text.
   /// 
   /// See [AFTextEditingControllersHolder] for an explanation
@@ -1352,13 +1363,14 @@ class AFConceptualTheme {
     @required AFWidgetID wid,
     @required AFTextEditingControllersHolder controllers,
     @required AFOnChangedStringDelegate onChanged,
-    @required String text,
+    String text,
     bool enabled,
     bool obscureText = false,
     bool autofocus = false,
     InputDecoration decoration,
     bool autocorrect = true,
     TextAlign textAlign = TextAlign.start,
+    TextInputType keyboardType 
   }) {
     final textController = controllers.syncText(wid, text);
     return TextField(
@@ -1366,6 +1378,7 @@ class AFConceptualTheme {
       enabled: enabled,
       controller: textController,
       onChanged: onChanged,
+      keyboardType: keyboardType,
       obscureText: obscureText,
       autocorrect: autocorrect,
       autofocus: autofocus,
@@ -1469,11 +1482,12 @@ class AFConceptualTheme {
   
   /// Returns a unique key for the specified widget.
   Key keyForWID(AFWidgetID wid) {
-    return AFUI.keyForWID(wid);
+    return keyForWIDStatic(wid);
   }
 
   static Key keyForWIDStatic(AFWidgetID wid) {
-    return AFUI.keyForWID(wid);
+    if(wid == null) { return null; }
+    return Key(wid.code);
   }
 
   Color color(dynamic idOrColor) {

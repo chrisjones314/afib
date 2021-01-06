@@ -43,18 +43,17 @@ class AFTextEditingControllersHolder extends AFDisposableUIHolder<TextEditingCon
 
   @Deprecated("Just for migration")
   TextEditingController syncText(AFWidgetID wid, String text) {
-    if(text == null) {
-      text = "";
-    }
     final controller = access(wid);
-    if(controller.text != text) {
-      var restoreSelection;
-      if(text.length >= controller.text.length) {
-        restoreSelection = controller.selection;
-      }
-      controller.text = text;
-      if(restoreSelection != null) {
-        controller.selection = restoreSelection;
+    if(text != null) {
+      if(controller.text != text) {
+        var restoreSelection;
+        if(text.length >= controller.text.length) {
+          restoreSelection = controller.selection;
+        }
+        controller.text = text;
+        if(restoreSelection != null) {
+          controller.selection = restoreSelection;
+        }
       }
     }
     return controller;

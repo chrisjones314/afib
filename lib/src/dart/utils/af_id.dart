@@ -16,6 +16,10 @@ class AFID {
     return (other is AFID && other.code == code);
   }
 
+  int get hashCode {
+    return code.hashCode;
+  }
+
   AFWidgetID with1(dynamic item) {
     return AFWidgetID("${code}_${item.toString()}");
   }

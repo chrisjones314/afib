@@ -22,7 +22,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
     return 50.0;
   }
 
-  Widget buildHeaderCard(AFBuildContext context, AFWidgetID wid, String title, List<Widget> rows) {
+  Widget childCardHeader(AFBuildContext context, AFWidgetID wid, String title, List<Widget> rows) {
     final radius = Radius.circular(4.0);
     final content = column();
     content.add(Container(

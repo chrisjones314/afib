@@ -1,11 +1,12 @@
 
+import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 typedef AFDisposableUICreateDelegate<T> = T Function();
 
 class AFDisposableUIHolder<T> {
-  Map<dynamic, T> controllers = <dynamic, T>{};
+  Map<AFWidgetID, T> controllers = <AFWidgetID, T>{};
   AFDisposableUICreateDelegate<T> create;
   bool disposed = false;
 
@@ -13,11 +14,11 @@ class AFDisposableUIHolder<T> {
     this.create
   });
 
-  T access(dynamic id) {
-    var controller = controllers[id];
+  T access(AFWidgetID wid) {
+    var controller = controllers[wid];
     if(controller == null) {
       controller = create();
-      controllers[id] = controller;
+      controllers[wid] = controller;
     }
     return controller;
   }
@@ -40,11 +41,12 @@ class AFDisposableUIHolder<T> {
 class AFTextEditingControllersHolder extends AFDisposableUIHolder<TextEditingController>  {
   AFTextEditingControllersHolder(): super(create: () => TextEditingController());
 
-  TextEditingController syncText(dynamic id, String text) {
+  @Deprecated("Just for migration")
+  TextEditingController syncText(AFWidgetID wid, String text) {
     if(text == null) {
       text = "";
     }
-    final controller = access(id);
+    final controller = access(wid);
     if(controller.text != text) {
       var restoreSelection;
       if(text.length >= controller.text.length) {

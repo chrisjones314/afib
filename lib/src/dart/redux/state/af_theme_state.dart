@@ -915,6 +915,29 @@ class AFConceptualTheme {
   /// Identical to [column], except prefixed with children to enhance discoverability
   List<Widget> childrenColumn() { return <Widget>[]; }
 
+  /// Returns a string label fpor hours and minutes that respects the device's 
+  /// always24Hours settings
+  /// 
+  String textHourMinuteLabel(int hour, int minute, { bool alwaysUse24Hours }) {
+    var always = alwaysUse24Hours ?? alwaysUse24HourFormat;
+    var suffix = ' am';
+    var nHour = hour;
+    if(always) {
+      suffix = '';
+    } else if(nHour >= 12) {
+      suffix = ' pm';
+      if(nHour > 12) {
+        nHour -= 12;
+      }
+    }
+    final buffer = StringBuffer();
+    buffer.write(nHour);
+    buffer.write(':');
+    buffer.write(minute.toString().padLeft(2, '0'));
+    buffer.write(suffix);
+    return buffer.toString();
+  }
+
   /// A utility for creating a list of child widgets
   /// 
   /// This allows for a readable syntax like:
@@ -1315,6 +1338,50 @@ class AFConceptualTheme {
       selected: selected,
       onSelected: onSelected
     );
+  }
+
+  /// Create a text field with the specified text.
+  /// 
+  /// See [AFTextEditingControllersHolder] for an explanation
+  /// of how text controllers should be handled.  The [wid] is
+  /// used as the id for the specific controller. The [AFTextEditingControllersHolder]
+  /// should be created only once, when you first visit a screen, and then
+  /// should be passed through via the 'copyWith' method, and then 
+  /// disposed of the route parameter is disposed.
+  Widget childTextField({
+    @required AFWidgetID wid,
+    @required AFTextEditingControllersHolder controllers,
+    @required AFOnChangedStringDelegate onChanged,
+    @required String text,
+    bool enabled,
+    bool obscureText = false,
+    bool autofocus = false,
+    InputDecoration decoration,
+    bool autocorrect = true,
+    TextAlign textAlign = TextAlign.start,
+  }) {
+    final textController = controllers.syncText(wid, text);
+    return TextField(
+      key: keyForWID(wid),
+      enabled: enabled,
+      controller: textController,
+      onChanged: onChanged,
+      obscureText: obscureText,
+      autocorrect: autocorrect,
+      autofocus: autofocus,
+      textAlign: textAlign,
+      decoration: decoration,
+    );
+  }
+
+  TapGestureRecognizer tapRecognizerFor({
+    @required AFWidgetID wid,
+    @required AFTapGestureRecognizersHolder recognizers,
+    @required AFPressedDelegate onTap,
+  }) {
+    final recognizer = recognizers.access(wid);
+    recognizer.onTap = onTap;
+    return recognizer;
   }
 
   Text childText(dynamic text, {

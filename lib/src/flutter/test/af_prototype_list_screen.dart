@@ -123,7 +123,7 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStateVie
       rows.add(t.createTestListTile(context.d, test));
     }
 
-    return t.buildHeaderCard(context, widGroup, group, rows);
+    return t.childCardHeader(context, widGroup, group, rows);
   }
 
 }

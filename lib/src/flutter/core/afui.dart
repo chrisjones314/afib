@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 /// Some very simple user interface utilities.
+@Deprecated("Migrating to themes")
 class AFUI {
   static const shouldStop = 1;
   static const shouldContinue = 2;

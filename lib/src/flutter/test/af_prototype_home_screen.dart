@@ -146,8 +146,8 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     }
 
     final rows = t.column();
-    rows.add(t.buildHeaderCard(context, AFUIWidgetID.cardTestHomeHeader, "Prototypes and Tests", protoRows));    
-    rows.add(t.buildHeaderCard(context, AFUIWidgetID.cardTestHomeSearchAndRun, "Search and Run", filterRows));
+    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeHeader, "Prototypes and Tests", protoRows));    
+    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeSearchAndRun, "Search and Run", filterRows));
     
     return context.t.buildPrototypeScaffold("AFib Prototype Mode", rows);
   }
@@ -193,14 +193,14 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
 
   Widget _buildFilterAndRunControls(AFBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam, AFPrototypeTheme> context, List<AFScreenPrototypeTest> tests) {
     final t = context.t;
-    final searchController = context.p.textControllers.syncText(AFPrototypeHomeScreenParam.filterTextId, context.p.filter);
 
     final rows = t.column();
 
     final searchText = Container(
-      child: TextField(
-        key: t.keyForWID(AFUIWidgetID.textTestSearch),
-        controller: searchController,
+      child: t.childTextField(
+        wid: AFUIWidgetID.textTestSearch,
+        controllers: context.p.textControllers,
+        text: context.p.filter,
         obscureText: false,
         autofocus: false,
         decoration: InputDecoration(

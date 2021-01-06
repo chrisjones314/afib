@@ -25,6 +25,7 @@ class AFUIWidgetID {
   static const cardTestGroup = AFWidgetID("${afibIDPrefix}card_test_group");
   static const buttonOK = AFWidgetID("${afibIDPrefix}button_ok");
   static const buttonCancel = AFWidgetID("${afibIDPrefix}button_cancel");
+  static const textFilter = AFWidgetID("${afibIDPrefix}filter_text");
 }
 
 class AFUITestID {

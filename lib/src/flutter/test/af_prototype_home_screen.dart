@@ -146,8 +146,8 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
     }
 
     final rows = t.column();
-    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeHeader, "Prototypes and Tests", protoRows));    
-    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeSearchAndRun, "Search and Run", filterRows));
+    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeHeader, "Prototypes and Tests", protoRows, margin: t.marginScaled(all: 0, bottom: 1)));    
+    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeSearchAndRun, "Search and Run", filterRows, margin: t.marginScaled(all: 0, bottom: 1)));
     
     return context.t.buildPrototypeScaffold("AFib Prototype Mode", rows);
   }

@@ -1,6 +1,5 @@
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
-import 'package:afib/src/flutter/core/afui.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -65,7 +64,7 @@ class AFRichTextBuilder {
   /// Creates a rich text widget with the specified content.
   Widget toRichText() {
     return RichText(
-        key: AFUI.keyForWID(wid),
+        key: AFConceptualTheme.keyForWIDStatic(wid),
         text: TextSpan(
         children: spans
         
@@ -95,7 +94,7 @@ class AFTextBuilder {
   Widget create() {
     return Text(
       buffer.toString(),
-      key: AFUI.keyForWID(wid),
+      key: AFConceptualTheme.keyForWIDStatic(wid),
       style: style
     );
   }

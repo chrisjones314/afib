@@ -8,7 +8,6 @@ import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
-import 'package:afib/src/flutter/core/afui.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
@@ -106,7 +105,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
 
   //--------------------------------------------------------------------------------------
   Widget _buildDrawer(AFBuildContext<AFTestDrawerData, AFTestDrawerRouteParam, AFPrototypeTheme> context) {
-    final rows = AFUI.column();
+    final rows = context.t.column();
     
     rows.add(_buildHeader(context));
     rows.add(_buildChoiceRow(context));

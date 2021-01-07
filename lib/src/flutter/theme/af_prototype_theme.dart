@@ -22,10 +22,11 @@ class AFPrototypeTheme extends AFConceptualTheme {
     return 50.0;
   }
 
-  Widget childCardHeader(AFBuildContext context, AFWidgetID wid, String title, List<Widget> rows) {
+  Widget childCardHeader(AFBuildContext context, AFWidgetID wid, String title, List<Widget> rows, { EdgeInsets margin }) {
     final radius = Radius.circular(4.0);
     final content = column();
     content.add(Container(
+      margin: margin,
         padding: paddingScaled(),
         child: Row(
           children: [childText(title, style: styleOnPrimary.subtitle1)],

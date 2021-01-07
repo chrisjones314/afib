@@ -100,7 +100,8 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   /// 
   /// If you need to dispatch an action, you should typically call [AFBuildContext.dispatch].
   /// If you need access to items from your reduce state, you should typically override
-  /// [AFConnectedScreen.createStateView] or [AFConnectedWidgetWithParam.createStateView].
+  /// [AFConnectedScreen.createStateView], [AFConnectedWidget.createStateView], or the same method
+  /// for dialogs, bottom sheets, etc.
   AFStore storeInternalOnly;
 
   /// WARNING: You should never call this.  See [internalOnlyStore] for details.

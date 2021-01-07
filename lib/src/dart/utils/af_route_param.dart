@@ -61,15 +61,14 @@ class AFRouteParamChild {
 
 /// A utility to build AFRouteParamWithChildren
 class AFRouteParamWithChildrenBuilder {
-  AFRouteParamChild primary;
+  final AFRouteParamChild primary;
   final children = <AFRouteParamChild>[];
   final activeSort = <Type, dynamic>{};
 
-  void setPrimary(AFScreenID wid, AFRouteParam child) {
-    primary = AFRouteParamChild(
-      widgetId: wid,
-      param: child
-    );
+  AFRouteParamWithChildrenBuilder(this.primary);
+
+  factory AFRouteParamWithChildrenBuilder.create(AFScreenID screen, AFRouteParam param) {
+    return AFRouteParamWithChildrenBuilder(AFRouteParamChild(widgetId: screen, param: param));
   }
 
   void add(AFWidgetID wid, AFRouteParam child) {
@@ -106,7 +105,7 @@ class AFRouteParamWithChildren extends AFRouteParam {
     @required this.activeSort,
   });
 
-  static AFRouteParamWithChildrenBuilder createBuilder() { return AFRouteParamWithChildrenBuilder(); }
+  static AFRouteParamWithChildrenBuilder createBuilder(AFScreenID screen, AFRouteParam param) { return AFRouteParamWithChildrenBuilder.create(screen, param); }
 
   TRouteParam primaryParam<TRouteParam extends AFRouteParam>() { return primary.param; }
 

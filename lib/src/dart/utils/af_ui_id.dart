@@ -26,6 +26,7 @@ class AFUIWidgetID {
   static const buttonOK = AFWidgetID("${afibIDPrefix}button_ok");
   static const buttonCancel = AFWidgetID("${afibIDPrefix}button_cancel");
   static const textFilter = AFWidgetID("${afibIDPrefix}filter_text");
+  static const widgetPrototypeTest = AFWidgetID("${afibIDPrefix}widget_prototype_test");
 }
 
 class AFUITestID {

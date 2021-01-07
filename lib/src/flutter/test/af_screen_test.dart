@@ -1190,14 +1190,14 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
 abstract class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
   final dynamic data;
   final AFSingleScreenPrototype body;
-  final AFCreateConnectedWidgetDelegate createConnectedWidget;
+  final AFRenderConnectedChildDelegate render;
   final AFCreateWidgetWrapperDelegate createWidgetWrapperDelegate;
 
   AFWidgetPrototypeTest({
     @required AFTestID id,
     @required this.body,
     @required this.data,
-    @required this.createConnectedWidget,
+    @required this.render,
     this.createWidgetWrapperDelegate,
     String title
   }): super(id: id);
@@ -1243,10 +1243,9 @@ class AFConnectedWidgetPrototypeTest extends AFWidgetPrototypeTest {
     @required AFTestID id,
     @required dynamic stateView,
     @required this.param,
-    @required AFCreateConnectedWidgetDelegate createConnectedWidget,
+    @required AFRenderConnectedChildDelegate render,
     @required AFSingleScreenPrototype body,
-    String title
-  }): super(id: id, title: title, body: body, data: stateView, createConnectedWidget: createConnectedWidget);
+  }): super(id: id, body: body, data: stateView, render: render);
 
   @override
   List<AFReusableTestID> get sectionIds {
@@ -1366,18 +1365,16 @@ class AFWidgetTests<TState> {
   
   AFSingleScreenPrototype addConnectedPrototype({
     @required AFTestID   id,
-    @required AFCreateConnectedWidgetDelegate createConnectedWidget,
-    @required dynamic data,
-    @required AFRouteParam param,
-    String title
+    @required AFRenderConnectedChildDelegate render,
+    dynamic data,
+    AFRouteParam param,
+    AFNavigatePushAction navigate,
   }) {
     final instance = AFConnectedWidgetPrototypeTest(
       id: id,
       stateView: data,
       param: param,
-
-      createConnectedWidget: createConnectedWidget,
-      title: title,
+      render: render,
       body: AFSingleScreenPrototype(id)
     );
     _connectedTests.add(instance);
@@ -1984,17 +1981,15 @@ class AFWidgetTestDefinitionContext extends AFBaseTestDefinitionContext {
 
   AFSingleScreenPrototype definePrototype({
     @required AFTestID   id,
-    @required AFCreateConnectedWidgetDelegate createConnectedWidget,
+    @required AFRenderConnectedChildDelegate render,
     @required dynamic data,
     @required AFRouteParam param,
-    String title
   }) {
     return tests.addConnectedPrototype(
       id: id,
-      createConnectedWidget: createConnectedWidget,
+      render: render,
       data: data,
       param: param,
-      title: title
     );
   }
 

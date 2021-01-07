@@ -313,12 +313,12 @@ abstract class AFStatelessWidget<TState extends AFAppStateArea, TStateView exten
 }
 
 abstract class AFConnectedWidget<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> extends AFConnectedUIBase<TState, TStateView, TRouteParam, TTheme> { 
-  final AFScreenID parentScreen;
+  final AFScreenID screenParent;
   final AFWidgetID widChild;
   final AFNavigateRoute route;
   
   AFConnectedWidget({
-    @required this.parentScreen,
+    @required this.screenParent,
     @required this.widChild,
     this.route = AFNavigateRoute.routeHierarchy,
   }): super(key: AFConceptualTheme.keyForWIDStatic(widChild));
@@ -333,7 +333,7 @@ abstract class AFConnectedWidget<TState extends AFAppStateArea, TStateView exten
   /// Which this widget used to find its specific child route param in that screen's
   /// overall route param.
   AFRouteParam findParam(AFState state) { 
-    return findChildParam<TRouteParam>(state, this.parentScreen, this.widChild);
+    return findChildParam<TRouteParam>(state, this.screenParent, this.widChild);
   }
 
   static AFRouteParam findChildParam<TRouteParam extends AFRouteParam>(AFState state, AFScreenID screen, AFID widChild) {
@@ -353,12 +353,12 @@ abstract class AFConnectedWidget<TState extends AFAppStateArea, TStateView exten
     if(widChild.endsWith(AFConceptualTheme.afibPassthroughSuffix)) {
       dispatcher.dispatch(AFNavigateSetParamAction(
         id: id,
-        screen: this.parentScreen, 
+        screen: this.screenParent, 
         param: revised,
         route: route
       ));
     } else {
-      updateChildRouteParam(dispatcher, revised, this.parentScreen, this.widChild, id: id);
+      updateChildRouteParam(dispatcher, revised, this.screenParent, this.widChild, id: id);
     }
   }
 
@@ -830,7 +830,8 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   /// If your [AFRouteParamWithChildren] contains exactly one value of type [TChildRouteParam], you can 
   /// render it using this method.
   material.Widget childConnectedRender<TChildRouteParam extends AFRouteParam>({
-    @required AFRenderChildByIDDelegate render
+    @required AFScreenID screenParent,
+    @required AFRenderConnectedChildDelegate render
   }) {
     final children = paramWithChildren.children.where( (test) => test.param is TChildRouteParam);
     if(children.isEmpty || children.length > 1) {
@@ -838,7 +839,7 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
     }
 
     final widChild = children.toList().first.widgetId;
-    final widget = render(widChild);
+    final widget = render(screenParent, widChild);
     if(widget is! AFConnectedWidget) {
       throw AFException("When rendering children of a AFConnectedScreen, the children must be subclasses of AFConnectedWidget");
     }
@@ -846,13 +847,15 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   }
 
   material.Widget childConnectedRenderPassthrough<TChildRouteParam extends AFRouteParam>({
-    @required AFScreenID screenId,
-    @required AFRenderChildByIDDelegate render
+    @required AFScreenID screenParent,
+    @required AFWidgetID widChild,
+    @required AFRenderConnectedChildDelegate render
   }) {
+    assert(TChildRouteParam != dynamic);
     final param = this.param;
-    final widChild = screenId.with1(AFConceptualTheme.afibPassthroughSuffix);
+    final widChildFull = screenParent.with2(widChild, AFConceptualTheme.afibPassthroughSuffix);
     assert(param is TChildRouteParam);
-    final widget = render(widChild);
+    final widget = render(screenParent, widChildFull);
     assert(widget is AFConnectedWidget);
     return widget;
   }
@@ -861,7 +864,8 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   /// Renders a list of connected children, one for reach child parameter in
   /// the parent's [AFRouteParamWithChildren] that also has the type [TChildRouteParam].
   List<material.Widget> childrenConnectedRender<TChildRouteParam extends AFRouteParam>({
-    @required  AFRenderChildByIDDelegate render
+    @required AFScreenID screenParent,
+    @required AFRenderConnectedChildDelegate render
   }) {
     final result = <material.Widget>[];
     if(paramWithChildren == null) {
@@ -871,7 +875,7 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
     for(final child in children) {
       if(child.param is TChildRouteParam) {
         final widChild = child.widgetId;
-        final widget = render(widChild);
+        final widget = render(screenParent, widChild);
         if(widget == null) {
           continue;
         }

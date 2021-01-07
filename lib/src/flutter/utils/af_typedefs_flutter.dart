@@ -76,14 +76,6 @@ typedef AFReusableScreenTestBodyExecuteDelegate1 = Future<void> Function(AFScree
 typedef AFReusableScreenTestBodyExecuteDelegate2 = Future<void> Function(AFScreenTestExecute ste, dynamic param1, dynamic param2);
 typedef AFReusableScreenTestBodyExecuteDelegate3 = Future<void> Function(AFScreenTestExecute ste, dynamic param1, dynamic param2, dynamic param3);
 
-
-/// Delegate used to create a widget in a widget test.
-typedef AFCreateConnectedWidgetDelegate = AFConnectedWidgetWithParam Function(
-  AFDispatcher dispatcher,
-  AFFindParamDelegate findParamDelegate,
-  AFUpdateParamDelegate updateParamDelegate,
-);
-
 /// Delegate used to implement the boyd of a multi screen test.
 typedef AFWorkflowTestBodyExecuteDelegate = Future<void> Function(AFWorkflowTestExecute mse);
 
@@ -159,7 +151,7 @@ typedef AFCreateDynamicDelegate = dynamic Function();
 
 typedef AFReturnValueDelegate = void Function(dynamic param);
 
-typedef AFRenderChildByIDDelegate = Widget Function(AFWidgetID widChild);
+typedef AFRenderConnectedChildDelegate = Widget Function(AFScreenID screenParent, AFWidgetID widChild);
 
 typedef AFBuildBodyDelegate<TData extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> = Widget Function(AFBuildContext<TData, TRouteParam, TTheme> context);
 

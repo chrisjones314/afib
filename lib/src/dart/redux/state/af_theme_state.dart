@@ -809,6 +809,10 @@ class AFFundamentalTheme {
     return themeDataActive.primaryTextTheme;
   }
 
+  TextTheme get styleOnSecondary {
+    return themeDataActive.primaryTextTheme;
+  }
+
   TextTheme get styleOnAccent {
     return themeDataActive.accentTextTheme;
   }
@@ -937,6 +941,23 @@ class AFConceptualTheme {
     return buffer.toString();
   }
 
+  Widget childConnectedRenderPassthrough<TChildRouteParam extends AFRouteParam>({
+    @required AFBuildContext context,
+    @required AFScreenID screenParent,
+    @required AFWidgetID widChild,
+    @required AFRenderConnectedChildDelegate render
+  }) {
+    return context.childConnectedRenderPassthrough<TChildRouteParam>(screenParent: screenParent, widChild: widChild, render: render);
+  }
+
+  Widget childConnectedRender<TChildRouteParam extends AFRouteParam>({
+    @required AFBuildContext context,
+    @required AFScreenID screenParent,
+    @required AFRenderConnectedChildDelegate render
+  }) {
+    return context.childConnectedRender<TChildRouteParam>(screenParent: screenParent, render: render);
+  }
+
   /// A utility for creating a list of child widgets
   /// 
   /// This allows for a readable syntax like:
@@ -1021,6 +1042,15 @@ class AFConceptualTheme {
   /// See [TextTheme], text theme to use on a primary color background
   TextTheme get styleOnPrimary {
     return fundamentals.styleOnPrimary;
+  }
+
+  /// Flutter by default does not have a styleOnSecondary, I am not sure why.
+  /// 
+  /// This is here so that you can override it if you need to, and can maintain
+  /// a more logical style of code where text on top of the secondary color has the
+  /// 'OnSecondary' style.
+  TextTheme get styleOnSecondary {
+    return fundamentals.styleOnSecondary;
   }
 
   /// See [TextTheme], text theme to use on an accent color backgroun
@@ -1351,6 +1381,18 @@ class AFConceptualTheme {
     );
   }
 
+  Widget childPadding({
+    AFWidgetID wid, 
+    Widget child,
+    EdgeInsets padding,  
+  }) {
+    return Container(
+      key: keyForWID(wid),
+      padding: padding,
+      child: child
+    );
+  }
+
   /// Create a text field with the specified text.
   /// 
   /// See [AFTextEditingControllersHolder] for an explanation
@@ -1370,7 +1412,8 @@ class AFConceptualTheme {
     InputDecoration decoration,
     bool autocorrect = true,
     TextAlign textAlign = TextAlign.start,
-    TextInputType keyboardType 
+    TextInputType keyboardType,
+    FocusNode focusNode,
   }) {
     final textController = controllers.syncText(wid, text);
     return TextField(
@@ -1384,6 +1427,7 @@ class AFConceptualTheme {
       autofocus: autofocus,
       textAlign: textAlign,
       decoration: decoration,
+      focusNode: focusNode,
     );
   }
 
@@ -1463,6 +1507,14 @@ class AFConceptualTheme {
   Brightness get deviceBrightness {
     return fundamentals.device.brightness(fundamentals);
 
+  }
+
+  bool get deviceIsDarkMode {
+    return deviceBrightness == Brightness.dark;
+  }
+
+  bool get deviceIsLightMode {
+    return !deviceIsDarkMode;
   }
 
   /// See Flutter [Window]
@@ -1555,6 +1607,10 @@ class AFConceptualTheme {
 
   Color get colorSecondary {
     return fundamentals.colorSecondary;
+  }
+
+  Color get colorOnSecondary {
+    return fundamentals.colorOnPrimary;
   }
 
   /// Important: the values you are passing in are scale factors on the
@@ -1791,9 +1847,10 @@ class AFConceptualTheme {
   /// will iterate through all children with route parameters of the specified type, and will call your
   /// render function once for each one.   You must use the widget id passed to you by the render function.
   List<Widget> childrenConnectedRender<TRouteParam extends AFRouteParam>(AFBuildContext context, {
-     @required  AFRenderChildByIDDelegate render
+    @required AFScreenID screenParent,
+    @required AFRenderConnectedChildDelegate render
   }) {
-    return context.childrenConnectedRender(render: render);
+    return context.childrenConnectedRender(screenParent: screenParent, render: render);
   }
 
   /// 

@@ -77,7 +77,7 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFProtot
     final testState = context.s.testState.findState(test.id);
     final param = testState.param;
     final testData = testState?.stateView ?? test.data;
-    final sourceWidget = test.render(screenId, AFUIWidgetID.widgetPrototypeTest.with1(AFConceptualTheme.afibPassthroughSuffix));
+    final sourceWidget = test.render(screenId, AFUIWidgetID.widgetPrototypeTest.with1(AFUIWidgetID.afibPassthroughSuffix));
 
     context.dispatch(AFNavigateSetParamAction(
       screen: this.screenId, 

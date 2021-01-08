@@ -951,11 +951,13 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
     } 
     if(verifyParamUpdate != null) {
       final AFNavigateSetParamAction setParam = AFibF.g.testOnlyRecentActions.firstWhere( (act) => (act is AFNavigateSetParamAction), orElse: () => null );
-      if(setParam == null) {
-        throw AFException("Passed in verifyUpdateParam, but there was not an AFNavigateSetParamAction dispatched by action");
+      var paramInner;
+      if(setParam != null) {
+        paramInner = setParam.param;
+      } else {
+        final AFNavigateSetChildParamAction setParamChild = AFibF.g.testOnlyRecentActions.firstWhere( (act) => (act is AFNavigateSetChildParamAction), orElse: () => null );
+        paramInner = setParamChild.param;
       }
-      var paramOuter = setParam.param;
-      var paramInner = paramOuter;
 
       verifyParamUpdate(paramInner);
     }

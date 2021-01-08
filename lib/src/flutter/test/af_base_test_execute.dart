@@ -179,7 +179,11 @@ abstract class AFBaseTestExecute {
 
   static String composeError(String desc, int depth) {
     final frames = Trace.current().frames;
-    final f = frames[depth+1];
+    var depthActual = depth+1;
+    if(depthActual >= frames.length) {
+      depthActual = frames.length-1;
+    }
+    final f = frames[depthActual];
     final loc = "${f.library}:${f.line}";
 
     final err = "$loc: $desc";

@@ -280,7 +280,7 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
   String translation(String textOrId, Locale locale) {
     var setT = translationSet[locale];
     if(setT == null) {
-      setT = translationSet[AFUIThemeID.localeDefault];
+      //setT = translationSet[AFUIThemeID.localeDefault];
     }
     if(setT == null) {
       return textOrId;
@@ -888,8 +888,6 @@ class AFFundamentalTheme {
 /// type, and that theme will be accessible via the context.theme and
 /// context.t methods.
 class AFConceptualTheme {
-  static const afibPassthroughSuffix = "_afib_passthough";
-
   final AFFundamentalTheme fundamentals;
   AFConceptualTheme({
     @required this.fundamentals,
@@ -953,9 +951,10 @@ class AFConceptualTheme {
   Widget childConnectedRender<TChildRouteParam extends AFRouteParam>({
     @required AFBuildContext context,
     @required AFScreenID screenParent,
+    @required AFWidgetID widChild,
     @required AFRenderConnectedChildDelegate render
   }) {
-    return context.childConnectedRender<TChildRouteParam>(screenParent: screenParent, render: render);
+    return context.childConnectedRender<TChildRouteParam>(screenParent: screenParent, widChild: widChild, render: render);
   }
 
   /// A utility for creating a list of child widgets
@@ -965,6 +964,9 @@ class AFConceptualTheme {
   /// final cols = context.t.children();
   /// ```
   List<Widget> children() { return <Widget>[]; }
+
+  /// A utility for create a list of table rows in a table.
+  List<TableRow> columnTable() { return <TableRow>[]; }
 
   /// A utility for create a list of table rows in a table.
   List<TableRow> childrenTable() { return <TableRow>[]; }
@@ -1243,11 +1245,13 @@ class AFConceptualTheme {
     return _createDebugDrawer(endDrawer, AFScreenPrototypeTest.testDrawerSideEnd);
   }
 
-  Widget childColumnCard(List<Widget> rows, {
+  Widget childCardColumn(List<Widget> rows, {
     EdgeInsets margin,
-    CrossAxisAlignment align
+    CrossAxisAlignment align,
+    AFWidgetID wid,
   }) {
     return Card(
+      key: keyForWID(wid),
       child: Container(
         margin: margin,
         child: Column(
@@ -1783,6 +1787,20 @@ class AFConceptualTheme {
       shape: shape,
       clipBehavior: clipBehavior,
     );
+  }
+
+  Row childRow(List<Widget> children, {
+   MainAxisAlignment mainAxisAlignment =  MainAxisAlignment.start
+  }) {
+    return Row(children: children,
+      mainAxisAlignment: mainAxisAlignment);
+  }
+
+  Column childColumn(List<Widget> children, {
+   MainAxisAlignment mainAxisAlignment =  MainAxisAlignment.start
+  }) {
+    return Column(children: children,
+      mainAxisAlignment: mainAxisAlignment);
   }
 
 

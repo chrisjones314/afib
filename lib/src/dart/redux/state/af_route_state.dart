@@ -1,7 +1,6 @@
 
 import 'package:afib/afib_dart.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
-import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
@@ -549,30 +548,35 @@ class AFRouteState {
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
   AFRouteState addConnectedChild(AFScreenID screen, AFWidgetID widget, AFRouteParam param) {
-    return _reviseParamWithChildren(screen, (pwc) => pwc.reviseAddChild(widget, param));
+    return _reviseParamWithChildren(screen, widget, param, (pwc) => pwc.reviseAddChild(widget, param));
   }
 
   /// Removes the route parameter for the specified child widget from the screen.
   AFRouteState removeConnectedChild(AFScreenID screen, AFWidgetID widget) {
-    return _reviseParamWithChildren(screen, (pwc) => pwc.reviseRemoveChild(widget));
+    return _reviseParamWithChildren(screen, widget, null, (pwc) => pwc.reviseRemoveChild(widget));
   }
 
   AFRouteState setConnectedChildParam(AFScreenID screen, AFID widget, AFRouteParam param) {
-    return _reviseParamWithChildren(screen, (pwc) => pwc.reviseChild(widget, param));
+    return _reviseParamWithChildren(screen, widget, param, (pwc) => pwc.reviseChild(widget, param));
   }
 
   
   AFRouteState sortConnectedChildren(AFScreenID screen, AFTypedSortDelegate sort, Type typeToSort) {
-    return _reviseParamWithChildren(screen, (pwc) => pwc.reviseSortChildren(typeToSort, sort));
+    return _reviseParamWithChildren(screen, null, null, (pwc) => pwc.reviseSortChildren(typeToSort, sort));
   }
 
-  AFRouteState _reviseParamWithChildren(AFScreenID screen, AFRouteParamWithChildren Function(AFRouteParamWithChildren original) revise) { 
+  AFRouteState _reviseParamWithChildren(AFScreenID screen, AFID wid, AFRouteParam paramNew, AFRouteParamWithChildren Function(AFRouteParamWithChildren original) revise) { 
     final p = _findParamInHierOrPool(screen);
+    var revisedParam;
     if(p is! AFRouteParamWithChildren) {
-      throw AFException("Expected screen $screen to have a route parameter withi type AFRouteParamWithChildren");
+      final isPassthrough = wid.endsWith(AFUIWidgetID.afibPassthroughSuffix);
+      assert(paramNew != null && isPassthrough, "This should only happen for passthrough widgets");
+      assert(paramNew.runtimeType == p.runtimeType || p.runtimeType == AFPrototypeWidgetRouteParam);
+      revisedParam = paramNew;
+    } else {
+      final AFRouteParamWithChildren pwc = p;
+      revisedParam = revise(pwc);      
     }
-    final AFRouteParamWithChildren pwc = p;
-    final revisedParam = revise(pwc);
     return _setParamInHierOrPool(screen, revisedParam);
   }
 

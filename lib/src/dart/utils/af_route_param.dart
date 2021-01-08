@@ -2,6 +2,7 @@
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
+import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:meta/meta.dart';
 import 'package:quiver/core.dart';
 
@@ -185,7 +186,7 @@ class AFRouteParamWithChildren extends AFRouteParam {
   }
 
   AFRouteParamWithChildren reviseChild(AFID wid, AFRouteParam revised) {
-    if(wid == primary.widgetId) {
+    if(wid == primary.widgetId || wid.endsWith(AFUIWidgetID.afibPassthroughSuffix)) {
       return copyWith(primary: primary.reviseParam(revised));
     }
     for(var i = 0; i < children.length; i++) {

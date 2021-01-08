@@ -1,5 +1,4 @@
 
-import 'dart:ui';
 
 import 'package:afib/src/dart/utils/af_id.dart';
 
@@ -15,7 +14,9 @@ class AFUIScreenID {
 }
 
 class AFUIWidgetID {
+
   static const afibIDPrefix = "_afib_";
+  static const afibPassthroughSuffix = "${afibIDPrefix}_passthough";
   //static const screenStartup = AFScreenID("${afibScreenPrefix}startup");
   static const buttonBack = AFWidgetID("${afibIDPrefix}button_back");  
   static const textTestSearch = AFWidgetID("${afibIDPrefix}test_search");
@@ -69,8 +70,4 @@ class AFUIThemeID {
 
   /// Used in prototype mode to display the value in the test/theme drawer, should not be used in production and cannot be overriden.
   static const physicalSize = AFThemeID("physical_size", tagDevice);
-
-  /// Used in prototype mode to override the device value.  Shouldn't generally be used in production.
-  static const Locale localeDefault = Locale('en', 'US');
-
 }

@@ -93,6 +93,7 @@ class AFScreenID extends AFID {
 
 class AFWidgetID extends AFID {
   const AFWidgetID(String code) : super(code);
+
 }
 
 class AFTestID extends AFIDWithTags {

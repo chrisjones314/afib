@@ -90,9 +90,9 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TStateView exten
       }
     }
 
-    final data = createStateViewAF(store.state);
     final param = findParam(store.state);
     final paramWithChildren = findParamWithChildren(store.state);
+    final data = createStateViewAF(store.state, param, paramWithChildren);
     if(param == null && !routeEntryExists(store.state)) {
       return null;
     }
@@ -160,8 +160,8 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TStateView exten
 
   bool routeEntryExists(AFState state) { return true; }
 
-  TStateView createStateViewAF(AFState state) {
-    return createStateViewPublic(state.public);
+  TStateView createStateViewAF(AFState state, TRouteParam param, AFRouteParamWithChildren paramWithChildren) {
+    return createStateViewPublic(state.public, param, paramWithChildren);
   }
 
   /// Override this instead of [createStateView] if you need access
@@ -169,14 +169,13 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TStateView exten
   /// 
   /// However, be aware that a full route state does not exist in single
   /// screen tests.
-  TStateView createStateViewPublic(AFPublicState public) {
+  TStateView createStateViewPublic(AFPublicState public, TRouteParam param, AFRouteParamWithChildren paramWithChildren) {
     final TState state = public.areaStateFor(TState);
-    return createStateView(state);
+    return createStateView(state, param);
   }
 
-
   /// Override this to create an [AFStateView] with the required data from the state.
-  TStateView createStateView(TState state);
+  TStateView createStateView(TState state, TRouteParam param);
 
   /// Builds a Widget using the data extracted from the state.
   material.Widget buildWithContext(AFBuildContext<TStateView, TRouteParam, TTheme> context);
@@ -945,7 +944,7 @@ abstract class AFConnectedWidgetWithParam<TState extends AFAppStateArea, TStateV
   }
 
   @override
-  TStateView createStateView(TState state) {
+  TStateView createStateView(TState state, TRouteParam param) {
     return this.createDataDelegate(state);
   }
 
@@ -1002,7 +1001,7 @@ abstract class AFPopupScreen<TState extends AFAppStateArea, TStateView extends A
     return p;
   }
 
-  TStateView createStateView(TState state) {
+  TStateView createStateView(TState state, TRouteParam param) {
     return this.createDataDelegate(state);
   }
 

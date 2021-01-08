@@ -92,13 +92,13 @@ class AFPrototypeHomeScreen extends AFConnectedScreen<AFAppStateArea, APrototype
   AFPrototypeHomeScreen(): super(AFUIScreenID.screenPrototypeHome);
 
   @override
-  APrototypeHomeScreenData createStateViewAF(AFState state) {
+  APrototypeHomeScreenData createStateViewAF(AFState state, AFPrototypeHomeScreenParam param, AFRouteParamWithChildren withChildren) {
     final tests = AFibF.g.screenTests;
     return APrototypeHomeScreenData(tests);
   }
 
   @override
-  APrototypeHomeScreenData createStateView(AFAppStateArea state) {
+  APrototypeHomeScreenData createStateView(AFAppStateArea state, AFPrototypeHomeScreenParam param) {
     // this should never be called, because createDataAF replaces it.
     throw UnimplementedError();
   }

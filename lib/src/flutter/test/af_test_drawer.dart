@@ -79,7 +79,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
 
   //--------------------------------------------------------------------------------------
   @override
-  AFTestDrawerData createStateViewAF(AFState state) {
+  AFTestDrawerData createStateViewAF(AFState state, AFTestDrawerRouteParam param, AFRouteParamWithChildren paramWithChildren) {
     final testState = state.testState;
     final test = AFibF.g.findScreenTestById(testState.activeTestId);
     return AFTestDrawerData(testState.findContext(test.id), testState.findState(test.id), test);
@@ -92,7 +92,7 @@ class AFTestDrawer extends AFConnectedDrawer<AFAppStateArea, AFTestDrawerData, A
 
   //--------------------------------------------------------------------------------------
   @override
-  AFTestDrawerData createStateView(AFAppStateArea state) {
+  AFTestDrawerData createStateView(AFAppStateArea state, AFTestDrawerRouteParam param) {
     // this should never be called, because createDataAF replaces it.
     throw UnimplementedError();
   }

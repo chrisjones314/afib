@@ -3,8 +3,7 @@
 import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
-import 'package:afib/src/flutter/screen/af_connected_screen.dart';
-import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
+import 'package:afib/src/flutter/test/af_connected_base.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -78,7 +77,7 @@ class AFPrototypeTestScreenData extends AFStateView1<AFSingleScreenTests> {
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStateViewUnused, AFPrototypeTestScreenParam, AFPrototypeTheme>{
+class AFPrototypeTestScreen extends AFProtoConnectedScreen<AFStateView, AFPrototypeTestScreenParam>{
 
   AFPrototypeTestScreen(): super(AFUIScreenID.screenPrototypeListSingleScreen);
 
@@ -88,12 +87,12 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStateVie
   }
 
   @override
-  AFStateViewUnused createStateView(AFAppStateArea state, AFPrototypeTestScreenParam param) {
-    return AFStateViewUnused();
+  AFStateView createStateView(AFAppStateArea state, AFPrototypeTestScreenParam param) {
+    return AFStateView();
   }
 
   @override
-  Widget buildWithContext(AFBuildContext<AFStateViewUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context) {
+  Widget buildWithContext(AFProtoBuildContext<AFStateView, AFPrototypeTestScreenParam> context) {
     return _buildList(context);
   }
 
@@ -103,7 +102,7 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStateVie
     return result;
   }
 
-  Widget _buildList(AFBuildContext<AFStateViewUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context) {
+  Widget _buildList(AFProtoBuildContext<AFStateView, AFPrototypeTestScreenParam> context) {
     final t = context.t;
     final rows = t.column();
     final groups = _sortIterable(context.p.screenTestsByGroup.keys);
@@ -116,7 +115,7 @@ class AFPrototypeTestScreen extends AFConnectedScreen<AFAppStateArea, AFStateVie
     return context.t.buildPrototypeScaffold(context.p.title, rows, leading: leading);
   }
 
-  Widget _addGroup(AFBuildContext<AFStateViewUnused, AFPrototypeTestScreenParam, AFPrototypeTheme> context, AFWidgetID widGroup, String group, List<AFScreenPrototypeTest> tests) {
+  Widget _addGroup(AFProtoBuildContext<AFStateView, AFPrototypeTestScreenParam> context, AFWidgetID widGroup, String group, List<AFScreenPrototypeTest> tests) {
     final t = context.t;
     final rows = t.column();
     for(final test in tests) {

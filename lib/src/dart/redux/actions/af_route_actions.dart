@@ -3,8 +3,6 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
-import 'package:afib/src/flutter/utils/af_bottom_popup_theme.dart';
-import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
@@ -75,10 +73,6 @@ class AFNavigateReplaceAllAction extends AFNavigateAction {
   }
 }
 
-class AFNavigateSetPopupParamAction extends AFNavigateAction {
-  AFNavigateSetPopupParamAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
-}
-
 /// Action that adds a new screen after the current screen in the route.
 /// 
 /// Subsequently, [AFNavigatePopAction] will return you to the parent screen.
@@ -89,24 +83,6 @@ class AFNavigatePushAction extends AFNavigateActionWithReturn {
     @required AFRouteParam param, 
     AFActionOnReturnDelegate onReturn
   }): super(id: id, screen: screen, param: param, onReturn: onReturn);
-}
-
-/// Pushes a popup with a custom route.
-class AFNavigatePushPopupAction extends AFNavigateActionWithReturn {
-  final BuildContext context;
-  final AFBottomPopupTheme theme;
-  final AFPopupRouteWidgetBuilderDelegate popupBuilder;
-  final String barrierLabel;
-  
-  AFNavigatePushPopupAction({
-    AFID id, 
-    @required this.context,
-    @required AFScreenID screen, 
-    AFRouteParam param,
-    AFActionOnReturnDelegate onReturn,
-    this.barrierLabel,
-    @required this.theme,
-    @required this.popupBuilder}): super(id: id, screen: screen, param: param, onReturn: onReturn);
 }
 
 class AFNavigatePopFromFlutterAction extends AFNavigateAction {
@@ -142,13 +118,6 @@ class AFNavigatePopAction extends AFNavigateActionWithReturnData {
   
   AFNavigatePopAction({AFID id, dynamic returnData, bool worksInPrototypeMode = true}): super(id: id, returnData: returnData, worksInPrototypeMode: worksInPrototypeMode);
 }
-
-/// Used to close a popup screen
-class AFNavigatePopPopupAction extends AFNavigateActionWithReturnData {
-  final BuildContext context;
-  AFNavigatePopPopupAction(this.context, {AFID id, dynamic returnData}): super(id: id, returnData: returnData);
-}
-
 
 /// Pops [popCount] screens off the navigation stack.
 class AFNavigatePopNAction extends AFNavigateActionWithReturnData {

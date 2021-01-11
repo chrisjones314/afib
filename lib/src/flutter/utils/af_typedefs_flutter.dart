@@ -8,7 +8,6 @@ import 'package:afib/src/flutter/test/af_state_test.dart';
 import 'package:afib/src/flutter/test/af_unit_tests.dart';
 import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
-import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:afib/src/dart/redux/state/af_state.dart';
@@ -20,8 +19,6 @@ import 'package:afib/src/flutter/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_data_registry.dart';
-import 'package:afib/src/flutter/utils/af_custom_popup_route.dart';
-
 
 /// Delegate used to populate the screen map used to associate keys with screens.
 typedef AFInitScreenMapDelegate = void Function(AFScreenMap map);
@@ -61,6 +58,9 @@ typedef AFCreateDataDelegate<TStateView, TState> = TStateView Function(TState st
 /// Delegate used to find the route parameter for a screen within the AFState
 typedef AFFindParamDelegate = AFRouteParam Function(AFState state);
 
+/// Used to pass in a functiont hat handles route parameter updates in AFEmbeddedWidget
+typedef AFUpdateRouteParamDelegate = void Function(AFBuildContext context, AFRouteParam revised, { AFID id });
+
 /// Delegate used in widget testing to wrap additional widgets around the widget being tested 
 /// (e.g. to position that widget on the screen, limit its width, etc.)
 typedef AFCreateWidgetWrapperDelegate = Widget Function(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam, AFPrototypeTheme> context, Widget testWidget);
@@ -80,10 +80,7 @@ typedef AFReusableScreenTestBodyExecuteDelegate3 = Future<void> Function(AFScree
 typedef AFWorkflowTestBodyExecuteDelegate = Future<void> Function(AFWorkflowTestExecute mse);
 
 /// Delegate used to creatae a widget builder.
-typedef AFWidgetBuilderDelegate<TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> = Widget Function(AFBuildContext<TStateView, TRouteParam, TTheme> context);
-
-/// Used to create a widget from a custom popup route.
-typedef AFPopupRouteWidgetBuilderDelegate = Widget Function(BuildContext ctx, AFCustomPopupRoute route);
+typedef AFWidgetBuilderDelegate<TBuildContext extends AFBuildContext> = Widget Function(TBuildContext context);
 
 /// Delegate used to initialize test data 
 typedef AFInitTestDataDelegate = void Function(AFTestDataRegistry registry);
@@ -153,7 +150,9 @@ typedef AFReturnValueDelegate = void Function(dynamic param);
 
 typedef AFRenderConnectedChildDelegate = Widget Function(AFScreenID screenParent, AFWidgetID widChild);
 
-typedef AFBuildBodyDelegate<TData extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme> = Widget Function(AFBuildContext<TData, TRouteParam, TTheme> context);
+typedef AFRenderEmbeddedChildDelegate = Widget Function();
+
+typedef AFBuildBodyDelegate<TBuildContext extends AFBuildContext> = Widget Function(TBuildContext context);
 
 typedef AFOnChangedBoolDelegate = void Function(bool);
 

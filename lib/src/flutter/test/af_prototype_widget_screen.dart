@@ -3,9 +3,9 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/test/af_connected_base.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/test/af_test.dart';
-import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
@@ -41,7 +41,7 @@ class AFPrototypeWidgetData extends AFStateView2<AFTestState, AFThemeState> {
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFPrototypeWidgetData, AFPrototypeWidgetRouteParam, AFPrototypeTheme>{
+class AFPrototypeWidgetScreen extends AFProtoConnectedScreen<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam>{
 
   AFPrototypeWidgetScreen(): super(AFUIScreenID.screenPrototypeWidget);
 
@@ -65,13 +65,13 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFProtot
   }
 
   @override
-  Widget buildWithContext(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam, AFPrototypeTheme> context) {    
+  Widget buildWithContext(AFProtoBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam> context) {    
     /// Remember what screen we are on for testing purposes.  Maybe eventually try to do this in navigator observer.
     AFTest.currentScreen = context.c;
     return _buildScreen(context);
   }
 
-  Widget _buildScreen(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam, AFPrototypeTheme> context) {
+  Widget _buildScreen(AFProtoBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam> context) {
     final test = context.p.test;
     final testContext = context.s.testState.findContext(test.id);
     final testState = context.s.testState.findState(test.id);
@@ -91,7 +91,7 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFProtot
       final dispatcher = AFWidgetScreenTestDispatcher(context: testContext, main: context.d, originalParam: context.p);
 
       final themeChild = sourceWidget.findTheme(context.s.themeState);
-      final childContext = sourceWidget.createContext(context.c, dispatcher, testData, paramChild, null, themeChild);
+      final childContext = sourceWidget.createContext(context.c, dispatcher, testData, paramChild, null, themeChild, this);
       resultWidget = sourceWidget.buildWithContext(childContext);
     } else {
       resultWidget = sourceWidget;
@@ -100,7 +100,7 @@ class AFPrototypeWidgetScreen extends AFConnectedScreen<AFAppStateArea, AFProtot
     return _createScaffold(context, resultWidget);
   }
 
-  Widget _createScaffold(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam, AFPrototypeTheme> context, Widget resultWidget) {
+  Widget _createScaffold(AFProtoBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam> context, Widget resultWidget) {
     if(context.p.test.createWidgetWrapperDelegate != null) {
       return context.p.test.createWidgetWrapperDelegate(context, resultWidget);
     }

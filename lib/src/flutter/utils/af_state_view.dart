@@ -1,3 +1,4 @@
+import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_unused.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
@@ -17,6 +18,10 @@ class AFStateView<TV1, TV2, TV3, TV4> {
   final TV4 fourth;
 
   AFStateView({this.first, this.second, this.third, this.fourth});
+
+  factory AFStateView.unused() {
+    return AFStateView();
+  }
 
   /// Because store connector data is always recreated, it is 
   /// important to implement deep equality so that the screen won't be re-rendered
@@ -55,12 +60,6 @@ class AFStateViewExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> extends AFStat
     final next = hash4(fifth?.hashCode, sixth?.hashCode, seventh?.hashCode, eighth?.hashCode);
     return hash2(start, next);
   }
-}
-
-/// Use this if you don't use any data from the state to render your screen.
-@immutable 
-class AFStateViewUnused extends AFStateView<AFUnused, AFUnused, AFUnused, AFUnused> {
-  AFStateViewUnused({AFDispatcher dispatcher, AFRouteParam param}): super();
 }
 
 /// Use this version of [AFStateView] if you only need one piece of data from the store.

@@ -7,17 +7,17 @@ typedef AFDisposableUICreateDelegate<T> = T Function();
 
 class AFDisposableUIHolder<T> {
   Map<AFWidgetID, T> controllers = <AFWidgetID, T>{};
-  AFDisposableUICreateDelegate<T> create;
+  AFDisposableUICreateDelegate<T> creator;
   bool disposed = false;
 
   AFDisposableUIHolder({
-    this.create
+    this.creator
   });
 
   T access(AFWidgetID wid) {
     var controller = controllers[wid];
     if(controller == null) {
-      controller = create();
+      controller = creator();
       controllers[wid] = controller;
     }
     return controller;
@@ -39,9 +39,8 @@ class AFDisposableUIHolder<T> {
 
 
 class AFTextEditingControllersHolder extends AFDisposableUIHolder<TextEditingController>  {
-  AFTextEditingControllersHolder(): super(create: () => TextEditingController());
+  AFTextEditingControllersHolder(): super(creator: create);
 
-  @Deprecated("Just for migration")
   TextEditingController syncText(AFWidgetID wid, String text) {
     final controller = access(wid);
     if(text != null) {
@@ -58,8 +57,16 @@ class AFTextEditingControllersHolder extends AFDisposableUIHolder<TextEditingCon
     }
     return controller;
   }
+
+  static TextEditingController create() {
+    return TextEditingController();
+  }
 }
 
 class AFTapGestureRecognizersHolder extends AFDisposableUIHolder<TapGestureRecognizer> {
-  AFTapGestureRecognizersHolder(): super(create: () => TapGestureRecognizer());
+  AFTapGestureRecognizersHolder(): super(creator: create);
+
+  static TapGestureRecognizer create() {
+    return TapGestureRecognizer();
+  }
 }

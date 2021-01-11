@@ -1030,7 +1030,7 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
   }
 
   void verifyPopupScreenId(AFScreenID popupScreenId) {
-    AFibF.g.testOnlyVerifyActiveScreen(popupScreenId, includePopups: true);
+    AFibF.g.testOnlyVerifyActiveScreen(popupScreenId);
   }
 }
 
@@ -1058,7 +1058,7 @@ class AFScreenTestContextWidgetTester extends AFScreenTestContext {
   }
 
   void verifyPopupScreenId(AFScreenID popupScreenId) {
-    AFibF.g.testOnlyVerifyActiveScreen(popupScreenId, includePopups: true);
+    AFibF.g.testOnlyVerifyActiveScreen(popupScreenId);
   }
 
 }

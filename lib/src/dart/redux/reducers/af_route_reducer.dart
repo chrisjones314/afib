@@ -9,13 +9,10 @@ import 'package:redux/redux.dart';
 final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigateReplaceAction>(_navReplace),
   TypedReducer<AFRouteState, AFNavigateReplaceAllAction>(_navReplaceAll),
-  TypedReducer<AFRouteState, AFNavigatePushPopupAction>(_navPushPopup),
-  TypedReducer<AFRouteState, AFNavigatePopPopupAction>(_navPopPopup),
   TypedReducer<AFRouteState, AFNavigatePushAction>(_navPush),
   TypedReducer<AFRouteState, AFNavigatePopAction>(_navPop),
   TypedReducer<AFRouteState, AFNavigatePopNAction>(_navPopN),
   TypedReducer<AFRouteState, AFNavigatePopToAction>(_navPopTo),
-  TypedReducer<AFRouteState, AFNavigateSetPopupParamAction>(_navSetPopupParam),
   TypedReducer<AFRouteState, AFNavigateSetParamAction>(_navSetParam),
   TypedReducer<AFRouteState, AFNavigateExitTestAction>(_navExitTest),
   TypedReducer<AFRouteState, AFNavigatePopFromFlutterAction>(_navPopFromFlutter),
@@ -49,16 +46,6 @@ AFRouteState _navPush(AFRouteState state, AFNavigatePushAction action) {
 }
 
 //---------------------------------------------------------------------------
-AFRouteState _navPushPopup(AFRouteState state, AFNavigatePushPopupAction action) {
-  return state.pushPopup(action.screen, action.param);
-}
-
-//---------------------------------------------------------------------------
-AFRouteState _navPopPopup(AFRouteState state, AFNavigatePopPopupAction action) {
-  return state.popPopup();
-}
-
-//---------------------------------------------------------------------------
 AFRouteState _navPop(AFRouteState state, AFNavigatePopAction action) {
   return state.pop(action.returnData);
 }
@@ -76,11 +63,6 @@ AFRouteState _navPopTo(AFRouteState state, AFNavigatePopToAction action) {
 //---------------------------------------------------------------------------
 AFRouteState _navSetParam(AFRouteState state, AFNavigateSetParamAction action) {
   return state.setParam(action.screen, action.param, action.route);
-}
-
-//---------------------------------------------------------------------------
-AFRouteState _navSetPopupParam(AFRouteState state, AFNavigateSetPopupParamAction action) {
-  return state.setPopupParam(action.screen, action.param);
 }
 
 //---------------------------------------------------------------------------

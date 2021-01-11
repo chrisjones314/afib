@@ -957,6 +957,11 @@ class AFConceptualTheme {
     return context.childConnectedRender<TChildRouteParam>(screenParent: screenParent, widChild: widChild, render: render);
   }
 
+  Widget childEmbeddedRender({
+    @required AFRenderEmbeddedChildDelegate render}) {
+    return render();
+  }
+
   /// A utility for creating a list of child widgets
   /// 
   /// This allows for a readable syntax like:
@@ -1203,14 +1208,30 @@ class AFConceptualTheme {
     );
   }
 
+  Widget childButton({
+    AFWidgetID wid,
+    Widget child,
+    AFPressedDelegate onPressed,
+    Color color,
+    Color textColor    
+  }) {
+    return FlatButton(
+      key: keyForWID(wid),
+      child: child,
+      color: color,
+      textColor: textColor,
+      onPressed: onPressed
+    );
+  }
+
   /// Create a button that the user is most likely to click.
   Widget childButtonPrimary({
     AFWidgetID wid,
     Widget child,
     AFPressedDelegate onPressed,
   }) {
-    return FlatButton(
-      key: keyForWID(wid),
+    return childButton(
+      wid: wid,
       child: child,
       color: colorPrimary,
       textColor: colorOnPrimary,
@@ -1290,12 +1311,13 @@ class AFConceptualTheme {
   /// You will most likely want to create one or more app-specific version of this method in your own app's 
   /// conceptual theme, which might fill in many of the parameters (e.g. appBar) with standard values, rather than 
   /// duplicating them on every screen.
-  Widget childScaffold<TData extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFConceptualTheme>({
+  Widget childScaffold<TBuildContext extends AFBuildContext>({
     Key key,
     @required AFBuildContext context,
+    AFConnectedUIBase contextSource,
     PreferredSizeWidget appBar,
     Widget drawer,
-    AFBuildBodyDelegate<TData, TRouteParam, TTheme> bodyUnderScaffold,
+    AFBuildBodyDelegate<TBuildContext> bodyUnderScaffold,
     Widget body,
     Widget bottomNavigationBar,
     Widget floatingActionButton,
@@ -1322,7 +1344,7 @@ class AFConceptualTheme {
       return Scaffold(
         key: key,
         drawer: childDebugDrawerBegin(drawer),
-        body: body ?? AFBuilder<TData, TRouteParam, TTheme>(parentContext: context, builder: (scaffoldContext) => bodyUnderScaffold(scaffoldContext)),
+        body: body ?? AFBuilder<TBuildContext>(parentContext: context, builder: (scaffoldContext) => bodyUnderScaffold(scaffoldContext)),
         appBar: appBar,
         bottomNavigationBar: bottomNavigationBar,
         floatingActionButton: floatingActionButton,
@@ -1340,7 +1362,7 @@ class AFConceptualTheme {
         drawerScrimColor: drawerScrimColor,
         drawerEdgeDragWidth: drawerEdgeDragWidth,
         drawerEnableOpenDragGesture: drawerEnableOpenDragGesture,
-        endDrawer: childDebugDrawerEnd(endDrawer)
+        endDrawer: childDebugDrawerEnd(endDrawer),
       );
   }
 

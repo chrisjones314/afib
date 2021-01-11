@@ -143,7 +143,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     storeDispatcherInternalOnly = AFStoreDispatcher(storeInternalOnly);
   }
 
-  void testOnlyVerifyActiveScreen(AFScreenID screenId, {bool includePopups = false}) {
+  void testOnlyVerifyActiveScreen(AFScreenID screenId) {
     if(screenId == null) {
       return;
     }
@@ -151,7 +151,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     final state = storeInternalOnly.state;
     final routeState = state.public.route;
 
-    if(!routeState.isActiveScreen(screenId, includePopups: includePopups)) {
+    if(!routeState.isActiveScreen(screenId)) {
       throw AFException("Screen $screenId is not the currently active screen in route ${routeState.toString()}");
     }
 

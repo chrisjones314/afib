@@ -446,30 +446,6 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
     underPaths.removeLast();
   }
 
-  /// Used to tap on an element that opens a popup of [popupScreenType].
-  /// 
-  /// You can operate on the controls in the popup from within [underHere]
-  Future<void> tapOpenPopup(dynamic selectorTap, final AFScreenID popupScreenId, Future<void> Function() underHere) async {
-    await tap(selectorTap);
-    await pauseForRender();
-    verifyPopupScreenId(popupScreenId);
-    await this.underScreen(popupScreenId, () async {
-      await underHere();
-      return keepSynchronous();
-    });
-
-    return null;
-  }
-
-  /// Used to tap on a control that closes a popup.
-  /// 
-  /// The standard tap waits for the popup to re-render, which
-  /// it may not do.  This function does the tap but does not
-  /// wait for a render.
-  Future<void> tapClosePopup(dynamic selector) async {
-    return tap(selector);
-  }
-
   /// Tap on the specified widget, then expect a dialog which you can interact with via the onDialog parameter.
   Future<void> tapExpectDialog(dynamic selectorTap, final AFScreenID dialogScreenId, AFTestScreenExecuteDelegate onDialog, {
     AFVerifyReturnValueDelegate verifyReturn

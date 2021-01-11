@@ -318,6 +318,7 @@ class AFTranslationSet {
     }
     return result;
   }
+
 }
 
 class AFPluginFundamentalThemeAreaBuilder {
@@ -574,6 +575,9 @@ mixin AFThemeAreaUtilties {
 class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuilder with AFThemeAreaUtilties {
   ThemeData themeLight;
   ThemeData themeDark;
+  static const bootstrapStandardMargins = <double>[0, 2.0, 4.0, 8.0, 12.0, 16.0];
+  static const bootstrapStandardPadding = bootstrapStandardMargins;
+  static const bootstrapStandardBorderRadius = bootstrapStandardMargins;
 
   AFAppFundamentalThemeAreaBuilder({
     @required Map<AFThemeID, List<dynamic>> optionsForType
@@ -611,13 +615,20 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
   /// flutter and AFib expect.  
   /// 
   /// Values which are not specified will be derived intelligently.
+  /// 
+  /// marginScale and paddingScale should each contain six values, starting with zero, which 
+  /// specify the various values returned [AFConceptualTheme.margin] and [AFConceptualTheme.padding]
   void setAfibFundamentals({
-    double margin = 8.0,
+    List<double> marginSizes = bootstrapStandardMargins,
+    List<double> paddingSizes = bootstrapStandardPadding,
+    List<double> borderRadiusSizes = bootstrapStandardBorderRadius,
     IconData iconBack = Icons.arrow_back,
     IconData iconNavDown = Icons.chevron_right,
   }) {
     // icons
-    setValue(AFUIThemeID.sizeMargin, margin);
+    setValue(AFUIThemeID.marginSizes, marginSizes);
+    setValue(AFUIThemeID.paddingSizes, paddingSizes);
+    setValue(AFUIThemeID.borderRadiusSizes, borderRadiusSizes);
     setValue(AFUIThemeID.iconBack, iconBack);
     setValue(AFUIThemeID.iconNavDown, iconNavDown);
   }
@@ -659,6 +670,21 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     );
   }
 
+  AFSpacing createMarginSpacing() {
+    final List<double> factors = value(AFUIThemeID.marginSizes);
+    return AFSpacing.create(factors);
+  }
+
+  AFSpacing createPaddingSpacing() {
+    final List<double> factors = value(AFUIThemeID.paddingSizes);
+    return AFSpacing.create(factors);
+  }
+
+  AFBorderRadius createBorderRadius() {
+    final List<double> factors = value(AFUIThemeID.borderRadiusSizes);
+    return AFBorderRadius.create(factors);
+  }
+
   @override 
   void validate() {
     if(themeLight == null || themeDark == null) {
@@ -669,6 +695,179 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     }
   }
 }
+
+class AFBorderRadiusSet {
+  final BorderRadius s1;
+  final BorderRadius s2;
+  final BorderRadius s3;
+  final BorderRadius s4;
+  final BorderRadius s5;
+
+  AFBorderRadiusSet({
+    @required this.s1,
+    @required this.s2,
+    @required this.s3,
+    @required this.s4,
+    @required this.s5,
+  });
+
+ factory AFBorderRadiusSet.create({
+    List<double> sizes,
+    final bool tl,
+    final bool tr,
+    final bool bl,
+    final bool br,
+    BorderRadius Function(Radius r) createRadius,
+   }) {
+    final s1 = _createRadius(sizes[1], createRadius);
+    final s2 = _createRadius(sizes[2], createRadius);
+    final s3 = _createRadius(sizes[3], createRadius);
+    final s4 = _createRadius(sizes[4], createRadius);
+    final s5 = _createRadius(sizes[5], createRadius);
+    return AFBorderRadiusSet(s1: s1, s2: s2, s3: s3, s4: s4, s5: s5);
+  }
+
+  static BorderRadius _createRadius(double amount, BorderRadius Function(Radius) createRadius) {
+    if(amount == null) {
+      return null;
+    }
+    
+    final radius = Radius.circular(amount);
+    return createRadius(radius);
+        
+  }  
+}
+
+class AFBorderRadius {
+  final List<double> sizes;
+  final AFBorderRadiusSet a;
+  final AFBorderRadiusSet l;
+  final AFBorderRadiusSet r;
+  final AFBorderRadiusSet t;
+  final AFBorderRadiusSet b;
+
+  AFBorderRadius({
+    @required this.sizes,
+    @required this.a,
+    @required this.l,
+    @required this.r,
+    @required this.t,
+    @required this.b,
+  });
+
+  factory AFBorderRadius.create(List<double> sizes) {
+    final a = AFBorderRadiusSet.create(sizes: sizes, createRadius: (r) => BorderRadius.all(r));
+    final l = AFBorderRadiusSet.create(sizes: sizes, createRadius: (r) => BorderRadius.only(topLeft: r, bottomLeft: r));
+    final r = AFBorderRadiusSet.create(sizes: sizes, createRadius: (r) => BorderRadius.only(topRight: r, bottomRight: r));
+    final t = AFBorderRadiusSet.create(sizes: sizes, createRadius: (r) => BorderRadius.only(topRight: r, topLeft: r));
+    final b = AFBorderRadiusSet.create(sizes: sizes, createRadius: (r) => BorderRadius.only(bottomRight: r, bottomLeft: r));
+
+    return AFBorderRadius(
+      sizes: sizes,
+      a: a,
+      l: l,
+      r: r,
+      t: t,
+      b: b,
+    );
+  }
+
+
+}
+
+
+
+class AFSpacingSet {
+  final EdgeInsets s0;
+  final EdgeInsets s1;
+  final EdgeInsets s2;
+  final EdgeInsets s3;
+  final EdgeInsets s4;
+  final EdgeInsets s5;
+
+  AFSpacingSet({
+    @required this.s0,
+    @required this.s1,
+    @required this.s2,
+    @required this.s3,
+    @required this.s4,
+    @required this.s5,
+  });
+
+  factory AFSpacingSet.createLTRB(
+    List<double> basicSizes,
+    final double left,
+    final double top,
+    final double right,
+    final double bottom,
+   ) {
+    final s0 = _createInsetsLTRB(basicSizes[0], left, top, right, bottom);
+    final s1 = _createInsetsLTRB(basicSizes[1], left, top, right, bottom);
+    final s2 = _createInsetsLTRB(basicSizes[2], left, top, right, bottom);
+    final s3 = _createInsetsLTRB(basicSizes[3], left, top, right, bottom);
+    final s4 = _createInsetsLTRB(basicSizes[4], left, top, right, bottom);
+    final s5 = _createInsetsLTRB(basicSizes[5], left, top, right, bottom);
+    return AFSpacingSet(s0: s0, s1: s1, s2: s2, s3: s3, s4: s4, s5: s5);
+  }
+
+  static EdgeInsets _createInsetsLTRB(double amount, double left, double top, double right, double bottom) {
+    final t = top * amount;
+    final b = bottom * amount;
+    final r = right * amount;
+    final l = left * amount;
+    return EdgeInsets.fromLTRB(l, t, r, b);
+  }
+}
+
+class AFSpacing {
+  final List<double> sizes;
+  final AFSpacingSet a;
+  final AFSpacingSet t;
+  final AFSpacingSet r;
+  final AFSpacingSet b;
+  final AFSpacingSet l;
+  final AFSpacingSet v;
+  final AFSpacingSet h;
+  final AFSpacingSet x;
+  final AFSpacingSet y;
+
+  AFSpacing({
+    @required this.sizes,
+    @required this.a,
+    @required this.t,
+    @required this.r,
+    @required this.b,
+    @required this.l,
+    @required this.v,
+    @required this.h,
+    @required this.x,
+    @required this.y,
+  });
+
+  factory AFSpacing.create(List<double> sizes) {
+    final m = AFSpacingSet.createLTRB(sizes, 1, 1, 1, 1);
+    final mt = AFSpacingSet.createLTRB(sizes, 0, 1, 0, 0);
+    final mr = AFSpacingSet.createLTRB(sizes, 0, 0, 1, 0);
+    final mb = AFSpacingSet.createLTRB(sizes, 0, 0, 0, 1);
+    final ml = AFSpacingSet.createLTRB(sizes, 1, 0, 0, 0);
+    final mv = AFSpacingSet.createLTRB(sizes, 0, 1, 0, 1);
+    final mh = AFSpacingSet.createLTRB(sizes, 1, 0, 1, 0);
+    return AFSpacing(
+      sizes: sizes,
+      a: m,
+      l: ml,
+      t: mt,
+      r: mr,
+      b: mb,
+      v: mv,
+      h: mh,
+      x: mh,
+      y: mv,
+    );
+  }
+
+}
+
 
 
 /// Fundamental values that contribute to theming in the app.
@@ -684,13 +883,19 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
 /// a fundamental theme.
 @immutable
 class AFFundamentalTheme {
+  static const badSizeIndexError = "You must specify an index into your 6 standard sizes";
   final AFFundamentalDeviceTheme device;
   final AFFundamentalThemeArea area;
+  final AFSpacing marginSpacing;
+  final AFSpacing paddingSpacing;
+  final AFBorderRadius borderRadius;
 
-  
   AFFundamentalTheme({
     @required this.device,
-    @required this.area
+    @required this.area,
+    @required this.marginSpacing,
+    @required this.paddingSpacing,
+    @required this.borderRadius
   });    
 
   List<dynamic> optionsForType(AFThemeID id) {
@@ -711,7 +916,10 @@ class AFFundamentalTheme {
   }) {
     return AFFundamentalTheme(
       area: area ?? this.area,
-      device: device ?? this.device
+      device: device ?? this.device,
+      marginSpacing: this.marginSpacing,
+      paddingSpacing: this.paddingSpacing,
+      borderRadius: this.borderRadius,
     );
   }
 
@@ -855,6 +1063,133 @@ class AFFundamentalTheme {
     }
     return result;
   }
+
+  double get size1 { 
+    return marginSpacing.a.s1.top;
+  }
+
+  double get size2 { 
+    return marginSpacing.a.s2.top;
+  }
+
+  double get size3 { 
+    return marginSpacing.a.s3.top;
+  }
+
+  double get size4 { 
+    return marginSpacing.a.s4.top;
+  }
+
+  double get size5 { 
+    return marginSpacing.a.s5.top;
+  }
+
+  AFSpacing get margin {
+    return marginSpacing;
+  }
+
+  AFSpacing get padding {
+    return paddingSpacing;
+  }
+
+  EdgeInsets marginCustom({
+    int horizontal,
+    int vertical,
+    int top,
+    int bottom,
+    int left,
+    int right,
+    int all
+  }) {
+    return spacingCustom(
+      spacing: marginSpacing,
+      all: all,
+      horizontal: horizontal,
+      vertical: vertical,
+      top: top,
+      left: left,
+      right: right,
+      bottom: bottom
+    );
+  }
+
+  EdgeInsets paddingCustom({
+    int horizontal,
+    int vertical,
+    int top,
+    int bottom,
+    int left,
+    int right,
+    int all
+  }) {
+    return spacingCustom(
+      spacing: paddingSpacing,
+      all: all,
+      horizontal: horizontal,
+      vertical: vertical,
+      top: top,
+      left: left,
+      right: right,
+      bottom: bottom
+    );
+  }
+
+  EdgeInsets spacingCustom({
+    AFSpacing spacing,
+    int horizontal,
+    int vertical,
+    int top,
+    int bottom,
+    int left,
+    int right,
+    int all
+  }) {
+    final basicSizes = spacing.sizes;
+    final m = 0.0;
+    var t = m;
+    var b = m;
+    var l = m;
+    var r = m;
+    if(all != null) {
+      assert(all >= 0 && all < 6, badSizeIndexError);
+      final ms = basicSizes[all];
+      t = ms;
+      b = ms;
+      l = ms;
+      r = ms;
+    }
+    if(vertical != null) {
+      assert(vertical >= 0 && vertical < 6, badSizeIndexError);
+      final ms = basicSizes[vertical];
+      b = ms;
+      t = ms;
+    }
+    if(horizontal != null) {
+      assert(horizontal >= 0 && horizontal < 6, badSizeIndexError);
+      final ms = basicSizes[horizontal];
+      l = ms;
+      r = ms;
+    }
+    if(top != null) {
+      assert(top >= 0 && top < 6, badSizeIndexError);
+      t = basicSizes[top];
+    }
+    if(bottom != null) {
+      assert(bottom >= 0 && bottom < 6, badSizeIndexError);
+      b = basicSizes[bottom];
+    }
+    if(left != null) {
+      assert(left >= 0 && left < 6, badSizeIndexError);
+      l = basicSizes[left];
+    }
+    if(right != null) {
+      assert(right >= 0 && right < 6, badSizeIndexError);
+      r = basicSizes[right];
+    }
+
+    return EdgeInsets.fromLTRB(l, t, r, b);
+  }  
+
 
   void resolve() {
     for(final val in area.values.values) {
@@ -1103,7 +1438,7 @@ class AFConceptualTheme {
     Radius Function(double) createRadius,
   }) {
     // by default, the radius is half the margin.
-    final base = margin * 0.5;
+    final base = size2;
     var lt = base;
     var lb = lt;
     var rt = lt;
@@ -1606,8 +1941,24 @@ class AFConceptualTheme {
     return fundamentals.size(id, scale: scale);
   }
 
-  double get margin { 
-    return fundamentals.size(AFUIThemeID.sizeMargin);
+  double get size1 { 
+    return fundamentals.size1;
+  }
+
+  double get size2 { 
+    return fundamentals.size2;
+  }
+
+  double get size3 { 
+    return fundamentals.size3;
+  }
+
+  double get size4 { 
+    return fundamentals.size4;
+  }
+
+  double get size5 { 
+    return fundamentals.size5;
   }
 
   Widget icon(dynamic id, {
@@ -1645,16 +1996,16 @@ class AFConceptualTheme {
   /// 
   /// For example, if the default margin is 8.0, and you pass in all: 2,
   /// you will get 16 all the way around.
-  EdgeInsets paddingScaled({
-    double horizontal,
-    double vertical,
-    double top,
-    double bottom,
-    double left,
-    double right,
-    double all
+  EdgeInsets paddingCustom_x({
+    int horizontal,
+    int vertical,
+    int top,
+    int bottom,
+    int left,
+    int right,
+    int all
   }) {
-    return marginScaled(
+    return fundamentals.paddingCustom(
       horizontal: horizontal,
       vertical: vertical,
       top: top,
@@ -1665,57 +2016,58 @@ class AFConceptualTheme {
     );
   }
 
-  /// Important: the values you are passing in are scale factors on the
-  /// value specified by [AFUIThemeID.sizeMargin], they are not
-  /// absolute measurements.
-  /// 
-  /// For example, if the default margin is 8.0, and you pass in all: 2,
-  /// you will get 16 all the way around.
-  EdgeInsets marginScaled({
-    double horizontal,
-    double vertical,
-    double top,
-    double bottom,
-    double left,
-    double right,
-    double all
-  }) {
-    final m = margin;
-    var t = m;
-    var b = m;
-    var l = m;
-    var r = m;
-    if(all != null) {
-      final ms = m*all;
-      t = ms;
-      b = ms;
-      l = ms;
-      r = ms;
-    }
-    if(vertical != null) {
-      final ms = m*vertical;
-      b = ms;
-      t = ms;
-    }
-    if(horizontal != null) {
-      final ms = m*horizontal;
-      l = ms;
-      r = ms;
-    }
-    if(top != null) {
-      t = m*top;
-    }
-    if(bottom != null) {
-      b = m*bottom;
-    }
-    if(left != null) {
-      l = m*left;
-    }
-    if(right != null) {
-      r = m*right;
-    }
+  EdgeInsets get paddingStandard {
+    return fundamentals.padding.a.s3;
+  }
 
-    return EdgeInsets.fromLTRB(l, t, r, b);
+  EdgeInsets get marginStandard {
+    return fundamentals.margin.a.s3;
+  }
+
+  AFSpacing get margin {
+    return fundamentals.margin;
+  }
+
+  AFSpacing get padding {
+    return fundamentals.padding;
+  }
+
+  AFBorderRadius get borderRadius {
+    return fundamentals.borderRadius;
+  }
+
+  /// Create a custom margin based on the standard sizes you setup in your fundamental theme.
+  ///
+  /// The values you are passing in offsets into the 
+  /// list of 6 sizes you passed into [AFAppFundamentalThemeAreaBuilder.setAfibFundamentals].
+  /// 
+  /// The margin is constructed starting from the most general offset (all), and overriding
+  /// it with more specific values (horizontal, vertical, then top, left, right, bottom).  So,
+  /// using 
+  /// ```
+  /// final m = t.marginScaledCustom(all: 3, b: 0)
+  /// ```
+  /// Would give you your standard margin all around, but zero on the bottom. 
+  /// 
+  /// If a margin side is not specified, it defaults to zero.
+  EdgeInsets marginCustom({
+    int all,
+    int horizontal,
+    int vertical,
+    int top,
+    int bottom,
+    int left,
+    int right,
+  }) {
+    return fundamentals.marginCustom(
+      all: all,
+      horizontal: horizontal,
+      vertical: vertical,
+      top: top,
+      bottom: bottom,
+      left: left,
+      right: right
+    );
   }
 
   /// Show the text in a snackbar. 

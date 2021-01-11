@@ -54,7 +54,11 @@ class AFUIThemeID {
   /// Used for the icon that indicates you are navigating down into more detailed screens, often a right caret.
   static const iconNavDown = AFThemeID("icon_nav_down", tagFundamental);
 
-  static const sizeMargin = AFThemeID("size_margin", tagFundamental);
+  /// Used to determine the values of [AFConceptualTheme.margin...], must be an array of 6 values, indicating the
+  /// margin amount for s0 through s5 (the first should be zero, or s0 will be confusing).
+  static const marginSizes = AFThemeID("margin_sizes", tagFundamental);
+  static const paddingSizes = AFThemeID("padding_sizes", tagFundamental);
+  static const borderRadiusSizes = AFThemeID("border_radius_sizes", tagFundamental);
 
   /// Used in prototype mode to override the device value.  Shouldn't generally be used in production.
   static const brightness = AFThemeID("brightness", tagDevice);

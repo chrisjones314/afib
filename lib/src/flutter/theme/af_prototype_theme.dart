@@ -27,7 +27,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
     final content = column();
     content.add(Container(
       margin: margin,
-        padding: paddingScaled(),
+        padding: paddingStandard,
         child: Row(
           children: [childText(title, style: styleOnPrimary.subtitle1)],
         ),
@@ -52,7 +52,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
 
   Widget createReusableTag() {
     return Container(
-      padding: paddingScaled(all: 0.5),
+      padding: padding.a.s2,
       decoration: BoxDecoration(
         color: colorPrimary,
         borderRadius: BorderRadius.circular(4.0),
@@ -130,13 +130,13 @@ class AFPrototypeTheme extends AFConceptualTheme {
           color: Colors.green,
           borderRadius: borderRadiusScaled(),
         ),
-        padding: paddingScaled(),
+        padding: paddingStandard,
         child: childText("All Tests Passed", textColor: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold, textAlign: TextAlign.center)
       );
     }
 
     return Container(
-      margin: marginScaled(horizontal: 0, top: 1),
+      margin: margin.t.s3,
       child: content,
     );
   }
@@ -144,7 +144,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
   Widget testResultTableHeader(AFBuildContext context, String text, TextAlign textAlign) {
     final t = context.t;
     return Container(
-      padding: t.paddingScaled(),
+      padding: t.paddingStandard,
       color: t.colorPrimary,
       child: t.childText(text, textColor: t.colorOnPrimary, textAlign: textAlign)
     );
@@ -153,7 +153,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
   Widget testResultTableErrorLine(AFBuildContext context, Widget text, int row) {
     final color = (row % 2 == 0) ? Colors.white : Colors.grey[350];
     return Container(
-      padding: context.t.paddingScaled(all: 0.5),
+      padding: context.t.padding.a.s2,
       color: color,
       child: text
     );
@@ -171,7 +171,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
     }
     return Container(
       color: color,
-      padding: t.paddingScaled(),
+      padding: t.paddingStandard,
       child: t.childText(text, textColor: colorText, textAlign: textAlign)
     );
   }

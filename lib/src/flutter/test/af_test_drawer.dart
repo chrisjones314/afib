@@ -125,7 +125,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
     final test = context.s.test;
 
     rows.add(Container(
-      margin: t.marginScaled(left: 0),
+      margin: t.margin.v.s3,
       child: t.childText(
         "AFib Test Drawer",
         style: t.styleOnPrimary.headline2
@@ -133,7 +133,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
     ));
 
     rows.add(Container(
-      margin: t.marginScaled(left: 0),
+      margin: t.margin.v.s3,
       child: t.childText(
           context.s.test.id.toString(), 
           style: t.styleOnPrimary.headline6
@@ -153,7 +153,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
 
     cols.add(
       Container(
-        margin: t.marginScaled(all: 0, left: 1),
+        margin: t.margin.l.s3,
         child: FlatButton(
         child: Text('Reset'),
         color: t.colorOnPrimary,
@@ -360,7 +360,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
     );
 
     return Container(
-      margin: t.marginScaled(),
+      margin: t.marginStandard,
       child: content
     );
   }
@@ -452,7 +452,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
 
   Widget _areaContentCard(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context, Widget child) {
     return Card(child: Container(
-      margin: context.t.marginScaled(),
+      margin: context.t.marginStandard,
       child: child
     ));
   }
@@ -471,7 +471,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
 
         if(reusableId != null) {
           rows.add(Container(
-            margin: t.marginScaled(bottom: 2, all: 0),
+            margin: t.margin.b.s5,
             child: t.childText('Reusable: ${reusableId.toString()}', textAlign: TextAlign.left)
           ));
         }
@@ -493,7 +493,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
 
         rows.add(Table(children: tableRows, columnWidths: AFPrototypeTheme.columnWidthsForNumValueTable));
         content = Container(
-          margin: t.marginScaled(horizontal: 0, top: 1),
+          margin: t.margin.t.s3,
           child: Column(
             children: rows
           )
@@ -540,7 +540,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
     };
 
     rows.add(Container(
-      margin: t.marginScaled(horizontal: 0, top: 2),
+      margin: t.margin.t.s4,
       child: Table(children: tableRows, columnWidths: columnWidths)
     ));
   }

@@ -291,7 +291,11 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     }
     
     final primaryArea = builder.create();
-    final result = AFFundamentalTheme(device: device, area: primaryArea);
+    final marginSpacing = builder.createMarginSpacing();
+    final paddingSpacing = builder.createPaddingSpacing();
+    final borderRadius = builder.createBorderRadius();
+
+    final result = AFFundamentalTheme(device: device, area: primaryArea, marginSpacing: marginSpacing, paddingSpacing: paddingSpacing, borderRadius: borderRadius);
     result.resolve();
     return result;
   }

@@ -145,8 +145,8 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenD
     }
 
     final rows = t.column();
-    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeHeader, "Prototypes and Tests", protoRows, margin: t.marginScaled(all: 0, bottom: 1)));    
-    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeSearchAndRun, "Search and Run", filterRows, margin: t.marginScaled(all: 0, bottom: 1)));
+    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeHeader, "Prototypes and Tests", protoRows, margin: t.margin.b.s3));    
+    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeSearchAndRun, "Search and Run", filterRows, margin: t.margin.b.s3));
     
     return context.t.buildPrototypeScaffold("AFib Prototype Mode", rows);
   }
@@ -263,7 +263,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenD
 
     return Container(
       key: t.keyForWID(AFUIWidgetID.contTestSearchControls),
-      margin: context.t.marginScaled(),
+      margin: t.marginStandard,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: rows,
@@ -286,7 +286,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenD
     final results = context.p.results;
     if(results.isEmpty) {
       rows.add(Container(
-        margin: t.marginScaled(all: 2),
+        margin: t.marginStandard,
         child: t.childText("No results yet.")
       ));
       return;
@@ -294,7 +294,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenD
     
     final allErrors = _findAllErrors(results);
     rows.add(Container(
-      margin: t.marginScaled(),
+      margin: t.marginStandard,
       child: t.buildErrorsSection(context, allErrors)
     ));
   
@@ -336,7 +336,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenD
     };
 
     rows.add(Container(
-      margin: t.marginScaled(horizontal: 1, top: 2),
+      margin: t.marginCustom(horizontal: 3, top: 4),
       child: Table(children: tableRows, columnWidths: columnWidths)
     ));    
   }

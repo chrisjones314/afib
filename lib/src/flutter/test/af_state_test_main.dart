@@ -1,6 +1,5 @@
 
 
-import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';

@@ -1,6 +1,5 @@
 
 
-import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
@@ -219,8 +218,6 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenD
     rows.add(searchText);
 
     final colsAction = t.row();
-    final view = context.p.view;
-    final isFilter = view == AFPrototypeHomeScreenParam.viewFilter;
     final colorSearchText = t.colorOnBackground;
     final colorResultsText = t.colorOnBackground;
 

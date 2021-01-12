@@ -5,7 +5,6 @@ import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:quiver/core.dart';
 import 'package:meta/meta.dart';
 
-import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';

@@ -2,7 +2,7 @@
 /// AFib code used in the bin/XX_afib command in your project.
 /// 
 /// This code cannot pull in flutter/UI source.
-library afib_dart;
+library afib_command;
 
 export 'src/dart/command/af_args.dart';
 export "src/dart/command/af_command.dart";

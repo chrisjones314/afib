@@ -2,7 +2,7 @@ import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/screen/af_startup_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:afib/afib_dart.dart';
+import 'package:afib/afib_flutter.dart';
 
 /// A mapping of screen identifiers to screen.  This mapping is used to 
 /// build the correct screen widget for the leaf element in the route.

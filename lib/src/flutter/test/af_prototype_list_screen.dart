@@ -1,6 +1,5 @@
 
 
-import 'package:afib/afib_dart.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/test/af_connected_base.dart';

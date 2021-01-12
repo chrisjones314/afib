@@ -1,5 +1,5 @@
 
-import 'package:afib/afib_dart.dart';
+import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
 import 'package:afib/src/flutter/test/af_prototype_home_screen.dart';

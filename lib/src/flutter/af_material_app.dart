@@ -1,7 +1,6 @@
-import 'package:afib/afib_dart.dart';
+import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:flutter/material.dart';
-import 'package:afib/afib_flutter.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:overlay_support/overlay_support.dart';
 

@@ -77,6 +77,10 @@ abstract class AFBaseTestExecute {
     endSection(body);
   }
 
+  void markDisabledSimple(String disabled) {
+    errors.markDisabled(disabled);
+  }
+
   void endSection(AFScreenTestBody body) {
     currentSection = null;
   }

@@ -87,7 +87,9 @@ class APrototypeHomeScreenData extends AFStateView1<AFSingleScreenTests> {
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
 class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenData, AFPrototypeHomeScreenParam>{
-
+  static const runWidgetTestsId = "run_widget_tests";
+  static const runScreenTestsId = "run_screen_tests";
+  static const runWorkflowTestsId = "run_workflow_tests";
   AFPrototypeHomeScreen(): super(AFUIScreenID.screenPrototypeHome);
 
   @override
@@ -216,50 +218,88 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenD
 
     rows.add(searchText);
 
-    if(tests.isNotEmpty) {
-      final colsAction = t.row();
-      final view = context.p.view;
-      final isFilter = view == AFPrototypeHomeScreenParam.viewFilter;
-      final colorSearch = isFilter ? t.colorSecondary : t.colorBackground;
-      final colorResults = isFilter ? t.colorBackground : t.colorSecondary;
-      final colorSearchText = isFilter ? t.colorOnPrimary : t.colorOnBackground;
-      final colorResultsText = isFilter ? t.colorOnBackground : t.colorOnPrimary;
+    final colsAction = t.row();
+    final view = context.p.view;
+    final isFilter = view == AFPrototypeHomeScreenParam.viewFilter;
+    final colorSearchText = t.colorOnBackground;
+    final colorResultsText = t.colorOnBackground;
 
 
-      colsAction.add(Container(
-        child: FlatButton(
-          child: t.childText("Search Results", textColor: colorSearchText),
-          color: colorSearch,
-          onPressed: () {
-            updateRouteParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewFilter));
-          },
-        )
-      ));
+    colsAction.add(Container(
+      child: FlatButton(
+        child: t.childText("Search Results", textColor: colorSearchText),
+        onPressed: () {
+          updateRouteParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewFilter));
+        },
+      )
+    ));
 
-      colsAction.add(Container(
-        child: FlatButton(
-          child: t.childText("Test Results", textColor: colorResultsText),
-          color: colorResults,
-          onPressed: () {
-            updateRouteParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewResults));
-          }
-      )));
+    colsAction.add(Container(
+      child: FlatButton(
+        child: t.childText("Test Results", textColor: colorResultsText),
+        onPressed: () {
+          updateRouteParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewResults));
+        }
+    )));
 
-      colsAction.add(Container(
-        child: FlatButton(
-          child: t.childText("Run All", style: t.styleOnPrimary.bodyText1),
-          color: t.colorPrimary,
-          onPressed: () {
-            _onRunTests(context, tests);
-          }
-        )
-      ));
+    final textRunMain = tests.isNotEmpty ? 'Selected' : 'All';
+    final colsRun = t.row();
+    colsRun.add(t.childText('Run $textRunMain'));
 
-      rows.add(Row(
+    colsRun.add(PopupMenuButton<String>(
+      onSelected: (id) { 
+        var tests;
+        if(id == runWorkflowTestsId) {
+          tests = AFibF.g.workflowTests.all;
+        } else if(id == runScreenTestsId) {
+          tests = AFibF.g.screenTests.all;
+        } else if(id == runWidgetTestsId) {
+          tests = AFibF.g.widgetTests.all;
+        }
+        _onRunTests(context, tests);
+      },
+      itemBuilder: (context) {
+        final result = <PopupMenuEntry<String>>[];
+        result.add(PopupMenuItem<String>(
+          value: runWidgetTestsId,
+          child: t.childText("Run widget tests")
+        ));
+        result.add(PopupMenuItem<String>(
+          value: runScreenTestsId,
+          child: t.childText("Run screen tests")
+        ));
+        result.add(PopupMenuItem<String>(
+          value: runWorkflowTestsId,
+          child: t.childText("Run workflow tests")
+        ));
+        return result;
+      }
+    ));
+
+    final buttonContent = Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: colsRun,
+    );
+
+    colsAction.add(FlatButton(
+      child: buttonContent,
+      color: t.colorSecondary,
+      textColor: t.colorOnSecondary,
+      onPressed: ()  {
+        if(tests.isEmpty) {
+          tests = AFibF.g.allScreenTests;
+        }
+        _onRunTests(context, tests);
+      }
+    ));
+
+    rows.add(t.childMargin(
+      margin: t.margin.v.s3,
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: colsAction
-      ));
-    }
+      )
+    ));
 
     return Container(
       key: t.keyForWID(AFUIWidgetID.contTestSearchControls),

@@ -1755,7 +1755,8 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
 
 class AFWorkflowStateTestBodyWithParam {
   final AFWorkflowTestBodyExecuteDelegate body;
-  AFWorkflowStateTestBodyWithParam(this.body);
+  final String disabled;
+  AFWorkflowStateTestBodyWithParam(this.body, this.disabled);
 
 }
 
@@ -1770,8 +1771,8 @@ class AFWorkflowStateTestPrototype {
     return AFWorkflowStateTestPrototype(tests, initialScreenId);
   }
 
-  void execute(AFWorkflowTestBodyExecuteDelegate body) async {
-    sections.add(AFWorkflowStateTestBodyWithParam(body));
+  void execute({AFWorkflowTestBodyExecuteDelegate body, String disabled }) async {
+    sections.add(AFWorkflowStateTestBodyWithParam(body, disabled));
   }  
 
   void openTestDrawer(AFReusableTestID id) {
@@ -1783,6 +1784,10 @@ class AFWorkflowStateTestPrototype {
   Future<void> run(AFScreenTestContext context, { Function onEnd }) async {
     final e = AFWorkflowTestContext(context);
     for(final section in sections) {
+      if(section.disabled != null) {
+        context.markDisabledSimple(section.disabled);
+        continue; 
+      }
       await section.body(e);
     }
 
@@ -2136,8 +2141,8 @@ class AFWorkflowTestDefinitionContext extends AFBaseTestDefinitionContext {
     );
   }
   
-  void defineWorkflow(AFWorkflowStateTestPrototype prototype, AFWorkflowTestBodyExecuteDelegate body) {
-    prototype.execute(body);
+  void defineWorkflow(AFWorkflowStateTestPrototype prototype, { AFWorkflowTestBodyExecuteDelegate body, String disabled }) {
+    prototype.execute(body: body, disabled: disabled);
   }
 }
 

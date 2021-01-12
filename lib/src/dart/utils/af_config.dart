@@ -53,6 +53,10 @@ class AFConfig {
     return boolFor(AFConfigEntries.widgetTesterContext);
   }
 
+  bool get startInDarkMode {
+    return boolFor(AFConfigEntries.startInDarkMode);
+  }
+
   /// Casts the value for [entry] to a string and returns it.
   String stringFor(AFConfigEntry entry) {
     return valueFor(entry);

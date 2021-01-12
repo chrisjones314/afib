@@ -25,6 +25,10 @@ class AFConfigEntries {
   /// the Afib framework, off by default.
   static final logAreas = AFConfigEntryLogArea();
 
+  /// Used to start the app in dark mode, rather than having to configure the device/emulator for 
+  /// dark mode.
+  static final startInDarkMode = AFConfigEntryBool(afNamespace, "startInDarkMode", "Set to true if you'd like to run the app in dark mode, regardless of the device setting", defaultValue: false);
+
   /// Set to true only when running under a flutter WidgetTester test.
   /// 
   /// The WidgetTester is thrown off by 'infinite' animations like CircularProgressIndicator:

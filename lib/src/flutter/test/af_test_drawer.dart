@@ -420,7 +420,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
     return FlatButton(
       child: buttonContent,
       color: t.colorSecondary,
-      textColor: t.colorOnPrimary,
+      textColor: t.colorOnSecondary,
       onPressed: ()  {
         _onRun(context, defaultRunId);
       }

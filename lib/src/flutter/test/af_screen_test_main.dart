@@ -138,7 +138,6 @@ Future<void> _afWorkflowTestMain<TState extends AFAppStateArea>(AFCommandOutput 
       await tester.pumpAndSettle(Duration(seconds: 1));
 
       AFibD.logTest?.d("Finished pumpWidget for ${test.id}");
-      //debugDumpApp();
       await test.body.run(context);
       AFibD.logTest?.d("Finished ${test.id}");
 

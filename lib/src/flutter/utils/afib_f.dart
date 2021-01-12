@@ -307,7 +307,11 @@ class AFibGlobalState<TState extends AFAppStateArea> {
       areas = storeInternalOnly.state.public.areas;
     }
     final device = AFFundamentalDeviceTheme.create();
-    final fundamentals = appContext.createFundamentalTheme(device, areas);
+    
+    var fundamentals = appContext.createFundamentalTheme(device, areas);
+    if(AFibD.config.startInDarkMode) {
+      fundamentals = fundamentals.reviseOverrideThemeValue(AFUIThemeID.brightness, Brightness.dark);
+    }
     final conceptuals = appContext.initializeConceptualThemes(fundamentals);  
     return AFThemeState.create(
       fundamentals: fundamentals,
@@ -343,10 +347,20 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 
   List<AFScreenPrototypeTest> findTestsForAreas(List<String> areas) {
     final result = <AFScreenPrototypeTest>[];
+    final addAllWidget = areas.contains("widget");
     final addAllScreen = areas.contains("screen");
     final addAllWorkflow  = areas.contains("workflow");
+    _addTestsForAreas(widgetTests.all, areas, addAllWidget, result);
     _addTestsForAreas(screenTests.all, areas, addAllScreen, result);
     _addTestsForAreas(workflowTests.all, areas, addAllWorkflow, result);
+    return result;
+  }
+
+  List<AFScreenPrototypeTest> get allScreenTests {
+    final result = <AFScreenPrototypeTest>[];
+    result.addAll(widgetTests.all);
+    result.addAll(screenTests.all);
+    result.addAll(workflowTests.all);
     return result;
   }
 

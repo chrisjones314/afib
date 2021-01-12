@@ -16,7 +16,7 @@ import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
-import 'package:afib/src/flutter/test/af_prototype_widget_screen.dart';
+import 'package:afib/src/flutter/ui/screen/af_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/test/af_widget_actions.dart';
@@ -582,7 +582,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
       await Future<void>.delayed(Duration(milliseconds: slowOnScreenMillis));
     }
     final sel = AFWidgetSelector.createSelector(activeSelectorPath, selector);
-    final info = AFibF.g.findTestScreen(activeScreenId);
+    final info = AFibF.g.internalOnlyFindScreen(activeScreenId);
     final currentPath = <Element>[];
     _populateChildrenDirect(info.element, currentPath, sel, null, underScaffold: false);
     return sel.elements;

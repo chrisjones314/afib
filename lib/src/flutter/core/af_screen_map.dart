@@ -1,6 +1,6 @@
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
-import 'package:afib/src/flutter/screen/af_startup_screen.dart';
+import 'package:afib/src/flutter/ui/screen/af_startup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:afib/afib_flutter.dart';
 

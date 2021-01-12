@@ -5,8 +5,9 @@
 class AFQueryError {
   String message;
   int code;
+  dynamic custom;
 
-  AFQueryError({this.message, this.code});
+  AFQueryError({this.message, this.code, this.custom});
 
   String toString() {
     final sb = StringBuffer();

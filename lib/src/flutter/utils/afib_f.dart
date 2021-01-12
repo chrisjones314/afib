@@ -18,6 +18,7 @@ import 'package:afib/src/flutter/test/af_init_prototype_screen_map.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_data_registry.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 
@@ -72,9 +73,9 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   final AFSingleScreenTests _afScreenTests = AFSingleScreenTests();
   final AFWidgetTests _afWidgetTests = AFWidgetTests();
   final AFWorkflowStateTests _afWorkflowStateTests = AFWorkflowStateTests<TState>();
-  final AFStateTests _afStateTests = AFStateTests();
+  final AFStateTests _afStateTests = AFStateTests<TState>();
   final AFUnitTests _afUnitTests = AFUnitTests();
-  final testOnlyScreens = <AFScreenID, AFibTestOnlyScreenElement>{};
+  final internalOnlyScreens = <AFScreenID, AFibTestOnlyScreenElement>{};
   AFibTestOnlyScreenElement testOnlyMostRecentScreen;
   final _recentActions = <AFActionWithKey>[];
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -112,6 +113,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 
   void initialize() {
     appContext.initScreenMap(screenMap);
+    screenMap.screen(AFUIScreenID.dialogStandardError, (_) => AFStandardErrorDialog());
 
     final middleware = <Middleware<AFState>>[];
     middleware.addAll(createRouteMiddleware());
@@ -142,6 +144,13 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     storeDispatcherInternalOnly = AFStoreDispatcher(storeInternalOnly);
   }
 
+  void finishAsyncWithError<TState extends AFAppStateArea>(AFFinishQueryErrorContext context) {
+    final handler = appContext.errorHandlerForState<TState>();
+    if(handler != null) {
+      handler(context);
+    }
+  }
+
   void testOnlyVerifyActiveScreen(AFScreenID screenId) {
     if(screenId == null) {
       return;
@@ -154,7 +163,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
       throw AFException("Screen $screenId is not the currently active screen in route ${routeState.toString()}");
     }
 
-    var info = AFibF.g.testOnlyScreens[screenId];    
+    var info = AFibF.g.internalOnlyScreens[screenId];    
     if(info == null || info.element == null) {
       throw AFException("Screen $screenId is active, but has not rendered (as there is no screen element), this might be an intenral problem in Afib.");
     }
@@ -165,10 +174,6 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     final state = AFibF.g.storeInternalOnly.state;
     final routeState = state.public.route;
     return routeState.activeScreenId;
-  }
-
-  void correctForFlutterPopNavigation() {
-    storeInternalOnly.dispatch(AFNavigatePopFromFlutterAction());
   }
 
   void doMiddlewareNavigation( Function(NavigatorState) underHere ) {
@@ -203,11 +208,11 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   }
 
   /// Used internally in tests to find widgets on the screen.  Not for public use.
-  AFibTestOnlyScreenElement registerTestScreen(AFScreenID screenId, BuildContext screenElement, AFConnectedUIBase source) {
-    var info = testOnlyScreens[screenId];
+  AFibTestOnlyScreenElement registerScreen(AFScreenID screenId, BuildContext screenElement, AFConnectedUIBase source) {
+    var info = internalOnlyScreens[screenId];
     if(info == null) {
       info = AFibTestOnlyScreenElement(screenId, screenElement);
-      testOnlyScreens[screenId] = info;
+      internalOnlyScreens[screenId] = info;
     }
     info.element = screenElement;
     if(source is AFConnectedScreen && source is! AFConnectedDrawer) {
@@ -237,14 +242,14 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 
   /// Used internally to reset widget tracking between tests.
   void resetTestScreens() {
-    testOnlyScreens.clear();
+    internalOnlyScreens.clear();
     _recentActions.clear();
   }
 
 
   /// Used internally in tests to find widgets on the screen.  Not for public use.
-  AFibTestOnlyScreenElement findTestScreen(AFScreenID screenId) {
-    return testOnlyScreens[screenId];
+  AFibTestOnlyScreenElement internalOnlyFindScreen(AFScreenID screenId) {
+    return internalOnlyScreens[screenId];
   }
 
   /// Used internally in tests to keep track of recently dispatched actions

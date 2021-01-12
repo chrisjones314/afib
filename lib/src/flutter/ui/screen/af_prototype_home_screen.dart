@@ -3,8 +3,8 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
-import 'package:afib/src/flutter/test/af_connected_base.dart';
-import 'package:afib/src/flutter/test/af_prototype_list_screen.dart';
+import 'package:afib/src/flutter/ui/af_prototype_base.dart';
+import 'package:afib/src/flutter/ui/screen/af_prototype_list_screen.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

@@ -6,7 +6,6 @@ import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
-import 'package:afib/src/dart/utils/af_query_error.dart';
 import 'package:afib/src/dart/utils/af_unused.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
@@ -26,11 +25,11 @@ abstract class AFDeferredQuery<TState extends AFAppStateArea> extends AFAsyncQue
   /// In addition, any calculations done at the beginning might be based on an
   /// obsolete state by the time onResponse gets called.   Instead, you want to
   /// do your calculations on the state you are handed on [finishAsyncExecute]
-  void startAsync(AFStartQueryContext<AFUnused, AFQueryError> context) {
+  void startAsync(AFStartQueryContext<AFUnused> context) {
     _delayThenExecute(context);
   }
 
-  void _delayThenExecute(AFStartQueryContext<AFUnused, AFQueryError> context) {
+  void _delayThenExecute(AFStartQueryContext<AFUnused> context) {
     timer = Timer.periodic(nextDelay, (_) {
       AFibD.logQuery?.d("Executing finishAsyncExecute for deferred query $this");
       context.onSuccess(null);

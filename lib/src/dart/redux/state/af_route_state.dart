@@ -5,7 +5,7 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:afib/src/flutter/test/af_prototype_widget_screen.dart';
+import 'package:afib/src/flutter/ui/screen/af_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:meta/meta.dart';
 

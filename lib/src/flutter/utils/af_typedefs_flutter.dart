@@ -6,7 +6,9 @@ import 'package:afib/src/dart/utils/af_should_continue_route_param.dart';
 import 'package:afib/src/flutter/core/af_app_extension_context.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
 import 'package:afib/src/flutter/test/af_unit_tests.dart';
-import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
+import 'package:afib/src/flutter/ui/theme/af_prototype_theme.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/ui/screen/af_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:flutter/material.dart';
 
@@ -15,8 +17,6 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
-import 'package:afib/src/flutter/screen/af_connected_screen.dart';
-import 'package:afib/src/flutter/test/af_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_data_registry.dart';
 
@@ -110,7 +110,7 @@ typedef AFUnitTestBodyExecuteDelegate = void Function(AFUnitTestExecute e);
 typedef AFOnResponseDelegate<TState extends AFAppStateArea, TResponse> = void Function(AFFinishQuerySuccessContext<TState, TResponse> context);
 
 /// Delegate used when an [AFAsyncQuery] results in an error.
-typedef AFOnErrorDelegate<TState extends AFAppStateArea, TError> = void Function(AFFinishQueryErrorContext<TState, TError> context);
+typedef AFOnErrorDelegate<TState extends AFAppStateArea> = void Function(AFFinishQueryErrorContext<TState> context);
 
 /// Delegate used to process an [AFAsyncQuery]
 typedef AFAsyncQueryListenerDelegate = void Function(AFAsyncQuery query);

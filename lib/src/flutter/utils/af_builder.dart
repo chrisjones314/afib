@@ -1,6 +1,6 @@
 
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/flutter/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:flutter/widgets.dart';
 

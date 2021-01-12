@@ -11,6 +11,7 @@ class AFUIScreenID {
   static const screenPrototypeHome = AFScreenID("${AFUIWidgetID.afibIDPrefix}prototype_home");
   static const screenPrototypeWidget = AFScreenID("${AFUIWidgetID.afibIDPrefix}prototype_widget");
   static const screenStartupWrapper = AFScreenID("${AFUIWidgetID.afibIDPrefix}startup_wrapper");
+  static const dialogStandardError = AFScreenID("${AFUIWidgetID.afibIDPrefix}standard_error_dialog");
 }
 
 class AFUIWidgetID {

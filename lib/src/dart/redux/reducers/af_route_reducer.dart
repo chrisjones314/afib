@@ -15,7 +15,6 @@ final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigatePopToAction>(_navPopTo),
   TypedReducer<AFRouteState, AFNavigateSetParamAction>(_navSetParam),
   TypedReducer<AFRouteState, AFNavigateExitTestAction>(_navExitTest),
-  TypedReducer<AFRouteState, AFNavigatePopFromFlutterAction>(_navPopFromFlutter),
   TypedReducer<AFRouteState, AFShutdownOngoingQueriesAction>(_shutdownQueries),
   TypedReducer<AFRouteState, AFNavigateAddConnectedChildAction>(_addConnectedChild),
   TypedReducer<AFRouteState, AFNavigateRemoveConnectedChildAction>(_removeConnectedChild),
@@ -23,11 +22,6 @@ final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigateSetChildParamAction>(_setChildParam),
   TypedReducer<AFRouteState, AFResetToInitialRouteAction>(_resetToInitialRoute),
 ]);
-
-//---------------------------------------------------------------------------
-AFRouteState _navPopFromFlutter(AFRouteState state, AFNavigatePopFromFlutterAction action) {
-  return state.popFromFlutter();
-}
 
 //---------------------------------------------------------------------------
 AFRouteState _navReplace(AFRouteState state, AFNavigateReplaceAction action) {

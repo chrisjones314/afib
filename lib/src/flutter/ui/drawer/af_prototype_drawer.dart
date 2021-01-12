@@ -7,9 +7,9 @@ import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
-import 'package:afib/src/flutter/test/af_connected_base.dart';
+import 'package:afib/src/flutter/ui/af_prototype_base.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
-import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
+import 'package:afib/src/flutter/ui/theme/af_prototype_theme.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -72,7 +72,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
   AFTestDrawer(): super(AFUIScreenID.screenTestDrawer);
 
   //--------------------------------------------------------------------------------------
-  AFScreenID get screenIdForTest {
+  AFScreenID get primaryScreenId {
     return null;
   }
 

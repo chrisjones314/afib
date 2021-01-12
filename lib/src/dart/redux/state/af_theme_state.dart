@@ -4,7 +4,8 @@ import 'dart:ui';
 
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
-import 'package:afib/src/flutter/theme/af_text_builders.dart';
+import 'package:afib/src/flutter/ui/theme/af_text_builders.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 

@@ -85,24 +85,11 @@ class AFNavigatePushAction extends AFNavigateActionWithReturn {
   }): super(id: id, screen: screen, param: param, onReturn: onReturn);
 }
 
-class AFNavigatePopFromFlutterAction extends AFNavigateAction {
-  AFNavigatePopFromFlutterAction({AFID id}): super(id:id, screen:null, param: null);
-}
-
 class AFNavigateActionWithReturnData extends AFNavigateAction {
   final dynamic returnData;
   final bool worksInPrototypeMode;
 
   AFNavigateActionWithReturnData({AFID id, this.returnData, this.worksInPrototypeMode = true}): super(id: id, screen: null, param: null);
-}
-
-/// Used when you only want to call Navigator.pop(context), without updating the 
-/// internal route state.   
-/// 
-/// Note that this should be called instead of calling Navigator.pop(context directly),
-/// because in that case we will catch it and pop the internal route state.
-class AFNavigatePopNavigatorOnlyAction extends AFNavigateAction {
-  AFNavigatePopNavigatorOnlyAction({AFID id}): super(id: id, screen: null, param: null);
 }
 
 /// Action that navigates on screen up in the route, discarding the current leaf route.

@@ -1,8 +1,10 @@
+import 'package:afib/src/dart/redux/actions/af_always_fail_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/utils/af_query_error.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
@@ -126,6 +128,9 @@ class AFStateTest<TState extends AFAppStateArea> {
   final List<_AFStateQueryBody> queryBodies = <_AFStateQueryBody>[];
 
   AFStateTest(this.id, this.tests) {
+    registerResult(AFAlwaysFailQuery, (context, query) {
+      query.testFinishAsyncWithError(context, AFQueryError(message: "Always fail in state test"));
+    });
     if(TState.runtimeType == AFAppStateArea) {
       throw AFException("You must explicitly specify your app state on AFStateTest instances");
     }
@@ -219,7 +224,14 @@ class AFStateTest<TState extends AFAppStateArea> {
   /// and then feeding them to its testAsyncResponse method.
   void processQuery(AFStateTestContext context, AFAsyncQuery query) {
     final key = _specifierToId(query);
-    final h = results[key];
+    var h = results[key];
+    if(h == null) {
+      /// Ummm, this might be a good place to admit that sometimes the type system
+      /// in Dart vexes me.
+      if(key.toString().startsWith("AFAlwaysFailQuery")) {
+        h = results["AFAlwaysFailQuery<AFAppStateArea>"];
+      }
+    }
     if(h == null) {
       /// deferred queries don't have any results.
       if(query is AFDeferredQuery) {
@@ -231,7 +243,7 @@ class AFStateTest<TState extends AFAppStateArea> {
         query.finishAsyncExecute(successContext);
         return;
       }
-
+    
       throw AFException("No results specified for query ${_specifierToId(query)}");
     }
 

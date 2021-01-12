@@ -17,7 +17,6 @@ List<Middleware<AFState>> createRouteMiddleware() {
     TypedMiddleware<AFState, AFNavigatePopNAction>(_navigatePopNAction),
     TypedMiddleware<AFState, AFNavigatePopToAction>(_navigatePopToAction),
     TypedMiddleware<AFState, AFNavigateExitTestAction>(_navigateExitTestAction),
-    TypedMiddleware<AFState, AFNavigatePopNavigatorOnlyAction>(_navigatePopNavOnlyAction),
   ];
 }
 
@@ -133,13 +132,6 @@ void _navigateReplaceAllAction(Store<AFState> store, action, NextDispatcher next
   // then, let the reducer integrate that state into the store.
   next(action);
 
-}
-
-//---------------------------------------------------------------------------
-void _navigatePopNavOnlyAction(Store<AFState> store, action, NextDispatcher next) {
-  AFibF.g.doMiddlewareNavigation((navState) {
-    navState.pop();
-  });
 }
 
 //---------------------------------------------------------------------------

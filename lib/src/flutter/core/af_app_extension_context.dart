@@ -7,8 +7,8 @@ import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
 import 'package:afib/src/flutter/test/af_test_data_registry.dart';
-import 'package:afib/src/flutter/theme/af_prototype_area.dart';
-import 'package:afib/src/flutter/theme/af_prototype_theme.dart';
+import 'package:afib/src/flutter/ui/theme/af_prototype_area.dart';
+import 'package:afib/src/flutter/ui/theme/af_prototype_theme.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
@@ -145,7 +145,6 @@ class AFTestExtensionContext {
     @required AFWidgetTests widgetTests,
     @required AFSingleScreenTests screenTests,
     @required AFWorkflowStateTests workflowTests,
-
   }) {
       _initTestData(testData);
       
@@ -192,7 +191,7 @@ class AFPluginExtensionContext {
   final test = AFTestExtensionContext();
   final initConceptualThemes = <AFCreateConceptualThemeDelegate>[];
   final initFundamentalThemeAreas = <AFInitPluginFundamentalThemeDelegate>[];
-
+  final errorListenerByState = <Type, AFOnErrorDelegate>{};
 
   /// Used by third parties to register extra query actions they'd like to take.
   void addPluginStartupAction(AFCreateStartupQueryActionDelegate createStartupQueryAction) {
@@ -227,6 +226,10 @@ class AFPluginExtensionContext {
   void addQuerySuccessListener(AFQuerySuccessListenerDelegate queryListenerDelegate) {
     querySuccessListenerDelegates.add(queryListenerDelegate);
   } 
+
+  void addQueryErrorListener<TState extends AFAppStateArea>(AFOnErrorDelegate onError) {
+    errorListenerByState[TState] = onError;
+  }
 }
 
 /// Enables you, or third parties, to register extensions
@@ -237,17 +240,19 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
 
   /// Used by the app to specify fundamental configuration/functionality
   /// that AFib requires.
-  void initializeAppFundamentals({
+  void initializeAppFundamentals<TState extends AFAppStateArea>({
     @required AFInitScreenMapDelegate initScreenMap,
     @required AFInitAppFundamentalThemeDelegate initFundamentalThemeArea,
     @required AFInitializeAppStateDelegate initializeAppState,
     @required AFCreateStartupQueryActionDelegate createStartupQueryAction,
     @required AFCreateAFAppDelegate createApp,
     @required AFCreateConceptualThemeDelegate createPrimaryTheme,
+    @required AFOnErrorDelegate<TState> queryErrorHandler,
   }) {
     this.initScreenMaps.add(initScreenMap);
     this.initialAppStates.add(initializeAppState);
     this.createStartupQueryActions.add(createStartupQueryAction);
+    this.errorListenerByState[TState] = queryErrorHandler;
     this.createApp = createApp;
     this.initConceptualThemes.add(createPrimaryTheme);
     this.initFundamentalThemeArea = initFundamentalThemeArea;
@@ -256,6 +261,10 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     _verifyNotNull(initializeAppState, "initializeAppState");
     _verifyNotNull(createStartupQueryAction, "createStartupQueryAction");
     _verifyNotNull(createApp, "createApp");
+  }
+
+  AFOnErrorDelegate<TState> errorHandlerForState<TState extends AFAppStateArea>() {
+    return errorListenerByState[TState];
   }
 
   void dispatchStartupActions(AFDispatcher dispatcher) {

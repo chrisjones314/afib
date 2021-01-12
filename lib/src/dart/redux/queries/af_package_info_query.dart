@@ -5,7 +5,6 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_package_info_state.dart';
-import 'package:afib/src/dart/utils/af_query_error.dart';
 import 'package:package_info/package_info.dart';
 
 class AFPackageInfoQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TState, AFPackageInfoState> {
@@ -14,7 +13,7 @@ class AFPackageInfoQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TSt
     super(successActions: successActions, onSuccessDelegate: onSuccessDelegate);
 
   @override
-  void startAsync(AFStartQueryContext<AFPackageInfoState, AFQueryError> context) {
+  void startAsync(AFStartQueryContext<AFPackageInfoState> context) {
     PackageInfo.fromPlatform().then((packageInfo) {
       final result = AFPackageInfoState(
         appName: packageInfo.appName,
@@ -31,10 +30,5 @@ class AFPackageInfoQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TSt
     final packageInfo = context.r;
   
     context.updateAppStateOne(packageInfo);
-  }
-
-  @override
-  void finishAsyncWithError(AFFinishQueryErrorContext<TState, AFQueryError> context) {
-
   }
 }

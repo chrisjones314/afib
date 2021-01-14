@@ -345,7 +345,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
   AFScreenTestExecute(this.testId);
 
   AFScreenPrototypeTest get test {
-    AFScreenPrototypeTest found = AFibF.g.screenTests.findById(this.testId);
+    var found = AFibF.g.findScreenTestById(this.testId);
     if(found == null) {
       found = AFibF.g.widgetTests.findById(this.testId);
     }
@@ -877,8 +877,6 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
     this.expect(elems.length, ft.equals(n), extraFrames: extraFrames+1);
     return keepSynchronous();
   }
-
-  
 
   Future<void> matchWidgetValue(dynamic selectorDyn, ft.Matcher matcher, { String extractType = AFExtractWidgetAction.extractPrimary, int extraFrames = 0 }) async {
     final selector = AFWidgetSelector.createSelector(null, selectorDyn);
@@ -1486,7 +1484,7 @@ class AFSingleScreenTests<TState> {
   }
 
   AFExtractWidgetAction findExtractor(String actionType, Element elem) {
-    for(final extractor in AFibF.g.testExtractors) {
+    for(final extractor in AFibF.g.sharedTestContext.extractors) {
       if(extractor.matches(actionType, elem)) {
         return extractor;
       }
@@ -1495,7 +1493,7 @@ class AFSingleScreenTests<TState> {
   }
 
   AFApplyWidgetAction findApplicator(String actionType, Element elem) {
-    for(final apply in AFibF.g.testApplicators) {
+    for(final apply in AFibF.g.sharedTestContext.applicators) {
       if(apply.matches(actionType, elem)) {
         return apply;
       }
@@ -1589,12 +1587,7 @@ abstract class AFWorkflowTestExecute {
     return withState(public.areaStateFor(TState), public.route);
   }
 
-  Future<void> runScreenTest(AFReusableTestID screenTestId, {
-    dynamic param1,
-    dynamic param2,
-    dynamic param3,
-    AFScreenID terminalScreen, 
-    AFStateTestID queryResults});
+  Future<void> runScreenTest(AFReusableTestID screenTestId, AFWorkflowTestDefinitionContext definitions, {AFScreenID terminalScreen, dynamic param1, dynamic param2, dynamic param3, AFTestID queryResults});
   Future<void> runWidgetTest(AFTestID widgetTestId, AFScreenID originScreen, {AFScreenID terminalScreen, AFTestID queryResults});
   Future<void> onScreen({
     @required AFScreenID startScreen, 
@@ -1625,10 +1618,13 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
   AFWorkflowTestContext(this.screenContext);  
 
   /// Execute the specified screen tests, with query-responses provided by the specified state test.
-  Future<void> runScreenTest(AFTestID screenTestId,  {AFScreenID terminalScreen, dynamic param1, dynamic param2, dynamic param3, AFTestID queryResults}) async {
+  @override
+  Future<void> runScreenTest(AFReusableTestID screenTestId, AFWorkflowTestDefinitionContext definitions, {AFScreenID terminalScreen, dynamic param1, dynamic param2, dynamic param3, AFTestID queryResults}) async {
     _installQueryResults(queryResults);
-    
-    final originalScreenId = await internalRunScreenTest(screenTestId, screenContext, param1, param2, param3);
+    final p1 = definitions.td(param1);
+    final p2 = definitions.td(param2);
+    final p3 = definitions.td(param3);
+    final originalScreenId = await internalRunScreenTest(screenTestId, screenContext, p1, p2, p3);
 
     if(terminalScreen != null && originalScreenId != terminalScreen) {
       await screenContext.pauseForRender();

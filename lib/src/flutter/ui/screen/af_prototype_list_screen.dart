@@ -67,8 +67,8 @@ class AFPrototypeTestScreenParam extends AFRouteParam {
 }
 
 /// Data used to render the screen
-class AFPrototypeTestScreenData extends AFStateView1<AFSingleScreenTests> {
-  AFPrototypeTestScreenData(AFSingleScreenTests tests): 
+class AFPrototypeTestScreenStateView extends AFStateView1<AFSingleScreenTests> {
+  AFPrototypeTestScreenStateView(AFSingleScreenTests tests): 
     super(first: tests);
   
   AFSingleScreenTests get tests { return first; }
@@ -80,7 +80,7 @@ class AFPrototypeTestScreen extends AFProtoConnectedScreen<AFStateView, AFProtot
 
   AFPrototypeTestScreen(): super(AFUIScreenID.screenPrototypeListSingleScreen);
 
-  static AFNavigatePushAction navigateTo(List<AFScreenPrototypeTest> tests, String title) {
+  static AFNavigatePushAction navigatePush(List<AFScreenPrototypeTest> tests, String title) {
     return AFNavigatePushAction(screen: AFUIScreenID.screenPrototypeListSingleScreen,
       param: AFPrototypeTestScreenParam.createFromList(title: title, tests: tests));
   }

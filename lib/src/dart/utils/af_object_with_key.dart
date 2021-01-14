@@ -21,10 +21,10 @@ class AFObjectWithKey {
   
   String get key {
     final sb = StringBuffer();
-    sb.write(runtimeType.toString());
     if(id != null) {
-      sb.write("_");
       sb.write(id.code);
+    } else {
+      sb.write(runtimeType.toString());
     }
     return sb.toString();
   }

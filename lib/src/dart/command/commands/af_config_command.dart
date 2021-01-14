@@ -128,6 +128,7 @@ class AFConfigEntryLogArea extends AFConfigEntryList {
   static const appQuery = "appQuery";
   static const appRender = "appRender";
   static const appTest = "appTest";
+  static const appAll = "appAll";
   static const query = "query";
   static const config = "config";
   static const test = "test";
@@ -136,7 +137,7 @@ class AFConfigEntryLogArea extends AFConfigEntryList {
   static const all = "all";
   static const allAreas = [appQuery, appRender, appTest, query, config, test, route, none, all];
 
-  AFConfigEntryLogArea(): super(AFConfigEntries.afNamespace, "logAreas", [appQuery, appRender, appTest], help: "Space separated list of [${allAreas.join('|')}|grep-style-text]");
+  AFConfigEntryLogArea(): super(AFConfigEntries.afNamespace, "logAreas", [appAll, appQuery, appRender, appTest], help: "Space separated list of [${allAreas.join('|')}|grep-style-text]");
 
   List<String> areasFor(AFConfig config) {
     return config.stringListFor(this);

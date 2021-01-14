@@ -37,12 +37,12 @@ class AFStateTestDifference {
     return _findAppState(afStateAfter);
   }
 
-  TAppTheme themeBefore<TAppTheme extends AFConceptualTheme>() {
-    return _findAppTheme(afStateBefore);
+  TAppTheme themeBefore<TAppTheme extends AFConceptualTheme>(AFThemeID themeId) {
+    return _findAppTheme(afStateBefore, themeId);
   }
 
-  TAppTheme themeAfter<TAppTheme extends AFConceptualTheme>() {
-    return _findAppTheme(afStateAfter);
+  TAppTheme themeAfter<TAppTheme extends AFConceptualTheme>(AFThemeID themeId) {
+    return _findAppTheme(afStateAfter, themeId);
   }
 
   AFRouteState get routeBefore {
@@ -58,9 +58,9 @@ class AFStateTestDifference {
     return areas.stateFor(TAppState);
   }
 
-  TAppTheme _findAppTheme<TAppTheme extends AFConceptualTheme>(AFState state) {
+  TAppTheme _findAppTheme<TAppTheme extends AFConceptualTheme>(AFState state, AFThemeID themeId) {
     final themes = state.public.themes;
-    return themes.findByType(TAppTheme);
+    return themes.findById(themeId);
   }
 
   AFRouteState _routeFor(AFState state) {

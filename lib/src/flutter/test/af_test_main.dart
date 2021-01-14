@@ -5,12 +5,14 @@ import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:afib/src/flutter/af_app_ui_library.dart';
 import 'package:afib/src/flutter/core/af_app_extension_context.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_screen_test_main.dart';
 import 'package:afib/src/flutter/test/af_state_test_main.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
 import 'package:afib/src/flutter/test/af_unit_test_main.dart';
+import 'package:afib/src/flutter/ui/theme/af_default_fundamental_theme.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:colorize/colorize.dart';
@@ -30,17 +32,32 @@ class AFibTestsFailedMatcher extends Matcher {
   }
 }
 
+Future<void> afTestMainUILibrary<TState extends AFAppStateArea>(AFExtendUILibraryDelegate extendApp, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
+  final contextLibrary = AFUILibraryExtensionContext();
+  extendApp(contextLibrary);
+
+  final extendAppFull = (context) {
+    context.fromUILibrary(contextLibrary,
+      createApp: () => AFAppUILibrary(),
+      initFundamentalThemeArea: initAFDefaultFundamentalThemeArea,
+    );
+  };
+
+  return afTestMain<TState>(extendAppFull, extendTest, paramsD, widgetTester);
+}
+
 /// The main function which executes the store test defined in your initStateTests function.
 Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendAppDelegate extendApp, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
   final stopwatch = Stopwatch();
   stopwatch.start();
 
+  final paramsTest = paramsD.forceEnvironment(AFEnvironment.prototype);
+  AFibD.initialize(paramsTest);
+
   final context = AFAppExtensionContext();
   extendApp(context);
   extendTest(context.test);
 
-  final paramsTest = paramsD.forceEnvironment(AFEnvironment.prototype);
-  AFibD.initialize(paramsTest);
   AFibF.initialize<TState>(context);
 
   // first unit tests

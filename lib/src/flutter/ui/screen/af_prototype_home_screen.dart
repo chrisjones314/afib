@@ -4,7 +4,7 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/ui/af_prototype_base.dart';
-import 'package:afib/src/flutter/ui/screen/af_prototype_list_screen.dart';
+import 'package:afib/src/flutter/ui/screen/af_prototype_third_party_list_screen.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -76,8 +76,8 @@ class AFPrototypeHomeScreenParam extends AFRouteParam {
 }
 
 /// Data used to render the screen
-class APrototypeHomeScreenData extends AFStateView1<AFSingleScreenTests> {
-  APrototypeHomeScreenData(AFSingleScreenTests tests): 
+class APrototypeHomeScreenStateView extends AFStateView1<AFSingleScreenTests> {
+  APrototypeHomeScreenStateView(AFSingleScreenTests tests): 
     super(first: tests);
   
   AFSingleScreenTests get tests { return first; }
@@ -85,53 +85,43 @@ class APrototypeHomeScreenData extends AFStateView1<AFSingleScreenTests> {
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenData, AFPrototypeHomeScreenParam>{
+class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam>{
   static const runWidgetTestsId = "run_widget_tests";
   static const runScreenTestsId = "run_screen_tests";
   static const runWorkflowTestsId = "run_workflow_tests";
   AFPrototypeHomeScreen(): super(AFUIScreenID.screenPrototypeHome);
 
   @override
-  APrototypeHomeScreenData createStateViewAF(AFState state, AFPrototypeHomeScreenParam param, AFRouteParamWithChildren withChildren) {
+  APrototypeHomeScreenStateView createStateViewAF(AFState state, AFPrototypeHomeScreenParam param, AFRouteParamWithChildren withChildren) {
     final tests = AFibF.g.screenTests;
-    return APrototypeHomeScreenData(tests);
+    return APrototypeHomeScreenStateView(tests);
   }
 
   @override
-  APrototypeHomeScreenData createStateView(AFAppStateArea state, AFPrototypeHomeScreenParam param) {
+  APrototypeHomeScreenStateView createStateView(AFAppStateArea state, AFPrototypeHomeScreenParam param) {
     // this should never be called, because createDataAF replaces it.
     throw UnimplementedError();
   }
 
-
   @override
-  Widget buildWithContext(AFProtoBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context) {
+  Widget buildWithContext(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context) {
     return _buildHome(context);
   }
 
   /// 
-  Widget _buildHome(AFProtoBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context) {
+  Widget _buildHome(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context) {
     final t = context.t;
-
     final protoRows = t.column();
-    final titleWidget = "Widget Prototypes";
-    protoRows.add(_createKindRow(context, titleWidget, () {
-      List<AFScreenPrototypeTest> tests = AFibF.g.widgetTests.all;
-      context.dispatch(AFPrototypeTestScreen.navigateTo(tests, titleWidget));
-    }));
+    final primaryTests = AFibF.g.primaryUITests;
+    t.buildTestNavDownAll(
+      context: context,
+      rows: protoRows,
+      tests: primaryTests,
+    );
     
-    final titleScreen = "Screen Prototypes";
-    protoRows.add(_createKindRow(context, titleScreen, () {
-      List<AFScreenPrototypeTest> tests = AFibF.g.screenTests.all;
-      context.dispatch(AFPrototypeTestScreen.navigateTo(tests, titleScreen));
+    protoRows.add(t.childListNav(title: "Third Party", onPressed: () {
+      context.dispatch(AFPrototypeThirdPartyListScreen.navigateTo());
     }));
-    
-    final titleWorkflow = "Workflow Prototypes";
-    protoRows.add(_createKindRow(context, titleWorkflow, () {
-      List<AFScreenPrototypeTest> tests = AFibF.g.workflowTests.all;
-      context.dispatch(AFPrototypeTestScreen.navigateTo(tests, titleWorkflow));
-    }));
-    
 
     final areas = context.p.filter.split(" ");
     final tests = AFibF.g.findTestsForAreas(areas);
@@ -152,7 +142,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenD
     return context.t.buildPrototypeScaffold("AFib Prototype Mode", rows);
   }
 
-  void _onRunTests(AFProtoBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests) async { 
+  void _onRunTests(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests) async { 
     
     final results = <AFScreenTestResultSummary>[];
     for(final test in tests) {
@@ -186,12 +176,12 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenD
     updateRouteParam(context, context.p.copyWith(results: results, view: AFPrototypeHomeScreenParam.viewResults));
   }
 
-  void _updateFilter(AFProtoBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context, String value) {
+  void _updateFilter(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, String value) {
     final revised = context.p.reviseFilter(value);
     updateRouteParam(context, revised);
   }
 
-  Widget _buildFilterAndRunControls(AFProtoBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests) {
+  Widget _buildFilterAndRunControls(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests) {
     final t = context.t;
 
     final rows = t.column();
@@ -239,7 +229,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenD
         }
     )));
 
-    final textRunMain = tests.isNotEmpty ? 'Selected' : 'All';
+    final textRunMain = tests.isNotEmpty ? 'Sel.' : 'All';
     final colsRun = t.row();
     colsRun.add(t.childText('Run $textRunMain'));
 
@@ -308,7 +298,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenD
   }
 
 
-  void _buildFilteredSection(AFProtoBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests, List<Widget> rows, ) {
+  void _buildFilteredSection(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests, List<Widget> rows, ) {
     if(tests == null || tests.isEmpty) {
       return;
     }
@@ -318,7 +308,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenD
     }
   }
 
-  void _buildResultsSection(AFProtoBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests, List<Widget> rows) {
+  void _buildResultsSection(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests, List<Widget> rows) {
     final t = context.t;
     final results = context.p.results;
     if(results.isEmpty) {
@@ -387,12 +377,4 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenD
     return errors;
   }
 
-  Widget _createKindRow(AFProtoBuildContext<APrototypeHomeScreenData, AFPrototypeHomeScreenParam> context, String text, Function onTap) {
-    return ListTile(
-      title: context.t.childText(text),
-      dense: true,
-      trailing: context.t.icon(AFUIThemeID.iconNavDown),
-      onTap: onTap
-    );
-  }
 }

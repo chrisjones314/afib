@@ -33,6 +33,8 @@ export "src/dart/utils/af_unused.dart";
 export "src/dart/utils/af_unused.dart"; // ok
 export "src/dart/utils/afib_d.dart";
 export 'src/flutter/af_main.dart';
+export 'src/flutter/af_main_test_startup.dart';
+export 'src/flutter/af_main_ui_library.dart';
 export 'src/flutter/af_material_app.dart';
 export 'src/flutter/core/af_app_extension_context.dart';
 export "src/flutter/core/af_circular_progress_indicator.dart";

@@ -63,6 +63,14 @@ class AFWidgetsBindingObserver extends WidgetsBindingObserver {
   }
 }
 
+class AFLibraryTestHolder<TState extends AFAppStateArea> {
+  final AFStateTests afStateTests = AFStateTests<TState>();
+  final AFUnitTests afUnitTests = AFUnitTests();
+  final AFSingleScreenTests afScreenTests = AFSingleScreenTests();
+  final AFWidgetTests afWidgetTests = AFWidgetTests();
+  final AFWorkflowStateTests afWorkflowStateTests = AFWorkflowStateTests<TState>();
+}
+
 
 class AFibGlobalState<TState extends AFAppStateArea> {
   final AFAppExtensionContext appContext;
@@ -70,17 +78,13 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   final AFScreenMap screenMap = AFScreenMap();
   final AFAsyncQueries _afAsyncQueries = AFAsyncQueries();
   final AFTestDataRegistry _afTestData = AFTestDataRegistry();
-  final AFSingleScreenTests _afScreenTests = AFSingleScreenTests();
-  final AFWidgetTests _afWidgetTests = AFWidgetTests();
-  final AFWorkflowStateTests _afWorkflowStateTests = AFWorkflowStateTests<TState>();
-  final AFStateTests _afStateTests = AFStateTests<TState>();
-  final AFUnitTests _afUnitTests = AFUnitTests();
+  final primaryUITests = AFLibraryTestHolder<TState>();
+  final thirdPartyUITests = <AFLibraryID, AFLibraryTestHolder>{};
   final internalOnlyScreens = <AFScreenID, AFibTestOnlyScreenElement>{};
   AFibTestOnlyScreenElement testOnlyMostRecentScreen;
   final _recentActions = <AFActionWithKey>[];
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  final testExtractors = <AFExtractWidgetAction>[];
-  final testApplicators = <AFApplyWidgetAction>[];
+  final sharedTestContext = AFSharedTestExtensionContext();
   final widgetsBindingObserver = AFWidgetsBindingObserver();
   final testOnlyDialogReturn = <AFScreenID, dynamic>{};
   final testOnlyBottomSheetReturn = <AFScreenID, dynamic>{};
@@ -112,7 +116,8 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   });
 
   void initialize() {
-    appContext.initScreenMap(screenMap);
+    final libraries = thirdPartyLibraries;
+    appContext.initScreenMap(screenMap, libraries);
     screenMap.screen(AFUIScreenID.dialogStandardError, (_) => AFStandardErrorDialog());
 
     final middleware = <Middleware<AFState>>[];
@@ -128,8 +133,21 @@ class AFibGlobalState<TState extends AFAppStateArea> {
         screenTests: screenTests,
         workflowTests: workflowTests,
       );
-      testExtractors.addAll(appContext.test.extractors);
-      testApplicators.addAll(appContext.test.applicators);
+
+      for(final thirdParty in libraries) {
+        final holder = thirdParty.createScreenTestHolder();
+        thirdPartyUITests[thirdParty.libraryId] = holder;
+        thirdParty.test.initialize(
+          testData: testData,
+          unitTests: holder.afUnitTests,
+          stateTests: holder.afStateTests,
+          widgetTests: holder.afWidgetTests,
+          screenTests: holder.afScreenTests,
+          workflowTests: holder.afWorkflowStateTests,
+        );
+      }
+
+      sharedTestContext.mergeWith(appContext.test.sharedTestContext);
     }
     if(AFibD.config.requiresPrototypeData) {
       afInitPrototypeScreenMap(screenMap);
@@ -142,6 +160,10 @@ class AFibGlobalState<TState extends AFAppStateArea> {
       middleware: middleware
     );
     storeDispatcherInternalOnly = AFStoreDispatcher(storeInternalOnly);
+  }
+
+  Iterable<AFUILibraryExtensionContext> get thirdPartyLibraries {
+    return appContext.thirdParty.libraries.values;
   }
 
   void finishAsyncWithError<TState extends AFAppStateArea>(AFFinishQueryErrorContext context) {
@@ -221,23 +243,44 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     return info;
   }
 
+  AFLibraryTestHolder libraryTests(AFLibraryID id) {
+    return thirdPartyUITests[id];
+  }
+
   AFScreenPrototypeTest findScreenTestById(AFTestID testId) {
-    final single = screenTests.findById(testId);
+    var test = _findTestInSet(testId, primaryUITests);
+    if(test != null) {
+      return test;
+    }
+
+    for(final thirdParty in thirdPartyUITests.values) {
+      test = _findTestInSet(testId, thirdParty);
+      if(test != null) {
+        return test;
+      }
+    }
+
+
+    throw AFException("Unknown test id #{testId}");
+  }
+
+  AFScreenPrototypeTest _findTestInSet(AFTestID testId, AFLibraryTestHolder tests) {
+    final single = tests.afScreenTests.findById(testId);
     if(single != null) {
       return single;
     }
 
-    final multi = workflowTests.findById(testId);
+    final multi = tests.afWorkflowStateTests.findById(testId);
     if(multi != null) {
       return multi;
     }
 
-    final widget = widgetTests.findById(testId);
+    final widget = tests.afWidgetTests.findById(testId);
     if(widget != null) {
       return widget;
     }
 
-    throw AFException("Unknown test id #{testId}");
+    return null;
   }
 
   /// Used internally to reset widget tracking between tests.
@@ -299,11 +342,11 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 
   /// Returns a function that creates the initial applications state, used to reset the state.
   AFAppStateAreas createInitialAppStateAreas() {
-    return appContext.createInitialAppStateAreas();
+    return appContext.createInitialAppStateAreas(thirdPartyLibraries);
   }
 
-  List<AFConceptualTheme> createConceptualThemes(AFFundamentalTheme fundamentals) {
-    return appContext.initializeConceptualThemes(fundamentals); 
+  AFConceptualThemeDefinitionContext createConceptualThemes(AFFundamentalTheme fundamentals) {
+    return appContext.initializeConceptualThemes(fundamentals, thirdPartyLibraries); 
   }  
 
   AFThemeState initializeThemeState({AFAppStateAreas areas}) {
@@ -316,10 +359,10 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     if(AFibD.config.startInDarkMode) {
       fundamentals = fundamentals.reviseOverrideThemeValue(AFUIThemeID.brightness, Brightness.dark);
     }
-    final conceptuals = appContext.initializeConceptualThemes(fundamentals);  
+    final conceptuals = appContext.initializeConceptualThemes(fundamentals, thirdPartyLibraries);  
     return AFThemeState.create(
       fundamentals: fundamentals,
-      conceptuals: conceptuals
+      conceptuals: conceptuals.toMap(),
     );
   }
 
@@ -346,18 +389,17 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   /// Retrieves screen/data pairings used for prototyping and for screen-specific
   /// testing.
   AFSingleScreenTests get screenTests {
-    return _afScreenTests;
+    return primaryUITests.afScreenTests;
   }
 
   List<AFScreenPrototypeTest> findTestsForAreas(List<String> areas) {
-    final result = <AFScreenPrototypeTest>[];
-    final addAllWidget = areas.contains("widget");
-    final addAllScreen = areas.contains("screen");
-    final addAllWorkflow  = areas.contains("workflow");
-    _addTestsForAreas(widgetTests.all, areas, addAllWidget, result);
-    _addTestsForAreas(screenTests.all, areas, addAllScreen, result);
-    _addTestsForAreas(workflowTests.all, areas, addAllWorkflow, result);
-    return result;
+    final results = <AFScreenPrototypeTest>[];
+    _addTestsForTestSet(AFibF.g.primaryUITests, areas, results);
+    for(final library in AFibF.g.thirdPartyUITests.values) {
+      _addTestsForTestSet(library, areas, results);
+      
+    }
+    return results;
   }
 
   List<AFScreenPrototypeTest> get allScreenTests {
@@ -366,6 +408,15 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     result.addAll(screenTests.all);
     result.addAll(workflowTests.all);
     return result;
+  }
+
+  static void _addTestsForTestSet(AFLibraryTestHolder testSet, List<String> areas, List<AFScreenPrototypeTest> results) {
+    final addAllWidget = areas.contains("widget");
+    final addAllScreen = areas.contains("screen");
+    final addAllWorkflow  = areas.contains("workflow");
+    _addTestsForAreas(testSet.afWidgetTests.all, areas, addAllWidget, results);
+    _addTestsForAreas(testSet.afScreenTests.all, areas, addAllScreen, results);
+    _addTestsForAreas(testSet.afWorkflowStateTests.all, areas, addAllWorkflow, results);
   }
 
   static void _addTestsForAreas(List<AFScreenPrototypeTest> tests, List<String> areas, bool addAll, List<AFScreenPrototypeTest> results) {
@@ -382,18 +433,18 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 
   /// Retrieves widget/data pairings for connected and unconnected widget tests.
   AFWidgetTests get widgetTests {
-    return _afWidgetTests;
+    return primaryUITests.afWidgetTests;
   }
 
   /// Retrieves tests which pair an initial state, and then multiple screen/state tests
   /// to produce a higher-level multi-screen test.
   AFWorkflowStateTests get workflowTests {
-    return _afWorkflowStateTests;
+    return primaryUITests.afWorkflowStateTests;
   }
 
   /// Retrieves unit/calculation tests
   AFUnitTests get unitTests {
-    return _afUnitTests;
+    return primaryUITests.afUnitTests;
   }
 
   /// Mapping from string ids to builders for specific screens for the real app.
@@ -404,7 +455,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   // Retrieves tests used to manipulate the redux state and verify that it 
   // changed as expected.
   AFStateTests get stateTests {
-    return _afStateTests;
+    return primaryUITests.afStateTests;
   }
 
   AFCreateAFAppDelegate get createApp {

@@ -1223,9 +1223,11 @@ class AFFundamentalTheme {
 /// type, and that theme will be accessible via the context.theme and
 /// context.t methods.
 class AFConceptualTheme {
+  final AFThemeID id;
   final AFFundamentalTheme fundamentals;
   AFConceptualTheme({
     @required this.fundamentals,
+    @required this.id,
   });
 
   /// A utility for creating a list of widgets in a row.   
@@ -1587,6 +1589,34 @@ class AFConceptualTheme {
     );
   }
 
+  /// Create a button that the user is most likely to click.
+  Widget childButtonSecondaryText({
+    AFWidgetID wid,
+    String text,
+    AFPressedDelegate onPressed,
+  }) {
+    return childButtonSecondary(
+      wid: wid,
+      child: childText(text),
+      onPressed: onPressed
+    );
+  }
+
+  /// Create a button that the user is most likely to click.
+  Widget childButtonSecondary({
+    AFWidgetID wid,
+    Widget child,
+    AFPressedDelegate onPressed,
+  }) {
+    return childButton(
+      wid: wid,
+      child: child,
+      color: colorSecondary,
+      textColor: colorOnSecondary,
+      onPressed: onPressed
+    );
+  }
+
 
 
   /// As long as you are calling [AFConceptualTheme.childScaffold], you don't need
@@ -1775,11 +1805,13 @@ class AFConceptualTheme {
     TextAlign textAlign = TextAlign.start,
     TextInputType keyboardType,
     FocusNode focusNode,
+    TextStyle style,
   }) {
     final textController = controllers.syncText(wid, text);
     return TextField(
       key: keyForWID(wid),
       enabled: enabled,
+      style: style,
       controller: textController,
       onChanged: onChanged,
       keyboardType: keyboardType,
@@ -1894,11 +1926,11 @@ class AFConceptualTheme {
   }
   
   /// Returns a unique key for the specified widget.
-  Key keyForWID(AFWidgetID wid) {
+  Key keyForWID(AFID wid) {
     return keyForWIDStatic(wid);
   }
 
-  static Key keyForWIDStatic(AFWidgetID wid) {
+  static Key keyForWIDStatic(AFID wid) {
     if(wid == null) { return null; }
     return Key(wid.code);
   }
@@ -2323,7 +2355,7 @@ class AFConceptualTheme {
 
 /// Can be used as a template parameter when you don't want a theme.
 class AFConceptualThemeUnused extends AFConceptualTheme {
-  AFConceptualThemeUnused(AFFundamentalTheme fundamentals): super(fundamentals: fundamentals);
+  AFConceptualThemeUnused(AFFundamentalTheme fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualUnused);
 }
 
 
@@ -2331,34 +2363,25 @@ class AFConceptualThemeUnused extends AFConceptualTheme {
 /// any registered third-party themes.
 class AFThemeState {
   final AFFundamentalTheme fundamentals;
-  final Map<String, AFConceptualTheme> conceptuals;  
+  final Map<AFThemeID, AFConceptualTheme> conceptuals;  
 
   AFThemeState({
     @required this.fundamentals,
     @required this.conceptuals
   });
 
-  AFConceptualTheme findByType(Type t) {
-    final key = _keyFor(t);
-    return conceptuals[key];
+  AFConceptualTheme findById(AFThemeID id) {
+    return conceptuals[id];
   }
 
   factory AFThemeState.create({
     AFFundamentalTheme fundamentals,
-    List<AFConceptualTheme> conceptuals
+    Map<AFThemeID, AFConceptualTheme> conceptuals
   }) {
-    final map = <String, AFConceptualTheme>{};
-
-    for(final conceptual in conceptuals) {
-      final key = _keyFor(conceptual);
-      if(!map.containsKey(key)) {
-        map[key] = conceptual;
-      }
-    }
 
     return AFThemeState(
       fundamentals: fundamentals,
-      conceptuals: map
+      conceptuals: conceptuals
     );
   }
 
@@ -2366,7 +2389,7 @@ class AFThemeState {
     final revised = fundamentals.reviseOverrideThemeValue(id, value);
     return copyWith(
       fundamentals: revised,
-      conceptuals: AFibF.g.createConceptualThemes(revised));
+      conceptuals: AFibF.g.createConceptualThemes(revised).toMap());
   }
 
   AFThemeState reviseRebuildAll() {
@@ -2375,18 +2398,11 @@ class AFThemeState {
 
   AFThemeState copyWith({
     AFFundamentalTheme fundamentals,
-    List<AFConceptualTheme> conceptuals,
+     Map<AFThemeID, AFConceptualTheme> conceptuals,
   }) {
     return AFThemeState.create(
       conceptuals: conceptuals ?? this.conceptuals,
       fundamentals: fundamentals ?? this.fundamentals
     );
-  }
-
-  static String _keyFor(dynamic theme) {
-    if(theme is Type) {
-      return theme.toString();
-    }
-    return theme.runtimeType.toString();
   }
 }

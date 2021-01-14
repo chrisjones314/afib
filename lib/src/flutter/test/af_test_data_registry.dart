@@ -25,7 +25,8 @@ class AFTestDataRegistry {
   /// in the test data registry.
   dynamic find(dynamic id) {
     if(id is String) {
-      return testData[id];
+      final result = testData[id];
+      return result ?? id;
     } 
     return id;
   }

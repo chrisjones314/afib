@@ -1,8 +1,10 @@
 
+import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/ui/screen/af_prototype_list_screen.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +14,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
       1: FlexColumnWidth(),
     };
 
-  AFPrototypeTheme(AFFundamentalTheme fundamentals): super(fundamentals: fundamentals);
+  AFPrototypeTheme(AFFundamentalTheme fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualPrototype);
 
   Widget testExplanationText(String explanation) {
     return childText(explanation);
@@ -76,17 +78,29 @@ class AFPrototypeTheme extends AFConceptualTheme {
     final tagsText = this.childTextBuilder();
     tagsText.write("tags: ");
     tagsText.write(instance.id.tagsText);
+    return childListTileNavDown(
+      wid: instance.id,
+      title: titleRow,
+      subtitle: tagsText.create(),
+      onTap: () => instance.startScreen(dispatcher)
+    );
+  }
+
+  Widget childListTileNavDown({
+    AFID wid,
+    Widget title,
+    Widget subtitle,
+    AFPressedDelegate onTap,
+  }) {
     return Container(
-      key: Key(instance.id.code),
+      key: keyForWID(wid),
       child: ListTile(
-        title: titleRow,
-        subtitle: tagsText.create(),
+        title: title,
+        subtitle: subtitle,
         dense: true,
         trailing: Icon(Icons.chevron_right),
-        onTap: () {
-          instance.startScreen(dispatcher);
-        }
-    ));
+        onTap: onTap,
+      ));
   }
 
   Widget buildPrototypeScaffold(dynamic title, List<Widget> rows, { Widget leading }) {
@@ -184,4 +198,56 @@ class AFPrototypeTheme extends AFConceptualTheme {
     return err.substring(idx+1);
   }
 
+  void buildTestNavDownAll({
+    AFBuildContext context,
+    List<Widget> rows,
+    AFLibraryTestHolder tests,
+  }) {
+    rows.add(childTestNavDown(
+      context: context,
+      title: "Widget Prototypes",
+      tests: tests.afWidgetTests.all,
+    ));
+    
+    rows.add(childTestNavDown(
+      context: context,
+      title: "Screen Prototypes",
+      tests: tests.afScreenTests.all,
+    ));
+    
+    rows.add(childTestNavDown(
+      context: context,
+      title: "Workflow Prototypes",
+      tests: tests.afWorkflowStateTests.all
+    ));
+  }
+
+  Widget childTestNavDown({
+    AFBuildContext context,
+    String title, 
+    List<AFScreenPrototypeTest> tests
+  }) {
+    return childListNav(
+      title: title,
+      onPressed: () {
+      context.dispatchNavigatePush(AFPrototypeTestScreen.navigatePush(tests, title));
+    });    
+  }
+
+  Widget childListNav({
+    String title,
+    AFPressedDelegate onPressed,
+  }) {
+    return _createKindRow(title, onPressed);
+  }
+
+
+  Widget _createKindRow(String text, Function onTap) {
+    return ListTile(
+      title: childText(text),
+      dense: true,
+      trailing: icon(AFUIThemeID.iconNavDown),
+      onTap: onTap
+    );
+  }
 }

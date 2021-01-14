@@ -4,6 +4,8 @@ import 'package:afib/src/dart/utils/af_ui_id.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
 import 'package:afib/src/flutter/ui/screen/af_prototype_home_screen.dart';
 import 'package:afib/src/flutter/ui/screen/af_prototype_list_screen.dart';
+import 'package:afib/src/flutter/ui/screen/af_prototype_third_party_home_screen.dart';
+import 'package:afib/src/flutter/ui/screen/af_prototype_third_party_list_screen.dart';
 import 'package:afib/src/flutter/ui/screen/af_prototype_widget_screen.dart';
 
 void afInitPrototypeScreenMap(AFScreenMap screens) {
@@ -11,4 +13,6 @@ void afInitPrototypeScreenMap(AFScreenMap screens) {
   screens.startupScreen(AFUIScreenID.screenPrototypeHome, (context) => AFPrototypeHomeScreen(), () => AFPrototypeHomeScreenParam.createOncePerScreen(filter: enabledTests.join(" ")));
   screens.screen(AFUIScreenID.screenPrototypeListSingleScreen, (context) => AFPrototypeTestScreen());
   screens.screen(AFUIScreenID.screenPrototypeWidget, (context) => AFPrototypeWidgetScreen());
+  screens.screen(AFUIScreenID.screenPrototypeThirdPartyList, (context) => AFPrototypeThirdPartyListScreen());
+  screens.screen(AFUIScreenID.screenPrototypeThirdPartyHome, (context) => AFPrototypeThirdPartyHomeScreen());
 }

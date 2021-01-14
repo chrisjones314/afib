@@ -1,11 +1,26 @@
 
+import 'package:afib/src/dart/utils/af_ui_id.dart';
+
 class AFID {
-  final String code;
-  const AFID(this.code);
+  final String prefix;
+  final String codeId;
+  final AFLibraryID library;
+  const AFID(this.prefix, this.codeId, this.library);
+
+  String get code {
+    if(library == null) {
+      return "${prefix}_$codeId";
+    }
+    return "${library.codeId}_${prefix}_$codeId";
+  }
 
   @override
   String toString() {
     return code;
+  }
+
+  bool isLibrary(AFLibraryID lib) {
+    return library == lib;
   }
 
   int compareTo(AFID other) {
@@ -21,7 +36,7 @@ class AFID {
   }
 
   AFWidgetID with1(dynamic item) {
-    return AFWidgetID("${code}_${item.toString()}");
+    return AFWidgetID("${code}_${item.toString()}", library);
   }
 
   AFWidgetID with2(dynamic first, dynamic second) {
@@ -30,7 +45,7 @@ class AFID {
     if(second != null) {
       key.write("_${second.toString()}");
     }
-    return AFWidgetID(key.toString());
+    return AFWidgetID(key.toString(), library);
   }
 
   bool endsWith(String ends) {
@@ -43,7 +58,7 @@ class AFIDWithTags extends AFID {
   final dynamic group;
   final List<String> tags;
 
-  const AFIDWithTags(String code, this.tags, this.group): super(code);
+  const AFIDWithTags(String prefix, String code,  AFLibraryID library, { this.tags, this.group, }): super(prefix, code, library);
 
   String get tagsText {
     if(tags == null) {
@@ -84,55 +99,60 @@ class AFIDWithTags extends AFID {
 
 class AFIDWithTag extends AFID {
   final String tag;
-  const AFIDWithTag(String code, this.tag): super(code);
+  const AFIDWithTag(String prefix, String code, AFLibraryID library, { this.tag }): super(prefix, code, library);
 }
 
 class AFScreenID extends AFID {
-  const AFScreenID(String code) : super(code);
+  const AFScreenID(String code, AFLibraryID library) : super("screen", code, library);
+}
+
+class AFLibraryID extends AFID {
+  const AFLibraryID(String code) : super("lib", code, null);
 }
 
 class AFWidgetID extends AFID {
-  const AFWidgetID(String code) : super(code);
-
+  const AFWidgetID(String code, AFLibraryID library) : super("wid", code, library);
 }
 
 class AFTestID extends AFIDWithTags {
-  const AFTestID(String code, {String group, List<String> tags}) : super(code, tags, group);
+  const AFTestID(String prefix, String code, AFLibraryID library, {String group, List<String> tags}) : super(prefix, code, library, tags: tags, group: group);
 }
 
 class AFStateTestID extends AFTestID {
-  const AFStateTestID(String code, {String group, List<String> tags}) : super(code, tags: tags, group: group);
+  const AFStateTestID(String code, AFLibraryID library, {String group, List<String> tags, }) : super("statet", code, library, tags: tags, group: group);
 }
 
 class AFReusableTestID extends AFTestID {
-  static const smokeTestId = AFReusableTestID("smoke");
-  static const allTestId = AFReusableTestID("all");
-  static const workflowTestId = AFReusableTestID("workflow");
-  const AFReusableTestID(String code, {String group, List<String> tags}) : super(code, tags: tags, group: group);
+  static const smokeTestId = AFReusableTestID("smoke", AFUILibraryID.id);
+  static const allTestId = AFReusableTestID("all", AFUILibraryID.id);
+  static const workflowTestId = AFReusableTestID("workflow", AFUILibraryID.id);
+  const AFReusableTestID(String code, AFLibraryID library, {String group, List<String> tags }) : super("rt", code, library, tags: tags, group: group);
 }
 
-class AFSingleScreenTestID extends AFReusableTestID {
-  const AFSingleScreenTestID(String code, {String group, List<String> tags}) : super(code, tags: tags, group: group);
+class AFSingleScreenTestID extends AFTestID {
+  const AFSingleScreenTestID(String code, AFLibraryID library, {String group, List<String> tags, }) : super("st", code, library, tags: tags, group: group);
 }
 
 class AFWorkflowTestID extends AFTestID {
-  const AFWorkflowTestID(String code, {String group, List<String> tags}) : super(code, tags: tags, group: group);
+  const AFWorkflowTestID(String code, AFLibraryID library, {String group, List<String> tags}) : super("wt", code, library, tags: tags, group: group);
 }
-
+/*
 class AFTestDataID extends AFID {
-  const AFTestDataID(String code) : super(code);
+  const AFTestDataID(String code) : super("td", code);
 }
+*/
 
 class AFQueryTestID extends AFID {
-  const AFQueryTestID(String code) : super(code);
+  const AFQueryTestID(String code, AFLibraryID library) : super("qt", code, library);
 }
 
 class AFQueryID extends AFID {
-  const AFQueryID(String code): super(code);
+  const AFQueryID(String code, AFLibraryID library): super("q", code, library);
 }
 
 class AFThemeID extends AFIDWithTag {
   const AFThemeID(
     String code,
-    String tag): super(code, tag);   
+    AFLibraryID library,
+    String tag): super("theme", code, library, tag: tag);   
 }

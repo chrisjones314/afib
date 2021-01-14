@@ -31,9 +31,10 @@ import 'package:flutter_redux/flutter_redux.dart';
 /// * [AFConnectedDialog]
 /// * [AFConnectedBottomSheet]
 abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends AFConceptualTheme, TBuildContext extends AFBuildContext, TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends material.StatelessWidget {
+  final AFThemeID themeId;
     
   //--------------------------------------------------------------------------------------
-  AFConnectedUIBase({Key key}): super(key: key);
+  AFConnectedUIBase({Key key, @required this.themeId}): super(key: key);
 
   //--------------------------------------------------------------------------------------
   @override
@@ -149,7 +150,7 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
   AFRouteParamWithChildren findParamWithChildren(AFState state) { return null; }
 
   TTheme findTheme(AFThemeState themes) {
-    return themes.findByType(TTheme);
+    return themes.findById(themeId);
   }
 
   bool routeEntryExists(AFState state) { return true; }
@@ -184,7 +185,7 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TTheme extends A
   final AFScreenID screenId;
     final AFNavigateRoute route;
 
-  AFConnectedScreen(this.screenId, { Key key, this.route = AFNavigateRoute.routeHierarchy }): super(key: key);
+  AFConnectedScreen(this.screenId, AFThemeID themeId, { Key key, this.route = AFNavigateRoute.routeHierarchy }): super(key: key, themeId: themeId);
 
   bool get testOnlyRequireScreenIdMatchForTestContext { return true; }
   bool get isPrimaryScreen { return true; }
@@ -283,7 +284,7 @@ abstract class AFEmbeddedWidget<TState extends AFAppStateArea,  TTheme extends A
       context, 
       parentContext.d, 
       stateViewOverride ?? parentContext.stateView,
-      routeParamOverride ?? parentContext.param,
+      routeParamOverride ?? parentContext.routeParam,
       paramWithChildren ?? parentContext.paramWithChildren,
       themeOverride ?? parentContext.theme,
     );
@@ -310,8 +311,9 @@ abstract class AFConnectedWidget<TState extends AFAppStateArea, TTheme extends A
   AFConnectedWidget({
     @required this.screenParent,
     @required this.widChild,
+    @required AFThemeID themeId,
     this.route = AFNavigateRoute.routeHierarchy,
-  }): super(key: AFConceptualTheme.keyForWIDStatic(widChild));
+  }): super(key: AFConceptualTheme.keyForWIDStatic(widChild), themeId: themeId);
 
   AFScreenID get primaryScreenId {
     return null;
@@ -362,7 +364,8 @@ abstract class AFConnectedWidget<TState extends AFAppStateArea, TTheme extends A
 abstract class AFConnectedScreenWithGlobalParam<TState extends AFAppStateArea, TTheme extends AFConceptualTheme, TBuildContext extends AFBuildContext, TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreen<TState, TTheme, TBuildContext, TStateView, TRouteParam> {
   AFConnectedScreenWithGlobalParam(
     AFScreenID screenId,
-  ): super(screenId, route: AFNavigateRoute.routeGlobalPool);
+    AFThemeID themeId,
+  ): super(screenId, themeId, route: AFNavigateRoute.routeGlobalPool);
 
   bool get testOnlyRequireScreenIdMatchForTestContext { return false; }
   bool get isPrimaryScreen { return false; }
@@ -397,7 +400,8 @@ abstract class AFConnectedScreenWithGlobalParam<TState extends AFAppStateArea, T
 abstract class AFConnectedDrawer<TState extends AFAppStateArea, TTheme extends AFConceptualTheme, TBuildContext extends AFBuildContext, TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithGlobalParam<TState, TTheme, TBuildContext, TStateView, TRouteParam> {
   AFConnectedDrawer(
     AFScreenID screenId,
-  ): super(screenId);
+    AFThemeID themeId,
+  ): super(screenId, themeId);
 
   /// Look for this screens route parameter in the global pool, 
   /// rather than in the navigational hierarchy.
@@ -429,7 +433,8 @@ abstract class AFConnectedDrawer<TState extends AFAppStateArea, TTheme extends A
 abstract class AFConnectedDialog<TState extends AFAppStateArea, TTheme extends AFConceptualTheme, TBuildContext extends AFBuildContext, TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithGlobalParam<TState, TTheme, TBuildContext, TStateView, TRouteParam> {
   AFConnectedDialog(
     AFScreenID screenId,
-  ): super(screenId);
+    AFThemeID themeId,
+  ): super(screenId, themeId);
 
 
   @override
@@ -447,7 +452,8 @@ abstract class AFConnectedDialog<TState extends AFAppStateArea, TTheme extends A
 abstract class AFConnectedBottomSheet<TState extends AFAppStateArea, TTheme extends AFConceptualTheme, TBuildContext extends AFBuildContext, TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithGlobalParam<TState, TTheme, TBuildContext, TStateView, TRouteParam> {
   AFConnectedBottomSheet(
     AFScreenID screenId,
-  ): super(screenId);
+    AFThemeID themeId,
+  ): super(screenId, themeId);
 
   @override
   material.Widget buildWithContext(TBuildContext context) {
@@ -691,16 +697,16 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   material.BuildContext context;
   AFDispatcher dispatcher;
   TStateView stateView;
-  TRouteParam param;
+  TRouteParam routeParam;
   AFRouteParamWithChildren paramWithChildren;
   AFScreenPrototypeTest screenTest;
   TTheme theme;
   AFConnectedUIBase container;
 
-  AFBuildContext(this.context, this.dispatcher, this.stateView, this.param, this.paramWithChildren, this.theme, this.container);
+  AFBuildContext(this.context, this.dispatcher, this.stateView, this.routeParam, this.paramWithChildren, this.theme, this.container);
 
   /// Shorthand for accessing the route param.
-  TRouteParam get p { return param; }
+  TRouteParam get p { return routeParam; }
 
   /// Shorthand for accessing data from the store
   TStateView get s { return stateView; }
@@ -810,12 +816,12 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   }
 
   bool operator==(dynamic o) {
-    final result = (o is AFBuildContext<TStateView, TRouteParam, TTheme> && param == o.param && paramWithChildren == o.paramWithChildren && stateView == o.stateView && theme == o.theme);
+    final result = (o is AFBuildContext<TStateView, TRouteParam, TTheme> && routeParam == o.routeParam && paramWithChildren == o.paramWithChildren && stateView == o.stateView && theme == o.theme);
     return result;
   }
 
   int get hashCode {
-    return hash2(param.hashCode, stateView.hashCode);
+    return hash2(routeParam.hashCode, stateView.hashCode);
   }
 
   /// This rebuilds the entire theme state. 
@@ -854,7 +860,7 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
     @required AFRenderConnectedChildDelegate render
   }) {
     assert(TChildRouteParam != dynamic);
-    final param = this.param;
+    final param = this.routeParam;
     final widChildFull = screenParent.with2(widChild, AFUIWidgetID.afibPassthroughSuffix);
     assert(param is TChildRouteParam);
     final widget = render(screenParent, widChildFull);

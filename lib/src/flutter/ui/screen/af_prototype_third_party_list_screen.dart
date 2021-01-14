@@ -1,0 +1,77 @@
+
+
+import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
+import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/af_state.dart';
+import 'package:afib/src/dart/utils/af_route_param.dart';
+import 'package:afib/src/dart/utils/af_ui_id.dart';
+import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/ui/af_prototype_base.dart';
+import 'package:afib/src/flutter/ui/screen/af_prototype_third_party_home_screen.dart';
+import 'package:afib/src/flutter/utils/af_state_view.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
+import 'package:flutter/material.dart';
+
+/// Data used to render the screen
+class AFPrototypeThirdPartyStateView extends AFStateView1<AFSingleScreenTests> {
+  AFPrototypeThirdPartyStateView(AFSingleScreenTests tests): 
+    super(first: tests);
+  
+  AFSingleScreenTests get tests { return first; }
+}
+
+/// A screen used internally in prototype mode to render screens and widgets with test data,
+/// and display them in a list.
+class AFPrototypeThirdPartyListScreen extends AFProtoConnectedScreen<AFPrototypeThirdPartyStateView, AFRouteParam>{
+  static const runWidgetTestsId = "run_widget_tests";
+  static const runScreenTestsId = "run_screen_tests";
+  static const runWorkflowTestsId = "run_workflow_tests";
+  AFPrototypeThirdPartyListScreen(): super(AFUIScreenID.screenPrototypeThirdPartyList);
+
+  static AFNavigatePushAction navigateTo() {
+    return AFNavigatePushAction(screen: AFUIScreenID.screenPrototypeThirdPartyList,
+      param: AFRouteParam.unused());
+  }
+
+  @override
+  AFPrototypeThirdPartyStateView createStateViewAF(AFState state, AFRouteParam param, AFRouteParamWithChildren withChildren) {
+    final tests = AFibF.g.screenTests;
+    return AFPrototypeThirdPartyStateView(tests);
+  }
+
+  @override
+  AFPrototypeThirdPartyStateView createStateView(AFAppStateArea state, AFRouteParam param) {
+    // this should never be called, because createStateViewAF replaces it.
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget buildWithContext(AFProtoBuildContext<AFPrototypeThirdPartyStateView, AFRouteParam> context) {
+    return _buildThirdParty(context);
+  }
+
+  /// 
+  Widget _buildThirdParty(AFProtoBuildContext<AFPrototypeThirdPartyStateView, AFRouteParam> context) {
+    final t = context.t;
+    final rowsCard = t.column();
+
+    for(final thirdParty in AFibF.g.appContext.thirdParty.libraries.values) {
+      final subtitle = "${thirdParty.libraryId} / ${thirdParty.libraryPrefix}";
+      rowsCard.add(
+        t.childListTileNavDown(
+          wid: thirdParty.libraryId,
+          title: t.childText(thirdParty.libraryName),
+          subtitle: t.childText(subtitle),
+          onTap: () {
+            context.dispatchNavigatePush(AFPrototypeThirdPartyHomeScreen.navigatePush(thirdParty));
+          }
+      ));
+    }
+
+    final rows = t.column();
+    rows.add(t.childCardHeader(context, AFUIWidgetID.cardThirdParty, "Third Party", rowsCard));
+    final leading = t.childButtonStandardBack(context);
+    return t.buildPrototypeScaffold("AFib Third Party", rows, leading: leading);
+
+  }
+}

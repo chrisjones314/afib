@@ -56,6 +56,11 @@ class AFibD<AppState> {
       }
 
       final logAreas = AFibD.config.logAreas;    
+      if(logAreas.contains(AFConfigEntryLogArea.appAll)) {
+        logAreas.add(AFConfigEntryLogArea.appQuery);
+        logAreas.add(AFConfigEntryLogArea.appRender);
+        logAreas.add(AFConfigEntryLogArea.appTest);
+      }
       AFibD.logAppQuery = _createLogger(AFConfigEntryLogArea.appQuery, logAreas);
       AFibD.logAppRender= _createLogger(AFConfigEntryLogArea.appRender, logAreas);
       AFibD.logAppTest  = _createLogger(AFConfigEntryLogArea.appTest, logAreas);

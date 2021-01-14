@@ -63,7 +63,7 @@ typedef AFUpdateRouteParamDelegate = void Function(AFBuildContext context, AFRou
 
 /// Delegate used in widget testing to wrap additional widgets around the widget being tested 
 /// (e.g. to position that widget on the screen, limit its width, etc.)
-typedef AFCreateWidgetWrapperDelegate = Widget Function(AFBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam, AFPrototypeTheme> context, Widget testWidget);
+typedef AFCreateWidgetWrapperDelegate = Widget Function(AFBuildContext<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam, AFPrototypeTheme> context, Widget testWidget);
 
 /// Delegate used to create a push action that moves us into a test screen.
 typedef AFTestCreatePushActionDelegate = List<dynamic> Function(AFScreenPrototypeTest test);
@@ -129,8 +129,10 @@ typedef AFChangedTextDelegate = void Function(String);
 typedef AFPressedDelegate = void Function();
 typedef AFOnTapDelegate = void Function();
 
+typedef AFExtendUILibraryDelegate = void Function(AFUILibraryExtensionContext context);
 typedef AFExtendAppDelegate = void Function(AFAppExtensionContext context);
 typedef AFExtendTestDelegate = void Function(AFTestExtensionContext context);
+typedef AFExtendThirdPartyDelegate = void Function(AFAppThirdPartyExtensionContext context);
 
 /// Allows plug-ins to contribute fundamental theme values
 typedef AFInitPluginFundamentalThemeDelegate = void Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState, AFPluginFundamentalThemeAreaBuilder builder);
@@ -139,7 +141,7 @@ typedef AFInitPluginFundamentalThemeDelegate = void Function(AFFundamentalDevice
 typedef AFInitAppFundamentalThemeDelegate = void Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState, AFAppFundamentalThemeAreaBuilder builder);
 
 /// Create a conceptual theme used by a subset of the app, or used by a third party plugin.
-typedef AFCreateConceptualThemeDelegate = AFConceptualTheme Function(AFFundamentalTheme fundamentals);
+typedef AFInitConceptualThemeDelegate = void Function(AFConceptualThemeDefinitionContext context);
 
 /// Optional delegate used to create the flutter ThemeData, rather than allowing AFib to do it for you based on the primary fundamental theme.
 typedef AFOverrideCreateThemeDataDelegate = ThemeData Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState, AFFundamentalThemeArea primary);

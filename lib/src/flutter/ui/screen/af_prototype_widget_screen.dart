@@ -30,8 +30,8 @@ class AFPrototypeWidgetRouteParam extends AFRouteParam {
 }
 
 /// Data used to render the screen
-class AFPrototypeWidgetData extends AFStateView2<AFTestState, AFThemeState> {
-  AFPrototypeWidgetData(AFTestState testState, AFThemeState themes): 
+class AFPrototypeWidgetStateView extends AFStateView2<AFTestState, AFThemeState> {
+  AFPrototypeWidgetStateView(AFTestState testState, AFThemeState themes): 
     super(first: testState, second: themes);
   
   AFTestState get testState { return first; }
@@ -40,7 +40,7 @@ class AFPrototypeWidgetData extends AFStateView2<AFTestState, AFThemeState> {
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeWidgetScreen extends AFProtoConnectedScreen<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam>{
+class AFPrototypeWidgetScreen extends AFProtoConnectedScreen<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam>{
 
   AFPrototypeWidgetScreen(): super(AFUIScreenID.screenPrototypeWidget);
 
@@ -53,24 +53,24 @@ class AFPrototypeWidgetScreen extends AFProtoConnectedScreen<AFPrototypeWidgetDa
   }
 
   @override
-  AFPrototypeWidgetData createStateViewAF(AFState state, AFPrototypeWidgetRouteParam param, AFRouteParamWithChildren paramWithChildren) {
-    return AFPrototypeWidgetData(state.testState, state.public.themes);
+  AFPrototypeWidgetStateView createStateViewAF(AFState state, AFPrototypeWidgetRouteParam param, AFRouteParamWithChildren paramWithChildren) {
+    return AFPrototypeWidgetStateView(state.testState, state.public.themes);
   }
 
   @override
-  AFPrototypeWidgetData createStateView(AFAppStateArea state, AFPrototypeWidgetRouteParam param) {
+  AFPrototypeWidgetStateView createStateView(AFAppStateArea state, AFPrototypeWidgetRouteParam param) {
     // this should never be called, because createDataAF supercedes it.
     throw UnimplementedError();
   }
 
   @override
-  Widget buildWithContext(AFProtoBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam> context) {    
+  Widget buildWithContext(AFProtoBuildContext<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam> context) {    
     /// Remember what screen we are on for testing purposes.  Maybe eventually try to do this in navigator observer.
     AFTest.currentScreen = context.c;
     return _buildScreen(context);
   }
 
-  Widget _buildScreen(AFProtoBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam> context) {
+  Widget _buildScreen(AFProtoBuildContext<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam> context) {
     final test = context.p.test;
     final testContext = context.s.testState.findContext(test.id);
     final testState = context.s.testState.findState(test.id);
@@ -99,7 +99,7 @@ class AFPrototypeWidgetScreen extends AFProtoConnectedScreen<AFPrototypeWidgetDa
     return _createScaffold(context, resultWidget);
   }
 
-  Widget _createScaffold(AFProtoBuildContext<AFPrototypeWidgetData, AFPrototypeWidgetRouteParam> context, Widget resultWidget) {
+  Widget _createScaffold(AFProtoBuildContext<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam> context, Widget resultWidget) {
     if(context.p.test.createWidgetWrapperDelegate != null) {
       return context.p.test.createWidgetWrapperDelegate(context, resultWidget);
     }

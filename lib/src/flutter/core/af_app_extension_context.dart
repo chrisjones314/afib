@@ -15,34 +15,22 @@ import 'package:meta/meta.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 
-class AFTestExtensionContext {
-  final initTestDatas = <AFInitTestDataDelegate>[];
-  final initUnitTests = <AFInitUnitTestsDelegate>[];
-  final initStateTests = <AFInitStateTestsDelegate>[];
-  final initWidgetTests = <AFInitWidgetTestsDelegate>[];
-  final initScreenTests = <AFInitScreenTestsDelegate>[];
-  final initWorkflowStateTests = <AFInitWorkflowStateTestsDelegate>[];
+class AFSharedTestExtensionContext {
   final extractors = <AFExtractWidgetAction>[];
   final applicators = <AFApplyWidgetAction>[];
 
-  void initializeTestFundamentals({
-    @required AFInitTestDataDelegate initTestData,
-    @required AFInitUnitTestsDelegate initUnitTests,
-    @required AFInitStateTestsDelegate initStateTests,
-    @required AFInitWidgetTestsDelegate initWidgetTests,
-    @required AFInitScreenTestsDelegate initScreenTests,
-    @required AFInitWorkflowStateTestsDelegate initWorkflowStateTests,
-  }) {
+  void initializeApp() {
     _registerDefaultApplicators();
-    addInitTestData(initTestData);
-    addInitUnitTest(initUnitTests);
-    addInitStateTest(initStateTests);
-    addInitWidgetTest(initWidgetTests);
-    addInitScreenTest(initScreenTests);
-    addInitWorkflowStateTest(initWorkflowStateTests);
+  }
+
+  bool get _needWidgetActions {
+    return AFibD.config.isTestContext || AFibD.config.isPrototypeMode;
   }
 
   void _registerDefaultApplicators() {
+    if(!_needWidgetActions) {
+      return;
+    }
     registerApplicator(AFFlatButtonAction());
     registerApplicator(AFRaisedButtonAction());
     registerApplicator(AFTapChoiceChip());
@@ -71,11 +59,68 @@ class AFTestExtensionContext {
   /// The intent is to allow the testing framework to be extended for
   /// arbitrary widgets that might get tapped.
   void registerApplicator(AFApplyWidgetAction apply) {
-    applicators.add(apply);
+    if(_needWidgetActions) {
+      applicators.add(apply);
+    }
   }
 
   void registerExtractor(AFExtractWidgetAction extract) {
-    extractors.add(extract);
+    if(_needWidgetActions) {
+      extractors.add(extract);
+    }
+  }
+
+  void mergeWith(AFSharedTestExtensionContext other) {
+    extractors.clear();
+    extractors.addAll(_merge<AFExtractWidgetAction>(extractors, other.extractors));
+
+    applicators.clear();
+    applicators.addAll(_merge<AFApplyWidgetAction>(applicators, other.applicators));
+  }
+
+  Iterable<TAction> _merge<TAction>(List<TAction> source1, List<TAction> source2) {
+    final map = <String, TAction>{};
+    for(final action in source1) {
+      final id = action.runtimeType.toString();
+      map[id] = action;
+    }
+
+    for(final action in source2) {
+      final id = action.runtimeType.toString();
+      map[id] = action;
+    }
+
+    return map.values;
+  }
+}
+
+class AFTestExtensionContext {
+  final initTestDatas = <AFInitTestDataDelegate>[];
+  final initUnitTests = <AFInitUnitTestsDelegate>[];
+  final initStateTests = <AFInitStateTestsDelegate>[];
+  final initWidgetTests = <AFInitWidgetTestsDelegate>[];
+  final initScreenTests = <AFInitScreenTestsDelegate>[];
+  final initWorkflowStateTests = <AFInitWorkflowStateTestsDelegate>[];
+  final sharedTestContext = AFSharedTestExtensionContext();
+
+  void initializeTestFundamentals({
+    @required AFInitTestDataDelegate initTestData,
+    @required AFInitUnitTestsDelegate initUnitTests,
+    @required AFInitStateTestsDelegate initStateTests,
+    @required AFInitWidgetTestsDelegate initWidgetTests,
+    @required AFInitScreenTestsDelegate initScreenTests,
+    @required AFInitWorkflowStateTestsDelegate initWorkflowStateTests,
+  }) {
+    addInitTestData(initTestData);
+    addInitUnitTest(initUnitTests);
+    addInitStateTest(initStateTests);
+    addInitWidgetTest(initWidgetTests);
+    addInitScreenTest(initScreenTests);
+    addInitWorkflowStateTest(initWorkflowStateTests);
+  }
+
+  void initializeForApp() {
+    sharedTestContext.initializeApp();
   }
 
   void addInitTestData(AFInitTestDataDelegate init) {
@@ -102,11 +147,24 @@ class AFTestExtensionContext {
     initWorkflowStateTests.add(init);
   }
 
+  /// Register a way to tap or set a value on a particular kind of widget.
+  /// 
+  /// The intent is to allow the testing framework to be extended for
+  /// arbitrary widgets that might get tapped.
+  void registerApplicator(AFApplyWidgetAction apply) {
+    sharedTestContext.registerApplicator(apply);
+  }
+
+  void registerExtractor(AFExtractWidgetAction extract) {
+    sharedTestContext.registerExtractor(extract);
+  }
+
   void _initTestData(AFTestDataRegistry testData) {
     for(final init in initTestDatas) {
       init(testData);
     }
   }
+
 
   void _initUnitTests(AFUnitTestDefinitionContext context) {
     for(final init in initUnitTests) {
@@ -182,14 +240,35 @@ class AFTestExtensionContext {
   }
 }
 
+class AFConceptualThemeDefinitionContext {
+  final AFFundamentalTheme fundamentals;
+  final themes = <AFThemeID, AFConceptualTheme>{};
+
+  AFConceptualThemeDefinitionContext(this.fundamentals);
+
+  void initUnlessPresent(AFThemeID id, { @required AFConceptualTheme Function(AFFundamentalTheme fundamentals) createTheme}) {
+    if(themes.containsKey(id)) {
+      return;
+    }
+    themes[id] = createTheme(fundamentals);
+  }
+
+  Map<AFThemeID, AFConceptualTheme> toMap() {
+    return themes;
+  }
+}
+
 class AFPluginExtensionContext {
+  AFCreateAFAppDelegate createApp;
+  AFInitAppFundamentalThemeDelegate initFundamentalThemeArea;
   final initScreenMaps = <AFInitScreenMapDelegate>[];
   final initialAppStates = <AFInitializeAppStateDelegate>[];
   final createStartupQueryActions = <AFCreateStartupQueryActionDelegate>[];
   final createLifecycleQueryActions = <AFCreateLifecycleQueryAction>[];
   final querySuccessListenerDelegates = <AFQuerySuccessListenerDelegate>[];
-  final test = AFTestExtensionContext();
-  final initConceptualThemes = <AFCreateConceptualThemeDelegate>[];
+  AFTestExtensionContext test = AFTestExtensionContext();
+  final thirdParty = AFAppThirdPartyExtensionContext();
+  final initConceptualThemes = <AFInitConceptualThemeDelegate>[];
   final initFundamentalThemeAreas = <AFInitPluginFundamentalThemeDelegate>[];
   final errorListenerByState = <Type, AFOnErrorDelegate>{};
 
@@ -213,7 +292,7 @@ class AFPluginExtensionContext {
     initialAppStates.add(initAppState);
   }
 
-  void addCreateConceptualTheme(AFCreateConceptualThemeDelegate init) {
+  void addCreateConceptualTheme(AFInitConceptualThemeDelegate init) {
     initConceptualThemes.add(init);
   }
 
@@ -230,13 +309,81 @@ class AFPluginExtensionContext {
   void addQueryErrorListener<TState extends AFAppStateArea>(AFOnErrorDelegate onError) {
     errorListenerByState[TState] = onError;
   }
+
+  void initScreenMap(AFScreenMap screenMap, Iterable<AFUILibraryExtensionContext> libraries) {
+    for(final init in this.initScreenMaps) {
+      init(screenMap);
+    }
+  }
+
+  void initConceptual(AFConceptualThemeDefinitionContext context) {
+    for(final init in this.initConceptualThemes) {
+      init(context);
+    }
+  }
+
+  void initAppStates(List<AFAppStateArea> appStates) {
+    for(final initState in this.initialAppStates) {
+      appStates.add(initState());
+    }
+  }
+
+  void _verifyNotNull(dynamic item, String setterName) {
+    if(item == null) {
+      throw AFException("You must specify a value using $setterName in extend_app.dart");
+    }
+  }
+
+}
+
+class AFAppThirdPartyExtensionContext {
+  final libraries = <AFLibraryID, AFUILibraryExtensionContext>{};
+  
+  AFUILibraryExtensionContext register(AFLibraryID libraryId, String prefix, String name) {
+    final context = AFUILibraryExtensionContext(libraryId: libraryId, libraryName: name, libraryPrefix: prefix);
+    assert(!libraries.containsKey(libraryId), "Duplicate library key $libraryId");
+    libraries[libraryId] = context;
+    return context;
+  }
+}
+
+class AFUILibraryExtensionContext<TState extends AFAppStateArea> extends AFPluginExtensionContext {
+  final String libraryName;
+  final String libraryPrefix;
+  final AFLibraryID libraryId;
+
+  AFUILibraryExtensionContext({
+    @required this.libraryName,
+    @required this.libraryPrefix,
+    @required this.libraryId,
+  });
+
+  AFLibraryTestHolder<TState> createScreenTestHolder() {
+    return AFLibraryTestHolder<TState>();
+  }
+
+  void initializeAppFundamentals<TState extends AFAppStateArea>({
+    @required AFInitScreenMapDelegate initScreenMap,
+    AFInitAppFundamentalThemeDelegate initFundamentalThemeArea,
+    @required AFInitializeAppStateDelegate initializeAppState,
+    @required AFInitConceptualThemeDelegate initConceptualTheme,
+  }) {
+    this.initScreenMaps.add(initScreenMap);
+    this.initialAppStates.add(initializeAppState);
+    this.initConceptualThemes.add(initConceptualTheme);
+    if(initFundamentalThemeArea != null) {
+      this.initFundamentalThemeArea = initFundamentalThemeArea;
+    } 
+    _verifyNotNull(initScreenMap, "initScreenMap");
+    _verifyNotNull(initializeAppState, "initializeAppState");
+  }
+  
 }
 
 /// Enables you, or third parties, to register extensions
 //  recognized by AFib.
 class AFAppExtensionContext extends AFPluginExtensionContext {
-  AFCreateAFAppDelegate createApp;
-  AFInitAppFundamentalThemeDelegate initFundamentalThemeArea;
+  final libraries = AFAppThirdPartyExtensionContext();
 
   /// Used by the app to specify fundamental configuration/functionality
   /// that AFib requires.
@@ -246,21 +393,38 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     @required AFInitializeAppStateDelegate initializeAppState,
     @required AFCreateStartupQueryActionDelegate createStartupQueryAction,
     @required AFCreateAFAppDelegate createApp,
-    @required AFCreateConceptualThemeDelegate createPrimaryTheme,
+    @required AFInitConceptualThemeDelegate initConceptualThemes,
     @required AFOnErrorDelegate<TState> queryErrorHandler,
   }) {
+    this.test.initializeForApp();
     this.initScreenMaps.add(initScreenMap);
     this.initialAppStates.add(initializeAppState);
     this.createStartupQueryActions.add(createStartupQueryAction);
     this.errorListenerByState[TState] = queryErrorHandler;
     this.createApp = createApp;
-    this.initConceptualThemes.add(createPrimaryTheme);
+    this.initConceptualThemes.add(initConceptualThemes);
     this.initFundamentalThemeArea = initFundamentalThemeArea;
     _verifyNotNull(initFundamentalThemeArea, "initFundamentalTheme");
     _verifyNotNull(initScreenMap, "initScreenMap");
     _verifyNotNull(initializeAppState, "initializeAppState");
     _verifyNotNull(createStartupQueryAction, "createStartupQueryAction");
     _verifyNotNull(createApp, "createApp");
+  }
+
+  void fromUILibrary(AFUILibraryExtensionContext source, {
+    @required AFInitAppFundamentalThemeDelegate initFundamentalThemeArea,
+    @required AFCreateAFAppDelegate createApp,
+  }) {
+    this.initScreenMaps.addAll(source.initScreenMaps);
+    this.initialAppStates.addAll(source.initialAppStates);
+    this.createStartupQueryActions.addAll(source.createStartupQueryActions);
+    this.errorListenerByState.addAll(source.errorListenerByState);
+    this.createApp = createApp;
+    this.test = source.test;
+    this.test.initializeForApp();
+    this.createApp = createApp;
+    this.initFundamentalThemeArea = source.initFundamentalThemeArea ?? initFundamentalThemeArea;
+    this.initConceptualThemes.addAll(source.initConceptualThemes);    
   }
 
   AFOnErrorDelegate<TState> errorHandlerForState<TState extends AFAppStateArea>() {
@@ -309,37 +473,45 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     return result;
   }
 
-  List<AFConceptualTheme> initializeConceptualThemes(AFFundamentalTheme fundamentals) {
-    final result = <AFConceptualTheme>[];
+  AFConceptualThemeDefinitionContext initializeConceptualThemes(AFFundamentalTheme fundamentals, Iterable<AFUILibraryExtensionContext> libraries) {
+    final context = AFConceptualThemeDefinitionContext(fundamentals);
     for(final init in initConceptualThemes) {
-      result.add(init(fundamentals));
+      init(context);
     }
 
     if(AFibD.config.requiresPrototypeData) {
-      result.add(AFPrototypeTheme(fundamentals));
+      context.initUnlessPresent(AFUIThemeID.conceptualPrototype, createTheme: (f) => AFPrototypeTheme(f));
     }
 
-    return result;
+    for(final thirdParty in libraries) {
+      thirdParty.initConceptual(context);
+    }
+
+    return context;
   }
 
-  AFAppStateAreas createInitialAppStateAreas() {
+  AFAppStateAreas createInitialAppStateAreas(Iterable<AFUILibraryExtensionContext> libraries) {
     final appStates = <AFAppStateArea>[];
     for(final initState in initialAppStates) {
       appStates.add(initState());
     }    
-    
+
+    for(final thirdParty in libraries) {
+      thirdParty.initAppStates(appStates);
+    }
+
     return AFAppStateAreas.createFrom(appStates);
   }
  
-  void _verifyNotNull(dynamic item, String setterName) {
-    if(item == null) {
-      throw AFException("You must specify a value using $setterName in extend_app.dart");
-    }
-  }
-
-  void initScreenMap(AFScreenMap screenMap) {
+  void initScreenMap(AFScreenMap screenMap, Iterable<AFUILibraryExtensionContext> libraries) {
     for(final init in initScreenMaps) {
       init(screenMap);
     }    
+
+    for(final thirdParty in libraries) {
+      for(final init in thirdParty.initScreenMaps) {
+        init(screenMap);
+      }
+    }
   }
 }

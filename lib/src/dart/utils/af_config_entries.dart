@@ -43,7 +43,7 @@ class AFConfigEntries {
   /// 
   /// For example, if the AppNamespace is ab, then the widget ID container class will be 
   /// named ABWidgetID, and a custom command called fixupdb will be ab:fixupdb.
-  static final appNamespace = AFConfigEntryString(afNamespace, "appNamespace", "A short identifier which is unique to your app", minChars: 2, maxChars: 3,
+  static final appNamespace = AFConfigEntryString(afNamespace, "appNamespace", "A short identifier which is unique to your app", minChars: 2, maxChars: 4,
    options: AFConfigEntryString.optionLowercase | AFConfigEntryString.optionIdentifier);
 
   static final projectName = AFConfigEntryString(afNamespace, "projectName", "The project name for your app", minChars: 4,

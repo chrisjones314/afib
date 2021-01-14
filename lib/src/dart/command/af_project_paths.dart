@@ -14,6 +14,7 @@ class AFProjectPaths {
   static const libFolder = 'lib';
   static const testFolder = 'test';
   static const afibFolder = 'afib';
+  static const srcFolder = 'src';
   static const initializationFolder = 'initialization';
   static const libPath = [libFolder];
   static const initializationPath = [libFolder, initializationFolder];
@@ -30,21 +31,35 @@ class AFProjectPaths {
 
   static bool projectFileExists(List<String> relativePath) {
     final path = fullPathFor(relativePath);
+    return pathExists(path);
+  }
+
+  static bool pathExists(String path) {
     return FileSystemEntity.typeSync(path) != FileSystemEntityType.notFound;
   }
 
   static String fullPathFor(List<String> relativePath) {
     final current = Directory.current;  
     final projectRoot = split(current.path);
-    final temp = List<String>.from(projectRoot);
+    var projectRootFolders = List<String>.from(projectRoot);
     // this is used by the 'new' command, which takes place from one folder below the 
     // project folder, which is where most commands are run.
     if(extraParentFolder != null) {
-      temp.addAll(extraParentFolder);
+      projectRootFolders.addAll(extraParentFolder);
     }
+    
+    final appPath = List<String>.from(projectRootFolders);
+    appPath.addAll(relativePath);
+    var path = joinAll(appPath);
 
-    temp.addAll(relativePath);
-    final path = joinAll(temp);
+    if(!pathExists(path) && relativePath.isNotEmpty && relativePath.first == libFolder) {
+      final revisedRelative = List<String>.from(relativePath);
+      revisedRelative.insert(1, srcFolder);
+      final revisedFull = List<String>.from(projectRootFolders);
+      revisedFull.addAll(revisedRelative);
+      path = joinAll(revisedFull);
+    }
+ 
     return path;
   }
 

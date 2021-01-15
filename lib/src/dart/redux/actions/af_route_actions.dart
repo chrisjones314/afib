@@ -2,7 +2,7 @@ import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
-import 'package:afib/src/dart/utils/af_ui_id.dart';
+import 'package:afib/id.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 

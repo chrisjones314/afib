@@ -4,7 +4,7 @@ import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
-import 'package:afib/src/dart/utils/af_ui_id.dart';
+import 'package:afib/id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/ui/af_prototype_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_prototype_third_party_home_screen.dart';
@@ -56,11 +56,11 @@ class AFPrototypeThirdPartyListScreen extends AFProtoConnectedScreen<AFPrototype
     final rowsCard = t.column();
 
     for(final thirdParty in AFibF.g.appContext.thirdParty.libraries.values) {
-      final subtitle = "${thirdParty.libraryId} / ${thirdParty.libraryPrefix}";
+      final subtitle = "${thirdParty.id}";
       rowsCard.add(
         t.childListTileNavDown(
-          wid: thirdParty.libraryId,
-          title: t.childText(thirdParty.libraryName),
+          wid: thirdParty.id,
+          title: t.childText(thirdParty.id.name),
           subtitle: t.childText(subtitle),
           onTap: () {
             context.dispatchNavigatePush(AFPrototypeThirdPartyHomeScreen.navigatePush(thirdParty));

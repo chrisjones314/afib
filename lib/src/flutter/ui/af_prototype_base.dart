@@ -2,7 +2,7 @@ import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
-import 'package:afib/src/dart/utils/af_ui_id.dart';
+import 'package:afib/id.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/theme/af_prototype_theme.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';

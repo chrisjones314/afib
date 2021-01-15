@@ -4,6 +4,7 @@ import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/af_app_ui_library.dart';
 import 'package:afib/src/flutter/core/af_app_extension_context.dart';
@@ -32,8 +33,8 @@ class AFibTestsFailedMatcher extends Matcher {
   }
 }
 
-Future<void> afTestMainUILibrary<TState extends AFAppStateArea>(AFExtendUILibraryDelegate extendApp, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
-  final contextLibrary = AFUILibraryExtensionContext();
+Future<void> afTestMainUILibrary<TState extends AFAppStateArea>(AFLibraryID id, AFExtendUILibraryDelegate extendApp, AFExtendThirdPartyDelegate extendThirdParty, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
+  final contextLibrary = AFUILibraryExtensionContext(id: id);
   extendApp(contextLibrary);
 
   final extendAppFull = (context) {
@@ -43,11 +44,11 @@ Future<void> afTestMainUILibrary<TState extends AFAppStateArea>(AFExtendUILibrar
     );
   };
 
-  return afTestMain<TState>(extendAppFull, extendTest, paramsD, widgetTester);
+  return afTestMain<TState>(extendAppFull, extendThirdParty, extendTest, paramsD, widgetTester);
 }
 
 /// The main function which executes the store test defined in your initStateTests function.
-Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendAppDelegate extendApp, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
+Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendAppDelegate extendApp, AFExtendThirdPartyDelegate extendThirdParty, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
   final stopwatch = Stopwatch();
   stopwatch.start();
 
@@ -57,6 +58,9 @@ Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendAppDelegate exten
   final context = AFAppExtensionContext();
   extendApp(context);
   extendTest(context.test);
+  if(extendThirdParty != null) {
+    extendThirdParty(context.thirdParty);
+  }
 
   AFibF.initialize<TState>(context);
 

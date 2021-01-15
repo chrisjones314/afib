@@ -88,7 +88,7 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
       }
     }
 
-    final param = findParam(store.state);
+    final param = findRouteParam(store.state);
     final paramWithChildren = findParamWithChildren(store.state);
     final data = createStateViewAF(store.state, param, paramWithChildren);
     if(param == null && !routeEntryExists(store.state)) {
@@ -123,7 +123,7 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
       return null;
     }
 
-    final param = findParam(store.state);
+    final param = findRouteParam(store.state);
     final paramWithChildren = findParamWithChildren(store.state);
 
     var data = activeState.findViewStateFor<TStateView>();
@@ -144,7 +144,7 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
   }
 
   /// Find the route param for this screen. 
-  AFRouteParam findParam(AFState state) { return null; }
+  AFRouteParam findRouteParam(AFState state) { return null; }
 
   /// Find the route param for this screen. 
   AFRouteParamWithChildren findParamWithChildren(AFState state) { return null; }
@@ -227,7 +227,7 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TTheme extends A
   }
 
   /// Find the route parameter for the specified named screen
-  AFRouteParam findParam(AFState state) {
+  AFRouteParam findRouteParam(AFState state) {
     final route = state.public.route;
     final pTest = route?.findParamFor(this.screenId, includePrior: true);
     if(pTest is AFRouteParamWithChildren) {
@@ -324,7 +324,7 @@ abstract class AFConnectedWidget<TState extends AFAppStateArea, TTheme extends A
   /// The parent screen must have a route param of type AFRouteParamWithChildren.
   /// Which this widget used to find its specific child route param in that screen's
   /// overall route param.
-  AFRouteParam findParam(AFState state) { 
+  AFRouteParam findRouteParam(AFState state) { 
     return findChildParam<TRouteParam>(state, this.screenParent, this.widChild);
   }
 
@@ -373,7 +373,7 @@ abstract class AFConnectedScreenWithGlobalParam<TState extends AFAppStateArea, T
   /// Look for this screens route parameter in the global pool, 
   /// rather than in the navigational hierarchy
   @override
-  TRouteParam findParam(AFState state) {
+  TRouteParam findRouteParam(AFState state) {
     var current = state.public.route.findGlobalParam(screenId);
     return current;
   }
@@ -406,8 +406,8 @@ abstract class AFConnectedDrawer<TState extends AFAppStateArea, TTheme extends A
   /// Look for this screens route parameter in the global pool, 
   /// rather than in the navigational hierarchy.
   @override
-  TRouteParam findParam(AFState state) {
-    var current = super.findParam(state);
+  TRouteParam findRouteParam(AFState state) {
+    var current = super.findRouteParam(state);
     // Note that because the user can slide a drawer on screen without the
     // application explictly opening it, we need to have the drawer create a default
     // route parameter if one does not already exist. 

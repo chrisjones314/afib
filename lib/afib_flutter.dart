@@ -4,6 +4,8 @@
 /// Be careful not to reference this library from integration tests.
 library afib_flutter;
 
+export 'id.dart';
+export 'locale_id.dart';
 export "src/dart/command/af_command.dart";
 export "src/dart/command/af_standard_commands.dart";
 export "src/dart/redux/actions/af_action_with_key.dart";
@@ -28,7 +30,6 @@ export "src/dart/utils/af_query_error.dart";
 export "src/dart/utils/af_route_param.dart";
 export "src/dart/utils/af_should_continue_route_param.dart";
 export "src/dart/utils/af_typedefs_dart.dart";
-export "src/dart/utils/af_ui_id.dart";
 export "src/dart/utils/af_unused.dart";
 export "src/dart/utils/af_unused.dart"; // ok
 export "src/dart/utils/afib_d.dart";
@@ -40,11 +41,10 @@ export 'src/flutter/core/af_app_extension_context.dart';
 export "src/flutter/core/af_circular_progress_indicator.dart";
 export 'src/flutter/core/af_screen_map.dart';
 export 'src/flutter/core/af_text_field.dart';
-export 'src/flutter/core/afui.dart';
 export 'src/flutter/test/af_screen_test.dart';
 export 'src/flutter/test/af_screen_test_main.dart';
-export "src/flutter/test/af_state_test.dart";
 export 'src/flutter/test/af_state_test.dart';
+export "src/flutter/test/af_state_test.dart";
 export 'src/flutter/test/af_state_test_main.dart';
 export "src/flutter/test/af_test_data_registry.dart";
 export "src/flutter/test/af_test_main.dart";

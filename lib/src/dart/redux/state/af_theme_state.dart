@@ -197,6 +197,8 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
   final ThemeData themeDark;
   final Map<AFThemeID, AFFundamentalThemeValue> values;
   final Map<Locale, AFTranslationSet> translationSet;
+  final List<Locale> supportedLocalesApp;
+  static final List<Locale> supportedLocalesDefault = [AFUILocaleID.englishUS];
   final Map<AFThemeID, AFFundamentalThemeValue> overrides;
   final Map<AFThemeID, List<dynamic>> optionsForType;
 
@@ -205,6 +207,7 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     @required this.themeDark,
     @required this.values, 
     @required this.translationSet,
+    @required this.supportedLocalesApp,
     @required this.overrides,
     @required this.optionsForType,
   });
@@ -222,6 +225,7 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     ThemeData themeDark,
     Map<AFThemeID, AFFundamentalThemeValue> values,
     Map<Locale, AFTranslationSet> translationSet,
+    List<Locale> supportedLocalesApp,
     Map<AFThemeID, AFFundamentalThemeValue> overrides,
   }) {
     return AFFundamentalThemeArea(
@@ -229,9 +233,17 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
       themeDark: themeDark ?? this.themeDark,
       values: values ?? this.values,
       translationSet: translationSet ?? this.translationSet,
+      supportedLocalesApp: supportedLocalesApp ?? this.supportedLocalesApp,
       overrides: overrides ?? this.overrides,
       optionsForType: this.optionsForType,
     );
+  }
+  
+  List<Locale> get supportedLocales {
+    if(supportedLocalesApp.isEmpty) {
+      return supportedLocalesDefault;
+    }
+    return supportedLocalesApp;
   }
 
   List<String> get areaList {
@@ -277,10 +289,24 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     return values[id]?.value;
   }
 
+  Locale get defaultLocale { 
+    assert(supportedLocales.isNotEmpty, "You must have at least one setTranslations call on your fundamental theme");
+    return supportedLocales.first;
+  }
+
   String translation(String textOrId, Locale locale) {
     var setT = translationSet[locale];
     if(setT == null) {
-      //setT = translationSet[AFUIThemeID.localeDefault];
+      // 
+      if(locale.scriptCode != null) {
+        locale = Locale.fromSubtags(languageCode: locale.languageCode, countryCode: locale.countryCode);
+        setT = translationSet[locale];
+      }
+      if(setT == null && locale.countryCode != null) {
+        locale = Locale.fromSubtags(languageCode: locale.languageCode);
+        setT = translationSet[locale];
+      }
+      setT = translationSet[defaultLocale];
     }
     if(setT == null) {
       return textOrId;
@@ -324,6 +350,7 @@ class AFTranslationSet {
 class AFPluginFundamentalThemeAreaBuilder {
   final values = <AFThemeID, AFFundamentalThemeValue>{};
   final translationSet = <Locale, AFTranslationSet>{};
+  final supportedLocalesApp = <Locale>[];
   Map<AFThemeID, List<dynamic>> optionsForType;
 
   AFPluginFundamentalThemeAreaBuilder(
@@ -373,6 +400,7 @@ class AFPluginFundamentalThemeAreaBuilder {
     if(setT == null) {
       setT = AFTranslationSet();
       translationSet[locale] = setT;
+      supportedLocalesApp.add(locale);
     }
     setT.setTranslations(translations);
   }
@@ -624,6 +652,7 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     List<double> borderRadiusSizes = bootstrapStandardBorderRadius,
     IconData iconBack = Icons.arrow_back,
     IconData iconNavDown = Icons.chevron_right,
+    Color colorTapableText = Colors.blue,
   }) {
     // icons
     setValue(AFUIThemeID.marginSizes, marginSizes);
@@ -631,6 +660,7 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     setValue(AFUIThemeID.borderRadiusSizes, borderRadiusSizes);
     setValue(AFUIThemeID.iconBack, iconBack);
     setValue(AFUIThemeID.iconNavDown, iconNavDown);
+    setValue(AFUIThemeID.colorTapableText, colorTapableText);
   }
 
 
@@ -665,6 +695,7 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
       themeDark: themeDark, 
       values: this.values, 
       translationSet: translationSet,
+      supportedLocalesApp: supportedLocalesApp,
       overrides: <AFThemeID, AFFundamentalThemeValue>{},
       optionsForType: optionsForType,
     );
@@ -923,6 +954,10 @@ class AFFundamentalTheme {
     );
   }
 
+  List<Locale> get supportedLocales {
+    return area.supportedLocales;
+  }
+
   String translate(dynamic idOrText) {
     return area.translate(idOrText, device.locale(this));
   }
@@ -937,6 +972,10 @@ class AFFundamentalTheme {
 
   ThemeData get themeDataDark {
     return area.themeData(Brightness.dark);
+  }
+
+  Color get colorTapableText {
+    return area.color(AFUIThemeID.colorTapableText);
   }
 
   List<String> get areaList {
@@ -1531,6 +1570,23 @@ class AFConceptualTheme {
       styleTapable: tapable,
       styleMuted: muted
     );
+  }
+
+  AFRichTextBuilder childRichTextBuilderOnCard({ 
+    AFWidgetID wid
+  }) {
+
+    return childRichTextBuilder(
+      wid: wid,
+      styleNormal: styleOnCard.bodyText2,
+      styleBold: styleOnCard.bodyText1,
+      styleTapable: styleOnCard.bodyText2.copyWith(color: colorTapableText),
+      styleMuted: styleOnCard.bodyText2,
+    );
+  }
+
+  Color get colorTapableText { 
+    return fundamentals.colorTapableText;
   }
 
   AFTextBuilder childTextBuilder({

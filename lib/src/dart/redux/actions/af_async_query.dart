@@ -49,7 +49,7 @@ class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatch
     return state.public.areaStateFor(TState);
   }
 
-  AFRouteParam findParam(AFScreenID screen) {
+  AFRouteParam findRouteParam(AFScreenID screen) {
     return state.public.route.findParamFor(screen);
   }
 

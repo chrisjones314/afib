@@ -1,5 +1,5 @@
 
-import 'package:afib/src/dart/utils/af_ui_id.dart';
+import 'package:afib/id.dart';
 
 class AFID {
   final String prefix;
@@ -107,7 +107,8 @@ class AFScreenID extends AFID {
 }
 
 class AFLibraryID extends AFID {
-  const AFLibraryID(String code) : super("lib", code, null);
+  final String name;
+  const AFLibraryID({String code, this.name}) : super("lib", code, null);
 }
 
 class AFWidgetID extends AFID {

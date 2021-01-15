@@ -1,4 +1,4 @@
-import 'package:afib/src/dart/utils/af_ui_id.dart';
+import 'package:afib/id.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/ui/screen/af_startup_screen.dart';
 import 'package:flutter/material.dart';
@@ -52,14 +52,13 @@ class AFScreenMap {
   }
 
   /// Call [startupScreen] once to specify the initial screen for your app.
-  void startupScreen(AFScreenID screenId, WidgetBuilder screenBuilder, AFCreateRouteParamDelegate createParam) {    
+  void startupScreen(AFScreenID screenId, AFCreateRouteParamDelegate createParam) {    
     if(_startupScreenId == null) {
       trueAppStartupScreenId = screenId;
       trueCreateStartupScreenParam = createParam;
     }
     _startupScreenId = screenId;
     _createStartupScreenParam = createParam;
-    screen(screenId, screenBuilder);
   }
 
   /// Call [screen] multiple times to specify the relationship between 

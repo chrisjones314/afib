@@ -12,7 +12,7 @@ import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
-import 'package:afib/src/dart/utils/af_ui_id.dart';
+import 'package:afib/id.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
 import 'package:afib/src/flutter/test/af_init_prototype_screen_map.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -136,7 +136,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 
       for(final thirdParty in libraries) {
         final holder = thirdParty.createScreenTestHolder();
-        thirdPartyUITests[thirdParty.libraryId] = holder;
+        thirdPartyUITests[thirdParty.id] = holder;
         thirdParty.test.initialize(
           testData: testData,
           unitTests: holder.afUnitTests,

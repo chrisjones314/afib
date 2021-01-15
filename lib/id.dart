@@ -1,9 +1,8 @@
 
-
 import 'package:afib/src/dart/utils/af_id.dart';
 
 class AFUILibraryID {
-  static const id = AFLibraryID("afui");
+  static const id = AFLibraryID(code: "afui", name: "AFib Core UI");
 }
 
 class AFUIScreenID {
@@ -70,6 +69,9 @@ class AFUIThemeID {
   static const paddingSizes = AFThemeID("padding_sizes", AFUILibraryID.id, tagFundamental);
   static const borderRadiusSizes = AFThemeID("border_radius_sizes", AFUILibraryID.id, tagFundamental);
 
+  /// Color used for text that can be tapped like a hyperlink.
+  static const colorTapableText = AFThemeID("color_tapable_text", AFUILibraryID.id, tagFundamental);
+
   /// Used in prototype mode to override the device value.  Shouldn't generally be used in production.
   static const brightness = AFThemeID("brightness", AFUILibraryID.id, tagDevice);
 
@@ -84,4 +86,6 @@ class AFUIThemeID {
 
   /// Used in prototype mode to display the value in the test/theme drawer, should not be used in production and cannot be overriden.
   static const physicalSize = AFThemeID("physical_size", AFUILibraryID.id, tagDevice);
+
+
 }

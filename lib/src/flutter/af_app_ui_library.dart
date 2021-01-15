@@ -14,6 +14,7 @@ class AFAppUILibrary extends AFMaterialApp<AFAppStateArea> {
     final screenMap = AFibF.g.effectiveScreenMap;
     return MaterialApp(
         title: 'AFib UI Library',
+        supportedLocales: fundamentals.supportedLocales,
         navigatorKey: AFibF.g.navigatorKey,
         theme: fundamentals.themeDataActive,
         initialRoute: AFibF.g.effectiveStartupScreenId.code,

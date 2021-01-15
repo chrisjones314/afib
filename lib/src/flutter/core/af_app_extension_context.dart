@@ -339,23 +339,19 @@ class AFPluginExtensionContext {
 class AFAppThirdPartyExtensionContext {
   final libraries = <AFLibraryID, AFUILibraryExtensionContext>{};
   
-  AFUILibraryExtensionContext register(AFLibraryID libraryId, String prefix, String name) {
-    final context = AFUILibraryExtensionContext(libraryId: libraryId, libraryName: name, libraryPrefix: prefix);
-    assert(!libraries.containsKey(libraryId), "Duplicate library key $libraryId");
-    libraries[libraryId] = context;
+  AFUILibraryExtensionContext register(AFLibraryID id) {
+    final context = AFUILibraryExtensionContext(id: id);
+    assert(!libraries.containsKey(id), "Duplicate library key $id");
+    libraries[id] = context;
     return context;
   }
 }
 
 class AFUILibraryExtensionContext<TState extends AFAppStateArea> extends AFPluginExtensionContext {
-  final String libraryName;
-  final String libraryPrefix;
-  final AFLibraryID libraryId;
+  final AFLibraryID id;
 
   AFUILibraryExtensionContext({
-    @required this.libraryName,
-    @required this.libraryPrefix,
-    @required this.libraryId,
+    @required this.id,
   });
 
   AFLibraryTestHolder<TState> createScreenTestHolder() {

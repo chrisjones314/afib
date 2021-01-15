@@ -1,6 +1,7 @@
 
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/af_app_ui_library.dart';
 import 'package:afib/src/flutter/af_main.dart';
@@ -9,8 +10,8 @@ import 'package:afib/src/flutter/ui/theme/af_default_fundamental_theme.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 
 /// [afMain] handles startup, execution, and shutdown sequence for an afApp
-void afMainUILibrary<TState extends AFAppStateArea>(AFDartParams paramsD, AFExtendUILibraryDelegate extendApp, AFExtendTestDelegate extendTest) {
-  final contextLibrary = AFUILibraryExtensionContext();
+void afMainUILibrary<TState extends AFAppStateArea>(AFLibraryID id, AFDartParams paramsD, AFExtendUILibraryDelegate extendApp, AFExtendTestDelegate extendTest) {
+  final contextLibrary = AFUILibraryExtensionContext(id: id);
   extendApp(contextLibrary);
 
   final paramsProto = paramsD.forceEnvironment(AFEnvironment.prototype);

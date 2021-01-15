@@ -10,10 +10,10 @@ import 'package:afib/src/flutter/test/af_test_data_registry.dart';
 import 'package:afib/src/flutter/ui/theme/af_prototype_area.dart';
 import 'package:afib/src/flutter/ui/theme/af_prototype_theme.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
+import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
-import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 
 class AFSharedTestExtensionContext {
   final extractors = <AFExtractWidgetAction>[];
@@ -241,21 +241,27 @@ class AFTestExtensionContext {
 }
 
 class AFConceptualThemeDefinitionContext {
-  final AFFundamentalTheme fundamentals;
-  final themes = <AFThemeID, AFConceptualTheme>{};
+  final themeFactories = <AFThemeID, AFCreateConceptualThemeDelegate>{};
 
-  AFConceptualThemeDefinitionContext(this.fundamentals);
+  AFConceptualThemeDefinitionContext();
 
-  void initUnlessPresent(AFThemeID id, { @required AFConceptualTheme Function(AFFundamentalTheme fundamentals) createTheme}) {
-    if(themes.containsKey(id)) {
+  void initUnlessPresent(AFThemeID id, { @required AFCreateConceptualThemeDelegate createTheme }) {
+    if(themeFactories.containsKey(id)) {
       return;
     }
-    themes[id] = createTheme(fundamentals);
+    themeFactories[id] = createTheme;
   }
 
-  Map<AFThemeID, AFConceptualTheme> toMap() {
-    return themes;
+  AFConceptualTheme create(AFThemeID id, AFFundamentalTheme fundamentals, ThemeData themeData) {
+    final create = themeFactories[id];
+    assert(create != null, "No theme registered with id $id");
+    return create(fundamentals, themeData);
   }
+
+  AFCreateConceptualThemeDelegate factoryFor(AFThemeID id) {
+    return themeFactories[id];
+  }
+
 }
 
 class AFPluginExtensionContext {
@@ -469,21 +475,18 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     return result;
   }
 
-  AFConceptualThemeDefinitionContext initializeConceptualThemes(AFFundamentalTheme fundamentals, Iterable<AFUILibraryExtensionContext> libraries) {
-    final context = AFConceptualThemeDefinitionContext(fundamentals);
+  void initializeConceptualThemeFactories(AFConceptualThemeDefinitionContext context, Iterable<AFUILibraryExtensionContext> libraries) {
     for(final init in initConceptualThemes) {
       init(context);
     }
 
     if(AFibD.config.requiresPrototypeData) {
-      context.initUnlessPresent(AFUIThemeID.conceptualPrototype, createTheme: (f) => AFPrototypeTheme(f));
+      context.initUnlessPresent(AFUIThemeID.conceptualPrototype, createTheme: (f, t) => AFPrototypeTheme(f, t));
     }
 
     for(final thirdParty in libraries) {
       thirdParty.initConceptual(context);
     }
-
-    return context;
   }
 
   AFAppStateAreas createInitialAppStateAreas(Iterable<AFUILibraryExtensionContext> libraries) {

@@ -29,7 +29,7 @@ class AFOverrideThemeValueAction {
 /// 1. Your fundamental theme state depends on some setting in your application state (for example, a compact mode setting)
 /// 2. The user has just changed that value in the application state (e.g. from the settings are of the app)
 /// In that case, the theme state won't refresh automatically.   Instead, you need to dispatch this action 
-/// or more likely call [AFBuildContext.updateRebuildThemeState].
+/// or more likely call [AFBuildContext.dispatchRebuildThemeState].
 @immutable
 class AFRebuildThemeState {
 

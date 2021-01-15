@@ -8,6 +8,7 @@ import 'package:afib/src/flutter/ui/theme/af_text_builders.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:quiver/core.dart';
 
 /// These are fundamental values for theming derived from the device
 /// and operating system itself.
@@ -277,7 +278,7 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     return brightness == Brightness.light ? themeLight : themeDark;
   }
 
-  String translate(String idOrText, Locale locale) {
+  String translate(dynamic idOrText, Locale locale) {
     var result = translation(idOrText, locale);
     if(result == null) {
       result = idOrText;
@@ -294,7 +295,7 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     return supportedLocales.first;
   }
 
-  String translation(String textOrId, Locale locale) {
+  String translation(dynamic textOrId, Locale locale) {
     var setT = translationSet[locale];
     if(setT == null) {
       // 
@@ -309,7 +310,7 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
       setT = translationSet[defaultLocale];
     }
     if(setT == null) {
-      return textOrId;
+      return textOrId.toString();
     }
     return setT.translate(textOrId);
   }
@@ -395,7 +396,7 @@ class AFPluginFundamentalThemeAreaBuilder {
     });
   }
 
-  void setTranslations(Locale locale, Map<String, String> translations) {
+  void setTranslations(Locale locale, Map<dynamic, String> translations) {
     var setT = translationSet[locale];
     if(setT == null) {
       setT = AFTranslationSet();
@@ -623,10 +624,11 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     ColorScheme colorSchemeLight,
     ColorScheme colorSchemeDark,
     TextTheme textThemeLight,
-    TextTheme textThemeDark,
+    TextTheme textThemeDark
   }) {
-    themeLight = ThemeData.from(colorScheme: colorSchemeLight, textTheme: textThemeLight);
-    themeDark = ThemeData.from(colorScheme: colorSchemeDark, textTheme: textThemeDark);
+
+    themeLight = ThemeData.from(colorScheme: colorSchemeLight);
+    themeDark = ThemeData.from(colorScheme: colorSchemeDark);
   }
 
   /// Most apps should use [setFlutterFundamentals], but this method gives you more control
@@ -1263,11 +1265,29 @@ class AFFundamentalTheme {
 /// context.t methods.
 class AFConceptualTheme {
   final AFThemeID id;
-  final AFFundamentalTheme fundamentals;
+  AFFundamentalTheme fundamentals;
+  ThemeData themeData;
   AFConceptualTheme({
     @required this.fundamentals,
     @required this.id,
+    @required this.themeData,
   });
+
+  void update({
+    AFFundamentalTheme fundamentals,
+    ThemeData themeData,
+  }) {
+    this.fundamentals = fundamentals;
+    this.themeData = themeData;
+  }
+
+  bool operator==(Object other) {
+    return (other is AFConceptualTheme && other.fundamentals == fundamentals && other.themeData == themeData);
+  }
+
+  int get hashCode {
+    return hash2(fundamentals.hashCode, themeData.hashCode);
+  }
 
   /// A utility for creating a list of widgets in a row.   
   /// 
@@ -1419,12 +1439,12 @@ class AFConceptualTheme {
 
   /// See [TextTheme], text theme to use on a card background
   TextTheme get styleOnCard {
-    return fundamentals.styleOnCard;
+    return themeData.textTheme;
   }
 
   /// See [TextTheme], text theme to use on a primary color background
   TextTheme get styleOnPrimary {
-    return fundamentals.styleOnPrimary;
+    return themeData.primaryTextTheme;
   }
 
   /// Flutter by default does not have a styleOnSecondary, I am not sure why.
@@ -1433,12 +1453,12 @@ class AFConceptualTheme {
   /// a more logical style of code where text on top of the secondary color has the
   /// 'OnSecondary' style.
   TextTheme get styleOnSecondary {
-    return fundamentals.styleOnSecondary;
+    return themeData.primaryTextTheme;
   }
 
   /// See [TextTheme], text theme to use on an accent color backgroun
   TextTheme get styleOnAccent {
-    return fundamentals.styleOnAccent;
+    return themeData.accentTextTheme;
   }
 
   /// Merges bold into whatever the style would have been.
@@ -1713,7 +1733,7 @@ class AFConceptualTheme {
     if(testState.activeTestId != null) {
       final test = AFibF.g.findScreenTestById(testState.activeTestId);
       if(test != null && test.testDrawerSide == testDrawerSide) {
-        return AFTestDrawer();
+        return AFPrototypeDrawer();
       }
     }
     return drawer;
@@ -2411,7 +2431,7 @@ class AFConceptualTheme {
 
 /// Can be used as a template parameter when you don't want a theme.
 class AFConceptualThemeUnused extends AFConceptualTheme {
-  AFConceptualThemeUnused(AFFundamentalTheme fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualUnused);
+  AFConceptualThemeUnused(AFFundamentalTheme fundamentals, ThemeData themeData): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualUnused, themeData: themeData);
 }
 
 
@@ -2444,8 +2464,8 @@ class AFThemeState {
   AFThemeState reviseOverrideThemeValue(AFThemeID id, dynamic value) {
     final revised = fundamentals.reviseOverrideThemeValue(id, value);
     return copyWith(
-      fundamentals: revised,
-      conceptuals: AFibF.g.createConceptualThemes(revised).toMap());
+      fundamentals: revised
+    );
   }
 
   AFThemeState reviseRebuildAll() {

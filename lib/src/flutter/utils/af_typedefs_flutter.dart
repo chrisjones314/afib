@@ -159,3 +159,5 @@ typedef AFBuildBodyDelegate<TBuildContext extends AFBuildContext> = Widget Funct
 typedef AFOnChangedBoolDelegate = void Function(bool);
 
 typedef AFOnChangedStringDelegate = void Function(String);
+
+typedef AFCreateConceptualThemeDelegate = AFConceptualTheme Function(AFFundamentalTheme fundamentals, ThemeData themeData);

@@ -88,6 +88,8 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   final widgetsBindingObserver = AFWidgetsBindingObserver();
   final testOnlyDialogReturn = <AFScreenID, dynamic>{};
   final testOnlyBottomSheetReturn = <AFScreenID, dynamic>{};
+  final themeFactories = AFConceptualThemeDefinitionContext();
+  final themeCache = <AFThemeID, AFConceptualTheme>{};
 
   AFScreenMap _afPrototypeScreenMap;
   AFScreenID forcedStartupScreen;
@@ -120,6 +122,8 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     appContext.initScreenMap(screenMap, libraries);
     screenMap.screen(AFUIScreenID.dialogStandardError, (_) => AFStandardErrorDialog());
 
+    appContext.initializeConceptualThemeFactories(themeFactories, libraries);
+    
     final middleware = <Middleware<AFState>>[];
     middleware.addAll(createRouteMiddleware());
     middleware.add(AFQueryMiddleware());
@@ -345,8 +349,18 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     return appContext.createInitialAppStateAreas(thirdPartyLibraries);
   }
 
-  AFConceptualThemeDefinitionContext createConceptualThemes(AFFundamentalTheme fundamentals) {
-    return appContext.initializeConceptualThemes(fundamentals, thirdPartyLibraries); 
+  AFConceptualTheme createConceptualTheme(AFThemeID themeId, AFFundamentalTheme fundamentals, ThemeData theme) {
+    // This might not seem necessary, but when I originally re-created the themes every time, 
+    // my test suite went from 30 seconds to 70 seconds.   Adding in this caching fixed it.
+    var current = themeCache[themeId];
+    if(current == null) {
+      current = themeFactories.create(themeId, fundamentals, theme);
+      themeCache[themeId] = current;
+    } else {
+      current.update(fundamentals: fundamentals, themeData: theme);
+    }
+    return current;
+    
   }  
 
   AFThemeState initializeThemeState({AFAppStateAreas areas}) {
@@ -359,10 +373,8 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     if(AFibD.config.startInDarkMode) {
       fundamentals = fundamentals.reviseOverrideThemeValue(AFUIThemeID.brightness, Brightness.dark);
     }
-    final conceptuals = appContext.initializeConceptualThemes(fundamentals, thirdPartyLibraries);  
     return AFThemeState.create(
-      fundamentals: fundamentals,
-      conceptuals: conceptuals.toMap(),
+      fundamentals: fundamentals
     );
   }
 

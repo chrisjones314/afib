@@ -56,9 +56,8 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
             AFibD.logTest?.d("Rebuilding screen $runtimeType/$screenIdRegister with param ${dataContext.p}");
           }
 
-
-
-          final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p, dataContext.paramWithChildren, dataContext.theme, this);
+          final conceptualTheme = createConceptualTheme(buildContext, dataContext.theme);
+          final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p, dataContext.paramWithChildren, conceptualTheme, this);
           final widgetResult = buildWithContext(withContext);
           return widgetResult;
         }
@@ -94,9 +93,8 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
     if(param == null && !routeEntryExists(store.state)) {
       return null;
     }
-    final theme = findTheme(store.state.public.themes);
-
-    final context = createContext(null, createDispatcher(store), data, param, paramWithChildren, theme, this);
+    final tempTheme = _createTemporaryTheme(store.state);
+    final context = createContext(null, createDispatcher(store), data, param, paramWithChildren, tempTheme, this);
     return context;
   }
 
@@ -119,7 +117,7 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
     if(this.testOnlyRequireScreenIdMatchForTestContext && screen != this.primaryScreenId) {
       return null;
     }
-    if(this is AFTestDrawer) {
+    if(this is AFPrototypeDrawer) {
       return null;
     }
 
@@ -134,9 +132,19 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
 
     final mainDispatcher = AFStoreDispatcher(store);
     final dispatcher = AFSingleScreenTestDispatcher(activeTestId, mainDispatcher, testContext);
-    final theme = findTheme(store.state.public.themes);    
+    final tempTheme = _createTemporaryTheme(store.state);
+    return createContext(null, dispatcher, data, param, paramWithChildren, tempTheme, this);
+  }
 
-    return createContext(null, dispatcher, data, param, paramWithChildren, theme, this);
+  AFConceptualTheme _createTemporaryTheme(AFState state) {
+    final fundamentals = state.public.themes.fundamentals;
+    return AFibF.g.createConceptualTheme(themeId, fundamentals, null);
+  }
+
+  TTheme createConceptualTheme(BuildContext context, AFConceptualTheme tempTheme) {
+    final theme = Theme.of(context);
+    final fundamentals = tempTheme.fundamentals;
+    return AFibF.g.createConceptualTheme(themeId, fundamentals, theme);
   }
 
   AFDispatcher createDispatcher(AFStore store) {
@@ -148,10 +156,6 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
 
   /// Find the route param for this screen. 
   AFRouteParamWithChildren findParamWithChildren(AFState state) { return null; }
-
-  TTheme findTheme(AFThemeState themes) {
-    return themes.findById(themeId);
-  }
 
   bool routeEntryExists(AFState state) { return true; }
 
@@ -743,7 +747,7 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   /// ```
   /// So, in a sense this is more consistent with that method.  They all function
   /// in the same way.
-  void updateRouteParam(AFConnectedUIBase widget, TRouteParam revised, { AFID id }) {
+  void dispatchUpdateRouteParam(AFConnectedUIBase widget, TRouteParam revised, { AFID id }) {
     widget.updateRouteParam(this, revised, id: id);
   }
 
@@ -753,7 +757,8 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   /// ```dart
   /// context.updateAppStateOne<YourRootState>(oneObjectWithinYourRootState);
   /// ```
-  void updateAppStateOne<TState extends AFAppStateArea>(Object toUpdate) {
+  void dispatchUpdateAppStateOne<TState extends AFAppStateArea>(Object toUpdate) {
+    assert(TState != AFAppStateArea);
     dispatcher.dispatch(AFUpdateAppStateAction.updateOne(TState, toUpdate));
   }
 
@@ -763,12 +768,13 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   /// ```dart
   /// context.updateAppStateMany<YourRootState>([oneObjectWithinYourRootState, anotherObjectWithinYourRootState]);
   /// ```
-  void updateAppStateMany<TState extends AFAppStateArea>(List<Object> toUpdate) {
+  void dispatchUpdateAppStateN<TState extends AFAppStateArea>(List<Object> toUpdate) {
+    assert(TState != AFAppStateArea);
     dispatcher.dispatch(AFUpdateAppStateAction.updateMany(TState, toUpdate));
   } 
 
   /// A utility which dispatches an asynchronous query.
-  void updateRunQuery(AFAsyncQuery query) {
+  void dispatchQuery(AFAsyncQuery query) {
     dispatcher.dispatch(query);
   }
 
@@ -834,7 +840,7 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   /// 
   /// In that case, the theme state won't refresh automatically, and you need to call this method to force
   /// it to refresh.
-  void updateRebuildThemeState() {
+  void dispatchRebuildThemeState() {
     dispatch(AFRebuildThemeState());
   }
 
@@ -905,7 +911,7 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   /// Adds a new connected child into the [AFRouteParamWithChildren] of this screen.
   /// 
   /// The parent screen will automatically re-render with the new child.
-  void updateAddConnectedChild({
+  void dispatchAddConnectedChild({
     @required AFScreenID screen,
     @required AFWidgetID widget, 
     @required AFRouteParam param
@@ -920,7 +926,7 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   /// Removes the connected child with the specified widget id from the [AFRouteParamWithChildren] of this screen.
   /// 
   /// The parent screen will automatically re-render.
-  void updateRemoveConnectedChild({
+  void dispatchRemoveConnectedChild({
     @required AFScreenID screen,
     @required AFWidgetID widget
   }) {
@@ -934,7 +940,7 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   /// 
   /// Note that the sort order is stored in the state and is maintained dynamically.   If you add a new connected
   /// child later, the parent screen will automatically re-sort using the previously specified sort order.
-  void updateSortConnectedChildren<TChildRouteParam extends AFRouteParam>({
+  void dispatchSortConnectedChildren<TChildRouteParam extends AFRouteParam>({
     @required AFScreenID screen,
     @required AFTypedSortDelegate<TChildRouteParam> sort
   }) {

@@ -40,6 +40,9 @@ class AFUITestID {
   static const smokeTest = AFSingleScreenTestID("smoke", AFUILibraryID.id);
 }
 
+class AFUITranslationID {
+  static const appTitle = AFTranslationID("app_title", AFUILibraryID.id);
+}
 
 /// Identifiers for the fundamental theme
 /// 

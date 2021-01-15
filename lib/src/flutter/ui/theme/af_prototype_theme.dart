@@ -14,7 +14,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
       1: FlexColumnWidth(),
     };
 
-  AFPrototypeTheme(AFFundamentalTheme fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualPrototype);
+  AFPrototypeTheme(AFFundamentalTheme fundamentals, ThemeData themeData): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualPrototype, themeData: themeData);
 
   Widget testExplanationText(String explanation) {
     return childText(explanation);

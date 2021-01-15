@@ -15,21 +15,21 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 //--------------------------------------------------------------------------------------
-class AFTestDrawerRouteParam extends AFRouteParam {
+class AFPrototypeDrawerRouteParam extends AFRouteParam {
   static const viewTheme = 1;
   static const viewTest  = 2;
   static const viewReuse = 3;
   final int view;
   final Map<String, bool> themeExpanded;
 
-  AFTestDrawerRouteParam({
+  AFPrototypeDrawerRouteParam({
     @required this.view, 
     @required this.themeExpanded
   });
 
-  factory AFTestDrawerRouteParam.createOncePerScreen(int view) {
+  factory AFPrototypeDrawerRouteParam.createOncePerScreen(int view) {
     final themeExpanded = <String, bool>{};
-    return AFTestDrawerRouteParam(view: view, themeExpanded: themeExpanded);
+    return AFPrototypeDrawerRouteParam(view: view, themeExpanded: themeExpanded);
   }
 
   bool isExpanded(String area) {
@@ -37,17 +37,17 @@ class AFTestDrawerRouteParam extends AFRouteParam {
     return result ?? false;
   }
 
-  AFTestDrawerRouteParam reviseExpanded(String area, { bool expanded }) {
+  AFPrototypeDrawerRouteParam reviseExpanded(String area, { bool expanded }) {
     final revised = Map<String, bool>.from(themeExpanded);
     revised[area] = expanded;
     return copyWith(themeExpanded: revised);
   }
 
-  AFTestDrawerRouteParam copyWith({
+  AFPrototypeDrawerRouteParam copyWith({
     int view,
     Map<String, bool> themeExpanded
   }) {
-    return AFTestDrawerRouteParam(
+    return AFPrototypeDrawerRouteParam(
       view: view ?? this.view,
       themeExpanded: themeExpanded ?? this.themeExpanded
     );
@@ -55,8 +55,8 @@ class AFTestDrawerRouteParam extends AFRouteParam {
 }
 
 //--------------------------------------------------------------------------------------
-class AFTestDrawerData extends AFStateView3<AFScreenTestContextSimulator, AFSingleScreenTestState, AFScreenPrototypeTest> {
-  AFTestDrawerData(AFScreenTestContextSimulator testContext, AFSingleScreenTestState testState, AFScreenPrototypeTest test): 
+class AFPrototypeDrawerStateView extends AFStateView3<AFScreenTestContextSimulator, AFSingleScreenTestState, AFScreenPrototypeTest> {
+  AFPrototypeDrawerStateView(AFScreenTestContextSimulator testContext, AFSingleScreenTestState testState, AFScreenPrototypeTest test): 
     super(first: testContext, second: testState, third: test);
 
   AFScreenTestContextSimulator get testContext { return first; }
@@ -65,11 +65,11 @@ class AFTestDrawerData extends AFStateView3<AFScreenTestContextSimulator, AFSing
 }
 
 //--------------------------------------------------------------------------------------
-class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawerRouteParam> {
+class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> {
   static final timeFormat = DateFormat('Hms');
 
   //--------------------------------------------------------------------------------------
-  AFTestDrawer(): super(AFUIScreenID.screenTestDrawer);
+  AFPrototypeDrawer(): super(AFUIScreenID.screenTestDrawer);
 
   //--------------------------------------------------------------------------------------
   AFScreenID get primaryScreenId {
@@ -78,32 +78,32 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
 
   //--------------------------------------------------------------------------------------
   @override
-  AFTestDrawerData createStateViewAF(AFState state, AFTestDrawerRouteParam param, AFRouteParamWithChildren paramWithChildren) {
+  AFPrototypeDrawerStateView createStateViewAF(AFState state, AFPrototypeDrawerRouteParam param, AFRouteParamWithChildren paramWithChildren) {
     final testState = state.testState;
     final test = AFibF.g.findScreenTestById(testState.activeTestId);
-    return AFTestDrawerData(testState.findContext(test.id), testState.findState(test.id), test);
+    return AFPrototypeDrawerStateView(testState.findContext(test.id), testState.findState(test.id), test);
   }
 
   //--------------------------------------------------------------------------------------
-  AFTestDrawerRouteParam createDefaultRouteParam(AFState state) {
-    return AFTestDrawerRouteParam.createOncePerScreen(AFTestDrawerRouteParam.viewTest);
+  AFPrototypeDrawerRouteParam createDefaultRouteParam(AFState state) {
+    return AFPrototypeDrawerRouteParam.createOncePerScreen(AFPrototypeDrawerRouteParam.viewTest);
   }
 
   //--------------------------------------------------------------------------------------
   @override
-  AFTestDrawerData createStateView(AFAppStateArea state, AFTestDrawerRouteParam param) {
+  AFPrototypeDrawerStateView createStateView(AFAppStateArea state, AFPrototypeDrawerRouteParam param) {
     // this should never be called, because createDataAF replaces it.
     throw UnimplementedError();
   }
 
   //--------------------------------------------------------------------------------------
   @override
-  Widget buildWithContext(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context) {
+  Widget buildWithContext(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     return _buildDrawer(context);
   }
 
   //--------------------------------------------------------------------------------------
-  Widget _buildDrawer(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context) {
+  Widget _buildDrawer(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     final rows = context.t.column();
     
     rows.add(_buildHeader(context));
@@ -118,7 +118,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
   }
 
   //--------------------------------------------------------------------------------------
-  Widget _buildHeader(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context) {
+  Widget _buildHeader(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     final t = context.t;
     final rows = t.column();
     final test = context.s.test;
@@ -127,7 +127,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
       margin: t.margin.v.s3,
       child: t.childText(
         "AFib Test Drawer",
-        style: t.styleOnPrimary.headline2
+        style: t.styleOnPrimary.headline5
       )
     ));
 
@@ -179,7 +179,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
     );
   }
 
-  Widget _buildChoiceButton(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context,
+  Widget _buildChoiceButton(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context,
     String title,
     int view
   ) {
@@ -200,28 +200,28 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
   }
 
   //--------------------------------------------------------------------------------------
-  Widget _buildChoiceRow(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context) {
+  Widget _buildChoiceRow(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     final t = context.t;
 
     final cols = t.row();
 
-    cols.add(_buildChoiceButton(context, "Theme", AFTestDrawerRouteParam.viewTheme));
-    cols.add(_buildChoiceButton(context, "Test", AFTestDrawerRouteParam.viewTest));
-    cols.add(_buildChoiceButton(context, "Reuse", AFTestDrawerRouteParam.viewReuse));
+    cols.add(_buildChoiceButton(context, "Theme", AFPrototypeDrawerRouteParam.viewTheme));
+    cols.add(_buildChoiceButton(context, "Test", AFPrototypeDrawerRouteParam.viewTest));
+    cols.add(_buildChoiceButton(context, "Reuse", AFPrototypeDrawerRouteParam.viewReuse));
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: cols);
   }
 
-  Widget _buildContent(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context) {
+  Widget _buildContent(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     var item;
     final view = context.p.view;
-    if(view == AFTestDrawerRouteParam.viewTheme) {
+    if(view == AFPrototypeDrawerRouteParam.viewTheme) {
       item = _buildThemeContent(context);
-    } else if(view == AFTestDrawerRouteParam.viewTest) {
+    } else if(view == AFPrototypeDrawerRouteParam.viewTest) {
       item = _buildTestContent(context);
-    } else if(view == AFTestDrawerRouteParam.viewReuse) {
+    } else if(view == AFPrototypeDrawerRouteParam.viewReuse) {
       item = _buildReuseContent(context);
     }
 
@@ -239,7 +239,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
     ));
   }
 
-  TableRow _createAttributeRow(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context, AFThemeID title, Widget Function() buildValue) {
+  TableRow _createAttributeRow(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFThemeID title, Widget Function() buildValue) {
     final t = context.t;    
     final cols = t.row();
     cols.add(t.testResultTableValue(context, title.toString(), TextAlign.right));
@@ -247,7 +247,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
     return TableRow(children: cols);
   }
 
-  Widget _buildEnumAttributeRowValue(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context, AFThemeID attr, dynamic attrValue) {
+  Widget _buildEnumAttributeRowValue(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFThemeID attr, dynamic attrValue) {
     final t = context.t;
     final rows = t.column();
 
@@ -283,13 +283,40 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
     );
   }
 
+  Widget _buildLocaleAttributeRowValue(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFThemeID attr, dynamic attrValue) {
+    final t = context.t;
+    final rows = t.column();
+
+    final values = t.fundamentals.supportedLocales;
+    for(final value in values) {
+      var text = value.toString();
+      final isSel = value == attrValue;
+      rows.add(ChoiceChip(
+        selected: isSel,
+        label: t.childText(text, textColor: t.colorOnPrimary),
+        selectedColor: t.colorPrimary,
+        onSelected: (val) {
+          if(val) {
+            context.dispatch(AFOverrideThemeValueAction(
+              id: attr,
+              value: value,
+            ));            
+          }
+        }
+      ));
+    }
+    
+    return Column(
+      children: rows
+    );
+  }
 
   bool _isEnum(dynamic attrVal) {
    final split = attrVal.toString().split('.');
    return split.length > 1 && split[0] == attrVal.runtimeType.toString();
   }
 
-  Widget _buildThemeAreaBody(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context, String area) {
+  Widget _buildThemeAreaBody(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, String area) {
     final t = context.t;    
     // build a table that has different values, like 
     final headerCols = t.row();
@@ -318,6 +345,9 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
           if(_isEnum(attrVal)) {
             return _buildEnumAttributeRowValue(context, attr, attrVal);
           }
+          if(attrVal is Locale) {
+            return _buildLocaleAttributeRowValue(context, attr, attrVal);
+          }
 
           return t.childText(attrVal.toString());        
       }));
@@ -330,7 +360,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
 
   }
 
-  Widget _buildThemeContent(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context) {
+  Widget _buildThemeContent(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     
     final t = context.t;
     final panels = t.childrenExpansionList();
@@ -364,7 +394,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
     );
   }
 
-  void _onRun(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context, AFReusableTestID id) {
+  void _onRun(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFReusableTestID id) {
     final test = context.s.test;
     context.closeDrawer();
     Timer(Duration(seconds: 1), () async {            
@@ -374,7 +404,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
     });    
   }
 
-  Widget _buildRunButton(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context) {
+  Widget _buildRunButton(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     final t = context.t;
     final test = context.s.test;
     final sectionIds = test.sectionIds;
@@ -431,7 +461,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
     
   }
 
-  Widget _buildTestContent(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context) {
+  Widget _buildTestContent(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     final t = context.t;
     var content;
     if(context.s.test.hasBody) {
@@ -449,14 +479,14 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
     return _areaContentCard(context, content);
   }
 
-  Widget _areaContentCard(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context, Widget child) {
+  Widget _areaContentCard(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, Widget child) {
     return Card(child: Container(
       margin: context.t.marginStandard,
       child: child
     ));
   }
 
-  Widget _buildReuseContent(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context) {
+  Widget _buildReuseContent(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     final t = context.t;
     final test = context.s.test;
     var content;
@@ -504,7 +534,7 @@ class AFTestDrawer extends AFProtoConnectedDrawer<AFTestDrawerData, AFTestDrawer
     return _areaContentCard(context, content);
   }
 
-  void _buildTestReport(AFProtoBuildContext<AFTestDrawerData, AFTestDrawerRouteParam> context, List<Widget> rows) {
+  void _buildTestReport(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, List<Widget> rows) {
     final t = context.t;
     final testContext = context.s.testContext;
     final testState = context.s.testState;

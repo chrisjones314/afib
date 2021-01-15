@@ -97,6 +97,10 @@ class AFIDWithTags extends AFID {
 
 }
 
+class AFTranslationID extends AFID {
+  const AFTranslationID(String code, AFLibraryID library) : super("i18n", code, library);
+}
+
 class AFIDWithTag extends AFID {
   final String tag;
   const AFIDWithTag(String prefix, String code, AFLibraryID library, { this.tag }): super(prefix, code, library);

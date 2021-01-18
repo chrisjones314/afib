@@ -1,5 +1,7 @@
 
 
+import 'package:afib/id.dart';
+import 'package:afib/locale_id.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:flutter/material.dart';
@@ -60,4 +62,8 @@ void initAFDefaultFundamentalThemeArea(AFFundamentalDeviceTheme device, AFAppSta
   ); 
 
   primary.setAfibFundamentals();
+
+  primary.setTranslations(AFUILocaleID.englishUS, {
+    AFUITranslationID.appTitle: "App Title"
+  });
 }

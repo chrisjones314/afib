@@ -90,5 +90,9 @@ class AFUIThemeID {
   /// Used in prototype mode to display the value in the test/theme drawer, should not be used in production and cannot be overriden.
   static const physicalSize = AFThemeID("physical_size", AFUILibraryID.id, tagDevice);
 
+  /// Indicates that where a UI uses AFLanguageIDs for translation, the UI should show the IDs rather than the 
+  /// translations.
+  static const showTranslationsIDs = AFThemeID("show_translation_ids", AFUILibraryID.id, tagFundamental);
+
 
 }

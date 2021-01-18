@@ -274,11 +274,25 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     return result;
   }
 
+  bool get showTranslationIds {
+    if(!AFibD.config.isPrototypeMode) {
+      return false;
+    }
+    final val = findValue(AFUIThemeID.showTranslationsIDs);
+    return (val != null && val);
+  }
+
   ThemeData themeData(Brightness brightness) {
     return brightness == Brightness.light ? themeLight : themeDark;
   }
 
   String translate(dynamic idOrText, Locale locale) {
+    if(showTranslationIds && (idOrText is AFTranslationID || idOrText is AFWidgetID)) {
+      if(idOrText is AFTranslationID && idOrText.values != null) {
+        return "${idOrText.code}+${idOrText.values.length}";
+      }
+      return idOrText.code;
+    }
     var result = translation(idOrText, locale);
     if(result == null) {
       result = idOrText;
@@ -337,6 +351,13 @@ class AFTranslationSet {
 
   String translate(dynamic textOrId) {
     var result = translations[textOrId];
+    if(textOrId is AFTranslationID && textOrId.values != null) {
+      for(var i = 0; i < textOrId.values.length; i++) {
+        final key = "{$i}";
+        final value = textOrId.values[i].toString();
+        result = result.replaceAll(key, value);
+      }
+    }
     if(result == null) {
       if(textOrId is String) {
         return textOrId;
@@ -941,6 +962,10 @@ class AFFundamentalTheme {
       device: device,
       area: area.reviseOverrideThemeValue(id, value)
     );
+  }
+
+  bool get showTranslationIds {
+    return area.showTranslationIds;
   }
 
   AFFundamentalTheme copyWith({
@@ -1825,12 +1850,13 @@ class AFConceptualTheme {
     AFWidgetID wid,
     Widget label,
     bool selected,
+    Color selectedColor,
     AFOnChangedBoolDelegate onSelected,
   }) {
     return ChoiceChip(
       key: keyForWID(wid),
       label: label,
-      selectedColor: selected ? colorPrimary : null,
+      selectedColor: selectedColor,
       selected: selected,
       onSelected: onSelected
     );

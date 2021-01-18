@@ -369,7 +369,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     }
     final device = AFFundamentalDeviceTheme.create();
     
-    var fundamentals = appContext.createFundamentalTheme(device, areas);
+    var fundamentals = appContext.createFundamentalTheme(device, areas, thirdPartyLibraries);
     if(AFibD.config.startInDarkMode) {
       fundamentals = fundamentals.reviseOverrideThemeValue(AFUIThemeID.brightness, Brightness.dark);
     }

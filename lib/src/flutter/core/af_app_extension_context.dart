@@ -364,17 +364,17 @@ class AFUILibraryExtensionContext<TState extends AFAppStateArea> extends AFPlugi
     return AFLibraryTestHolder<TState>();
   }
 
-  void initializeAppFundamentals<TState extends AFAppStateArea>({
+  void initializeLibraryFundamentals<TState extends AFAppStateArea>({
     @required AFInitScreenMapDelegate initScreenMap,
-    AFInitAppFundamentalThemeDelegate initFundamentalThemeArea,
+    @required AFInitPluginFundamentalThemeDelegate initFundamentalThemeArea,
     @required AFInitializeAppStateDelegate initializeAppState,
     @required AFInitConceptualThemeDelegate initConceptualTheme,
   }) {
     this.initScreenMaps.add(initScreenMap);
     this.initialAppStates.add(initializeAppState);
     this.initConceptualThemes.add(initConceptualTheme);
-    if(initFundamentalThemeArea != null) {
-      this.initFundamentalThemeArea = initFundamentalThemeArea;
+    if(initFundamentalThemeAreas != null) {
+      this.initFundamentalThemeAreas.add(initFundamentalThemeArea);
     } 
     _verifyNotNull(initScreenMap, "initScreenMap");
     _verifyNotNull(initializeAppState, "initializeAppState");
@@ -426,6 +426,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     this.test.initializeForApp();
     this.createApp = createApp;
     this.initFundamentalThemeArea = source.initFundamentalThemeArea ?? initFundamentalThemeArea;
+    this.initFundamentalThemeAreas.addAll(source.initFundamentalThemeAreas);
     this.initConceptualThemes.addAll(source.initConceptualThemes);    
   }
 
@@ -453,7 +454,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     }
   }
 
-  AFFundamentalTheme createFundamentalTheme(AFFundamentalDeviceTheme device, AFAppStateAreas areas) {
+  AFFundamentalTheme createFundamentalTheme(AFFundamentalDeviceTheme device, AFAppStateAreas areas, Iterable<AFUILibraryExtensionContext> libraries) {
     final builder = AFAppFundamentalThemeAreaBuilder.create();
     this.initFundamentalThemeArea(device, areas, builder);
 
@@ -464,7 +465,15 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     if(AFibD.config.requiresPrototypeData) {
       initPrototypeThemeArea(device, areas, builder);      
     }
-    
+
+    for(final library in libraries) {
+      final inits = library.initFundamentalThemeAreas;
+      for(final init in inits) {
+        init(device, areas, builder);
+      }
+    }
+
+        
     final primaryArea = builder.create();
     final marginSpacing = builder.createMarginSpacing();
     final paddingSpacing = builder.createPaddingSpacing();

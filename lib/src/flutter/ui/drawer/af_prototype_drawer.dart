@@ -288,15 +288,32 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     final rows = t.column();
 
     final values = t.fundamentals.supportedLocales;
+
+    rows.add(t.childChoiceChip(
+      selected: t.fundamentals.showTranslationIds,
+      label: t.childText("Identifiers", textColor: t.colorOnPrimary),
+      selectedColor: t.colorPrimary,
+      onSelected: (val) {
+        context.dispatch(AFOverrideThemeValueAction(
+          id: AFUIThemeID.showTranslationsIDs,
+          value: true
+        ));
+      } 
+    ));    
+
     for(final value in values) {
       var text = value.toString();
       final isSel = value == attrValue;
-      rows.add(ChoiceChip(
+      rows.add(t.childChoiceChip(
         selected: isSel,
         label: t.childText(text, textColor: t.colorOnPrimary),
         selectedColor: t.colorPrimary,
         onSelected: (val) {
           if(val) {
+            context.dispatch(AFOverrideThemeValueAction(
+              id: AFUIThemeID.showTranslationsIDs,
+              value: false 
+            ));
             context.dispatch(AFOverrideThemeValueAction(
               id: attr,
               value: value,

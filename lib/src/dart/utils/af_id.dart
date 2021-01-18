@@ -1,5 +1,6 @@
 
 import 'package:afib/id.dart';
+import 'package:quiver/core.dart';
 
 class AFID {
   final String prefix;
@@ -94,11 +95,43 @@ class AFIDWithTags extends AFID {
     }
     return false;
   }
-
 }
 
 class AFTranslationID extends AFID {
-  const AFTranslationID(String code, AFLibraryID library) : super("i18n", code, library);
+  final List<dynamic> values;
+  const AFTranslationID(String code, AFLibraryID library, { this.values}) : super("i18n", code, library);
+
+  /// Used to insert values into translated text.  
+  /// 
+  /// The translation can reference the values using {0}, {1}... {n} allowing you to change the 
+  /// word/value order for different locales.
+  AFTranslationID insert1(dynamic value) {
+    return AFTranslationID(codeId, library, values: [value]);
+  }
+
+  /// See [insert1]
+  AFTranslationID insert2(dynamic v1, dynamic v2) {
+    return AFTranslationID(codeId, library, values: [v1, v2]);
+  }
+
+  /// See [insert1]
+  AFTranslationID insert3(dynamic v1, dynamic v2, dynamic v3) {
+    return AFTranslationID(codeId, library, values: [v1, v2, v3]);
+  }
+
+  /// See [insert1]
+  AFTranslationID insertN(List<dynamic> values) {
+    return AFTranslationID(codeId, library, values: values);
+  }
+
+  bool operator==(Object other) {
+    return (other is AFTranslationID && other.code == code && other.library == library);
+  }
+
+  int get hashCode {
+    return hash2(code.hashCode, library.code);
+  }
+
 }
 
 class AFIDWithTag extends AFID {

@@ -168,7 +168,7 @@ abstract class AFAsyncQuery<TState extends AFAppStateArea, TResponse> extends AF
   }
 
   /// The default implementation calls the error handler passed in to 
-  /// [initializeAppFundamentals] in extend_app.dart
+  /// [initializeLibraryFundamentals] in extend_app.dart
   void finishAsyncWithError(AFFinishQueryErrorContext<TState> context) {
     AFibF.g.finishAsyncWithError<TState>(context);
   }

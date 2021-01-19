@@ -479,6 +479,21 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     final paddingSpacing = builder.createPaddingSpacing();
     final borderRadius = builder.createBorderRadius();
 
+    builder.setTranslations(AFUILocaleID.universal, {
+      AFUITranslationID.appTitle: "App Title",
+      AFUITranslationID.notTranslated: "{0}",
+      AFUITranslationID.widgetPrototypes: "Widget Prototypes",
+      AFUITranslationID.screenPrototypes: "Screen Prototypes",
+      AFUITranslationID.workflowPrototypes: "Workflow Prototypes",
+      AFUITranslationID.thirdParty: "Third Party",
+      AFUITranslationID.searchResults: "Search Results",
+      AFUITranslationID.testResults: "Test Results",
+      AFUITranslationID.run: "Run {0}",
+      AFUITranslationID.prototypesAndTests: "Prototypes and Tests",
+      AFUITranslationID.searchAndRun: "Search and Run",
+      AFUITranslationID.afibPrototypeMode: "AFib Prototype Mode",
+    });
+
     final result = AFFundamentalTheme(device: device, area: primaryArea, marginSpacing: marginSpacing, paddingSpacing: paddingSpacing, borderRadius: borderRadius);
     result.resolve();
     return result;

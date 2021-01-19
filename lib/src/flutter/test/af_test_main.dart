@@ -3,6 +3,7 @@
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
@@ -84,6 +85,23 @@ Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendAppDelegate exten
 
   if(stats.hasErrors) {
     expect("${stats.totalErrors} errors (see details above)", AFibTestsFailedMatcher());
+  } else if(AFConfigEntries.enabledTestList.isI18NEnabled(AFibD.config)) {
+    final missing = AFibF.g.testMissingTranslations;
+    if(missing.totalCount == 0) {
+      AFBaseTestExecute.printTotalPass(output, "NO MISSING TRANSLATIONS", 0);
+    } else {
+      AFBaseTestExecute.printTotalFail(output, "MISSING TRANSLATIONS", missing.totalCount);
+      for(final setT in missing.missing.values) {
+        output.writeErrorLine("${setT.locale} missing: ");
+        output.indent();
+        for(final id in setT.translations.keys) {
+          output.writeLine(id.toString());
+        }
+        output.outdent();
+
+      }
+    }
+
   } else {
     output.writeSeparatorLine();
     AFBaseTestExecute.printTotalPass(output, "GRAND TOTAL", stats.totalPasses, stopwatch: stopwatch);

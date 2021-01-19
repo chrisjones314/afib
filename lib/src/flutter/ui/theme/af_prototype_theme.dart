@@ -16,6 +16,24 @@ class AFPrototypeTheme extends AFConceptualTheme {
 
   AFPrototypeTheme(AFFundamentalTheme fundamentals, ThemeData themeData): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualPrototype, themeData: themeData);
 
+  @override
+  Text childText(dynamic text, {
+    AFWidgetID wid, 
+    dynamic style,
+    dynamic textColor,
+    dynamic fontSize,
+    dynamic fontWeight,
+    TextAlign textAlign,
+  }) {
+    return super.childText(text,
+      wid: wid,
+      style: style,
+      textColor: textColor,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      textAlign: textAlign);
+  }
+
   Widget testExplanationText(String explanation) {
     return childText(explanation);
   }
@@ -24,7 +42,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
     return 50.0;
   }
 
-  Widget childCardHeader(AFBuildContext context, AFWidgetID wid, String title, List<Widget> rows, { EdgeInsets margin }) {
+  Widget childCardHeader(AFBuildContext context, AFWidgetID wid, dynamic title, List<Widget> rows, { EdgeInsets margin }) {
     final radius = Radius.circular(4.0);
     final content = column();
     content.add(Container(
@@ -205,26 +223,26 @@ class AFPrototypeTheme extends AFConceptualTheme {
   }) {
     rows.add(childTestNavDown(
       context: context,
-      title: "Widget Prototypes",
+      title: AFUITranslationID.widgetPrototypes,
       tests: tests.afWidgetTests.all,
     ));
     
     rows.add(childTestNavDown(
       context: context,
-      title: "Screen Prototypes",
+      title: AFUITranslationID.screenPrototypes,
       tests: tests.afScreenTests.all,
     ));
     
     rows.add(childTestNavDown(
       context: context,
-      title: "Workflow Prototypes",
+      title: AFUITranslationID.workflowPrototypes,
       tests: tests.afWorkflowStateTests.all
     ));
   }
 
   Widget childTestNavDown({
     AFBuildContext context,
-    String title, 
+    dynamic title, 
     List<AFScreenPrototypeTest> tests
   }) {
     return childListNav(
@@ -235,14 +253,14 @@ class AFPrototypeTheme extends AFConceptualTheme {
   }
 
   Widget childListNav({
-    String title,
+    dynamic title,
     AFPressedDelegate onPressed,
   }) {
     return _createKindRow(title, onPressed);
   }
 
 
-  Widget _createKindRow(String text, Function onTap) {
+  Widget _createKindRow(dynamic text, Function onTap) {
     return ListTile(
       title: childText(text),
       dense: true,

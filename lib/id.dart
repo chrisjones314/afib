@@ -41,7 +41,18 @@ class AFUITestID {
 }
 
 class AFUITranslationID {
+  static const afibPrototypeMode = AFTranslationID("afib_prototype_mode", AFUILibraryID.id);
+  static const searchAndRun = AFTranslationID("search_and_run", AFUILibraryID.id);
+  static const prototypesAndTests = AFTranslationID("prototypes_and_tests", AFUILibraryID.id);
+  static const run = AFTranslationID("run", AFUILibraryID.id);
+  static const testResults = AFTranslationID("test_results", AFUILibraryID.id);
+  static const searchResults = AFTranslationID("search_results", AFUILibraryID.id);
+  static const thirdParty = AFTranslationID("third_party", AFUILibraryID.id);
+  static const workflowPrototypes = AFTranslationID("workflow_prototypes", AFUILibraryID.id);
+  static const screenPrototypes = AFTranslationID("screen_prototypes", AFUILibraryID.id);
+  static const widgetPrototypes = AFTranslationID("widget_prototypes", AFUILibraryID.id);
   static const appTitle = AFTranslationID("app_title", AFUILibraryID.id);
+  static const notTranslated = AFTranslationID("not_translated", AFUILibraryID.id);
 }
 
 /// Identifiers for the fundamental theme

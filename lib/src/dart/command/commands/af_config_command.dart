@@ -152,12 +152,13 @@ class AFConfigEntryEnabledTests extends AFConfigEntryList {
   static const queryTests = "query";
   static const workflowTests = "workflow";
   static const widgetTests = "widget";
-  static const allAreas = [allTests, unitTests, stateTests, widgetTests, screenTests, queryTests, workflowTests];
+  static const i18n = "i18n";
+  static const allAreas = [allTests, unitTests, stateTests, widgetTests, screenTests, queryTests, workflowTests, i18n];
 
   AFConfigEntryEnabledTests(): super(AFConfigEntries.afNamespace, "enabledTestList", [allTests], help: "Space separated list of areas that should display logging messages [${allAreas.join('|')}|test_id|test_tag|test_area:test_tag]");
 
   bool isAreaEnabled(AFConfig config, String areaTest) {
-    final areas = config.stringListFor(this);
+    final areas = _params(config);
     if(hasNoAreas(areas)) {
       return true;
     }
@@ -173,8 +174,13 @@ class AFConfigEntryEnabledTests extends AFConfigEntryList {
     return false;
   }
 
-  bool isTestEnabled(AFConfig config, AFTestID id) {
+  bool isI18NEnabled(AFConfig config) {
     final areas = config.stringListFor(this);
+    return areas.contains(i18n);
+  }
+
+  bool isTestEnabled(AFConfig config, AFTestID id) {
+    final areas = _params(config);
     if(hasOnlyAreas(areas)) {
       return true;
     }
@@ -188,6 +194,15 @@ class AFConfigEntryEnabledTests extends AFConfigEntryList {
       }
     }
     return false;
+  }
+
+  List<String> _params(AFConfig config) {
+    var result = config.stringListFor(this);
+    if(result.contains(i18n)) {
+      result = List<String>.from(result);
+      result.remove(i18n);
+    }
+    return result;
   }
 
   bool hasNoAreas(List<String> areas) {

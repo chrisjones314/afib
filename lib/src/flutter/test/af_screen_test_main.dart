@@ -1,9 +1,11 @@
 
 
+import 'package:afib/id.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
+import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
@@ -32,20 +34,33 @@ Future<void> afScreenTestMain<TState extends AFAppStateArea>(AFCommandOutput out
   final app = AFibF.g.createApp();
   await tester.pumpWidget(app);
 
-  if(isWidget) {
-    await _afWidgetTestMain<TState>(output, stats, tester, app);
-  }
+  final locales = AFibF.g.testEnabledLocales(AFibD.config);
+    
+  for(final locale in locales) {
+    output.writeSeparatorLine();
+    output.writeLine("Running in locale $locale");
+    AFibF.g.storeDispatcherInternalOnly.dispatch(AFOverrideThemeValueAction(
+      id: AFUIThemeID.locale,
+      value: locale,
+    ));            
 
-  if(isSingle) {
-    await _afSingleScreenTestMain<TState>(output, stats, tester, app);
-  }
+    if(isWidget) {
+      await _afWidgetTestMain<TState>(output, stats, tester, app);
+    }
 
-  if(isMulti) {
-    await _afWorkflowTestMain<TState>(output, stats, tester, app);
+    if(isSingle) {
+      await _afSingleScreenTestMain<TState>(output, stats, tester, app);
+    }
+
+    if(isMulti) {
+      await _afWorkflowTestMain<TState>(output, stats, tester, app);
+    }
   }
 
   return null;
 }
+
+
 
 Future<void> _afStandardScreenTestMain<TState extends AFAppStateArea>(
   AFCommandOutput output, 

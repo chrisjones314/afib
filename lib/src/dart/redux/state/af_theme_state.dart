@@ -310,6 +310,12 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
   }
 
   String translation(dynamic textOrId, Locale locale) {
+    if(textOrId is AFTranslationID) {
+      if(textOrId == AFUITranslationID.notTranslated) {
+        return textOrId.values.first.toString();
+      }
+    }
+    
     var setT = translationSet[locale];
     if(setT == null) {
       // 
@@ -326,7 +332,7 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     if(setT == null) {
       return textOrId.toString();
     }
-    return setT.translate(textOrId);
+    return setT.translate(textOrId, translationSet[AFUILocaleID.universal]);
   }
 
   dynamic findValue(AFThemeID id) {
@@ -339,7 +345,14 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
 }
 
 class AFTranslationSet {
+  final Locale locale;
   final translations = <dynamic, String>{};
+
+  AFTranslationSet(this.locale);
+
+  int get count { 
+    return translations.length;
+  }
 
   void setTranslations(Map<dynamic, String> source) {
     source.forEach((key, text) {
@@ -349,20 +362,37 @@ class AFTranslationSet {
     });
   }
 
-  String translate(dynamic textOrId) {
+  void setTranslation(dynamic idOrText, String trans) {
+    translations[idOrText] = trans;
+  }
+
+  String translate(dynamic textOrId, AFTranslationSet universal) {
     var result = translations[textOrId];
-    if(textOrId is AFTranslationID && textOrId.values != null) {
-      for(var i = 0; i < textOrId.values.length; i++) {
-        final key = "{$i}";
-        final value = textOrId.values[i].toString();
-        result = result.replaceAll(key, value);
+    if(result == null) {
+      result = universal.translations[textOrId];
+    }      
+    if(textOrId is AFTranslationID) {
+      if(textOrId.values != null) {
+        for(var i = 0; i < textOrId.values.length; i++) {
+          final key = "{$i}";
+          final value = textOrId.values[i].toString();
+          result = result.replaceAll(key, value);
+        }
       }
+
+      if(result == null) {
+        result = universal.translations[textOrId];
+      }      
     }
     if(result == null) {
+      if(AFibD.config.isTestContext) {
+        AFibF.g.testMissingTranslations.register(locale, textOrId);
+      }
       if(textOrId is String) {
         return textOrId;
       }
-      throw AFException("Unknown translation $textOrId");
+      return textOrId.toString();
+      //throw AFException("Unknown translation $textOrId");
     }
     return result;
   }
@@ -420,9 +450,11 @@ class AFPluginFundamentalThemeAreaBuilder {
   void setTranslations(Locale locale, Map<dynamic, String> translations) {
     var setT = translationSet[locale];
     if(setT == null) {
-      setT = AFTranslationSet();
+      setT = AFTranslationSet(locale);
       translationSet[locale] = setT;
-      supportedLocalesApp.add(locale);
+      if(locale != AFUILocaleID.universal) {
+        supportedLocalesApp.add(locale);
+      }
     }
     setT.setTranslations(translations);
   }
@@ -1509,6 +1541,15 @@ class AFConceptualTheme {
 
   Radius radiusCircular(double r) {
     return Radius.circular(r);
+  }
+
+  AFTranslationID notTranslated(dynamic value) {
+    return AFUITranslationID.notTranslated.insert1(value?.toString());
+  }
+
+  /// Here for discoverability, you might prefer [notTranslated].
+  AFTranslationID translateNot(dynamic value) {
+    return notTranslated(value);
   }
 
   BorderRadius borderRadiusScaled({

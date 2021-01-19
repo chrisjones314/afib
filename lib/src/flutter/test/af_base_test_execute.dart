@@ -151,6 +151,10 @@ abstract class AFBaseTestExecute {
     return 0;
   }
 
+  static void printTotalFail(AFCommandOutput output, String title, int fail) {
+      _writeTestResult(output, title, fail, " failed", Styles.RED, tags: "");
+  }
+
   static void _writeTestResult(AFCommandOutput output, String title, int count, String suffix, Styles color, { String tags }) {
     output.startColumn(alignment: AFOutputAlignment.alignRight, width: 48);
     output.write(title);

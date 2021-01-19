@@ -119,7 +119,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
       tests: primaryTests,
     );
     
-    protoRows.add(t.childListNav(title: "Third Party", onPressed: () {
+    protoRows.add(t.childListNav(title: AFUITranslationID.thirdParty, onPressed: () {
       context.dispatch(AFPrototypeThirdPartyListScreen.navigateTo());
     }));
 
@@ -136,10 +136,10 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
     }
 
     final rows = t.column();
-    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeHeader, "Prototypes and Tests", protoRows, margin: t.margin.b.s3));    
-    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeSearchAndRun, "Search and Run", filterRows, margin: t.margin.b.s3));
+    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeHeader, AFUITranslationID.prototypesAndTests, protoRows, margin: t.margin.b.s3));    
+    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeSearchAndRun, AFUITranslationID.searchAndRun, filterRows, margin: t.margin.b.s3));
     
-    return context.t.buildPrototypeScaffold("AFib Prototype Mode", rows);
+    return context.t.buildPrototypeScaffold(AFUITranslationID.afibPrototypeMode, rows);
   }
 
   void _onRunTests(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests) async { 
@@ -214,7 +214,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
 
     colsAction.add(Container(
       child: FlatButton(
-        child: t.childText("Search Results", textColor: colorSearchText),
+        child: t.childText(AFUITranslationID.searchResults, textColor: colorSearchText),
         onPressed: () {
           updateRouteParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewFilter));
         },
@@ -223,7 +223,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
 
     colsAction.add(Container(
       child: FlatButton(
-        child: t.childText("Test Results", textColor: colorResultsText),
+        child: t.childText(AFUITranslationID.testResults, textColor: colorResultsText),
         onPressed: () {
           updateRouteParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewResults));
         }
@@ -231,7 +231,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
 
     final textRunMain = tests.isNotEmpty ? 'Sel.' : 'All';
     final colsRun = t.row();
-    colsRun.add(t.childText('Run $textRunMain'));
+    colsRun.add(t.childText(AFUITranslationID.run.insert1(textRunMain)));
 
     colsRun.add(PopupMenuButton<String>(
       onSelected: (id) { 

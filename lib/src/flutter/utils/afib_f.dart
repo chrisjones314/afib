@@ -71,6 +71,27 @@ class AFLibraryTestHolder<TState extends AFAppStateArea> {
   final AFWorkflowStateTests afWorkflowStateTests = AFWorkflowStateTests<TState>();
 }
 
+class AFTestMissingTranslations {
+  final missing = <Locale, AFTranslationSet>{};
+
+  int get totalCount {
+    var result = 0;
+    for(final setT in missing.values) {
+      result += setT.count;
+    }
+    return result;
+  }
+
+  void register(Locale locale, dynamic idOrText) {
+    var setT = missing[locale];
+    if(setT == null) {
+      setT = AFTranslationSet(locale);
+      missing[locale] = setT;
+    }
+    setT.setTranslation(idOrText, "missing");
+  }
+}
+
 
 class AFibGlobalState<TState extends AFAppStateArea> {
   final AFAppExtensionContext appContext;
@@ -90,6 +111,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   final testOnlyBottomSheetReturn = <AFScreenID, dynamic>{};
   final themeFactories = AFConceptualThemeDefinitionContext();
   final themeCache = <AFThemeID, AFConceptualTheme>{};
+  final testMissingTranslations = AFTestMissingTranslations();
 
   AFScreenMap _afPrototypeScreenMap;
   AFScreenID forcedStartupScreen;
@@ -233,6 +255,10 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     }
   }
 
+  void testRegisterMissingTranslations(Locale locale, dynamic textOrId) {
+    testMissingTranslations.register(locale, textOrId);
+  }
+
   /// Used internally in tests to find widgets on the screen.  Not for public use.
   AFibTestOnlyScreenElement registerScreen(AFScreenID screenId, BuildContext screenElement, AFConnectedUIBase source) {
     var info = internalOnlyScreens[screenId];
@@ -339,6 +365,16 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     return screenMap.startupScreenId;
   }
 
+  List<Locale> testEnabledLocales(AFConfig config) {
+    final fundamentals = storeInternalOnly.state.public.themes.fundamentals;
+    if(AFConfigEntries.enabledTestList.isI18NEnabled(config)) {
+      return fundamentals.supportedLocales.sublist(1);
+    }
+
+    return [fundamentals.supportedLocales.first];
+  }
+
+
   /// Returns the route parameter used by the startup screen.
   AFCreateRouteParamDelegate get startupRouteParamFactory {
     return screenMap.startupRouteParamFactory;
@@ -437,7 +473,9 @@ class AFibGlobalState<TState extends AFAppStateArea> {
       for(final area in areas) {        
         final testCode = test.id.code;
         if((reusable && test.hasReusable) || addAll || (area.length > 2 && testCode.contains(area)) || test.id.hasTagLike(area)) {
-          results.add(test);
+          if(!results.contains(test)) {
+            results.add(test);
+          }
         }
       }
     } 

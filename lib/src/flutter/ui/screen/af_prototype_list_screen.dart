@@ -14,7 +14,7 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 class AFPrototypeTestScreenParam extends AFRouteParam {
   static const ungroupedGroup = "ungrouped";
   final String filter;
-  final String title;
+  final dynamic title;
 
   final Map<String, List<AFScreenPrototypeTest>> screenTestsByGroup;
 
@@ -25,7 +25,7 @@ class AFPrototypeTestScreenParam extends AFRouteParam {
 
 
   factory AFPrototypeTestScreenParam.createFromList({
-    @required String title,
+    @required dynamic title,
     @required List<AFScreenPrototypeTest> tests
   }) {
     final groups = <String, List<AFScreenPrototypeTest>>{};
@@ -80,7 +80,7 @@ class AFPrototypeTestScreen extends AFProtoConnectedScreen<AFStateView, AFProtot
 
   AFPrototypeTestScreen(): super(AFUIScreenID.screenPrototypeListSingleScreen);
 
-  static AFNavigatePushAction navigatePush(List<AFScreenPrototypeTest> tests, String title) {
+  static AFNavigatePushAction navigatePush(List<AFScreenPrototypeTest> tests, dynamic title) {
     return AFNavigatePushAction(screen: AFUIScreenID.screenPrototypeListSingleScreen,
       param: AFPrototypeTestScreenParam.createFromList(title: title, tests: tests));
   }

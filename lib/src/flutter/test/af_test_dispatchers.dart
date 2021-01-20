@@ -45,7 +45,8 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
       action is AFNavigateSetChildParamAction ||
       action is AFNavigateAddConnectedChildAction ||
       action is AFNavigateRemoveConnectedChildAction ||
-      action is AFNavigateSortConnectedChildrenAction) {
+      action is AFNavigateSortConnectedChildrenAction || 
+      action is AFNavigateWireframeAction) {
         main.dispatch(action);
     } 
 

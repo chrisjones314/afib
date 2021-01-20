@@ -23,9 +23,6 @@ class AFPrototypeThirdPartyStateView extends AFStateView1<AFSingleScreenTests> {
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
 class AFPrototypeThirdPartyListScreen extends AFProtoConnectedScreen<AFPrototypeThirdPartyStateView, AFRouteParam>{
-  static const runWidgetTestsId = "run_widget_tests";
-  static const runScreenTestsId = "run_screen_tests";
-  static const runWorkflowTestsId = "run_workflow_tests";
   AFPrototypeThirdPartyListScreen(): super(AFUIScreenID.screenPrototypeThirdPartyList);
 
   static AFNavigatePushAction navigateTo() {

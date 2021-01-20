@@ -6,6 +6,7 @@ class AFUILibraryID {
 }
 
 class AFUIScreenID {
+  static const screenPrototypeWireframesList = AFScreenID("screen_prototype_wireframes_list", AFUILibraryID.id);
   static const screenPrototypeListSingleScreen = AFScreenID("prototype_list_single_screen", AFUILibraryID.id);
   static const screenPrototypeListWorkflow = AFScreenID("prototype_list_multi_screen", AFUILibraryID.id);
   static const screenPrototypeSingleScreen = AFScreenID("prototype_single_screen", AFUILibraryID.id);
@@ -20,6 +21,7 @@ class AFUIScreenID {
 }
 
 class AFUIWidgetID {
+  static const cardWireframes = AFWidgetID("card_wireframes", AFUILibraryID.id);
 
   static const afibPassthroughSuffix = "_passthough";
   //static const screenStartup = AFScreenID("${afibScreenPrefix}startup");
@@ -41,6 +43,7 @@ class AFUITestID {
 }
 
 class AFUITranslationID {
+  static const wireframes = AFTranslationID("wireframes", AFUILibraryID.id);
   static const afibPrototypeMode = AFTranslationID("afib_prototype_mode", AFUILibraryID.id);
   static const searchAndRun = AFTranslationID("search_and_run", AFUILibraryID.id);
   static const prototypesAndTests = AFTranslationID("prototypes_and_tests", AFUILibraryID.id);

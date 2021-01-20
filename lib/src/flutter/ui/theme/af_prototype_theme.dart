@@ -81,8 +81,12 @@ class AFPrototypeTheme extends AFConceptualTheme {
     );
   }    
 
-  Widget createTestListTile(AFDispatcher dispatcher, AFScreenPrototypeTest instance) {
-    final titleText = instance.id.code;
+  Widget createTestListTile(AFDispatcher dispatcher, AFScreenPrototypeTest instance, {
+    String title,
+    String subtitle,
+    AFPressedDelegate onTap,
+  }) {
+    final titleText = title ?? instance.id.code;
     final cols = row();
     cols.add(childText(titleText));
     if(instance.hasReusable) {
@@ -94,13 +98,18 @@ class AFPrototypeTheme extends AFConceptualTheme {
       children: cols
     );
     final tagsText = this.childTextBuilder();
-    tagsText.write("tags: ");
-    tagsText.write(instance.id.tagsText);
+    if(subtitle != null) {
+      tagsText.write(subtitle);
+    } else {
+      tagsText.write("tags: ");
+      tagsText.write(instance.id.tagsText);
+    }
+    final onPressed = onTap ?? () => instance.startScreen(dispatcher);
     return childListTileNavDown(
       wid: instance.id,
       title: titleRow,
       subtitle: tagsText.create(),
-      onTap: () => instance.startScreen(dispatcher)
+      onTap: onPressed
     );
   }
 

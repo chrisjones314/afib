@@ -112,6 +112,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   final themeFactories = AFConceptualThemeDefinitionContext();
   final themeCache = <AFThemeID, AFConceptualTheme>{};
   final testMissingTranslations = AFTestMissingTranslations();
+  final wireframes = AFWireframes();
 
   AFScreenMap _afPrototypeScreenMap;
   AFScreenID forcedStartupScreen;
@@ -158,6 +159,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
         widgetTests: widgetTests,
         screenTests: screenTests,
         workflowTests: workflowTests,
+        wireframes: wireframes,
       );
 
       for(final thirdParty in libraries) {
@@ -170,6 +172,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
           widgetTests: holder.afWidgetTests,
           screenTests: holder.afScreenTests,
           workflowTests: holder.afWorkflowStateTests,
+          wireframes: wireframes
         );
       }
 

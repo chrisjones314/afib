@@ -1,6 +1,7 @@
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
 
 mixin AFContextDispatcherMixin {
 
@@ -31,6 +32,17 @@ mixin AFContextDispatcherMixin {
   /// It is no different from dispatch(action).
   void dispatchNavigate(AFNavigateAction action) {
     dispatch(action);
+  }
+
+
+  void dispatchWireframe(AFScreenID screen, AFID widget, {
+    dynamic param
+  }) {
+    dispatch(AFNavigateWireframeAction(
+      screen: screen,
+      widget: widget,
+      wireframeParam: param
+    ));
   }
 
   /// Dispatch an [AFAsyncQuery] subclass, which is used to interact

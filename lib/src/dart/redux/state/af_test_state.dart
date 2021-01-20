@@ -1,6 +1,7 @@
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/test/af_wireframe.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:meta/meta.dart';
 
@@ -86,17 +87,20 @@ class AFSingleScreenTestState {
 @immutable
 class AFTestState {
   final AFTestID activeTestId;
+  final AFWireframe activeWireframe;
   final Map<AFTestID, AFScreenTestContext> testContexts;
   final Map<AFTestID, AFSingleScreenTestState> testStates;
 
   AFTestState({
     @required this.activeTestId, 
+    @required this.activeWireframe,
     @required this.testContexts, 
     @required this.testStates});
 
   factory AFTestState.initial() {
     return AFTestState(
       activeTestId: null,
+      activeWireframe: null,
       testContexts: <AFTestID, AFScreenTestContext>{}, 
       testStates:<AFTestID, AFSingleScreenTestState>{}
     );
@@ -113,6 +117,10 @@ class AFTestState {
   AFTestState navigateToTest(AFScreenPrototypeTest test, dynamic param, dynamic data, AFScreenID screen) {
     final revisedStates = _createTestState(test.id, param, data, screen);
     return copyWith(activeTestId: test.id, testStates: revisedStates);
+  }
+
+  AFTestState startWireframe(AFWireframe wireframe) {
+    return copyWith(activeWireframe: wireframe);
   }
 
   Map<AFTestID, AFSingleScreenTestState> _createTestState(AFTestID testId, dynamic param, dynamic data, AFScreenID screen) {
@@ -171,13 +179,15 @@ class AFTestState {
 
   AFTestState copyWith({
     AFTestID activeTestId,
+    AFWireframe activeWireframe,
     Map<AFTestID, AFScreenTestContext> testContexts,
      Map<AFTestID, AFSingleScreenTestState> testStates
   }) {
     return AFTestState(
       activeTestId: activeTestId ?? this.activeTestId,
       testContexts: testContexts ?? this.testContexts,
-      testStates: testStates ?? this.testStates
+      testStates: testStates ?? this.testStates,
+      activeWireframe: activeWireframe ?? this.activeWireframe,
     );
   }
 }

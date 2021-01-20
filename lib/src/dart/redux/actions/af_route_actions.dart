@@ -179,3 +179,15 @@ class AFNavigateSetChildParamAction extends AFNavigateAction {
   }): super(id: id, screen: screen, param: param); 
 }
 
+class AFNavigateWireframeAction {
+  final AFScreenID screen;
+  final AFID widget;
+  final dynamic wireframeParam;
+
+  AFNavigateWireframeAction({
+    this.screen,
+    this.widget,
+    this.wireframeParam,
+  });
+}
+

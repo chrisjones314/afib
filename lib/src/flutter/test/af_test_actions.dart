@@ -1,5 +1,6 @@
 
 
+import 'package:afib/src/flutter/test/af_wireframe.dart';
 import 'package:meta/meta.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -29,6 +30,11 @@ class AFStartPrototypeScreenTestAction {
       @required this.screen });
 }
 
+class AFStartWireframeAction {
+  final AFWireframe wireframe;
+
+  AFStartWireframeAction({this.wireframe});
+}
 
 /// Update the 'store based' data for a prototype screen.
 class AFUpdatePrototypeScreenTestDataAction {

@@ -17,6 +17,7 @@ List<Middleware<AFState>> createRouteMiddleware() {
     TypedMiddleware<AFState, AFNavigatePopNAction>(_navigatePopNAction),
     TypedMiddleware<AFState, AFNavigatePopToAction>(_navigatePopToAction),
     TypedMiddleware<AFState, AFNavigateExitTestAction>(_navigateExitTestAction),
+    TypedMiddleware<AFState, AFNavigateWireframeAction>(_navigateWireframe),
   ];
 }
 
@@ -146,5 +147,16 @@ void _navigateExitTestAction(Store<AFState> store, action, NextDispatcher next) 
       navState.pop();
     }
   });
+  next(action);
+}
+
+//---------------------------------------------------------------------------
+void _navigateWireframe(Store<AFState> store, AFNavigateWireframeAction action, NextDispatcher next) {
+  /// see if we are under a wireframe.
+  final testState = store.state.testState;
+  final wireframe = testState.activeWireframe;
+  if(wireframe != null) {
+    wireframe.updateState(action.screen, action.widget, action.wireframeParam);
+  }
   next(action);
 }

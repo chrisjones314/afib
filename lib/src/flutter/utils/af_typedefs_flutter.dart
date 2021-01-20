@@ -1,4 +1,5 @@
 
+import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
@@ -33,13 +34,16 @@ typedef AFOnLifecycleEventDelegate = void Function(AppLifecycleState newState);
 typedef AFCreateAFAppDelegate = AFApp Function();
 
 /// Delegate used to populate widget tests.
-typedef AFInitWidgetTestsDelegate = void Function(AFWidgetTestDefinitionContext definitions);
+typedef AFInitWidgetTestsDelegate = void Function(AFWidgetTestDefinitionContext context);
 
 /// Delegate used to populate single-screen tests.
-typedef AFInitScreenTestsDelegate = void Function(AFSingleScreenTestDefinitionContext definitions);
+typedef AFInitScreenTestsDelegate = void Function(AFSingleScreenTestDefinitionContext context);
 
 /// Delegate used to populate multi-screen tests.
-typedef AFInitWorkflowStateTestsDelegate = void Function(AFWorkflowTestDefinitionContext definitions);
+typedef AFInitWorkflowStateTestsDelegate = void Function(AFWorkflowTestDefinitionContext context);
+
+/// Delegate used to populate wireframes.
+typedef AFInitWireframesDelegate = void Function(AFWireframeDefinitionContext context);
 
 /// Delegate used to perform an asynchronous operation (like an alert, and say whether it should continue).
 typedef AFShouldContinueCheckDelegate = Future<AFShouldContinue> Function();
@@ -86,10 +90,10 @@ typedef AFWidgetBuilderDelegate<TBuildContext extends AFBuildContext> = Widget F
 typedef AFInitTestDataDelegate = void Function(AFTestDataRegistry registry);
 
 /// Delegate used to initialize unit tests.
-typedef AFInitUnitTestsDelegate = void Function(AFUnitTestDefinitionContext definitions);
+typedef AFInitUnitTestsDelegate = void Function(AFUnitTestDefinitionContext context);
 
 /// Delegate used to initialize state tests.
-typedef AFInitStateTestsDelegate = void Function(AFStateTestDefinitionContext definitions);
+typedef AFInitStateTestsDelegate = void Function(AFStateTestDefinitionContext context);
 
 /// Delegate 
 typedef AFProcessQueryDelegate = void Function(AFStateTestContext context, AFAsyncQuery query);
@@ -161,3 +165,5 @@ typedef AFOnChangedBoolDelegate = void Function(bool);
 typedef AFOnChangedStringDelegate = void Function(String);
 
 typedef AFCreateConceptualThemeDelegate = AFConceptualTheme Function(AFFundamentalTheme fundamentals, ThemeData themeData);
+
+typedef AFWireframeExecutionDelegate = void Function(AFWireframeExecutionContext we);

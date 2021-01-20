@@ -101,6 +101,7 @@ class AFTestExtensionContext {
   final initWidgetTests = <AFInitWidgetTestsDelegate>[];
   final initScreenTests = <AFInitScreenTestsDelegate>[];
   final initWorkflowStateTests = <AFInitWorkflowStateTestsDelegate>[];
+  final initWireframes = <AFInitWireframesDelegate>[];
   final sharedTestContext = AFSharedTestExtensionContext();
 
   void initializeTestFundamentals({
@@ -110,6 +111,7 @@ class AFTestExtensionContext {
     @required AFInitWidgetTestsDelegate initWidgetTests,
     @required AFInitScreenTestsDelegate initScreenTests,
     @required AFInitWorkflowStateTestsDelegate initWorkflowStateTests,
+    @required AFInitWireframesDelegate initWireframes,
   }) {
     addInitTestData(initTestData);
     addInitUnitTest(initUnitTests);
@@ -117,6 +119,7 @@ class AFTestExtensionContext {
     addInitWidgetTest(initWidgetTests);
     addInitScreenTest(initScreenTests);
     addInitWorkflowStateTest(initWorkflowStateTests);
+    addInitWireframe(initWireframes);
   }
 
   void initializeForApp() {
@@ -145,6 +148,12 @@ class AFTestExtensionContext {
 
   void addInitWorkflowStateTest(AFInitWorkflowStateTestsDelegate init) {
     initWorkflowStateTests.add(init);
+  }
+
+  void addInitWireframe(AFInitWireframesDelegate init) {
+    if(init != null) {
+      initWireframes.add(init);
+    }
   }
 
   /// Register a way to tap or set a value on a particular kind of widget.
@@ -196,6 +205,12 @@ class AFTestExtensionContext {
     }
   }
 
+  void _initWireframes(AFWireframeDefinitionContext context) {
+    for(final init in initWireframes) {
+      init(context);
+    }
+  }
+
   void initialize({
     @required AFTestDataRegistry testData, 
     @required AFUnitTests unitTests,
@@ -203,6 +218,7 @@ class AFTestExtensionContext {
     @required AFWidgetTests widgetTests,
     @required AFSingleScreenTests screenTests,
     @required AFWorkflowStateTests workflowTests,
+    @required AFWireframes wireframes,
   }) {
       _initTestData(testData);
       
@@ -237,6 +253,12 @@ class AFTestExtensionContext {
 
       _initWorkflowStateTests(workflowTestDefineContext);
 
+      final wireframeContext = AFWireframeDefinitionContext(
+        wireframes: wireframes,
+        testData: testData
+      );
+
+      _initWireframes(wireframeContext);
   }
 }
 
@@ -492,6 +514,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
       AFUITranslationID.prototypesAndTests: "Prototypes and Tests",
       AFUITranslationID.searchAndRun: "Search and Run",
       AFUITranslationID.afibPrototypeMode: "AFib Prototype Mode",
+      AFUITranslationID.wireframes: "Wireframes",
     });
 
     final result = AFFundamentalTheme(device: device, area: primaryArea, marginSpacing: marginSpacing, paddingSpacing: paddingSpacing, borderRadius: borderRadius);

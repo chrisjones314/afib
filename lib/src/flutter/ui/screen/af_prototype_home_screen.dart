@@ -5,6 +5,7 @@ import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/id.dart';
 import 'package:afib/src/flutter/ui/af_prototype_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_prototype_third_party_list_screen.dart';
+import 'package:afib/src/flutter/ui/screen/af_prototype_wireframes_list_screen.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -121,6 +122,10 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
     
     protoRows.add(t.childListNav(title: AFUITranslationID.thirdParty, onPressed: () {
       context.dispatch(AFPrototypeThirdPartyListScreen.navigateTo());
+    }));
+
+    protoRows.add(t.childListNav(title: AFUITranslationID.wireframes, onPressed: () {
+      ;;context.dispatch(AFPrototypeWireframesListScreen.navigateTo());
     }));
 
     final areas = context.p.filter.split(" ");

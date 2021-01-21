@@ -221,6 +221,7 @@ class AFTestExtensionContext {
     @required AFWireframes wireframes,
   }) {
       _initTestData(testData);
+      testData.regenerate();
       
       final unitTestDefineContext = AFUnitTestDefinitionContext(
         tests: unitTests,

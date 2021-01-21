@@ -727,7 +727,17 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   /// Dispatch an action or query.
   void dispatch(dynamic action) { 
     if(_isInWireframe) {
-      if(action is AFUpdateAppStateAction || action is AFNavigateAction || action is AFAsyncQuery) {
+      if(action is AFNavigateAction) {
+        if(action is AFNavigatePopAction || 
+           action is AFNavigatePushAction || 
+           action is AFNavigatePopNAction || 
+           action is AFNavigatePopToAction || 
+           action is AFNavigateReplaceAction || 
+           action is AFNavigateReplaceAllAction) {
+          return;
+        }
+      }
+      if(action is AFUpdateAppStateAction || action is AFAsyncQuery) {
         return;
       } 
     }

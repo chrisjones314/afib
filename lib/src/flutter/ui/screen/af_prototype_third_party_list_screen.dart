@@ -27,7 +27,7 @@ class AFPrototypeThirdPartyListScreen extends AFProtoConnectedScreen<AFPrototype
 
   static AFNavigatePushAction navigateTo() {
     return AFNavigatePushAction(screen: AFUIScreenID.screenPrototypeThirdPartyList,
-      param: AFRouteParam.unused());
+      routeParam: AFRouteParam.unused());
   }
 
   @override

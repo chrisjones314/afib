@@ -127,7 +127,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
       margin: t.margin.v.s3,
       child: t.childText(
         "AFib Test Drawer",
-        style: t.styleOnPrimary.headline5
+        style: t.styleOnPrimary.headline6
       )
     ));
 
@@ -135,7 +135,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
       margin: t.margin.v.s3,
       child: t.childText(
           context.s.test.id.toString(), 
-          style: t.styleOnPrimary.headline6
+          style: t.styleOnPrimary.bodyText2
       )
     ));
 

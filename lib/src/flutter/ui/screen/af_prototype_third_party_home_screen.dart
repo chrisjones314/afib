@@ -30,7 +30,7 @@ class AFPrototypeThirdPartyHomeScreen extends AFProtoConnectedScreen<AFStateView
 
   static AFNavigatePushAction navigatePush(AFUILibraryExtensionContext libraryContext) {
     return AFNavigatePushAction(screen: AFUIScreenID.screenPrototypeThirdPartyHome,
-      param: AFPrototypeThirdPartyHomeParam.create(libraryContext));
+      routeParam: AFPrototypeThirdPartyHomeParam.create(libraryContext));
   }
 
   @override

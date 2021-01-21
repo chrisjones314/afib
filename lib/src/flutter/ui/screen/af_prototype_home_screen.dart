@@ -152,7 +152,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
     final results = <AFScreenTestResultSummary>[];
     for(final test in tests) {
       // first, we navigate into the screen.
-      test.startScreen(context.d);
+      test.startScreen(context.d, AFibF.g.testData);
 
       final state = AFibF.g.storeInternalOnly.state;
       final testState = state.testState;

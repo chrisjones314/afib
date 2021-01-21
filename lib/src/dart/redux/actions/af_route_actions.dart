@@ -80,9 +80,9 @@ class AFNavigatePushAction extends AFNavigateActionWithReturn {
   AFNavigatePushAction({
     AFID id, 
     @required AFScreenID screen, 
-    @required AFRouteParam param, 
+    @required AFRouteParam routeParam, 
     AFActionOnReturnDelegate onReturn
-  }): super(id: id, screen: screen, param: param, onReturn: onReturn);
+  }): super(id: id, screen: screen, param: routeParam, onReturn: onReturn);
 }
 
 class AFNavigateActionWithReturnData extends AFNavigateAction {
@@ -182,12 +182,12 @@ class AFNavigateSetChildParamAction extends AFNavigateAction {
 class AFNavigateWireframeAction {
   final AFScreenID screen;
   final AFID widget;
-  final dynamic wireframeParam;
+  final dynamic eventParam;
 
   AFNavigateWireframeAction({
     this.screen,
     this.widget,
-    this.wireframeParam,
+    this.eventParam,
   });
 }
 

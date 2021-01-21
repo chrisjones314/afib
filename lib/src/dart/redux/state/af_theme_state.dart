@@ -2403,8 +2403,8 @@ class AFConceptualTheme {
         tooltip: translate(tooltip),
         onPressed: () async {
           if(shouldContinueCheck == null || await shouldContinueCheck() == AFShouldContinue.yesContinue) {
-            context.dispatchWireframe(screen, wid);
             context.dispatchNavigate(AFNavigatePopAction(id: wid));
+            context.dispatchWireframe(screen, wid);
           } 
         }
     );

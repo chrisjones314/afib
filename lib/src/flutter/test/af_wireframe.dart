@@ -15,12 +15,14 @@ class AFWireframes {
 class AFWireframeExecutionContext {
   final AFScreenID screen;
   final AFID widget;
-  final dynamic wireframeParam;
+  final dynamic eventParam;
+  final AFWireframe wireframe;
 
   AFWireframeExecutionContext({
-    this.screen,
-    this.widget,
-    this.wireframeParam,
+    @required this.screen,
+    @required this.widget,
+    @required this.eventParam,
+    @required this.wireframe,
   });
 
   void navigatePop() {
@@ -29,9 +31,26 @@ class AFWireframeExecutionContext {
     _dispatch(AFStartWireframePopTestAction());
   }
 
-  void navigateTo(AFSingleScreenTestID testId) {
+  void navigateTo(AFSingleScreenTestID testId, { AFRouteParam routeParam, AFStateView stateView }) {
     final test = AFibF.g.findScreenTestById(testId);
-    test.startScreen(AFibF.g.storeDispatcherInternalOnly);
+    test.startScreen(AFibF.g.storeDispatcherInternalOnly, wireframe.registry, routeParam: routeParam, stateView: stateView);
+  }
+
+  dynamic td(dynamic id) {
+    return wireframe.registry.find(id);
+  }
+
+  void updateTestData(dynamic objectId, dynamic value, { bool updateStates = true }) {
+    wireframe.updateTestData(objectId, value);
+    if(!updateStates) {
+      return;
+    }
+    // now, regenerate the composite objects.
+    wireframe.registry.regenerate();
+
+    // then, go through all active screens in the hierarchy, and update their stateViews.
+    _dispatch(AFTestUpdateWireframeStateViews(wireframe.registry));
+
   }
 
   void _dispatch(dynamic action) {
@@ -43,17 +62,35 @@ class AFWireframe {
   final String name;
   final AFSingleScreenTestID initialScreen;
   final AFWireframeExecutionDelegate body;
+  final AFTestDataRegistry registry;
 
   AFWireframe({
     @required this.name, 
     @required this.initialScreen, 
-    @required this.body});
+    @required this.body,
+    @required this.registry
+  });
+
+  factory AFWireframe.create({
+    @required String name,
+    @required AFSingleScreenTestID initialScreen,
+    @required AFWireframeExecutionDelegate body
+  }) {
+    final registry = AFibF.g.testData.cloneForWireframe();
+    return AFWireframe(name: name, initialScreen: initialScreen, body: body, registry: registry);
+  }
+
+  void updateTestData(dynamic objectId, dynamic value) {
+    registry.register(objectId, value);
+  }
+
 
   void updateState(AFScreenID screen, AFID widget, dynamic param) {
     final context = AFWireframeExecutionContext(
       screen: screen,
       widget: widget,
-      wireframeParam: param,
+      eventParam: param,
+      wireframe: this,
     );
     body(context);
   }
@@ -74,7 +111,12 @@ class AFWireframeDefinitionContext {
     @required AFSingleScreenTestID initialScreen,
     @required AFWireframeExecutionDelegate body,
   }) {
-    final wf = AFWireframe(name: name, initialScreen: initialScreen, body: body);
+    final wf = AFWireframe(
+      name: name, 
+      initialScreen: initialScreen, 
+      body: body,
+      registry: AFibF.g.testData
+    );
     wireframes.add(wf);
     return wf;
   }

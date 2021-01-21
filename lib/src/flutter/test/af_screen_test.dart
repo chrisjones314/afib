@@ -602,7 +602,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
 
   Future<void> keepSynchronous();
   Future<void> get ks { return keepSynchronous(); }
-  Future<void> updateScreenData(dynamic data);
+  Future<void> updateStateViews(dynamic data);
   void verifyPopupScreenId(AFScreenID screenId);
 
   Future<void> pauseForRender();
@@ -960,8 +960,9 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   }
   
   @override
-  Future<void> updateScreenData(dynamic data) {
-    dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.testId, data));
+  Future<void> updateStateViews(dynamic stateViews) {
+    final sv = AFibF.g.testData.findMultiple(stateViews);
+    dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.testId, sv));
     return pauseForRender();
   }
 
@@ -1053,13 +1054,13 @@ abstract class AFScreenPrototypeTest {
   bool get hasReusable { return false; }
   List<String> paramDescriptions(AFReusableTestID id) { return <String>[]; }
   List<AFReusableTestID> get sectionIds { return <AFReusableTestID>[]; }
-  void startScreen(AFDispatcher dispatcher);
+  void startScreen(AFDispatcher dispatcher, AFTestDataRegistry registry, { AFRouteParam routeParam, AFStateView stateView });
   Future<void> run(AFScreenTestContext context, { Function onEnd});
   void onDrawerReset(AFDispatcher dispatcher);
   Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSingleScreenTestState state, AFReusableTestID testId, Function onEnd);
   void openTestDrawer(AFReusableTestID id);
-  dynamic get routeParam { return null; }
-  dynamic get stateView { return null; }
+  dynamic get routeParam;
+  dynamic get stateViews;
   bool get isTestDrawerEnd { return testDrawerSide == testDrawerSideEnd; }
   bool get isTestDrawerBegin { return testDrawerSide == testDrawerSideBegin; }
 
@@ -1072,7 +1073,7 @@ abstract class AFScreenPrototypeTest {
     }
 
     final testContext = AFScreenTestContextSimulator(dispatcher, this.id, runNumber);
-    dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(testContext, param: this.routeParam, stateView: this.stateView, screen: this.screenId));
+    dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(testContext, routeParam: this.routeParam, stateViews: this.stateViews, screen: this.screenId, stateViewId: null, routeParamId: null));
     return testContext;
   }
 
@@ -1081,16 +1082,16 @@ abstract class AFScreenPrototypeTest {
 /// All the information necessary to render a single screen for
 /// prototyping and testing.
 class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
-  dynamic data;
-  dynamic param;
+  dynamic stateViews;
+  dynamic routeParam;
   final AFSingleScreenPrototype body;
   //final AFConnectedScreenWithoutRoute screen;
   final AFScreenID screenId;
 
   AFSingleScreenPrototypeTest({
     @required AFSingleScreenTestID id,
-    @required this.data,
-    @required this.param,
+    @required this.stateViews,
+    @required this.routeParam,
     @required this.screenId,
     @required this.body,
   }): super(id: id);
@@ -1105,16 +1106,6 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
   }
 
   @override
-  dynamic get routeParam { 
-    return param;
-  }
-
-  @override
-  dynamic get stateView { 
-    return data;
-  }
-
-  @override
   List<AFReusableTestID> get sectionIds {
     return body.sectionIds;
   }
@@ -1124,11 +1115,24 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
     return body.paramDescriptions(id);
   }
 
-  void startScreen(AFDispatcher dispatcher) {
-    dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, param: param, stateView: data, screen: screenId));
+  @override
+  void startScreen(AFDispatcher dispatcher, AFTestDataRegistry registry, { AFRouteParam routeParam, AFStateView stateView }) {
+    final svp = stateView ?? this.stateViews;
+    final rvp = routeParam ?? this.routeParam;
+    final sv = registry.find(svp);
+    final rp = registry.find(rvp);
+
+    dispatcher.dispatch(AFStartPrototypeScreenTestAction(
+      this, 
+      param: rp, 
+      stateView: sv, 
+      screen: screenId, 
+      stateViewId: AFTestDataRegistry.filterTestId(svp),
+      routeParamId: AFTestDataRegistry.filterTestId(rvp),
+    ));
     dispatcher.dispatch(AFNavigatePushAction(
       screen: this.screenId,
-      param: this.param
+      routeParam: rp
     ));
   }
 
@@ -1146,8 +1150,9 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
   }
 
   void onDrawerReset(AFDispatcher dispatcher) {
-    AFSingleScreenPrototypeTest.resetTestParam(dispatcher, this.id, this.screenId, this.param);
-    dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.id, this.data));
+    AFSingleScreenPrototypeTest.resetTestParam(dispatcher, this.id, this.screenId, this.routeParam);
+    final sv = AFibF.g.testData.findMultiple(this.stateViews);
+    dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.id, sv));
   }
 
   @override
@@ -1163,7 +1168,7 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
 
 
 abstract class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
-  final dynamic data;
+  final dynamic stateViews;
   final AFSingleScreenPrototype body;
   final AFRenderConnectedChildDelegate render;
   final AFCreateWidgetWrapperDelegate createWidgetWrapperDelegate;
@@ -1171,7 +1176,7 @@ abstract class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
   AFWidgetPrototypeTest({
     @required AFTestID id,
     @required this.body,
-    @required this.data,
+    @required this.stateViews,
     @required this.render,
     this.createWidgetWrapperDelegate,
     String title
@@ -1189,8 +1194,19 @@ abstract class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
     body.openTestDrawer(id);
   }
 
-  void startScreen(AFDispatcher dispatcher) {
-    dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, stateView: data, screen: AFUIScreenID.screenPrototypeWidget, param: this.routeParam));
+  void startScreen(AFDispatcher dispatcher, AFTestDataRegistry registry, { AFRouteParam routeParam, AFStateView stateView }) {
+    final svp = stateView ?? this.stateViews;
+    final rpp = routeParam ?? this.routeParam;
+
+    final sv = registry.find(svp);
+    final rp = registry.find(rpp);
+    dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, 
+      stateView: sv, 
+      screen: AFUIScreenID.screenPrototypeWidget, 
+      param: rp,
+      stateViewId: AFTestDataRegistry.filterTestId(svp),
+      routeParamId: AFTestDataRegistry.filterTestId(rpp),
+    ));
     dispatcher.dispatch(AFPrototypeWidgetScreen.navigatePush(this, id: this.id));    
   }
   
@@ -1212,15 +1228,15 @@ abstract class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
 /// All the information necessary to render a single screen for
 /// prototyping and testing.
 class AFConnectedWidgetPrototypeTest extends AFWidgetPrototypeTest {
-  final AFRouteParam param;
+  final AFRouteParam routeParam;
 
   AFConnectedWidgetPrototypeTest({
     @required AFTestID id,
-    @required dynamic stateView,
-    @required this.param,
+    @required dynamic stateViews,
+    @required this.routeParam,
     @required AFRenderConnectedChildDelegate render,
     @required AFSingleScreenPrototype body,
-  }): super(id: id, body: body, data: stateView, render: render);
+  }): super(id: id, body: body, stateViews: stateViews, render: render);
 
   @override
   List<AFReusableTestID> get sectionIds {
@@ -1230,10 +1246,11 @@ class AFConnectedWidgetPrototypeTest extends AFWidgetPrototypeTest {
   void onDrawerReset(AFDispatcher dispatcher) {
     dispatcher.dispatch(AFNavigateSetParamAction(
       screen: this.screenId,
-      param: AFPrototypeWidgetRouteParam(test: this, param: this.param),
+      param: AFPrototypeWidgetRouteParam(test: this, routeParam: this.routeParam),
       route: AFNavigateRoute.routeHierarchy
     ));
-    dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.id, this.data));
+    final sv = AFibF.g.testData.findMultiple(this.stateViews);
+    dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.id, sv));
   }
 
 }
@@ -1257,6 +1274,9 @@ class AFWorkflowStatePrototypeTest<TState extends AFAppStateArea> extends AFScre
     return body != null;
   }
 
+  dynamic get stateViews { return null; }
+  dynamic get routeParam { return null; }
+
   @override
   List<AFReusableTestID> get sectionIds {
     return [AFReusableTestID.workflowTestId];
@@ -1274,7 +1294,7 @@ class AFWorkflowStatePrototypeTest<TState extends AFAppStateArea> extends AFScre
     return AFibF.g.screenTests;
   }
 
-  void startScreen(AFDispatcher dispatcher) {
+  void startScreen(AFDispatcher dispatcher, AFTestDataRegistry registry, { AFRouteParam routeParam, AFStateView stateView }) {
     initializeMultiscreenPrototype<TState>(dispatcher, this);
   }
 
@@ -1283,9 +1303,9 @@ class AFWorkflowStatePrototypeTest<TState extends AFAppStateArea> extends AFScre
     final screenMap = AFibF.g.screenMap;
     dispatcher.dispatch(AFNavigatePushAction(
       screen: screenMap.trueAppStartupScreenId,
-      param: screenMap.trueCreateStartupScreenParam()
+      routeParam: screenMap.trueCreateStartupScreenParam()
     ));
-    dispatcher.dispatch(AFStartPrototypeScreenTestAction(test, screen: test.screenId));
+    dispatcher.dispatch(AFStartPrototypeScreenTestAction(test, screen: test.screenId, stateViewId: null, routeParamId: null));
 
     // lookup the test.
     final testImpl = AFibF.g.stateTests.findById(test.stateTestId);
@@ -1341,14 +1361,15 @@ class AFWidgetTests<TState> {
   AFSingleScreenPrototype addConnectedPrototype({
     @required AFTestID   id,
     @required AFRenderConnectedChildDelegate render,
-    dynamic data,
-    AFRouteParam param,
+    dynamic stateViews,
+    AFRouteParam routeParam,
     AFNavigatePushAction navigate,
   }) {
+    final sv = AFibF.g.testData.findMultiple(stateViews);    
     final instance = AFConnectedWidgetPrototypeTest(
       id: id,
-      stateView: data,
-      param: param,
+      stateViews: sv,
+      routeParam: routeParam,
       render: render,
       body: AFSingleScreenPrototype(id)
     );
@@ -1501,20 +1522,20 @@ class AFSingleScreenTests<TState> {
     return null;
   }
 
-  /// Add a prototype of a particular screen with the specified [data]
-  /// and [param].  
+  /// Add a prototype of a particular screen with the specified [stateViews]
+  /// and [routeParam].  
   /// 
   /// Returns an [AFSingleScreenPrototype], which can be used to create a 
   /// test for the screen.
   AFSingleScreenPrototype addPrototype({
     @required AFSingleScreenTestID   id,
-    @required dynamic data,
-    dynamic param,
+    @required dynamic stateViews,
+    dynamic routeParam,
     AFScreenID screenId,
     AFNavigatePushAction navigate
   }) {
     final hasNav    = (navigate != null);
-    final hasParam  = (screenId != null || param != null);
+    final hasParam  = (screenId != null || routeParam != null);
     if(hasNav && hasParam) {
       throw AFException("Please specify either the navigate parameter, or the screenId and param parameters, but not both (they are redundant)");
     }
@@ -1524,13 +1545,13 @@ class AFSingleScreenTests<TState> {
 
     if(hasNav) {
       screenId = navigate.screen;
-      param = navigate.param;
+      routeParam = navigate.param;
     }
 
     final instance = AFSingleScreenPrototypeTest(
       id: id,
-      data: data,
-      param: param,
+      stateViews: stateViews,
+      routeParam: routeParam,
       screenId: screenId,
       body: AFSingleScreenPrototype(id, screenId: screenId)
     );
@@ -1538,25 +1559,9 @@ class AFSingleScreenTests<TState> {
     return instance.body;
   }
 
-
-  /*
-  /// Add a screen widget, and then in the [addInstances] callback add one or more 
-  /// data states to render with that screen.
-  void addScreen(AFScreenID screenId, Function(AFScreenTestGroup) addInstances) {
-    AFScreenTestGroup group = AFScreenTestGroup(screenId: screenId);
-
-    groups.add(group);
-
-    addInstances(group);
-  }
-  */
-  
-
   AFSingleScreenPrototypeTest findById(AFTestID id) {
     return _singleScreenTests.firstWhere((test) => test.id == id, orElse: () => null);
   }
-
-
 
   void registerData(dynamic id, dynamic data) {
     AFibF.g.testData.register(id, data);
@@ -1960,14 +1965,14 @@ class AFWidgetTestDefinitionContext extends AFBaseTestDefinitionContext {
   AFSingleScreenPrototype definePrototype({
     @required AFTestID   id,
     @required AFRenderConnectedChildDelegate render,
-    @required dynamic data,
-    @required AFRouteParam param,
+    dynamic stateViews,
+    @required AFRouteParam routeParam,
   }) {
     return tests.addConnectedPrototype(
       id: id,
       render: render,
-      data: data,
-      param: param,
+      stateViews: stateViews,
+      routeParam: routeParam,
     );
   }
 
@@ -1997,19 +2002,16 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
   /// in a navigate action, which has both of those values within it.
   AFSingleScreenPrototype definePrototype({
     @required AFSingleScreenTestID   id,
-    @required dynamic viewState,
+    @required dynamic stateViews,
     dynamic routeParam,
     AFScreenID screenId,
     AFNavigatePushAction navigate,
     String title,
   }) {
-    final dataActual = testData(viewState);
-    final paramActual = testData(routeParam);
-    
     return tests.addPrototype(
       id: id,
-      data: dataActual,
-      param: paramActual,
+      stateViews: stateViews,
+      routeParam: routeParam,
       screenId: screenId,
       navigate: navigate,
     );

@@ -27,7 +27,7 @@ class AFPrototypeWireframesListScreen extends AFProtoConnectedScreen<AFPrototype
 
   static AFNavigatePushAction navigateTo() {
     return AFNavigatePushAction(screen: AFUIScreenID.screenPrototypeWireframesList,
-      param: AFRouteParam.unused());
+      routeParam: AFRouteParam.unused());
   }
 
   @override
@@ -60,7 +60,7 @@ class AFPrototypeWireframesListScreen extends AFProtoConnectedScreen<AFPrototype
           subtitle: test.id.toString(),
           onTap: () {
             context.dispatch(AFStartWireframeAction(wireframe: wireframe));
-            test.startScreen(context.d);
+            test.startScreen(context.d, wireframe.registry);
           }
         )
       );

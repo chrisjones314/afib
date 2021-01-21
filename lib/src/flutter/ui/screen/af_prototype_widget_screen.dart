@@ -14,9 +14,9 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 @immutable
 class AFPrototypeWidgetRouteParam extends AFRouteParam {
   final AFWidgetPrototypeTest test;
-  final AFRouteParam param;
+  final AFRouteParam routeParam;
 
-  AFPrototypeWidgetRouteParam({this.test, this.param});
+  AFPrototypeWidgetRouteParam({this.test, this.routeParam});
 
   AFPrototypeWidgetRouteParam copyWith({
     AFWidgetPrototypeTest test,
@@ -24,7 +24,7 @@ class AFPrototypeWidgetRouteParam extends AFRouteParam {
   }) {
     return AFPrototypeWidgetRouteParam(
       test: test ?? this.test,
-      param: param ?? this.param
+      routeParam: param ?? this.routeParam
     );
   }
 }
@@ -47,7 +47,7 @@ class AFPrototypeWidgetScreen extends AFProtoConnectedScreen<AFPrototypeWidgetSt
   static AFNavigateAction navigatePush(AFWidgetPrototypeTest test, {AFID id}) {
     return AFNavigatePushAction(
       id: id,
-      param: AFPrototypeWidgetRouteParam(test: test),
+      routeParam: AFPrototypeWidgetRouteParam(test: test),
       screen: AFUIScreenID.screenPrototypeWidget,
     );
   }
@@ -74,19 +74,12 @@ class AFPrototypeWidgetScreen extends AFProtoConnectedScreen<AFPrototypeWidgetSt
     final test = context.p.test;
     final testContext = context.s.testState.findContext(test.id);
     final testState = context.s.testState.findState(test.id);
-    final param = testState.param;
-    final testData = testState?.stateView ?? test.data;
+    final testData = testState?.stateView ?? test.stateViews;
     final sourceWidget = test.render(screenId, AFUIWidgetID.widgetPrototypeTest.with1(AFUIWidgetID.afibPassthroughSuffix));
-
-    context.dispatch(AFNavigateSetParamAction(
-      screen: this.screenId, 
-      param: param,
-      route: AFNavigateRoute.routeHierarchy
-    ));
     
     Widget resultWidget;
     if(test is AFConnectedWidgetPrototypeTest && sourceWidget is AFConnectedWidget) {
-      final paramChild = context.p.param ?? test.param;
+      final paramChild = context.p.routeParam ?? test.routeParam;
       final dispatcher = AFWidgetScreenTestDispatcher(context: testContext, main: context.d, originalParam: context.p);
 
       final themeChild = sourceWidget.createConceptualTheme(context.c, context.t);
@@ -116,7 +109,7 @@ class AFPrototypeWidgetScreen extends AFProtoConnectedScreen<AFPrototypeWidgetSt
             automaticallyImplyLeading: false,
             leading: t.childButtonStandardBack(context, screen: screenId),
             title: t.childText('Widget Test Screen',
-              style: t.styleOnPrimary.headline4,
+              style: t.styleOnPrimary.headline6,
             ),
           ),
           SliverList(

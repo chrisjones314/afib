@@ -1,6 +1,7 @@
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/test/af_test_data_registry.dart';
 import 'package:afib/src/flutter/test/af_wireframe.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:meta/meta.dart';
@@ -10,16 +11,20 @@ class AFSingleScreenTestState {
   final AFTestID testId;
   final int pass;
   final List<String> errors;
+  final String stateViewId;
   final dynamic stateView;
   final dynamic param;
+  final dynamic routeParamId;
   final AFScreenID screen;
 
   AFSingleScreenTestState({
     @required this.testId,
     @required this.pass, 
     @required this.errors, 
+    @required this.stateViewId,
     @required this.stateView, 
     @required this.param, 
+    @required this.routeParamId,
     @required this.screen
   });
 
@@ -82,6 +87,8 @@ class AFSingleScreenTestState {
       param: this.param,
       screen: this.screen,
       testId: this.testId,
+      stateViewId: this.stateViewId,
+      routeParamId: this.routeParamId,
     );
   }
 }
@@ -136,19 +143,38 @@ class AFTestState {
     return testStates[id];
   }
 
-  AFTestState navigateToTest(AFScreenPrototypeTest test, dynamic param, dynamic data, AFScreenID screen) {
-    final revisedStates = _createTestState(test.id, param, data, screen);
+  AFTestState navigateToTest(AFScreenPrototypeTest test, dynamic param, dynamic data, AFScreenID screen, String stateViewId, String routeParamId) {
+    final revisedStates = _createTestState(test.id, param, data, screen, stateViewId, routeParamId);
     final revisedActive = List<AFTestID>.from(activeTestIds);
     revisedActive.add(test.id);
     return copyWith(activeTestIds: revisedActive, testStates: revisedStates);
   }
 
+  AFTestState updateWireframeStateViews(AFTestDataRegistry registry) {
+    final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(this.testStates);
+    for(final testState in testStates.values) {
+      if(testState.stateViewId != null) { 
+        final stateView = registry.find(testState.stateViewId);
+        revisedStates[testState.testId] = testState.reviseStateView(stateView);
+      }
+    }
+    return copyWith(testStates: revisedStates);
+  }
+
   AFTestState popWireframeTest() {
     final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
-    revisedStates.remove(activeTestId);
+
+    // the issue is that when we are navigating up, flutter continues to re-render the screen which we are in the process
+    // of leaving, if we remove the test state, that render fails, as it loses its data.
+    //revisedStates.remove(activeTestId);
     final revisedActive = List<AFTestID>.from(activeTestIds);
     revisedActive.removeLast();
-    return copyWith(testStates: revisedStates, activeTestIds: revisedActive);
+    var clearWireframe = false;
+    if(revisedActive.isEmpty) {
+      clearWireframe = true;
+    }
+    final result = copyWith(testStates: revisedStates, activeTestIds: revisedActive, clearActiveWireframe: clearWireframe);
+    return result;
   }
 
   AFTestState reset() {
@@ -160,21 +186,21 @@ class AFTestState {
     return copyWith(activeWireframe: wireframe);
   }
 
-  Map<AFTestID, AFSingleScreenTestState> _createTestState(AFTestID testId, dynamic param, dynamic data, AFScreenID screen) {
+  Map<AFTestID, AFSingleScreenTestState> _createTestState(AFTestID testId, dynamic param, dynamic data, AFScreenID screen, String stateViewId, String routeParamId) {
     if(testStates.containsKey(testId)) {
       return testStates;
     }
     final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
-    revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: <String>[], stateView: data, param: param, screen: screen);
+    revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: <String>[], stateView: data, routeParamId: routeParamId, stateViewId: stateViewId, param: param, screen: screen);
     return revisedStates;
 
   }
 
-  AFTestState startTest(AFScreenTestContext simulator, dynamic param, dynamic data, AFScreenID screen) {
+  AFTestState startTest(AFScreenTestContext simulator, dynamic param, dynamic data, AFScreenID screen, String stateViewId, String routeParamId) {
     final testId = simulator.testId;
     final revisedContexts = Map<AFTestID, AFScreenTestContext>.from(testContexts);
     revisedContexts[testId] = simulator;
-    final revisedStates = _createTestState(testId, param, data, screen);
+    final revisedStates = _createTestState(testId, param, data, screen, stateViewId, routeParamId);
     var revisedActive = activeTestIds;
     if(activeTestIds.isEmpty || activeTestIds.last != simulator.testId) {
       revisedActive = List<AFTestID>.from(activeTestIds);
@@ -222,14 +248,19 @@ class AFTestState {
   AFTestState copyWith({
     List<AFTestID> activeTestIds,
     AFWireframe activeWireframe,
+    bool clearActiveWireframe,
     Map<AFTestID, AFScreenTestContext> testContexts,
      Map<AFTestID, AFSingleScreenTestState> testStates
   }) {
+    var wf = activeWireframe ?? this.activeWireframe;
+    if(clearActiveWireframe != null && clearActiveWireframe) {
+      wf = null;
+    }
     return AFTestState(
       activeTestIds: activeTestIds ?? this.activeTestIds,
       testContexts: testContexts ?? this.testContexts,
       testStates: testStates ?? this.testStates,
-      activeWireframe: activeWireframe ?? this.activeWireframe,
+      activeWireframe: wf,
     );
   }
 }

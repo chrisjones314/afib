@@ -82,7 +82,7 @@ class AFPrototypeTestScreen extends AFProtoConnectedScreen<AFStateView, AFProtot
 
   static AFNavigatePushAction navigatePush(List<AFScreenPrototypeTest> tests, dynamic title) {
     return AFNavigatePushAction(screen: AFUIScreenID.screenPrototypeListSingleScreen,
-      param: AFPrototypeTestScreenParam.createFromList(title: title, tests: tests));
+      routeParam: AFPrototypeTestScreenParam.createFromList(title: title, tests: tests));
   }
 
   @override

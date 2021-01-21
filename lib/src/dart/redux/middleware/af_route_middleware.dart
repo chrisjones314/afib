@@ -156,7 +156,7 @@ void _navigateWireframe(Store<AFState> store, AFNavigateWireframeAction action, 
   final testState = store.state.testState;
   final wireframe = testState.activeWireframe;
   if(wireframe != null) {
-    wireframe.updateState(action.screen, action.widget, action.wireframeParam);
+    wireframe.updateState(action.screen, action.widget, action.eventParam);
   }
   next(action);
 }

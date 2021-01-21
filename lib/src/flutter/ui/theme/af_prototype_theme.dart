@@ -104,7 +104,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
       tagsText.write("tags: ");
       tagsText.write(instance.id.tagsText);
     }
-    final onPressed = onTap ?? () => instance.startScreen(dispatcher);
+    final onPressed = onTap ?? () => instance.startScreen(dispatcher, AFibF.g.testData);
     return childListTileNavDown(
       wid: instance.id,
       title: titleRow,

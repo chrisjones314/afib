@@ -167,3 +167,5 @@ typedef AFOnChangedStringDelegate = void Function(String);
 typedef AFCreateConceptualThemeDelegate = AFConceptualTheme Function(AFFundamentalTheme fundamentals, ThemeData themeData);
 
 typedef AFWireframeExecutionDelegate = void Function(AFWireframeExecutionContext we);
+
+typedef AFTestDataCompositeGeneratorDelegate = void Function(AFTestDataRegistry destination);

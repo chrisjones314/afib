@@ -89,7 +89,7 @@ Future<void> _afStandardScreenTestMain<TState extends AFAppStateArea>(
       final dispatcher = AFSingleScreenTestDispatcher(test.id, storeDispatcher, null);
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id);
       storeDispatcher.dispatch(AFResetToInitialStateAction());
-      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, stateView: test.stateView, screen: test.screenId, param: test.routeParam));
+      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, stateViews: test.stateViews, screen: test.screenId, routeParam: test.routeParam, stateViewId: null, routeParamId: null));
       dispatcher.setContext(context);
       simpleContexts.add(context);
 
@@ -119,17 +119,22 @@ Future<void> _afStandardScreenTestMain<TState extends AFAppStateArea>(
 
 Future<void> _afWidgetTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
   return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.widgetTests.all, "Widget", (test) {
-    return [AFPrototypeWidgetScreen.navigatePush(test)];
+    return [
+      AFStartPrototypeScreenTestAction(test, param: test.routeParam, stateView: test.stateViews, screen: test.screenId, stateViewId: null, routeParamId: null),
+      AFPrototypeWidgetScreen.navigatePush(test)
+    ];
   });
 }
 
 Future<void> _afSingleScreenTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
   return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.screenTests.all, "Single-Screen", (test) {
+    final stateViews = AFibF.g.testData.findMultiple(test.stateViews);
     return [
-      AFStartPrototypeScreenTestAction(test, param: test.routeParam, stateView: test.stateView, screen: test.screenId),
+      AFStartPrototypeScreenTestAction(test, param: test.routeParam, stateView: stateViews, screen: test.screenId, stateViewId: null, routeParamId: null),
       AFNavigatePushAction(
         screen: test.screenId,
-        param: test.routeParam
+        routeParam: test.routeParam
+        
       )
     ];
   });
@@ -146,7 +151,6 @@ Future<void> _afWorkflowTestMain<TState extends AFAppStateArea>(AFCommandOutput 
     }
     if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
       AFibD.logTest?.d("Starting test ${test.id}");
-
       final dispatcher = AFStoreDispatcher(AFibF.g.storeInternalOnly);
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id);
       multiContexts.add(context);

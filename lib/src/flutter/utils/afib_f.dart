@@ -98,7 +98,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 
   final AFScreenMap screenMap = AFScreenMap();
   final AFAsyncQueries _afAsyncQueries = AFAsyncQueries();
-  final AFTestDataRegistry _afTestData = AFTestDataRegistry();
+  final AFTestDataRegistry _afTestData = AFTestDataRegistry.create();
   final primaryUITests = AFLibraryTestHolder<TState>();
   final thirdPartyUITests = <AFLibraryID, AFLibraryTestHolder>{};
   final internalOnlyScreens = <AFScreenID, AFibTestOnlyScreenElement>{};
@@ -175,7 +175,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
           wireframes: wireframes
         );
       }
-
+      testData.regenerate();
       sharedTestContext.mergeWith(appContext.test.sharedTestContext);
     }
     if(AFibD.config.requiresPrototypeData) {

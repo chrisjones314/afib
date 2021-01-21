@@ -27,7 +27,7 @@ class AFStandardErrorDialog extends AFProtoConnectedDialog<AFStateView, AFStanda
   static AFNavigateAction navigatePush(String message) {
     return AFNavigatePushAction(
       screen: AFUIScreenID.dialogStandardError,
-      param: AFStandardErrorDialogRouteParam.createOncePerScreen(message)
+      routeParam: AFStandardErrorDialogRouteParam.createOncePerScreen(message)
     );
   }
 

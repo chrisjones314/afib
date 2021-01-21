@@ -111,6 +111,7 @@ Future<void> _afStandardScreenTestMain<TState extends AFAppStateArea>(
     }
   }
 
+  AFibF.g.storeInternalOnly.dispatch(AFResetTestState());
   final baseContexts = List<AFBaseTestExecute>.of(simpleContexts);
   printTestTotal(output, testKind, baseContexts, localStats);
   stats.mergeIn(localStats);

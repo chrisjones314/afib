@@ -16,7 +16,8 @@ class AFRouteSegment {
   final AFScreenID screen;
   final AFRouteParam param;
 
-  AFRouteSegment({this.screen, this.param});
+  AFRouteSegment({
+    @required this.screen, this.param});
 
   AFRouteSegment copyWith({
     String screen,
@@ -340,7 +341,7 @@ class AFRouteState {
   static const emptySegments = <AFRouteSegment>[];
   final AFRouteStateSegments screenHierarchy;
 
-  final Map<AFScreenID, AFRouteParam> globalPool;
+  final Map<AFScreenID, AFRouteSegment> globalPool;
 
   AFRouteState({
     @required this.screenHierarchy, 
@@ -352,7 +353,7 @@ class AFRouteState {
     final screen = <AFRouteSegment>[];
     screen.add(AFRouteSegment.withParam(AFibF.g.effectiveStartupScreenId, AFibF.g.startupRouteParamFactory()));
     final screenSegs = AFRouteStateSegments(active: screen, prior: emptySegments);
-    final globalPool = <AFScreenID, AFRouteParam>{};
+    final globalPool = <AFScreenID, AFRouteSegment>{};
     return AFRouteState(screenHierarchy: screenSegs, globalPool: globalPool);
   }
 
@@ -415,7 +416,7 @@ class AFRouteState {
   /// but still needs to be included in the search.
   AFRouteParam findParamFor(AFScreenID screen, { bool includePrior = true }) {
     if(globalPool != null && globalPool.containsKey(screen)) {
-      return globalPool[screen];
+      return globalPool[screen]?.param;
     }
     if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
       screen = AFUIScreenID.screenStartupWrapper;
@@ -429,7 +430,7 @@ class AFRouteState {
   /// This may return null, in which case you should use the drawer's createRouteParam method
   /// to create an initial value.
   AFRouteParam findGlobalParam(AFScreenID screen) {
-    return globalPool[screen];
+    return globalPool[screen]?.param;
   }
 
   bool routeEntryExists(AFScreenID screen, { bool includePrior = true }) {
@@ -516,7 +517,7 @@ class AFRouteState {
     final revisedSegs = revisedRootSegs.pushNamed(screenMap.trueAppStartupScreenId, screenMap.trueCreateStartupScreenParam());
 
     return copyWith(
-      globalPool: <AFScreenID, AFRouteParam>{},
+      globalPool: <AFScreenID, AFRouteSegment>{},
       popupSegs: AFRouteStateSegments(active: emptySegments, prior: emptySegments),
       screenSegs: revisedSegs
     );
@@ -566,7 +567,7 @@ class AFRouteState {
   }
 
   AFRouteParam _findParamInHierOrPool(AFScreenID screen) {
-    var p = globalPool[screen];
+    var p = globalPool[screen]?.param;
     if(p == null) {
       final segment = screenHierarchy.findSegmentFor(screen);
       p = segment?.param;
@@ -578,8 +579,15 @@ class AFRouteState {
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
   AFRouteState setGlobalPoolParam(AFScreenID screen, AFRouteParam param) {
-    final revised = Map<AFScreenID, AFRouteParam>.from(globalPool);
-    revised[screen] = param;
+    final revised = Map<AFScreenID, AFRouteSegment>.from(globalPool);
+    final current = revised[screen];
+    var revisedSeg;
+    if(current != null) {
+      revisedSeg = current.copyWith(param: param);
+    } else {
+      revisedSeg = AFRouteSegment(param: param, screen: screen);
+    }
+    revised[screen] = revisedSeg;
     AFibD.logRoute?.d("Set global param for $screen to $param");
     return copyWith(globalPool: revised);
   }
@@ -598,7 +606,7 @@ class AFRouteState {
   AFRouteState copyWith({
     AFRouteStateSegments screenSegs,
     AFRouteStateSegments popupSegs,
-    Map<AFScreenID, AFRouteParam> globalPool,
+    Map<AFScreenID, AFRouteSegment> globalPool,
   }) {
     final revised = AFRouteState(
       screenHierarchy: screenSegs ?? this.screenHierarchy,

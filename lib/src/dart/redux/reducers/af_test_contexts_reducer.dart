@@ -16,6 +16,10 @@ AFTestState afTestStateReducer(AFTestState state, dynamic action) {
     return state.addError(action.testId, action.err);
   } else if(action is AFStartPrototypeScreenTestAction) {
     return state.navigateToTest(action.test, action.param, action.stateView, action.screen);
+  } else if(action is AFStartWireframePopTestAction) {
+    return state.popWireframeTest();
+  } else if(action is AFResetTestState) {
+    return state.reset();
   } else if(action is AFStartWireframeAction) {
     return state.startWireframe(action.wireframe);
   }

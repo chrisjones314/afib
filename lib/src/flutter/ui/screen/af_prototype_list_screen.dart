@@ -110,7 +110,7 @@ class AFPrototypeTestScreen extends AFProtoConnectedScreen<AFStateView, AFProtot
       rows.add(_addGroup(context, AFUIWidgetID.cardTestGroup.with1(group), group, tests));
     }
 
-    final leading = t.childButtonStandardBack(context);
+    final leading = t.childButtonStandardBack(context, screen: screenId);
     return context.t.buildPrototypeScaffold(context.p.title, rows, leading: leading);
   }
 

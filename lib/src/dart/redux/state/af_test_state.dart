@@ -7,6 +7,7 @@ import 'package:meta/meta.dart';
 
 @immutable 
 class AFSingleScreenTestState {
+  final AFTestID testId;
   final int pass;
   final List<String> errors;
   final dynamic stateView;
@@ -14,6 +15,7 @@ class AFSingleScreenTestState {
   final AFScreenID screen;
 
   AFSingleScreenTestState({
+    @required this.testId,
     @required this.pass, 
     @required this.errors, 
     @required this.stateView, 
@@ -79,6 +81,7 @@ class AFSingleScreenTestState {
       pass: pass ?? this.pass,
       param: this.param,
       screen: this.screen,
+      testId: this.testId,
     );
   }
 }
@@ -86,24 +89,43 @@ class AFSingleScreenTestState {
 
 @immutable
 class AFTestState {
-  final AFTestID activeTestId;
+  final List<AFTestID> activeTestIds;
   final AFWireframe activeWireframe;
   final Map<AFTestID, AFScreenTestContext> testContexts;
   final Map<AFTestID, AFSingleScreenTestState> testStates;
 
   AFTestState({
-    @required this.activeTestId, 
+    @required this.activeTestIds, 
     @required this.activeWireframe,
     @required this.testContexts, 
     @required this.testStates});
 
   factory AFTestState.initial() {
     return AFTestState(
-      activeTestId: null,
+      activeTestIds: <AFTestID>[],
       activeWireframe: null,
       testContexts: <AFTestID, AFScreenTestContext>{}, 
       testStates:<AFTestID, AFSingleScreenTestState>{}
     );
+  }
+
+  AFTestID findTestForScreen(AFScreenID screen) {
+    for(final testState in testStates.values) {
+      if(testState.screen == screen) {
+        return testState.testId;
+      }
+    }
+
+    // this catches the case where you have a dialog with a different
+    // screen id.   The assumption is that this only occurs on the active screen.
+    return activeTestId;
+  }
+
+  AFTestID get activeTestId {
+    if(activeTestIds.isEmpty) {
+      return null;
+    }
+    return activeTestIds.last;
   }
 
   AFScreenTestContext findContext(AFTestID id) {
@@ -116,8 +138,23 @@ class AFTestState {
 
   AFTestState navigateToTest(AFScreenPrototypeTest test, dynamic param, dynamic data, AFScreenID screen) {
     final revisedStates = _createTestState(test.id, param, data, screen);
-    return copyWith(activeTestId: test.id, testStates: revisedStates);
+    final revisedActive = List<AFTestID>.from(activeTestIds);
+    revisedActive.add(test.id);
+    return copyWith(activeTestIds: revisedActive, testStates: revisedStates);
   }
+
+  AFTestState popWireframeTest() {
+    final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
+    revisedStates.remove(activeTestId);
+    final revisedActive = List<AFTestID>.from(activeTestIds);
+    revisedActive.removeLast();
+    return copyWith(testStates: revisedStates, activeTestIds: revisedActive);
+  }
+
+  AFTestState reset() {
+    return AFTestState.initial();
+  }
+
 
   AFTestState startWireframe(AFWireframe wireframe) {
     return copyWith(activeWireframe: wireframe);
@@ -128,7 +165,7 @@ class AFTestState {
       return testStates;
     }
     final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
-    revisedStates[testId] = AFSingleScreenTestState(pass: 0, errors: <String>[], stateView: data, param: param, screen: screen);
+    revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: <String>[], stateView: data, param: param, screen: screen);
     return revisedStates;
 
   }
@@ -138,8 +175,13 @@ class AFTestState {
     final revisedContexts = Map<AFTestID, AFScreenTestContext>.from(testContexts);
     revisedContexts[testId] = simulator;
     final revisedStates = _createTestState(testId, param, data, screen);
+    var revisedActive = activeTestIds;
+    if(activeTestIds.isEmpty || activeTestIds.last != simulator.testId) {
+      revisedActive = List<AFTestID>.from(activeTestIds);
+      revisedActive.add(simulator.testId);
+    }
     return copyWith(
-      activeTestId: simulator.testId,
+      activeTestIds: revisedActive,
       testContexts: revisedContexts,
       testStates: revisedStates
     );
@@ -178,13 +220,13 @@ class AFTestState {
   }
 
   AFTestState copyWith({
-    AFTestID activeTestId,
+    List<AFTestID> activeTestIds,
     AFWireframe activeWireframe,
     Map<AFTestID, AFScreenTestContext> testContexts,
      Map<AFTestID, AFSingleScreenTestState> testStates
   }) {
     return AFTestState(
-      activeTestId: activeTestId ?? this.activeTestId,
+      activeTestIds: activeTestIds ?? this.activeTestIds,
       testContexts: testContexts ?? this.testContexts,
       testStates: testStates ?? this.testStates,
       activeWireframe: activeWireframe ?? this.activeWireframe,

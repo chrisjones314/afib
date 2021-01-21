@@ -19,6 +19,14 @@ class AFStartPrototypeScreenTestContextAction {
     });
 }
 
+class AFStartWireframePopTestAction {
+  
+}
+
+class AFResetTestState {
+  
+}
+
 class AFStartPrototypeScreenTestAction {
     final AFScreenPrototypeTest test;
     final dynamic param;

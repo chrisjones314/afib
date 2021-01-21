@@ -114,7 +114,7 @@ class AFPrototypeWidgetScreen extends AFProtoConnectedScreen<AFPrototypeWidgetSt
         slivers: [
           SliverAppBar(
             automaticallyImplyLeading: false,
-            leading: t.childButtonStandardBack(context),
+            leading: t.childButtonStandardBack(context, screen: screenId),
             title: t.childText('Widget Test Screen',
               style: t.styleOnPrimary.headline4,
             ),

@@ -68,7 +68,7 @@ class AFPrototypeWireframesListScreen extends AFProtoConnectedScreen<AFPrototype
 
     final rows = t.column();
     rows.add(t.childCardHeader(context, AFUIWidgetID.cardWireframes, "Wireframes", rowsCard));
-    final leading = t.childButtonStandardBack(context);
+    final leading = t.childButtonStandardBack(context, screen: screenId);
     return t.buildPrototypeScaffold("AFib Wireframes", rows, leading: leading);
 
   }

@@ -101,7 +101,7 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
   TBuildContext _createTestContext(AFStore store) {
     // find the test state.
     final testState = store.state.testState;
-    final activeTestId = testState.activeTestId;
+    final activeTestId = testState.findTestForScreen(primaryScreenId);
     if(activeTestId == null) {
       return null;
     }
@@ -725,7 +725,14 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   material.BuildContext get c { return context; }
 
   /// Dispatch an action or query.
-  void dispatch(dynamic action) { dispatcher.dispatch(action); }
+  void dispatch(dynamic action) { 
+    if(_isInWireframe) {
+      if(action is AFUpdateAppStateAction || action is AFNavigateAction || action is AFAsyncQuery) {
+        return;
+      } 
+    }
+    dispatcher.dispatch(action); 
+  }
 
   /// Update the parameter for the specified screen, but favor calling
   /// updateParam in your screen directly.
@@ -759,7 +766,7 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   /// ```
   void dispatchUpdateAppStateOne<TState extends AFAppStateArea>(Object toUpdate) {
     assert(TState != AFAppStateArea);
-    dispatcher.dispatch(AFUpdateAppStateAction.updateOne(TState, toUpdate));
+    dispatch(AFUpdateAppStateAction.updateOne(TState, toUpdate));
   }
 
   /// Update several objects at the root of the application state.
@@ -770,12 +777,19 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   /// ```
   void dispatchUpdateAppStateN<TState extends AFAppStateArea>(List<Object> toUpdate) {
     assert(TState != AFAppStateArea);
-    dispatcher.dispatch(AFUpdateAppStateAction.updateMany(TState, toUpdate));
+    dispatch(AFUpdateAppStateAction.updateMany(TState, toUpdate));
   } 
 
   /// A utility which dispatches an asynchronous query.
   void dispatchQuery(AFAsyncQuery query) {
-    dispatcher.dispatch(query);
+    dispatch(query);
+  }
+
+  bool get _isInWireframe {
+    if(!AFibD.config.isTestContext) {
+      return false;
+    }
+    return AFibF.g.storeInternalOnly.state.testState.activeWireframe != null;
   }
 
 

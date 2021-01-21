@@ -1,5 +1,6 @@
 
 
+import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:meta/meta.dart';
 import 'package:afib/afib_flutter.dart';
 
@@ -22,10 +23,19 @@ class AFWireframeExecutionContext {
     this.wireframeParam,
   });
 
+  void navigatePop() {
+    /// TODO: update the test state to remove the current test from the active list.
+    _dispatch(AFNavigatePopAction());
+    _dispatch(AFStartWireframePopTestAction());
+  }
 
   void navigateTo(AFSingleScreenTestID testId) {
     final test = AFibF.g.findScreenTestById(testId);
     test.startScreen(AFibF.g.storeDispatcherInternalOnly);
+  }
+
+  void _dispatch(dynamic action) {
+    AFibF.g.storeDispatcherInternalOnly.dispatch(action);
   }
 }
 

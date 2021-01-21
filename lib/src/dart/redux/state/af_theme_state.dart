@@ -2389,6 +2389,7 @@ class AFConceptualTheme {
   /// The back button can optionally display a dialog which checks whether the user
   /// should continue, see [standardShouldContinueAlertCheck] for more.
   Widget childButtonStandardBack(AFBuildContext context, {
+    @required AFScreenID screen,
     AFWidgetID wid = AFUIWidgetID.buttonBack,
     dynamic iconIdOrWidget = AFUIThemeID.iconBack,
     dynamic iconColor,
@@ -2402,8 +2403,9 @@ class AFConceptualTheme {
         tooltip: translate(tooltip),
         onPressed: () async {
           if(shouldContinueCheck == null || await shouldContinueCheck() == AFShouldContinue.yesContinue) {
+            context.dispatchWireframe(screen, wid);
             context.dispatchNavigate(AFNavigatePopAction(id: wid));
-          }
+          } 
         }
     );
   }

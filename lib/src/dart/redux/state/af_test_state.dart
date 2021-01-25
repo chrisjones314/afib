@@ -150,11 +150,11 @@ class AFTestState {
     return copyWith(activeTestIds: revisedActive, testStates: revisedStates);
   }
 
-  AFTestState updateWireframeStateViews(AFTestDataRegistry registry) {
+  AFTestState updateWireframeStateViews(AFCompositeTestDataRegistry registry) {
     final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(this.testStates);
     for(final testState in testStates.values) {
       if(testState.stateViewId != null) { 
-        final stateView = registry.find(testState.stateViewId);
+        final stateView = registry.f(testState.stateViewId);
         revisedStates[testState.testId] = testState.reviseStateView(stateView);
       }
     }

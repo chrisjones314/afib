@@ -98,7 +98,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 
   final AFScreenMap screenMap = AFScreenMap();
   final AFAsyncQueries _afAsyncQueries = AFAsyncQueries();
-  final AFTestDataRegistry _afTestData = AFTestDataRegistry.create();
+  final AFCompositeTestDataRegistry _afTestData = AFCompositeTestDataRegistry.create();
   final primaryUITests = AFLibraryTestHolder<TState>();
   final thirdPartyUITests = <AFLibraryID, AFLibraryTestHolder>{};
   final internalOnlyScreens = <AFScreenID, AFibTestOnlyScreenElement>{};
@@ -501,7 +501,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   }
 
   /// Mapping from string ids to builders for specific screens for the real app.
-  AFTestDataRegistry get testData {
+  AFCompositeTestDataRegistry get testData {
     return _afTestData;
   }
 

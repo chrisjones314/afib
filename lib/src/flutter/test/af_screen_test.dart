@@ -961,7 +961,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   
   @override
   Future<void> updateStateViews(dynamic stateViews) {
-    final sv = AFibF.g.testData.findMultiple(stateViews);
+    final sv = AFibF.g.testData.findStateViews(stateViews);
     dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.testId, sv));
     return pauseForRender();
   }
@@ -1054,7 +1054,7 @@ abstract class AFScreenPrototypeTest {
   bool get hasReusable { return false; }
   List<String> paramDescriptions(AFReusableTestID id) { return <String>[]; }
   List<AFReusableTestID> get sectionIds { return <AFReusableTestID>[]; }
-  void startScreen(AFDispatcher dispatcher, AFTestDataRegistry registry, { AFRouteParam routeParam, AFStateView stateView });
+  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam routeParam, AFStateView stateView });
   Future<void> run(AFScreenTestContext context, { Function onEnd});
   void onDrawerReset(AFDispatcher dispatcher);
   Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator prevContext, AFSingleScreenTestState state, AFReusableTestID testId, Function onEnd);
@@ -1116,19 +1116,19 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
   }
 
   @override
-  void startScreen(AFDispatcher dispatcher, AFTestDataRegistry registry, { AFRouteParam routeParam, AFStateView stateView }) {
+  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam routeParam, AFStateView stateView }) {
     final svp = stateView ?? this.stateViews;
     final rvp = routeParam ?? this.routeParam;
-    final sv = registry.find(svp);
-    final rp = registry.find(rvp);
+    final sv = registry.f(svp);
+    final rp = registry.f(rvp);
 
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(
       this, 
       param: rp, 
       stateView: sv, 
       screen: screenId, 
-      stateViewId: AFTestDataRegistry.filterTestId(svp),
-      routeParamId: AFTestDataRegistry.filterTestId(rvp),
+      stateViewId: AFCompositeTestDataRegistry.filterTestId(svp),
+      routeParamId: AFCompositeTestDataRegistry.filterTestId(rvp),
     ));
     dispatcher.dispatch(AFNavigatePushAction(
       screen: this.screenId,
@@ -1151,7 +1151,7 @@ class AFSingleScreenPrototypeTest extends AFScreenPrototypeTest {
 
   void onDrawerReset(AFDispatcher dispatcher) {
     AFSingleScreenPrototypeTest.resetTestParam(dispatcher, this.id, this.screenId, this.routeParam);
-    final sv = AFibF.g.testData.findMultiple(this.stateViews);
+    final sv = AFibF.g.testData.findStateViews(this.stateViews);
     dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.id, sv));
   }
 
@@ -1194,18 +1194,18 @@ abstract class AFWidgetPrototypeTest extends AFScreenPrototypeTest {
     body.openTestDrawer(id);
   }
 
-  void startScreen(AFDispatcher dispatcher, AFTestDataRegistry registry, { AFRouteParam routeParam, AFStateView stateView }) {
+  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam routeParam, AFStateView stateView }) {
     final svp = stateView ?? this.stateViews;
     final rpp = routeParam ?? this.routeParam;
 
-    final sv = registry.find(svp);
-    final rp = registry.find(rpp);
+    final sv = registry.f(svp);
+    final rp = registry.f(rpp);
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, 
       stateView: sv, 
       screen: AFUIScreenID.screenPrototypeWidget, 
       param: rp,
-      stateViewId: AFTestDataRegistry.filterTestId(svp),
-      routeParamId: AFTestDataRegistry.filterTestId(rpp),
+      stateViewId: AFCompositeTestDataRegistry.filterTestId(svp),
+      routeParamId: AFCompositeTestDataRegistry.filterTestId(rpp),
     ));
     dispatcher.dispatch(AFPrototypeWidgetScreen.navigatePush(this, id: this.id));    
   }
@@ -1249,7 +1249,7 @@ class AFConnectedWidgetPrototypeTest extends AFWidgetPrototypeTest {
       param: AFPrototypeWidgetRouteParam(test: this, routeParam: this.routeParam),
       route: AFNavigateRoute.routeHierarchy
     ));
-    final sv = AFibF.g.testData.findMultiple(this.stateViews);
+    final sv = AFibF.g.testData.findStateViews(this.stateViews);
     dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.id, sv));
   }
 
@@ -1294,7 +1294,7 @@ class AFWorkflowStatePrototypeTest<TState extends AFAppStateArea> extends AFScre
     return AFibF.g.screenTests;
   }
 
-  void startScreen(AFDispatcher dispatcher, AFTestDataRegistry registry, { AFRouteParam routeParam, AFStateView stateView }) {
+  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam routeParam, AFStateView stateView }) {
     initializeMultiscreenPrototype<TState>(dispatcher, this);
   }
 
@@ -1365,7 +1365,7 @@ class AFWidgetTests<TState> {
     AFRouteParam routeParam,
     AFNavigatePushAction navigate,
   }) {
-    final sv = AFibF.g.testData.findMultiple(stateViews);    
+    final sv = AFibF.g.testData.findStateViews(stateViews);    
     final instance = AFConnectedWidgetPrototypeTest(
       id: id,
       stateViews: sv,
@@ -1564,11 +1564,11 @@ class AFSingleScreenTests<TState> {
   }
 
   void registerData(dynamic id, dynamic data) {
-    AFibF.g.testData.register(id, data);
+    AFibF.g.testData.registerAtomic(id, data);
   }
 
   dynamic findData(dynamic id) {
-    return AFibF.g.testData.find(id);
+    return AFibF.g.testData.f(id);
   }
 
   bool addPassIf({bool test}) {
@@ -1863,19 +1863,19 @@ class AFWorkflowStateTests<TState extends AFAppStateArea> {
 /// Base test definition wrapper, with access to test data.
 /// 
 class AFBaseTestDefinitionContext {
-  final AFTestDataRegistry registry;
+  final AFCompositeTestDataRegistry registry;
   AFBaseTestDefinitionContext(this.registry);
 
   /// Looks up the test data defined in your test_data.dart file for a particular
   /// test data id.
   dynamic td(dynamic testDataId) {
-    return registry.find(testDataId);
+    return registry.f(testDataId);
   }
 
   /// Looks up the test data defined in your test_data.dart file for a particular
   /// test data id.
   dynamic testData(dynamic testDataId) {
-    return registry.find(testDataId);
+    return registry.f(testDataId);
   }
 
 }
@@ -1885,7 +1885,7 @@ class AFUnitTestDefinitionContext extends AFBaseTestDefinitionContext {
 
   AFUnitTestDefinitionContext({
     this.tests,
-    AFTestDataRegistry testData
+    AFCompositeTestDataRegistry testData
   }): super(testData);
 
   void addTest(AFTestID id, AFUnitTestBodyExecuteDelegate fnTest) {
@@ -1903,7 +1903,7 @@ class AFStateTestDefinitionContext extends AFBaseTestDefinitionContext {
 
   AFStateTestDefinitionContext({
     this.tests,
-    AFTestDataRegistry testData
+    AFCompositeTestDataRegistry testData
   }): super(testData);
 
   /// Define a state test. 
@@ -1959,7 +1959,7 @@ class AFWidgetTestDefinitionContext extends AFBaseTestDefinitionContext {
   final AFWidgetTests tests;
   AFWidgetTestDefinitionContext({
     this.tests,
-    AFTestDataRegistry testData
+    AFCompositeTestDataRegistry testData
   }): super(testData);
 
   AFSingleScreenPrototype definePrototype({
@@ -1991,7 +1991,7 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
 
   AFSingleScreenTestDefinitionContext({
     this.tests,
-    AFTestDataRegistry testData
+    AFCompositeTestDataRegistry testData
   }): super(testData);
 
 
@@ -2122,7 +2122,7 @@ class AFWorkflowTestDefinitionContext extends AFBaseTestDefinitionContext {
 
   AFWorkflowTestDefinitionContext({
     this.tests,
-    AFTestDataRegistry testData
+    AFCompositeTestDataRegistry testData
   }): super(testData);
 
   AFWorkflowStateTestPrototype definePrototype({

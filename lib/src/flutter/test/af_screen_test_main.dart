@@ -128,7 +128,7 @@ Future<void> _afWidgetTestMain<TState extends AFAppStateArea>(AFCommandOutput ou
 
 Future<void> _afSingleScreenTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
   return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.screenTests.all, "Single-Screen", (test) {
-    final stateViews = AFibF.g.testData.findMultiple(test.stateViews);
+    final stateViews = AFibF.g.testData.findStateViews(test.stateViews);
     return [
       AFStartPrototypeScreenTestAction(test, param: test.routeParam, stateView: stateViews, screen: test.screenId, stateViewId: null, routeParamId: null),
       AFNavigatePushAction(

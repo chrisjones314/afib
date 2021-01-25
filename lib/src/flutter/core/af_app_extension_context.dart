@@ -168,7 +168,7 @@ class AFTestExtensionContext {
     sharedTestContext.registerExtractor(extract);
   }
 
-  void _initTestData(AFTestDataRegistry testData) {
+  void _initTestData(AFCompositeTestDataRegistry testData) {
     for(final init in initTestDatas) {
       init(testData);
     }
@@ -212,7 +212,7 @@ class AFTestExtensionContext {
   }
 
   void initialize({
-    @required AFTestDataRegistry testData, 
+    @required AFCompositeTestDataRegistry testData, 
     @required AFUnitTests unitTests,
     @required AFStateTests stateTests,
     @required AFWidgetTests widgetTests,

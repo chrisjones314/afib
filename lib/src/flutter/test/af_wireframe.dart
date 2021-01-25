@@ -37,7 +37,7 @@ class AFWireframeExecutionContext {
   }
 
   dynamic td(dynamic id) {
-    return wireframe.registry.find(id);
+    return wireframe.registry.f(id);
   }
 
   void updateTestData(dynamic objectId, dynamic value, { bool updateStates = true }) {
@@ -62,7 +62,7 @@ class AFWireframe {
   final String name;
   final AFSingleScreenTestID initialScreen;
   final AFWireframeExecutionDelegate body;
-  final AFTestDataRegistry registry;
+  final AFCompositeTestDataRegistry registry;
 
   AFWireframe({
     @required this.name, 
@@ -81,7 +81,7 @@ class AFWireframe {
   }
 
   void updateTestData(dynamic objectId, dynamic value) {
-    registry.register(objectId, value);
+    registry.registerAtomic(objectId, value);
   }
 
 
@@ -98,7 +98,7 @@ class AFWireframe {
 
 class AFWireframeDefinitionContext {
   final AFWireframes wireframes;
-  final AFTestDataRegistry testData;
+  final AFCompositeTestDataRegistry testData;
 
   AFWireframeDefinitionContext({
     this.wireframes,

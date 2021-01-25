@@ -33,7 +33,7 @@ class AFResetTestState {
 }
 
 class AFTestUpdateWireframeStateViews {
-  final AFTestDataRegistry registry;
+  final AFCompositeTestDataRegistry registry;
 
   AFTestUpdateWireframeStateViews(this.registry);  
 }

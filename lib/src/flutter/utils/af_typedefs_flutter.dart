@@ -87,7 +87,7 @@ typedef AFWorkflowTestBodyExecuteDelegate = Future<void> Function(AFWorkflowTest
 typedef AFWidgetBuilderDelegate<TBuildContext extends AFBuildContext> = Widget Function(TBuildContext context);
 
 /// Delegate used to initialize test data 
-typedef AFInitTestDataDelegate = void Function(AFTestDataRegistry registry);
+typedef AFInitTestDataDelegate = void Function(AFCompositeTestDataRegistry registry);
 
 /// Delegate used to initialize unit tests.
 typedef AFInitUnitTestsDelegate = void Function(AFUnitTestDefinitionContext context);
@@ -168,4 +168,4 @@ typedef AFCreateConceptualThemeDelegate = AFConceptualTheme Function(AFFundament
 
 typedef AFWireframeExecutionDelegate = void Function(AFWireframeExecutionContext we);
 
-typedef AFTestDataCompositeGeneratorDelegate = void Function(AFTestDataRegistry destination);
+typedef AFTestDataCompositeGeneratorDelegate = void Function(AFCompositeTestDataRegistry destination);

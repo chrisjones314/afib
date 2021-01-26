@@ -15,6 +15,8 @@ abstract class AFWidgetAction {
   bool matches(String actionType, Element element);
 }
 
+
+
 /// A superclass for actions that apply to a widget based on its runtimeType.
 abstract class AFWidgetByTypeAction {
   /// The type of the widget that this can tap on.
@@ -34,7 +36,7 @@ abstract class AFWidgetByTypeAction {
 abstract class AFApplyWidgetAction extends AFWidgetByTypeAction {
   static const applyTap = "apply_tap";
   static const applySetValue = "apply_set_value";
-  static const applyDismiss = "applyDismiss";
+  static const applyDismiss = "apply_dismiss";
 
   AFApplyWidgetAction(String actionType, Type appliesTo): super(actionType, appliesTo);
 
@@ -52,6 +54,56 @@ abstract class AFApplyWidgetAction extends AFWidgetByTypeAction {
   /// Implementations should override this method, and return false if they fail.
   bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data);
 }
+
+abstract class AFScrollTracker {
+  final AFWidgetSelector selector;
+  final Element element;
+
+  AFScrollTracker(this.selector, this.element);
+  bool canScrollMore();
+  Future<void> scrollMore();
+}
+
+abstract class AFScrollerAction {
+  bool matches(Element elem);
+  AFScrollTracker createScrollTracker(AFWidgetSelector selector, Element element);
+}
+
+class AFScrollableScrollTracker extends AFScrollTracker {
+
+  AFScrollableScrollTracker(AFWidgetSelector selector, Element element): super(selector, element);
+  
+  bool canScrollMore() {
+    final controller = _controller();
+    return controller.offset < controller.position.maxScrollExtent;
+  }
+  Future<void> scrollMore() async {
+    final controller = _controller();
+    var newPos = controller.offset +  200;
+    if(newPos > controller.position.maxScrollExtent) {
+      newPos = controller.position.maxScrollExtent;
+    }
+    await controller.animateTo(newPos, duration: Duration(milliseconds: 500), curve: Curves.ease);
+  }
+
+  ScrollController _controller() {
+    final Scrollable s = element.widget;
+    return s.controller;
+  }
+}
+
+class AFScrollableScrollerAction extends AFScrollerAction {
+  bool matches(Element elem) {
+    final widget = elem.widget;
+    return widget is Scrollable;
+  }
+
+  AFScrollTracker createScrollTracker(AFWidgetSelector selector, Element element) {
+    return AFScrollableScrollTracker(selector, element);
+  }
+}
+
+
 
 abstract class AFApplyTapWidgetAction extends AFApplyWidgetAction {
   AFApplyTapWidgetAction(Type appliesTo): super(AFApplyWidgetAction.applyTap, appliesTo);
@@ -479,4 +531,3 @@ class AFSwitchExtractor extends AFExtractPrimaryWidgetAction {
   }
 
 }
-

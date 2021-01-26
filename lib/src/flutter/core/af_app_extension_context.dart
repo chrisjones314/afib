@@ -18,6 +18,7 @@ import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 class AFSharedTestExtensionContext {
   final extractors = <AFExtractWidgetAction>[];
   final applicators = <AFApplyWidgetAction>[];
+  final scrollers = <AFScrollerAction>[];
 
   void initializeApp() {
     _registerDefaultApplicators();
@@ -52,6 +53,8 @@ class AFSharedTestExtensionContext {
     registerExtractor(AFExtractTextAFTextFieldAction());
     registerExtractor(AFExtractRichTextAction());
     registerExtractor(AFSwitchExtractor());    
+
+    registerScroller(AFScrollableScrollerAction());
   }
 
   /// Register a way to tap or set a value on a particular kind of widget.
@@ -70,12 +73,21 @@ class AFSharedTestExtensionContext {
     }
   }
 
+  void registerScroller(AFScrollerAction scroller) {
+    if(_needWidgetActions) {
+      scrollers.add(scroller);
+    }
+  }
+
   void mergeWith(AFSharedTestExtensionContext other) {
-    extractors.clear();
+    //extractors.clear();
     extractors.addAll(_merge<AFExtractWidgetAction>(extractors, other.extractors));
 
-    applicators.clear();
+    //applicators.clear();
     applicators.addAll(_merge<AFApplyWidgetAction>(applicators, other.applicators));
+
+    //scrollers.clear();
+    scrollers.addAll(_merge<AFScrollerAction>(scrollers, other.scrollers));
   }
 
   Iterable<TAction> _merge<TAction>(List<TAction> source1, List<TAction> source2) {

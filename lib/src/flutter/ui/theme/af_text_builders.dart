@@ -86,6 +86,10 @@ class AFTextBuilder {
     this.style
   });
 
+  bool get isEmpty {
+    return buffer.isEmpty;
+  }
+
   void write(dynamic idOrText) {
     final trans = theme.translate(idOrText);
     buffer.write(trans);

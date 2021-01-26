@@ -28,10 +28,12 @@ import 'package:flutter_test/flutter_test.dart' as ft;
 typedef AFTestScreenExecuteDelegate = Future<void> Function(AFScreenTestExecute ste);
 typedef AFVerifyReturnValueDelegate = void Function(dynamic value);
 
+
 /// A utility class used to pass 
 abstract class AFWidgetSelector {
   final elements = <Element>[];
-  AFScreenTestWidgetCollectorScrollableSubpath parentScrollable;
+  //AFScreenTestWidgetCollectorScrollableSubpath parentScrollable;
+  final scrollables = <AFScrollTracker>[];
 
   void add(Element elem) {
     elements.add(elem);
@@ -45,10 +47,6 @@ abstract class AFWidgetSelector {
     elements.clear();
   }
 
-  bool get isUnderScrollable {
-    return parentScrollable != null;
-  }
-
   bool matchesPath(List<Element> elem) {
     // by default, just match the leaf, but allow for more complicated
     // paths
@@ -57,6 +55,22 @@ abstract class AFWidgetSelector {
 
   Element activeElementForPath(List<Element> elems) {
     return elems.last;
+  }
+
+  bool canScrollMore() {
+    if(scrollables.isEmpty) {
+      return false;
+    }    
+    final scrollable = scrollables.first;
+    return scrollable.canScrollMore();
+  }
+
+  Future<void> scrollMore() async {
+    if(scrollables.isEmpty) {
+      return;
+    }    
+    final scrollable = scrollables.first;
+    return scrollable.scrollMore();    
   }
 
   bool matches(Element elem);
@@ -577,14 +591,20 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
     return applyWidgetValue(selector, value, AFApplyWidgetAction.applySetValue, maxWidgets:  maxWidgets, extraFrames: extraFrames+1, verifyActions: verifyActions, verifyParamUpdate: verifyParamUpdate, verifyQuery: verifyQuery);
   }
 
-  Future<List<Element>> findWidgetsFor(dynamic selector, { bool scrollIfMissing = true}) async {
+  Future<List<Element>> findWidgetsFor(dynamic selector, { @required bool shouldScroll }) async {
     if(slowOnScreenMillis > 0 && !AFibD.config.isWidgetTesterContext) {
       await Future<void>.delayed(Duration(milliseconds: slowOnScreenMillis));
     }
     final sel = AFWidgetSelector.createSelector(activeSelectorPath, selector);
     final info = AFibF.g.internalOnlyFindScreen(activeScreenId);
+
     final currentPath = <Element>[];
-    _populateChildrenDirect(info.element, currentPath, sel, null, underScaffold: false);
+    _populateChildrenDirect(info.element, currentPath, sel, null, underScaffold: false, collectScrollable: true);
+    while(sel.elements.isEmpty && shouldScroll && sel.canScrollMore()) {
+      await sel.scrollMore();
+      _populateChildrenDirect(info.element, currentPath, sel, null, underScaffold: false, collectScrollable: false);
+    }
+
     return sel.elements;
   }
 
@@ -610,53 +630,34 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
 
   // Go though all the children of [current], having the parent path [currentPath],
   // and add path entries for any widgets with keys.
-  void _populateChildrenDirect(Element currentElem, List<Element> currentPath, AFWidgetSelector selector, AFScreenTestWidgetCollectorScrollableSubpath parentScrollable, { bool underScaffold }) {
+  void _populateChildrenDirect(Element currentElem, List<Element> currentPath, AFWidgetSelector selector, AFScreenTestWidgetCollectorScrollableSubpath parentScrollable, { bool underScaffold, @required bool collectScrollable }) {
 
     // add the current element.
     currentPath.add(currentElem);
 
-    /*
-    final widget = currentElem.widget;
-    if(widget is Scrollable) {
-      parentScrollable = addScrollableAt(currentPath);
-    }
-
-    if(underScaffold && !hasScaffoldState) {
-      final scaffoldState = Scaffold.of(currentElem);
-      if(scaffoldState != null) {
-        this.scaffoldState = scaffoldState;
+    if(collectScrollable) {
+      final scroller = AFibF.g.screenTests.findScroller(currentElem);
+      if(scroller != null) {
+        selector.scrollables.add(scroller.createScrollTracker(selector, currentElem));
       }
     }
-    */
 
     if(selector.matchesPath(currentPath)) {
       final activeElement = selector.activeElementForPath(currentPath);
       if(!selector.contains(activeElement)) {
         selector.add(activeElement);
       }
-    
-      if(parentScrollable != null) {
-        selector.parentScrollable = parentScrollable;
-      }
     }
 
     // do this same process recursively on the childrne.
     currentElem.visitChildren((child) {
       final nowUnderScaffold = underScaffold || currentElem.widget is Scaffold;
-      _populateChildrenDirect(child, currentPath, selector, parentScrollable, underScaffold: nowUnderScaffold);
+      _populateChildrenDirect(child, currentPath, selector, parentScrollable, underScaffold: nowUnderScaffold, collectScrollable: collectScrollable);
     });
 
     // maintain the path as we go back up.
     currentPath.removeLast();
   }
-
-  /*
-  AFScreenTestWidgetCollectorScrollableSubpath addScrollableAt(List<Element> path) {
-    final result = AFScreenTestWidgetCollectorScrollableSubpath.create(path);
-    scrollables.add(result);
-    return result;
-  }
-  */
 
 }
 
@@ -858,7 +859,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   AFTestID get testID { return this.testId; }
 
   Future<void> visitWidget(dynamic selector, Function(Element elem) onFound, { int extraFrames = 0 }) async {
-    final elems = await findWidgetsFor(selector);
+    final elems = await findWidgetsFor(selector, shouldScroll: true);
     this.expect(elems.length, ft.equals(1), extraFrames: extraFrames+1);
     if(elems.length > 0) {
       onFound(elems.first);
@@ -867,20 +868,20 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   }
 
   Future<void> visitWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 }) async {
-    final elems = await findWidgetsFor(selector);
+    final elems = await findWidgetsFor(selector, shouldScroll: true);
     onFound(elems);
     return keepSynchronous();
   }
 
   Future<void> visitNWidgets(dynamic selector, int n, {int extraFrames = 0, bool scrollIfMissing = true}) async {
-    final elems = await findWidgetsFor(selector, scrollIfMissing: scrollIfMissing);
+    final elems = await findWidgetsFor(selector, shouldScroll: scrollIfMissing);
     this.expect(elems.length, ft.equals(n), extraFrames: extraFrames+1);
     return keepSynchronous();
   }
 
   Future<void> matchWidgetValue(dynamic selectorDyn, ft.Matcher matcher, { String extractType = AFExtractWidgetAction.extractPrimary, int extraFrames = 0 }) async {
     final selector = AFWidgetSelector.createSelector(null, selectorDyn);
-    final elems = await findWidgetsFor(selector);
+    final elems = await findWidgetsFor(selector, shouldScroll: false);
     if(elems.isEmpty) {
       this.expect(elems, ft.isNotEmpty, extraFrames: extraFrames+1);
       return;
@@ -905,7 +906,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
     }) async {
     AFibF.g.testOnlyClearRecentActions();
     final selector = AFWidgetSelector.createSelector(null, selectorDyn);
-    final elems = await findWidgetsFor(selector);
+    final elems = await findWidgetsFor(selector, shouldScroll: true);
     if(maxWidgets > 0 && maxWidgets < elems.length) {
       throw AFException("Expected at most $maxWidgets widget for selector $selector, found ${elems.length} widgets");
     }
@@ -1517,6 +1518,15 @@ class AFSingleScreenTests<TState> {
     for(final apply in AFibF.g.sharedTestContext.applicators) {
       if(apply.matches(actionType, elem)) {
         return apply;
+      }
+    }
+    return null;
+  }
+
+  AFScrollerAction findScroller(Element elem) {
+    for(final scroller in AFibF.g.sharedTestContext.scrollers) {
+      if(scroller.matches(elem)) {
+        return scroller;
       }
     }
     return null;

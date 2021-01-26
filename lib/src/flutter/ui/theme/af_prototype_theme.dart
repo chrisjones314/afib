@@ -24,6 +24,7 @@ class AFPrototypeTheme extends AFConceptualTheme {
     dynamic fontSize,
     dynamic fontWeight,
     TextAlign textAlign,
+    TextOverflow overflow,
   }) {
     return super.childText(text,
       wid: wid,
@@ -31,7 +32,8 @@ class AFPrototypeTheme extends AFConceptualTheme {
       textColor: textColor,
       fontSize: fontSize,
       fontWeight: fontWeight,
-      textAlign: textAlign);
+      textAlign: textAlign,
+      overflow: overflow);
   }
 
   Widget testExplanationText(String explanation) {

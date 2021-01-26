@@ -56,6 +56,7 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
             AFibD.logTest?.d("Rebuilding screen $runtimeType/$screenIdRegister with param ${dataContext.p}");
           }
 
+
           final conceptualTheme = createConceptualTheme(buildContext, dataContext.theme);
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p, dataContext.paramWithChildren, conceptualTheme, this);
           final widgetResult = buildWithContext(withContext);

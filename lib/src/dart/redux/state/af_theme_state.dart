@@ -1677,9 +1677,8 @@ class AFConceptualTheme {
 
   AFTextBuilder childTextBuilder({
     AFWidgetID wid,
-    dynamic textStyle
+    dynamic style,
   }) {
-    final style = textStyle != null ? textStyle(textStyle) : null;
     return AFTextBuilder(
       theme: fundamentals,
       wid: wid,
@@ -1984,6 +1983,7 @@ class AFConceptualTheme {
     dynamic fontSize,
     dynamic fontWeight,
     TextAlign textAlign,
+    TextOverflow overflow,
   }) {
     TextStyle styleS;
     if(style != null) {
@@ -2004,6 +2004,7 @@ class AFConceptualTheme {
       style: styleS,
       textAlign: textAlign,
       textScaleFactor: deviceTextScaleFactor,
+      overflow: overflow,
     );
   }
 

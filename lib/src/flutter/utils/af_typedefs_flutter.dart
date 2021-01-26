@@ -164,7 +164,7 @@ typedef AFOnChangedBoolDelegate = void Function(bool);
 
 typedef AFOnChangedStringDelegate = void Function(String);
 
-typedef AFCreateConceptualThemeDelegate = AFConceptualTheme Function(AFFundamentalTheme fundamentals, ThemeData themeData);
+typedef AFCreateConceptualThemeDelegate = AFFunctionalTheme Function(AFFundamentalThemeState fundamentals);
 
 typedef AFWireframeExecutionDelegate = void Function(AFWireframeExecutionContext we);
 

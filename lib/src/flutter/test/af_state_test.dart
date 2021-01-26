@@ -37,11 +37,11 @@ class AFStateTestDifference {
     return _findAppState(afStateAfter);
   }
 
-  TAppTheme themeBefore<TAppTheme extends AFConceptualTheme>(AFThemeID themeId) {
+  TAppTheme themeBefore<TAppTheme extends AFFunctionalTheme>(AFThemeID themeId) {
     return _findAppTheme(afStateBefore, themeId);
   }
 
-  TAppTheme themeAfter<TAppTheme extends AFConceptualTheme>(AFThemeID themeId) {
+  TAppTheme themeAfter<TAppTheme extends AFFunctionalTheme>(AFThemeID themeId) {
     return _findAppTheme(afStateAfter, themeId);
   }
 
@@ -58,7 +58,7 @@ class AFStateTestDifference {
     return areas.stateFor(TAppState);
   }
 
-  TAppTheme _findAppTheme<TAppTheme extends AFConceptualTheme>(AFState state, AFThemeID themeId) {
+  TAppTheme _findAppTheme<TAppTheme extends AFFunctionalTheme>(AFState state, AFThemeID themeId) {
     final themes = state.public.themes;
     return themes.findById(themeId);
   }

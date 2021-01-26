@@ -268,10 +268,11 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
           selectedColor: t.colorPrimary,
           onSelected: (val) {
             if(val) {
-              context.dispatch(AFOverrideThemeValueAction(
+              _overrideThemeValue(
+                context: context,
                 id: attr,
                 value: value,
-              ));            
+              );            
             }
           }
         ));
@@ -281,6 +282,14 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     return Column(
       children: rows
     );
+  }
+
+  void _overrideThemeValue({AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFThemeID id, dynamic value}) {
+      context.dispatch(AFOverrideThemeValueAction(
+        id: id,
+        value: value,
+      ));     
+      context.dispatch(AFRebuildFunctionalThemes());       
   }
 
   Widget _buildLocaleAttributeRowValue(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFThemeID attr, dynamic attrValue) {
@@ -294,10 +303,11 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
       label: t.childText("Identifiers", textColor: t.colorOnPrimary),
       selectedColor: t.colorPrimary,
       onSelected: (val) {
-        context.dispatch(AFOverrideThemeValueAction(
+        _overrideThemeValue(
+          context: context,
           id: AFUIThemeID.showTranslationsIDs,
           value: true
-        ));
+        );            
       } 
     ));    
 
@@ -310,14 +320,16 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
         selectedColor: t.colorPrimary,
         onSelected: (val) {
           if(val) {
-            context.dispatch(AFOverrideThemeValueAction(
+            _overrideThemeValue(
+              context: context,
               id: AFUIThemeID.showTranslationsIDs,
-              value: false 
-            ));
-            context.dispatch(AFOverrideThemeValueAction(
+              value: false
+            );            
+            _overrideThemeValue(
+              context: context,
               id: attr,
               value: value,
-            ));            
+            );            
           }
         }
       ));
@@ -352,10 +364,11 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
             return Row(children: [Switch(          
               value: attrVal,
               onChanged: (attrValNow) {
-                context.dispatch(AFOverrideThemeValueAction(
+                _overrideThemeValue(
+                  context: context,
                   id: attr,
                   value: attrValNow,
-                ));
+                );            
               }
             )]);
           }
@@ -470,12 +483,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
       onPressed: ()  {
         _onRun(context, defaultRunId);
       }
-    );
-
-
-    
-      
-    
+    );   
   }
 
   Widget _buildTestContent(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {

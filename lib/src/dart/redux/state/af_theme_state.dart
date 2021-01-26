@@ -8,7 +8,6 @@ import 'package:afib/src/flutter/ui/theme/af_text_builders.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:quiver/core.dart';
 
 /// These are fundamental values for theming derived from the device
 /// and operating system itself.
@@ -70,22 +69,22 @@ class AFFundamentalDeviceTheme {
     throw AFException("Unknown device theme value: $id");
   }
 
-  Brightness brightness(AFFundamentalTheme fundamentals) {
+  Brightness brightness(AFFundamentalThemeState fundamentals) {
     Brightness b = fundamentals.findValue(AFUIThemeID.brightness);
     return b ?? brightnessValue;
   }
 
-  bool alwaysUse24HourFormat(AFFundamentalTheme fundamentals) {
+  bool alwaysUse24HourFormat(AFFundamentalThemeState fundamentals) {
     bool b = fundamentals.findValue(AFUIThemeID.alwaysUse24HourFormat);
     return b ?? alwaysUse24HourFormatValue;
   }
 
-  Locale locale(AFFundamentalTheme fundamentals) {
+  Locale locale(AFFundamentalThemeState fundamentals) {
     Locale l = fundamentals.findValue(AFUIThemeID.locale);
     return l ?? localeValue;
   }
 
-  double textScaleFactor(AFFundamentalTheme fundamentals) {
+  double textScaleFactor(AFFundamentalThemeState fundamentals) {
     double ts = fundamentals.findValue(AFUIThemeID.textScaleFactor);
     return ts ?? textScaleFactorValue;
   }
@@ -106,7 +105,7 @@ class AFFundamentalThemeValue {
 /// A theme value that refers to other values, and needs to be resolved 
 /// at the end of the theme creation process.
 abstract class AFThemeResolvableValue {
-  void resolve(AFFundamentalTheme theme);
+  void resolve(AFFundamentalThemeState theme);
 }
 
 /// A summary of a text style composed from other theme components.
@@ -123,7 +122,7 @@ class AFTextStyle extends AFThemeResolvableValue {
     this.weight,
   });
 
-  void resolve(AFFundamentalTheme theme) {
+  void resolve(AFFundamentalThemeState theme) {
     final c = theme.foreground(color);
     final fs = theme.size(fontSize);
     final fw = theme.weight(weight);
@@ -154,7 +153,7 @@ class AFColor extends AFThemeResolvableValue {
 
   Color color(Brightness brightness) { return brightness == Brightness.light ? colorLightCache : colorDarkCache; }
 
-  void resolve(AFFundamentalTheme theme) {
+  void resolve(AFFundamentalThemeState theme) {
     colorLightCache = theme.color(colorLight);
     colorDarkCache = theme.color(colorDark);
   }
@@ -164,8 +163,8 @@ class AFColor extends AFThemeResolvableValue {
 /// A pairing of [AFColor] for foreground and background.
 /// 
 /// You can register one of these, and then automatically get the 
-/// correct color with [AFConceptualTheme.colorForeground] and
-/// [AFConceptualTheme.colorBackground]
+/// correct color with [AFFunctionalTheme.colorForeground] and
+/// [AFFunctionalTheme.colorBackground]
 class AFColorPairing extends AFThemeResolvableValue {
   final AFColor foreground;
   final AFColor background;
@@ -183,7 +182,7 @@ class AFColorPairing extends AFThemeResolvableValue {
     return background.color(brightness);
   }
 
-  void resolve(AFFundamentalTheme theme) {
+  void resolve(AFFundamentalThemeState theme) {
     foreground.resolve(theme);
     background.resolve(theme);
   }
@@ -700,7 +699,7 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
   /// Values which are not specified will be derived intelligently.
   /// 
   /// marginScale and paddingScale should each contain six values, starting with zero, which 
-  /// specify the various values returned [AFConceptualTheme.margin] and [AFConceptualTheme.padding]
+  /// specify the various values returned [AFFunctionalTheme.margin] and [AFFunctionalTheme.padding]
   void setAfibFundamentals({
     List<double> marginSizes = bootstrapStandardMargins,
     List<double> paddingSizes = bootstrapStandardPadding,
@@ -958,37 +957,42 @@ class AFSpacing {
 
 /// Fundamental values that contribute to theming in the app.
 /// 
-/// An [AFFundamentalTheme] provides fundamental values like
+/// An [AFFundamentalThemeState] provides fundamental values like
 /// colors, fonts, and measurements which determine the basic
 /// properties of the UI.   It is the place where you store
 /// and manipulate data values that contribute to a them.
 /// 
-/// [AFConceptualTheme] doesn't have its own mutable data values,
+/// [AFFunctionalTheme] doesn't have its own mutable data values,
 /// instead it provides a functional wrapper that creates 
 /// conceptual components in the UI based on the values in 
 /// a fundamental theme.
-@immutable
-class AFFundamentalTheme {
+class AFFundamentalThemeState {
   static const badSizeIndexError = "You must specify an index into your 6 standard sizes";
+  ThemeData themeData;
   final AFFundamentalDeviceTheme device;
   final AFFundamentalThemeArea area;
   final AFSpacing marginSpacing;
   final AFSpacing paddingSpacing;
   final AFBorderRadius borderRadius;
 
-  AFFundamentalTheme({
+  AFFundamentalThemeState({
     @required this.device,
     @required this.area,
     @required this.marginSpacing,
     @required this.paddingSpacing,
-    @required this.borderRadius
+    @required this.borderRadius,
+    @required this.themeData,
   });    
 
   List<dynamic> optionsForType(AFThemeID id) {
     return area.optionsForType[id];
   }
 
-  AFFundamentalTheme reviseOverrideThemeValue(AFThemeID id, dynamic value) {
+  void updateThemeData(ThemeData td) {
+    themeData = td;
+  }
+
+  AFFundamentalThemeState reviseOverrideThemeValue(AFThemeID id, dynamic value) {
 
     return copyWith(
       device: device,
@@ -1000,16 +1004,18 @@ class AFFundamentalTheme {
     return area.showTranslationIds;
   }
 
-  AFFundamentalTheme copyWith({
+  AFFundamentalThemeState copyWith({
     AFFundamentalDeviceTheme device,
     AFFundamentalThemeArea area,
+    ThemeData themeData
   }) {
-    return AFFundamentalTheme(
+    return AFFundamentalThemeState(
       area: area ?? this.area,
       device: device ?? this.device,
       marginSpacing: this.marginSpacing,
       paddingSpacing: this.paddingSpacing,
       borderRadius: this.borderRadius,
+      themeData: themeData ?? this.themeData,
     );
   }
 
@@ -1300,50 +1306,40 @@ class AFFundamentalTheme {
 
 }
 
-/// Conceptual themes are interfaces that provide UI theming
-/// for conceptual componenets that are shared across many pages
-/// in the app
+/// Functional themes are interfaces that provide UI theming
+/// for conceptual components that are shared across many pages
+/// in the app.
 /// 
-/// For example, a conceptual theme would answer the question,
-/// what does a 'primary button' look like, or what does a 
-/// 'secondary button' look like.
+/// For example, a functional theme might answer the question,
+/// what does a recurring 'section header' look like across the app.
 /// 
-/// An app will have at least one conceptual theme, but it might
-/// split conceptual themes up into multiple areas (e.g. settings, 
+/// An app will have at least one functional theme, but it might
+/// split functional themes up into multiple areas (e.g. settings, 
 /// signin, main app, etc).
 /// 
-/// Conceptual themes also provide a way for complex third party 
+/// Functional themes also provide a way for complex third party 
 /// components (for example, an entire set of third party signin pages,
 /// a map or audio/video component) to delegate theming decisions
-/// to the app that contains them.
+/// to the app that contains them.  Apps can override the functional themes
+/// provided by third parties.  
 /// 
-/// Each [AFConnectedWidget] is parmeterized with a conceptual theme
+/// Functional themes should never contain data.  Data should be stored in
+/// the [AFFundamentalThemeState], which is referenced by each functional theme.
+/// 
+/// Each [AFConnectedWidget] is parmeterized with a functional theme
 /// type, and that theme will be accessible via the context.theme and
 /// context.t methods.
-class AFConceptualTheme {
+@immutable
+class AFFunctionalTheme {
   final AFThemeID id;
-  AFFundamentalTheme fundamentals;
-  ThemeData themeData;
-  AFConceptualTheme({
+  final AFFundamentalThemeState fundamentals;
+  AFFunctionalTheme({
     @required this.fundamentals,
     @required this.id,
-    @required this.themeData,
   });
 
-  void update({
-    AFFundamentalTheme fundamentals,
-    ThemeData themeData,
-  }) {
-    this.fundamentals = fundamentals;
-    this.themeData = themeData;
-  }
-
-  bool operator==(Object other) {
-    return (other is AFConceptualTheme && other.fundamentals == fundamentals && other.themeData == themeData);
-  }
-
-  int get hashCode {
-    return hash2(fundamentals.hashCode, themeData.hashCode);
+  ThemeData get themeData {
+    return fundamentals.themeData;
   }
 
   /// A utility for creating a list of widgets in a row.   
@@ -1760,13 +1756,13 @@ class AFConceptualTheme {
 
 
 
-  /// As long as you are calling [AFConceptualTheme.childScaffold], you don't need
+  /// As long as you are calling [AFFunctionalTheme.childScaffold], you don't need
   /// to worry about this, it will be done for you.
   Widget childDebugDrawerBegin(Widget beginDrawer) {
     return _createDebugDrawer(beginDrawer, AFScreenPrototypeTest.testDrawerSideBegin);
   }
 
-  /// As long as you are calling [AFConceptualTheme.childScaffold], you don't need
+  /// As long as you are calling [AFFunctionalTheme.childScaffold], you don't need
   /// to worry about this, it will be done for you.
   Widget childDebugDrawerEnd(Widget endDrawer) {
     return _createDebugDrawer(endDrawer, AFScreenPrototypeTest.testDrawerSideEnd);
@@ -1789,7 +1785,7 @@ class AFConceptualTheme {
     );
   }
 
-  /// As long as you are calling [AFConceptualTheme.childScaffold], you don't need
+  /// As long as you are calling [AFFunctionalTheme.childScaffold], you don't need
   /// to worry about this, it will be done for you.
   Widget _createDebugDrawer(Widget drawer, int testDrawerSide) {
     final store = AFibF.g.storeInternalOnly;
@@ -2500,34 +2496,33 @@ class AFConceptualTheme {
 }
 
 /// Can be used as a template parameter when you don't want a theme.
-class AFConceptualThemeUnused extends AFConceptualTheme {
-  AFConceptualThemeUnused(AFFundamentalTheme fundamentals, ThemeData themeData): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualUnused, themeData: themeData);
+class AFConceptualThemeUnused extends AFFunctionalTheme {
+  AFConceptualThemeUnused(AFFundamentalThemeState fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualUnused);
 }
-
 
 /// Captures the current state of the primary theme, and
 /// any registered third-party themes.
 class AFThemeState {
-  final AFFundamentalTheme fundamentals;
-  final Map<AFThemeID, AFConceptualTheme> conceptuals;  
+  final AFFundamentalThemeState fundamentals;
+  final Map<AFThemeID, AFFunctionalTheme> functionals;  
 
   AFThemeState({
     @required this.fundamentals,
-    @required this.conceptuals
+    @required this.functionals
   });
 
-  AFConceptualTheme findById(AFThemeID id) {
-    return conceptuals[id];
+  AFFunctionalTheme findById(AFThemeID id) {
+    return functionals[id];
   }
 
   factory AFThemeState.create({
-    AFFundamentalTheme fundamentals,
-    Map<AFThemeID, AFConceptualTheme> conceptuals
+    AFFundamentalThemeState fundamentals,
+    Map<AFThemeID, AFFunctionalTheme> functionals
   }) {
 
     return AFThemeState(
       fundamentals: fundamentals,
-      conceptuals: conceptuals
+      functionals: functionals
     );
   }
 
@@ -2542,12 +2537,16 @@ class AFThemeState {
     return AFibF.g.initializeThemeState();
   }
 
+  AFThemeState reviseRebuildFunctional() {
+    return AFibF.g.rebuildFunctionalThemes();
+  }
+
   AFThemeState copyWith({
-    AFFundamentalTheme fundamentals,
-     Map<AFThemeID, AFConceptualTheme> conceptuals,
+    AFFundamentalThemeState fundamentals,
+     Map<AFThemeID, AFFunctionalTheme> functionals,
   }) {
     return AFThemeState.create(
-      conceptuals: conceptuals ?? this.conceptuals,
+      functionals: functionals ?? this.functionals,
       fundamentals: fundamentals ?? this.fundamentals
     );
   }

@@ -58,7 +58,7 @@ abstract class AFMaterialApp<AppState> extends AFApp<AppState> {
   }
 
   Widget _buildMaterialApp(BuildContext context) {
-    return StoreConnector<AFState, AFFundamentalTheme>(
+    return StoreConnector<AFState, AFFundamentalThemeState>(
         converter: (store) {
           return store.state.public.themes.fundamentals;
         },
@@ -70,7 +70,7 @@ abstract class AFMaterialApp<AppState> extends AFApp<AppState> {
   }
 
   /// Build a [MaterialApp] for the application
-  Widget buildMaterialApp(AFFundamentalTheme themeData);
+  Widget buildMaterialApp(AFFundamentalThemeState themeData);
 
   AFNavigatorObserver createAFNavigatorObserver() {
     return AFNavigatorObserver();

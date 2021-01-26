@@ -10,7 +10,7 @@ class AFAppUILibrary extends AFMaterialApp<AFAppStateArea> {
 
   //----------------------------------------------------------------------------
   @override
-  Widget buildMaterialApp(AFFundamentalTheme fundamentals) {
+  Widget buildMaterialApp(AFFundamentalThemeState fundamentals) {
     final screenMap = AFibF.g.effectiveScreenMap;
     return MaterialApp(
         title: 'AFib UI Library',

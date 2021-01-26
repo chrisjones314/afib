@@ -287,14 +287,25 @@ class AFConceptualThemeDefinitionContext {
     themeFactories[id] = createTheme;
   }
 
-  AFConceptualTheme create(AFThemeID id, AFFundamentalTheme fundamentals, ThemeData themeData) {
+  AFFunctionalTheme create(AFThemeID id, AFFundamentalThemeState fundamentals) {
     final create = themeFactories[id];
     assert(create != null, "No theme registered with id $id");
-    return create(fundamentals, themeData);
+    return create(fundamentals);
   }
 
   AFCreateConceptualThemeDelegate factoryFor(AFThemeID id) {
     return themeFactories[id];
+  }
+
+
+  Map<AFThemeID, AFFunctionalTheme> createFunctionals(AFFundamentalThemeState fundamentals) {
+    final result = <AFThemeID, AFFunctionalTheme>{};
+    for(final id in themeFactories.keys) {
+      final create = themeFactories[id];
+      result[id] = create(fundamentals);
+    }
+
+    return result;
   }
 
 }
@@ -489,7 +500,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     }
   }
 
-  AFFundamentalTheme createFundamentalTheme(AFFundamentalDeviceTheme device, AFAppStateAreas areas, Iterable<AFUILibraryExtensionContext> libraries) {
+  AFFundamentalThemeState createFundamentalTheme(AFFundamentalDeviceTheme device, AFAppStateAreas areas, Iterable<AFUILibraryExtensionContext> libraries) {
     final builder = AFAppFundamentalThemeAreaBuilder.create();
     this.initFundamentalThemeArea(device, areas, builder);
 
@@ -530,7 +541,14 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
       AFUITranslationID.wireframes: "Wireframes",
     });
 
-    final result = AFFundamentalTheme(device: device, area: primaryArea, marginSpacing: marginSpacing, paddingSpacing: paddingSpacing, borderRadius: borderRadius);
+    final result = AFFundamentalThemeState(
+      device: device, 
+      area: primaryArea, 
+      marginSpacing: marginSpacing, 
+      paddingSpacing: paddingSpacing, 
+      borderRadius: borderRadius,
+      themeData: null,
+    );
     result.resolve();
     return result;
   }
@@ -541,7 +559,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     }
 
     if(AFibD.config.requiresPrototypeData) {
-      context.initUnlessPresent(AFUIThemeID.conceptualPrototype, createTheme: (f, t) => AFPrototypeTheme(f, t));
+      context.initUnlessPresent(AFUIThemeID.conceptualPrototype, createTheme: (f) => AFPrototypeTheme(f));
     }
 
     for(final thirdParty in libraries) {

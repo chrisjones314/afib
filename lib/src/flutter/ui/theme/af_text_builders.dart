@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 /// Used for building up RichText widgets in parts.
 class AFRichTextBuilder {
-  final AFFundamentalTheme theme;
+  final AFFundamentalThemeState theme;
   final AFWidgetID wid;
   final TextStyle styleBold;
   final TextStyle styleNormal;
@@ -64,7 +64,7 @@ class AFRichTextBuilder {
   /// Creates a rich text widget with the specified content.
   Widget toRichText() {
     return RichText(
-        key: AFConceptualTheme.keyForWIDStatic(wid),
+        key: AFFunctionalTheme.keyForWIDStatic(wid),
         text: TextSpan(
         children: spans
         
@@ -75,7 +75,7 @@ class AFRichTextBuilder {
 
 /// Used for building up Text widgets in parts.
 class AFTextBuilder {
-  final AFFundamentalTheme theme;
+  final AFFundamentalThemeState theme;
   final AFWidgetID wid;
   final TextStyle style;
   final buffer = StringBuffer();
@@ -98,7 +98,7 @@ class AFTextBuilder {
   Widget create() {
     return Text(
       buffer.toString(),
-      key: AFConceptualTheme.keyForWIDStatic(wid),
+      key: AFFunctionalTheme.keyForWIDStatic(wid),
       style: style
     );
   }

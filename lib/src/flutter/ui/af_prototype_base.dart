@@ -23,7 +23,7 @@ class AFProtoBuildContext<TStateView extends AFStateView, TRouteParam extends AF
     AFStateView stateView,
     AFRouteParam routeParam,
     AFRouteParamWithChildren paramWithChildren, 
-    AFConceptualTheme theme,
+    AFFunctionalTheme theme,
     AFConnectedUIBase container
   ): super(context, dispatcher, stateView, routeParam, paramWithChildren, theme, container);
 }

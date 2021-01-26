@@ -82,7 +82,7 @@ class AFPrototypeWidgetScreen extends AFProtoConnectedScreen<AFPrototypeWidgetSt
       final paramChild = context.p.routeParam ?? test.routeParam;
       final dispatcher = AFWidgetScreenTestDispatcher(context: testContext, main: context.d, originalParam: context.p);
 
-      final themeChild = sourceWidget.createConceptualTheme(context.c, context.t);
+      final themeChild = sourceWidget.findFunctionalTheme(AFibF.g.storeInternalOnly.state);
       final childContext = sourceWidget.createContext(context.c, dispatcher, testData, paramChild, null, themeChild, this);
       resultWidget = sourceWidget.buildWithContext(childContext);
     } else {

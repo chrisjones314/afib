@@ -58,8 +58,7 @@ class AFWidgetsBindingObserver extends WidgetsBindingObserver {
 
   void rebuildTheme() {
     // rebuild our theme with the new values, and then update it.
-    final revisedTheme = AFibF.g.initializeThemeState();
-    AFibF.g.storeDispatcherInternalOnly.dispatch(AFUpdateThemeStateAction(revisedTheme));    
+    AFibF.g.storeDispatcherInternalOnly.dispatch(AFRebuildThemeState());    
   }
 }
 
@@ -110,7 +109,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   final testOnlyDialogReturn = <AFScreenID, dynamic>{};
   final testOnlyBottomSheetReturn = <AFScreenID, dynamic>{};
   final themeFactories = AFConceptualThemeDefinitionContext();
-  final themeCache = <AFThemeID, AFConceptualTheme>{};
+  final themeCache = <AFThemeID, AFFunctionalTheme>{};
   final testMissingTranslations = AFTestMissingTranslations();
   final wireframes = AFWireframes();
 
@@ -388,19 +387,20 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     return appContext.createInitialAppStateAreas(thirdPartyLibraries);
   }
 
-  AFConceptualTheme createConceptualTheme(AFThemeID themeId, AFFundamentalTheme fundamentals, ThemeData theme) {
-    // This might not seem necessary, but when I originally re-created the themes every time, 
-    // my test suite went from 30 seconds to 70 seconds.   Adding in this caching fixed it.
-    var current = themeCache[themeId];
-    if(current == null) {
-      current = themeFactories.create(themeId, fundamentals, theme);
-      themeCache[themeId] = current;
-    } else {
-      current.update(fundamentals: fundamentals, themeData: theme);
-    }
-    return current;
-    
-  }  
+  /// This is called internally by AFib and should not really exist.
+  /// 
+  /// It appears it is only possible to get a valid themeData using an actual [BuildContext],
+  /// which fills in certain typography information based on the locale.  As a result, we need
+  /// to update the state during the actual render, which shouldn't really be necessary.   
+  /// 
+  /// I initially tried re-creating all the theming info during every render, which is the 
+  /// redux/immutable way to go about it, but it caused my test suite execution time to double.
+  /// Manually updating the themeData works because the themeData is constant across all the renders,
+  /// and we recreate the fundamental and conceptual themes any time the themeData would actually change.
+  void updateFundamentalThemeData(ThemeData themeData) {
+    final fundamentals = storeInternalOnly.state.public.themes.fundamentals;
+    fundamentals.updateThemeData(themeData);
+  }
 
   AFThemeState initializeThemeState({AFAppStateAreas areas}) {
     if(areas == null) {
@@ -412,9 +412,21 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     if(AFibD.config.startInDarkMode) {
       fundamentals = fundamentals.reviseOverrideThemeValue(AFUIThemeID.brightness, Brightness.dark);
     }
+
+    final functionals = themeFactories.createFunctionals(fundamentals);
     return AFThemeState.create(
-      fundamentals: fundamentals
+      fundamentals: fundamentals,
+      functionals: functionals,
     );
+  }
+
+
+  AFThemeState rebuildFunctionalThemes() {
+    final themes = storeInternalOnly.state.public.themes;
+    final functionals = themeFactories.createFunctionals(themes.fundamentals);
+    return themes.copyWith(
+      functionals: functionals
+    );   
   }
 
   /// Used internally by the framework.

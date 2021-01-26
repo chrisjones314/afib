@@ -13,6 +13,10 @@ AFThemeState afThemeStateReducer(AFThemeState theme, dynamic action) {
   if(action is AFRebuildThemeState) {
     return theme.reviseRebuildAll();
   }
+  if(action is AFRebuildFunctionalThemes) {
+    return theme.reviseRebuildFunctional();
+  }
+
 
   return theme;
 }

@@ -67,7 +67,7 @@ typedef AFUpdateRouteParamDelegate = void Function(AFBuildContext context, AFRou
 
 /// Delegate used in widget testing to wrap additional widgets around the widget being tested 
 /// (e.g. to position that widget on the screen, limit its width, etc.)
-typedef AFCreateWidgetWrapperDelegate = Widget Function(AFBuildContext<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam, AFPrototypeTheme> context, Widget testWidget);
+typedef AFCreateWidgetWrapperDelegate = Widget Function(AFBuildContext<AFAppStateArea, AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam, AFPrototypeTheme> context, Widget testWidget);
 
 /// Delegate used to create a push action that moves us into a test screen.
 typedef AFTestCreatePushActionDelegate = List<dynamic> Function(AFScreenPrototypeTest test);
@@ -145,7 +145,7 @@ typedef AFInitPluginFundamentalThemeDelegate = void Function(AFFundamentalDevice
 typedef AFInitAppFundamentalThemeDelegate = void Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState, AFAppFundamentalThemeAreaBuilder builder);
 
 /// Create a conceptual theme used by a subset of the app, or used by a third party plugin.
-typedef AFInitConceptualThemeDelegate = void Function(AFConceptualThemeDefinitionContext context);
+typedef AFInitFunctionalThemeDelegate = void Function(AFFunctionalThemeDefinitionContext context);
 
 /// Optional delegate used to create the flutter ThemeData, rather than allowing AFib to do it for you based on the primary fundamental theme.
 typedef AFOverrideCreateThemeDataDelegate = ThemeData Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState, AFFundamentalThemeArea primary);
@@ -164,7 +164,7 @@ typedef AFOnChangedBoolDelegate = void Function(bool);
 
 typedef AFOnChangedStringDelegate = void Function(String);
 
-typedef AFCreateConceptualThemeDelegate = AFFunctionalTheme Function(AFFundamentalThemeState fundamentals);
+typedef AFCreateFunctionalThemeDelegate = AFFunctionalTheme Function(AFFundamentalThemeState fundamentals);
 
 typedef AFWireframeExecutionDelegate = void Function(AFWireframeExecutionContext we);
 

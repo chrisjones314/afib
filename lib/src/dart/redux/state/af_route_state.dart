@@ -340,7 +340,6 @@ class AFRouteStateSegments {
 class AFRouteState {
   static const emptySegments = <AFRouteSegment>[];
   final AFRouteStateSegments screenHierarchy;
-
   final Map<AFScreenID, AFRouteSegment> globalPool;
 
   AFRouteState({

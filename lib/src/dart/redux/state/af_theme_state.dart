@@ -2520,8 +2520,8 @@ class AFFunctionalTheme {
 }
 
 /// Can be used as a template parameter when you don't want a theme.
-class AFConceptualThemeUnused extends AFFunctionalTheme {
-  AFConceptualThemeUnused(AFFundamentalThemeState fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualUnused);
+class AFFunctionalThemeUnused extends AFFunctionalTheme {
+  AFFunctionalThemeUnused(AFFundamentalThemeState fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualUnused);
 }
 
 /// Captures the current state of the primary theme, and

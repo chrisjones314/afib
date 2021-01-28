@@ -275,12 +275,12 @@ class AFTestExtensionContext {
   }
 }
 
-class AFConceptualThemeDefinitionContext {
-  final themeFactories = <AFThemeID, AFCreateConceptualThemeDelegate>{};
+class AFFunctionalThemeDefinitionContext {
+  final themeFactories = <AFThemeID, AFCreateFunctionalThemeDelegate>{};
 
-  AFConceptualThemeDefinitionContext();
+  AFFunctionalThemeDefinitionContext();
 
-  void initUnlessPresent(AFThemeID id, { @required AFCreateConceptualThemeDelegate createTheme }) {
+  void initUnlessPresent(AFThemeID id, { @required AFCreateFunctionalThemeDelegate createTheme }) {
     if(themeFactories.containsKey(id)) {
       return;
     }
@@ -293,7 +293,7 @@ class AFConceptualThemeDefinitionContext {
     return create(fundamentals);
   }
 
-  AFCreateConceptualThemeDelegate factoryFor(AFThemeID id) {
+  AFCreateFunctionalThemeDelegate factoryFor(AFThemeID id) {
     return themeFactories[id];
   }
 
@@ -320,7 +320,7 @@ class AFPluginExtensionContext {
   final querySuccessListenerDelegates = <AFQuerySuccessListenerDelegate>[];
   AFTestExtensionContext test = AFTestExtensionContext();
   final thirdParty = AFAppThirdPartyExtensionContext();
-  final initConceptualThemes = <AFInitConceptualThemeDelegate>[];
+  final initFunctionalThemes = <AFInitFunctionalThemeDelegate>[];
   final initFundamentalThemeAreas = <AFInitPluginFundamentalThemeDelegate>[];
   final errorListenerByState = <Type, AFOnErrorDelegate>{};
 
@@ -344,8 +344,8 @@ class AFPluginExtensionContext {
     initialAppStates.add(initAppState);
   }
 
-  void addCreateConceptualTheme(AFInitConceptualThemeDelegate init) {
-    initConceptualThemes.add(init);
+  void addCreateFunctionalTheme(AFInitFunctionalThemeDelegate init) {
+    initFunctionalThemes.add(init);
   }
 
   /// Used by the app or third parties to create a query that runs on lifecycle actions.
@@ -368,8 +368,8 @@ class AFPluginExtensionContext {
     }
   }
 
-  void initConceptual(AFConceptualThemeDefinitionContext context) {
-    for(final init in this.initConceptualThemes) {
+  void initFunctional(AFFunctionalThemeDefinitionContext context) {
+    for(final init in this.initFunctionalThemes) {
       init(context);
     }
   }
@@ -414,11 +414,11 @@ class AFUILibraryExtensionContext<TState extends AFAppStateArea> extends AFPlugi
     @required AFInitScreenMapDelegate initScreenMap,
     @required AFInitPluginFundamentalThemeDelegate initFundamentalThemeArea,
     @required AFInitializeAppStateDelegate initializeAppState,
-    @required AFInitConceptualThemeDelegate initConceptualTheme,
+    @required AFInitFunctionalThemeDelegate initFunctionalTheme,
   }) {
     this.initScreenMaps.add(initScreenMap);
     this.initialAppStates.add(initializeAppState);
-    this.initConceptualThemes.add(initConceptualTheme);
+    this.initFunctionalThemes.add(initFunctionalTheme);
     if(initFundamentalThemeAreas != null) {
       this.initFundamentalThemeAreas.add(initFundamentalThemeArea);
     } 
@@ -441,7 +441,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     @required AFInitializeAppStateDelegate initializeAppState,
     @required AFCreateStartupQueryActionDelegate createStartupQueryAction,
     @required AFCreateAFAppDelegate createApp,
-    @required AFInitConceptualThemeDelegate initConceptualThemes,
+    @required AFInitFunctionalThemeDelegate initFunctionalThemes,
     @required AFOnErrorDelegate<TState> queryErrorHandler,
   }) {
     this.test.initializeForApp();
@@ -450,7 +450,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     this.createStartupQueryActions.add(createStartupQueryAction);
     this.errorListenerByState[TState] = queryErrorHandler;
     this.createApp = createApp;
-    this.initConceptualThemes.add(initConceptualThemes);
+    this.initFunctionalThemes.add(initFunctionalThemes);
     this.initFundamentalThemeArea = initFundamentalThemeArea;
     _verifyNotNull(initFundamentalThemeArea, "initFundamentalTheme");
     _verifyNotNull(initScreenMap, "initScreenMap");
@@ -473,7 +473,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     this.createApp = createApp;
     this.initFundamentalThemeArea = source.initFundamentalThemeArea ?? initFundamentalThemeArea;
     this.initFundamentalThemeAreas.addAll(source.initFundamentalThemeAreas);
-    this.initConceptualThemes.addAll(source.initConceptualThemes);    
+    this.initFunctionalThemes.addAll(source.initFunctionalThemes);    
   }
 
   AFOnErrorDelegate<TState> errorHandlerForState<TState extends AFAppStateArea>() {
@@ -553,8 +553,8 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     return result;
   }
 
-  void initializeConceptualThemeFactories(AFConceptualThemeDefinitionContext context, Iterable<AFUILibraryExtensionContext> libraries) {
-    for(final init in initConceptualThemes) {
+  void initializeFunctionalThemeFactories(AFFunctionalThemeDefinitionContext context, Iterable<AFUILibraryExtensionContext> libraries) {
+    for(final init in initFunctionalThemes) {
       init(context);
     }
 
@@ -563,7 +563,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     }
 
     for(final thirdParty in libraries) {
-      thirdParty.initConceptual(context);
+      thirdParty.initFunctional(context);
     }
   }
 

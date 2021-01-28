@@ -108,7 +108,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   final widgetsBindingObserver = AFWidgetsBindingObserver();
   final testOnlyDialogReturn = <AFScreenID, dynamic>{};
   final testOnlyBottomSheetReturn = <AFScreenID, dynamic>{};
-  final themeFactories = AFConceptualThemeDefinitionContext();
+  final themeFactories = AFFunctionalThemeDefinitionContext();
   final themeCache = <AFThemeID, AFFunctionalTheme>{};
   final testMissingTranslations = AFTestMissingTranslations();
   final wireframes = AFWireframes();
@@ -144,7 +144,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     appContext.initScreenMap(screenMap, libraries);
     screenMap.screen(AFUIScreenID.dialogStandardError, (_) => AFStandardErrorDialog());
 
-    appContext.initializeConceptualThemeFactories(themeFactories, libraries);
+    appContext.initializeFunctionalThemeFactories(themeFactories, libraries);
     
     final middleware = <Middleware<AFState>>[];
     middleware.addAll(createRouteMiddleware());

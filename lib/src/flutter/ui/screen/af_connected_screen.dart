@@ -698,7 +698,7 @@ mixin AFContextShowMixin {
 /// screen data and param to many functions, to make things more concise.  
 /// 
 /// The framework cannot pass you this itself because 
-class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFFunctionalTheme> with AFContextDispatcherMixin, AFContextShowMixin {
+class AFBuildContext<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFFunctionalTheme> with AFContextDispatcherMixin, AFContextShowMixin {
   material.BuildContext context;
   AFDispatcher dispatcher;
   TStateView stateView;
@@ -847,7 +847,7 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
   }
 
   bool operator==(dynamic o) {
-    final result = (o is AFBuildContext<TStateView, TRouteParam, TTheme> && routeParam == o.routeParam && paramWithChildren == o.paramWithChildren && stateView == o.stateView && theme == o.theme);
+    final result = (o is AFBuildContext<TState, TStateView, TRouteParam, TTheme> && routeParam == o.routeParam && paramWithChildren == o.paramWithChildren && stateView == o.stateView && theme == o.theme);
     return result;
   }
 
@@ -976,6 +976,19 @@ class AFBuildContext<TStateView extends AFStateView, TRouteParam extends AFRoute
       },
       typeToSort: TChildRouteParam,
     ));
+  }
+
+  /// Meant to make the public state visible in the debugger, absolutely not for runtime use.
+  AFPublicState get debugOnlyPublicState {
+    return dispatcher.debugOnlyPublicState;
+  }
+
+  TState get debugOnlyAppState {
+    final public = debugOnlyPublicState;
+    if(public == null) {
+      return null;
+    }
+    return public.areaStateFor(TState);
   }
 }
 

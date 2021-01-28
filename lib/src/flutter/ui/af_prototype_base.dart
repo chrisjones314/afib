@@ -16,7 +16,7 @@ mixin AFProtoConnectedUIMixin<TStateView extends AFStateView, TRouteParam extend
 }
 
 
-class AFProtoBuildContext<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFBuildContext<TStateView, TRouteParam, AFPrototypeTheme> {
+class AFProtoBuildContext<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFBuildContext<AFAppStateArea, TStateView, TRouteParam, AFPrototypeTheme> {
   AFProtoBuildContext(
     BuildContext context, 
     AFDispatcher dispatcher, 

@@ -12,6 +12,9 @@ abstract class AFTestDispatcher extends AFDispatcher {
     return action is AFNavigateAction;
   }
 
+  AFPublicState get debugOnlyPublicState {
+    return main.debugOnlyPublicState;
+  }
 }
 
 class AFStateScreenTestDispatcher extends AFTestDispatcher {

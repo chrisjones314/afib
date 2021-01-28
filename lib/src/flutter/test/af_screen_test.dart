@@ -435,12 +435,6 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
       await pauseForRender();
     }
     
-    // the situation here is something like:
-    // e.underWidget(WidgetID.myWidgetID) {
-    //   e.tapWithPopup(..., () {
-    //      // here, we aren't under myWidgetID any more.
-    //   })
-    // })
     await underHere();
 
     if(shouldPush) {
@@ -623,7 +617,6 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
   Future<void> keepSynchronous();
   Future<void> get ks { return keepSynchronous(); }
   Future<void> updateStateViews(dynamic data);
-  void verifyPopupScreenId(AFScreenID screenId);
 
   Future<void> pauseForRender();
   void addError(String error, int depth);
@@ -1003,10 +996,6 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
     }
     return test;
   }
-
-  void verifyPopupScreenId(AFScreenID popupScreenId) {
-    AFibF.g.testOnlyVerifyActiveScreen(popupScreenId);
-  }
 }
 
 class AFScreenTestContextWidgetTester extends AFScreenTestContext {
@@ -1031,11 +1020,6 @@ class AFScreenTestContextWidgetTester extends AFScreenTestContext {
   Future<void> keepSynchronous() {
     return null;
   }
-
-  void verifyPopupScreenId(AFScreenID popupScreenId) {
-    AFibF.g.testOnlyVerifyActiveScreen(popupScreenId);
-  }
-
 }
 
 abstract class AFScreenPrototypeTest {

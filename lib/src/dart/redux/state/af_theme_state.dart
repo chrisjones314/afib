@@ -1768,13 +1768,32 @@ class AFFunctionalTheme {
     return _createDebugDrawer(endDrawer, AFScreenPrototypeTest.testDrawerSideEnd);
   }
 
+  Widget childCard({ 
+    Widget child,
+    AFWidgetID wid,
+    EdgeInsets margin,
+    Color color,
+  }) {
+    return Card(
+      key: keyForWID(wid),
+      color: color,
+      child: Container(
+        margin: margin,
+        child: child,
+      )
+    );
+  }
+
+
   Widget childCardColumn(List<Widget> rows, {
     EdgeInsets margin,
     CrossAxisAlignment align,
     AFWidgetID wid,
+    Color color,
   }) {
     return Card(
       key: keyForWID(wid),
+      color: color,
       child: Container(
         margin: margin,
         child: Column(
@@ -2195,6 +2214,11 @@ class AFFunctionalTheme {
   EdgeInsets get marginStandard {
     return fundamentals.margin.a.s3;
   }
+
+  EdgeInsets get marginNone {
+    return fundamentals.margin.a.s0;
+  }
+
 
   AFSpacing get margin {
     return fundamentals.margin;

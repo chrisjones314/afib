@@ -120,6 +120,7 @@ abstract class AFApplyDismissWidgetAction extends AFApplyWidgetAction {
 
 abstract class AFExtractWidgetAction extends AFWidgetByTypeAction {
   static const extractPrimary = "extract_primary";
+  static const extractChildren = "extract_children";
 
   AFExtractWidgetAction(String actionType, Type appliesTo): super(actionType, appliesTo);
 
@@ -135,6 +136,7 @@ abstract class AFExtractWidgetAction extends AFWidgetByTypeAction {
   dynamic extractInternal(String extractType, AFWidgetSelector selector, Element element);
 
   static bool isPrimary(String extractType) { return extractType == extractPrimary; }
+  static bool isChildren(String extractType) { return extractType == extractChildren; }
 
   List<Element> findChildrenWithWidgetType<T>(Element element) {
     final result = <Element>[];
@@ -150,6 +152,10 @@ abstract class AFExtractWidgetAction extends AFWidgetByTypeAction {
 
 abstract class AFExtractPrimaryWidgetAction extends AFExtractWidgetAction {
   AFExtractPrimaryWidgetAction(Type appliesTo): super(AFExtractWidgetAction.extractPrimary, appliesTo); 
+}
+
+abstract class AFExtractChildrenWidgetAction extends AFExtractWidgetAction {
+  AFExtractChildrenWidgetAction(Type appliesTo): super(AFExtractWidgetAction.extractChildren, appliesTo); 
 }
 
 class AFFlatButtonAction extends AFApplyTapWidgetAction {
@@ -413,6 +419,19 @@ class AFApplyTextAFTextFieldAction extends AFApplySetValueWidgetAction {
       return true;
     } 
     return false;
+  }
+}
+
+class AFExtractColumnChildrenAction extends AFExtractChildrenWidgetAction {
+  AFExtractColumnChildrenAction(): super(Column);
+
+  @override
+  dynamic extractInternal(String extractType, AFWidgetSelector selector, Element element) {
+    final widget = element.widget;
+    if(AFExtractWidgetAction.isChildren(extractType) && widget is Column) {
+      return widget.children;
+    } 
+    return null;
   }
 }
 

@@ -254,9 +254,9 @@ class AFRouteStateSegments {
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteStateSegments setParam(AFScreenID screen, AFRouteParam param) {
+  AFRouteStateSegments updateRouteParam(AFScreenID screen, AFRouteParam param) {
     final revised = copyActive();
-    for(var i = 0; i < revised.length; i++) {
+    for(var i = revised.length - 1; i >= 0; i--) {
       final seg = revised[i];
       if(seg.matchesScreen(screen)) {
         revised[i] = seg.copyWith(param: param);
@@ -502,7 +502,7 @@ class AFRouteState {
       if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
         screen = AFUIScreenID.screenStartupWrapper;
       }
-      return _reviseScreen(screenHierarchy.setParam(screen, param));
+      return _reviseScreen(screenHierarchy.updateRouteParam(screen, param));
     } else {
       return setGlobalPoolParam(screen, param);
     }
@@ -561,7 +561,7 @@ class AFRouteState {
     if(globalPool.containsKey(screen)) {
       return setGlobalPoolParam(screen, revised);
     } else {
-      return _reviseScreen(screenHierarchy.setParam(screen, revised));    
+      return _reviseScreen(screenHierarchy.updateRouteParam(screen, revised));    
     }
   }
 

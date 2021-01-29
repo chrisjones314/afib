@@ -61,7 +61,7 @@ abstract class AFBaseTestExecute {
       addError(desc, stackFrames);
     }
   }
-
+  
   void startSection(AFScreenTestBody body) {
     currentSection = body.sectionId;
     var current = sectionErrors[currentSection];

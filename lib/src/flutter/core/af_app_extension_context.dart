@@ -53,6 +53,7 @@ class AFSharedTestExtensionContext {
     registerExtractor(AFExtractTextAFTextFieldAction());
     registerExtractor(AFExtractRichTextAction());
     registerExtractor(AFSwitchExtractor());    
+    registerExtractor(AFExtractColumnChildrenAction());
 
     registerScroller(AFScrollableScrollerAction());
   }

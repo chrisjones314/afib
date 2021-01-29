@@ -49,7 +49,9 @@ class AFTextEditingControllersHolder extends AFDisposableUIHolder<TextEditingCon
         if(text.length >= controller.text.length) {
           restoreSelection = controller.selection;
         }
-        controller.text = text;
+        if(controller.text != text) {
+          controller.text = text;
+        }
         if(restoreSelection != null) {
           controller.selection = restoreSelection;
         }

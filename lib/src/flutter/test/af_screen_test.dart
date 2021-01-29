@@ -1,5 +1,4 @@
 
-
 import 'dart:async';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:quiver/core.dart';
@@ -27,7 +26,6 @@ import 'package:flutter_test/flutter_test.dart' as ft;
 
 typedef AFTestScreenExecuteDelegate = Future<void> Function(AFScreenTestExecute ste);
 typedef AFVerifyReturnValueDelegate = void Function(dynamic value);
-
 
 /// A utility class used to pass 
 abstract class AFWidgetSelector {
@@ -600,6 +598,29 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
     }
 
     return sel.elements;
+  }
+
+  Future<List<Widget>> matchDirectChildrenOf(dynamic selector, { bool shouldScroll = true }) async {
+
+    final elems = await findWidgetsFor(selector, shouldScroll: shouldScroll);
+    if(elems.isEmpty) {
+      throw AFException("Could not find element $selector");
+    }
+    if(elems.length > 1) {
+      throw AFException("matchDirectChildrenOf should refer to exactly one widget.");
+    }
+
+    final sel = AFWidgetSelector.createSelector(activeSelectorPath, selector);
+    final elem = elems.first;
+    final extractor = AFibF.g.screenTests.findExtractor(AFExtractWidgetAction.extractChildren, elem);
+    if(extractor == null) {
+      throw AFException("No children extractor for element with widget type ${elem.widget.runtimeType}");
+    }
+    dynamic result = extractor.extract(AFExtractWidgetAction.extractChildren, sel, elem);
+    if(result is! List<Widget>) {
+      throw AFException("The extractor ${extractor.runtimeType} did not return a list of widget children");
+    }
+    return result;
   }
 
   /// A debugging utility which slows down every widget lookup in a test under the function [f].
@@ -1641,9 +1662,18 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
       body = screenTest.body;
     } else {
       // this might be a re-usable screen test.
-      final reusable = AFibF.g.screenTests.findReusable(screenTestId);
+      var reusable = AFibF.g.screenTests.findReusable(screenTestId);
       if(reusable == null) {
-        throw AFException("Screen test $screenTestId is not defined");
+        for(final uiTests in AFibF.g.thirdPartyUITests.values) {
+          reusable = uiTests.afScreenTests.findReusable(screenTestId);
+          if(reusable != null) {
+            break;
+          }
+        }
+
+        if(reusable == null) {
+          throw AFException("Screen test $screenTestId is not defined");
+        }
       }
       screenId = reusable.prototype.screenId;
       body = AFSingleScreenPrototype.createReusable(screenTestId, reusable.body);

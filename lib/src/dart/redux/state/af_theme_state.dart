@@ -2367,9 +2367,11 @@ class AFFunctionalTheme {
   }
 
   Column childColumn(List<Widget> children, {
+   AFWidgetID wid,
    MainAxisAlignment mainAxisAlignment =  MainAxisAlignment.start
   }) {
     return Column(children: children,
+      key: keyForWID(wid),
       mainAxisAlignment: mainAxisAlignment);
   }
 

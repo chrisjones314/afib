@@ -56,6 +56,9 @@ abstract class AFWidgetSelector {
   }
 
   bool canScrollMore() {
+    if(AFibD.config.isWidgetTesterContext) {
+      return false;
+    }
     if(scrollables.isEmpty) {
       return false;
     }    

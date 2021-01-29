@@ -11,6 +11,12 @@ void afMainFirstStartup() {
   WidgetsFlutterBinding.ensureInitialized();
 }
 
+void afMainWrapper(Function() onReady) {
+  WidgetsFlutterBinding.ensureInitialized();
+  onReady();
+}
+
+
 /// [afMain] handles startup, execution, and shutdown sequence for an afApp
 void afMain<TState extends AFAppStateArea>(AFDartParams paramsD, AFExtendAppDelegate extendApp, AFExtendThirdPartyDelegate extendThirdParty, AFExtendTestDelegate extendTest) {
   AFibD.initialize(paramsD);

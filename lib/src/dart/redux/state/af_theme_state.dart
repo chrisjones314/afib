@@ -8,6 +8,7 @@ import 'package:afib/src/flutter/ui/theme/af_text_builders.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 /// These are fundamental values for theming derived from the device
 /// and operating system itself.
@@ -1023,8 +1024,12 @@ class AFFundamentalThemeState {
     return area.supportedLocales;
   }
 
+  Locale get deviceLocale {
+    return device.locale(this);
+  }
+
   String translate(dynamic idOrText) {
-    return area.translate(idOrText, device.locale(this));
+    return area.translate(idOrText, deviceLocale);
   }
 
   ThemeData get themeDataActive {

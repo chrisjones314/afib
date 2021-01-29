@@ -22,6 +22,7 @@ import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 
+
 class AFibTestOnlyScreenElement {
   final AFScreenID screenId;
   BuildContext element;

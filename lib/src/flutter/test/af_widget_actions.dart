@@ -78,12 +78,14 @@ class AFScrollableScrollTracker extends AFScrollTracker {
     return controller.offset < controller.position.maxScrollExtent;
   }
   Future<void> scrollMore() async {
-    final controller = _controller();
-    var newPos = controller.offset +  200;
-    if(newPos > controller.position.maxScrollExtent) {
-      newPos = controller.position.maxScrollExtent;
+    if(!AFibD.config.isWidgetTesterContext) {
+      final controller = _controller();
+      var newPos = controller.offset +  200;
+      if(newPos > controller.position.maxScrollExtent) {
+        newPos = controller.position.maxScrollExtent;
+      }
+      await controller.animateTo(newPos, duration: Duration(milliseconds: 500), curve: Curves.ease);
     }
-    await controller.animateTo(newPos, duration: Duration(milliseconds: 500), curve: Curves.ease);
   }
 
   ScrollController _controller() {

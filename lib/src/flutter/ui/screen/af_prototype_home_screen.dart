@@ -48,12 +48,12 @@ class AFPrototypeHomeScreenParam extends AFRouteParam {
   factory AFPrototypeHomeScreenParam.createOncePerScreen({
     @required String filter,
   }) {
-
+    final controllers = AFTextEditingControllersHolder.createOne(AFUIWidgetID.textTestSearch, filter);
     return AFPrototypeHomeScreenParam(
       filter: filter,
       view: viewFilter,
       results: <AFScreenTestResultSummary>[],
-      textControllers: AFTextEditingControllersHolder()
+      textControllers: controllers,
     );
   }
 
@@ -195,9 +195,9 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
       child: t.childTextField(
         wid: AFUIWidgetID.textTestSearch,
         controllers: context.p.textControllers,
-        text: context.p.filter,
         obscureText: false,
         autofocus: false,
+        text: context.p.filter,
         decoration: InputDecoration(
           border: OutlineInputBorder(),
           labelText: "Search"

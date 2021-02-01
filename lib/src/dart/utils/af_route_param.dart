@@ -17,7 +17,6 @@ class AFRouteParam {
   factory AFRouteParam.unused() { 
     return AFRouteParam();
   }
-  
 
   bool matchesScreen(AFScreenID screen) {
     return false;

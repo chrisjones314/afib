@@ -1959,7 +1959,7 @@ class AFFunctionalTheme {
     @required AFWidgetID wid,
     @required AFTextEditingControllersHolder controllers,
     @required AFOnChangedStringDelegate onChanged,
-    String text,
+    @required String text,
     bool enabled,
     bool obscureText = false,
     bool autofocus = false,
@@ -1970,7 +1970,16 @@ class AFFunctionalTheme {
     FocusNode focusNode,
     TextStyle style,
   }) {
-    final textController = controllers.syncText(wid, text);
+    final textController = controllers.access(wid);
+    assert(textController != null, "You must register the text controller for $wid in your route parameter using AFTextEditingControllersHolder.createN or createOne");
+    assert(textController.text == text, '''The text value in the text controller was different from the value you passed into 
+childTextField was different from the value in the text controller for $wid ($text != ${textController.text}).  This will happen
+if you try to change the value of a text field during the render process (which you should not).   It will also happen if you are 
+modifying the value returned to you in the onChanged callback, but are not subsequently calling AFTextEditingControllersOwner.reviseOne.
+In the later case, AFib automatically keeps the controller in sync with the value the user typed, but if you post-process that value, you
+need to manually update the value in the controller.
+''');
+
     return TextField(
       key: keyForWID(wid),
       enabled: enabled,

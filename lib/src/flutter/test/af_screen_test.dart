@@ -86,6 +86,12 @@ abstract class AFWidgetSelector {
       selector = sel;
     } else if(sel is Type) {
       selector = AFWidgetTypeSelector(sel);
+    } else if(sel is List) {
+      final selectors = <AFWidgetSelector>[];
+      for(final selItem in sel) {
+        selectors.add(createSelector(null, selItem));
+      }
+      return AFSparsePathWidgetSelector(selectors);
     } else {
       throw AFException("Unknown widget selector type: ${sel.runtimeType}");
     }
@@ -378,12 +384,9 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
     return underPaths.last;
   }
 
-  Future<void> matchOneWidget(dynamic selector) {
-    return visitNWidgets(selector, 1, extraFrames: 1);
-  }  
-
-  Future<void> matchMissingWidget(dynamic selector) {
-    return visitNWidgets(selector, 0, extraFrames: 1, scrollIfMissing: false);
+  /// Verifies the specified widget is not present.  
+  Future<void> matchMissingWidget(dynamic selector) async {
+    await matchWidgets(selector, expectedCount: 0, extraFrames: 1, scrollIfMissing: false);
   }
 
   /// Any operations applied within the [underHere] callback operate on 
@@ -392,7 +395,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
   /// In addition to passing a standard [selector], like a AFWidgetID, you can also
   /// pass in a list of selectors.  If you do so, then the operation takes place
   /// under a sparse-path containing all the items in the list.
-  Future<void> underWidget(dynamic selector, Future<void> Function() withinHere) async {
+  Future<void> underWidget(dynamic selector, Future<void> Function() underHere) async {
     var path = activeSelectorPath;
     if(path == null) {
       path = AFSparsePathWidgetSelector.createEmpty();
@@ -406,26 +409,24 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
       next = AFWidgetSelector.createSelector(next, selector);
     }
     underPaths.add(next);
-    await withinHere();
+    await underHere();
     underPaths.removeLast();
-    return keepSynchronous();
   }
 
-  Future<void> visitNWidgets(dynamic selector, int n, {int extraFrames = 0, bool scrollIfMissing });
-
-  Future<void> matchTextEquals(dynamic selector, String text) {
+  Future<Widget> matchTextEquals(dynamic selector, String text) {
     return matchWidgetValue(selector, ft.equals(text), extraFrames: 1);
   }
 
-  Future<void> matchText(dynamic selector, ft.Matcher matcher) {
+  Future<Widget> matchText(dynamic selector, ft.Matcher matcher) {
     return matchWidgetValue(selector, matcher, extraFrames: 1);
   }
 
-  Future<void> matchSwitch(dynamic selector, { @required bool enabled }) {
-    return matchWidgetValue(selector, ft.equals(enabled), extraFrames: 1);
+  Future<Switch> matchSwitch(dynamic selector, { @required bool enabled }) async {
+    final Switch swi = await matchWidgetValue(selector, ft.equals(enabled), extraFrames: 1);
+    return swi;
   }
 
-  Future<void> setSwitch(dynamic selector, { @required bool enabled }) {
+  Future<void> applySetSwitch(dynamic selector, { @required bool enabled }) {
     return setValue(selector, enabled, extraFrames: 1);
   }
 
@@ -441,7 +442,6 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
     if(shouldPush) {
       popScreen();
     }
-    return keepSynchronous();
   }
 
   void pushScreen(AFScreenID screen) {
@@ -455,15 +455,14 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
   }
 
   /// Tap on the specified widget, then expect a dialog which you can interact with via the onDialog parameter.
-  Future<void> tapExpectDialog(dynamic selectorTap, final AFScreenID dialogScreenId, AFTestScreenExecuteDelegate onDialog, {
+  Future<void> applyTapExpectDialog(dynamic selectorTap, final AFScreenID dialogScreenId, AFTestScreenExecuteDelegate onDialog, {
     AFVerifyReturnValueDelegate verifyReturn
   }) async {
-    await tap(selectorTap);
+    await applyTap(selectorTap);
     await pauseForRender();
     
     await this.underScreen(dialogScreenId, () async {
       await onDialog(this);
-      return keepSynchronous();
     });
 
     final result = AFibF.g.testOnlyDialogReturn[dialogScreenId];
@@ -476,15 +475,14 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
   }
 
   /// Tap on the specified widget, then expect a dialog which you can interact with via the onSheet parameter.
-  Future<void> tapExpectModalBottomSheet(dynamic selectorTap, final AFScreenID dialogScreenId, AFTestScreenExecuteDelegate onSheet, {
+  Future<void> applyTapExpectModalBottomSheet(dynamic selectorTap, final AFScreenID dialogScreenId, AFTestScreenExecuteDelegate onSheet, {
     AFVerifyReturnValueDelegate verifyReturn
   }) async {
-    await tap(selectorTap);
+    await applyTap(selectorTap);
     await pauseForRender();
     
     await this.underScreen(dialogScreenId, () async {
       await onSheet(this);
-      return keepSynchronous();
     });
 
     final result = AFibF.g.testOnlyBottomSheetReturn[dialogScreenId];
@@ -496,6 +494,12 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
 
   }
 
+  Future<void> matchChipsSelected(List<dynamic> selectors, { @required bool selected }) async {
+    for(final sel in selectors) {
+      await matchChipSelected(sel, selected: selected);
+    }
+  }
+
   /// Expect that a [Chip] is selected or not selected.
   /// 
   /// Note that in addition to the standard options, 
@@ -503,40 +507,26 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
   /// it is very common to verify that several of them are on or off
   /// at the same time, and passing in a list is a concise way to do
   /// so.
-  Future<void> matchChipSelected(dynamic selector, {@required bool selected}) {
+  Future<Widget> matchChipSelected(dynamic selector, {@required bool selected}) async {
     return matchWidgetValue(selector, ft.equals(selected), extraFrames: 1);
   }
 
-  Future<void> visitWidget(dynamic selector, Function(Element elem) onFound, { int extraFrames = 0 });
-  Future<void> visitWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 });
-
-  Future<void> matchWidgetValue(dynamic selector, ft.Matcher matcher, { int extraFrames = 0 });
-
-  /// Verifies that [element] has the expected [key], which can be
-  /// either a [String] or an [AFWidgetID].
-  void expectKey(Element element, dynamic key, { int extraFrames = 0 }) {
-    var keyVal;
-    if(key is AFWidgetID) {
-      keyVal = key.code;
-    } else if(key is String) {
-      keyVal = key;
-    } else {
-      throw AFException("Unknown key type ${key.runtimeType}");
+  Future<Widget> matchWidgetValue(dynamic selectorDyn, ft.Matcher matcher, { bool scrollIfMissing = true, String extractType = AFExtractWidgetAction.extractPrimary, int extraFrames = 0 }) async {
+    final elems = await findElementsFor(selectorDyn, shouldScroll: scrollIfMissing);
+    if(elems.length != 1) {
+      throw AFException("matchWidgetValue expects $selectorDyn to match exactly one widget");
     }
-    this.expect(element.widget.key, ft.equals(Key(keyVal)), extraFrames: extraFrames+1);
-  }
 
-  void expectKeys(List<Element> elements, List<dynamic> keys) {
-    this.expect(elements.length, ft.equals(keys.length), extraFrames: 1);
-    if(elements.length != keys.length) {
-      return;
-    }    
-
-    for(var i = 0; i < elements.length; i++) {
-      final elem = elements[i];
-      final source = keys[i];
-      this.expectKey(elem, source, extraFrames: 1);
+    final elem = elems.first;
+    final selectable = AFibF.g.screenTests.findExtractor(extractType, elem);
+    if(selectable == null) {
+      throw AFException("No AFSelectedWidgetTest found for ${elem.widget.runtimeType}, you can register one using AFScreenTests.registerSelectable");
     }
+    
+    final selector = AFWidgetSelector.createSelector(activeSelectorPath, selectorDyn);
+    final value = selectable.extract(extractType, selector, elem);
+    this.expect(value, matcher, extraFrames: extraFrames+1);
+    return elem.widget;
   }
   
   Future<void> applyWidgetValue(dynamic selector, dynamic value, String applyType, { 
@@ -547,7 +537,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
     int extraFrames = 0 
   });
 
-  Future<void> tap(dynamic selector, { 
+  Future<void> applyTap(dynamic selector, { 
     int extraFrames = 0,
     AFActionListenerDelegate verifyActions, 
     AFParamListenerDelegate verifyParamUpdate,
@@ -556,7 +546,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
     return applyWidgetValue(selector, null, AFApplyWidgetAction.applyTap, extraFrames: extraFrames+1, verifyActions: verifyActions, verifyParamUpdate: verifyParamUpdate, verifyQuery: verifyQuery);
   }
 
-  Future<void> swipeDismiss(dynamic selector, { 
+  Future<void> applySwipeDismiss(dynamic selector, { 
     int maxWidgets = 1, 
     int extraFrames = 0, 
     AFActionListenerDelegate verifyActions, 
@@ -576,7 +566,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
     return applyWidgetValue(selector, value, AFApplyWidgetAction.applySetValue, maxWidgets:  maxWidgets, extraFrames: extraFrames+1, verifyActions: verifyActions, verifyParamUpdate: verifyParamUpdate, verifyQuery: verifyQuery);
   }
 
-  Future<void> enterText(dynamic selector, dynamic value, { 
+  Future<void> applyEnterText(dynamic selector, dynamic value, { 
     int maxWidgets = 1, 
     int extraFrames = 0, 
     AFActionListenerDelegate verifyActions, 
@@ -586,7 +576,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
     return applyWidgetValue(selector, value, AFApplyWidgetAction.applySetValue, maxWidgets:  maxWidgets, extraFrames: extraFrames+1, verifyActions: verifyActions, verifyParamUpdate: verifyParamUpdate, verifyQuery: verifyQuery);
   }
 
-  Future<List<Element>> findWidgetsFor(dynamic selector, { @required bool shouldScroll }) async {
+  Future<List<Element>> findElementsFor(dynamic selector, { @required bool shouldScroll }) async {
     if(slowOnScreenMillis > 0 && !AFibD.config.isWidgetTesterContext) {
       await Future<void>.delayed(Duration(milliseconds: slowOnScreenMillis));
     }
@@ -603,9 +593,22 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
     return sel.elements;
   }
 
-  Future<List<Widget>> matchDirectChildrenOf(dynamic selector, { bool shouldScroll = true }) async {
+  Future<Widget> matchWidget(dynamic selector, { bool shouldScroll = true }) async {
+    final widgets = await matchWidgets(selector, expectedCount: 1, scrollIfMissing: shouldScroll, extraFrames: 1);
+    return widgets.first;
+  }
 
-    final elems = await findWidgetsFor(selector, shouldScroll: shouldScroll);
+  Future<List<Widget>> matchWidgets(dynamic selector, { int expectedCount, bool scrollIfMissing = true, int extraFrames = 0 }) async {
+    final elems = await findElementsFor(selector, shouldScroll: scrollIfMissing);
+    if(expectedCount != null) {
+      expect(elems, ft.hasLength(expectedCount), extraFrames: extraFrames+1);
+    }
+    return elems.map( (e) => e.widget ).toList();
+  }
+
+  Future<List<Widget>> matchDirectChildrenOf(dynamic selector, { List<AFWidgetID> expectedIds, bool shouldScroll = true, 
+    Type filterByWidgetType }) async {
+    final elems = await findElementsFor(selector, shouldScroll: shouldScroll);
     if(elems.isEmpty) {
       throw AFException("Could not find element $selector");
     }
@@ -617,11 +620,21 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
     final elem = elems.first;
     final extractor = AFibF.g.screenTests.findExtractor(AFExtractWidgetAction.extractChildren, elem);
     if(extractor == null) {
-      throw AFException("No children extractor for element with widget type ${elem.widget.runtimeType}");
+      throw AFException("No children extractor for element $selector with widget type ${elem.widget.runtimeType}");
     }
-    dynamic result = extractor.extract(AFExtractWidgetAction.extractChildren, sel, elem);
-    if(result is! List<Widget>) {
+    dynamic resultDyn = extractor.extract(AFExtractWidgetAction.extractChildren, sel, elem);
+    if(resultDyn is! List<Widget>) {
       throw AFException("The extractor ${extractor.runtimeType} did not return a list of widget children");
+    }
+
+    List<Widget> result = resultDyn;
+
+    if(filterByWidgetType != null) {
+      result = result.where((e) => e.runtimeType == filterByWidgetType ).toList();
+    }
+
+    if(expectedIds != null) {
+      expectWidgetIds(result, expectedIds);
     }
     return result;
   }
@@ -637,9 +650,6 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
     slowOnScreenMillis = 0;
   }
 
-
-  Future<void> keepSynchronous();
-  Future<void> get ks { return keepSynchronous(); }
   Future<void> updateStateViews(dynamic data);
 
   Future<void> pauseForRender();
@@ -875,45 +885,6 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   AFScreenTestContext(this.dispatcher, AFTestID testId): super(testId);
   AFTestID get testID { return this.testId; }
 
-  Future<void> visitWidget(dynamic selector, Function(Element elem) onFound, { int extraFrames = 0 }) async {
-    final elems = await findWidgetsFor(selector, shouldScroll: true);
-    this.expect(elems.length, ft.equals(1), extraFrames: extraFrames+1);
-    if(elems.length > 0) {
-      onFound(elems.first);
-    }
-    return keepSynchronous();
-  }
-
-  Future<void> visitWidgets(dynamic selector, Function(List<Element>) onFound, { int extraFrames = 0 }) async {
-    final elems = await findWidgetsFor(selector, shouldScroll: true);
-    onFound(elems);
-    return keepSynchronous();
-  }
-
-  Future<void> visitNWidgets(dynamic selector, int n, {int extraFrames = 0, bool scrollIfMissing = true}) async {
-    final elems = await findWidgetsFor(selector, shouldScroll: scrollIfMissing);
-    this.expect(elems.length, ft.equals(n), extraFrames: extraFrames+1);
-    return keepSynchronous();
-  }
-
-  Future<void> matchWidgetValue(dynamic selectorDyn, ft.Matcher matcher, { String extractType = AFExtractWidgetAction.extractPrimary, int extraFrames = 0 }) async {
-    final selector = AFWidgetSelector.createSelector(null, selectorDyn);
-    final elems = await findWidgetsFor(selector, shouldScroll: false);
-    if(elems.isEmpty) {
-      this.expect(elems, ft.isNotEmpty, extraFrames: extraFrames+1);
-      return;
-    }
-
-    for(final elem in elems) {
-      final selectable = AFibF.g.screenTests.findExtractor(extractType, elem);
-      if(selectable == null) {
-        throw AFException("No AFSelectedWidgetTest found for ${elem.widget.runtimeType}, you can register one using AFScreenTests.registerSelectable");
-      }
-      this.expect(selectable.extract(extractType, selector, elem), matcher, extraFrames: extraFrames+1);
-    }
-    return keepSynchronous();
-  }
-
   Future<void> applyWidgetValue(dynamic selectorDyn, dynamic value, String applyType, { 
       AFActionListenerDelegate verifyActions, 
       AFParamListenerDelegate verifyParamUpdate,
@@ -923,7 +894,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
     }) async {
     AFibF.g.testOnlyClearRecentActions();
     final selector = AFWidgetSelector.createSelector(null, selectorDyn);
-    final elems = await findWidgetsFor(selector, shouldScroll: true);
+    final elems = await findElementsFor(selector, shouldScroll: true);
     if(maxWidgets > 0 && maxWidgets < elems.length) {
       throw AFException("Expected at most $maxWidgets widget for selector $selector, found ${elems.length} widgets");
     }
@@ -958,15 +929,9 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
         throw AFException("Passed in verifyQuery, but there was not an AFAsyncQuery dispatched by action");
       }
       verifyQuery(query);
-      return keepSynchronous();
     }
 
     await pauseForRender();
-    return keepSynchronous();
-  }
-
-  Future<void> keepSynchronous() {
-    return null;
   }
 
   TExpected expectType<TExpected>(dynamic obj) {
@@ -987,13 +952,11 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   Future<void> yieldToRenderLoop() async {
     AFibD.logTest?.d("Starting yield to event loop");
     await Future<void>.delayed(Duration(milliseconds: 100), () {});
-    return keepSynchronous();
   }
 
   @override
   Future<void> pauseForRender() async {
-    await yieldToRenderLoop();
-    return keepSynchronous();
+    return yieldToRenderLoop();
   }
 }
 
@@ -1003,10 +966,6 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
 
   AFScreenTestContextSimulator(AFDispatcher dispatcher, AFTestID testId, this.runNumber): super(dispatcher, testId);
 
-  @override
-  Future<void> keepSynchronous() {
-    return null;
-  }
 
   void addError(String desc, int depth) {
     final err = AFBaseTestExecute.composeError(desc, depth);
@@ -1032,18 +991,13 @@ class AFScreenTestContextWidgetTester extends AFScreenTestContext {
   Future<void> pauseForRender() async {
     await tester.pumpAndSettle(Duration(seconds: 2));
     await super.pauseForRender();
-    return keepSynchronous();
   }
 
   Future<void> yieldToRenderLoop() async {
     AFibD.logTest?.d("yielding to pump");
     await tester.pumpAndSettle(Duration(seconds: 2));
-    return keepSynchronous();
   }
 
-  Future<void> keepSynchronous() {
-    return null;
-  }
 }
 
 abstract class AFScreenPrototypeTest {
@@ -1618,7 +1572,6 @@ abstract class AFWorkflowTestExecute {
     AFTestID queryResults, 
     Function(AFScreenTestExecute) body,
     bool verifyScreen = true });
-  Future<void> keepSynchronous();
   Future<void> tapOpenDrawer({
     @required dynamic tap,
     @required AFScreenID startScreen,
@@ -1652,8 +1605,6 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     if(terminalScreen != null && originalScreenId != terminalScreen) {
       await screenContext.pauseForRender();
     } 
-
-    return keepSynchronous();  
   }
 
   static Future<AFScreenID> internalRunScreenTest(AFReusableTestID screenTestId, AFSingleScreenTestExecute sse, dynamic param1, dynamic param2, dynamic param3 ) async {
@@ -1704,7 +1655,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     bool verifyScreen = true
   }) {
       return onScreen(startScreen: startScreen, endScreen: endScreen, verifyScreen: verifyScreen, body: (ste) async {
-        await ste.tap(tap);
+        await ste.applyTap(tap);
       });
   }
 
@@ -1751,7 +1702,6 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
 
       final fut = body(screenContext);
       await fut;
-      return screenContext.keepSynchronous();
     });
     AFibD.logTest?.d("Finished underscreen");
 
@@ -1773,11 +1723,6 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     final stateTestContext = AFStateTestContext(stateTest, store, dispatcher, isTrueTestContext: false);
     AFStateTestContext.currentTest = stateTestContext;    
   }
-
-  Future<void> keepSynchronous() {
-    return null;
-  }
-
 }
 
 class AFWorkflowStateTestBodyWithParam {

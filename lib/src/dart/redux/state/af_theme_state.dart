@@ -8,7 +8,6 @@ import 'package:afib/src/flutter/ui/theme/af_text_builders.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 /// These are fundamental values for theming derived from the device
 /// and operating system itself.
@@ -1793,15 +1792,17 @@ class AFFunctionalTheme {
   Widget childCardColumn(List<Widget> rows, {
     EdgeInsets margin,
     CrossAxisAlignment align,
-    AFWidgetID wid,
+    AFWidgetID widColumn,
+    AFWidgetID widCard,
     Color color,
   }) {
     return Card(
-      key: keyForWID(wid),
       color: color,
+      key: keyForWID(widCard),
       child: Container(
         margin: margin,
         child: Column(
+          key: keyForWID(widColumn),
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: rows,
         )

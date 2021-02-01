@@ -88,4 +88,10 @@ typedef AFWidgetMapperDelegate = AFWidgetID Function(dynamic);
 ft.Matcher hasWidgetId(AFWidgetID expected) => _AFHasWidgetId(expected);
 ft.Matcher hasOneWidgetId(AFWidgetID expected) => _AFHasWidgetIds([expected]);
 ft.Matcher hasWidgetIds(List<AFWidgetID> expected) => _AFHasWidgetIds(expected);
-ft.Matcher hasWidgetIdsWith(List<dynamic> expected, { @required AFWidgetMapperDelegate mapper }) => _AFHasWidgetIds(expected.map(mapper).toList());
+ft.Matcher hasWidgetIdsWith(List<dynamic> expected, { @required AFWidgetMapperDelegate mapper }) {
+    if(mapper != null ) {
+      return _AFHasWidgetIds(expected.map(mapper).toList());
+    } else {
+      return _AFHasWidgetIds(expected);
+    }
+}

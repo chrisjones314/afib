@@ -5,6 +5,7 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
 import 'package:colorize/colorize.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart' as flutter_test;
 import 'package:stack_trace/stack_trace.dart';
 
@@ -60,6 +61,10 @@ abstract class AFBaseTestExecute {
       final stackFrames = extraFrames + 2;
       addError(desc, stackFrames);
     }
+  }
+
+  void expectWidgetIds(List<Widget> widgets, List<AFWidgetID> ids, { AFWidgetMapperDelegate mapper } ) {
+    return expect(widgets, hasWidgetIdsWith(ids, mapper: mapper));
   }
   
   void startSection(AFScreenTestBody body) {

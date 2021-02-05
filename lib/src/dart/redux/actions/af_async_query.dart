@@ -261,6 +261,16 @@ class AFConsolidatedQueryResponse {
     final foundError = responses.firstWhere( (response) => response.isError, orElse: () => null);
     return foundError != null;
   }
+
+  List<TResult> resultsOfType<TResult>() {
+    final results = <TResult>[];
+    for(final r in responses) {
+      if(r.result is TResult) {
+        results.add(r.result);
+      }
+    }
+    return results;
+  }
 }
 
 class AFConsolidatedQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TState, AFConsolidatedQueryResponse> {

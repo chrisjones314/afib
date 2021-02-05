@@ -595,6 +595,9 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
 
   Future<Widget> matchWidget(dynamic selector, { bool shouldScroll = true }) async {
     final widgets = await matchWidgets(selector, expectedCount: 1, scrollIfMissing: shouldScroll, extraFrames: 1);
+    if(widgets.isEmpty) {
+      return null;
+    }
     return widgets.first;
   }
 
@@ -1584,6 +1587,7 @@ abstract class AFWorkflowTestExecute {
     Function(AFScreenTestExecute) body,
   });
   
+  Future<void> pushQueryListener<TState extends AFAppStateArea, TQueryResponse>(AFAsyncQueryListener specifier, AFWorkflowTestDefinitionContext definitions, dynamic testData);
 }
 
 
@@ -1606,6 +1610,19 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
       await screenContext.pauseForRender();
     } 
   }
+
+  Future<void> pushQueryListener<TState extends AFAppStateArea, TQueryResponse>(AFAsyncQueryListener query, AFWorkflowTestDefinitionContext definitions, dynamic testData) async {
+    assert(TState != AFAppStateArea, "You need to specify a AFAppStateArea subclass as a type parameter");
+    assert(TQueryResponse != dynamic, "You need to specify a type for the query response");
+    final td = definitions.td(testData);
+    final successContext = AFFinishQuerySuccessContext<TState, TQueryResponse>(
+      dispatcher: AFibF.g.storeDispatcherInternalOnly,
+      state: AFibF.g.storeInternalOnly.state,
+      response: td
+    );
+    query.finishAsyncWithResponseAF(successContext);
+  }
+
 
   static Future<AFScreenID> internalRunScreenTest(AFReusableTestID screenTestId, AFSingleScreenTestExecute sse, dynamic param1, dynamic param2, dynamic param3 ) async {
     final screenTest = AFibF.g.screenTests.findById(screenTestId);
@@ -1897,6 +1914,10 @@ class AFStateTestDefinitionContext extends AFBaseTestDefinitionContext {
     test.specifyResponse(querySpecifier, this, idData);
   }
 
+  void specifyNoResponse(AFStateTest test, dynamic querySpecifier) {
+    test.specifyNoResponse(querySpecifier, this);
+  }
+
   /// Create a response dynamically for a particular query.
   /// 
   /// This method is useful when you have query methods which 'write' data, where often
@@ -2099,7 +2120,6 @@ class AFWorkflowTestDefinitionContext extends AFBaseTestDefinitionContext {
 
   AFWorkflowStateTestPrototype definePrototype({
     @required AFWorkflowTestID id,
-    String title,
     @required dynamic subpath,
     @required AFTestID stateTestId,
   }) {

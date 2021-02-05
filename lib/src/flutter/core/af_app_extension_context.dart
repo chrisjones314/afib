@@ -316,7 +316,7 @@ class AFPluginExtensionContext {
   AFInitAppFundamentalThemeDelegate initFundamentalThemeArea;
   final initScreenMaps = <AFInitScreenMapDelegate>[];
   final initialAppStates = <AFInitializeAppStateDelegate>[];
-  final createStartupQueryActions = <AFCreateStartupQueryActionDelegate>[];
+  final createStartupQueries = <AFCreateStartupQueryActionDelegate>[];
   final createLifecycleQueryActions = <AFCreateLifecycleQueryAction>[];
   final querySuccessListenerDelegates = <AFQuerySuccessListenerDelegate>[];
   AFTestExtensionContext test = AFTestExtensionContext();
@@ -326,8 +326,8 @@ class AFPluginExtensionContext {
   final errorListenerByState = <Type, AFOnErrorDelegate>{};
 
   /// Used by third parties to register extra query actions they'd like to take.
-  void addPluginStartupAction(AFCreateStartupQueryActionDelegate createStartupQueryAction) {
-    createStartupQueryActions.add(createStartupQueryAction);
+  void addPluginStartupQuery(AFCreateStartupQueryActionDelegate createStartupQueryAction) {
+    createStartupQueries.add(createStartupQueryAction);
   }
 
   /// Used by third parties to register screens that can be used by the app.
@@ -448,7 +448,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     this.test.initializeForApp();
     this.initScreenMaps.add(initScreenMap);
     this.initialAppStates.add(initializeAppState);
-    this.createStartupQueryActions.add(createStartupQueryAction);
+    this.createStartupQueries.add(createStartupQueryAction);
     this.errorListenerByState[TState] = queryErrorHandler;
     this.createApp = createApp;
     this.initFunctionalThemes.add(initFunctionalThemes);
@@ -466,7 +466,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
   }) {
     this.initScreenMaps.addAll(source.initScreenMaps);
     this.initialAppStates.addAll(source.initialAppStates);
-    this.createStartupQueryActions.addAll(source.createStartupQueryActions);
+    this.createStartupQueries.addAll(source.createStartupQueries);
     this.errorListenerByState.addAll(source.errorListenerByState);
     this.createApp = createApp;
     this.test = source.test;
@@ -481,8 +481,8 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     return errorListenerByState[TState];
   }
 
-  void dispatchStartupActions(AFDispatcher dispatcher) {
-    for(final creator in this.createStartupQueryActions) {
+  void dispatchStartupQueries(AFDispatcher dispatcher) {
+    for(final creator in this.createStartupQueries) {
       final action = creator();
       dispatcher.dispatch(action);
     }

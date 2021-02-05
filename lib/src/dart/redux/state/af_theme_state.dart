@@ -796,6 +796,12 @@ class AFBorderRadiusSet {
     @required this.s5,
   });
 
+  BorderRadius get size1 { return s1; }
+  BorderRadius get size2 { return s2; }
+  BorderRadius get size3 { return s3; }
+  BorderRadius get size4 { return s4; }
+  BorderRadius get size5 { return s5; }
+
  factory AFBorderRadiusSet.create({
     List<double> sizes,
     final bool tl,
@@ -840,6 +846,13 @@ class AFBorderRadius {
     @required this.b,
   });
 
+  AFBorderRadiusSet get all { return a; }
+  AFBorderRadiusSet get left { return l; }
+  AFBorderRadiusSet get right { return r; }
+  AFBorderRadiusSet get top { return t; }
+  AFBorderRadiusSet get bottom { return b; }
+
+
   factory AFBorderRadius.create(List<double> sizes) {
     final a = AFBorderRadiusSet.create(sizes: sizes, createRadius: (r) => BorderRadius.all(r));
     final l = AFBorderRadiusSet.create(sizes: sizes, createRadius: (r) => BorderRadius.only(topLeft: r, bottomLeft: r));
@@ -879,6 +892,13 @@ class AFSpacingSet {
     @required this.s5,
   });
 
+  EdgeInsets get sizeNone { return s0; }
+  EdgeInsets get size1 { return s1; }
+  EdgeInsets get size2 { return s2; }
+  EdgeInsets get size3 { return s3; }
+  EdgeInsets get size4 { return s4; }
+  EdgeInsets get size5 { return s5; }
+
   factory AFSpacingSet.createLTRB(
     List<double> basicSizes,
     final double left,
@@ -913,8 +933,17 @@ class AFSpacing {
   final AFSpacingSet l;
   final AFSpacingSet v;
   final AFSpacingSet h;
-  final AFSpacingSet x;
-  final AFSpacingSet y;
+
+  AFSpacingSet get all { return a; }
+  AFSpacingSet get top { return t; }
+  AFSpacingSet get right { return r; }
+  AFSpacingSet get bottom { return b; }
+  AFSpacingSet get left { return l; }
+  AFSpacingSet get vert { return v; }
+  AFSpacingSet get horz { return h; }
+  AFSpacingSet get y { return v; }
+  AFSpacingSet get x { return h; }
+
 
   AFSpacing({
     @required this.sizes,
@@ -924,9 +953,7 @@ class AFSpacing {
     @required this.b,
     @required this.l,
     @required this.v,
-    @required this.h,
-    @required this.x,
-    @required this.y,
+    @required this.h
   });
 
   factory AFSpacing.create(List<double> sizes) {
@@ -945,9 +972,7 @@ class AFSpacing {
       r: mr,
       b: mb,
       v: mv,
-      h: mh,
-      x: mh,
-      y: mv,
+      h: mh
     );
   }
 
@@ -1064,12 +1089,12 @@ class AFFundamentalThemeState {
     return themeDataActive.colorScheme.primary;
   }
 
-  Color get colorOnPrimary {
-    return themeDataActive.colorScheme.onPrimary;
-  }
-
   Color get colorPrimaryVariant {
     return themeDataActive.colorScheme.primaryVariant;
+  }
+
+  Color get colorOnPrimary {
+    return themeDataActive.colorScheme.onPrimary;
   }
 
   Color get colorSecondaryVariant {
@@ -1743,6 +1768,18 @@ class AFFunctionalTheme {
     );
   }
 
+  Widget childButtonFlatText({
+    AFWidgetID wid,
+    String text,
+    AFPressedDelegate onPressed,
+  }) {
+    return childButtonFlat(
+      wid: wid,
+      child: childText(text),
+      onPressed: onPressed
+    );
+  }
+
   /// Create a button that the user is most likely to click.
   Widget childButtonSecondary({
     AFWidgetID wid,
@@ -1758,6 +1795,18 @@ class AFFunctionalTheme {
     );
   }
 
+  /// Create a button that the user is most likely to click.
+  Widget childButtonFlat({
+    AFWidgetID wid,
+    Widget child,
+    AFPressedDelegate onPressed,
+  }) {
+    return childButton(
+      wid: wid,
+      child: child,
+      onPressed: onPressed
+    );
+  }
 
 
   /// As long as you are calling [AFFunctionalTheme.childScaffold], you don't need

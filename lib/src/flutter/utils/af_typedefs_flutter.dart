@@ -96,7 +96,7 @@ typedef AFInitUnitTestsDelegate = void Function(AFUnitTestDefinitionContext cont
 typedef AFInitStateTestsDelegate = void Function(AFStateTestDefinitionContext context);
 
 /// Delegate 
-typedef AFProcessQueryDelegate = void Function(AFStateTestContext context, AFAsyncQuery query);
+typedef AFProcessQueryDelegate = dynamic Function(AFStateTestContext context, AFAsyncQuery query);
 
 /// Delegate used in state tests to create a mock result from a query.
 typedef AFCreateQueryResultDelegate = dynamic Function(AFStateTestContext context, AFAsyncQuery query);

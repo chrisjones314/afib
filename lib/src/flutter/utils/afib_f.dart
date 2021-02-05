@@ -434,8 +434,8 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   /// 
   /// If you'd like to dispatch a startup action, see [AFAppExtensionContext.initializeAppFundamentals]
   /// or [AFAppExtensionContext.addStartupAction]
-  void dispatchStartupActions(AFDispatcher dispatcher) {
-    appContext.dispatchStartupActions(dispatcher);
+  void dispatchStartupQueries(AFDispatcher dispatcher) {
+    appContext.dispatchStartupQueries(dispatcher);
   }
 
   /// Used internally by the framework.

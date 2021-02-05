@@ -111,7 +111,10 @@ class AFStateTests<TState extends AFAppStateArea> {
 class _AFStateResultEntry {
   final dynamic querySpecifier;
   final AFProcessQueryDelegate handler;
-  _AFStateResultEntry(this.querySpecifier, this.handler);
+  _AFStateResultEntry(
+    this.querySpecifier, 
+    this.handler
+  );
 }
 
 class _AFStateQueryBody {
@@ -171,19 +174,27 @@ class AFStateTest<TState extends AFAppStateArea> {
     registerResult(querySpecifier, (context, query) {
       final data = definitions.td(idData);
       query.testFinishAsyncWithResponse(context, data);
+      return data;
     });
+  }
+
+  void specifyNoResponse(dynamic querySpecifier, AFStateTestDefinitionContext definitions) {
+    final key = _specifierToId(querySpecifier);
+    results[key] = _AFStateResultEntry(querySpecifier, null);    
   }
 
   void createResponse(dynamic querySpecifier, AFCreateQueryResultDelegate delegate) {
     registerResult(querySpecifier, (context, query) {
       final result = delegate(context, query);
       query.testFinishAsyncWithResponse(context, result);
+      return result;
     });
   }
 
   void specifySecondaryError(dynamic querySpecifier, dynamic error) {
     registerResult(querySpecifier, (context, query) {
       query.testFinishAsyncWithError(context, error);
+      return null;
     });
   }
 
@@ -243,10 +254,29 @@ class AFStateTest<TState extends AFAppStateArea> {
         query.finishAsyncExecute(successContext);
         return;
       }
+
+      if(query is AFConsolidatedQuery) {
+        final successContext = AFFinishQuerySuccessContext<TState, AFConsolidatedQueryResponse>(
+          dispatcher: context.dispatcher,
+          state: context.store.state,
+          response: query.queryResponses
+        );
+        for(final consolidatedQueries in query.queryResponses.responses) {
+          final consolidatedQuery = consolidatedQueries.query;
+          final consolidatedKey = _specifierToId(consolidatedQuery);
+          final consolidatedHandler = results[consolidatedKey];
+          consolidatedQueries.result = consolidatedHandler.handler(context, consolidatedQuery);
+
+        }
+        query.finishAsyncWithResponseAF(successContext);
+        return;
+      }
     
       throw AFException("No results specified for query ${_specifierToId(query)}");
     }
 
-    h.handler(context, query);
+    if(h.handler != null) {
+      h.handler(context, query);
+    }
   }
 }

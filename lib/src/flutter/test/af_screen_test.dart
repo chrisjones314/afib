@@ -128,7 +128,7 @@ class AFKeySelector extends AFWidgetSelector {
   }
 
   String toString() {
-    return "AFKeySelector($key)";
+    return "$key";
   }
 
   
@@ -150,6 +150,10 @@ class AFWidgetTypeSelector extends AFWidgetSelector {
   int get hashCode {
     return widgetType.hashCode;
   }
+
+  String toString() {
+    return widgetType.toString();
+  }
 }
 
 class AFIconDataSelector extends AFWidgetSelector {
@@ -170,6 +174,10 @@ class AFIconDataSelector extends AFWidgetSelector {
 
   int get hashCode {
     return data.hashCode;
+  }
+
+  String toString() {
+    return data.toString();
   }
 }
 
@@ -249,6 +257,14 @@ class AFRichTextGestureTapSpecifier extends AFWidgetSelector {
 
   int get hashCode {
     return hash2(selector.hashCode, containsText.hashCode);
+  }
+
+  String toString() {
+    final result = StringBuffer();
+    result.write(selector.toString());
+    result.write(":");
+    result.write(containsText);
+    return result.toString();
   }
 }
 
@@ -355,6 +371,18 @@ class AFSparsePathWidgetSelector extends AFWidgetSelector {
   int get hashCode {
     return pathSelectors.hashCode;
   }
+
+  String toString() {
+    final result = StringBuffer();
+    for(final sel in pathSelectors) {
+      if(result.isNotEmpty) {
+        result.write("/.../");
+      }
+      result.write(sel.toString());
+    }
+    return result.toString();
+  }
+
 }
 
 abstract class AFScreenTestExecute extends AFBaseTestExecute {
@@ -514,7 +542,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
   Future<Widget> matchWidgetValue(dynamic selectorDyn, ft.Matcher matcher, { bool scrollIfMissing = true, String extractType = AFExtractWidgetAction.extractPrimary, int extraFrames = 0 }) async {
     final elems = await findElementsFor(selectorDyn, shouldScroll: scrollIfMissing);
     if(elems.length != 1) {
-      throw AFException("matchWidgetValue expects $selectorDyn to match exactly one widget");
+      throw AFException("matchWidgetValue expects $selectorDyn to match exactly one widget, found ${elems.length}");
     }
 
     final elem = elems.first;
@@ -610,7 +638,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
   }
 
   Future<List<Widget>> matchDirectChildrenOf(dynamic selector, { List<AFWidgetID> expectedIds, bool shouldScroll = true, 
-    Type filterByWidgetType }) async {
+    AFFilterWidgetDelegate filterWidgets }) async {
     final elems = await findElementsFor(selector, shouldScroll: shouldScroll);
     if(elems.isEmpty) {
       throw AFException("Could not find element $selector");
@@ -632,8 +660,8 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute {
 
     List<Widget> result = resultDyn;
 
-    if(filterByWidgetType != null) {
-      result = result.where((e) => e.runtimeType == filterByWidgetType ).toList();
+    if(filterWidgets != null) {
+      result = result.where((e) => filterWidgets(e) ).toList();
     }
 
     if(expectedIds != null) {
@@ -1670,10 +1698,13 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     @required AFScreenID startScreen,
     AFScreenID endScreen,
     bool verifyScreen = true
-  }) {
-      return onScreen(startScreen: startScreen, endScreen: endScreen, verifyScreen: verifyScreen, body: (ste) async {
-        await ste.applyTap(tap);
-      });
+  }) async {
+    await onScreen(startScreen: startScreen, endScreen: endScreen, verifyScreen: verifyScreen, body: (ste) async {
+      await ste.applyTap(tap);
+      if(!AFibD.config.isWidgetTesterContext) {
+        await Future.delayed(AFibF.g.testDelayOnNewScreen);
+      }
+    });
   }
 
   Future<void> tapOpenDrawer({

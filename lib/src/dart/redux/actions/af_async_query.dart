@@ -133,7 +133,6 @@ abstract class AFAsyncQuery<TState extends AFAppStateArea, TResponse> extends AF
         if(onResponseExtra != null) {
           onResponseExtra(successContext);
         }
-        AFibF.g.onQuerySuccess(this, successContext);
       }, 
       onError: (error) {
         final errorContext = AFFinishQueryErrorContext<TState>(dispatcher: dispatcher, state: store.state, error: error);
@@ -158,6 +157,7 @@ abstract class AFAsyncQuery<TState extends AFAppStateArea, TResponse> extends AF
         context.dispatch(act);
       }
     }
+    AFibF.g.onQuerySuccess(this, context);
   }
 
   void finishAsyncWithErrorAF(AFFinishQueryErrorContext<TState> context) {

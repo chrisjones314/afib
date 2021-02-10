@@ -169,3 +169,5 @@ typedef AFCreateFunctionalThemeDelegate = AFFunctionalTheme Function(AFFundament
 typedef AFWireframeExecutionDelegate = void Function(AFWireframeExecutionContext we);
 
 typedef AFTestDataCompositeGeneratorDelegate = void Function(AFCompositeTestDataRegistry destination);
+
+typedef AFFilterWidgetDelegate = bool Function(Widget);

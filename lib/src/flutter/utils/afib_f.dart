@@ -227,6 +227,19 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     return routeState.activeScreenId;
   }
 
+  bool testOnlyIsWorkflowTest(AFTestID testId) {
+    if(primaryUITests.afWorkflowStateTests.findById(testId) != null) {
+      return true;
+    }
+
+    for(final tests in thirdPartyUITests.values) {
+      if(tests.afWorkflowStateTests.findById(testId) != null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   void doMiddlewareNavigation( Function(NavigatorState) underHere ) {
     navDepth++;
     if(navDepth > 1) {
@@ -322,6 +335,10 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     _recentActions.clear();
   }
 
+  Duration get testDelayOnNewScreen {
+    return Duration(milliseconds: 500);
+  }
+
 
   /// Used internally in tests to find widgets on the screen.  Not for public use.
   AFibTestOnlyScreenElement internalOnlyFindScreen(AFScreenID screenId) {
@@ -357,9 +374,6 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   AFScreenID get effectiveStartupScreenId {
     if(forcedStartupScreen != null) {
       return forcedStartupScreen;
-    }
-    if(AFibD.config.requiresPrototypeData) {
-      return AFUIScreenID.screenPrototypeHome;
     }
     return AFUIScreenID.screenStartupWrapper;
   }
@@ -422,8 +436,8 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   }
 
 
-  AFThemeState rebuildFunctionalThemes() {
-    final themes = storeInternalOnly.state.public.themes;
+  AFThemeState rebuildFunctionalThemes({AFThemeState initial}) {
+    final themes = initial ?? storeInternalOnly.state.public.themes;
     final functionals = themeFactories.createFunctionals(themes.fundamentals);
     return themes.copyWith(
       functionals: functionals

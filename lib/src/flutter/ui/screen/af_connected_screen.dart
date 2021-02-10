@@ -107,6 +107,10 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
       return null;
     }
 
+    if(AFibF.g.testOnlyIsWorkflowTest(activeTestId)) {
+      return null;
+    }
+
     
     final testContext = testState.findContext(activeTestId);
     final activeState = testState.findState(activeTestId);

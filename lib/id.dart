@@ -85,6 +85,9 @@ class AFUIThemeID {
   static const marginSizes = AFThemeID("margin_sizes", AFUILibraryID.id, tagFundamental);
   static const paddingSizes = AFThemeID("padding_sizes", AFUILibraryID.id, tagFundamental);
   static const borderRadiusSizes = AFThemeID("border_radius_sizes", AFUILibraryID.id, tagFundamental);
+  static const formFactor = AFThemeID("form_factor", AFUILibraryID.id, tagFundamental);
+  static const formOrientation = AFThemeID("form_orientation", AFUILibraryID.id, tagFundamental);
+  static const formFactorLimits = AFThemeID("form_factor_limits", AFUILibraryID.id, tagFundamental);
 
   /// Color used for text that can be tapped like a hyperlink.
   static const colorTapableText = AFThemeID("color_tapable_text", AFUILibraryID.id, tagFundamental);

@@ -1,5 +1,6 @@
 
 //--------------------------------------------------------------------------------------
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/widgets.dart';
@@ -39,7 +40,9 @@ class _AFStartupScreenState extends State<AFStartupScreenWrapper> {
 
     // Kick off the app by firing a query.  In a typical app this might check the user's
     // logged in status while a splash screen displays.
-    AFibF.g.dispatchStartupQueries(AFibF.g.storeDispatcherInternalOnly);
+    if(!AFibD.config.requiresPrototypeData) {
+      AFibF.g.dispatchStartupQueries(AFibF.g.storeDispatcherInternalOnly);
+    }
   }
 
   //--------------------------------------------------------------------------------------

@@ -69,6 +69,10 @@ class AFScreenMap {
 
   /// Returns the widget builder for the initial screen.
   WidgetBuilder get initialScreenBuilder {
+    if(AFibD.config.requiresPrototypeData) {
+      return _screens[AFUIScreenID.screenPrototypeHome];
+    }
+
     return _screens[_startupScreenId];
   }
 

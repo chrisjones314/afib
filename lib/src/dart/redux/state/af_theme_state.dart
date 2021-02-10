@@ -9,6 +9,20 @@ import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+/// You can override [AFFunctionalTheme.deviceFormFactor] to modify
+/// the meanings of these defintions.  
+/// 
+/// In your code, you can use methods like [AFFunctionalTheme.deviceHasFormFactor]
+/// to conditionally change your UI build based on the device form factor.  
+enum AFFormFactor {
+  smallPhone,  /// Similar to an iPhone mini
+  standardPhone, /// Similar to all other iPhones
+  largePhone, /// Similar to 
+  smallTablet,  /// Similar to 
+  standardTablet,
+  largeTablet,
+}
+
 /// These are fundamental values for theming derived from the device
 /// and operating system itself.
 class AFFundamentalDeviceTheme {
@@ -20,6 +34,7 @@ class AFFundamentalDeviceTheme {
   final Locale localeValue;
   final Size physicalSize;
   final double textScaleFactorValue;
+  final double devicePixelRatio;
 
   AFFundamentalDeviceTheme({
     @required this.brightnessValue,
@@ -30,6 +45,7 @@ class AFFundamentalDeviceTheme {
     @required this.localeValue,
     @required this.physicalSize,
     @required this.textScaleFactorValue,
+    @required this.devicePixelRatio,
   });
 
   factory AFFundamentalDeviceTheme.create() {
@@ -42,6 +58,7 @@ class AFFundamentalDeviceTheme {
     final locale = window.locale;
     final physicalSize = window.physicalSize;
     final textScaleFactor = window.textScaleFactor;
+    final devicePixelRatio = window.devicePixelRatio;
     return AFFundamentalDeviceTheme(
       brightnessValue: brightness,
       alwaysUse24HourFormatValue: alwaysUse24,
@@ -50,7 +67,8 @@ class AFFundamentalDeviceTheme {
       viewPadding: viewPadding,
       localeValue: locale,
       physicalSize: physicalSize,
-      textScaleFactorValue: textScaleFactor
+      textScaleFactorValue: textScaleFactor,
+      devicePixelRatio: devicePixelRatio,
     );
   }
 
@@ -269,6 +287,8 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
       result.add(AFUIThemeID.alwaysUse24HourFormat);
       result.add(AFUIThemeID.textScaleFactor);
       result.add(AFUIThemeID.locale);
+      result.add(AFUIThemeID.formFactor);
+      result.add(AFUIThemeID.formOrientation);
     }
     return result;
   }
@@ -659,6 +679,8 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
   static const bootstrapStandardMargins = <double>[0, 2.0, 4.0, 8.0, 12.0, 16.0];
   static const bootstrapStandardPadding = bootstrapStandardMargins;
   static const bootstrapStandardBorderRadius = bootstrapStandardMargins;
+  static const afFormFactorLimits = <double>[650, 1200, 1400, 1600, 2000];
+    
 
   AFAppFundamentalThemeAreaBuilder({
     @required Map<AFThemeID, List<dynamic>> optionsForType
@@ -704,10 +726,16 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     List<double> marginSizes = bootstrapStandardMargins,
     List<double> paddingSizes = bootstrapStandardPadding,
     List<double> borderRadiusSizes = bootstrapStandardBorderRadius,
+    List<double> formFactorLimits = afFormFactorLimits,
     IconData iconBack = Icons.arrow_back,
     IconData iconNavDown = Icons.chevron_right,
     Color colorTapableText = Colors.blue,
   }) {
+    assert(marginSizes.length == bootstrapStandardMargins.length);
+    assert(paddingSizes.length == bootstrapStandardPadding.length);
+    assert(borderRadiusSizes.length == bootstrapStandardBorderRadius.length);
+    assert(formFactorLimits.length == afFormFactorLimits.length);
+
     // icons
     setValue(AFUIThemeID.marginSizes, marginSizes);
     setValue(AFUIThemeID.paddingSizes, paddingSizes);
@@ -715,6 +743,7 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     setValue(AFUIThemeID.iconBack, iconBack);
     setValue(AFUIThemeID.iconNavDown, iconNavDown);
     setValue(AFUIThemeID.colorTapableText, colorTapableText);
+    setValue(AFUIThemeID.formFactorLimits, formFactorLimits);
   }
 
 
@@ -1360,6 +1389,7 @@ class AFFundamentalThemeState {
 /// context.t methods.
 @immutable
 class AFFunctionalTheme {
+  static const orderedFormFactors = <AFFormFactor>[AFFormFactor.smallPhone, AFFormFactor.standardPhone, AFFormFactor.largePhone, AFFormFactor.smallTablet, AFFormFactor.standardTablet, AFFormFactor.largeTablet];
   final AFThemeID id;
   final AFFundamentalThemeState fundamentals;
   AFFunctionalTheme({
@@ -1398,7 +1428,7 @@ class AFFunctionalTheme {
   /// always24Hours settings
   /// 
   String textHourMinuteLabel(int hour, int minute, { bool alwaysUse24Hours }) {
-    var always = alwaysUse24Hours ?? alwaysUse24HourFormat;
+    var always = alwaysUse24Hours ?? deviceAlwaysUse24HourFormat;
     var suffix = ' am';
     var nHour = hour;
     if(always) {
@@ -1641,11 +1671,6 @@ class AFFunctionalTheme {
     );
   }
 
-  /// Whether times should use a 24 hour format.
-  bool get alwaysUse24HourFormat {
-    return fundamentals.device.alwaysUse24HourFormat(fundamentals);
-  }
-
   /// Translate the specified string id and return it.
   /// 
   /// See also [childTextBuilder] and [childRichTextBuilder]
@@ -1708,6 +1733,20 @@ class AFFunctionalTheme {
       theme: fundamentals,
       wid: wid,
       style: style
+    );
+  }
+
+  Widget childButtonIcon({
+    AFWidgetID wid,
+    Widget child,
+    AFPressedDelegate onPressed,
+    Color color,
+  }) {
+    return IconButton(
+      key: keyForWID(wid),
+      icon: child,
+      color: color,
+      onPressed: onPressed
     );
   }
 
@@ -2101,11 +2140,58 @@ need to manually update the value in the controller.
     return (dSize.height >= dSize.width) ? Orientation.portrait : Orientation.landscape;
   }
 
+  /// An appoximate form factor for the device.   
+  /// 
+  /// Since web browsers
+  /// can be resized arbitrarily, in the web case this returns the best
+  /// approximation in [AFFormFactor].
+  AFFormFactor get deviceFormFactor {
+    final dSize = devicePhysicalSize;
+    final smaller = dSize.width < dSize.height ? dSize.width : dSize.height;
+    final List<double> formLimits = fundamentals.findValue(AFUIThemeID.formFactorLimits);
+    if(smaller < formLimits[0]) {
+      return AFFormFactor.smallPhone;
+    } else if(smaller < formLimits[1]) {
+      return AFFormFactor.standardPhone;
+    } else if(smaller < formLimits[2]) {
+      return AFFormFactor.largePhone;
+    } else if(smaller < formLimits[3]) {
+      return AFFormFactor.smallTablet;
+    } else if(smaller < formLimits[4]) {
+      return AFFormFactor.standardTablet;
+    }
+    return AFFormFactor.largeTablet;
+  }
+
+  bool deviceHasFormFactor({
+    AFFormFactor atLeast,
+    AFFormFactor atMost,
+    Orientation withOrientation
+  }) {
+    if(withOrientation != null) {
+      if(deviceOrientation != withOrientation) {
+        return false;
+      }
+    }
+    
+    var atLeastIdx = 0;
+    var atMostIdx = orderedFormFactors.length;
+    if(atLeast != null) {
+      atLeastIdx = orderedFormFactors.indexOf(atLeast);
+    }
+    if(atMost != null) {
+      atMostIdx = orderedFormFactors.indexOf(atMost);
+    }
+
+    final actualIdx = orderedFormFactors.indexOf(deviceFormFactor);
+    return (actualIdx >= atLeastIdx && actualIdx <= atMostIdx);
+  }
+
   // Whether to always use 24-hour time format.
   bool get deviceAlwaysUse24HourFormat {
     return fundamentals.device.alwaysUse24HourFormat(fundamentals);
   }
- 
+
   /// The physical size of the screen.
   /// 
   /// This value updates automatically when the
@@ -2618,9 +2704,10 @@ class AFThemeState {
 
   AFThemeState reviseOverrideThemeValue(AFThemeID id, dynamic value) {
     final revised = fundamentals.reviseOverrideThemeValue(id, value);
-    return copyWith(
+    final revisedState = copyWith(
       fundamentals: revised
     );
+    return AFibF.g.rebuildFunctionalThemes(initial: revisedState);
   }
 
   AFThemeState reviseRebuildAll() {

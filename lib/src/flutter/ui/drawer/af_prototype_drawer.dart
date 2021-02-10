@@ -356,7 +356,12 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
 
     for(final attr in t.fundamentals.attrsForArea(area)) {
       tableRows.add(_createAttributeRow(context, attr, () {
-          final attrVal = t.fundamentals.findValue(attr);
+          var attrVal = t.fundamentals.findValue(attr);
+          if(attr == AFUIThemeID.formFactor) {
+            attrVal = t.deviceFormFactor;
+          } else if(attr == AFUIThemeID.formOrientation) {
+            attrVal = t.deviceOrientation;
+          }
           if(attrVal is IconData) {
             return Icon(attrVal);
           }

@@ -1,5 +1,4 @@
 
-import 'package:afib/id.dart';
 import 'package:quiver/core.dart';
 
 class AFID {
@@ -161,9 +160,6 @@ class AFStateTestID extends AFTestID {
 }
 
 class AFReusableTestID extends AFTestID {
-  static const smokeTestId = AFReusableTestID("smoke", AFUILibraryID.id);
-  static const allTestId = AFReusableTestID("all", AFUILibraryID.id);
-  static const workflowTestId = AFReusableTestID("workflow", AFUILibraryID.id);
   const AFReusableTestID(String code, AFLibraryID library, {String group, List<String> tags }) : super("rt", code, library, tags: tags, group: group);
 }
 

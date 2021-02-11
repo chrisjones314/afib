@@ -451,7 +451,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     var defaultRunId = firstId;
     var rowAlign = MainAxisAlignment.start;
     if(hasMultiple) {
-      defaultRunId = AFReusableTestID.allTestId;
+      defaultRunId = AFUIReusableTestID.all;
       rowAlign = MainAxisAlignment.spaceBetween;
     }
 
@@ -524,7 +524,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
 
       for(final reusableId in test.sectionIds) {
         final rows = t.column();
-        if(reusableId == AFReusableTestID.smokeTestId) {
+        if(reusableId == AFUIReusableTestID.smoke) {
           continue;
         }
 

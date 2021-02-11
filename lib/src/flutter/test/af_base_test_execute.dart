@@ -101,8 +101,8 @@ abstract class AFBaseTestExecute {
 
   void printPassMessages(AFCommandOutput output, AFTestStats stats) {
     if(sectionErrors.isNotEmpty) {
-      final sectionErrorSmoke = sectionErrors.values.where((section) => section.section == AFUITestID.smokeTest);
-      final sectionErrorReusable = sectionErrors.values.where((section) => section.section != AFUITestID.smokeTest);
+      final sectionErrorSmoke = sectionErrors.values.where((section) => section.section == AFUIReusableTestID.smoke);
+      final sectionErrorReusable = sectionErrors.values.where((section) => section.section != AFUIReusableTestID.smoke);
       if(sectionErrorSmoke.isNotEmpty) {
         _writePassed(output, "$testID/s", sectionErrorSmoke.first, stats);
       }

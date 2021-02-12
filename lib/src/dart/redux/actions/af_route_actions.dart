@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
@@ -66,7 +67,7 @@ class AFNavigateExitTestAction extends AFNavigateAction {
 /// Action that removes all screens in the route, and replaces them with
 /// a single new screen at the root.
 class AFNavigateReplaceAllAction extends AFNavigateAction {
-  AFNavigateReplaceAllAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
+  AFNavigateReplaceAllAction({AFID id, @required AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
 
   factory AFNavigateReplaceAllAction.toStartupScreen({AFRouteParam param}) {
     return AFNavigateReplaceAllAction(screen: AFUIScreenID.screenStartupWrapper, param: param);

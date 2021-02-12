@@ -1,4 +1,4 @@
-
+// @dart=2.9
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/af_args.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';

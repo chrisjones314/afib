@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';

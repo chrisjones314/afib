@@ -1,4 +1,4 @@
-
+// @dart=2.9
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:redux/redux.dart';
 

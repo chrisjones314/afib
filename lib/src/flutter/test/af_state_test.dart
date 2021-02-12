@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'package:afib/src/dart/redux/actions/af_always_fail_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';

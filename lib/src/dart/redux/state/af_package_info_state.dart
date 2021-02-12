@@ -1,5 +1,4 @@
-
-
+// @dart=2.9
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 
 /// A utility containing package info that is placed in your own app state 

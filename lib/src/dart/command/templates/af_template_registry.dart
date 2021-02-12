@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/generator_code/af_code_generator.dart';

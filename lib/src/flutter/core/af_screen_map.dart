@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'package:afib/id.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/ui/screen/af_startup_screen.dart';

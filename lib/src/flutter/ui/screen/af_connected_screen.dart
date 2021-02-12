@@ -1,4 +1,4 @@
-
+// @dart=2.9
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/utils/af_context_dispatcher_mixin.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
@@ -537,7 +537,8 @@ mixin AFContextShowMixin {
   /// See also [showSnackbarText]
   void showSnackbarText(String text, { Duration duration = const Duration(seconds: 2)}) {
     if(text != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text), duration: duration));
+      // TODO: Re-enable this.
+      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text), duration: duration));
     }
   }
 
@@ -547,7 +548,8 @@ mixin AFContextShowMixin {
   /// 
   /// See also [showSnackbarText]
   void showSnackbar(SnackBar snackbar) {
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    // TODO: Re-enable this.
+    //ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 
   /// Show a modal bottom sheet.

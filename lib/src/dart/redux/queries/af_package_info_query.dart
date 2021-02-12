@@ -1,6 +1,4 @@
-
-
-
+// @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';

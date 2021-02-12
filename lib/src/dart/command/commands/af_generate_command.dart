@@ -1,4 +1,4 @@
-
+// @dart=2.9
 import 'dart:io';
 
 import 'package:afib/src/dart/command/af_project_paths.dart';

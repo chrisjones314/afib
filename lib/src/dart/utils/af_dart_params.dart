@@ -1,4 +1,4 @@
-
+// @dart=2.9
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:logger/logger.dart';

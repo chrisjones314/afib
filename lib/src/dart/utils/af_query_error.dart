@@ -1,4 +1,4 @@
-
+// @dart=2.9
 /// A standard way to represent errors that occur during [AFAsyncQuery].
 /// 
 /// However, you can also use your own error type if you prefer.

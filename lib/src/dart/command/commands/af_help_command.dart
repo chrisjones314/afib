@@ -1,3 +1,4 @@
+// @dart=2.9
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 

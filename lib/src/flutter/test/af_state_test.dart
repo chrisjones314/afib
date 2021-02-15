@@ -72,7 +72,7 @@ class AFStateTestDifference {
 class AFStateTestContext<TState extends AFAppStateArea> extends AFStateTestExecute {
   AFStateTest test;
   final AFStore store;
-  final AFDispatcher dispatcher;
+  AFDispatcher dispatcher;
   static AFStateTestContext currentTest;
   final bool isTrueTestContext;
   

@@ -25,6 +25,11 @@ class AFStateScreenTestDispatcher extends AFTestDispatcher {
 
   @override
   void dispatch(dynamic action) {
+    // don't do navigation actions when executed in a workflow context, instead,
+    // let the workflow test itself establish the initial path.
+    if(action is AFNavigateAction) {
+      return;
+    }
     main.dispatch(action);
   }
 }

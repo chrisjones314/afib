@@ -1328,6 +1328,7 @@ class AFWorkflowStatePrototypeTest<TState extends AFAppStateArea> extends AFScre
 
     final stateTestContext = AFStateTestContext<TState>(testImpl, store, stateDispatcher, isTrueTestContext: false);
     testImpl.execute(stateTestContext);
+    stateTestContext.dispatcher = mainDispatcher;
 
 
     if(stateTestContext.errors.hasErrors) {
@@ -1335,7 +1336,7 @@ class AFWorkflowStatePrototypeTest<TState extends AFAppStateArea> extends AFScre
 
     // then, navigate into the desired path.
     final subpath = test.subpath;
-    if(subpath is AFNavigatePushAction) {
+    if(subpath is AFNavigatePushAction || subpath is AFNavigateReplaceAllAction) {
       dispatcher.dispatch(subpath);
     } else if(subpath is List) {
       for(final push in subpath) {
@@ -1837,18 +1838,12 @@ class AFWorkflowStateTests<TState extends AFAppStateArea> {
   }
 
   AFScreenID _initialScreenIdFromSubpath(dynamic subpath) {
-    if(subpath is AFScreenID) {
-      return subpath;
-    }
-    if(subpath is AFNavigatePushAction) {
+    if(subpath is AFNavigateAction) {
       return subpath.screen;
     }
     if(subpath is List) {
       final last = subpath.last;
-      if(last is AFScreenID) {
-        return last;
-      }
-      if(last is AFNavigatePushAction) {
+      if(last is AFNavigateAction) {
         return last.screen;
       }
     }

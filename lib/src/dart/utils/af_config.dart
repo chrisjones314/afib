@@ -135,9 +135,5 @@ class AFConfig {
       output.write("${entry.namespaceKey}: ");
       AFCommand.startHelpColumn(output);
       output.writeLine(valueFor(entry).toString());    
-  }
-
-  
-  //void setJson(String key, HashMap<String, dynamic> json) { jsonSettings[key] = json; }
-  //HashMap<String, dynamic> getJson(String key) { return jsonSettings[key]; }
+  }  
 }

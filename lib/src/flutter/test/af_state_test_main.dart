@@ -24,6 +24,9 @@ void afStateTestMain<TState extends AFAppStateArea> (AFCommandOutput output, AFT
   final dispatcher = AFStoreDispatcher(store);
   for(final test in tests.tests) {
     if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
+      if(localStats.isEmpty) {
+        printTestKind(output, testKind);
+      }
       final context = AFStateTestContext<TState>(test, store, dispatcher, isTrueTestContext: true);
       
       context.store.dispatch(AFResetToInitialStateAction());
@@ -37,7 +40,7 @@ void afStateTestMain<TState extends AFAppStateArea> (AFCommandOutput output, AFT
   store.dispatch(AFNavigateExitTestAction());
 
   final baseContexts = List<AFBaseTestExecute>.of(contexts);
-  printTestTotal(output, testKind, baseContexts, localStats);
+  printTestTotal(output, baseContexts, localStats);
   stats.mergeIn(localStats);
 
 }

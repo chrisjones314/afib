@@ -36,7 +36,7 @@ Future<void> afScreenTestMain<TState extends AFAppStateArea>(AFCommandOutput out
   final locales = AFibF.g.testEnabledLocales(AFibD.config);
     
   for(final locale in locales) {
-    output.writeSeparatorLine();
+    AFBaseTestExecute.writeSeparatorLine(output);
     output.writeLine("Running in locale $locale");
     AFibF.g.storeDispatcherInternalOnly.dispatch(AFOverrideThemeValueAction(
       id: AFUIThemeID.locale,
@@ -66,53 +66,55 @@ Future<void> _afStandardScreenTestMain<TState extends AFAppStateArea>(
   AFTestStats stats, 
   WidgetTester tester, 
   AFApp app,  
-  List<AFScreenPrototypeTest> allTests, 
+  List<AFScreenPrototype> allPrototypes, 
   String sectionTitle,
   AFTestCreatePushActionDelegate createPush) async {
   final simpleContexts = <AFScreenTestContextWidgetTester>[];
   final testKind = sectionTitle;
   final localStats = AFTestStats();
-
-  for(var test in allTests) {
-    if(!test.hasBody) {
+  for(var prototype in allPrototypes) {
+    if(!prototype.hasTests) {
       continue;
     }
-    if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
-      final startActions = createPush(test);
+    if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, prototype.id)) {
+      if(localStats.isEmpty) {
+        printTestKind(output, testKind);
+      }
+
+      printPrototypeStart(output, prototype.id);
+      final startActions = createPush(prototype);
       for(final action in startActions) {
         AFibF.g.storeInternalOnly.dispatch(action);
       }
-      AFibD.logTest?.d("Starting ${test.id}");
+      AFibD.logTest?.d("Starting ${prototype.id}");
   
       final storeDispatcher = AFStoreDispatcher(AFibF.g.storeInternalOnly);
-      final dispatcher = AFSingleScreenTestDispatcher(test.id, storeDispatcher, null);
-      final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id);
+      final dispatcher = AFSingleScreenTestDispatcher(prototype.id, storeDispatcher, null);
+      final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, prototype.id, output, localStats);
       storeDispatcher.dispatch(AFResetToInitialStateAction());
-      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, stateViews: test.stateViews, screen: test.screenId, routeParam: test.routeParam, stateViewId: null, routeParamId: null));
+      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, stateViews: prototype.stateViews, screen: prototype.screenId, routeParam: prototype.routeParam, stateViewId: null, routeParamId: null));
       dispatcher.setContext(context);
       simpleContexts.add(context);
 
       // tell the store to go to the correct screen.
       await tester.pumpAndSettle(Duration(seconds: 1));
 
-      AFibD.logTest?.d("Finished pumpWidget for ${test.id}");
-      //debugDumpApp();
-      await test.run(context);
-      AFibD.logTest?.d("Finished ${test.id}");
-
+      output.indent();
+      AFibD.logTest?.d("Finished pumpWidget for ${prototype.id}");
+      await prototype.run(context);
+      AFibD.logTest?.d("Finished ${prototype.id}");
+      output.outdent();
       // pop this test screen off so that we are ready for the next one.
       AFibF.g.storeInternalOnly.dispatch(AFNavigateExitTestAction());
       
       dispatcher.setContext(context);
       await tester.pumpAndSettle(Duration(seconds: 1));
-      printTestResult(output, testKind, context, localStats);
-
     }
   }
 
   AFibF.g.storeInternalOnly.dispatch(AFResetTestState());
   final baseContexts = List<AFBaseTestExecute>.of(simpleContexts);
-  printTestTotal(output, testKind, baseContexts, localStats);
+  printTestTotal(output, baseContexts, localStats);
   stats.mergeIn(localStats);
 }
 
@@ -145,16 +147,22 @@ Future<void> _afWorkflowTestMain<TState extends AFAppStateArea>(AFCommandOutput 
   final localStats = AFTestStats();
 
   for(final test in AFibF.g.workflowTests.stateTests) {
-    if(!test.hasBody) {
+    if(!test.hasTests) {
       continue;
     }
     if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
+      if(localStats.isEmpty) {
+        printTestKind(output, testKind);
+      }
+
+      printPrototypeStart(output, test.id);
+      output.indent();
       AFibD.logTest?.d("Starting test ${test.id}");
       final dispatcher = AFStoreDispatcher(AFibF.g.storeInternalOnly);
-      final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id);
+      final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id, output, localStats);
       multiContexts.add(context);
 
-      AFWorkflowStatePrototypeTest.initializeMultiscreenPrototype<TState>(dispatcher, test);
+      AFWorkflowStatePrototype.initializeMultiscreenPrototype<TState>(dispatcher, test);
       
       // tell the store to go to the correct screen.
       await tester.pumpAndSettle(Duration(seconds: 1));
@@ -171,12 +179,13 @@ Future<void> _afWorkflowTestMain<TState extends AFAppStateArea>(AFCommandOutput 
 
       /// Clear out our cache of screen info for the next test.
       AFibF.g.resetTestScreens();
-      printTestResult(output, testKind, context, localStats);
+
+      output.outdent();
     }
   }
 
   final baseMultiContexts = List<AFBaseTestExecute>.of(multiContexts);
-   printTestTotal(output, testKind, baseMultiContexts, localStats);
+   printTestTotal(output, baseMultiContexts, localStats);
   stats.mergeIn(localStats);
   return null;
 }

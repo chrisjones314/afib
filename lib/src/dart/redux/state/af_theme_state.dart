@@ -3,25 +3,12 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:afib/afib_flutter.dart';
+import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/ui/theme/af_text_builders.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-
-/// You can override [AFFunctionalTheme.deviceFormFactor] to modify
-/// the meanings of these defintions.  
-/// 
-/// In your code, you can use methods like [AFFunctionalTheme.deviceHasFormFactor]
-/// to conditionally change your UI build based on the device form factor.  
-enum AFFormFactor {
-  smallPhone,  /// Similar to an iPhone mini
-  standardPhone, /// Similar to all other iPhones
-  largePhone, /// Similar to 
-  smallTablet,  /// Similar to 
-  standardTablet,
-  largeTablet,
-}
 
 /// These are fundamental values for theming derived from the device
 /// and operating system itself.
@@ -1364,6 +1351,27 @@ class AFFundamentalThemeState {
 
 }
 
+mixin AFDeviceFormFactorMixin {
+  bool deviceHasFormFactor({
+    AFFormFactor atLeast,
+    AFFormFactor atMost,
+    Orientation withOrientation
+  });
+
+  bool get deviceIsTablet {
+    return deviceHasFormFactor(atLeast: AFFormFactor.smallTablet);
+  }
+
+  bool get deviceIsPhone {
+    return deviceHasFormFactor(atMost: AFFormFactor.largePhone);
+  }
+
+  bool get deviceIsLandscapeTablet {
+    return deviceHasFormFactor(atLeast: AFFormFactor.smallTablet, withOrientation: Orientation.landscape);
+  }
+
+}
+
 /// Functional themes are interfaces that provide UI theming
 /// for conceptual components that are shared across many pages
 /// in the app.
@@ -1388,7 +1396,7 @@ class AFFundamentalThemeState {
 /// type, and that theme will be accessible via the context.theme and
 /// context.t methods.
 @immutable
-class AFFunctionalTheme {
+class AFFunctionalTheme with AFDeviceFormFactorMixin {
   static const orderedFormFactors = <AFFormFactor>[AFFormFactor.smallPhone, AFFormFactor.standardPhone, AFFormFactor.largePhone, AFFormFactor.smallTablet, AFFormFactor.standardTablet, AFFormFactor.largeTablet];
   final AFThemeID id;
   final AFFundamentalThemeState fundamentals;
@@ -1851,13 +1859,13 @@ class AFFunctionalTheme {
   /// As long as you are calling [AFFunctionalTheme.childScaffold], you don't need
   /// to worry about this, it will be done for you.
   Widget childDebugDrawerBegin(Widget beginDrawer) {
-    return _createDebugDrawer(beginDrawer, AFScreenPrototypeTest.testDrawerSideBegin);
+    return _createDebugDrawer(beginDrawer, AFScreenPrototype.testDrawerSideBegin);
   }
 
   /// As long as you are calling [AFFunctionalTheme.childScaffold], you don't need
   /// to worry about this, it will be done for you.
   Widget childDebugDrawerEnd(Widget endDrawer) {
-    return _createDebugDrawer(endDrawer, AFScreenPrototypeTest.testDrawerSideEnd);
+    return _createDebugDrawer(endDrawer, AFScreenPrototype.testDrawerSideEnd);
   }
 
   Widget childCard({ 
@@ -2185,6 +2193,15 @@ need to manually update the value in the controller.
 
     final actualIdx = orderedFormFactors.indexOf(deviceFormFactor);
     return (actualIdx >= atLeastIdx && actualIdx <= atMostIdx);
+  }
+
+
+  bool get deviceIsLandscape {
+    return deviceOrientation == Orientation.landscape;
+  }
+
+  bool get deviceIsPortrait {
+    return deviceOrientation == Orientation.portrait;
   }
 
   // Whether to always use 24-hour time format.

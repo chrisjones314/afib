@@ -15,7 +15,7 @@ class AFPrototypeTestScreenParam extends AFRouteParam {
   final String filter;
   final dynamic title;
 
-  final Map<String, List<AFScreenPrototypeTest>> screenTestsByGroup;
+  final Map<String, List<AFScreenPrototype>> screenTestsByGroup;
 
   AFPrototypeTestScreenParam({
     @required this.screenTestsByGroup,
@@ -25,9 +25,9 @@ class AFPrototypeTestScreenParam extends AFRouteParam {
 
   factory AFPrototypeTestScreenParam.createFromList({
     @required dynamic title,
-    @required List<AFScreenPrototypeTest> tests
+    @required List<AFScreenPrototype> tests
   }) {
-    final groups = <String, List<AFScreenPrototypeTest>>{};
+    final groups = <String, List<AFScreenPrototype>>{};
     for(final test in tests) {
       var group = test.id.effectiveGroup;
       if(group == null) {
@@ -35,7 +35,7 @@ class AFPrototypeTestScreenParam extends AFRouteParam {
       }
       var tests = groups[group];      
       if(tests == null) {
-        tests = <AFScreenPrototypeTest>[];
+        tests = <AFScreenPrototype>[];
         groups[group] = tests;
       }
 
@@ -55,7 +55,7 @@ class AFPrototypeTestScreenParam extends AFRouteParam {
   AFPrototypeTestScreenParam copyWith({
     String filter,
     String title,
-    Map<String, AFScreenPrototypeTest> screenTestsByGroup
+    Map<String, AFScreenPrototype> screenTestsByGroup
   }) {
     return AFPrototypeTestScreenParam(
       screenTestsByGroup: screenTestsByGroup ?? this.screenTestsByGroup,
@@ -79,7 +79,7 @@ class AFPrototypeTestScreen extends AFProtoConnectedScreen<AFStateView, AFProtot
 
   AFPrototypeTestScreen(): super(AFUIScreenID.screenPrototypeListSingleScreen);
 
-  static AFNavigatePushAction navigatePush(List<AFScreenPrototypeTest> tests, dynamic title) {
+  static AFNavigatePushAction navigatePush(List<AFScreenPrototype> tests, dynamic title) {
     return AFNavigatePushAction(screen: AFUIScreenID.screenPrototypeListSingleScreen,
       routeParam: AFPrototypeTestScreenParam.createFromList(title: title, tests: tests));
   }
@@ -113,7 +113,7 @@ class AFPrototypeTestScreen extends AFProtoConnectedScreen<AFStateView, AFProtot
     return context.t.buildPrototypeScaffold(context.p.title, rows, leading: leading);
   }
 
-  Widget _addGroup(AFProtoBuildContext<AFStateView, AFPrototypeTestScreenParam> context, AFWidgetID widGroup, String group, List<AFScreenPrototypeTest> tests) {
+  Widget _addGroup(AFProtoBuildContext<AFStateView, AFPrototypeTestScreenParam> context, AFWidgetID widGroup, String group, List<AFScreenPrototype> tests) {
     final t = context.t;
     final rows = t.column();
     for(final test in tests) {

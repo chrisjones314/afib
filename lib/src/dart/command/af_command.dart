@@ -248,4 +248,5 @@ class AFCommandExtensionContext {
     commands.register(command);
   }
 
+
 }

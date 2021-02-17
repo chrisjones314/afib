@@ -7,7 +7,7 @@ class AFUnitTestContext extends AFUnitTestExecute {
   final AFUnitTest test;
   AFUnitTestContext(this.test);
 
-  AFTestID get testID => this.test.id;
+  AFBaseTestID get testID => this.test.id;
 
 }
 
@@ -17,7 +17,7 @@ abstract class AFUnitTestExecute extends AFBaseTestExecute {
 
 
 class AFUnitTest {
-  final AFTestID id;
+  final AFBaseTestID id;
   final AFUnitTestBodyExecuteDelegate fnTest;
 
   AFUnitTest(this.id, this.fnTest);
@@ -31,7 +31,7 @@ class AFUnitTest {
 class AFUnitTests {
   final tests = <AFUnitTest>[];
 
-  void addTest(AFTestID id, AFUnitTestBodyExecuteDelegate fnTest) {
+  void addTest(AFBaseTestID id, AFUnitTestBodyExecuteDelegate fnTest) {
     tests.add(AFUnitTest(id, fnTest));
   }
 }

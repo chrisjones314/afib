@@ -308,7 +308,7 @@ abstract class AFEmbeddedWidget<TState extends AFAppStateArea,  TTheme extends A
   
   void updateRouteParam(AFBuildContext context, TRouteParam revised, { AFID id }) {
     assert(updateRouteParamDelegate != null, "If you want to call updateRouteParam from an AFEmbeddedWidget, you need to pass an updateRouteParamDelegate to it's constructor, or us an AFConnectedWidget instead.");
-    updateRouteParam(context, revised, id: id);
+    updateRouteParamDelegate(context, revised, id: id);
   }
 }
 
@@ -710,7 +710,7 @@ class AFBuildContext<TState extends AFAppStateArea, TStateView extends AFStateVi
   TStateView stateView;
   TRouteParam routeParam;
   AFRouteParamWithChildren paramWithChildren;
-  AFScreenPrototypeTest screenTest;
+  AFScreenPrototype screenTest;
   TTheme theme;
   AFConnectedUIBase container;
 

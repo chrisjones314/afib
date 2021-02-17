@@ -179,7 +179,7 @@ class AFConfigEntryEnabledTests extends AFConfigEntryList {
     return areas.contains(i18n);
   }
 
-  bool isTestEnabled(AFConfig config, AFTestID id) {
+  bool isTestEnabled(AFConfig config, AFBaseTestID id) {
     final areas = _params(config);
     if(hasOnlyAreas(areas)) {
       return true;

@@ -102,12 +102,12 @@ Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendAppDelegate exten
     }
 
   } else {
-    output.writeSeparatorLine();
+    AFBaseTestExecute.writeSeparatorLine(output);
     AFBaseTestExecute.printTotalPass(output, "GRAND TOTAL", stats.totalPasses, stopwatch: stopwatch);
     if(stats.totalDisabled > 0) {
       AFBaseTestExecute.printTotalPass(output, "DISABLED", stats.totalDisabled, style: Styles.YELLOW, suffix: "disabled");
     }
-    output.writeSeparatorLine();   
+    AFBaseTestExecute.writeSeparatorLine(output);
   }
   return null;
 }

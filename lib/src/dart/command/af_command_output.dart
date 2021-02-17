@@ -13,13 +13,15 @@ class AFCommandOutputColumn {
   Styles color;
   Styles fontStyle;
   int width;
+  String fill;
   final StringBuffer content = StringBuffer();
 
   AFCommandOutputColumn({
     this.alignment,
     this.color,
     this.fontStyle,
-    this.width
+    this.width,
+    this.fill,
   });
 
   int get length { return content.length; }
@@ -38,12 +40,13 @@ class AFCommandOutput {
   void indent() { nIndent++; }
   void outdent() { nIndent--; }
 
-  void startColumn({AFOutputAlignment alignment, Styles color, Styles fontStyle, int width}) {
+  void startColumn({AFOutputAlignment alignment, Styles color, Styles fontStyle, int width, String fill = " "}) {
     cols.add(AFCommandOutputColumn(
       alignment: alignment ?? AFOutputAlignment.alignLeft,
       color: color ?? Styles.DEFAULT,
       fontStyle: fontStyle ?? Styles.DEFAULT,
-      width: width ?? 0
+      width: width ?? 0,
+      fill: fill,
     ));
   }
 
@@ -73,26 +76,25 @@ class AFCommandOutput {
     endLine();
   }
 
-  void writeSeparatorLine() {
-    writeLine("------------------------------------");
-  }
-
   void endLine() {
     final sb = StringBuffer();
     _writeSpace(sb, 2*nIndent);
 
-    for(var col in cols) {
+    for(var i = 0; i < cols.length; i++) {
+      final col = cols[i];
+      var req = col.width - col.length;
+      if(i == 0) {
+        req -= (2*nIndent);
+      }
       if(col.alignment == AFOutputAlignment.alignRight) {
-        final req = col.width - col.length;
-        _writeSpace(sb, req);
+        _writeSpace(sb, req, fill: col.fill);
       }
 
       final out = Colorize(col.content.toString()).apply(col.color);
       sb.write(out);
       
       if(col.alignment == AFOutputAlignment.alignLeft) {
-        final req = col.width - col.length;
-        _writeSpace(sb, req);
+        _writeSpace(sb, req, fill: col.fill);
       }
     }
 
@@ -101,9 +103,9 @@ class AFCommandOutput {
     cols.clear();
   }
 
-  void _writeSpace(StringBuffer sb, int count) {
+  void _writeSpace(StringBuffer sb, int count, { String fill = " "}) {
     for(var i = 0; i < count; i++) {
-      sb.write(" ");
+      sb.write(fill);
     }   
   }
 

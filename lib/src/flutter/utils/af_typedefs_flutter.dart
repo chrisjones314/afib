@@ -70,7 +70,7 @@ typedef AFUpdateRouteParamDelegate = void Function(AFBuildContext context, AFRou
 typedef AFCreateWidgetWrapperDelegate = Widget Function(AFBuildContext<AFAppStateArea, AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam, AFPrototypeTheme> context, Widget testWidget);
 
 /// Delegate used to create a push action that moves us into a test screen.
-typedef AFTestCreatePushActionDelegate = List<dynamic> Function(AFScreenPrototypeTest test);
+typedef AFTestCreatePushActionDelegate = List<dynamic> Function(AFScreenPrototype test);
 
 /// Delegate used to implmeent the body of a single screen test.
 typedef AFScreenTestBodyExecuteDelegate = Future<void> Function(AFScreenTestExecute ste);

@@ -37,7 +37,7 @@ class AFTestUpdateWireframeStateViews {
   AFTestUpdateWireframeStateViews(this.registry);  
 }
 class AFStartPrototypeScreenTestAction {
-    final AFScreenPrototypeTest test;
+    final AFScreenPrototype test;
     final dynamic param;
     final dynamic stateView;
     final AFScreenID screen;
@@ -61,18 +61,18 @@ class AFStartWireframeAction {
 
 /// Update the 'store based' data for a prototype screen.
 class AFUpdatePrototypeScreenTestDataAction {
-  AFTestID testId;
+  AFBaseTestID testId;
   dynamic stateView;
   AFUpdatePrototypeScreenTestDataAction(this.testId, this.stateView);
 }
 
 class AFPrototypeScreenTestIncrementPassCount {
-  AFTestID testId;
+  AFBaseTestID testId;
   AFPrototypeScreenTestIncrementPassCount(this.testId);
 }
 
 class AFPrototypeScreenTestAddError {
-  AFTestID testId;
+  AFBaseTestID testId;
   String err;
   AFPrototypeScreenTestAddError(this.testId, this.err);
 }

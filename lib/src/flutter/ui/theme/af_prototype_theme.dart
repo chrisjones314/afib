@@ -83,15 +83,15 @@ class AFPrototypeTheme extends AFFunctionalTheme {
     );
   }    
 
-  Widget createTestListTile(AFDispatcher dispatcher, AFScreenPrototypeTest instance, {
+  Widget createTestListTile(AFDispatcher dispatcher, AFScreenPrototype prototype, {
     String title,
     String subtitle,
     AFPressedDelegate onTap,
   }) {
-    final titleText = title ?? instance.id.code;
+    final titleText = title ?? prototype.id.code;
     final cols = row();
     cols.add(childText(titleText));
-    if(instance.hasReusable) {
+    if(prototype.hasReusable) {
       cols.add(createReusableTag());
     }
 
@@ -104,11 +104,11 @@ class AFPrototypeTheme extends AFFunctionalTheme {
       tagsText.write(subtitle);
     } else {
       tagsText.write("tags: ");
-      tagsText.write(instance.id.tagsText);
+      tagsText.write(prototype.id.tagsText);
     }
-    final onPressed = onTap ?? () => instance.startScreen(dispatcher, AFibF.g.testData);
+    final onPressed = onTap ?? () => prototype.startScreen(dispatcher, AFibF.g.testData);
     return childListTileNavDown(
-      wid: instance.id,
+      wid: prototype.id,
       title: titleRow,
       subtitle: tagsText.create(),
       onTap: onPressed
@@ -254,7 +254,7 @@ class AFPrototypeTheme extends AFFunctionalTheme {
   Widget childTestNavDown({
     AFBuildContext context,
     dynamic title, 
-    List<AFScreenPrototypeTest> tests
+    List<AFScreenPrototype> tests
   }) {
     return childListNav(
       title: title,

@@ -9,7 +9,6 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/id.dart';
 import 'package:afib/src/flutter/ui/af_prototype_base.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
-import 'package:afib/src/flutter/ui/theme/af_prototype_theme.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -18,7 +17,7 @@ import 'package:intl/intl.dart';
 class AFPrototypeDrawerRouteParam extends AFRouteParam {
   static const viewTheme = 1;
   static const viewTest  = 2;
-  static const viewReuse = 3;
+  static const viewResults = 3;
   final int view;
   final Map<String, bool> themeExpanded;
 
@@ -43,6 +42,10 @@ class AFPrototypeDrawerRouteParam extends AFRouteParam {
     return copyWith(themeExpanded: revised);
   }
 
+  AFPrototypeDrawerRouteParam reviseView(int view) {
+    return copyWith(view: view);
+  }
+
   AFPrototypeDrawerRouteParam copyWith({
     int view,
     Map<String, bool> themeExpanded
@@ -55,13 +58,13 @@ class AFPrototypeDrawerRouteParam extends AFRouteParam {
 }
 
 //--------------------------------------------------------------------------------------
-class AFPrototypeDrawerStateView extends AFStateView3<AFScreenTestContextSimulator, AFSingleScreenTestState, AFScreenPrototypeTest> {
-  AFPrototypeDrawerStateView(AFScreenTestContextSimulator testContext, AFSingleScreenTestState testState, AFScreenPrototypeTest test): 
+class AFPrototypeDrawerStateView extends AFStateView3<AFScreenTestContextSimulator, AFSingleScreenTestState, AFScreenPrototype> {
+  AFPrototypeDrawerStateView(AFScreenTestContextSimulator testContext, AFSingleScreenTestState testState, AFScreenPrototype test): 
     super(first: testContext, second: testState, third: test);
 
   AFScreenTestContextSimulator get testContext { return first; }
   AFSingleScreenTestState get testState { return second; }
-  AFScreenPrototypeTest get test { return third; }
+  AFScreenPrototype get prototype { return third; }
 }
 
 //--------------------------------------------------------------------------------------
@@ -121,12 +124,12 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
   Widget _buildHeader(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     final t = context.t;
     final rows = t.column();
-    final test = context.s.test;
+    final test = context.s.prototype;
 
     rows.add(Container(
       margin: t.margin.v.s3,
       child: t.childText(
-        "AFib Test Drawer",
+        "AFib Prototype",
         style: t.styleOnPrimary.headline6
       )
     ));
@@ -134,7 +137,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     rows.add(Container(
       margin: t.margin.v.s3,
       child: t.childText(
-          context.s.test.id.toString(), 
+          context.s.prototype.id.toString(), 
           style: t.styleOnPrimary.bodyText2
       )
     ));
@@ -206,8 +209,8 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     final cols = t.row();
 
     cols.add(_buildChoiceButton(context, "Theme", AFPrototypeDrawerRouteParam.viewTheme));
-    cols.add(_buildChoiceButton(context, "Test", AFPrototypeDrawerRouteParam.viewTest));
-    cols.add(_buildChoiceButton(context, "Reuse", AFPrototypeDrawerRouteParam.viewReuse));
+    cols.add(_buildChoiceButton(context, "Tests", AFPrototypeDrawerRouteParam.viewTest));
+    cols.add(_buildChoiceButton(context, "Results", AFPrototypeDrawerRouteParam.viewResults));
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -220,9 +223,9 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     if(view == AFPrototypeDrawerRouteParam.viewTheme) {
       item = _buildThemeContent(context);
     } else if(view == AFPrototypeDrawerRouteParam.viewTest) {
-      item = _buildTestContent(context);
-    } else if(view == AFPrototypeDrawerRouteParam.viewReuse) {
-      item = _buildReuseContent(context);
+      item = _childTestLists(context);
+    } else if(view == AFPrototypeDrawerRouteParam.viewResults) {
+      item = _buildResultsContent(context);
     }
 
     return Expanded(
@@ -429,139 +432,71 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     );
   }
 
-  void _onRun(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFReusableTestID id) {
-    final test = context.s.test;
+  void _onRun(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFScreenTestID id) {
+    final test = context.s.prototype;
     context.closeDrawer();
     Timer(Duration(seconds: 1), () async {            
       await test.onDrawerRun(context.d, context.s.testContext, context.s.testState, id, () {
+        final revised = context.p.reviseView(AFPrototypeDrawerRouteParam.viewResults);
+        updateRouteParam(context, revised);
         test.openTestDrawer(id);
       });
     });    
   }
 
-  Widget _buildRunButton(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
+  Widget _childTestList(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context,
+    List<AFScreenTestDescription> tests,
+    String title) {
     final t = context.t;
-    final test = context.s.test;
-    final sectionIds = test.sectionIds;
-
-    final cols = t.row();
-
-    final hasMultiple = sectionIds.length > 1;
-    final firstId = sectionIds.first;
-    var defaultRunId = firstId;
-    var rowAlign = MainAxisAlignment.start;
-    if(hasMultiple) {
-      defaultRunId = AFUIReusableTestID.all;
-      rowAlign = MainAxisAlignment.spaceBetween;
-    }
-
-    cols.add(t.childText('Run $defaultRunId test'));
-
-    if(hasMultiple) {
-      cols.add(PopupMenuButton<AFReusableTestID>(
-        onSelected: (id) { 
-          _onRun(context, id);
-        },
-        itemBuilder: (context) {
-          final result = <PopupMenuEntry<AFReusableTestID>>[];
-          for(final id in sectionIds) {
-            result.add(PopupMenuItem<AFReusableTestID>(
-              value: id,
-              child: t.childText(id.toString())
-            ));
-          }
-
-          return result;
+    final rows = t.column();
+    
+    for(final test in tests) {
+      rows.add(ListTile(
+        title: t.childText(test.id.codeId),
+        subtitle: t.childText(test.description ?? ""),
+        trailing: Icon(Icons.run_circle),
+        dense: true,
+        onTap: () {
+          _onRun(context, test.id);
         }
+      ));     
+    }
+    if(tests.isEmpty) {
+      rows.add(t.childPadding(
+        padding: t.paddingStandard,
+        child: t.childText("No tests defined.")
       ));
     }
+    
 
-    final buttonContent = Row(
-      mainAxisAlignment: rowAlign,
-      children: cols,
+    return t.childCardHeader(context, null, title, rows);
+  }
+
+  Widget _childTestLists(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
+    final t = context.t;
+    final prototype = context.s.prototype;
+    final rows = t.column();
+    rows.add(_childTestList(context, prototype.smokeTests, "Smoke"));
+    rows.add(_childTestList(context, prototype.reusableTests, "Resuable"));
+    rows.add(_childTestList(context, prototype.regressionTests, "Regression"));
+
+    //_buildTestReport(context, rows);
+    final content = Column(
+      children: rows
     );
-
-    return FlatButton(
-      child: buttonContent,
-      color: t.colorSecondary,
-      textColor: t.colorOnSecondary,
-      onPressed: ()  {
-        _onRun(context, defaultRunId);
-      }
-    );   
+    return content;
   }
 
-  Widget _buildTestContent(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
+  Widget _buildResultsContent(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     final t = context.t;
-    var content;
-    if(context.s.test.hasBody) {
-      final rows = t.column();
-      rows.add(_buildRunButton(context));
-      _buildTestReport(context, rows);
-      content = Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: rows
-      );
-    } else {
-      content = t.testExplanationText("This test does not have a test body.  To add one, see definitions.addSmokeTest or definitions.addReusableTest1...");
-    }
-
-    return _areaContentCard(context, content);
-  }
-
-  Widget _areaContentCard(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, Widget child) {
-    return Card(child: Container(
-      margin: context.t.marginStandard,
-      child: child
-    ));
-  }
-
-  Widget _buildReuseContent(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
-    final t = context.t;
-    final test = context.s.test;
-    var content;
-    if(test.hasReusable) {
-
-      for(final reusableId in test.sectionIds) {
-        final rows = t.column();
-        if(reusableId == AFUIReusableTestID.smoke) {
-          continue;
-        }
-
-        if(reusableId != null) {
-          rows.add(Container(
-            margin: t.margin.b.s5,
-            child: t.childText('Reusable: ${reusableId.toString()}', textAlign: TextAlign.left)
-          ));
-        }
-        final params = test.paramDescriptions(reusableId);
-
-        final tableRows = t.childrenTable();
-        final headerCols = t.row();
-        headerCols.add(t.testResultTableHeader(context, "#", TextAlign.left));
-        headerCols.add(t.testResultTableHeader(context, "Param Description", TextAlign.left));
-        tableRows.add(TableRow(children: headerCols));
-        
-        for(var i = 0; i < params.length; i++) {
-          final param = params[i];
-          final resultCols = t.row();
-          resultCols.add(t.testResultTableValue(context, (i+1).toString(), TextAlign.right));
-          resultCols.add(t.testResultTableValue(context, param, TextAlign.left));
-          tableRows.add(TableRow(children: resultCols));
-        }
-
-        rows.add(Table(children: tableRows, columnWidths: AFPrototypeTheme.columnWidthsForNumValueTable));
-        content = Container(
-          margin: t.margin.t.s3,
-          child: Column(
-            children: rows
-          )
-        );
-      }
-    } else {
-      content = t.testExplanationText("This test has no reusable sections.  To add on, see definitions.defineReusable1...");
-    }
-    return _areaContentCard(context, content);
+    final rows = t.column();
+    _buildTestReport(context, rows);
+    return t.childCard(
+      child: t.childPadding(
+        padding: t.paddingStandard,
+        child: Column(children: rows, crossAxisAlignment: CrossAxisAlignment.stretch)
+      )
+    );
   }
 
   void _buildTestReport(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, List<Widget> rows) {
@@ -576,14 +511,12 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     rows.add(t.buildErrorsSection(context, testState.errors));
 
     final headerCols = t.row();
-    headerCols.add(t.testResultTableHeader(context, "Run", TextAlign.right));
-    headerCols.add(t.testResultTableHeader(context, "At", TextAlign.left));
+    headerCols.add(t.testResultTableHeader(context, "Test", TextAlign.right));
     headerCols.add(t.testResultTableHeader(context, "Pass", TextAlign.right));
     headerCols.add(t.testResultTableHeader(context, "Fail", TextAlign.right));
 
     final resultCols = t.row();
-    resultCols.add(t.testResultTableValue(context, testContext.runNumber.toString(), TextAlign.right));
-    resultCols.add(t.testResultTableValue(context, timeFormat.format(testContext.lastRun), TextAlign.left));
+    resultCols.add(t.testResultTableValue(context, testState.testId.code, TextAlign.left));
     resultCols.add(t.testResultTableValue(context, testState.pass.toString(), TextAlign.right));
     resultCols.add(t.testResultTableValue(context, testState.errors.length.toString(), TextAlign.right, showError: (testState.errors.isNotEmpty)));
     
@@ -592,7 +525,6 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     tableRows.add(TableRow(children: resultCols));
 
     final columnWidths = {
-      0: FixedColumnWidth(t.resultColumnWidth),
       1: FlexColumnWidth(),
       2: FixedColumnWidth(t.resultColumnWidth),
       3: FixedColumnWidth(t.resultColumnWidth),

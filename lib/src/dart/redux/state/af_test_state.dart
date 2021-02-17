@@ -9,7 +9,7 @@ import 'package:meta/meta.dart';
 
 @immutable 
 class AFSingleScreenTestState {
-  final AFTestID testId;
+  final AFBaseTestID testId;
   final int pass;
   final List<String> errors;
   final String stateViewId;
@@ -97,10 +97,10 @@ class AFSingleScreenTestState {
 
 @immutable
 class AFTestState {
-  final List<AFTestID> activeTestIds;
+  final List<AFBaseTestID> activeTestIds;
   final AFWireframe activeWireframe;
-  final Map<AFTestID, AFScreenTestContext> testContexts;
-  final Map<AFTestID, AFSingleScreenTestState> testStates;
+  final Map<AFBaseTestID, AFScreenTestContext> testContexts;
+  final Map<AFBaseTestID, AFSingleScreenTestState> testStates;
 
   AFTestState({
     @required this.activeTestIds, 
@@ -110,14 +110,14 @@ class AFTestState {
 
   factory AFTestState.initial() {
     return AFTestState(
-      activeTestIds: <AFTestID>[],
+      activeTestIds: <AFBaseTestID>[],
       activeWireframe: null,
-      testContexts: <AFTestID, AFScreenTestContext>{}, 
-      testStates:<AFTestID, AFSingleScreenTestState>{}
+      testContexts: <AFBaseTestID, AFScreenTestContext>{}, 
+      testStates:<AFBaseTestID, AFSingleScreenTestState>{}
     );
   }
 
-  AFTestID findTestForScreen(AFScreenID screen) {
+  AFBaseTestID findTestForScreen(AFScreenID screen) {
     for(final testState in testStates.values) {
       if(testState.screen == screen) {
         return testState.testId;
@@ -129,30 +129,30 @@ class AFTestState {
     return activeTestId;
   }
 
-  AFTestID get activeTestId {
+  AFBaseTestID get activeTestId {
     if(activeTestIds.isEmpty) {
       return null;
     }
     return activeTestIds.last;
   }
 
-  AFScreenTestContext findContext(AFTestID id) {
+  AFScreenTestContext findContext(AFBaseTestID id) {
     return testContexts[id];
   }
 
-  AFSingleScreenTestState findState(AFTestID id) {
+  AFSingleScreenTestState findState(AFBaseTestID id) {
     return testStates[id];
   }
 
-  AFTestState navigateToTest(AFScreenPrototypeTest test, dynamic param, dynamic data, AFScreenID screen, String stateViewId, String routeParamId) {
+  AFTestState navigateToTest(AFScreenPrototype test, dynamic param, dynamic data, AFScreenID screen, String stateViewId, String routeParamId) {
     final revisedStates = _createTestState(test.id, param, data, screen, stateViewId, routeParamId);
-    final revisedActive = List<AFTestID>.from(activeTestIds);
+    final revisedActive = List<AFBaseTestID>.from(activeTestIds);
     revisedActive.add(test.id);
     return copyWith(activeTestIds: revisedActive, testStates: revisedStates);
   }
 
   AFTestState updateWireframeStateViews(AFCompositeTestDataRegistry registry) {
-    final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(this.testStates);
+    final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(this.testStates);
     for(final testState in testStates.values) {
       if(testState.stateViewId != null) { 
         final stateView = registry.f(testState.stateViewId);
@@ -163,12 +163,12 @@ class AFTestState {
   }
 
   AFTestState popWireframeTest() {
-    final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
+    final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
 
     // the issue is that when we are navigating up, flutter continues to re-render the screen which we are in the process
     // of leaving, if we remove the test state, that render fails, as it loses its data.
     //revisedStates.remove(activeTestId);
-    final revisedActive = List<AFTestID>.from(activeTestIds);
+    final revisedActive = List<AFBaseTestID>.from(activeTestIds);
     revisedActive.removeLast();
     var clearWireframe = false;
     if(revisedActive.isEmpty) {
@@ -187,11 +187,11 @@ class AFTestState {
     return copyWith(activeWireframe: wireframe);
   }
 
-  Map<AFTestID, AFSingleScreenTestState> _createTestState(AFTestID testId, dynamic param, dynamic data, AFScreenID screen, String stateViewId, String routeParamId) {
+  Map<AFBaseTestID, AFSingleScreenTestState> _createTestState(AFBaseTestID testId, dynamic param, dynamic data, AFScreenID screen, String stateViewId, String routeParamId) {
     if(testStates.containsKey(testId)) {
       return testStates;
     }
-    final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
+    final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
     revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: <String>[], stateView: data, routeParamId: routeParamId, stateViewId: stateViewId, param: param, screen: screen);
     return revisedStates;
 
@@ -199,12 +199,12 @@ class AFTestState {
 
   AFTestState startTest(AFScreenTestContext simulator, dynamic param, dynamic data, AFScreenID screen, String stateViewId, String routeParamId) {
     final testId = simulator.testId;
-    final revisedContexts = Map<AFTestID, AFScreenTestContext>.from(testContexts);
+    final revisedContexts = Map<AFBaseTestID, AFScreenTestContext>.from(testContexts);
     revisedContexts[testId] = simulator;
     final revisedStates = _createTestState(testId, param, data, screen, stateViewId, routeParamId);
     var revisedActive = activeTestIds;
     if(activeTestIds.isEmpty || activeTestIds.last != simulator.testId) {
-      revisedActive = List<AFTestID>.from(activeTestIds);
+      revisedActive = List<AFBaseTestID>.from(activeTestIds);
       revisedActive.add(simulator.testId);
     }
     return copyWith(
@@ -214,8 +214,8 @@ class AFTestState {
     );
   }
 
-  AFTestState updateStateView(AFTestID testId, dynamic stateView) {
-    final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
+  AFTestState updateStateView(AFBaseTestID testId, dynamic stateView) {
+    final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
     final currentState = revisedStates[testId];
     if(currentState == null) {
       throw AFException("Internal error, calling updateStateView when there is no test state for $testId");
@@ -228,8 +228,8 @@ class AFTestState {
     );
   }
 
-  AFTestState incrementPassCount(AFTestID testId) {
-    final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
+  AFTestState incrementPassCount(AFBaseTestID testId) {
+    final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
     final currentState = revisedStates[testId];
     revisedStates[testId] = currentState?.incrementPassCount();
     return copyWith(
@@ -237,8 +237,8 @@ class AFTestState {
     );
   }
 
-  AFTestState addError(AFTestID testId, String err) {
-    final revisedStates = Map<AFTestID, AFSingleScreenTestState>.from(testStates);
+  AFTestState addError(AFBaseTestID testId, String err) {
+    final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
     final currentState = revisedStates[testId];
     revisedStates[testId] = currentState.addError(err);
     return copyWith(
@@ -247,11 +247,11 @@ class AFTestState {
   }
 
   AFTestState copyWith({
-    List<AFTestID> activeTestIds,
+    List<AFBaseTestID> activeTestIds,
     AFWireframe activeWireframe,
     bool clearActiveWireframe,
-    Map<AFTestID, AFScreenTestContext> testContexts,
-     Map<AFTestID, AFSingleScreenTestState> testStates
+    Map<AFBaseTestID, AFScreenTestContext> testContexts,
+     Map<AFBaseTestID, AFSingleScreenTestState> testStates
   }) {
     var wf = activeWireframe ?? this.activeWireframe;
     if(clearActiveWireframe != null && clearActiveWireframe) {

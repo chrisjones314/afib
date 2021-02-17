@@ -228,7 +228,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     return routeState.activeScreenId;
   }
 
-  bool testOnlyIsWorkflowTest(AFTestID testId) {
+  bool testOnlyIsWorkflowTest(AFBaseTestID testId) {
     if(primaryUITests.afWorkflowStateTests.findById(testId) != null) {
       return true;
     }
@@ -294,7 +294,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     return thirdPartyUITests[id];
   }
 
-  AFScreenPrototypeTest findScreenTestById(AFTestID testId) {
+  AFScreenPrototype findScreenTestById(AFBaseTestID testId) {
     var test = _findTestInSet(testId, primaryUITests);
     if(test != null) {
       return test;
@@ -311,7 +311,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     throw AFException("Unknown test id #{testId}");
   }
 
-  AFScreenPrototypeTest _findTestInSet(AFTestID testId, AFLibraryTestHolder tests) {
+  AFScreenPrototype _findTestInSet(AFBaseTestID testId, AFLibraryTestHolder tests) {
     final single = tests.afScreenTests.findById(testId);
     if(single != null) {
       return single;
@@ -471,8 +471,8 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     return primaryUITests.afScreenTests;
   }
 
-  List<AFScreenPrototypeTest> findTestsForAreas(List<String> areas) {
-    final results = <AFScreenPrototypeTest>[];
+  List<AFScreenPrototype> findTestsForAreas(List<String> areas) {
+    final results = <AFScreenPrototype>[];
     _addTestsForTestSet(AFibF.g.primaryUITests, areas, results);
     for(final library in AFibF.g.thirdPartyUITests.values) {
       _addTestsForTestSet(library, areas, results);
@@ -481,15 +481,15 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     return results;
   }
 
-  List<AFScreenPrototypeTest> get allScreenTests {
-    final result = <AFScreenPrototypeTest>[];
+  List<AFScreenPrototype> get allScreenTests {
+    final result = <AFScreenPrototype>[];
     result.addAll(widgetTests.all);
     result.addAll(screenTests.all);
     result.addAll(workflowTests.all);
     return result;
   }
 
-  static void _addTestsForTestSet(AFLibraryTestHolder testSet, List<String> areas, List<AFScreenPrototypeTest> results) {
+  static void _addTestsForTestSet(AFLibraryTestHolder testSet, List<String> areas, List<AFScreenPrototype> results) {
     final addAllWidget = areas.contains("widget");
     final addAllScreen = areas.contains("screen");
     final addAllWorkflow  = areas.contains("workflow");
@@ -498,7 +498,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     _addTestsForAreas(testSet.afWorkflowStateTests.all, areas, addAllWorkflow, results);
   }
 
-  static void _addTestsForAreas(List<AFScreenPrototypeTest> tests, List<String> areas, bool addAll, List<AFScreenPrototypeTest> results) {
+  static void _addTestsForAreas(List<AFScreenPrototype> tests, List<String> areas, bool addAll, List<AFScreenPrototype> results) {
     final reusable = areas.indexWhere((element) => element.startsWith("reuse")) >= 0;
     for(final test in tests) {
       for(final area in areas) {        

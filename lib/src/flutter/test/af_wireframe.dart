@@ -30,7 +30,7 @@ class AFWireframeExecutionContext {
     _dispatch(AFStartWireframePopTestAction());
   }
 
-  void navigateTo(AFSingleScreenTestID testId, { AFRouteParam routeParam, AFStateView stateView }) {
+  void navigateTo(AFPrototypeID testId, { AFRouteParam routeParam, AFStateView stateView }) {
     final test = AFibF.g.findScreenTestById(testId);
     test.startScreen(AFibF.g.storeDispatcherInternalOnly, wireframe.registry, routeParam: routeParam, stateView: stateView);
   }
@@ -59,7 +59,7 @@ class AFWireframeExecutionContext {
 
 class AFWireframe {
   final String name;
-  final AFSingleScreenTestID initialScreen;
+  final AFPrototypeID initialScreen;
   final AFWireframeExecutionDelegate body;
   final AFCompositeTestDataRegistry registry;
 
@@ -72,7 +72,7 @@ class AFWireframe {
 
   factory AFWireframe.create({
     @required String name,
-    @required AFSingleScreenTestID initialScreen,
+    @required AFPrototypeID initialScreen,
     @required AFWireframeExecutionDelegate body
   }) {
     final registry = AFibF.g.testData.cloneForWireframe();
@@ -107,7 +107,7 @@ class AFWireframeDefinitionContext {
 
   AFWireframe defineWireframe({
     @required String name,
-    @required AFSingleScreenTestID initialScreen,
+    @required AFPrototypeID initialScreen,
     @required AFWireframeExecutionDelegate body,
   }) {
     final wf = AFWireframe(

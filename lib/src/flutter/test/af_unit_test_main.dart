@@ -23,6 +23,10 @@ void afUnitTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTes
 
   for(final test in tests.tests) {
     if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
+      if(localStats.isEmpty) {
+        printTestKind(output, testKind);
+      }
+
       final context = AFUnitTestContext(test);
       test.execute(context);
       contexts.add(context);
@@ -31,6 +35,6 @@ void afUnitTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTes
   }
 
   final baseContexts = List<AFBaseTestExecute>.of(contexts);
-  printTestTotal(output, testKind, baseContexts, localStats);
+  printTestTotal(output, baseContexts, localStats);
   stats.mergeIn(localStats);
 }

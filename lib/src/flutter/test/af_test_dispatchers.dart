@@ -67,7 +67,7 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
 }
 
 class AFSingleScreenTestDispatcher extends AFScreenTestDispatcher {
-  final AFTestID testId;
+  final AFBaseTestID testId;
   
   
   AFSingleScreenTestDispatcher(

@@ -13,7 +13,7 @@ class AFTestStats {
   int get totalPasses => pass;
   int get totalErrors => fail;
   int get totalDisabled => disabled;
-  bool get isEmpty { return pass == 0 && fail == 0; }
+  bool get isEmpty { return pass == 0 && fail == 0 && disabled == 0; }
   void mergeIn(AFTestStats other) {
     pass += other.pass;
     fail += other.fail;

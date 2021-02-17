@@ -146,7 +146,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
     return context.t.buildPrototypeScaffold(AFUITranslationID.afibPrototypeMode, rows);
   }
 
-  void _onRunTests(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests) async { 
+  void _onRunTests(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests) async { 
     
     final results = <AFScreenTestResultSummary>[];
     for(final test in tests) {
@@ -185,7 +185,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
     updateRouteParam(context, revised);
   }
 
-  Widget _buildFilterAndRunControls(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests) {
+  Widget _buildFilterAndRunControls(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests) {
     final t = context.t;
 
     final rows = t.column();
@@ -302,7 +302,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
   }
 
 
-  void _buildFilteredSection(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests, List<Widget> rows, ) {
+  void _buildFilteredSection(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests, List<Widget> rows, ) {
     if(tests == null || tests.isEmpty) {
       return;
     }
@@ -312,7 +312,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
     }
   }
 
-  void _buildResultsSection(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototypeTest> tests, List<Widget> rows) {
+  void _buildResultsSection(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests, List<Widget> rows) {
     final t = context.t;
     final results = context.p.results;
     if(results.isEmpty) {

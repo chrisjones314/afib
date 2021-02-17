@@ -39,9 +39,9 @@ class AFUIWidgetID {
 }
 
 class AFUIReusableTestID {
-  static const smoke = AFReusableTestID("smoke", AFUILibraryID.id);
-  static const all = AFReusableTestID("all", AFUILibraryID.id);
-  static const workflow = AFReusableTestID("workflow", AFUILibraryID.id);
+  static const smoke = AFScreenTestID("smoke", AFUILibraryID.id);
+  static const all = AFScreenTestID("all", AFUILibraryID.id);
+  static const workflow = AFScreenTestID("workflow", AFUILibraryID.id);
 }
 
 class AFUITranslationID {

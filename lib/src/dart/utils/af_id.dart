@@ -151,30 +151,21 @@ class AFWidgetID extends AFID {
   const AFWidgetID(String code, AFLibraryID library) : super("wid", code, library);
 }
 
-class AFTestID extends AFIDWithTags {
-  const AFTestID(String prefix, String code, AFLibraryID library, {String group, List<String> tags}) : super(prefix, code, library, tags: tags, group: group);
+class AFBaseTestID extends AFIDWithTags {
+  const AFBaseTestID(String prefix, String code, AFLibraryID library, {String group, List<String> tags}) : super(prefix, code, library, tags: tags, group: group);
 }
 
-class AFStateTestID extends AFTestID {
+class AFStateTestID extends AFBaseTestID {
   const AFStateTestID(String code, AFLibraryID library, {String group, List<String> tags, }) : super("statet", code, library, tags: tags, group: group);
 }
 
-class AFReusableTestID extends AFTestID {
-  const AFReusableTestID(String code, AFLibraryID library, {String group, List<String> tags }) : super("rt", code, library, tags: tags, group: group);
+class AFScreenTestID extends AFBaseTestID {
+  const AFScreenTestID(String code, AFLibraryID library, {String group, List<String> tags }) : super("rt", code, library, tags: tags, group: group);
 }
 
-class AFSingleScreenTestID extends AFTestID {
-  const AFSingleScreenTestID(String code, AFLibraryID library, {String group, List<String> tags, }) : super("st", code, library, tags: tags, group: group);
+class AFPrototypeID extends AFBaseTestID {
+  const AFPrototypeID(String code, AFLibraryID library, {String group, List<String> tags, }) : super("pr", code, library, tags: tags, group: group);
 }
-
-class AFWorkflowTestID extends AFTestID {
-  const AFWorkflowTestID(String code, AFLibraryID library, {String group, List<String> tags}) : super("wt", code, library, tags: tags, group: group);
-}
-/*
-class AFTestDataID extends AFID {
-  const AFTestDataID(String code) : super("td", code);
-}
-*/
 
 class AFQueryTestID extends AFID {
   const AFQueryTestID(String code, AFLibraryID library) : super("qt", code, library);

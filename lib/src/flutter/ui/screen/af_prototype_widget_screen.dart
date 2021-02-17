@@ -15,13 +15,13 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 /// Parameter uses to filter the tests shown on the screen.
 @immutable
 class AFPrototypeWidgetRouteParam extends AFRouteParam {
-  final AFWidgetPrototypeTest test;
+  final AFWidgetPrototype test;
   final AFRouteParam routeParam;
 
   AFPrototypeWidgetRouteParam({this.test, this.routeParam});
 
   AFPrototypeWidgetRouteParam copyWith({
-    AFWidgetPrototypeTest test,
+    AFWidgetPrototype test,
     AFRouteParam param
   }) {
     return AFPrototypeWidgetRouteParam(
@@ -46,7 +46,7 @@ class AFPrototypeWidgetScreen extends AFProtoConnectedScreen<AFPrototypeWidgetSt
 
   AFPrototypeWidgetScreen(): super(AFUIScreenID.screenPrototypeWidget);
 
-  static AFNavigateAction navigatePush(AFWidgetPrototypeTest test, {AFID id}) {
+  static AFNavigateAction navigatePush(AFWidgetPrototype test, {AFID id}) {
     return AFNavigatePushAction(
       id: id,
       routeParam: AFPrototypeWidgetRouteParam(test: test),
@@ -80,7 +80,7 @@ class AFPrototypeWidgetScreen extends AFProtoConnectedScreen<AFPrototypeWidgetSt
     final sourceWidget = test.render(screenId, AFUIWidgetID.widgetPrototypeTest.with1(AFUIWidgetID.afibPassthroughSuffix));
     
     Widget resultWidget;
-    if(test is AFConnectedWidgetPrototypeTest && sourceWidget is AFConnectedWidget) {
+    if(test is AFConnectedWidgetPrototype && sourceWidget is AFConnectedWidget) {
       final paramChild = context.p.routeParam ?? test.routeParam;
       final dispatcher = AFWidgetScreenTestDispatcher(context: testContext, main: context.d, originalParam: context.p);
 

@@ -188,11 +188,13 @@ class AFTestState {
   }
 
   Map<AFBaseTestID, AFSingleScreenTestState> _createTestState(AFBaseTestID testId, dynamic param, dynamic data, AFScreenID screen, String stateViewId, String routeParamId) {
-    if(testStates.containsKey(testId)) {
-      return testStates;
-    }
     final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
-    revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: <String>[], stateView: data, routeParamId: routeParamId, stateViewId: stateViewId, param: param, screen: screen);
+      final orig = testStates[testId];
+    if(orig == null) {
+      revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: <String>[], stateView: data, routeParamId: routeParamId, stateViewId: stateViewId, param: param, screen: screen);
+    } else {
+      revisedStates[testId] = orig.copyWith(pass: 0, errors: <String>[]);
+    }
     return revisedStates;
 
   }

@@ -16,6 +16,11 @@ class AFPrototypeTheme extends AFFunctionalTheme {
 
   AFPrototypeTheme(AFFundamentalThemeState fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualPrototype);
 
+
+  Color get colorDisabled {
+    return Colors.deepOrange;
+  }
+
   @override
   Text childText(dynamic text, {
     AFWidgetID wid, 

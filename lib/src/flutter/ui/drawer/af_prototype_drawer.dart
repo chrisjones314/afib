@@ -451,9 +451,16 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     final rows = t.column();
     
     for(final test in tests) {
+      var description = test.description ?? "";
+      var descColor;
+      if(test.disabled != null) {
+        description = "Disabled: ${test.disabled}";
+        descColor = t.colorDisabled;
+      }
+
       rows.add(ListTile(
         title: t.childText(test.id.codeId),
-        subtitle: t.childText(test.description ?? ""),
+        subtitle: t.childText(description, textColor: descColor),
         trailing: Icon(Icons.run_circle),
         dense: true,
         onTap: () {

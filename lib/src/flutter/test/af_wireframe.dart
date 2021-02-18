@@ -25,7 +25,6 @@ class AFWireframeExecutionContext {
   });
 
   void navigatePop() {
-    /// TODO: update the test state to remove the current test from the active list.
     _dispatch(AFNavigatePopAction());
     _dispatch(AFStartWireframePopTestAction());
   }

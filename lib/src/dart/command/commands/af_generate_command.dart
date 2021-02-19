@@ -4,12 +4,10 @@ import 'dart:io';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/generator_code/af_code_buffer.dart';
 import 'package:afib/src/dart/command/generator_code/af_code_generator.dart';
-import 'package:afib/src/dart/command/generators/af_id_generator.dart';
 import 'package:afib/src/dart/command/templates/af_template_registry.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/generators/af_config_generator.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
-import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 
 
@@ -110,7 +108,7 @@ class AFGeneratedFile {
     final re = insert.replaceRegexFor;
     final toInsert = buffer.withIndent(indent);
     final revised = content.replaceAll(re, toInsert);
-    updateContent(ctx.o, revised); 
+    updateContent(ctx.out, revised); 
   }
 
   void updateContent(AFCommandOutput output, String revised) {
@@ -203,25 +201,16 @@ class AFSourceGenerator extends AFItemWithNamespace {
     }
     
   }
-
-  /// Writes out a single line help statement.
-  void writeShortHelp(AFCommandOutput output, {int indent = 0}) {
-    AFCommand.startCommandColumn(output, indent: indent);
-    output.write("$namespaceKey - ");
-    AFCommand.startHelpColumn(output);
-    output.writeLine(shortHelp);
-  }
-
 }
 
 /// An extensible command used to generate source code from the command-line.
 class AFGenerateCommand extends AFCommand {
-  static const cmdKey = "generate";
+  final name = "generate";
+  final description = "Generate AFib classes for screens, queries, and more";
   final generators = <String, AFSourceGenerator>{};
 
-  AFGenerateCommand(): super(AFConfigEntries.afNamespace, cmdKey, 1, 0) {
+  AFGenerateCommand(): super() {
     registerGenerator(AFConfigGenerator());
-    registerGenerator(AFIDGenerator());
   }
 
   void registerGenerator(AFSourceGenerator generator) {
@@ -235,7 +224,7 @@ class AFGenerateCommand extends AFCommand {
   @override
   void execute(AFCommandContext ctx) {
     final files = ctx.files;
-    final genKey = ctx.args.at(0);
+    final genKey = ctx.unnamedArguments(this).first;
     final generator = generators[genKey];
     if(generator == null) {
       ctx.output.writeErrorLine("Unknown generator $genKey, stopping.");
@@ -250,26 +239,5 @@ class AFGenerateCommand extends AFCommand {
 
 
     files.saveChangedFiles(ctx.output);
-  }
-
-  @override
-  String get shortHelp {
-    return "Generate source code elements such as screens, queries, and identifiers";
-  }
-
-  @override  
-  void writeLongHelp(AFCommandContext ctx, String subCommand) {
-    final output = ctx.o;
-    writeShortHelp(ctx);
-    if(subCommand == null) {
-      AFCommand.emptyCommandColumn(output);
-      AFCommand.startHelpColumn(output);
-      output.writeLine("Use help generate <generator> for any of the following generators:");
-      final gens = List<AFSourceGenerator>.of(generators.values);
-      gens.sort( (l, r) { return l.namespaceKey.compareTo(r.namespaceKey); });
-      for(final gen in gens) {
-        gen.writeShortHelp(output, indent: 1);
-      }
-    }
   }
 }

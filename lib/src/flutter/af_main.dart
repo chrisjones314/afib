@@ -1,5 +1,6 @@
 // @dart=2.9
 import 'package:afib/afib_command.dart';
+import 'package:afib/src/dart/command/commands/af_typedefs_command.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/core/af_app_extension_context.dart';
@@ -13,20 +14,29 @@ void afMainFirstStartup() {
 
 void afMainWrapper(Function() onReady) {
   WidgetsFlutterBinding.ensureInitialized();
+  AFibD.registerGlobals();
   onReady();
 }
 
 
 /// [afMain] handles startup, execution, and shutdown sequence for an afApp
-void afMain<TState extends AFAppStateArea>(AFDartParams paramsD, AFExtendAppDelegate extendApp, AFExtendThirdPartyDelegate extendThirdParty, AFExtendTestDelegate extendTest) {
+void afMain<TState extends AFAppStateArea>(
+  AFDartParams paramsD, 
+  AFExtendBaseDelegate extendBase,
+  AFExtendAppDelegate extendApp, 
+  AFExtendThirdPartyDelegate extendThirdParty, 
+  AFExtendTestDelegate extendTest) {
   AFibD.initialize(paramsD);
 
   final context = AFAppExtensionContext();
+
+
   extendApp(context);
   extendTest(context.test);
   if(extendThirdParty != null) {
     extendThirdParty(context.thirdParty);
   }
+
 
   AFibF.initialize<TState>(context);
   

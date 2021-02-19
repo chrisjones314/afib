@@ -1,4 +1,5 @@
 
+/*
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
@@ -45,3 +46,4 @@ class AFCreateProjectFolderStep extends AFCreateFolderStep {
   }
 
 }
+*/

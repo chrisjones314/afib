@@ -385,7 +385,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 
   List<Locale> testEnabledLocales(AFConfig config) {
     final fundamentals = storeInternalOnly.state.public.themes.fundamentals;
-    if(AFConfigEntries.enabledTestList.isI18NEnabled(config)) {
+    if(AFConfigEntries.testsEnabled.isI18NEnabled(config)) {
       return fundamentals.supportedLocales.sublist(1);
     }
 

@@ -1,28 +1,28 @@
 // @dart=2.9
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/af_command.dart';
+import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
-import 'package:afib/src/dart/command/commands/af_help_command.dart';
-import 'package:afib/src/dart/command/commands/af_new_project_command.dart';
 import 'package:afib/src/dart/command/commands/af_test_command.dart';
+import 'package:afib/src/dart/command/commands/af_typedefs_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
+import 'package:afib/src/dart/command/templates/af_template_registry.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:args/command_runner.dart' as cmd;
 
 /// Initialize commands that are used only from the afib command
 /// line app itself (e.g. new).
-void afRegisterAfibOnlyCommands(AFCommands commands) {
-  commands.register(AFHelpCommand(all: commands));
+void afRegisterAfibOnlyCommands(AFCommandExtensionContext commands) {
   commands.register(AFVersionCommand());
-  commands.register(AFNewProjectCommand());
+  //commands.register(AFNewProjectCommand());
 }
 
 /// Initialize afib comamnds that are used from the application-specific
 /// commamd
 void afRegisterAppCommands(AFCommandExtensionContext definitions) {
-  definitions.register(AFHelpCommand(all: definitions.commands));
   definitions.register(AFVersionCommand());
   definitions.register(AFConfigCommand());
   definitions.register(AFGenerateCommand());
@@ -30,41 +30,58 @@ void afRegisterAppCommands(AFCommandExtensionContext definitions) {
 }
 
 /// Used to initialize and execute commands available via afib_bootstrap
-void afBootstrapCommandMain(AFDartParams paramsD, AFArgs afArgs) {
-  final commands = AFCommands(command: AFCommands.afCommandAfib);
-
-  _afCommandMain(commands, paramsD, afArgs, [
+void afBootstrapCommandMain(AFDartParams paramsD, List<String> args) {
+  _afCommandMain(paramsD, args, "afib_bootstrap", "Command used to create new afib projects", [
     afRegisterAppCommands
-  ]);
+  ], null);
 }
 
-void afAppCommandMain(AFDartParams paramsD, AFArgs afArgs, AFExtendCommandsDelegate initApp) {
-  final commands = AFCommands();
-  _afCommandMain(commands, paramsD, afArgs, [
+void afCommandStartup(void Function() onRun) {
+  AFibD.registerGlobals();
+  onRun();
+}
+
+void afAppCommandMain(AFDartParams paramsD, List<String> args, AFExtendBaseDelegate initBase, AFExtendCommandsDelegate initApp, AFExtendCommandsThirdPartyDelegate initExtend) {
+  _afCommandMain(paramsD, args, "afib", "App-specific afib command", [
     afRegisterAppCommands,
     initApp
-  ]);
+  ], initExtend);
 }
 
-void _afCommandMain(AFCommands commands, AFDartParams paramsD, AFArgs afArgs, List<AFExtendCommandsDelegate> inits) {
-  final definitions = AFCommandExtensionContext(commands: commands, paramsD: paramsD);
-  for(final init in inits) {
-    init(definitions);
-  }
-
-  var command = "help";
-  if(afArgs.hasCommand) {
-    command = afArgs.command;
-  }
+void _afCommandMain(AFDartParams paramsD, List<String> args, String cmdName, String cmdDescription, List<AFExtendCommandsDelegate> inits, AFExtendCommandsThirdPartyDelegate initExtend) {
+  final definitions = AFCommandExtensionContext(paramsD: paramsD, commands: cmd.CommandRunner(cmdName, cmdDescription));
 
   // initialize the stuff that is accessible from dart/the command line.
   AFibD.initialize(paramsD);
+
+  for(final init in inits) {
+    init(definitions);
+  }
+  if(initExtend != null) {
+    initExtend(definitions);
+  }
+
+  final generators = AFGeneratorRegistry();
+  generators.registerGlobals();
+
+  final ctx = AFCommandContext(
+    output: AFCommandOutput(),
+    generators: generators,
+    templates: AFTemplateRegistry(),
+    definitions: definitions,
+  );
+
+  definitions.finalize(ctx);
+
+  
+  /*
   final afibConfig = AFConfig();
   if(paramsD != null) {
     final configCmd = commands.findConfigCommand();
     configCmd.initAfibDefaults(afibConfig);
     paramsD.initAfib(afibConfig);
   }
+  */
 
-  commands.execute(command, afArgs, afibConfig);
+  definitions.execute(args);
 }

@@ -1,7 +1,7 @@
 // @dart=2.9
 import 'package:afib/id.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
-import 'package:afib/src/dart/command/commands/af_config_command.dart';
+import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
@@ -22,16 +22,21 @@ import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Future<void> afScreenTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTestStats stats, AFDartParams paramsD1, WidgetTester tester) async {
-  final isWidget = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.widgetTests);
-  final isSingle = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.screenTests);
-  final isMulti  = AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.workflowTests);
+  final isWidget = AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.widgetTests);
+  final isSingle = AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.screenTests);
+  final isMulti  = AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.workflowTests);
   if(!isSingle && !isMulti && !isWidget) {
     return;
   }
 
-  AFibD.config.setValue(AFConfigEntries.widgetTesterContext, AFConfigEntryBool.trueValue);
+  AFibD.config.setValue(AFConfigEntries.widgetTesterContextKey, true);
   final app = AFibF.g.createApp();
   await tester.pumpWidget(app);
+
+
+  AFBaseTestExecute.writeSeparatorLine(output);
+  final formFactor = AFibD.config.formFactorWithOrientation;
+  output.writeLine("Running at size ${formFactor.summaryText()}"); 
 
   final locales = AFibF.g.testEnabledLocales(AFibD.config);
     
@@ -76,7 +81,7 @@ Future<void> _afStandardScreenTestMain<TState extends AFAppStateArea>(
     if(!prototype.hasTests) {
       continue;
     }
-    if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, prototype.id)) {
+    if(AFConfigEntries.testsEnabled.isTestEnabled(AFibD.config, prototype.id)) {
       if(localStats.isEmpty) {
         printTestKind(output, testKind);
       }
@@ -150,7 +155,7 @@ Future<void> _afWorkflowTestMain<TState extends AFAppStateArea>(AFCommandOutput 
     if(!test.hasTests) {
       continue;
     }
-    if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
+    if(AFConfigEntries.testsEnabled.isTestEnabled(AFibD.config, test.id)) {
       if(localStats.isEmpty) {
         printTestKind(output, testKind);
       }

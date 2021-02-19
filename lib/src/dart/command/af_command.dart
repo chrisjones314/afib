@@ -1,13 +1,15 @@
+
 // @dart=2.9
+import 'package:afib/src/dart/command/commands/af_config_command.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:meta/meta.dart';
 import 'package:afib/afib_command.dart';
-import 'package:afib/src/dart/command/af_args.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
-import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/templates/af_template_registry.dart';
-import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
+import 'package:args/command_runner.dart' as cmd;
 
 class AFItemWithNamespace {
   /// The namespace used to differentiate third party commands.
@@ -42,121 +44,55 @@ class AFItemWithNamespace {
 }
 
 /// Parent for commands executed through the afib command line app.
-abstract class AFCommand extends AFItemWithNamespace { 
-  final int minArgs;
-  final int maxArgs;
-  AFCommand(String namespace, String key, this.minArgs, this.maxArgs): super(namespace, key);
-
-  /// Returns true of [cmd] matches our command name, optionally prefixed with --
-  bool matches(String cmd) {
-    final withDash = "--$namespaceKey";
-    return namespaceKey == cmd || withDash == cmd;
-  }
+abstract class AFCommand extends cmd.Command { 
+  AFCommandContext ctx;
 
   /// Override this to implement the command.   The first item in the list is the command name.
   /// 
   /// [afibConfig] contains only the values from initialization/afib.g.dart, which can be 
   /// manipulated from the command line.
-  void execute(AFCommandContext ctx);
+  void run() {
+    // make sure we are in the project root.
+    if(!errorIfNotProjectRoot(ctx.out)) {
+      return;
+    }
 
-  /// Should return a simple help string summarizing the command.
-  String get shortHelp;
+    execute(ctx);
+  }
+
+  void finalize() {}
+  void execute(AFCommandContext ctx);
 
   bool errorIfNotProjectRoot(AFCommandOutput output) {
     if(!AFProjectPaths.inRootOfAfibProject) {
-      output.writeErrorLine("Please run the $namespaceKey command from the project root");
+      output.writeErrorLine("Please run the $name command from the project root");
       return false;
     }
     return true;
-  }
-
-  /// Briefly describe command usage.
-  void writeShortHelp(AFCommandContext ctx, { int indent = 0 }) {
-    final output = ctx.o;
-    startCommandColumn(output, indent: indent);
-    output.write("$namespaceKey - ");
-    startHelpColumn(output);
-    output.write(shortHelp);
-    output.endLine();
-  }
-
-
-  /// Optionally override this to provide more verbose help for a command,
-  /// Which is shown for afib help <command>.  By default, shows the [shortHelp]. 
-  void writeLongHelp(AFCommandContext ctx, String subCommand) {
-    writeShortHelp(ctx);
-  }
-
-  void writeUsage(AFCommandContext ctx, String cmdKey, String args) {
-    final output = ctx.o;
-    output.writeLine("Usage: ");
-    output.writeLine("    ${ctx.commandUsed} $cmdKey $args");
-  }
-
-  void startArguments(AFCommandContext ctx) {
-    ctx.o.writeLine("\nArguments: ");
-  }
-
-  void writeArgument(AFCommandContext ctx, String arg, String help) {
-    startArgColumn(ctx.o);
-    ctx.o.write("$arg - ");
-    startHelpColumn(ctx.o);
-    ctx.o.writeLine(help);
-  }
-
-  void writeConfigArgument(AFCommandContext ctx, AFConfigEntry entry) {
-    writeArgument(ctx, entry.argumentString, entry.argumentHelp);
-  }
-
-  void printError(String text) {
-    print("Error: $text");
-  }
-
-  static void startArgColumn(AFCommandOutput output) {
-    output.startColumn(alignment: AFOutputAlignment.alignRight, width: 30);
-  }
-
-  static void startCommandColumn(AFCommandOutput output, { int indent = 0 }) {
-    final width = 20 + (indent * 4);
-    output.startColumn(alignment: AFOutputAlignment.alignRight, width: width);
-  }
-
-  static void startHelpColumn(AFCommandOutput output) {
-    output.startColumn(alignment: AFOutputAlignment.alignLeft);
-  }
-
-  static void emptyCommandColumn(AFCommandOutput output) {
-    startCommandColumn(output);
-    output.write("");
-  }
-
+  }  
 }
 
 class AFCommandContext {
-  final AFCommands commands;
-  final AFArgs args;
-  final AFConfig afibConfig;
+  final AFCommandExtensionContext definitions;
   final AFCommandOutput output;
   final AFTemplateRegistry templates;
   final AFGeneratorRegistry generators;
   final files = AFGeneratedFiles();
+  AFCommandContext({
+    @required this.output, 
+    @required this.templates, 
+    @required this.generators,
+    @required this.definitions,
+  });
 
-  AFCommandContext(this.commands, this.args, this.afibConfig, this.output, this.templates, this.generators);
-
-  AFCommandOutput get o { return output; }
-  AFArgs get a { return args; }
-
-  String get commandUsed {
-    if(commands.isAfib) {
-      return "afib";
-    } else {
-      final namespace = afibConfig.stringFor(AFConfigEntries.appNamespace);
-      return "${namespace}_afib";
-    }
+  List<String> unnamedArguments(AFCommand command) {
+    return command.argResults.rest;
   }
 
+  AFCommandOutput get out { return output; }
 }
 
+/*
 /// The set of all known afib commands.
 class AFCommands {
   final List<AFCommand> commands = <AFCommand>[];
@@ -235,18 +171,56 @@ class AFCommands {
   }
 
 }
+*/
 
-class AFCommandExtensionContext {
+abstract class AFBaseExtensionContext {
+  void registerConfigEntry(AFConfigItem entry) {
+    AFibD.registerConfigEntry(entry);
+  }
+}
+
+class AFCommandThirdPartyExtensionContext extends AFBaseExtensionContext {
   final AFDartParams paramsD;
-  final AFCommands commands;
+  final cmd.CommandRunner commands;
 
-  AFCommandExtensionContext({this.paramsD, this.commands});
+  AFCommandThirdPartyExtensionContext({this.paramsD, this.commands});
 
-  /// Used to register a new [AFCommand] that can be executed via the 
+  /// Used to register a new root level command 
   /// command line.
   void register(AFCommand command) {
-    commands.register(command);
+    commands.addCommand(command);
   }
 
+  /// Used to register sub-commands on the specified parent command.
+  void registerSubcommand(List<String> path, AFCommand command) {
+    
+  }
 
+  AFGenerateCommand get generateCommand {
+    for(final cmd in commands.commands.values) {
+      if(cmd is AFGenerateCommand) {
+        return cmd;
+      }
+    }
+    return null;
+  }
+
+  void finalize(AFCommandContext context) {
+    for(final command in commands.commands.values) {
+      if(command is AFCommand) {
+        command.ctx = context;
+        command.finalize();
+      }
+    }
+  }
+
+}
+
+class AFCommandExtensionContext extends AFCommandThirdPartyExtensionContext {
+  AFCommandExtensionContext({AFDartParams paramsD, cmd.CommandRunner commands}):
+    super(paramsD: paramsD, commands: commands);
+
+    void execute(List<String> args) {
+      commands.run(args);
+    }
 }

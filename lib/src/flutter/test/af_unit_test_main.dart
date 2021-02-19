@@ -1,6 +1,6 @@
 
 import 'package:afib/src/dart/command/af_command_output.dart';
-import 'package:afib/src/dart/command/commands/af_config_command.dart';
+import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
@@ -12,7 +12,7 @@ import 'package:afib/src/flutter/utils/afib_f.dart';
 
 /// The main function which executes the tests defined in your initUnitTests function.
 void afUnitTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTestStats stats, AFDartParams paramsD) {
-  if(!AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.unitTests)) {
+  if(!AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.unitTests)) {
     return;
   }
 
@@ -22,7 +22,7 @@ void afUnitTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTes
   final localStats = AFTestStats();
 
   for(final test in tests.tests) {
-    if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
+    if(AFConfigEntries.testsEnabled.isTestEnabled(AFibD.config, test.id)) {
       if(localStats.isEmpty) {
         printTestKind(output, testKind);
       }

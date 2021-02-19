@@ -1,5 +1,6 @@
 // @dart=2.9
 import 'package:afib/src/dart/command/af_command_enums.dart';
+import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
@@ -9,12 +10,56 @@ import 'package:logger/logger.dart';
 
 class AFibD<AppState> {
     static final AFConfig _afConfig = AFConfig();
+    static final configEntries = <AFConfigItem>[];
+    static final standardSizes = <String, AFFormFactorSize>{};
     static Logger logAppQuery;
     static Logger logAppRender;
     static Logger logAppTest;
     static Logger logQuery;
     static Logger logConfig;
     static Logger logTest;
+
+    /// Register an entry in the configuration file.
+    static void registerConfigEntry(AFConfigItem entry) {
+      configEntries.add(entry);
+    }
+
+    static AFConfigItem findConfigEntry(String name) {
+      final result = configEntries.firstWhere((e) => e.name == name, orElse: () => null);
+      return result;
+    }
+
+    static void registerGlobals() {
+      registerStandardSizes();
+      registerDefaultConfigEntries();
+    }
+
+    static void registerStandardSizes() {
+      registerStandardSize(AFFormFactorSize.sizePhoneStandard);
+      registerStandardSize(AFFormFactorSize.sizePhoneLarge);
+      registerStandardSize(AFFormFactorSize.sizeTabletSmall);
+      registerStandardSize(AFFormFactorSize.sizeTabletStandard);
+      registerStandardSize(AFFormFactorSize.sizeTabletLarge);
+    }
+
+    static void registerStandardSize(AFFormFactorSize size) {
+      standardSizes[size.identifier] = size;
+    }
+
+    static AFFormFactorSize findSize(String identifier) {
+      return standardSizes[identifier];
+    }
+
+    static void registerDefaultConfigEntries() {
+      registerConfigEntry(AFConfigEntries.appNamespace);
+      registerConfigEntry(AFConfigEntries.forceDarkMode);
+      registerConfigEntry(AFConfigEntries.environment);
+      registerConfigEntry(AFConfigEntries.testsEnabled);
+      registerConfigEntry(AFConfigEntries.logsEnabled);
+      registerConfigEntry(AFConfigEntries.testSize);
+      registerConfigEntry(AFConfigEntries.testOrientation);
+      registerConfigEntry(AFConfigEntries.widgetTesterContext);
+    }
 
     /// Logger which is non-null if we should log changes to routing.
     static Logger logRoute;
@@ -39,7 +84,7 @@ class AFibD<AppState> {
         // first do the separate initialization that just says what environment it is, since this
         p.initAfib(AFibD.config);
         if(p.forceEnv != null) {
-          AFibD.config.setValue(AFConfigEntries.environment, p.forceEnv);
+          AFibD.config.setValue(AFConfigEntryEnvironment.optionName, p.forceEnv);
         }
         p.initAppConfig(AFibD.config);
         final env = AFibD.config.environment;
@@ -55,6 +100,7 @@ class AFibD<AppState> {
 
       }
 
+      /*
       final logAreas = AFibD.config.logAreas;    
       if(logAreas.contains(AFConfigEntryLogArea.appAll)) {
         logAreas.add(AFConfigEntryLogArea.appQuery);
@@ -69,6 +115,7 @@ class AFibD<AppState> {
       AFibD.logTest    = _createLogger(AFConfigEntryLogArea.test, logAreas);
       AFibD.logRoute   = _createLogger(AFConfigEntryLogArea.route, logAreas);
       AFibD.logConfig?.i("Environment: ${AFibD.config.environment}");
+      */
 
   }
 

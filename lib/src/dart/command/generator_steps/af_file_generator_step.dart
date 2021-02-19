@@ -44,7 +44,7 @@ class AFFileGeneratorStep extends AFSourceGenerationStep {
     }
     start.writeln(template.template);
     final result = replacePoints(ctx, start.toString(), points, localGenerators);
-    file.updateContent(ctx.o, result);
+    file.updateContent(ctx.out, result);
   }
 
   static String replacePoints(AFCommandContext ctx, String source, List<AFTemplateReplacementPoint> points, AFGeneratorRegistry localGenerators) {

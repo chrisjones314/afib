@@ -1,3 +1,5 @@
+
+/*
 // @dart=2.9
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
@@ -66,3 +68,4 @@ class AFNewProjectCommand extends AFCommand {
   String get shortHelp => "create a new AFib project in a specified sub-folder of the current folder";
 
 }
+*/

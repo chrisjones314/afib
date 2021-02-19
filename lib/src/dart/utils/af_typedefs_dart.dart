@@ -28,5 +28,8 @@ typedef AFInitializeAppStateDelegate = AFAppStateArea Function();
 /// Delegate use to define commands that are part of the afib command-line app.
 typedef AFExtendCommandsDelegate = void Function(AFCommandExtensionContext context);
 
+/// Used by third party extensions to defined commands for the command-line app.
+typedef AFExtendCommandsThirdPartyDelegate = void Function(AFCommandThirdPartyExtensionContext context);
+
 /// Just a typed sort function.
 typedef AFTypedSortDelegate<TSort> = int Function(TSort left, TSort right);

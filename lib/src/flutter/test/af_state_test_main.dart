@@ -1,7 +1,7 @@
 // @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
-import 'package:afib/src/dart/command/commands/af_config_command.dart';
+import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
@@ -11,7 +11,7 @@ import 'package:afib/src/flutter/utils/afib_f.dart';
 
 /// The main function which executes the store test defined in your initStateTests function.
 void afStateTestMain<TState extends AFAppStateArea> (AFCommandOutput output, AFTestStats stats, AFDartParams paramsD) {
-  if(!AFConfigEntries.enabledTestList.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.stateTests)) {
+  if(!AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.stateTests)) {
     return;
   }
 
@@ -23,7 +23,7 @@ void afStateTestMain<TState extends AFAppStateArea> (AFCommandOutput output, AFT
   final store = AFibF.g.storeInternalOnly;
   final dispatcher = AFStoreDispatcher(store);
   for(final test in tests.tests) {
-    if(AFConfigEntries.enabledTestList.isTestEnabled(AFibD.config, test.id)) {
+    if(AFConfigEntries.testsEnabled.isTestEnabled(AFibD.config, test.id)) {
       if(localStats.isEmpty) {
         printTestKind(output, testKind);
       }

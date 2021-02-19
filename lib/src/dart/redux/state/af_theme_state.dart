@@ -666,8 +666,6 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
   static const bootstrapStandardMargins = <double>[0, 2.0, 4.0, 8.0, 12.0, 16.0];
   static const bootstrapStandardPadding = bootstrapStandardMargins;
   static const bootstrapStandardBorderRadius = bootstrapStandardMargins;
-  static const afFormFactorLimits = <double>[650, 1200, 1400, 1600, 2000];
-    
 
   AFAppFundamentalThemeAreaBuilder({
     @required Map<AFThemeID, List<dynamic>> optionsForType
@@ -702,6 +700,25 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     this.themeDark = themeDark;
   }
 
+  static AFFormFactor convertFormFactor(Size size) {
+    // normalize to portrait
+    final width = size.width > size.height ? size.height : size.width;
+    final height = size.width > size.height ? size.width : size.height;
+
+    if(width >= AFFormFactorSize.sizeTabletLarge.width && height >= AFFormFactorSize.sizeTabletLarge.height) {
+      return AFFormFactor.largeTablet;
+    } else if(width >= AFFormFactorSize.sizeTabletStandard.width && height >= AFFormFactorSize.sizeTabletStandard.height) {
+      return AFFormFactor.standardTablet;
+    } else if(width >= AFFormFactorSize.sizeTabletSmall.width && height >= AFFormFactorSize.sizeTabletSmall.height) {
+      return AFFormFactor.smallTablet;
+    } else if(width >= AFFormFactorSize.sizePhoneLarge.width && height >= AFFormFactorSize.sizePhoneLarge.height) {
+      return AFFormFactor.largePhone;
+    } else if(width >= AFFormFactorSize.sizePhoneStandard.width && height >= AFFormFactorSize.sizePhoneStandard.height) {
+      return AFFormFactor.standardPhone;
+    }
+    return AFFormFactor.smallPhone;    
+  }
+
   /// The app must call this method to establish some fundamental theme values that both 
   /// flutter and AFib expect.  
   /// 
@@ -713,15 +730,15 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     List<double> marginSizes = bootstrapStandardMargins,
     List<double> paddingSizes = bootstrapStandardPadding,
     List<double> borderRadiusSizes = bootstrapStandardBorderRadius,
-    List<double> formFactorLimits = afFormFactorLimits,
     IconData iconBack = Icons.arrow_back,
     IconData iconNavDown = Icons.chevron_right,
     Color colorTapableText = Colors.blue,
+    AFConvertSizeToFormFactorDelegate convertFormFactor = AFAppFundamentalThemeAreaBuilder.convertFormFactor,
   }) {
     assert(marginSizes.length == bootstrapStandardMargins.length);
     assert(paddingSizes.length == bootstrapStandardPadding.length);
     assert(borderRadiusSizes.length == bootstrapStandardBorderRadius.length);
-    assert(formFactorLimits.length == afFormFactorLimits.length);
+    //assert(formFactorLimits.length == afFormFactorMinimums.length);
 
     // icons
     setValue(AFUIThemeID.marginSizes, marginSizes);
@@ -730,7 +747,7 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
     setValue(AFUIThemeID.iconBack, iconBack);
     setValue(AFUIThemeID.iconNavDown, iconNavDown);
     setValue(AFUIThemeID.colorTapableText, colorTapableText);
-    setValue(AFUIThemeID.formFactorLimits, formFactorLimits);
+    setValue(AFUIThemeID.formFactorDelegate, convertFormFactor);
   }
 
 
@@ -2155,20 +2172,8 @@ need to manually update the value in the controller.
   /// approximation in [AFFormFactor].
   AFFormFactor get deviceFormFactor {
     final dSize = devicePhysicalSize;
-    final smaller = dSize.width < dSize.height ? dSize.width : dSize.height;
-    final List<double> formLimits = fundamentals.findValue(AFUIThemeID.formFactorLimits);
-    if(smaller < formLimits[0]) {
-      return AFFormFactor.smallPhone;
-    } else if(smaller < formLimits[1]) {
-      return AFFormFactor.standardPhone;
-    } else if(smaller < formLimits[2]) {
-      return AFFormFactor.largePhone;
-    } else if(smaller < formLimits[3]) {
-      return AFFormFactor.smallTablet;
-    } else if(smaller < formLimits[4]) {
-      return AFFormFactor.standardTablet;
-    }
-    return AFFormFactor.largeTablet;
+    final AFConvertSizeToFormFactorDelegate delegate = fundamentals.findValue(AFUIThemeID.formFactorDelegate);
+    return delegate(dSize);
   }
 
   bool deviceHasFormFactor({

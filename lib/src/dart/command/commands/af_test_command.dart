@@ -1,44 +1,36 @@
+
 import 'dart:io';
 
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
-import 'package:afib/src/dart/command/generators/af_config_file_generator.dart';
-import 'package:afib/src/dart/utils/af_config_entries.dart';
+import 'package:afib/src/dart/command/commands/af_config_command.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
 
 class AFTestCommand extends AFCommand { 
-  static const cmdKey = "test";
 
-  AFTestCommand(): super(AFConfigEntries.afNamespace, cmdKey, 0, 10);
+  final name = "test";
+  final description = "Run tests, you can specify any prototype name, test name, or any of the values for afib.dart help config's --tests-enabled option";
 
-  @override
-  String get shortHelp => "Run afib tests conveniently";
-
-  void writeLongHelp(AFCommandContext ctx, String subCommand) {
-    writeUsage(ctx, cmdKey, "[${AFConfigEntries.enabledTestList.argumentString}]*");
-    startArguments(ctx);
-    writeConfigArgument(ctx, AFConfigEntries.enabledTestList);
+  AFTestCommand() {
+    AFConfigEntries.testSize.addArguments(argParser);
+    AFConfigEntries.testOrientation.addArguments(argParser);
   }
-
 
   @override
   void execute(AFCommandContext ctx) {
-    // make sure we are in the project root.
-    if(!errorIfNotProjectRoot(ctx.o)) {
-      return;
-    }
+    final config = AFibD.config;
+    AFConfigEntries.testsEnabled.setValue(config, ctx.unnamedArguments(this));
+    AFConfigCommand.updateConfig(ctx, config, [AFConfigEntries.testSize, AFConfigEntries.testOrientation], argResults);
 
-    ctx.afibConfig.setValue(AFConfigEntries.enabledTestList, ctx.a.listFrom());
-
-    // write out the local configuration file.
-    final generator = AFConfigFileGenerator();
-    
+    final generateCmd = ctx.definitions.generateCommand;
+    final configGenerator = generateCmd.configGenerator;
     final files = ctx.files;
-    if(!generator.validateBefore(ctx, files)) {
+    if(!configGenerator.validateBefore(ctx, files)) {
       return;
     }
-    generator.execute(ctx, files);    
-    files.saveChangedFiles(ctx.o);
+    configGenerator.execute(ctx, files);    
+    files.saveChangedFiles(ctx.out);
       
     Process.start('flutter', ['test', AFProjectPaths.relativePathFor(AFProjectPaths.afTestPath)]).then((process) {
       stdout.addStream(process.stdout);
@@ -46,7 +38,5 @@ class AFTestCommand extends AFCommand {
     });
 
     // reset the local config file to run all tests, in case they run 'flutter test'  
-
-    
   }
 }

@@ -1,5 +1,6 @@
 // @dart=2.9
 import 'package:afib/afib_command.dart';
+import 'package:afib/src/dart/command/commands/af_typedefs_command.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
@@ -10,7 +11,7 @@ import 'package:afib/src/flutter/ui/theme/af_default_fundamental_theme.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 
 /// [afMain] handles startup, execution, and shutdown sequence for an afApp
-void afMainUILibrary<TState extends AFAppStateArea>(AFLibraryID id, AFDartParams paramsD, AFExtendUILibraryDelegate extendApp, AFExtendTestDelegate extendTest) {
+void afMainUILibrary<TState extends AFAppStateArea>(AFLibraryID id, AFDartParams paramsD, AFExtendBaseDelegate extendBase, AFExtendUILibraryDelegate extendApp, AFExtendTestDelegate extendTest) {
   final contextLibrary = AFUILibraryExtensionContext(id: id);
   extendApp(contextLibrary);
 
@@ -24,5 +25,5 @@ void afMainUILibrary<TState extends AFAppStateArea>(AFLibraryID id, AFDartParams
     );
   };
 
-  afMain<TState>(paramsProto, extendAppFull, null, extendTest);
+  afMain<TState>(paramsProto, extendBase, extendAppFull, null, extendTest);
 }

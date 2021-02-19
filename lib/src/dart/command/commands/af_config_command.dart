@@ -1,383 +1,265 @@
-// @dart=2.9
+import 'dart:convert';
+
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:meta/meta.dart';
 import 'package:afib/src/dart/command/af_command.dart';
-import 'package:afib/src/dart/command/af_command_output.dart';
-import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
-import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
-import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:args/args.dart' as args;
 
 /// Superclass for all configuration definitions.
-abstract class AFConfigEntry extends AFItemWithNamespace {
-    final dynamic defaultValue;
-    final String declaringClass;
-    
-    AFConfigEntry(String namespace, String key, this.defaultValue, {this.declaringClass = AFConfigEntries.declaredIn}): super(namespace, key);
+abstract class AFConfigItem {
+  static const validContextInternalOnly = 0;
+  static const validContextConfigCommand = 1;
+  static const validContextNewProjectCommand = 2;
+  static const validContextAFibGFile = 4;
+  static const validContextsNewProjectAndConfig = validContextNewProjectCommand | validContextAFibGFile;
+  static const validContextsAllButNew = validContextConfigCommand | validContextAFibGFile;
+  static const validContextsAll = validContextConfigCommand | validContextNewProjectCommand | validContextAFibGFile;
 
-
-
-    void writeHelp(AFCommandOutput output, {int indent = 0});
-
-    String get codeIdentifier {
-      return "$declaringClass.$key";
-    }
-
-    String get argumentString {
-      return key;
-    }
-
-    String get argumentHelp {
-      return "";
-    }
-
-    String codeValue(AFConfig config) {
-      dynamic val = config.valueFor(this);
-      if(val == null) {
-        return null;
-      }
-      if(val is String) {
-        return "\"$val\"";
-      }
-      return val.toString();
-    }
-    
-    /// Return an error message if the value is invalid, otherwise return null.
-    String validate(dynamic value);
-
-    void setValueWithString(AFConfig dest, String value) {
-      validateWithException(value);
-      dest.putInternal(this, value);
-    }
-
-    void setValue(AFConfig dest, dynamic value) {
-      if(value is String) {
-        setValueWithString(dest, value);
-      } else {
-        dest.putInternal(this, value);
-      }
-    }
-    
-    void writeCommandHelp(AFCommandOutput output, String help, {int indent = 0}) {
-      AFCommand.startCommandColumn(output, indent: indent);
-      output.write("$namespaceKey - ");
-      AFCommand.startHelpColumn(output);
-      output.write(help);
-      output.endLine();
-    }    
-
-    void validateWithException(String value) {
-      final val = validate(value);
-      if(val != null) {
-        throw AFException("Invalid value $value for $namespaceKey");
-      }
-    }
-
-
-}
-
-class AFConfigEntryList extends AFConfigEntry {
-  final List<String> allowed;
+  final String name;
   final String help;
-  AFConfigEntryList(String namespace, String key, dynamic defaultValue, {String declaringClass = AFConfigEntries.declaredIn, this.allowed, this.help}): super(namespace, key, defaultValue, declaringClass: declaringClass);
+  final dynamic defaultValue;
+  final int validContexts;
+  final double ordinal;
+    
+  AFConfigItem({ 
+    @required this.name, 
+    @required this.defaultValue,  
+    @required this.validContexts, 
+    @required this.help, 
+    @required this.ordinal 
+  });
 
-  @override
-  String get argumentHelp {
-    return help;
+  String get codeIdentifier {
+    return name;
   }
 
-  @override
-  String validate(dynamic value) {
-    if(allowed == null) {
+  String get argumentString {
+    return name;
+  }
+
+  String get argumentHelp {
+    return "";
+  }
+
+  bool allowedIn(int validContext) {
+    return (validContext & validContexts) != 0;
+  }
+
+  static void sortByOrdinal(List<AFConfigItem> items) {
+    items.sort((l, r) {
+      return l.ordinal.compareTo(r.ordinal);
+    });
+  }
+
+  String comment() {
+      final argParser = args.ArgParser();
+      addArguments(argParser);
+      final usage = argParser.usage;
+      final ls = LineSplitter();
+      final lines = ls.convert(usage);
+      final result = StringBuffer();
+      for(var i = 0; i < lines.length; i++) {
+        final line = lines[i];
+        if(i > 0) {
+          result.writeln();
+          result.write("  ");
+        }
+        result.write("// $line");
+      }
+      return result.toString();
+  }
+
+  String codeValue(AFConfig config) {
+    dynamic val = config.valueFor(this);
+    if(val == null) {
       return null;
     }
-
-    if(value is String) {
-      if(!allowed.contains(value)) {
-        return "$namespaceKey must be one of $allowed";
-      }
+    if(val is String) {
+      return "\"$val\"";
     }
-    return null;
+    if(val is List) {
+      final result = StringBuffer("[");
+      for(var i = 0; i < val.length; i++) {
+        final item = val[i];
+        if(i > 0) {
+          result.write(', ');
+        } 
+        result.write('"$item"');
+      }
+      result.write("]");
+      return result.toString();
+    }
+    return val.toString();
+  }
+
+  void addArguments(args.ArgParser argParser);
+  
+  /// Return an error message if the value is invalid, otherwise return null.
+  String validate(dynamic value);
+
+  void setValueWithString(AFConfig dest, String value) {
+    validateWithException(value);
+    dest.putInternal(this, value);
+  }
+
+  void setValue(AFConfig dest, dynamic value) {
+    if(value is String) {
+      setValueWithString(dest, value);
+    } else {
+      dest.putInternal(this, value);
+    }
   }
   
-  @override
-  String codeValue(AFConfig config) {
-    final sb = StringBuffer("[");
-    final vals = config.stringListFor(this);
-    for(var i = 0; i < vals.length; i++) {
-      sb.write('"');
-      sb.write(vals[i]);
-      sb.write('"');
-      if(i+1 < vals.length) {
-        sb.write(", ");
-      }
+  void validateWithException(String value) {
+    final val = validate(value);
+    if(val != null) {
+      throw AFException("Invalid value $value for $name");
     }
-    sb.write("]");
-    return sb.toString();
-  }
-
-  void writeHelp(AFCommandOutput output, { int indent = 0 }) {
-    writeCommandHelp(output, help, indent: indent);
-  }
-
-}
-
-
-
-class AFConfigEntryLogArea extends AFConfigEntryList {
-  static const appQuery = "appQuery";
-  static const appRender = "appRender";
-  static const appTest = "appTest";
-  static const appAll = "appAll";
-  static const query = "query";
-  static const config = "config";
-  static const test = "test";
-  static const route = "route";
-  static const none = "none";
-  static const all = "all";
-  static const allAreas = [appQuery, appRender, appTest, query, config, test, route, none, all];
-
-  AFConfigEntryLogArea(): super(AFConfigEntries.afNamespace, "logAreas", [appAll, appQuery, appRender, appTest], help: "Space separated list of [${allAreas.join('|')}|grep-style-text]");
-
-  List<String> areasFor(AFConfig config) {
-    return config.stringListFor(this);
-  }
-}
-
-class AFConfigEntryEnabledTests extends AFConfigEntryList {
-  static const allTests = "all";
-  static const stateTests = "state";
-  static const unitTests = "unit";
-  static const screenTests = "screen";
-  static const queryTests = "query";
-  static const workflowTests = "workflow";
-  static const widgetTests = "widget";
-  static const i18n = "i18n";
-  static const allAreas = [allTests, unitTests, stateTests, widgetTests, screenTests, queryTests, workflowTests, i18n];
-
-  AFConfigEntryEnabledTests(): super(AFConfigEntries.afNamespace, "enabledTestList", [allTests], help: "Space separated list of areas that should display logging messages [${allAreas.join('|')}|test_id|test_tag|test_area:test_tag]");
-
-  bool isAreaEnabled(AFConfig config, String areaTest) {
-    final areas = _params(config);
-    if(hasNoAreas(areas)) {
-      return true;
-    }
-    for(final area in areas) {
-      if(area == allTests) {
-        return true;
-      }
-      final actualArea = _extractArea(area);
-      if(areaTest == actualArea) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  bool isI18NEnabled(AFConfig config) {
-    final areas = config.stringListFor(this);
-    return areas.contains(i18n);
-  }
-
-  bool isTestEnabled(AFConfig config, AFBaseTestID id) {
-    final areas = _params(config);
-    if(hasOnlyAreas(areas)) {
-      return true;
-    }
-    if(areas.contains(id.code)) {
-      return true;
-    }
-    for(final area in areas) {
-      final actualTag = _extractTag(area);
-      if(id.hasTag(actualTag)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  List<String> _params(AFConfig config) {
-    var result = config.stringListFor(this);
-    if(result.contains(i18n)) {
-      result = List<String>.from(result);
-      result.remove(i18n);
-    }
-    return result;
-  }
-
-  bool hasNoAreas(List<String> areas) {
-    for(final area in areas) {
-      final actualArea = _extractArea(area);
-      if(allAreas.contains(actualArea)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  bool hasOnlyAreas(List<String> areas) {
-    for(final area in areas) {
-      if(!allAreas.contains(area)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  String _extractArea(String area) {
-    final idx = area.indexOf(":");
-    if(idx < 0) {
-      return area;
-    }
-    return area.substring(0, idx);
-  }
-
-  String _extractTag(String area) {
-    final idx = area.indexOf(":");
-    if(idx < 0) {
-      return area;
-    }
-    return area.substring(idx+1);
   }
 }
 
 /// Used to define choices for a configuration value.
 class AFConfigEntryDescription {
-  final String choice;
-  final dynamic value;
+  final String textValue;
+  final dynamic runtimeValue;
   final String help;
   AFConfigEntryDescription({
-    @required this.choice, 
     @required this.help,
-    @required this.value,
+    @required this.textValue,
+    @required this.runtimeValue,
   });
 
 }
 
+
 /// Superclass for configuration definitions that offer a list of string values,
 /// for example 'debug', 'production', 'test'
-abstract class AFConfigEntryChoice extends AFConfigEntry {
+class AFConfigEntryOptionChoice extends AFConfigItem {
+  static const wildcardValue = "*";
   final choices = <AFConfigEntryDescription>[];
+  final bool allowMultiple;
   
-  AFConfigEntryChoice(String namespace, String key, dynamic defaultValue, {String declaringClass = AFConfigEntries.declaredIn}): super(namespace, key, defaultValue, declaringClass: declaringClass);
+  AFConfigEntryOptionChoice({ 
+    @required String name, 
+    @required dynamic defaultValue, 
+    @required int validContexts, 
+    @required double ordinal, 
+    String help, 
+    this.allowMultiple = false }): super(
+      name: name, 
+      defaultValue: defaultValue, 
+      validContexts: validContexts, 
+      ordinal: ordinal, 
+      help: help
+    );
 
-  void addChoice(String choice, String help) {
+  void addChoice({@required String textValue, String help, dynamic runtimeValue }) {
+    if(runtimeValue == null) {
+      runtimeValue = name;
+    }
     choices.add(AFConfigEntryDescription(
-      choice: choice, 
-      value: choice,
+      textValue: textValue,
+      runtimeValue: runtimeValue,
       help: help
     ));
   }  
 
-  void writeHelp(AFCommandOutput output, { int indent = 0 }) {
-    writeCommandHelp(output, "set the $key configuration value to one of:", indent: indent);
-    for(var choice in choices) {
-      AFCommand.startCommandColumn(output, indent: indent+1);
-      output.write("${choice.choice} - ");
-      AFCommand.startHelpColumn(output);
-      output.write(choice.help);
-      output.endLine();
-    }
+  void addWildcard(String help) {
+    choices.add(AFConfigEntryDescription(
+      textValue: wildcardValue,
+      runtimeValue: wildcardValue,
+      help: help,
+    ));
   }
 
-  String validate(dynamic value) {
-    final choice = findChoice(value);
-    if(choice == null) {
-      return "$value is not a valid choice for $namespaceKey";
+  void addArguments(args.ArgParser argParser) {
+    var allowed;
+    var allowedHelp;
+  
+    if(findChoice(wildcardValue) == null) {
+       allowed = choices.map((e) => e.textValue);
+    }
+    if(choices.first.help != null) {
+      allowedHelp = <String, String>{};
+
+      for(final choice in choices) {
+        allowedHelp[choice.textValue] = choice.help;
+      }
+    }
+
+    if(allowMultiple) {
+      argParser.addMultiOption(name,
+        help: help,
+        allowed: allowed,
+        allowedHelp: allowedHelp);
+    } else {
+      argParser.addOption(name, 
+        help: help,
+        allowed: allowed,
+        allowedHelp: allowedHelp,
+      );
+    }
+    
+    
+  }
+
+  String validate(dynamic listValue) {
+    if(listValue is! List) {
+      if(listValue is! String) {
+        return "Expected value for $name to be a list";
+      }
+      listValue = listValue.split("[ ,]");
+    }
+
+    if(findChoice(wildcardValue) == null) {
+      for(final textValue in listValue) {
+        final choice = findChoice(textValue);
+        if(choice == null) {
+          return "$textValue is not a valid choice for $name";
+        }
+      }
     }
     return null;
   }
 
   AFConfigEntryDescription findChoice(String val) {
-    for(var choice in choices) {
-      if(choice.choice == val) {
-        return choice;
-      }
-    }
-    return null;
+    return choices.firstWhere((e) => e.textValue == val, orElse: () => null);
   }
 }
 
-/// Superclass for configuration definitions that offer a list of string values,
-/// for example 'debug', 'production', 'test'
-abstract class AFConfigEntryEnumChoice<TEnum> extends AFConfigEntry {
-  final choices = <AFConfigEntryDescription>[];
-  
-  AFConfigEntryEnumChoice(String namespace, String key, TEnum defaultValue, {String declaringClass = AFConfigEntries.declaredIn}): super(namespace, key, defaultValue, declaringClass: declaringClass);
 
-  void addChoice(TEnum choice, String help) {
-    final full = choice.toString();
-    final idx = full.indexOf(".");
-    final str = full.substring(idx+1);
-    choices.add(AFConfigEntryDescription(
-      choice: str, 
-      value: choice,
-      help: help
-    ));
-  }  
 
-  void writeHelp(AFCommandOutput output, { int indent = 0 }) {
-    writeCommandHelp(output, "set the $key configuration value to one of:", indent: indent);
-    for(var choice in choices) {
-      AFCommand.startCommandColumn(output, indent: indent+1);
-      output.write("${choice.choice} - ");
-      AFCommand.startHelpColumn(output);
-      output.write(choice.help);
-      output.endLine();
-    }
+class AFConfigEntryFlag extends AFConfigEntryOptionChoice {
+
+  AFConfigEntryFlag({ 
+    @required String name, 
+    @required int validContexts, 
+    @required double ordinal, 
+    @required bool defaultValue, 
+    @required String help 
+  }): super(
+    name: name, 
+    defaultValue: defaultValue, 
+    validContexts: validContexts, 
+    ordinal: ordinal, help: help
+  ) {
+    addChoice(textValue: "true", runtimeValue: true);
+    addChoice(textValue: "false", runtimeValue: false);
   }
 
-  void setValueWithString(AFConfig dest, String value) {
-    validateWithException(value);
-    for(final choice in choices) {
-      if(choice.choice == value) {
-        dest.putInternal(this, choice.value);
-      }
+  void setValue(AFConfig dest, dynamic value) {
+    if(value is String) {
+      dest.putInternal(this, value == "true");
+    } else {
+      dest.putInternal(this, value);
     }
   }
-
-  String validate(dynamic value) {
-    final choice = findChoice(value);
-    if(choice == null) {
-      return "$value is not a valid choice for $namespaceKey";
-    }
-    return null;
-  }
-
-  AFConfigEntryDescription findChoice(String val) {
-    for(var choice in choices) {
-      if(choice.choice == val) {
-        return choice;
-      }
-    }
-    return null;
-  }
+   
 }
 
-class AFConfigEntryBool extends AFConfigEntryChoice {
-  static const trueValue = "true";
-  static const falseValue = "false";
-
-  final String help;
-  
-  AFConfigEntryBool(String namespace, String key,this.help, { bool defaultValue, String declaringClass = AFConfigEntries.declaredIn}): super(namespace, key, defaultValue, declaringClass: declaringClass) {
-    addChoice(trueValue, "");
-    addChoice(falseValue, "");
-  }
-
-  void writeHelp(AFCommandOutput output, { int indent = 0 }) {
-    writeCommandHelp(output, this.help, indent: indent);
-  }
-
-  void setValueWithString(AFConfig dest, String value) {
-    validateWithException(value);
-    final val = (value == "true");
-    dest.putInternal(this, val);
-  }
-
-}
-
-class AFConfigEntryString extends AFConfigEntry {
+class AFConfigEntryOption extends AFConfigItem {
   static const optionLowercase = 1;
   static const optionIdentifier = 2;
   static const optionMixedCase = 4;
@@ -387,7 +269,27 @@ class AFConfigEntryString extends AFConfigEntry {
   final String help;
   final int options;
 
-  AFConfigEntryString(String namespace, String key, this.help, {this.minChars = -1, this.maxChars = -1, this.options = 0}): super(namespace, key, "");
+  AFConfigEntryOption({
+    @required String name, 
+    this.help, 
+    @required int validContexts, 
+    @required double ordinal, 
+    String defaultValue = "",
+    this.minChars = -1, 
+    this.maxChars = -1, 
+    this.options = 0 
+  }): super(
+    name: name, 
+    help: help,
+    validContexts: validContexts, 
+    ordinal: ordinal,
+    defaultValue: defaultValue,
+  );
+
+  void addArguments(args.ArgParser argParser) {
+    argParser.addOption(name, help: help);
+  }
+
   
   @override
   String validate(dynamic value) {
@@ -405,43 +307,6 @@ class AFConfigEntryString extends AFConfigEntry {
     return null;
   }  
 
-  String get argumentHelp {
-    final extraDetails = (maxChars > 0 || minChars > 0 || options != 0);
-    final sb = StringBuffer();
-    sb.write(help);
-    if(extraDetails) {
-      final dets = <String>[];
-      if(minChars > 0) {
-        dets.add("min: $minChars");
-      }
-      if(maxChars > 0) {
-        dets.add("max: $maxChars");
-      }
-      if(options != 0) {
-        if(hasOption(optionLowercase)) {
-          dets.add("all lowercase");
-        }
-        if(hasOption(optionMixedCase)) {
-          dets.add("mixed case");
-        }
-        if(hasOption(optionIdentifier)) {
-          dets.add("valid identifier");
-        }
-      }
-      if(dets.isNotEmpty) {
-        sb.write(" (");
-        sb.write(dets.join(", "));
-        sb.write(")");
-      }
-    }
-    return sb.toString();
-  }
-
-
-  void writeHelp(AFCommandOutput output, { int indent = 0 }) {    
-    writeCommandHelp(output, this.argumentString, indent: indent);
-  }
-
   bool hasOption(int opt) {
     return (options & opt) != 0;
   }
@@ -451,89 +316,79 @@ class AFConfigEntryString extends AFConfigEntry {
 /// Command that displays or modified values from [AFConfig], and
 /// that modifed values under the initialization/afib.g.dart.
 class AFConfigCommand extends AFCommand { 
-  final configs = <String, AFConfigEntry>{};
-  static const cmdKey = "config";
+  final name = "config";
+  final description = "Set configuration values in afib.g.dart";
 
-  AFConfigCommand(): super(AFConfigEntries.afNamespace, cmdKey, 0, 2) {
-    registerEntry(AFConfigEntries.environment);
-    registerEntry(AFConfigEntries.logAreas);
+  AFConfigCommand(): super() {
+
+    /*
+    argParser.addOption("environment", 
+      allowed: ["production", "test", "debug", "prototype"],
+      allowedHelp: {
+        "production": "Used for running in production",
+        "test": "Used during command-line testing, not usually used by developers directly",
+        "debug": "Used when running the app in debug mode",
+        "prototype": "Used to run the app in prototype mode"
+      }
+    );
+    */
+    //registerEntry(AFConfigEntries.logAreas);
   }
 
-  /// Only register entries that are stored in afib.g.dart and can be manipulated
-  /// from the command line.
-  /// 
-  /// Most entries don't need to be registered, they can simply be initialized
-  /// in one of the command-line entries.
-  void registerEntry(AFConfigEntry entry) {
-    configs[entry.key] = entry;
-  }
-
-  void writeLongHelp(AFCommandContext ctx, String subCommand) {
-    final output = ctx.o;
-    writeShortHelp(ctx);
-    final entries = AFItemWithNamespace.sortIterable<AFConfigEntry>(configs.values);
-    for(final entry in entries) {
-      entry.writeHelp(output, indent: 2);
+  @override
+  void finalize() {
+    for(final option in AFibD.configEntries) {
+      if(option.allowedIn(AFConfigItem.validContextConfigCommand)) {
+        option.addArguments(argParser);
+      }
     }
   }
 
-  /// Adds default values for all the registered configuration entries.
-  void initAfibDefaults(AFConfig config) {
-    for(final entry in configs.values) {
-      config.putInternal(entry, entry.defaultValue);
+  static void updateConfig(AFCommandContext ctx, AFConfig config, List<AFConfigItem> items, args.ArgResults argResults) {
+    final output = ctx.output;
+    // go through all the options that were set, and convert them into values
+    // in the config.
+    for(final entry in items) {
+      if(!entry.allowedIn(AFConfigItem.validContextConfigCommand)) {
+        continue;
+      }
+      final key = entry.name;
+      final value = argResults[key];
+      if(value == null) {
+        continue;
+      }
+
+      if(value is List && value.isEmpty) {
+        continue;
+      }
+
+      final error = entry.validate(value);
+      if(error != null) {
+        output.writeErrorLine(error);
+        return;
+      }
+
+      entry.setValue(config, value);
     }
-  }
+  } 
   
   @override
   void execute(AFCommandContext ctx) {    
-    final args = ctx.args;
-    final afibConfig = ctx.afibConfig;
     final output = ctx.output;
-    
-    // dump out the current value of all arguments.
-    if(args.count == 0) {
-      final sorted = AFItemWithNamespace.sortIterable<AFConfigEntry>(afibConfig.all);
-      afibConfig.dumpAll(sorted, output);
-      return;
-    }
 
-    // dump out the current value of a specific argument
-    final configKey = args.first;
-    if(args.count == 1) {
-      afibConfig.dumpOne(configKey, output);
-      return;
-    }
+    updateConfig(ctx, AFibD.config, AFibD.configEntries, argResults);
 
-    final configVal = args.second;
-    final entry = afibConfig.find(configKey);
-    if(entry == null) {
-      output.writeErrorLine("Unknown configuration entry $configKey");
-      return;
-    }
 
-    /// set the value.  this will throw an exception if it is an invalid value.
-    afibConfig.setValue(entry, configVal);
-    output.writeLine("Set ${entry.codeIdentifier} to $configVal");
 
-    if(!errorIfNotProjectRoot(output)) {
-      return;
-    }
-    
-    
-    final generateCmd = ctx.commands.generateCmd;
+    // now, write out that configuration to the afib.g.dart file.
+    final generateCmd = ctx.definitions.generateCommand;
     final configGenerator = generateCmd.configGenerator;
     final files = ctx.files;
     if(!configGenerator.validateBefore(ctx, files)) {
       return;
-
     }
     configGenerator.execute(ctx, files);    
 
     files.saveChangedFiles(output);
-  }
-
-  @override
-  String get shortHelp {
-    return "Set the values below, which are written to ${AFProjectPaths.relativePathFor(AFProjectPaths.afibConfigPath)}";
   }
 }

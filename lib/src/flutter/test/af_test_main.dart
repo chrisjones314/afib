@@ -17,6 +17,7 @@ import 'package:afib/src/flutter/ui/theme/af_default_fundamental_theme.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:colorize/colorize.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class AFibTestsFailedMatcher extends Matcher {
@@ -55,6 +56,13 @@ Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendAppDelegate exten
   final paramsTest = paramsD.forceEnvironment(AFEnvironment.prototype);
   AFibD.initialize(paramsTest);
 
+  final formFactor = AFibD.config.formFactorWithOrientation;
+  final screenSize = Size(formFactor.width, formFactor.height);
+  await widgetTester.binding.setSurfaceSize(screenSize);
+  widgetTester.binding.window.physicalSizeTestValue = screenSize;
+  widgetTester.binding.window.devicePixelRatioTestValue = 1.0;
+
+
   final context = AFAppExtensionContext();
   extendApp(context);
   extendTest(context.test);
@@ -84,7 +92,7 @@ Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendAppDelegate exten
 
   if(stats.hasErrors) {
     expect("${stats.totalErrors} errors (see details above)", AFibTestsFailedMatcher());
-  } else if(AFConfigEntries.enabledTestList.isI18NEnabled(AFibD.config)) {
+  } else if(AFConfigEntries.testsEnabled.isI18NEnabled(AFibD.config)) {
     final missing = AFibF.g.testMissingTranslations;
     if(missing.totalCount == 0) {
       AFBaseTestExecute.printTotalPass(output, "NO MISSING TRANSLATIONS", 0);

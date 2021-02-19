@@ -1,5 +1,6 @@
 
 import 'package:afib/afib_flutter.dart';
+import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
@@ -171,3 +172,5 @@ typedef AFWireframeExecutionDelegate = void Function(AFWireframeExecutionContext
 typedef AFTestDataCompositeGeneratorDelegate = void Function(AFCompositeTestDataRegistry destination);
 
 typedef AFFilterWidgetDelegate = bool Function(Widget);
+
+typedef AFConvertSizeToFormFactorDelegate = AFFormFactor Function(Size);

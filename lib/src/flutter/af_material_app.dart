@@ -33,7 +33,7 @@ class AFNavigatorObserver extends NavigatorObserver {
   }
 
   void _logNav(String title) {
-    AFibD.logRoute?.d("$title");
+    //AFibD.logRoute?.d("$title");
   }
 
 }

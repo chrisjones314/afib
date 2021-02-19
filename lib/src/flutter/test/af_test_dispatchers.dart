@@ -61,7 +61,7 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
     // if this is a test action, then remember it so that we can 
     if(!isTestAct && action is AFObjectWithKey) {
       AFibF.g.testOnlyRegisterRegisterAction(action);
-      AFibD.logTest?.d("Registered action: $action");
+      AFibD.logTestAF?.d("Registered action: $action");
     }
   }
 }

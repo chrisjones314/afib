@@ -45,32 +45,38 @@ class AFConfigEntryEnvironment extends AFConfigEntryOptionChoice {
 
 class AFConfigEntryLogArea extends AFConfigEntryOptionChoice {
   static const query = "query";
-  static const config = "config";
-  static const test = "test";
-  static const route = "route";
-  static const state = "state";
-  static const theme = "theme";
-  static const none = "none";
-  static const all = "all";
-  static const app = "app";
   static const ui = "ui";
+  static const test = "test";
+  static const afRoute = "af:route";
+  static const afState = "af:state";
+  static const afConfig = "af:config";
+  static const afTheme = "af:theme";
+  static const afQuery = "af:query";
+  static const afUI = "af:ui";
+  static const afTest = "af:test";
+  static const none = "none";
+  static const standard = "standard";
 
   AFConfigEntryLogArea(): super(
     name: "logs-enabled", 
-    defaultValue: app, 
+    defaultValue: [query, ui, afRoute, afState], 
     validContexts: AFConfigItem.validContextsAllButNew, 
     ordinal: 200.0, 
     allowMultiple: true
   ) {
     addChoice(textValue: none, help: "Turn off all logging");
-    addChoice(textValue: app, help: "Show log messages from app-specific code for query, route, state and ui");
-    addChoice(textValue: ui, help: "Show log messages on any AFBuildContext");
-    addChoice(textValue: query, help: "Logging on AFStartQueryContext, AFFinishQuerySuccessContext or AFFinishQueryErrorContext");
-    addChoice(textValue: config, help: "Logging on any non-test definition/initialization context, and of afib.g.dart/startup configuration values");
-    addChoice(textValue: test, help: "Logging on test definition contexts and all test execution contexts");
-    addChoice(textValue: route, help: "Logging of any action that modified a route");
-    addChoice(textValue: state, help: "Logging of any action that modifies an app state");
-    addChoice(textValue: theme, help: "Logging of changes related to theming");
+    addChoice(textValue: standard, help: "Logging for app query and ui, plus afib route and state");
+    addChoice(textValue: ui, help: "App logging on any AFBuildContext");
+    addChoice(textValue: query, help: "App logging on AFStartQueryContext, AFFinishQuerySuccessContext or AFFinishQueryErrorContext");
+    addChoice(textValue: test, help: "App logging on test definition contexts and all test execution contexts");
+
+    addChoice(textValue: afConfig, help: "Logging on any non-test definition/initialization context, and of afib.g.dart/startup configuration values");
+    addChoice(textValue: afRoute, help: "Internal AFib logging related to apps and navigation");
+    addChoice(textValue: afState, help: "Internal AFib logging related to app state");
+    addChoice(textValue: afTheme, help: "Internal AFib logging related to theming");
+    addChoice(textValue: afQuery, help: "Internal AFib logging for queries");
+    addChoice(textValue: afTest, help: "Internal AFib logging for testing");
+    addChoice(textValue: afUI, help: "Internal AFib logging for UI build");
   }
 
   List<String> areasFor(AFConfig config) {
@@ -92,7 +98,7 @@ class AFConfigEntryEnabledTests extends AFConfigEntryOptionChoice {
     name: "tests-enabled", 
     defaultValue: allTests, 
     validContexts: AFConfigItem.validContextsAllButNew, 
-    ordinal: 300.0, 
+    ordinal: 400.0, 
     allowMultiple: true
   ) {
     addChoice(textValue: allTests, help: "All tests, not including i18n and regression");
@@ -197,7 +203,7 @@ class AFConfigEntryTestSize extends AFConfigEntryOptionChoice {
     help: "The size used for command line tests, often used in conjunction with test-orientation",
     defaultValue: AFFormFactorSize.idPhoneStandard, 
     validContexts: AFConfigItem.validContextsAll, 
-    ordinal: 350.0, 
+    ordinal: 450.0, 
     allowMultiple: false
   ) {
     for(final size in AFibD.standardSizes.values) {
@@ -265,7 +271,7 @@ class AFConfigEntryTestOrientation extends AFConfigEntryOptionChoice {
     help: "The orientation used in command line tests",
     defaultValue: AFFormFactorSize.idPhoneStandard, 
     validContexts: AFConfigItem.validContextsAll, 
-    ordinal: 370.0, 
+    ordinal: 470.0, 
     allowMultiple: false
   ) {
     addChoice(textValue: AFFormFactorSize.idOrientationPortrait, help: "Portrait, height larger than width");

@@ -3,7 +3,7 @@
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 
-/// Constants used to specify values in [AF.config].
+/// Constants used to specify values in [AF.afConfig].
 /// 
 /// All keys end in ...Key.
 class AFConfigEntries {  
@@ -29,7 +29,7 @@ class AFConfigEntries {
   static final forceDarkMode = AFConfigEntryFlag(
     name: "force-dark-mode", 
     validContexts: AFConfigItem.validContextsAllButNew,
-    ordinal: 400.0,
+    ordinal: 300.0,
     help: "Set to true if you'd like to run the app in dark mode, regardless of the device setting", 
     defaultValue: false);
 

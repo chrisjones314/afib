@@ -38,6 +38,10 @@ class AFRouteParam {
   void dispose() {
 
   }
+
+  String toString() {
+    return runtimeType.toString();
+  }
 }
 
 

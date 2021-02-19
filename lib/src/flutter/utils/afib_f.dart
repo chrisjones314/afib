@@ -40,21 +40,25 @@ class AFWidgetsBindingObserver extends WidgetsBindingObserver {
 
   @override 
   void didChangeMetrics() {
+    AFibD.logThemeAF?.d("Detected metrics change");
     rebuildTheme();
   }
 
   @override
   void didChangeLocales(List<Locale> locale) {
+    AFibD.logThemeAF?.d("Detected local change");
     rebuildTheme();
   }
 
   @override 
   void didChangePlatformBrightness() {
+    AFibD.logThemeAF?.d("Detected dark-mode change");
     rebuildTheme();
   }
 
   @override 
   void didChangeTextScaleFactor() {
+    AFibD.logThemeAF?.d("Detected text-scale change");
     rebuildTheme();
   }
 
@@ -419,6 +423,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   }
 
   AFThemeState initializeThemeState({AFAppStateAreas areas}) {
+    AFibD.logThemeAF?.d("Rebuild fundamental and functional themes");
     if(areas == null) {
       areas = storeInternalOnly.state.public.areas;
     }
@@ -438,6 +443,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 
 
   AFThemeState rebuildFunctionalThemes({AFThemeState initial}) {
+    AFibD.logThemeAF?.d("Rebuild functional themes only");
     final themes = initial ?? storeInternalOnly.state.public.themes;
     final functionals = themeFactories.createFunctionals(themes.fundamentals);
     return themes.copyWith(
@@ -555,7 +561,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   /// you should not call it directly.
   void registerListenerQuery(AFAsyncQueryListener query) {
     final key = query.key;
-    AFibD.logQuery?.d("Registering listener query $key");
+    AFibD.logQueryAF?.d("Registering listener query $key");
     final current = listenerQueries[key];
     if(current != null) {
       current.afShutdown();
@@ -570,7 +576,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   /// you should not call it directly.
   void registerDeferredQuery(AFDeferredQuery query) {
     final key = query.key;
-    AFibD.logQuery?.d("Registering deferred query $key");
+    AFibD.logQueryAF?.d("Registering deferred query $key");
     final current = deferredQueries[key];
     if(current != null) {
       current.afShutdown();

@@ -1,12 +1,14 @@
 // @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
+import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
 import 'package:colorize/colorize.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart' as flutter_test;
+import 'package:logger/logger.dart';
 import 'package:stack_trace/stack_trace.dart';
 
 class AFTestError {
@@ -91,6 +93,10 @@ abstract class AFBaseTestExecute {
 
   void endSection() {
     currentSection = null;
+  }
+
+  Logger get log {
+    return AFibD.log(AFConfigEntryLogArea.test);
   }
 
   AFBaseTestID get testID;

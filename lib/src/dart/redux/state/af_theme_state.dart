@@ -2729,6 +2729,7 @@ class AFThemeState {
     final revisedState = copyWith(
       fundamentals: revised
     );
+    AFibD.logThemeAF?.d("Overriding theme value: $id = $value");
     return AFibF.g.rebuildFunctionalThemes(initial: revisedState);
   }
 

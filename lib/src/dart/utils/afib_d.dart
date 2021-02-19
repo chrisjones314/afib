@@ -12,12 +12,7 @@ class AFibD<AppState> {
     static final AFConfig _afConfig = AFConfig();
     static final configEntries = <AFConfigItem>[];
     static final standardSizes = <String, AFFormFactorSize>{};
-    static Logger logAppQuery;
-    static Logger logAppRender;
-    static Logger logAppTest;
-    static Logger logQuery;
-    static Logger logConfig;
-    static Logger logTest;
+    static final logs = <String, Logger>{};
 
     /// Register an entry in the configuration file.
     static void registerConfigEntry(AFConfigItem entry) {
@@ -61,18 +56,6 @@ class AFibD<AppState> {
       registerConfigEntry(AFConfigEntries.widgetTesterContext);
     }
 
-    /// Logger which is non-null if we should log changes to routing.
-    static Logger logRoute;
-
-    static _createLogger(String area, List<String> areas) {
-      if(areas.contains(area) || areas.contains(AFConfigEntryLogArea.all)) {
-        return Logger(
-            printer: AFLogPrinter(area),
-        );
-      }
-      return null;
-    }
-
     static void initialize<AppState>(AFDartParams p) {
       //Logger.root.level = Level.ALL;
       //Logger.root.onRecord.listen((LogRecord rec) {
@@ -97,29 +80,54 @@ class AFibD<AppState> {
         } else if(env == AFEnvironment.test) {
           p.initTestConfig(AFibD.config);
         }
-
       }
 
-      /*
-      final logAreas = AFibD.config.logAreas;    
-      if(logAreas.contains(AFConfigEntryLogArea.appAll)) {
-        logAreas.add(AFConfigEntryLogArea.appQuery);
-        logAreas.add(AFConfigEntryLogArea.appRender);
-        logAreas.add(AFConfigEntryLogArea.appTest);
+      var logsEnabled = AFibD.config.logsEnabled;
+      for(final area in logsEnabled) {
+        final logger = Logger(printer: AFLogPrinter(area));
+        logs[area] = logger;
       }
-      AFibD.logAppQuery = _createLogger(AFConfigEntryLogArea.appQuery, logAreas);
-      AFibD.logAppRender= _createLogger(AFConfigEntryLogArea.appRender, logAreas);
-      AFibD.logAppTest  = _createLogger(AFConfigEntryLogArea.appTest, logAreas);
-      AFibD.logQuery   = _createLogger(AFConfigEntryLogArea.query, logAreas);
-      AFibD.logConfig  = _createLogger(AFConfigEntryLogArea.config, logAreas);
-      AFibD.logTest    = _createLogger(AFConfigEntryLogArea.test, logAreas);
-      AFibD.logRoute   = _createLogger(AFConfigEntryLogArea.route, logAreas);
-      AFibD.logConfig?.i("Environment: ${AFibD.config.environment}");
-      */
+
+      final configLog = AFibD.logConfigAF;
+      if(configLog != null) {
+        for(final item in AFibD.configEntries) {
+          configLog.d("${item.name} = ${AFibD.config.valueFor(item)}");
+        }
+      }
 
   }
 
+  static Logger log(String area) {
+    return logs[area]; 
+  }
 
+  static Logger get logQueryAF {
+    return log(AFConfigEntryLogArea.afQuery);
+  }
+
+  static Logger get logRouteAF {
+    return log(AFConfigEntryLogArea.afRoute);
+  }
+
+  static Logger get logStateAF {
+    return log(AFConfigEntryLogArea.afState);
+  }
+
+  static Logger get logUIAF {
+    return log(AFConfigEntryLogArea.afUI);
+  }
+
+  static Logger get logConfigAF {
+    return log(AFConfigEntryLogArea.afConfig);
+  }
+
+  static Logger get logTestAF {
+    return log(AFConfigEntryLogArea.afTest);
+  }
+
+  static Logger get logThemeAF {
+    return log(AFConfigEntryLogArea.afTheme);
+  }
 
   /// Contains configuration data for the app, specific to test, production, etc.
   static AFConfig get config {

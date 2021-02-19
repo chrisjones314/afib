@@ -6,6 +6,7 @@ import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
@@ -84,6 +85,7 @@ class AFStateTestContext<TState extends AFAppStateArea> extends AFStateTestExecu
   AFRouteState get route { return store.state.public.route; }
 
   void processQuery(AFAsyncQuery q) {
+    AFibD.logQueryAF?.d("Processing ${q.runtimeType} for test $testID");
     test.processQuery(this, q);
   }
 }

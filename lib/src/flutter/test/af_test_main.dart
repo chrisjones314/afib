@@ -76,19 +76,19 @@ Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendAppDelegate exten
   final output = AFCommandOutput();
   final stats = AFTestStats();
 
-  AFibD.logTest?.d("entering afUnitTestMain");
+  AFibD.logTestAF?.d("entering afUnitTestMain");
   afUnitTestMain<TState>(output, stats, paramsD);
-  AFibD.logTest?.d("exiting afUnitTestMain");
+  AFibD.logTestAF?.d("exiting afUnitTestMain");
 
   // then state tests
-  AFibD.logTest?.d("entering afStateTestMain");
+  AFibD.logTestAF?.d("entering afStateTestMain");
   afStateTestMain<TState>(output, stats, paramsD);
-  AFibD.logTest?.d("exiting afStateTestMain");
+  AFibD.logTestAF?.d("exiting afStateTestMain");
 
   /// then screen tests
-  AFibD.logTest?.d("entering afScreenTestMain");
+  AFibD.logTestAF?.d("entering afScreenTestMain");
   await afScreenTestMain<TState>(output, stats, paramsD, widgetTester);
-  AFibD.logTest?.d("exiting afScreenTestMain");
+  AFibD.logTestAF?.d("exiting afScreenTestMain");
 
   if(stats.hasErrors) {
     expect("${stats.totalErrors} errors (see details above)", AFibTestsFailedMatcher());

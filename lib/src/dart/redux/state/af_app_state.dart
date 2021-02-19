@@ -1,5 +1,6 @@
 // @dart=2.9
 import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:meta/meta.dart';
 
 /// All models in the [AFAppStateArea] must be derived from
@@ -112,6 +113,16 @@ class AFAppStateAreas {
     final initialState = states[key];
     final revisedState = initialState.reviseModels(models);
     revisedStates[key] = revisedState;
+
+    final log = AFibD.logStateAF;
+    if(log != null) {
+      log.d("In area $areaType revised");
+      for(final model in models ) {
+        log.d("  ${model.runtimeType}: ${model.toString()}");
+      }
+    }
+
+
     return AFAppStateAreas(states: revisedStates);    
   }
 

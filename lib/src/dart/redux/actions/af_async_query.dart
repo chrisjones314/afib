@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:afib/afib_flutter.dart';
+import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
@@ -24,9 +25,8 @@ class AFStartQueryContext<TResponse> {
   AFStartQueryContext({this.onSuccess, this.onError});
 
   Logger get log {
-    return AFibD.logAppQuery;
+    return AFibD.log(AFConfigEntryLogArea.query);
   }
-
 }
 
 class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatcherMixin, AFContextShowMixin {
@@ -52,7 +52,7 @@ class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatch
   }
 
   Logger get log {
-    return AFibD.logAppQuery;
+    return AFibD.log(AFConfigEntryLogArea.query);
   }
 
   /// Dispatches an action that updates the route parameter for the specified screen.
@@ -140,7 +140,7 @@ abstract class AFAsyncQuery<TState extends AFAppStateArea, TResponse> extends AF
         }
       })
     ;
-    AFibD.logQuery?.d("Starting query: $this");
+    AFibD.logQueryAF?.d("Starting query: $this");
     startAsync(startContext);
   }
 
@@ -388,7 +388,7 @@ abstract class AFAsyncQueryListener<TState extends AFAppStateArea, TResponse> ex
   AFAsyncQueryListener({AFID id, List<dynamic> successActions, AFOnResponseDelegate<TState, TResponse> onSuccessDelegate, AFOnErrorDelegate<TState> onErrorDelegate}): super(id: id, successActions: successActions, onSuccessDelegate: onSuccessDelegate);
 
   void afShutdown() {
-    AFibD.logQuery?.d("Shutting down listener query $this");
+    AFibD.logQueryAF?.d("Shutting down listener query $this");
     shutdown();
   }
 

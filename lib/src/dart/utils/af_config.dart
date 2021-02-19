@@ -1,6 +1,7 @@
 // @dart=2.9
 import 'dart:core';
 import 'package:afib/src/dart/command/af_command_enums.dart';
+import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
@@ -40,6 +41,10 @@ class AFConfig {
   /// Returns a text-version of the current AFConfigConstants.environmentKey value.
   AFEnvironment get environment  {
     return valueFor(AFConfigEntries.environment);
+  }
+
+  bool get isProduction {
+    return environment == AFEnvironment.production;
   }
 
   /// 
@@ -101,33 +106,24 @@ class AFConfig {
   }
 
   /// True if AFib should display internal log statements.
-  List<String> get logAreas {
-    return AFConfigEntries.logsEnabled.areasFor(this);
+  List<String> get logsEnabled {
+    final result = List<String>.from(AFConfigEntries.logsEnabled.areasFor(this));
+    if(result.contains(AFConfigEntryLogArea.standard)) {
+      _addIfMissing(result, AFConfigEntryLogArea.afRoute);
+      _addIfMissing(result, AFConfigEntryLogArea.afState);
+      _addIfMissing(result, AFConfigEntryLogArea.query);
+      _addIfMissing(result, AFConfigEntryLogArea.ui);
+    }
+    return result;
   }
 
   Iterable<AFConfigItem> get all {
     return values.keys;
   }
 
-  /*
-  void dumpAll(List<AFConfigEntry> entries, AFCommandOutput output) {
-    output.writeLine("Configuration values from initialization/afib.g.dart");
-    for(final entry in entries) {
-      dumpEntry(entry, output);
+  void _addIfMissing(List<String> items, String item) {
+    if(!items.contains(item)) {
+      items.add(item);
     }
   }
-
-  void dumpOne(String key, AFCommandOutput output) {
-    final entry = find(key);
-    if(entry == null) {
-      output.writeErrorLine("No configuration value for $key");
-      return;
-    }
-    dumpEntry(entry, output);
-  }
-
-  void dumpEntry(AFConfigEntry entry, AFCommandOutput output) {
-  } 
-  */
-
 }

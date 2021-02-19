@@ -453,12 +453,14 @@ class AFRouteState {
   /// Removes the current leaf from the route, and adds the specified screen
   /// and data in its place.
   AFRouteState popAndPushNamed(AFScreenID screen, AFRouteParam param) {
+    AFibD.logRouteAF?.d("popAndPushNamed: $screen / $param");
     final revisedScreen = screenHierarchy.popAndPushNamed(screen, param);
     return _reviseScreen(revisedScreen);
   }
 
   /// Adds a new screen/data below the current screen in the route.
   AFRouteState pushNamed(AFScreenID screen, AFRouteParam param) {
+    AFibD.logRouteAF?.d("pushNamed: $screen / $param");
     return _reviseScreen(screenHierarchy.pushNamed(screen, param));
   }
 
@@ -470,12 +472,14 @@ class AFRouteState {
   /// Remove the leaf element from the route, returning back to the parent
   /// screen.
   AFRouteState pop(dynamic childReturn) {
+    AFibD.logRouteAF?.d("pop returned $childReturn");
     return popN(1, childReturn);
   }
 
   /// Remove the leaf element from the route, returning back to the parent
   /// screen.
   AFRouteState popTo(AFScreenID screen, AFScreenID push, AFRouteParam pushParam, dynamic childReturn) {
+    AFibD.logRouteAF?.d("popTo: $screen and push($push, $pushParam) with return $childReturn");
     final popCount = popCountToScreen(screen);
     var revised = popN(popCount, childReturn);
     if(push != null) {
@@ -487,11 +491,13 @@ class AFRouteState {
   /// Remove the leaf element from the route, returning back to the parent
   /// screen.
   AFRouteState popN(int popCount, dynamic childReturn) {
+    AFibD.logRouteAF?.d("popN($popCount) with return $childReturn");
     return _reviseScreen(screenHierarchy.popN(popCount, childReturn));
   }
 
   /// Pops the route until we get to the first afib test screen.
   AFRouteState exitTest() {
+    AFibD.logRouteAF?.d("exitTest");
     return _reviseScreen(screenHierarchy.exitTest());
   }
 
@@ -502,6 +508,7 @@ class AFRouteState {
       if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
         screen = AFUIScreenID.screenStartupWrapper;
       }
+      AFibD.logRouteAF?.d("updateHierarchyParam: $screen, $param");
       return _reviseScreen(screenHierarchy.updateRouteParam(screen, param));
     } else {
       return setGlobalPoolParam(screen, param);
@@ -509,6 +516,8 @@ class AFRouteState {
   }
 
   AFRouteState resetToInitialRoute() {
+    AFibD.logRouteAF?.d("resetToInitialRoute");
+
     final popCount = screenHierarchy.popCountToRoot;
     final revisedRootSegs = this.screenHierarchy.popN(popCount, null);
     final screenMap = AFibF.g.screenMap;
@@ -525,20 +534,24 @@ class AFRouteState {
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
   AFRouteState addConnectedChild(AFScreenID screen, AFWidgetID widget, AFRouteParam param) {
+    AFibD.logRouteAF?.d("addConnectedChild $screen/$widget with $param");
     return _reviseParamWithChildren(screen, widget, param, (pwc) => pwc.reviseAddChild(widget, param));
   }
 
   /// Removes the route parameter for the specified child widget from the screen.
   AFRouteState removeConnectedChild(AFScreenID screen, AFWidgetID widget) {
+    AFibD.logRouteAF?.d("addConnectedChild $screen/$widget");
     return _reviseParamWithChildren(screen, widget, null, (pwc) => pwc.reviseRemoveChild(widget));
   }
 
   AFRouteState setConnectedChildParam(AFScreenID screen, AFID widget, AFRouteParam param) {
+    AFibD.logRouteAF?.d("setConnectedChild $screen/$widget with $param");
     return _reviseParamWithChildren(screen, widget, param, (pwc) => pwc.reviseChild(widget, param));
   }
 
   
   AFRouteState sortConnectedChildren(AFScreenID screen, AFTypedSortDelegate sort, Type typeToSort) {
+    AFibD.logRouteAF?.d("addConnectedChild $screen/$sort");
     return _reviseParamWithChildren(screen, null, null, (pwc) => pwc.reviseSortChildren(typeToSort, sort));
   }
 
@@ -578,6 +591,7 @@ class AFRouteState {
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
   AFRouteState setGlobalPoolParam(AFScreenID screen, AFRouteParam param) {
+    AFibD.logRouteAF?.d("updateGlobalPoolParam: $screen, $param");
     final revised = Map<AFScreenID, AFRouteSegment>.from(globalPool);
     final current = revised[screen];
     var revisedSeg;
@@ -587,7 +601,7 @@ class AFRouteState {
       revisedSeg = AFRouteSegment(param: param, screen: screen);
     }
     revised[screen] = revisedSeg;
-    AFibD.logRoute?.d("Set global param for $screen to $param");
+    AFibD.logRouteAF?.d("Set global param for $screen to $param");
     return copyWith(globalPool: revised);
   }
 
@@ -613,7 +627,7 @@ class AFRouteState {
     );
 
     if(screenSegs != null) {
-      AFibD.logRoute?.d("Revised Nav Hierarchy: $revised");
+      AFibD.logRouteAF?.d("Revised Route $revised");
     }
     return revised;
   }

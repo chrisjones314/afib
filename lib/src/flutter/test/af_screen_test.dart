@@ -2,9 +2,11 @@
 import 'dart:async';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
+import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:colorize/colorize.dart';
+import 'package:logger/logger.dart';
 import 'package:quiver/core.dart';
 import 'package:meta/meta.dart';
 
@@ -1028,7 +1030,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   }
 
   Future<void> yieldToRenderLoop() async {
-    AFibD.logTest?.d("Starting yield to event loop");
+    AFibD.logUIAF?.d("Starting yield to event loop");
     await Future<void>.delayed(Duration(milliseconds: 100), () {});
   }
 
@@ -1076,7 +1078,6 @@ class AFScreenTestContextWidgetTester extends AFScreenTestContext {
   }
 
   Future<void> yieldToRenderLoop() async {
-    AFibD.logTest?.d("yielding to pump");
     await tester.pumpAndSettle(Duration(seconds: 2));
   }
 
@@ -1649,6 +1650,10 @@ abstract class AFWorkflowTestExecute {
     return withState(public.areaStateFor(TState), public.route);
   }
 
+  Logger get log {
+    return AFibD.log(AFConfigEntryLogArea.test);
+  }
+
   void expect(dynamic value, ft.Matcher matcher, {int extraFrames = 0});
 
   Future<void> runScreenTest(AFScreenTestID screenTestId, AFWorkflowTestDefinitionContext definitions, {AFScreenID terminalScreen, dynamic param1, dynamic param2, dynamic param3, AFBaseTestID queryResults});
@@ -1815,7 +1820,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     }
     _installQueryResults(queryResults);
     await screenContext.underScreen(startScreen, () async {
-      AFibD.logTest?.d("Starting underScreen");
+      AFibD.logTestAF?.d("Starting underScreen");
 
       final fut = body(screenContext);
       await fut;
@@ -1825,7 +1830,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     if(printResults) {
       screenContext.printFinishTest(startScreen);
     }
-    AFibD.logTest?.d("Finished underscreen");
+    AFibD.logTestAF?.d("Finished underscreen");
 
     await screenContext.pauseForRender();
     if(verifyScreen) {
@@ -1980,6 +1985,10 @@ class AFBaseTestDefinitionContext {
   /// test data id.
   dynamic testData(dynamic testDataId) {
     return registry.f(testDataId);
+  }
+
+  Logger get log {
+    return AFibD.log(AFConfigEntryLogArea.test);
   }
 
 }

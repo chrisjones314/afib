@@ -1,4 +1,5 @@
 // @dart=2.9
+import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/utils/af_context_dispatcher_mixin.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
@@ -53,9 +54,10 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
           var screenIdRegister = this.primaryScreenId;          
           if(screenIdRegister != null) {            
             AFibF.g.registerScreen(screenIdRegister, buildContext, this);
-            AFibD.logTest?.d("Rebuilding screen $runtimeType/$screenIdRegister with param ${dataContext.p}");
+            AFibD.logUIAF?.d("Rebuilding screen $screenIdRegister");
+          } else {
+            AFibD.logUIAF?.d("Rebuilding widget $runtimeType");
           }
-
 
           _updateFundamentalThemeState(buildContext);
           final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p, dataContext.paramWithChildren, dataContext.theme, this);
@@ -849,7 +851,7 @@ class AFBuildContext<TState extends AFAppStateArea, TStateView extends AFStateVi
   /// The logger can be null, so you should
   /// use something like context.log?.d("my message");
   Logger get log { 
-    return AFibD.logAppRender;
+    return AFibD.log(AFConfigEntryLogArea.ui);
   }
 
   bool operator==(dynamic o) {

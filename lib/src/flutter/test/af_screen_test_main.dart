@@ -91,7 +91,7 @@ Future<void> _afStandardScreenTestMain<TState extends AFAppStateArea>(
       for(final action in startActions) {
         AFibF.g.storeInternalOnly.dispatch(action);
       }
-      AFibD.logTest?.d("Starting ${prototype.id}");
+      AFibD.logTestAF?.d("Starting ${prototype.id}");
   
       final storeDispatcher = AFStoreDispatcher(AFibF.g.storeInternalOnly);
       final dispatcher = AFSingleScreenTestDispatcher(prototype.id, storeDispatcher, null);
@@ -105,9 +105,9 @@ Future<void> _afStandardScreenTestMain<TState extends AFAppStateArea>(
       await tester.pumpAndSettle(Duration(seconds: 1));
 
       output.indent();
-      AFibD.logTest?.d("Finished pumpWidget for ${prototype.id}");
+      AFibD.logTestAF?.d("Finished pumpWidget for ${prototype.id}");
       await prototype.run(context);
-      AFibD.logTest?.d("Finished ${prototype.id}");
+      AFibD.logTestAF?.d("Finished ${prototype.id}");
       output.outdent();
       // pop this test screen off so that we are ready for the next one.
       AFibF.g.storeInternalOnly.dispatch(AFNavigateExitTestAction());
@@ -162,7 +162,7 @@ Future<void> _afWorkflowTestMain<TState extends AFAppStateArea>(AFCommandOutput 
 
       printPrototypeStart(output, test.id);
       output.indent();
-      AFibD.logTest?.d("Starting test ${test.id}");
+      AFibD.logTestAF?.d("Starting test ${test.id}");
       final dispatcher = AFStoreDispatcher(AFibF.g.storeInternalOnly);
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id, output, localStats);
       multiContexts.add(context);
@@ -172,9 +172,9 @@ Future<void> _afWorkflowTestMain<TState extends AFAppStateArea>(AFCommandOutput 
       // tell the store to go to the correct screen.
       await tester.pumpAndSettle(Duration(seconds: 1));
 
-      AFibD.logTest?.d("Finished pumpWidget for ${test.id}");
+      AFibD.logTestAF?.d("Finished pumpWidget for ${test.id}");
       await test.body.run(context);
-      AFibD.logTest?.d("Finished ${test.id}");
+      AFibD.logTestAF?.d("Finished ${test.id}");
 
       // pop this test screen off so that we are ready for the next one.
       AFibF.g.storeInternalOnly.dispatch(AFNavigateExitTestAction());

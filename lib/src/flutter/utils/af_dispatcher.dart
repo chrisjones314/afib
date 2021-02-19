@@ -40,7 +40,7 @@ class AFStoreDispatcher extends AFDispatcher {
   dynamic dispatch(dynamic action) {  
     if(AFibD.config.requiresTestData && !isTestAction(action) && action is AFActionWithKey) {
       AFibF.g.testOnlyRegisterRegisterAction(action);
-      AFibD.logTest?.d("Registered action: $action");
+      AFibD.logTestAF?.d("Registered action: $action");
     }
 
     return store.dispatch(action);

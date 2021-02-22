@@ -1,7 +1,6 @@
 // @dart=2.9
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
-import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
@@ -10,16 +9,16 @@ import 'package:logger/logger.dart';
 
 class AFibD<AppState> {
     static final AFConfig _afConfig = AFConfig();
-    static final configEntries = <AFConfigItem>[];
+    static final configEntries = <AFConfigurationItem>[];
     static final standardSizes = <String, AFFormFactorSize>{};
     static final logs = <String, Logger>{};
 
     /// Register an entry in the configuration file.
-    static void registerConfigEntry(AFConfigItem entry) {
+    static void registerConfigEntry(AFConfigurationItem entry) {
       configEntries.add(entry);
     }
 
-    static AFConfigItem findConfigEntry(String name) {
+    static AFConfigurationItem findConfigEntry(String name) {
       final result = configEntries.firstWhere((e) => e.name == name, orElse: () => null);
       return result;
     }
@@ -65,6 +64,7 @@ class AFibD<AppState> {
       // the params are null when we run the bin/afib.dart command, which doesn't have any configuration information.
       if(p != null) {
         // first do the separate initialization that just says what environment it is, since this
+        config.establishDefaults();
         p.initAfib(AFibD.config);
         if(p.forceEnv != null) {
           AFibD.config.setValue(AFConfigEntryEnvironment.optionName, p.forceEnv);

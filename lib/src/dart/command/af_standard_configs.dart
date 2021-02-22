@@ -1,19 +1,19 @@
 
 import 'package:afib/afib_command.dart';
-import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
-class AFConfigEntryEnvironment extends AFConfigEntryOptionChoice {
+class AFConfigEntryEnvironment extends AFConfigurationItemOptionChoice {
   static const optionName = "environment";
   static const allEnvironments = AFEnvironment.values;
   
   AFConfigEntryEnvironment(): super(
+    libraryId: AFUILibraryID.id,
     name: optionName, 
     defaultValue: AFEnvironment.production, 
-    validContexts: AFConfigItem.validContextsAllButNew, 
+    validContexts: AFConfigurationItem.validContextsAllButNew, 
     ordinal: 100.0,
   ) {
     addChoice(textValue: "debug", help: "For debugging", runtimeValue: AFEnvironment.debug);
@@ -43,7 +43,7 @@ class AFConfigEntryEnvironment extends AFConfigEntryOptionChoice {
 }
 
 
-class AFConfigEntryLogArea extends AFConfigEntryOptionChoice {
+class AFConfigEntryLogArea extends AFConfigurationItemOptionChoice {
   static const query = "query";
   static const ui = "ui";
   static const test = "test";
@@ -58,9 +58,10 @@ class AFConfigEntryLogArea extends AFConfigEntryOptionChoice {
   static const standard = "standard";
 
   AFConfigEntryLogArea(): super(
+    libraryId: AFUILibraryID.id,
     name: "logs-enabled", 
     defaultValue: [query, ui, afRoute, afState], 
-    validContexts: AFConfigItem.validContextsAllButNew, 
+    validContexts: AFConfigurationItem.validContextsAllButNew, 
     ordinal: 200.0, 
     allowMultiple: true
   ) {
@@ -84,7 +85,7 @@ class AFConfigEntryLogArea extends AFConfigEntryOptionChoice {
   }
 }
 
-class AFConfigEntryEnabledTests extends AFConfigEntryOptionChoice {
+class AFConfigEntryEnabledTests extends AFConfigurationItemOptionChoice {
   static const allTests = "all";
   static const stateTests = "state";
   static const unitTests = "unit";
@@ -95,9 +96,10 @@ class AFConfigEntryEnabledTests extends AFConfigEntryOptionChoice {
   static const allAreas = [allTests, unitTests, stateTests, widgetTests, screenTests, workflowTests, i18n];
 
   AFConfigEntryEnabledTests(): super(
+    libraryId: AFUILibraryID.id,
     name: "tests-enabled", 
     defaultValue: allTests, 
-    validContexts: AFConfigItem.validContextsAllButNew, 
+    validContexts: AFConfigurationItem.validContextsAllButNew, 
     ordinal: 400.0, 
     allowMultiple: true
   ) {
@@ -196,13 +198,14 @@ class AFConfigEntryEnabledTests extends AFConfigEntryOptionChoice {
 }
 
 
-class AFConfigEntryTestSize extends AFConfigEntryOptionChoice {
+class AFConfigEntryTestSize extends AFConfigurationItemOptionChoice {
 
   AFConfigEntryTestSize(): super(
+    libraryId: AFUILibraryID.id,
     name: "test-size", 
     help: "The size used for command line tests, often used in conjunction with test-orientation",
     defaultValue: AFFormFactorSize.idPhoneStandard, 
-    validContexts: AFConfigItem.validContextsAll, 
+    validContexts: AFConfigurationItem.validContextsAll, 
     ordinal: 450.0, 
     allowMultiple: false
   ) {
@@ -264,13 +267,14 @@ class AFConfigEntryTestSize extends AFConfigEntryOptionChoice {
 
 }
 
-class AFConfigEntryTestOrientation extends AFConfigEntryOptionChoice {
+class AFConfigEntryTestOrientation extends AFConfigurationItemOptionChoice {
 
   AFConfigEntryTestOrientation(): super(
+    libraryId: AFUILibraryID.id,
     name: "test-orientation", 
     help: "The orientation used in command line tests",
     defaultValue: AFFormFactorSize.idPhoneStandard, 
-    validContexts: AFConfigItem.validContextsAll, 
+    validContexts: AFConfigurationItem.validContextsAll, 
     ordinal: 470.0, 
     allowMultiple: false
   ) {

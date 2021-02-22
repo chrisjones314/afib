@@ -1,7 +1,9 @@
 
 
-import 'package:afib/src/dart/command/commands/af_config_command.dart';
+//import 'package:afib/id.dart';
+import 'package:afib/id.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
+import 'package:afib/src/dart/utils/af_config.dart';
 
 /// Constants used to specify values in [AF.afConfig].
 /// 
@@ -26,9 +28,10 @@ class AFConfigEntries {
 
   /// Used to start the app in dark mode, rather than having to configure the device/emulator for 
   /// dark mode.
-  static final forceDarkMode = AFConfigEntryFlag(
+  static final forceDarkMode = AFConfigurationitemTrueFalse(
+    libraryId: AFUILibraryID.id,
     name: "force-dark-mode", 
-    validContexts: AFConfigItem.validContextsAllButNew,
+    validContexts: AFConfigurationItem.validContextsAllButNew,
     ordinal: 300.0,
     help: "Set to true if you'd like to run the app in dark mode, regardless of the device setting", 
     defaultValue: false);
@@ -41,9 +44,10 @@ class AFConfigEntries {
   /// by way of the utility [AFConfig.isWidgetTesterContext] to return static widgets
   /// instead of an infinite animation in the widget tester context.
   static final widgetTesterContextKey = "widgetTesterContext";
-  static final widgetTesterContext = AFConfigEntryFlag(
+  static final widgetTesterContext = AFConfigurationitemTrueFalse(
+    libraryId: AFUILibraryID.id,
     name: widgetTesterContextKey, 
-    validContexts: AFConfigItem.validContextInternalOnly,
+    validContexts: AFConfigurationItem.validContextInternalOnly,
     ordinal: 10000,
     help: "Internal value set to true when we are doing widget tests", 
     defaultValue: false
@@ -54,14 +58,15 @@ class AFConfigEntries {
   /// 
   /// For example, if the AppNamespace is ab, then the widget ID container class will be 
   /// named ABWidgetID, and a custom command called fixupdb will be ab:fixupdb.
-  static final appNamespace = AFConfigEntryOption(
+  static final appNamespace = AFConfigurationItemOption(
+    libraryId: AFUILibraryID.id,
     name: "app-namespace", 
     help: "A short identifier which is unique to your app, many files and classes are prefixed with these characters, so changing it later is not advised", 
-    validContexts: AFConfigItem.validContextsNewProjectAndConfig,
+    validContexts: AFConfigurationItem.validContextsNewProjectAndConfig,
     ordinal: 700.0,
     minChars: 2, 
     maxChars: 4,
-    options: AFConfigEntryOption.optionLowercase | AFConfigEntryOption.optionIdentifier
+    options: AFConfigurationItemOption.optionLowercase | AFConfigurationItemOption.optionIdentifier
   );
 
   /// Specify a list of test categories, ids or tags.  This is used automatically in

@@ -9,7 +9,7 @@ import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/generators/af_config_generator.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
-
+import 'package:args/args.dart' as args;
 
 class AFInsertionPoint {
   final String id;
@@ -221,10 +221,14 @@ class AFGenerateCommand extends AFCommand {
     return generators[AFConfigGenerator.cmdKey];
   }
 
+  void registerArguments(args.ArgParser args) {
+
+  }
+
   @override
-  void execute(AFCommandContext ctx) {
+  void execute(AFCommandContext ctx, args.ArgResults args) {
     final files = ctx.files;
-    final genKey = ctx.unnamedArguments(this).first;
+    final genKey = ctx.unnamedArguments(args).first;
     final generator = generators[genKey];
     if(generator == null) {
       ctx.output.writeErrorLine("Unknown generator $genKey, stopping.");

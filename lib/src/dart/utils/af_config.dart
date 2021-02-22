@@ -1,11 +1,338 @@
 // @dart=2.9
+import 'dart:convert';
 import 'dart:core';
+
+//import 'package:afib/id.dart';
+//import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:afib/id.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:meta/meta.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
-import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:args/args.dart' as args;
+
+/// Superclass for all configuration definitions.
+abstract class AFConfigurationItem {
+  static const validContextInternalOnly = 0;
+  static const validContextConfigCommand = 1;
+  static const validContextNewProjectCommand = 2;
+  static const validContextAFibGFile = 4;
+  static const validContextsNewProjectAndConfig = validContextNewProjectCommand | validContextAFibGFile;
+  static const validContextsAllButNew = validContextConfigCommand | validContextAFibGFile;
+  static const validContextsAll = validContextConfigCommand | validContextNewProjectCommand | validContextAFibGFile;
+
+  final AFLibraryID libraryId;
+  final String name;
+  final String help;
+  final dynamic defaultValue;
+  final int validContexts;
+  final double ordinal;
+    
+  AFConfigurationItem({ 
+    @required this.libraryId,
+    @required this.name, 
+    @required this.defaultValue,  
+    @required this.validContexts, 
+    @required this.help, 
+    @required this.ordinal 
+  }) {
+    if(libraryId != AFUILibraryID.id) {
+      final prefix = "${libraryId.codeId}_";
+      if(!name.startsWith(prefix)) {
+        throw AFException("Please start the custom configuration item named $name in $libraryId with the prefix $prefix");
+      }
+    }
+  }
+
+  String get codeIdentifier {
+    return name;
+  }
+
+  String get argumentString {
+    return name;
+  }
+
+  String get argumentHelp {
+    return "";
+  }
+
+  bool allowedIn(int validContext) {
+    return (validContext & validContexts) != 0;
+  }
+
+  static void sortByOrdinal(List<AFConfigurationItem> items) {
+    items.sort((l, r) {
+      return l.ordinal.compareTo(r.ordinal);
+    });
+  }
+
+  String comment() {
+      final argParser = args.ArgParser();
+      addArguments(argParser);
+      final usage = argParser.usage;
+      final ls = LineSplitter();
+      final lines = ls.convert(usage);
+      final result = StringBuffer();
+      for(var i = 0; i < lines.length; i++) {
+        final line = lines[i];
+        if(i > 0) {
+          result.writeln();
+          result.write("  ");
+        }
+        result.write("// $line");
+      }
+      return result.toString();
+  }
+
+  String codeValue(AFConfig config) {
+    dynamic val = config.valueFor(this);
+    if(val == null) {
+      return null;
+    }
+    if(val is String) {
+      return "\"$val\"";
+    }
+    if(val is List) {
+      final result = StringBuffer("[");
+      for(var i = 0; i < val.length; i++) {
+        final item = val[i];
+        if(i > 0) {
+          result.write(', ');
+        } 
+        result.write('"$item"');
+      }
+      result.write("]");
+      return result.toString();
+    }
+    return val.toString();
+  }
+
+  void addArguments(args.ArgParser argParser);
+  
+  /// Return an error message if the value is invalid, otherwise return null.
+  String validate(dynamic value);
+
+  void setValueWithString(AFConfig dest, String value) {
+    validateWithException(value);
+    dest.putInternal(this, value);
+  }
+
+  void setValue(AFConfig dest, dynamic value) {
+    if(value is String) {
+      setValueWithString(dest, value);
+    } else {
+      dest.putInternal(this, value);
+    }
+  }
+  
+  void validateWithException(String value) {
+    final val = validate(value);
+    if(val != null) {
+      throw AFException("Invalid value $value for $name");
+    }
+  }
+}
+
+/// Used to define choices for a configuration value.
+class AFConfigEntryDescription {
+  final String textValue;
+  final dynamic runtimeValue;
+  final String help;
+  AFConfigEntryDescription({
+    @required this.help,
+    @required this.textValue,
+    @required this.runtimeValue,
+  });
+
+}
+
+
+/// Superclass for configuration definitions that offer a list of string values,
+/// for example 'debug', 'production', 'test'
+class AFConfigurationItemOptionChoice extends AFConfigurationItem {
+  static const wildcardValue = "*";
+  final choices = <AFConfigEntryDescription>[];
+  final bool allowMultiple;
+  
+  AFConfigurationItemOptionChoice({ 
+    @required AFLibraryID libraryId,
+    @required String name, 
+    @required dynamic defaultValue, 
+    @required int validContexts, 
+    @required double ordinal, 
+    String help, 
+    this.allowMultiple = false }): super(
+      libraryId: libraryId,
+      name: name, 
+      defaultValue: defaultValue, 
+      validContexts: validContexts, 
+      ordinal: ordinal, 
+      help: help
+    );
+
+  void addChoice({@required String textValue, String help, dynamic runtimeValue }) {
+    if(runtimeValue == null) {
+      runtimeValue = name;
+    }
+    choices.add(AFConfigEntryDescription(
+      textValue: textValue,
+      runtimeValue: runtimeValue,
+      help: help
+    ));
+  }  
+
+  void addWildcard(String help) {
+    choices.add(AFConfigEntryDescription(
+      textValue: wildcardValue,
+      runtimeValue: wildcardValue,
+      help: help,
+    ));
+  }
+
+  void addArguments(args.ArgParser argParser) {
+    var allowed;
+    var allowedHelp;
+  
+    if(findChoice(wildcardValue) == null) {
+       allowed = choices.map((e) => e.textValue);
+    }
+    if(choices.first.help != null) {
+      allowedHelp = <String, String>{};
+
+      for(final choice in choices) {
+        allowedHelp[choice.textValue] = choice.help;
+      }
+    }
+
+    if(allowMultiple) {
+      argParser.addMultiOption(name,
+        help: help,
+        allowed: allowed,
+        allowedHelp: allowedHelp);
+    } else {
+      argParser.addOption(name, 
+        help: help,
+        allowed: allowed,
+        allowedHelp: allowedHelp,
+      );
+    }
+    
+    
+  }
+
+  String validate(dynamic listValue) {
+    if(listValue is! List) {
+      if(listValue is! String) {
+        return "Expected value for $name to be a list";
+      }
+      listValue = listValue.split("[ ,]");
+    }
+
+    if(findChoice(wildcardValue) == null) {
+      for(final textValue in listValue) {
+        final choice = findChoice(textValue);
+        if(choice == null) {
+          return "$textValue is not a valid choice for $name";
+        }
+      }
+    }
+    return null;
+  }
+
+  AFConfigEntryDescription findChoice(String val) {
+    return choices.firstWhere((e) => e.textValue == val, orElse: () => null);
+  }
+}
+
+
+
+class AFConfigurationitemTrueFalse extends AFConfigurationItemOptionChoice {
+
+  AFConfigurationitemTrueFalse({ 
+    @required AFLibraryID libraryId,
+    @required String name, 
+    @required int validContexts, 
+    @required double ordinal, 
+    @required bool defaultValue, 
+    @required String help 
+  }): super(
+    libraryId: libraryId,
+    name: name, 
+    defaultValue: defaultValue, 
+    validContexts: validContexts, 
+    ordinal: ordinal, help: help
+  ) {
+    addChoice(textValue: "true", runtimeValue: true);
+    addChoice(textValue: "false", runtimeValue: false);
+  }
+
+  void setValue(AFConfig dest, dynamic value) {
+    if(value is String) {
+      dest.putInternal(this, value == "true");
+    } else {
+      dest.putInternal(this, value);
+    }
+  }
+   
+}
+
+class AFConfigurationItemOption extends AFConfigurationItem {
+  static const optionLowercase = 1;
+  static const optionIdentifier = 2;
+  static const optionMixedCase = 4;
+
+  final int maxChars;
+  final int minChars;
+  final String help;
+  final int options;
+
+  AFConfigurationItemOption({
+    @required AFLibraryID libraryId,
+    @required String name, 
+    this.help, 
+    @required int validContexts, 
+    @required double ordinal, 
+    String defaultValue = "",
+    this.minChars = -1, 
+    this.maxChars = -1, 
+    this.options = 0 
+  }): super(
+    libraryId: libraryId,
+    name: name, 
+    help: help,
+    validContexts: validContexts, 
+    ordinal: ordinal,
+    defaultValue: defaultValue,
+  );
+
+  void addArguments(args.ArgParser argParser) {
+    argParser.addOption(name, help: help);
+  }
+
+  
+  @override
+  String validate(dynamic value) {
+    if(minChars > 0 && value.length < minChars ) {
+      return "$value must be at least $minChars characters long.";
+    }
+    if(maxChars > 0 && value.length > maxChars) {
+      return "$value must be at most $maxChars characters long.";
+    }
+    if(hasOption(optionLowercase)) {
+      if(value.toLowerCase() != value) {
+        return "$value must be all lowercase";
+      }
+    }
+    return null;
+  }  
+
+  bool hasOption(int opt) {
+    return (options & opt) != 0;
+  }
+}
 
 
 /// A config is used to agreggate, universal and environment specific configuration settings
@@ -17,13 +344,22 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 /// All get methods return null if the key does not have a value. 
 class AFConfig {
 
-  final Map<AFConfigItem, dynamic> values = <AFConfigItem, dynamic>{};
+  final Map<AFConfigurationItem, dynamic> values = <AFConfigurationItem, dynamic>{};
 
+  void establishDefaults() {
+    // establish the defaults.
+    final all = AFibD.configEntries;
+    for(final item in all) {
+      if(!values.containsKey(item)) {
+        putInternal(item, item.defaultValue);
+      }
+    }
 
+  }  
 
   /// This should only be used for validated values of the correct type, you should
   /// use [setValue] in most cases.
-  void putInternal(AFConfigItem entry, dynamic value) {
+  void putInternal(AFConfigurationItem entry, dynamic value) {
     values[entry] = value;
   }
 
@@ -57,11 +393,11 @@ class AFConfig {
   }
 
   /// Casts the value for [entry] to a string and returns it.
-  String stringFor(AFConfigItem entry) {
+  String stringFor(AFConfigurationItem entry) {
     return valueFor(entry);
   }
 
-  List<String> stringListFor(AFConfigItem entry) {
+  List<String> stringListFor(AFConfigurationItem entry) {
     List result = valueFor(entry);
     if(result.length == 0) {
       return <String>[];
@@ -70,11 +406,11 @@ class AFConfig {
   }
 
   /// Casts the value for [entry] to a boolean and returns it.
-  bool boolFor(AFConfigItem entry) {
+  bool boolFor(AFConfigurationItem entry) {
     return valueFor(entry);
   }
 
-  dynamic valueFor(AFConfigItem entry) {
+  dynamic valueFor(AFConfigurationItem entry) {
     dynamic val = values[entry];
     return val ?? entry.defaultValue;
   }
@@ -117,7 +453,7 @@ class AFConfig {
     return result;
   }
 
-  Iterable<AFConfigItem> get all {
+  Iterable<AFConfigurationItem> get all {
     return values.keys;
   }
 

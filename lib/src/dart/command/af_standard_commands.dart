@@ -31,7 +31,7 @@ void afRegisterAppCommands(AFCommandExtensionContext definitions) {
 
 /// Used to initialize and execute commands available via afib_bootstrap
 void afBootstrapCommandMain(AFDartParams paramsD, List<String> args) {
-  _afCommandMain(paramsD, args, "afib_bootstrap", "Command used to create new afib projects", [
+  _afCommandMain(paramsD, args, "afib_bootstrap", "Command used to create new afib projects", null, null, [
     afRegisterAppCommands
   ], null);
 }
@@ -41,15 +41,29 @@ void afCommandStartup(void Function() onRun) {
   onRun();
 }
 
-void afAppCommandMain(AFDartParams paramsD, List<String> args, AFExtendBaseDelegate initBase, AFExtendCommandsDelegate initApp, AFExtendCommandsThirdPartyDelegate initExtend) {
-  _afCommandMain(paramsD, args, "afib", "App-specific afib command", [
+void afAppCommandMain(AFDartParams paramsD, List<String> args, AFExtendBaseDelegate initBase, AFExtendBaseDelegate initBaseThirdParty, AFExtendCommandsDelegate initApp, AFExtendCommandsThirdPartyDelegate initExtend) {
+  _afCommandMain(paramsD, args, "afib", "App-specific afib command", initBase, initBaseThirdParty, [
     afRegisterAppCommands,
     initApp
   ], initExtend);
 }
 
-void _afCommandMain(AFDartParams paramsD, List<String> args, String cmdName, String cmdDescription, List<AFExtendCommandsDelegate> inits, AFExtendCommandsThirdPartyDelegate initExtend) {
+void afUILibraryCommandMain(AFDartParams paramsD, List<String> args, AFExtendBaseDelegate initBase, AFExtendBaseDelegate initBaseThirdParty, AFExtendCommandsDelegate initApp, AFExtendCommandsThirdPartyDelegate initExtend) {
+  _afCommandMain(paramsD, args, "afib", "App-specific afib command", initBase, initBaseThirdParty, [
+    afRegisterAppCommands,
+    initApp
+  ], initExtend);
+}
+
+void _afCommandMain(AFDartParams paramsD, List<String> args, String cmdName, String cmdDescription, AFExtendBaseDelegate initBase, AFExtendBaseDelegate initBaseThirdParty, List<AFExtendCommandsDelegate> inits, AFExtendCommandsThirdPartyDelegate initExtend) {
   final definitions = AFCommandExtensionContext(paramsD: paramsD, commands: cmd.CommandRunner(cmdName, cmdDescription));
+  final baseContext = AFBaseExtensionContext();
+  if(initBase != null) {
+    initBase(baseContext);
+  }
+  if(initBaseThirdParty != null) {
+    initBaseThirdParty(baseContext);
+  }
 
   // initialize the stuff that is accessible from dart/the command line.
   AFibD.initialize(paramsD);

@@ -6,21 +6,23 @@ import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:args/args.dart' as args;
 
 class AFTestCommand extends AFCommand { 
 
   final name = "test";
   final description = "Run tests, you can specify any prototype name, test name, or any of the values for afib.dart help config's --tests-enabled option";
 
-  AFTestCommand() {
+  @override 
+  void registerArguments(args.ArgParser argsParser) {
     AFConfigEntries.testSize.addArguments(argParser);
     AFConfigEntries.testOrientation.addArguments(argParser);
   }
 
   @override
-  void execute(AFCommandContext ctx) {
+  void execute(AFCommandContext ctx, args.ArgResults args) {
     final config = AFibD.config;
-    AFConfigEntries.testsEnabled.setValue(config, ctx.unnamedArguments(this));
+    AFConfigEntries.testsEnabled.setValue(config, ctx.unnamedArguments(args));
     AFConfigCommand.updateConfig(ctx, config, [AFConfigEntries.testSize, AFConfigEntries.testOrientation], argResults);
 
     final generateCmd = ctx.definitions.generateCommand;

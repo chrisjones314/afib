@@ -1,6 +1,8 @@
 // @dart=2.9
+import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
+import 'package:afib/src/dart/command/commands/af_typedefs_command.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
@@ -34,7 +36,7 @@ class AFibTestsFailedMatcher extends Matcher {
   }
 }
 
-Future<void> afTestMainUILibrary<TState extends AFAppStateArea>(AFLibraryID id, AFExtendUILibraryDelegate extendApp, AFExtendThirdPartyDelegate extendThirdParty, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
+Future<void> afTestMainUILibrary<TState extends AFAppStateArea>(AFLibraryID id, AFExtendBaseDelegate extendBase, AFExtendBaseDelegate extendBaseThirdParty, AFExtendUILibraryDelegate extendApp, AFExtendThirdPartyDelegate extendThirdParty, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
   final contextLibrary = AFUILibraryExtensionContext(id: id);
   extendApp(contextLibrary);
 
@@ -45,13 +47,21 @@ Future<void> afTestMainUILibrary<TState extends AFAppStateArea>(AFLibraryID id, 
     );
   };
 
-  return afTestMain<TState>(extendAppFull, extendThirdParty, extendTest, paramsD, widgetTester);
+  return afTestMain<TState>(extendBase, extendBaseThirdParty, extendAppFull, extendThirdParty, extendTest, paramsD, widgetTester);
 }
 
 /// The main function which executes the store test defined in your initStateTests function.
-Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendAppDelegate extendApp, AFExtendThirdPartyDelegate extendThirdParty, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
+Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendBaseDelegate extendBase, AFExtendBaseDelegate extendBaseThirdParty, AFExtendAppDelegate extendApp, AFExtendThirdPartyDelegate extendThirdParty, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
   final stopwatch = Stopwatch();
   stopwatch.start();
+
+  final baseContext = AFBaseExtensionContext();
+  if(extendBase != null) {
+    extendBase(baseContext);
+  }
+  if(extendBaseThirdParty != null) {
+    extendBaseThirdParty(baseContext);
+  }
 
   final paramsTest = paramsD.forceEnvironment(AFEnvironment.prototype);
   AFibD.initialize(paramsTest);

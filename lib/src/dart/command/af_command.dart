@@ -1,6 +1,5 @@
 
 // @dart=2.9
-import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:meta/meta.dart';
 import 'package:afib/afib_command.dart';
@@ -10,6 +9,7 @@ import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/templates/af_template_registry.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:args/command_runner.dart' as cmd;
+import 'package:args/args.dart' as args;
 
 class AFItemWithNamespace {
   /// The namespace used to differentiate third party commands.
@@ -57,11 +57,12 @@ abstract class AFCommand extends cmd.Command {
       return;
     }
 
-    execute(ctx);
+    execute(ctx, argResults);
   }
 
   void finalize() {}
-  void execute(AFCommandContext ctx);
+  void execute(AFCommandContext ctx, args.ArgResults args);
+  void registerArguments(args.ArgParser parser);
 
   bool errorIfNotProjectRoot(AFCommandOutput output) {
     if(!AFProjectPaths.inRootOfAfibProject) {
@@ -85,96 +86,16 @@ class AFCommandContext {
     @required this.definitions,
   });
 
-  List<String> unnamedArguments(AFCommand command) {
-    return command.argResults.rest;
+  List<String> unnamedArguments(args.ArgResults argResults) {
+    return argResults.rest;
   }
 
   AFCommandOutput get out { return output; }
 }
 
-/*
-/// The set of all known afib commands.
-class AFCommands {
-  final List<AFCommand> commands = <AFCommand>[];
-  static const afCommandAfib = 1;
-  static const afCommandApp  = 2;
 
-  /// When you are registerying commands, you can also register your own templates,
-  /// or overwrite the existing templates.
-  final templates = AFTemplateRegistry();
-
-  final generators = AFGeneratorRegistry();
-
-  /// Either [afCommandAfib] if the command is afib, or [afCommandApp] if this is the 
-  /// app-specific command
-  final int command;
-
-  /// Create a set of commands which can be executed in the specified [command]
-  AFCommands({this.command});
-
-  /// Returns true if this is the native afib command and not the application-specific command.
-  bool get isAfib { 
-    return command == afCommandAfib;
-  }
-
-  /// Register a command.
-  /// 
-  /// The command will display in the help and be executable.   It will generally
-  void register(AFCommand command) {
-    commands.add(command);
-  }
-
-  /// Access the [AFGenerateCommand] command, which can be modified/extended by third parties.
-  AFGenerateCommand get generateCmd {
-    return find(AFGenerateCommand.cmdKey);
-  }
-
-  /// Access the [AFConfigCommand] command, which can be modified/extended by third parties.
-  AFConfigCommand get configCmd {
-    return find(AFConfigCommand.cmdKey);
-  }
-
-  /// Get the configuration commnd, which can be extended to allow for 3rd party configuration values.
-  AFConfigCommand findConfigCommand() {
-    return find(AFConfigCommand.cmdKey);
-  }
-
-  /// Given "help" or "--help", returns the HelpCommand, etc.
-  AFCommand find(String command) {
-    return commands.firstWhere((cmd) => cmd.matches(command), orElse: () => null);
-  }
-
-  /// Execute a command with the specified arguments.
-  void execute(String command, AFArgs afArgs, AFConfig afibConfig) {
-    final cmd = find(command);
-    final output = AFCommandOutput();
-
-    if(cmd == null) {
-      output.writeErrorLine("Unknown command: $command");
-      return;
-    }
-
-    if(afArgs.count < cmd.minArgs) {
-      output.writeErrorLine("Command $command must have at least ${cmd.minArgs} arguments.");
-    }
-    if(afArgs.count > cmd.maxArgs && cmd.maxArgs != 0) {
-      output.writeErrorLine("Command $command must have at most ${cmd.maxArgs} arguments.");
-    }
-
-    generators.registerGlobals();
-    try {
-      final ctx = AFCommandContext(this, afArgs, afibConfig, output, templates, generators);
-      cmd.execute(ctx);
-    } on Exception catch(e) {
-      output.writeErrorLine(e.toString());
-    }
-  }
-
-}
-*/
-
-abstract class AFBaseExtensionContext {
-  void registerConfigEntry(AFConfigItem entry) {
+class AFBaseExtensionContext {
+  void registerConfigurationItem(AFConfigurationItem entry) {
     AFibD.registerConfigEntry(entry);
   }
 }
@@ -209,6 +130,7 @@ class AFCommandThirdPartyExtensionContext extends AFBaseExtensionContext {
     for(final command in commands.commands.values) {
       if(command is AFCommand) {
         command.ctx = context;
+        command.registerArguments(command.argParser);
         command.finalize();
       }
     }

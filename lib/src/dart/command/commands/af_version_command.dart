@@ -1,4 +1,5 @@
 import 'package:afib/src/dart/command/af_command.dart';
+import 'package:args/args.dart' as args;
 
 /// Parent for commands executed through the afib command line app.
 class AFVersionCommand extends AFCommand { 
@@ -8,7 +9,12 @@ class AFVersionCommand extends AFCommand {
 
   AFVersionCommand();
 
-  void execute(AFCommandContext ctx) {
+  @override
+  void registerArguments(args.ArgParser argParser) {
+
+  }
+
+  void execute(AFCommandContext ctx, args.ArgResults args) {
     ctx.output.writeLine("Afib 0.0.10");
   }
 }

@@ -23,9 +23,17 @@ void afMainWrapper(Function() onReady) {
 void afMain<TState extends AFAppStateArea>(
   AFDartParams paramsD, 
   AFExtendBaseDelegate extendBase,
+  AFExtendBaseDelegate extendBaseThirdParty,
   AFExtendAppDelegate extendApp, 
   AFExtendThirdPartyDelegate extendThirdParty, 
   AFExtendTestDelegate extendTest) {
+  final baseContext = AFBaseExtensionContext();
+  if(extendBase != null) {
+    extendBase(baseContext);
+  }
+  if(extendBaseThirdParty != null) {
+    extendBaseThirdParty(baseContext);
+  }
   AFibD.initialize(paramsD);
 
   final context = AFAppExtensionContext();

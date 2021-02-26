@@ -72,7 +72,7 @@ class AFConfigEntryLogArea extends AFConfigurationItemOptionChoice {
     addChoice(textValue: test, help: "App logging on test definition contexts and all test execution contexts");
 
     addChoice(textValue: afConfig, help: "Logging on any non-test definition/initialization context, and of afib.g.dart/startup configuration values");
-    addChoice(textValue: afRoute, help: "Internal AFib logging related to apps and navigation");
+    addChoice(textValue: afRoute, help: "Internal AFib logging related to routes and navigation");
     addChoice(textValue: afState, help: "Internal AFib logging related to app state");
     addChoice(textValue: afTheme, help: "Internal AFib logging related to theming");
     addChoice(textValue: afQuery, help: "Internal AFib logging for queries");

@@ -26,7 +26,7 @@ class AFRichTextBuilder {
   });
 
   bool get isEmpty {
-    return spans.length == 0;
+    return spans.isEmpty;
   }
 
   bool get isNotEmpty {

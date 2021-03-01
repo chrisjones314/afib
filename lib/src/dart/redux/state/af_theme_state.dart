@@ -2590,6 +2590,7 @@ need to manually update the value in the controller.
     dynamic iconColor,
     dynamic iconSize,
     String tooltip = "Back",
+    bool worksInSingleScreenTest = true,
     AFShouldContinueCheckDelegate shouldContinueCheck,   
   }) {
     return IconButton(
@@ -2598,7 +2599,7 @@ need to manually update the value in the controller.
         tooltip: translate(tooltip),
         onPressed: () async {
           if(shouldContinueCheck == null || await shouldContinueCheck() == AFShouldContinue.yesContinue) {
-            context.dispatchNavigate(AFNavigatePopAction(id: wid));
+            context.dispatchNavigate(AFNavigatePopAction(id: wid, worksInSingleScreenTest: worksInSingleScreenTest));
             context.dispatchWireframe(screen, wid);
           } 
         }

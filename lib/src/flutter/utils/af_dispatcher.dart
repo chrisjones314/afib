@@ -15,7 +15,7 @@ abstract class AFDispatcher {
   bool isTestAction(dynamic action) {
     var shouldPop = false;
     if(action is AFNavigatePopAction) {
-      shouldPop = action.worksInPrototypeMode;
+      shouldPop = action.worksInSingleScreenTest;
     }
 
     return ( shouldPop ||

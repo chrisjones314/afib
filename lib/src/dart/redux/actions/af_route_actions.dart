@@ -88,9 +88,12 @@ class AFNavigatePushAction extends AFNavigateActionWithReturn {
 
 class AFNavigateActionWithReturnData extends AFNavigateAction {
   final dynamic returnData;
-  final bool worksInPrototypeMode;
 
-  AFNavigateActionWithReturnData({AFID id, this.returnData, this.worksInPrototypeMode = true}): super(id: id, screen: null, param: null);
+  /// This flag is used so that the standard back button can work in single
+  /// screen test prototypes, but generally navigation does not
+  final bool worksInSingleScreenTest;
+
+  AFNavigateActionWithReturnData({AFID id, this.returnData, this.worksInSingleScreenTest = false}): super(id: id, screen: null, param: null);
 }
 
 /// Action that navigates on screen up in the route, discarding the current leaf route.
@@ -100,11 +103,11 @@ class AFNavigateActionWithReturnData extends AFNavigateAction {
 /// your [AFRouteParam] is null in widgets that are transitioning/animating off the screen.
 /// 
 /// If you want to test for the presence of a pop action in response to an event in 
-/// prototype mode, you can make [worksInPrototypeMode] false.   By default, pop actions
+/// prototype mode, you can make [worksInSingleScreenTest] false.   By default, pop actions
 /// navigate you out of a prototype screen in test mode.
 class AFNavigatePopAction extends AFNavigateActionWithReturnData {
   
-  AFNavigatePopAction({AFID id, dynamic returnData, bool worksInPrototypeMode = true}): super(id: id, returnData: returnData, worksInPrototypeMode: worksInPrototypeMode);
+  AFNavigatePopAction({AFID id, dynamic returnData, bool worksInSingleScreenTest = false}): super(id: id, returnData: returnData, worksInSingleScreenTest: worksInSingleScreenTest);
 }
 
 /// Pops [popCount] screens off the navigation stack.
@@ -119,7 +122,7 @@ class AFNavigatePopNAction extends AFNavigateActionWithReturnData {
     }): super(
       id: id,
       returnData: returnData,
-      worksInPrototypeMode: worksInPrototypeMode
+      worksInSingleScreenTest: worksInPrototypeMode
     );
 }
 
@@ -136,7 +139,7 @@ class AFNavigatePopToAction extends AFNavigateActionWithReturnData {
   }): super(
     id: id,
     returnData: returnData,
-    worksInPrototypeMode: worksInPrototypeMode
+    worksInSingleScreenTest: worksInPrototypeMode
   );
 }
 

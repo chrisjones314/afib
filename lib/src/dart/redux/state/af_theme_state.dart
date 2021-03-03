@@ -834,6 +834,7 @@ class AFBorderRadiusSet {
   BorderRadius get size3 { return s3; }
   BorderRadius get size4 { return s4; }
   BorderRadius get size5 { return s5; }
+  BorderRadius get standard { return s2; }
 
  factory AFBorderRadiusSet.create({
     List<double> sizes,
@@ -931,6 +932,7 @@ class AFSpacingSet {
   EdgeInsets get size3 { return s3; }
   EdgeInsets get size4 { return s4; }
   EdgeInsets get size5 { return s5; }
+  EdgeInsets get standard { return s3; }
 
   factory AFSpacingSet.createLTRB(
     List<double> basicSizes,
@@ -1888,14 +1890,14 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   Widget childCard({ 
     Widget child,
     AFWidgetID wid,
-    EdgeInsets margin,
+    EdgeInsets padding,
     Color color,
   }) {
     return Card(
       key: keyForWID(wid),
       color: color,
       child: Container(
-        margin: margin,
+        margin: padding,
         child: child,
       )
     );
@@ -1903,7 +1905,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
 
   Widget childCardColumn(List<Widget> rows, {
-    EdgeInsets margin,
+    EdgeInsets padding,
     CrossAxisAlignment align,
     AFWidgetID widColumn,
     AFWidgetID widCard,
@@ -1913,7 +1915,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
       color: color,
       key: keyForWID(widCard),
       child: Container(
-        margin: margin,
+        margin: padding,
         child: Column(
           key: keyForWID(widColumn),
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2380,11 +2382,11 @@ need to manually update the value in the controller.
   }
 
   EdgeInsets get paddingStandard {
-    return fundamentals.padding.a.s3;
+    return fundamentals.padding.a.standard;
   }
 
   EdgeInsets get marginStandard {
-    return fundamentals.margin.a.s3;
+    return fundamentals.margin.a.standard;
   }
 
   EdgeInsets get marginNone {
@@ -2402,6 +2404,10 @@ need to manually update the value in the controller.
 
   AFBorderRadius get borderRadius {
     return fundamentals.borderRadius;
+  }
+
+  BorderRadius get borderRadiusStandard {
+    return fundamentals.borderRadius.a.standard;
   }
 
   /// Create a custom margin based on the standard sizes you setup in your fundamental theme.

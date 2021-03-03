@@ -79,7 +79,7 @@ class AFPrototypeTheme extends AFFunctionalTheme {
 
   Widget createReusableTag() {
     return Container(
-      padding: padding.a.s2,
+      padding: padding.a.standard,
       decoration: BoxDecoration(
         color: colorPrimary,
         borderRadius: BorderRadius.circular(4.0),
@@ -201,7 +201,7 @@ class AFPrototypeTheme extends AFFunctionalTheme {
   Widget testResultTableErrorLine(AFBuildContext context, Widget text, int row) {
     final color = (row % 2 == 0) ? Colors.white : Colors.grey[350];
     return Container(
-      padding: context.t.padding.a.s2,
+      padding: context.t.padding.a.standard,
       color: color,
       child: text
     );

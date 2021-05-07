@@ -11,6 +11,9 @@ class AFID {
     if(library == null) {
       return "${prefix}_$codeId";
     }
+    if(prefix == null) {
+      return "${library.codeId}_$codeId";
+    }
     return "${library.codeId}_${prefix}_$codeId";
   }
 
@@ -180,4 +183,8 @@ class AFThemeID extends AFIDWithTag {
     String code,
     AFLibraryID library,
     String tag): super("theme", code, library, tag: tag);   
+}
+
+class AFSourceTemplateID extends AFID {
+  const AFSourceTemplateID(String code, AFLibraryID library): super(null, code, library);
 }

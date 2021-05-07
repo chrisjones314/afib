@@ -14,7 +14,7 @@ class AFVersionCommand extends AFCommand {
 
   }
 
-  void execute(AFCommandContext ctx, args.ArgResults args) {
+  void execute(AFCommandContext ctx) {
     ctx.output.writeLine("Afib 0.0.10");
   }
 }

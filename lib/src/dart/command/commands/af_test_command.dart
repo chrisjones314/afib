@@ -20,25 +20,16 @@ class AFTestCommand extends AFCommand {
   }
 
   @override
-  void execute(AFCommandContext ctx, args.ArgResults args) {
+  void execute(AFCommandContext ctx) {
     final config = AFibD.config;
-    AFConfigEntries.testsEnabled.setValue(config, ctx.unnamedArguments(args));
+    AFConfigEntries.testsEnabled.setValue(config, ctx.unnamedArguments);
     AFConfigCommand.updateConfig(ctx, config, [AFConfigEntries.testSize, AFConfigEntries.testOrientation], argResults);
-
-    final generateCmd = ctx.definitions.generateCommand;
-    final configGenerator = generateCmd.configGenerator;
-    final files = ctx.files;
-    if(!configGenerator.validateBefore(ctx, files)) {
-      return;
-    }
-    configGenerator.execute(ctx, files);    
-    files.saveChangedFiles(ctx.out);
+    AFConfigCommand.writeUpdatedConfig(ctx);
       
     Process.start('flutter', ['test', AFProjectPaths.relativePathFor(AFProjectPaths.afTestPath)]).then((process) {
       stdout.addStream(process.stdout);
       stderr.addStream(process.stderr);      
     });
-
     // reset the local config file to run all tests, in case they run 'flutter test'  
   }
 }

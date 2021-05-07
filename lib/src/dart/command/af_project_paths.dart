@@ -39,28 +39,28 @@ class AFProjectPaths {
   }
 
   static String fullPathFor(List<String> relativePath) {
+    return createLibraryFriendlyPathFor(relativePath); 
+  }
+
+  static String createLibraryFriendlyPathFor(List<String> relativeFolder) {
     final current = Directory.current;  
     final projectRoot = split(current.path);
-    var projectRootFolders = List<String>.from(projectRoot);
-    // this is used by the 'new' command, which takes place from one folder below the 
-    // project folder, which is where most commands are run.
-    if(extraParentFolder != null) {
-      projectRootFolders.addAll(extraParentFolder);
+    final projectRootFolders = List<String>.from(projectRoot);
+    final relativeSrcFolder = List<String>.from(relativeFolder);        
+    if(relativeSrcFolder.first == libFolder && hasLibSrcFolder(projectRootFolders)) {
+      relativeSrcFolder.insert(1, srcFolder);
     }
-    
-    final appPath = List<String>.from(projectRootFolders);
-    appPath.addAll(relativePath);
-    var path = joinAll(appPath);
 
-    if(!pathExists(path) && relativePath.isNotEmpty && relativePath.first == libFolder) {
-      final revisedRelative = List<String>.from(relativePath);
-      revisedRelative.insert(1, srcFolder);
-      final revisedFull = List<String>.from(projectRootFolders);
-      revisedFull.addAll(revisedRelative);
-      path = joinAll(revisedFull);
-    }
- 
-    return path;
+    projectRootFolders.addAll(relativeSrcFolder);
+    return joinAll(projectRootFolders);
+
+  }
+
+  static bool hasLibSrcFolder(List<String> projectRootFolders) {
+    final projectRoot = List<String>.from(projectRootFolders);
+    projectRoot.addAll([libFolder, srcFolder]);
+    final path = joinAll(projectRoot);
+    return pathExists(path);
   }
 
   static bool ensureFolderExistsForFile(List<String> filePath) {

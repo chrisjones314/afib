@@ -1,5 +1,11 @@
 
 // @dart=2.9
+import 'package:afib/src/dart/command/commands/af_config_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_screen_command.dart';
+import 'package:afib/src/dart/command/commands/af_test_command.dart';
+import 'package:afib/src/dart/command/commands/af_version_command.dart';
+import 'package:afib/src/dart/command/code_generation/af_code_generator.dart';
+import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:meta/meta.dart';
 import 'package:afib/afib_command.dart';
@@ -57,11 +63,12 @@ abstract class AFCommand extends cmd.Command {
       return;
     }
 
-    execute(ctx, argResults);
+    ctx.arguments = argResults;
+    execute(ctx);
   }
 
   void finalize() {}
-  void execute(AFCommandContext ctx, args.ArgResults args);
+  void execute(AFCommandContext ctx);
   void registerArguments(args.ArgParser parser);
 
   bool errorIfNotProjectRoot(AFCommandOutput output) {
@@ -76,18 +83,17 @@ abstract class AFCommand extends cmd.Command {
 class AFCommandContext {
   final AFCommandExtensionContext definitions;
   final AFCommandOutput output;
-  final AFTemplateRegistry templates;
-  final AFGeneratorRegistry generators;
-  final files = AFGeneratedFiles();
+  final AFCodeGenerator generator;
+  args.ArgResults arguments;
+
   AFCommandContext({
     @required this.output, 
-    @required this.templates, 
-    @required this.generators,
     @required this.definitions,
+    @required this.generator
   });
 
-  List<String> unnamedArguments(args.ArgResults argResults) {
-    return argResults.rest;
+  List<String> get unnamedArguments {
+    return arguments.rest;
   }
 
   AFCommandOutput get out { return output; }
@@ -103,8 +109,13 @@ class AFBaseExtensionContext {
 class AFCommandThirdPartyExtensionContext extends AFBaseExtensionContext {
   final AFDartParams paramsD;
   final cmd.CommandRunner commands;
+  final AFTemplateRegistry templates;
 
-  AFCommandThirdPartyExtensionContext({this.paramsD, this.commands});
+  AFCommandThirdPartyExtensionContext({
+    @required this.paramsD, 
+    @required this.commands, 
+    @required this.templates, 
+  });
 
   /// Used to register a new root level command 
   /// command line.
@@ -112,18 +123,16 @@ class AFCommandThirdPartyExtensionContext extends AFBaseExtensionContext {
     commands.addCommand(command);
   }
 
-  /// Used to register sub-commands on the specified parent command.
-  void registerSubcommand(List<String> path, AFCommand command) {
-    
+  
+
+  // Used to register a subcommand of afib.dart generate...
+  void registerGenerateSubcommand(AFGenerateSubcommand generate) {
+    final cmd = findCommandByType<AFGenerateParentCommand>();
+    cmd.addSubcommand(generate);
   }
 
-  AFGenerateCommand get generateCommand {
-    for(final cmd in commands.commands.values) {
-      if(cmd is AFGenerateCommand) {
-        return cmd;
-      }
-    }
-    return null;
+  AFCommand findCommandByType<T extends AFCommand>() {
+    return commands.commands.values.firstWhere((c) => c is T, orElse: () => null);
   }
 
   void finalize(AFCommandContext context) {
@@ -132,6 +141,14 @@ class AFCommandThirdPartyExtensionContext extends AFBaseExtensionContext {
         command.ctx = context;
         command.registerArguments(command.argParser);
         command.finalize();
+
+        for(final sub in command.subcommands.values) {
+          if(sub is AFCommand) {
+            sub.ctx = context;
+            sub.registerArguments(sub.argParser);
+            sub.finalize();
+          }
+        }
       }
     }
   }
@@ -140,9 +157,26 @@ class AFCommandThirdPartyExtensionContext extends AFBaseExtensionContext {
 
 class AFCommandExtensionContext extends AFCommandThirdPartyExtensionContext {
   AFCommandExtensionContext({AFDartParams paramsD, cmd.CommandRunner commands}):
-    super(paramsD: paramsD, commands: commands);
+    super(
+      paramsD: paramsD, 
+      commands: commands,
+      templates: AFTemplateRegistry()
+    );
 
-    void execute(List<String> args) {
-      commands.run(args);
+    Future<void> execute(AFCommandOutput output, List<String> args) async {
+      try {
+        await commands.run(args);
+      } on AFCommandError catch(e) {
+        output.writeErrorLine("Aborted because: $e");
+      }
+    }
+
+    void registerStandardCommands() {
+      register(AFVersionCommand());
+      register(AFConfigCommand());
+      register(AFGenerateParentCommand());
+      register(AFTestCommand());
+
+      registerGenerateSubcommand(AFGenerateScreenSubcommand());
     }
 }

@@ -2,12 +2,9 @@
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
-import 'package:afib/src/dart/command/commands/af_config_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_command.dart';
-import 'package:afib/src/dart/command/commands/af_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_typedefs_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
-import 'package:afib/src/dart/command/templates/af_template_registry.dart';
+import 'package:afib/src/dart/command/code_generation/af_code_generator.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
@@ -23,41 +20,39 @@ void afRegisterAfibOnlyCommands(AFCommandExtensionContext commands) {
 /// Initialize afib comamnds that are used from the application-specific
 /// commamd
 void afRegisterAppCommands(AFCommandExtensionContext definitions) {
-  definitions.register(AFVersionCommand());
-  definitions.register(AFConfigCommand());
-  definitions.register(AFGenerateCommand());
-  definitions.register(AFTestCommand());
+  definitions.registerStandardCommands();
 }
 
 /// Used to initialize and execute commands available via afib_bootstrap
-void afBootstrapCommandMain(AFDartParams paramsD, List<String> args) {
-  _afCommandMain(paramsD, args, "afib_bootstrap", "Command used to create new afib projects", null, null, [
+Future<void> afBootstrapCommandMain(AFDartParams paramsD, List<String> args) async {
+  await _afCommandMain(paramsD, args, "afib_bootstrap", "Command used to create new afib projects", null, null, [
     afRegisterAppCommands
   ], null);
 }
 
-void afCommandStartup(void Function() onRun) {
+void afCommandStartup(Future<void> Function() onRun) async {
   AFibD.registerGlobals();
-  onRun();
+  await onRun();
 }
 
-void afAppCommandMain(AFDartParams paramsD, List<String> args, AFExtendBaseDelegate initBase, AFExtendBaseDelegate initBaseThirdParty, AFExtendCommandsDelegate initApp, AFExtendCommandsThirdPartyDelegate initExtend) {
-  _afCommandMain(paramsD, args, "afib", "App-specific afib command", initBase, initBaseThirdParty, [
+Future<void> afAppCommandMain(AFDartParams paramsD, List<String> args, AFExtendBaseDelegate initBase, AFExtendBaseDelegate initBaseThirdParty, AFExtendCommandsDelegate initApp, AFExtendCommandsThirdPartyDelegate initExtend) async {
+  await _afCommandMain(paramsD, args, "afib", "App-specific afib command", initBase, initBaseThirdParty, [
     afRegisterAppCommands,
     initApp
   ], initExtend);
 }
 
-void afUILibraryCommandMain(AFDartParams paramsD, List<String> args, AFExtendBaseDelegate initBase, AFExtendBaseDelegate initBaseThirdParty, AFExtendCommandsDelegate initApp, AFExtendCommandsThirdPartyDelegate initExtend) {
-  _afCommandMain(paramsD, args, "afib", "App-specific afib command", initBase, initBaseThirdParty, [
+Future<void> afUILibraryCommandMain(AFDartParams paramsD, List<String> args, AFExtendBaseDelegate initBase, AFExtendBaseDelegate initBaseThirdParty, AFExtendCommandsDelegate initApp, AFExtendCommandsThirdPartyDelegate initExtend) async {
+  await _afCommandMain(paramsD, args, "afib", "App-specific afib command", initBase, initBaseThirdParty, [
     afRegisterAppCommands,
     initApp
   ], initExtend);
 }
 
-void _afCommandMain(AFDartParams paramsD, List<String> args, String cmdName, String cmdDescription, AFExtendBaseDelegate initBase, AFExtendBaseDelegate initBaseThirdParty, List<AFExtendCommandsDelegate> inits, AFExtendCommandsThirdPartyDelegate initExtend) {
+Future<void> _afCommandMain(AFDartParams paramsD, List<String> args, String cmdName, String cmdDescription, AFExtendBaseDelegate initBase, AFExtendBaseDelegate initBaseThirdParty, List<AFExtendCommandsDelegate> inits, AFExtendCommandsThirdPartyDelegate initExtend) async {
   final definitions = AFCommandExtensionContext(paramsD: paramsD, commands: cmd.CommandRunner(cmdName, cmdDescription));
   final baseContext = AFBaseExtensionContext();
+
   if(initBase != null) {
     initBase(baseContext);
   }
@@ -75,14 +70,10 @@ void _afCommandMain(AFDartParams paramsD, List<String> args, String cmdName, Str
     initExtend(definitions);
   }
 
-  final generators = AFGeneratorRegistry();
-  generators.registerGlobals();
-
   final ctx = AFCommandContext(
     output: AFCommandOutput(),
-    generators: generators,
-    templates: AFTemplateRegistry(),
     definitions: definitions,
+    generator: AFCodeGenerator(definitions: definitions)
   );
 
   definitions.finalize(ctx);
@@ -97,5 +88,5 @@ void _afCommandMain(AFDartParams paramsD, List<String> args, String cmdName, Str
   }
   */
 
-  definitions.execute(args);
+  await definitions.execute(ctx.output, args);
 }

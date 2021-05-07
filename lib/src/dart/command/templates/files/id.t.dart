@@ -1,17 +1,11 @@
 
 
 
-import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
-import 'package:afib/src/dart/utils/af_config_entries.dart';
 
-class IdentifierT extends AFFileSourceTemplate {
+class IdentifierT extends AFSourceTemplate {
 
-  IdentifierT(): super(AFConfigEntries.afNamespace, AFProjectPaths.idFile, AFFileTemplateCreationRule.updateInPlace);
-
-  @override
-  String get template {
-    return '''
+  final String template = '''
 AFRP(import_afib_dart)
 
 // IDs will often be created for you as part of the generate command.
@@ -31,6 +25,5 @@ class QueryID {
   // AFibInsertionPoint(QueryID)
 }
 ''';
-  }
 }
 

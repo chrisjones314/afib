@@ -346,6 +346,14 @@ class AFConfig {
 
   final Map<AFConfigurationItem, dynamic> values = <AFConfigurationItem, dynamic>{};
 
+  String get appNamespace {
+    return stringFor(AFConfigEntries.appNamespace);
+  }
+
+  String get packageName { 
+    return stringFor(AFConfigEntries.packageName);
+  }
+
   void establishDefaults() {
     // establish the defaults.
     final all = AFibD.configEntries;

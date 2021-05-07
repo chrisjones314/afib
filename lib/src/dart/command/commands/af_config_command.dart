@@ -1,4 +1,7 @@
 
+import 'package:afib/id.dart';
+import 'package:afib/src/dart/command/templates/dynamic/declare_config_entries.t.dart';
+import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
@@ -48,23 +51,24 @@ class AFConfigCommand extends AFCommand {
     }
   } 
   
+  static void writeUpdatedConfig(AFCommandContext ctx) {
+    final generator = ctx.generator;
+    final projectPath = generator.afibConfigPath;
+    final configFile = generator.overwriteFile(ctx, projectPath, AFUISourceTemplateID.fileConfig);
+    configFile.replaceTemplate(ctx, AFUISourceTemplateID.dynConfigEntries, DeclareConfigEntriesT(AFibD.config, AFibD.configEntries));
+
+    // replace any default 
+    generator.finalizeAndWriteFiles(ctx);
+  }
+
   @override
-  void execute(AFCommandContext ctx, args.ArgResults args) {    
-    final output = ctx.output;
+  void execute(AFCommandContext ctx) {    
 
-    updateConfig(ctx, AFibD.config, AFibD.configEntries, args);
-
-
-
-    // now, write out that configuration to the afib.g.dart file.
-    final generateCmd = ctx.definitions.generateCommand;
-    final configGenerator = generateCmd.configGenerator;
-    final files = ctx.files;
-    if(!configGenerator.validateBefore(ctx, files)) {
-      return;
+    if(ctx.unnamedArguments.length > 0) {
+      throw AFCommandError("The command has extra unrecognized arguments, did you forgot -- before an argument?");
     }
-    configGenerator.execute(ctx, files);    
 
-    files.saveChangedFiles(output);
+    updateConfig(ctx, AFibD.config, AFibD.configEntries, ctx.arguments);
+    writeUpdatedConfig(ctx);
   }
 }

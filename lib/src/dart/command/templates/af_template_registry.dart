@@ -1,67 +1,42 @@
 // @dart=2.9
-import 'package:afib/src/dart/command/af_project_paths.dart';
+import 'package:afib/id.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
-import 'package:afib/src/dart/command/generator_code/af_code_generator.dart';
-import 'package:afib/src/dart/command/generator_code/af_namespace_generator.dart';
 import 'package:afib/src/dart/command/templates/files/afib.t.dart';
 import 'package:afib/src/dart/command/templates/files/afib_test_config.t.dart';
 import 'package:afib/src/dart/command/templates/files/id.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_id_statement.dart';
-import 'package:afib/src/dart/command/templates/statements/import_statements.dart';
+import 'package:afib/src/dart/command/templates/files/screen.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_id_statement.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_route_param.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_state_view.t.dart';
 
-class AFGeneratorRegistry {
-  final replacementGenerators = <String, AFCodeGenerator>{};
 
-  AFGeneratorRegistry();
-
-  void registerGlobals() {
-    registerGenerator(AFCodeGeneratorWithTemplate(ImportAfibDartT()));
-    registerGenerator(AFCodeGeneratorWithTemplate(ImportAfibCommandT()));
-    registerGenerator(AFNamespaceGenerator());
-  }
-
-  /// Set a handler for a dynamic section (e.g. AFRP(insert_code_here) in the template)
-  void registerGenerator(AFCodeGenerator gen) {
-    replacementGenerators[gen.namespaceKey] = gen;
-  }
-
-  bool hasGeneratorFor(AFTemplateReplacementPoint point) {
-    return replacementGenerators.containsKey(point.namespaceKey);
-  }
-
-  AFCodeGenerator generatorFor(AFTemplateReplacementPoint point) {
-    return replacementGenerators[point.namespaceKey];
-  }
-}
-
+/// A registry of source code templates used in code generation.
+/// 
+/// The templates can be registered using string ids, or 
+/// [AFSourceTemplateID], the latter should be used for 
+/// source that might be reused or overridden by third parties.
 class AFTemplateRegistry {
-  final fileTemplates = <String, AFFileSourceTemplate>{};
-  final statementTemplates = <String, AFStatementSourceTemplate>{};
+  final templates = <dynamic, AFSourceTemplate>{};
 
   AFTemplateRegistry() {
-    registerFile(AFProjectPaths.afibConfigPath, AFibT());
-    registerFile(AFProjectPaths.idPath, IdentifierT());
-    registerFile(AFProjectPaths.afTestConfigPath, AFTestConfigT());
-
-    registerStatement(AFStatementID.stmtDeclareID, DeclareIDStatementT());
+    register(AFUISourceTemplateID.fileConfig, AFibT());
+    register(AFUISourceTemplateID.fileScreen, AFScreenT());
+    register(AFUISourceTemplateID.fileIds, IdentifierT());
+    register(AFUISourceTemplateID.fileTestConfig, AFTestConfigT());
+    register(AFUISourceTemplateID.stmtDeclareID, DeclareIDStatementT());
+    register(AFUISourceTemplateID.stmtDeclareRouteParam, DeclareRouteParamT());
+    register(AFUISourceTemplateID.stmtDeclareStateView, DeclareStateViewT());
   }  
 
-  void registerFile(List<String> projectPath, AFFileSourceTemplate source) {
-    final path = AFProjectPaths.relativePathFor(projectPath);
-    fileTemplates[path] = source;
+  Iterable<dynamic> get templateCodes {
+    return templates.keys;
   }
 
-  void registerStatement(String id, AFStatementSourceTemplate source) {
-    statementTemplates[id] = source;
+  void register(dynamic id, AFSourceTemplate source) {
+    templates[id] = source;
   }
 
-  AFFileSourceTemplate templateForFile(List<String> projectPath) {
-    final path = AFProjectPaths.relativePathFor(projectPath, allowExtra: false);
-    return fileTemplates[path];
+  AFSourceTemplate find(dynamic id) {
+    return templates[id];
   }
-
-  AFStatementSourceTemplate templateForStatement(String id) {
-    return statementTemplates[id];
-  }
-
 }

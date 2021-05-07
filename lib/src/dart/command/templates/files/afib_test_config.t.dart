@@ -1,16 +1,11 @@
 
 
-import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
-import 'package:afib/src/dart/utils/af_config_entries.dart';
 
-class AFTestConfigT extends AFFileSourceTemplate {
-
-  AFTestConfigT(): super(AFConfigEntries.afNamespace, AFProjectPaths.afTestConfigFile, AFFileTemplateCreationRule.createAlways);
+class AFTestConfigT extends AFSourceTemplate {
 
   @override
-  String get template {
-    return '''
+  final String template = '''
 AFRP(import_afib_command)
 
 // This file is overwritten each time you run the your xx_afib test command.
@@ -22,5 +17,4 @@ void configureTests(AFConfig config) {
   AFRP(configuration_entries)
 }
 ''';
-  }
 }

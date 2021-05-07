@@ -46,6 +46,7 @@ class AFibD<AppState> {
 
     static void registerDefaultConfigEntries() {
       registerConfigEntry(AFConfigEntries.appNamespace);
+      registerConfigEntry(AFConfigEntries.packageName);
       registerConfigEntry(AFConfigEntries.forceDarkMode);
       registerConfigEntry(AFConfigEntries.environment);
       registerConfigEntry(AFConfigEntries.testsEnabled);
@@ -53,6 +54,7 @@ class AFibD<AppState> {
       registerConfigEntry(AFConfigEntries.testSize);
       registerConfigEntry(AFConfigEntries.testOrientation);
       registerConfigEntry(AFConfigEntries.widgetTesterContext);
+
     }
 
     static void initialize<AppState>(AFDartParams p) {

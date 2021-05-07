@@ -69,6 +69,24 @@ class AFConfigEntries {
     options: AFConfigurationItemOption.optionLowercase | AFConfigurationItemOption.optionIdentifier
   );
 
+  /// The name of the package for the app.  
+  /// 
+  /// e.g, the statement
+  /// ```
+  /// import 'package:mypackagename/id.dart';
+  /// ```
+  /// should import the id file from your application.
+  static final packageName = AFConfigurationItemOption(
+    libraryId: AFUILibraryID.id,
+    name: "package-name", 
+    help: "The name of your application package", 
+    validContexts: AFConfigurationItem.validContextsNewProjectAndConfig,
+    ordinal: 710.0,
+    minChars: 4, 
+    maxChars: 40,
+    options: AFConfigurationItemOption.optionLowercase | AFConfigurationItemOption.optionIdentifier
+  );
+
   /// Specify a list of test categories, ids or tags.  This is used automatically in
   /// test/afib/afib_test_config.g.dart
   static final testsEnabled = AFConfigEntryEnabledTests();

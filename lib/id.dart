@@ -112,6 +112,22 @@ class AFUIThemeID {
   /// Indicates that where a UI uses AFLanguageIDs for translation, the UI should show the IDs rather than the 
   /// translations.
   static const showTranslationsIDs = AFThemeID("show_translation_ids", AFUILibraryID.id, tagFundamental);
+}
 
 
+class AFUISourceTemplateID {
+  static const fileConfig = AFSourceTemplateID("config", AFUILibraryID.id);
+  static const fileIds = AFSourceTemplateID("ids", AFUILibraryID.id);
+  static const fileTestConfig = AFSourceTemplateID("test_config", AFUILibraryID.id);
+  static const fileScreen = AFSourceTemplateID("file_screen", AFUILibraryID.id);
+
+  static const stmtDeclareID = AFSourceTemplateID("declare_id", AFUILibraryID.id);
+  static const stmtDeclareRouteParam = AFSourceTemplateID("declare_route_param", AFUILibraryID.id);
+  static const stmtDeclareStateView = AFSourceTemplateID("declare_state_view", AFUILibraryID.id);
+
+  static const textScreenName = AFSourceTemplateID("screen_name", AFUILibraryID.id);
+  static const textAppNamespace = AFSourceTemplateID("app_namespace", AFUILibraryID.id);
+  static const textPackageName = AFSourceTemplateID("package_name", AFUILibraryID.id);
+
+  static const dynConfigEntries = AFSourceTemplateID("config_entries", AFUILibraryID.id);
 }

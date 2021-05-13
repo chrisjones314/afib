@@ -3,7 +3,6 @@
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_id_statement.t.dart';
-import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:args/args.dart' as args;
 
 class AFGenerateScreenSubcommand extends AFGenerateSubcommand {
@@ -39,7 +38,7 @@ class AFGenerateScreenSubcommand extends AFGenerateSubcommand {
 
     // create a screen name
     final generator = ctx.generator;
-    final projectPath = generator.createPathScreen(screenName);
+    final projectPath = generator.pathScreen(screenName);
     final screenFile = generator.createFile(ctx, projectPath, AFUISourceTemplateID.fileScreen);
     screenFile.replaceText(ctx, AFUISourceTemplateID.textScreenName, screenName);
 

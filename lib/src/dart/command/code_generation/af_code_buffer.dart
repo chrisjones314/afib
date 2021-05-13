@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:afib/id.dart';
 import 'package:afib/src/dart/command/af_command.dart';
+import 'package:afib/src/dart/command/af_command_error.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_generator.dart';
-import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:meta/meta.dart';
 
@@ -61,8 +61,12 @@ class AFCodeBuffer {
     replaceText(context, AFUISourceTemplateID.textPackageName, AFibD.config.packageName);
   }
 
-  void addLineAtEnd(String line) {
+  void appendLine(String line) {
     lines.add(line);
+  }
+
+  void appendEmptyLine() {
+    lines.add('');
   }
 
   void addLinesAfter(AFCommandContext context, RegExp match, List<String> toInsert) {
@@ -96,7 +100,7 @@ class AFCodeBuffer {
           return [value.toUpperCase()];
         }
         if(options.indexOf("snake") >= 0) {
-          return [AFCodeGenerator.toSnakeCase(value)];
+          return [AFCodeGenerator.convertMixedToSnake(value)];
         }
         throw AFCommandError("Unknown option in tag $idCode");
       });

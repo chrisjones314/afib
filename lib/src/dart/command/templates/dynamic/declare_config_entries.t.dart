@@ -21,9 +21,9 @@ class DeclareConfigEntriesT extends AFDynamicSourceTemplate {
       final comment = entry.comment();
       final codeVal = entry.codeValue(afibConfig);
       if(codeVal != null) {
-        buffer.addLineAtEnd(comment);
-        buffer.addLineAtEnd("config.setValue(\"${entry.name}\", $codeVal);");
-        buffer.addLineAtEnd("");
+        buffer.appendLine(comment);
+        buffer.appendLine("config.setValue(\"${entry.name}\", $codeVal);");
+        buffer.appendLine("");
       }
     }
     return buffer.lines;

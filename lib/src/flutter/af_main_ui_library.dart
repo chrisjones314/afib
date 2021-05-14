@@ -3,7 +3,6 @@ import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_typedefs_command.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
-import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/af_app_ui_library.dart';
 import 'package:afib/src/flutter/af_main.dart';
 import 'package:afib/src/flutter/core/af_app_extension_context.dart';
@@ -16,8 +15,7 @@ void afMainUILibrary<TState extends AFAppStateArea>(AFLibraryID id, AFDartParams
   extendApp(contextLibrary);
 
   final paramsProto = paramsD.forceEnvironment(AFEnvironment.prototype);
-  AFibD.initialize(paramsProto);
-
+ 
   final extendAppFull = (context) {
     context.fromUILibrary(contextLibrary,
       createApp: () => AFAppUILibrary(),

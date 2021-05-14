@@ -217,7 +217,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
 
 
     colsAction.add(Container(
-      child: FlatButton(
+      child: TextButton(
         child: t.childText(AFUITranslationID.searchResults, textColor: colorSearchText),
         onPressed: () {
           updateRouteParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewFilter));
@@ -226,7 +226,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
     ));
 
     colsAction.add(Container(
-      child: FlatButton(
+      child: TextButton(
         child: t.childText(AFUITranslationID.testResults, textColor: colorResultsText),
         onPressed: () {
           updateRouteParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewResults));
@@ -272,10 +272,14 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
       children: colsRun,
     );
 
-    colsAction.add(FlatButton(
-      child: buttonContent,
+    final buttonStyle = t.styleTextButton(
       color: t.colorSecondary,
       textColor: t.colorOnSecondary,
+    );
+
+    colsAction.add(TextButton(
+      child: buttonContent,
+      style: buttonStyle,
       onPressed: ()  {
         if(tests.isEmpty) {
           tests = AFibF.g.allScreenTests;

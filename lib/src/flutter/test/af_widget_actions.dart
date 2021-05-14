@@ -161,13 +161,13 @@ abstract class AFExtractChildrenWidgetAction extends AFExtractWidgetAction {
 
 class AFFlatButtonAction extends AFApplyTapWidgetAction {
 
-  AFFlatButtonAction(): super(FlatButton);
+  AFFlatButtonAction(): super(TextButton);
 
   /// [data] is ignored.
   @override
   bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
     final tapOn = elem.widget;
-    if(tapOn is FlatButton) {
+    if(tapOn is TextButton) {
       tapOn.onPressed();
       return true;
     } 
@@ -260,13 +260,13 @@ class AFIconButtonAction extends AFApplyTapWidgetAction {
 
 class AFRaisedButtonAction extends AFApplyTapWidgetAction {
 
-  AFRaisedButtonAction(): super(RaisedButton);
+  AFRaisedButtonAction(): super(ElevatedButton);
 
   /// [data] is ignored.
   @override
   bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
     final tapOn = elem.widget;
-    if(tapOn is RaisedButton) {
+    if(tapOn is ElevatedButton) {
       tapOn.onPressed();
       return true;
     } 

@@ -1576,6 +1576,23 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return fundamentals.colorSchemeBrightness;
   }
 
+  ButtonStyle styleTextButton({
+    Color color,
+    Color textColor
+  }) {
+    return TextButton.styleFrom(
+      primary: color,
+      textStyle: TextStyle(color: textColor)
+    );
+  }
+
+  ButtonStyle styleTextButtonPrimary() {
+    return styleTextButton(
+      color: colorPrimary,
+      textColor: colorOnPrimary,
+    );
+  }
+
   /// See [TextTheme], text theme to use on a card background
   TextTheme get styleOnCard {
     return themeData.textTheme;
@@ -1784,11 +1801,15 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     Color color,
     Color textColor    
   }) {
-    return FlatButton(
+    final style = TextButton.styleFrom(
+      primary: color,
+      textStyle: TextStyle(color: textColor)
+    );
+
+    return TextButton(
       key: keyForWID(wid),
       child: child,
-      color: color,
-      textColor: textColor,
+      style: style,
       onPressed: onPressed
     );
   }
@@ -1995,7 +2016,6 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
         backgroundColor: backgroundColor,
         persistentFooterButtons: persistentFooterButtons,
         bottomSheet: bottomSheet,
-        resizeToAvoidBottomPadding: resizeToAvoidBottomPadding,
         resizeToAvoidBottomInset: resizeToAvoidBottomInset,
         primary: primary,
         drawerDragStartBehavior: drawerDragStartBehavior,

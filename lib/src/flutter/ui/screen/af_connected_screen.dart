@@ -539,7 +539,7 @@ mixin AFContextShowMixin {
   /// See also [showSnackbarText]
   void showSnackbarText(String text, { Duration duration = const Duration(seconds: 2)}) {
     if(text != null) {
-      // TODO: Re-enable this.
+      // TODO: Re-enable snackbars.
       //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text), duration: duration));
     }
   }
@@ -550,7 +550,7 @@ mixin AFContextShowMixin {
   /// 
   /// See also [showSnackbarText]
   void showSnackbar(SnackBar snackbar) {
-    // TODO: Re-enable this.
+    // TODO: Re-enable snackbars.
     //ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 

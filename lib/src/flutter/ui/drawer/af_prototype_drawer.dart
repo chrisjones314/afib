@@ -142,11 +142,15 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
       )
     ));
 
+    final buttonStyle = TextButton.styleFrom(
+      primary: t.colorOnPrimary,
+      textStyle: TextStyle(color: t.colorSecondary),
+    );
+
     final cols = t.row();
-    cols.add(FlatButton(
+    cols.add(TextButton(
       child: t.childText('Exit'),
-      color: t.colorOnPrimary,
-      textColor: t.colorSecondary,
+      style: buttonStyle,
       onPressed: () {
           context.closeDrawer();
           context.dispatch(AFNavigateExitTestAction());
@@ -156,16 +160,16 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     cols.add(
       Container(
         margin: t.margin.l.s3,
-        child: FlatButton(
-        child: Text('Reset'),
-        color: t.colorOnPrimary,
-        textColor: t.colorSecondary,
-        onPressed: () {
-            context.closeDrawer();
-            test.onDrawerReset(context.d);
-        }
+        child: TextButton(
+          style: buttonStyle,
+          child: Text('Reset'),
+          onPressed: () {
+              context.closeDrawer();
+              test.onDrawerReset(context.d);
+          }
+        )
       )
-    ));
+    );
 
     rows.add(Row(children: cols));
 
@@ -191,11 +195,15 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     final color = isActive ? t.colorSecondary : Colors.grey[400];
     final colorText = isActive ? t.colorOnPrimary : t.colorOnBackground;
 
-    return FlatButton(
-      child: t.childText(title),
-      color: color,
-      textColor: colorText,
+    final buttonStyle = TextButton.styleFrom(
+      primary: color, 
+      textStyle: TextStyle(color: colorText),
       shape: RoundedRectangleBorder(),
+    );
+      
+    return TextButton(
+      child: t.childText(title),
+      style: buttonStyle,
       onPressed: () {
         updateRouteParam(context, context.p.copyWith(view: view));
       },

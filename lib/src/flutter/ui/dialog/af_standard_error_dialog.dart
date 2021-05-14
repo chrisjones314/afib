@@ -52,11 +52,15 @@ class AFStandardErrorDialog extends AFProtoConnectedDialog<AFStateView, AFStanda
     rows.add(t.childText("An unexpected error occcured, please wait a few minutes and try again.", style: t.styleOnCard.bodyText1));
     rows.add(t.childText("If the error persists, please report this message to customer support: '${context.p.message}'."));
 
-    rows.add(FlatButton(
+    final buttonStyle = TextButton.styleFrom(
+      primary: t.colorPrimary,
+      textStyle: TextStyle(color: t.colorOnPrimary),
+    );
+
+    rows.add(TextButton(
       key: t.keyForWID(AFUIWidgetID.buttonCancel),
+      style: buttonStyle,
       child: t.childText("Close"),
-      color: t.colorPrimary,
-      textColor: t.colorOnPrimary,
       onPressed: () {
         context.closeDialog(context.p);
       },

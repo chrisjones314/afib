@@ -49,6 +49,7 @@ class AFPrototypeTheme extends AFFunctionalTheme {
     return 50.0;
   }
 
+
   Widget childCardHeader(AFBuildContext context, AFWidgetID wid, dynamic title, List<Widget> rows, { EdgeInsets margin }) {
     final radius = Radius.circular(4.0);
     final content = column();

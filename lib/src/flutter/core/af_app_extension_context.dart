@@ -32,7 +32,8 @@ class AFSharedTestExtensionContext {
     if(!_needWidgetActions) {
       return;
     }
-    registerApplicator(AFFlatButtonAction());
+    registerApplicator(AFTextButtonAction());
+    registerApplicator(AFOutlinedButtonAction());
     registerApplicator(AFRaisedButtonAction());
     registerApplicator(AFTapChoiceChip());
     registerApplicator(AFSetChoiceChip());

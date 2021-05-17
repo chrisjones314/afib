@@ -159,15 +159,31 @@ abstract class AFExtractChildrenWidgetAction extends AFExtractWidgetAction {
   AFExtractChildrenWidgetAction(Type appliesTo): super(AFExtractWidgetAction.extractChildren, appliesTo); 
 }
 
-class AFFlatButtonAction extends AFApplyTapWidgetAction {
+class AFTextButtonAction extends AFApplyTapWidgetAction {
 
-  AFFlatButtonAction(): super(TextButton);
+  AFTextButtonAction(): super(TextButton);
 
   /// [data] is ignored.
   @override
   bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
     final tapOn = elem.widget;
     if(tapOn is TextButton) {
+      tapOn.onPressed();
+      return true;
+    } 
+    return false;
+  }
+}
+
+class AFOutlinedButtonAction extends AFApplyTapWidgetAction {
+
+  AFOutlinedButtonAction(): super(OutlinedButton);
+
+  /// [data] is ignored.
+  @override
+  bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
+    final tapOn = elem.widget;
+    if(tapOn is OutlinedButton) {
       tapOn.onPressed();
       return true;
     } 

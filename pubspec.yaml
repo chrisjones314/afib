@@ -16,7 +16,7 @@ dependencies:
   intl: ^0.17.0
   colorize: ^3.0.0
   logger: ^1.0.0  
-  package_info: ^2.0.0
+  package_info_plus: ^1.0.1
   quiver: ^3.0.1
   path: ^1.8.0
   overlay_support: ^1.2.1

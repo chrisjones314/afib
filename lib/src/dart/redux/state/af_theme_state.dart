@@ -1581,8 +1581,8 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     Color textColor
   }) {
     return TextButton.styleFrom(
-      primary: color,
-      textStyle: TextStyle(color: textColor)
+      backgroundColor: color,
+      primary: textColor
     );
   }
 
@@ -1785,8 +1785,10 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     Widget child,
     AFPressedDelegate onPressed,
     Color color,
+    VisualDensity visualDensity,
   }) {
     return IconButton(
+      visualDensity: visualDensity,
       key: keyForWID(wid),
       icon: child,
       color: color,
@@ -1802,8 +1804,8 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     Color textColor    
   }) {
     final style = TextButton.styleFrom(
-      primary: color,
-      textStyle: TextStyle(color: textColor)
+      backgroundColor: color,
+      primary: textColor,
     );
 
     return TextButton(

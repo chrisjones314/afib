@@ -2106,6 +2106,8 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     TextInputType keyboardType,
     FocusNode focusNode,
     TextStyle style,
+    Color cursorColor,
+    ValueChanged<String> onSubmitted,
   }) {
     final textController = controllers.access(wid);
     assert(textController != null, "You must register the text controller for $wid in your route parameter using AFTextEditingControllersHolder.createN or createOne");
@@ -2130,6 +2132,8 @@ need to manually update the value in the controller.
       textAlign: textAlign,
       decoration: decoration,
       focusNode: focusNode,
+      onSubmitted: onSubmitted,
+      cursorColor: cursorColor,
     );
   }
 
@@ -2415,6 +2419,9 @@ need to manually update the value in the controller.
     return fundamentals.margin.a.s0;
   }
 
+  EdgeInsets get paddingNone {
+    return fundamentals.padding.a.s0;
+  }
 
   AFSpacing get margin {
     return fundamentals.margin;

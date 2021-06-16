@@ -18,6 +18,7 @@ class AFUIScreenID {
   static const dialogStandardError = AFScreenID("standard_error_dialog", AFUILibraryID.id);
   static const screenPrototypeThirdPartyList = AFScreenID("protoype_third_party_list", AFUILibraryID.id);
   static const screenPrototypeThirdPartyHome = AFScreenID("protoype_third_party_home", AFUILibraryID.id);
+  static const dialogStandardChoice = AFScreenID("standard_choice_dialog", AFUILibraryID.id);
 }
 
 class AFUIWidgetID {
@@ -74,7 +75,7 @@ class AFUIThemeID {
   static const tagDevice = "device";
 
   static const conceptualUnused = AFThemeID("conceptual_unused", AFUILibraryID.id, tagFundamental);
-  static const conceptualPrototype = AFThemeID("conceptual_proto", AFUILibraryID.id, tagFundamental);
+  static const conceptualUI = AFThemeID("conceptual_ui", AFUILibraryID.id, tagFundamental);
   
   /// Used for the icon that indicates you are navigating up into a parent screen, often the left caret.
   static const iconBack = AFThemeID("icon_back", AFUILibraryID.id, tagFundamental);

@@ -101,12 +101,12 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
 
   //--------------------------------------------------------------------------------------
   @override
-  Widget buildWithContext(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
+  Widget buildWithContext(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     return _buildDrawer(context);
   }
 
   //--------------------------------------------------------------------------------------
-  Widget _buildDrawer(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
+  Widget _buildDrawer(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     final rows = context.t.column();
     
     rows.add(_buildHeader(context));
@@ -121,7 +121,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
   }
 
   //--------------------------------------------------------------------------------------
-  Widget _buildHeader(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
+  Widget _buildHeader(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     final t = context.t;
     final rows = t.column();
     final test = context.s.prototype;
@@ -186,7 +186,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     );
   }
 
-  Widget _buildChoiceButton(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context,
+  Widget _buildChoiceButton(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context,
     String title,
     int view
   ) {
@@ -211,7 +211,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
   }
 
   //--------------------------------------------------------------------------------------
-  Widget _buildChoiceRow(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
+  Widget _buildChoiceRow(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     final t = context.t;
 
     final cols = t.row();
@@ -225,7 +225,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
       children: cols);
   }
 
-  Widget _buildContent(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
+  Widget _buildContent(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     var item;
     final view = context.p.view;
     if(view == AFPrototypeDrawerRouteParam.viewTheme) {
@@ -250,7 +250,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     ));
   }
 
-  TableRow _createAttributeRow(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFThemeID title, Widget Function() buildValue) {
+  TableRow _createAttributeRow(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFThemeID title, Widget Function() buildValue) {
     final t = context.t;    
     final cols = t.row();
     cols.add(t.testResultTableValue(context, title.toString(), TextAlign.right));
@@ -258,7 +258,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     return TableRow(children: cols);
   }
 
-  Widget _buildEnumAttributeRowValue(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFThemeID attr, dynamic attrValue) {
+  Widget _buildEnumAttributeRowValue(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFThemeID attr, dynamic attrValue) {
     final t = context.t;
     final rows = t.column();
 
@@ -295,7 +295,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     );
   }
 
-  void _overrideThemeValue({AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFThemeID id, dynamic value}) {
+  void _overrideThemeValue({AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFThemeID id, dynamic value}) {
       context.dispatch(AFOverrideThemeValueAction(
         id: id,
         value: value,
@@ -303,7 +303,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
       context.dispatch(AFRebuildFunctionalThemes());       
   }
 
-  Widget _buildLocaleAttributeRowValue(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFThemeID attr, dynamic attrValue) {
+  Widget _buildLocaleAttributeRowValue(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFThemeID attr, dynamic attrValue) {
     final t = context.t;
     final rows = t.column();
 
@@ -356,7 +356,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
    return split.length > 1 && split[0] == attrVal.runtimeType.toString();
   }
 
-  Widget _buildThemeAreaBody(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, String area) {
+  Widget _buildThemeAreaBody(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, String area) {
     final t = context.t;    
     // build a table that has different values, like 
     final headerCols = t.row();
@@ -406,7 +406,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
 
   }
 
-  Widget _buildThemeContent(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
+  Widget _buildThemeContent(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     
     final t = context.t;
     final panels = t.childrenExpansionList();
@@ -440,7 +440,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     );
   }
 
-  void _onRun(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFScreenTestID id) {
+  void _onRun(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFScreenTestID id) {
     final test = context.s.prototype;
     context.closeDrawer();
     Timer(Duration(seconds: 1), () async {            
@@ -452,7 +452,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     });    
   }
 
-  Widget _childTestList(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context,
+  Widget _childTestList(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context,
     List<AFScreenTestDescription> tests,
     String title) {
     final t = context.t;
@@ -487,7 +487,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     return t.childCardHeader(context, null, title, rows);
   }
 
-  Widget _childTestLists(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
+  Widget _childTestLists(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     final t = context.t;
     final prototype = context.s.prototype;
     final rows = t.column();
@@ -502,7 +502,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     return content;
   }
 
-  Widget _buildResultsContent(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
+  Widget _buildResultsContent(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context) {
     final t = context.t;
     final rows = t.column();
     _buildTestReport(context, rows);
@@ -514,7 +514,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     );
   }
 
-  void _buildTestReport(AFProtoBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, List<Widget> rows) {
+  void _buildTestReport(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, List<Widget> rows) {
     final t = context.t;
     final testContext = context.s.testContext;
     final testState = context.s.testState;

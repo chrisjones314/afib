@@ -18,7 +18,7 @@ class AFStandardErrorDialogRouteParam extends AFRouteParam {
 }
 
 //--------------------------------------------------------------------------------------
-class AFStandardErrorDialog extends AFProtoConnectedDialog<AFStateView, AFStandardErrorDialogRouteParam> {
+class AFStandardErrorDialog extends AFUIConnectedDialog<AFStateView, AFStandardErrorDialogRouteParam> {
 
   //--------------------------------------------------------------------------------------
   AFStandardErrorDialog(): super(AFUIScreenID.dialogStandardError);
@@ -39,7 +39,7 @@ class AFStandardErrorDialog extends AFProtoConnectedDialog<AFStateView, AFStanda
 
   //--------------------------------------------------------------------------------------
   @override
-  Dialog buildDialogWithContext(AFProtoBuildContext<AFStateView, AFStandardErrorDialogRouteParam> context) {
+  Dialog buildDialogWithContext(AFUIBuildContext<AFStateView, AFStandardErrorDialogRouteParam> context) {
     final t = context.t;
     final rows = t.column();
     

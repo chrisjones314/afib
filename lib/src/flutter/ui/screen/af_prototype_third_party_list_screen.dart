@@ -22,7 +22,7 @@ class AFPrototypeThirdPartyStateView extends AFStateView1<AFSingleScreenTests> {
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeThirdPartyListScreen extends AFProtoConnectedScreen<AFPrototypeThirdPartyStateView, AFRouteParam>{
+class AFPrototypeThirdPartyListScreen extends AFUIConnectedScreen<AFPrototypeThirdPartyStateView, AFRouteParam>{
   AFPrototypeThirdPartyListScreen(): super(AFUIScreenID.screenPrototypeThirdPartyList);
 
   static AFNavigatePushAction navigateTo() {
@@ -43,12 +43,12 @@ class AFPrototypeThirdPartyListScreen extends AFProtoConnectedScreen<AFPrototype
   }
 
   @override
-  Widget buildWithContext(AFProtoBuildContext<AFPrototypeThirdPartyStateView, AFRouteParam> context) {
+  Widget buildWithContext(AFUIBuildContext<AFPrototypeThirdPartyStateView, AFRouteParam> context) {
     return _buildThirdParty(context);
   }
 
   /// 
-  Widget _buildThirdParty(AFProtoBuildContext<AFPrototypeThirdPartyStateView, AFRouteParam> context) {
+  Widget _buildThirdParty(AFUIBuildContext<AFPrototypeThirdPartyStateView, AFRouteParam> context) {
     final t = context.t;
     final rowsCard = t.column();
 

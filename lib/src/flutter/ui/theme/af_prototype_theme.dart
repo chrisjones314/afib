@@ -8,13 +8,13 @@ import 'package:afib/src/flutter/ui/screen/af_prototype_list_screen.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:flutter/material.dart';
 
-class AFPrototypeTheme extends AFFunctionalTheme {
+class AFUITheme extends AFFunctionalTheme {
   static const columnWidthsForNumValueTable = {
       0: FixedColumnWidth(20.0),
       1: FlexColumnWidth(),
     };
 
-  AFPrototypeTheme(AFFundamentalThemeState fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualPrototype);
+  AFUITheme(AFFundamentalThemeState fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualUI);
 
 
   Color get colorDisabled {

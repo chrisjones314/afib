@@ -10,15 +10,15 @@ import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/material.dart';
 
-mixin AFProtoConnectedUIMixin<TStateView extends AFStateView, TRouteParam extends AFRouteParam> {
-  AFProtoBuildContext<TStateView, TRouteParam> createContext(BuildContext context, AFDispatcher dispatcher, TStateView stateView, TRouteParam param, AFRouteParamWithChildren paramWithChildren, AFPrototypeTheme theme, AFConnectedUIBase container) {
-    return AFProtoBuildContext<TStateView, TRouteParam>(context, dispatcher, stateView, param, paramWithChildren, theme, container);
+mixin AFUIConnectedUIMixin<TStateView extends AFStateView, TRouteParam extends AFRouteParam> {
+  AFUIBuildContext<TStateView, TRouteParam> createContext(BuildContext context, AFDispatcher dispatcher, TStateView stateView, TRouteParam param, AFRouteParamWithChildren paramWithChildren, AFUITheme theme, AFConnectedUIBase container) {
+    return AFUIBuildContext<TStateView, TRouteParam>(context, dispatcher, stateView, param, paramWithChildren, theme, container);
   }
 }
 
 
-class AFProtoBuildContext<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFBuildContext<AFAppStateArea, TStateView, TRouteParam, AFPrototypeTheme> {
-  AFProtoBuildContext(
+class AFUIBuildContext<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFBuildContext<AFAppStateArea, TStateView, TRouteParam, AFUITheme> {
+  AFUIBuildContext(
     BuildContext context, 
     AFDispatcher dispatcher, 
     AFStateView stateView,
@@ -30,16 +30,16 @@ class AFProtoBuildContext<TStateView extends AFStateView, TRouteParam extends AF
 }
 
 
-abstract class AFProtoConnectedScreen<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreen<AFAppStateArea, AFPrototypeTheme, AFProtoBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFProtoConnectedUIMixin<TStateView, TRouteParam> {
-  AFProtoConnectedScreen(AFScreenID screen): super(screen, AFUIThemeID.conceptualPrototype);
+abstract class AFUIConnectedScreen<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreen<AFAppStateArea, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFUIConnectedUIMixin<TStateView, TRouteParam> {
+  AFUIConnectedScreen(AFScreenID screen): super(screen, AFUIThemeID.conceptualUI);
 }
 
-abstract class AFProtoConnectedDrawer<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedDrawer<AFAppStateArea, AFPrototypeTheme, AFProtoBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFProtoConnectedUIMixin<TStateView, TRouteParam> {
+abstract class AFProtoConnectedDrawer<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedDrawer<AFAppStateArea, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFUIConnectedUIMixin<TStateView, TRouteParam> {
   AFProtoConnectedDrawer(
     AFScreenID screen,
-  ): super(screen, AFUIThemeID.conceptualPrototype);
+  ): super(screen, AFUIThemeID.conceptualUI);
 }
 
-abstract class AFProtoConnectedDialog<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedDialog<AFAppStateArea, AFPrototypeTheme, AFProtoBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFProtoConnectedUIMixin<TStateView, TRouteParam> {
-  AFProtoConnectedDialog(AFScreenID screen): super(screen, AFUIThemeID.conceptualPrototype);
+abstract class AFUIConnectedDialog<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedDialog<AFAppStateArea, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFUIConnectedUIMixin<TStateView, TRouteParam> {
+  AFUIConnectedDialog(AFScreenID screen): super(screen, AFUIThemeID.conceptualUI);
 }

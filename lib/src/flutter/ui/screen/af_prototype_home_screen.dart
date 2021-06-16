@@ -85,7 +85,7 @@ class APrototypeHomeScreenStateView extends AFStateView1<AFSingleScreenTests> {
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam>{
+class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam>{
   static const runWidgetTestsId = "run_widget_tests";
   static const runScreenTestsId = "run_screen_tests";
   static const runWorkflowTestsId = "run_workflow_tests";
@@ -104,12 +104,12 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
   }
 
   @override
-  Widget buildWithContext(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context) {
+  Widget buildWithContext(AFUIBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context) {
     return _buildHome(context);
   }
 
   /// 
-  Widget _buildHome(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context) {
+  Widget _buildHome(AFUIBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context) {
     final t = context.t;
     final protoRows = t.column();
     final primaryTests = AFibF.g.primaryUITests;
@@ -146,7 +146,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
     return context.t.buildPrototypeScaffold(AFUITranslationID.afibPrototypeMode, rows);
   }
 
-  void _onRunTests(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests) async { 
+  void _onRunTests(AFUIBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests) async { 
     
     final results = <AFScreenTestResultSummary>[];
     for(final test in tests) {
@@ -180,12 +180,12 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
     updateRouteParam(context, context.p.copyWith(results: results, view: AFPrototypeHomeScreenParam.viewResults));
   }
 
-  void _updateFilter(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, String value) {
+  void _updateFilter(AFUIBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, String value) {
     final revised = context.p.reviseFilter(value);
     updateRouteParam(context, revised);
   }
 
-  Widget _buildFilterAndRunControls(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests) {
+  Widget _buildFilterAndRunControls(AFUIBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests) {
     final t = context.t;
 
     final rows = t.column();
@@ -306,7 +306,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
   }
 
 
-  void _buildFilteredSection(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests, List<Widget> rows, ) {
+  void _buildFilteredSection(AFUIBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests, List<Widget> rows, ) {
     if(tests == null || tests.isEmpty) {
       return;
     }
@@ -316,7 +316,7 @@ class AFPrototypeHomeScreen extends AFProtoConnectedScreen<APrototypeHomeScreenS
     }
   }
 
-  void _buildResultsSection(AFProtoBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests, List<Widget> rows) {
+  void _buildResultsSection(AFUIBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests, List<Widget> rows) {
     final t = context.t;
     final results = context.p.results;
     if(results.isEmpty) {

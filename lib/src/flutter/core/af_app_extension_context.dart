@@ -560,9 +560,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
       init(context);
     }
 
-    if(AFibD.config.requiresPrototypeData) {
-      context.initUnlessPresent(AFUIThemeID.conceptualPrototype, createTheme: (f) => AFPrototypeTheme(f));
-    }
+    context.initUnlessPresent(AFUIThemeID.conceptualUI, createTheme: (f) => AFUITheme(f));
 
     for(final thirdParty in libraries) {
       thirdParty.initFunctional(context);

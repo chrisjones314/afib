@@ -22,7 +22,7 @@ class AFPrototypeWireframesStateView extends AFStateView1<AFSingleScreenTests> {
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeWireframesListScreen extends AFProtoConnectedScreen<AFPrototypeWireframesStateView, AFRouteParam>{
+class AFPrototypeWireframesListScreen extends AFUIConnectedScreen<AFPrototypeWireframesStateView, AFRouteParam>{
   AFPrototypeWireframesListScreen(): super(AFUIScreenID.screenPrototypeWireframesList);
 
   static AFNavigatePushAction navigateTo() {
@@ -43,12 +43,12 @@ class AFPrototypeWireframesListScreen extends AFProtoConnectedScreen<AFPrototype
   }
 
   @override
-  Widget buildWithContext(AFProtoBuildContext<AFPrototypeWireframesStateView, AFRouteParam> context) {
+  Widget buildWithContext(AFUIBuildContext<AFPrototypeWireframesStateView, AFRouteParam> context) {
     return _buildWireframes(context);
   }
 
   /// 
-  Widget _buildWireframes(AFProtoBuildContext<AFPrototypeWireframesStateView, AFRouteParam> context) {
+  Widget _buildWireframes(AFUIBuildContext<AFPrototypeWireframesStateView, AFRouteParam> context) {
     final t = context.t;
     final rowsCard = t.column();
 

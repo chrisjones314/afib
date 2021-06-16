@@ -516,7 +516,7 @@ mixin AFContextShowMixin {
     if(builder == null) {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
-    final result = await material.showDialog<AFRouteParam>(
+    final result = await material.showDialog<dynamic>(
       context: context,
       builder: builder,
       barrierDismissible: barrierDismissible,
@@ -597,7 +597,7 @@ mixin AFContextShowMixin {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
 
-    final result = await material.showModalBottomSheet<AFRouteParam>(
+    final result = await material.showModalBottomSheet<dynamic>(
       context: context,
       builder: builder,
       backgroundColor: backgroundColor,
@@ -645,7 +645,7 @@ mixin AFContextShowMixin {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
 
-    material.Scaffold.of(context).showBottomSheet<AFRouteParam>(
+    material.Scaffold.of(context).showBottomSheet<dynamic>(
       builder,
       backgroundColor: backgroundColor,
       elevation: elevation,

@@ -9,6 +9,7 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_unused.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
+import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 
 /// A version of [AFAsyncQuery] for queries that should be run in the background
 /// after a delay.  
@@ -16,7 +17,7 @@ abstract class AFDeferredQuery<TState extends AFAppStateArea> extends AFAsyncQue
   Duration nextDelay;
   Timer timer;
 
-  AFDeferredQuery(this.nextDelay, {AFID id}): super(id: id);
+  AFDeferredQuery(this.nextDelay, {AFID id, AFOnResponseDelegate<TState, AFUnused> onSuccessDelegate}): super(id: id, onSuccessDelegate: onSuccessDelegate);
 
   /// Delays for [nextDelay] and then calls [finishAsyncWithResponse] with null as the value.
   /// 
@@ -76,7 +77,28 @@ abstract class AFDeferredQuery<TState extends AFAppStateArea> extends AFAsyncQue
   }
 }
 
+/// A deferred query which waits a specified duration, then calls its onSuccessDelegate,
+/// but does not otherwise do anything.
+class AFDeferredSuccessQuery<TState extends AFAppStateArea> extends AFDeferredQuery<TState> {
+
+  AFDeferredSuccessQuery(Duration delayOnce, {AFID id, AFOnResponseDelegate<TState, AFUnused> onSuccessDelegate}): super(delayOnce, id: id, onSuccessDelegate: onSuccessDelegate);
+  Duration finishAsyncExecute(AFFinishQuerySuccessContext<TState, AFUnused> context) {
+    if(this.onSuccessDelegate != null) {
+      onSuccessDelegate(context);
+    }
+    return null;
+  }
+
+  void shutdown() {
+
+  }
+
+}
+
 /// Shuts down outstanding deferred and listener queries.
 class AFShutdownOngoingQueriesAction extends AFActionWithKey {
 
+
 }
+
+

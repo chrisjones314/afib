@@ -42,7 +42,7 @@ class AFPrototypeWidgetStateView extends AFStateView2<AFTestState, AFThemeState>
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeWidgetScreen extends AFProtoConnectedScreen<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam>{
+class AFPrototypeWidgetScreen extends AFUIConnectedScreen<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam>{
 
   AFPrototypeWidgetScreen(): super(AFUIScreenID.screenPrototypeWidget);
 
@@ -66,13 +66,13 @@ class AFPrototypeWidgetScreen extends AFProtoConnectedScreen<AFPrototypeWidgetSt
   }
 
   @override
-  Widget buildWithContext(AFProtoBuildContext<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam> context) {    
+  Widget buildWithContext(AFUIBuildContext<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam> context) {    
     /// Remember what screen we are on for testing purposes.  Maybe eventually try to do this in navigator observer.
     AFTest.currentScreen = context.c;
     return _buildScreen(context);
   }
 
-  Widget _buildScreen(AFProtoBuildContext<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam> context) {
+  Widget _buildScreen(AFUIBuildContext<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam> context) {
     final test = context.p.test;
     final testContext = context.s.testState.findContext(test.id);
     final testState = context.s.testState.findState(test.id);
@@ -94,7 +94,7 @@ class AFPrototypeWidgetScreen extends AFProtoConnectedScreen<AFPrototypeWidgetSt
     return _createScaffold(context, resultWidget);
   }
 
-  Widget _createScaffold(AFProtoBuildContext<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam> context, Widget resultWidget) {
+  Widget _createScaffold(AFUIBuildContext<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam> context, Widget resultWidget) {
     if(context.p.test.createWidgetWrapperDelegate != null) {
       return context.p.test.createWidgetWrapperDelegate(context, resultWidget);
     }

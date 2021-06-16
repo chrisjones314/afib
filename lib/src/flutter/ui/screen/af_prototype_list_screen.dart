@@ -75,7 +75,7 @@ class AFPrototypeTestScreenStateView extends AFStateView1<AFSingleScreenTests> {
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeTestScreen extends AFProtoConnectedScreen<AFStateView, AFPrototypeTestScreenParam>{
+class AFPrototypeTestScreen extends AFUIConnectedScreen<AFStateView, AFPrototypeTestScreenParam>{
 
   AFPrototypeTestScreen(): super(AFUIScreenID.screenPrototypeListSingleScreen);
 
@@ -90,7 +90,7 @@ class AFPrototypeTestScreen extends AFProtoConnectedScreen<AFStateView, AFProtot
   }
 
   @override
-  Widget buildWithContext(AFProtoBuildContext<AFStateView, AFPrototypeTestScreenParam> context) {
+  Widget buildWithContext(AFUIBuildContext<AFStateView, AFPrototypeTestScreenParam> context) {
     return _buildList(context);
   }
 
@@ -100,7 +100,7 @@ class AFPrototypeTestScreen extends AFProtoConnectedScreen<AFStateView, AFProtot
     return result;
   }
 
-  Widget _buildList(AFProtoBuildContext<AFStateView, AFPrototypeTestScreenParam> context) {
+  Widget _buildList(AFUIBuildContext<AFStateView, AFPrototypeTestScreenParam> context) {
     final t = context.t;
     final rows = t.column();
     final groups = _sortIterable(context.p.screenTestsByGroup.keys);
@@ -113,7 +113,7 @@ class AFPrototypeTestScreen extends AFProtoConnectedScreen<AFStateView, AFProtot
     return context.t.buildPrototypeScaffold(context.p.title, rows, leading: leading);
   }
 
-  Widget _addGroup(AFProtoBuildContext<AFStateView, AFPrototypeTestScreenParam> context, AFWidgetID widGroup, String group, List<AFScreenPrototype> tests) {
+  Widget _addGroup(AFUIBuildContext<AFStateView, AFPrototypeTestScreenParam> context, AFWidgetID widGroup, String group, List<AFScreenPrototype> tests) {
     final t = context.t;
     final rows = t.column();
     for(final test in tests) {

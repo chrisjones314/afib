@@ -24,7 +24,7 @@ class AFPrototypeThirdPartyHomeParam extends AFRouteParam {
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeThirdPartyHomeScreen extends AFProtoConnectedScreen<AFStateView, AFPrototypeThirdPartyHomeParam>{
+class AFPrototypeThirdPartyHomeScreen extends AFUIConnectedScreen<AFStateView, AFPrototypeThirdPartyHomeParam>{
   AFPrototypeThirdPartyHomeScreen(): super(AFUIScreenID.screenPrototypeThirdPartyHome);
 
   static AFNavigatePushAction navigatePush(AFUILibraryExtensionContext libraryContext) {
@@ -44,12 +44,12 @@ class AFPrototypeThirdPartyHomeScreen extends AFProtoConnectedScreen<AFStateView
   }
 
   @override
-  Widget buildWithContext(AFProtoBuildContext<AFStateView, AFPrototypeThirdPartyHomeParam> context) {
+  Widget buildWithContext(AFUIBuildContext<AFStateView, AFPrototypeThirdPartyHomeParam> context) {
     return _buildThirdParty(context);
   }
 
   /// 
-  Widget _buildThirdParty(AFProtoBuildContext<AFStateView, AFPrototypeThirdPartyHomeParam> context) {
+  Widget _buildThirdParty(AFUIBuildContext<AFStateView, AFPrototypeThirdPartyHomeParam> context) {
     final t = context.t;
     final libraryContext = context.p.libraryContext;
     final libraryName = libraryContext.id.name;

@@ -1,5 +1,6 @@
 // @dart=2.9
 import 'package:afib/src/dart/command/af_standard_configs.dart';
+import 'package:afib/src/dart/redux/actions/af_deferred_delegate_query.dart';
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/utils/af_context_dispatcher_mixin.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
@@ -858,6 +859,17 @@ class AFBuildContext<TState extends AFAppStateArea, TStateView extends AFStateVi
   /// A utility which dispatches an asynchronous query.
   void dispatchQuery(AFAsyncQuery query) {
     dispatch(query);
+  }
+
+  /// A utility which delays for the specified time, then updates the resulting code.   
+  /// 
+  /// This deferral is active in UIs, but is disabled during automated tests to speed results and avoid 
+  /// complexity.
+  void deferUpdate({ AFPressedDelegate update, Duration duration = const Duration(milliseconds: 200)}) {
+    dispatch(AFDeferredDelegateQuery(
+      onExecute: update,
+      duration: duration
+    ));
   }
 
   bool get _isInWireframe {

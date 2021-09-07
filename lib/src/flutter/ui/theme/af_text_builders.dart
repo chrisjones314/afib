@@ -53,6 +53,11 @@ class AFRichTextBuilder {
     spans.add(TextSpan(text: text, style: styleMuted));
   }
 
+  void writeStyled(dynamic idOrText, TextStyle style) {
+    final text = theme.translate(idOrText);
+    spans.add(TextSpan(text: text, style: style));
+  }
+
   void writeNormal(dynamic idOrText) {
     final text = theme.translate(idOrText);
     write(text);

@@ -6,27 +6,22 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/id.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/theme/af_prototype_theme.dart';
-import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
-import 'package:flutter/material.dart';
 
 mixin AFUIConnectedUIMixin<TStateView extends AFStateView, TRouteParam extends AFRouteParam> {
-  AFUIBuildContext<TStateView, TRouteParam> createContext(BuildContext context, AFDispatcher dispatcher, TStateView stateView, TRouteParam param, AFRouteParamWithChildren paramWithChildren, AFUITheme theme, AFConnectedUIBase container) {
-    return AFUIBuildContext<TStateView, TRouteParam>(context, dispatcher, stateView, param, paramWithChildren, theme, container);
+  AFUIBuildContext<TStateView, TRouteParam> createContext(AFStandardBuildContextData standard, TStateView stateView, TRouteParam param, AFUITheme theme) {
+    return AFUIBuildContext<TStateView, TRouteParam>(standard, stateView, param, theme);
   }
 }
 
 
 class AFUIBuildContext<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFBuildContext<AFAppStateArea, TStateView, TRouteParam, AFUITheme> {
   AFUIBuildContext(
-    BuildContext context, 
-    AFDispatcher dispatcher, 
+    AFStandardBuildContextData standard, 
     AFStateView stateView,
     AFRouteParam routeParam,
-    AFRouteParamWithChildren paramWithChildren, 
     AFFunctionalTheme theme,
-    AFConnectedUIBase container
-  ): super(context, dispatcher, stateView, routeParam, paramWithChildren, theme, container);
+  ): super(standard, stateView, routeParam, theme);
 }
 
 

@@ -14,14 +14,20 @@ class AFBuilder<TBuildContext extends AFBuildContext> extends StatelessWidget {
   });
 
   Widget build(BuildContext childContext) {
+    final standard = AFStandardBuildContextData(
+      context: childContext,
+      dispatcher: parentContext.d,
+      container: parentContext.container,
+      paramWithChildren: parentContext.paramWithChildren,
+      themes: parentContext.standard.themes,
+    );
     final childContextAF = parentContext.container.createContext(
-      childContext,
-      parentContext.d,
+      standard,
       parentContext.s,
       parentContext.p,
-      parentContext.paramWithChildren,
       parentContext.t,
-      parentContext.container);
+
+    );
       
     return builder(childContextAF);
   }

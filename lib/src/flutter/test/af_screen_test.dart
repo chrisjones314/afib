@@ -590,12 +590,13 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
 
   Future<void> applyTap(dynamic selector, { 
     int extraFrames = 0,
+    dynamic tapData,
     AFActionListenerDelegate verifyActions, 
     AFParamListenerDelegate verifyParamUpdate,
     AFAsyncQueryListenerDelegate verifyQuery, 
     bool ignoreUnderWidget = false,
   }) {
-    return applyWidgetValue(selector, null, AFApplyWidgetAction.applyTap, ignoreUnderWidget: ignoreUnderWidget, extraFrames: extraFrames+1, verifyActions: verifyActions, verifyParamUpdate: verifyParamUpdate, verifyQuery: verifyQuery);
+    return applyWidgetValue(selector, tapData, AFApplyWidgetAction.applyTap, ignoreUnderWidget: ignoreUnderWidget, extraFrames: extraFrames+1, verifyActions: verifyActions, verifyParamUpdate: verifyParamUpdate, verifyQuery: verifyQuery);
   }
 
   Future<void> applySwipeDismiss(dynamic selector, { 
@@ -1640,6 +1641,7 @@ abstract class AFWorkflowTestExecute {
   Future<void> tapNavigateFromTo({
     @required dynamic tap,
     @required AFScreenID startScreen,
+    dynamic tapData,
     AFScreenID endScreen,
     bool verifyScreen = true
   });
@@ -1766,11 +1768,12 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
   Future<void> tapNavigateFromTo({
     @required dynamic tap,
     @required AFScreenID startScreen,
+    dynamic tapData,
     AFScreenID endScreen,
     bool verifyScreen = true
   }) async {
     await onScreen(startScreen: startScreen, endScreen: endScreen, verifyScreen: verifyScreen, printResults: false, body: (ste) async {
-      await ste.applyTap(tap);
+      await ste.applyTap(tap, tapData: tapData);
       if(!AFibD.config.isWidgetTesterContext) {
         await Future.delayed(AFibF.g.testDelayOnNewScreen);
       }

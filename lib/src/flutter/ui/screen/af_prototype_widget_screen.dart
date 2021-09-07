@@ -85,7 +85,15 @@ class AFPrototypeWidgetScreen extends AFUIConnectedScreen<AFPrototypeWidgetState
       final dispatcher = AFWidgetScreenTestDispatcher(context: testContext, main: context.d, originalParam: context.p);
 
       final themeChild = sourceWidget.findFunctionalTheme(AFibF.g.storeInternalOnly.state);
-      final childContext = sourceWidget.createContext(context.c, dispatcher, testData, paramChild, null, themeChild, this);
+      final standard = AFStandardBuildContextData(
+        context: context.c,
+        dispatcher: dispatcher,
+        container: this,
+        paramWithChildren: null,
+        themes: context.standard.themes,
+      );
+
+      final childContext = sourceWidget.createContext(standard, testData, paramChild, themeChild);
       resultWidget = sourceWidget.buildWithContext(childContext);
     } else {
       resultWidget = sourceWidget;

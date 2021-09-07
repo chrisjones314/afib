@@ -60,14 +60,21 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
           }
 
           _updateFundamentalThemeState(buildContext);
-          final withContext = createContext(buildContext, dataContext.d, dataContext.s, dataContext.p, dataContext.paramWithChildren, dataContext.theme, this);
+          final standard = AFStandardBuildContextData(
+            context: buildContext,
+            dispatcher: dataContext.d,
+            paramWithChildren: dataContext.paramWithChildren,
+            container: this,
+            themes: dataContext.standard.themes,
+          );
+          final withContext = createContext(standard, dataContext.s, dataContext.p, dataContext.theme);
           final widgetResult = buildWithContext(withContext);
           return widgetResult;
         }
     );
   }
 
-  TBuildContext createContext(material.BuildContext context, AFDispatcher dispatcher, TStateView stateView, TRouteParam param, AFRouteParamWithChildren paramWithChildren, TTheme theme, AFConnectedUIBase container);
+  TBuildContext createContext(AFStandardBuildContextData standard, TStateView stateView, TRouteParam param, TTheme theme);
 
   /// Screens that have their own element tree in testing must return their screen id here,
   /// otherwise return null.
@@ -91,13 +98,21 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
     }
 
     final param = findRouteParam(store.state);
-    final paramWithChildren = findParamWithChildren(store.state);
+    final paramWithChildren = findParamWithChildren(store.state.public);
     final data = createStateViewAF(store.state, param, paramWithChildren);
     if(param == null && !routeEntryExists(store.state)) {
       return null;
     }
     final functionalTheme = findFunctionalTheme(store.state);
-    final context = createContext(null, createDispatcher(store), data, param, paramWithChildren, functionalTheme, this);
+    final standard = AFStandardBuildContextData(
+      context: null,
+      dispatcher:  createDispatcher(store),
+      paramWithChildren: paramWithChildren,
+      container: this,
+      themes: store.state.public.themes,
+    );
+
+    final context = createContext(standard, data, param, functionalTheme);
     return context;
   }
 
@@ -129,7 +144,7 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
     }
 
     final param = findRouteParam(store.state);
-    final paramWithChildren = findParamWithChildren(store.state);
+    final paramWithChildren = findParamWithChildren(store.state.public);
 
     var data = activeState.findViewStateFor<TStateView>();
 
@@ -140,7 +155,15 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
     final mainDispatcher = AFStoreDispatcher(store);
     final dispatcher = AFSingleScreenTestDispatcher(activeTestId, mainDispatcher, testContext);
     final tempTheme = findFunctionalTheme(store.state);
-    return createContext(null, dispatcher, data, param, paramWithChildren, tempTheme, this);
+    final standard = AFStandardBuildContextData(
+      context: null,
+      dispatcher: dispatcher,
+      paramWithChildren: paramWithChildren,
+      container: this,
+      themes: store.state.public.themes,
+    );
+
+    return createContext(standard, data, param, tempTheme);
   }
 
   TTheme findFunctionalTheme(AFState state) {
@@ -162,7 +185,7 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
   AFRouteParam findRouteParam(AFState state) { return null; }
 
   /// Find the route param for this screen. 
-  AFRouteParamWithChildren findParamWithChildren(AFState state) { return null; }
+  AFRouteParamWithChildren findParamWithChildren(AFPublicState state) { return null; }
 
   bool routeEntryExists(AFState state) { return true; }
 
@@ -253,8 +276,8 @@ abstract class AFConnectedScreen<TState extends AFAppStateArea, TTheme extends A
   }
 
   @override
-  AFRouteParamWithChildren findParamWithChildren(AFState state) { 
-    final route = state.public.route;
+  AFRouteParamWithChildren findParamWithChildren(AFPublicState public) { 
+    final route = public.route;
     final param = route?.findParamFor(this.screenId, includePrior: true);
     if(param is AFRouteParamWithChildren) {
       return param;
@@ -291,19 +314,25 @@ abstract class AFEmbeddedWidget<TState extends AFAppStateArea,  TTheme extends A
 
   @override
   material.Widget build(material.BuildContext context) {
+    final standard = AFStandardBuildContextData(
+      context: context,
+      dispatcher: parentContext.d,
+      paramWithChildren: paramWithChildren ?? parentContext.paramWithChildren,
+      container: null,
+      themes: parentContext.standard.themes,
+    );
+
     final afContext = createContext(
-      context, 
-      parentContext.d, 
+      standard,
       stateViewOverride ?? parentContext.stateView,
       routeParamOverride ?? parentContext.routeParam,
-      paramWithChildren ?? parentContext.paramWithChildren,
       themeOverride ?? parentContext.theme,
     );
 
     return buildWithContext(afContext);    
   }
 
-  TBuildContext createContext(material.BuildContext context, AFDispatcher dispatcher, TStateView stateView, TRouteParam param, AFRouteParamWithChildren paramWithChildren, TTheme theme);
+  TBuildContext createContext(AFStandardBuildContextData standard, TStateView stateView, TRouteParam param, TTheme theme);
 
   material.Widget buildWithContext(TBuildContext context);
 
@@ -702,21 +731,36 @@ mixin AFContextShowMixin {
 
 }
 
+/// A utility that reduces the number of parameters passed in AF client code, and enhances flexibility
+class AFStandardBuildContextData {
+  material.BuildContext context;
+  AFDispatcher dispatcher;
+  AFRouteParamWithChildren paramWithChildren;
+  AFScreenPrototype screenTest;
+  AFConnectedUIBase container;
+  AFThemeState themes;
+
+  AFStandardBuildContextData({
+    @required this.context,
+    @required this.dispatcher,
+    @required this.paramWithChildren,
+    this.screenTest,
+    @required this.container,
+    @required this.themes,
+  });
+}
+
 /// A utility class which you can use when you have a complex screen which passes the dispatcher,
 /// screen data and param to many functions, to make things more concise.  
 /// 
 /// The framework cannot pass you this itself because 
 class AFBuildContext<TState extends AFAppStateArea, TStateView extends AFStateView, TRouteParam extends AFRouteParam, TTheme extends AFFunctionalTheme> with AFContextDispatcherMixin, AFContextShowMixin {
-  material.BuildContext context;
-  AFDispatcher dispatcher;
+  AFStandardBuildContextData standard;
   TStateView stateView;
   TRouteParam routeParam;
-  AFRouteParamWithChildren paramWithChildren;
-  AFScreenPrototype screenTest;
   TTheme theme;
-  AFConnectedUIBase container;
 
-  AFBuildContext(this.context, this.dispatcher, this.stateView, this.routeParam, this.paramWithChildren, this.theme, this.container);
+  AFBuildContext(this.standard, this.stateView, this.routeParam, this.theme);
 
   /// Shorthand for accessing the route param.
   TRouteParam get p { return routeParam; }
@@ -724,11 +768,23 @@ class AFBuildContext<TState extends AFAppStateArea, TStateView extends AFStateVi
   /// Shorthand for accessing data from the store
   TStateView get s { return stateView; }
 
+
+  material.BuildContext get context { return standard.context; }  
+  AFDispatcher get dispatcher { return standard.dispatcher; }
+  AFRouteParamWithChildren get paramWithChildren { return standard.paramWithChildren; }
+  AFScreenPrototype get screenTest { return standard.screenTest; }
+  AFConnectedUIBase get container { return standard.container; }
+
+  TFunctionalTheme findTheme<TFunctionalTheme extends AFFunctionalTheme>(AFThemeID themeId) {
+    final themes = standard.themes;
+    return themes.findById(themeId);
+  }
+
   /// Shorthand for accessing the theme
   TTheme get t { return theme; }
 
   /// Shorthand for accessing the dispatcher
-  AFDispatcher get d { return dispatcher; }
+  AFDispatcher get d { return standard.dispatcher; }
 
   /// Shorthand for accessing the flutter build context
   material.BuildContext get c { return context; }
@@ -750,7 +806,7 @@ class AFBuildContext<TState extends AFAppStateArea, TStateView extends AFStateVi
         return;
       } 
     }
-    dispatcher.dispatch(action); 
+    standard.dispatcher.dispatch(action); 
   }
 
   /// Update the parameter for the specified screen, but favor calling

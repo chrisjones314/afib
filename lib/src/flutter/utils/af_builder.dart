@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
@@ -9,8 +8,8 @@ class AFBuilder<TBuildContext extends AFBuildContext> extends StatelessWidget {
   final AFWidgetBuilderDelegate<TBuildContext> builder;
 
   AFBuilder({
-    @required this.parentContext,
-    @required this.builder,
+    required this.parentContext,
+    required this.builder,
   });
 
   Widget build(BuildContext childContext) {
@@ -21,7 +20,7 @@ class AFBuilder<TBuildContext extends AFBuildContext> extends StatelessWidget {
       paramWithChildren: parentContext.paramWithChildren,
       themes: parentContext.standard.themes,
     );
-    final childContextAF = parentContext.container.createContext(
+    final childContextAF = parentContext.container?.createContext(
       standard,
       parentContext.s,
       parentContext.p,
@@ -29,6 +28,6 @@ class AFBuilder<TBuildContext extends AFBuildContext> extends StatelessWidget {
 
     );
       
-    return builder(childContextAF);
+    return builder(childContextAF as TBuildContext);
   }
 }

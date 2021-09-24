@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
@@ -36,7 +35,10 @@ class AFWidgetsBindingObserver extends WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    AFibF.g.dispatchLifecycleActions(AFibF.g.storeDispatcherInternalOnly, state);    
+    final dispatcher = AFibF.g.storeDispatcherInternalOnly;
+    assert(dispatcher != null);
+    if(dispatcher == null) return;
+    AFibF.g.dispatchLifecycleActions(dispatcher, state);    
   }
 
   @override 
@@ -46,7 +48,7 @@ class AFWidgetsBindingObserver extends WidgetsBindingObserver {
   }
 
   @override
-  void didChangeLocales(List<Locale> locale) {
+  void didChangeLocales(List<Locale>? locale) {
     AFibD.logThemeAF?.d("Detected local change");
     rebuildTheme();
   }
@@ -65,7 +67,7 @@ class AFWidgetsBindingObserver extends WidgetsBindingObserver {
 
   void rebuildTheme() {
     // rebuild our theme with the new values, and then update it.
-    AFibF.g.storeDispatcherInternalOnly.dispatch(AFRebuildThemeState());    
+    AFibF.g.storeDispatcherInternalOnly?.dispatch(AFRebuildThemeState());    
   }
 }
 
@@ -108,7 +110,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   final primaryUITests = AFLibraryTestHolder<TState>();
   final thirdPartyUITests = <AFLibraryID, AFLibraryTestHolder>{};
   final internalOnlyScreens = <AFScreenID, AFibTestOnlyScreenElement>{};
-  AFibTestOnlyScreenElement testOnlyMostRecentScreen;
+  AFibTestOnlyScreenElement? testOnlyMostRecentScreen;
   final _recentActions = <AFActionWithKey>[];
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   final sharedTestContext = AFSharedTestExtensionContext();
@@ -120,10 +122,10 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   final testMissingTranslations = AFTestMissingTranslations();
   final wireframes = AFWireframes();
 
-  AFScreenMap _afPrototypeScreenMap;
-  AFScreenID forcedStartupScreen;
+  AFScreenMap? _afPrototypeScreenMap;
+  AFScreenID? forcedStartupScreen;
   int navDepth = 0;
-  Map<String, AFAsyncQueryListener> listenerQueries = <String, AFAsyncQueryListener>{};
+  Map<String, AFAsyncQueryListener?> listenerQueries = <String, AFAsyncQueryListener>{};
   Map<String, AFDeferredQuery> deferredQueries = <String, AFDeferredQuery>{};
 
   /// The redux store, which contains the application state, NOT FOR PUBLIC USE.
@@ -137,13 +139,13 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   /// If you need access to items from your reduce state, you should typically override
   /// [AFConnectedScreen.createStateView], [AFConnectedWidget.createStateView], or the same method
   /// for dialogs, bottom sheets, etc.
-  AFStore storeInternalOnly;
+  AFStore? storeInternalOnly;
 
   /// WARNING: You should never call this.  See [internalOnlyStore] for details.
-  AFStoreDispatcher storeDispatcherInternalOnly;
+  AFStoreDispatcher? storeDispatcherInternalOnly;
 
   AFibGlobalState({
-    this.appContext
+    required this.appContext
   });
 
   void initialize() {
@@ -195,7 +197,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
       initialState: AFState.initialState(),
       middleware: middleware
     );
-    storeDispatcherInternalOnly = AFStoreDispatcher(storeInternalOnly);
+    storeDispatcherInternalOnly = AFStoreDispatcher(storeInternalOnly!);
   }
 
   Iterable<AFUILibraryExtensionContext> get thirdPartyLibraries {
@@ -205,32 +207,34 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   void finishAsyncWithError<TState extends AFAppStateArea>(AFFinishQueryErrorContext context) {
     final handler = appContext.errorHandlerForState<TState>();
     if(handler != null) {
-      handler(context);
+      handler(context as AFFinishQueryErrorContext<TState>);
     }
   }
 
-  void testOnlyVerifyActiveScreen(AFScreenID screenId) {
+  void testOnlyVerifyActiveScreen(AFScreenID? screenId) {
     if(screenId == null) {
       return;
     }
 
-    final state = storeInternalOnly.state;
-    final routeState = state.public.route;
+    final state = storeInternalOnly?.state;
+    final routeState = state?.public.route;
+    if(routeState == null) throw AFException("Missing route state");
 
     if(!routeState.isActiveScreen(screenId)) {
       throw AFException("Screen $screenId is not the currently active screen in route ${routeState.toString()}");
     }
 
     var info = AFibF.g.internalOnlyScreens[screenId];    
-    if(info == null || info.element == null) {
+    if(info?.element == null) {
       throw AFException("Screen $screenId is active, but has not rendered (as there is no screen element), this might be an intenral problem in Afib.");
     }
 
   }
 
   AFScreenID get testOnlyActiveScreenId {
-    final state = AFibF.g.storeInternalOnly.state;
-    final routeState = state.public.route;
+    final state = AFibF.g.storeInternalOnly?.state;
+    final routeState = state?.public.route;
+    if(routeState == null) throw AFException("Missing route state");
     return routeState.activeScreenId;
   }
 
@@ -296,11 +300,11 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     return info;
   }
 
-  AFLibraryTestHolder libraryTests(AFLibraryID id) {
+  AFLibraryTestHolder? libraryTests(AFLibraryID id) {
     return thirdPartyUITests[id];
   }
 
-  AFScreenPrototype findScreenTestById(AFBaseTestID testId) {
+  AFScreenPrototype? findScreenTestById(AFBaseTestID testId) {
     var test = _findTestInSet(testId, primaryUITests);
     if(test != null) {
       return test;
@@ -312,12 +316,10 @@ class AFibGlobalState<TState extends AFAppStateArea> {
         return test;
       }
     }
-
-
-    throw AFException("Unknown test id #{testId}");
+    return null;
   }
 
-  AFScreenPrototype _findTestInSet(AFBaseTestID testId, AFLibraryTestHolder tests) {
+  AFScreenPrototype? _findTestInSet(AFBaseTestID testId, AFLibraryTestHolder tests) {
     final single = tests.afScreenTests.findById(testId);
     if(single != null) {
       return single;
@@ -348,7 +350,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 
 
   /// Used internally in tests to find widgets on the screen.  Not for public use.
-  AFibTestOnlyScreenElement internalOnlyFindScreen(AFScreenID screenId) {
+  AFibTestOnlyScreenElement? internalOnlyFindScreen(AFScreenID screenId) {
     return internalOnlyScreens[screenId];
   }
 
@@ -368,7 +370,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   }
  
   /// The screen map to use given the mode we are running in (its different in prototype mode, for example)
-  AFScreenMap get effectiveScreenMap {
+  AFScreenMap? get effectiveScreenMap {
     if(AFibD.config.requiresPrototypeData) {
       return _afPrototypeScreenMap;
     }
@@ -379,18 +381,19 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   /// 
   /// This varies depending on the afib mode (e.g. prototype mode has a different starutp screen than debug/production)
   AFScreenID get effectiveStartupScreenId {
-    if(forcedStartupScreen != null) {
-      return forcedStartupScreen;
+    final forced = forcedStartupScreen;
+    if(forced != null) {
+      return forced;
     }
     return AFUIScreenID.screenStartupWrapper;
   }
 
-  AFScreenID get actualStartupScreenId {
+  AFScreenID? get actualStartupScreenId {
     return screenMap.startupScreenId;
   }
 
   List<Locale> testEnabledLocales(AFConfig config) {
-    final fundamentals = storeInternalOnly.state.public.themes.fundamentals;
+    final fundamentals = storeInternalOnly!.state.public.themes.fundamentals;
     if(AFConfigEntries.testsEnabled.isI18NEnabled(config)) {
       return fundamentals.supportedLocales.sublist(1);
     }
@@ -400,7 +403,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 
 
   /// Returns the route parameter used by the startup screen.
-  AFCreateRouteParamDelegate get startupRouteParamFactory {
+  AFCreateRouteParamDelegate? get startupRouteParamFactory {
     return screenMap.startupRouteParamFactory;
   }
 
@@ -420,14 +423,14 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   /// Manually updating the themeData works because the themeData is constant across all the renders,
   /// and we recreate the fundamental and conceptual themes any time the themeData would actually change.
   void updateFundamentalThemeData(ThemeData themeData) {
-    final fundamentals = storeInternalOnly.state.public.themes.fundamentals;
+    final fundamentals = storeInternalOnly!.state.public.themes.fundamentals;
     fundamentals.updateThemeData(themeData);
   }
 
-  AFThemeState initializeThemeState({AFAppStateAreas areas}) {
+  AFThemeState initializeThemeState({AFAppStateAreas? areas}) {
     AFibD.logThemeAF?.d("Rebuild fundamental and functional themes");
     if(areas == null) {
-      areas = storeInternalOnly.state.public.areas;
+      areas = storeInternalOnly!.state.public.areas;
     }
     final device = AFFundamentalDeviceTheme.create();
     
@@ -444,9 +447,9 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   }
 
 
-  AFThemeState rebuildFunctionalThemes({AFThemeState initial}) {
+  AFThemeState rebuildFunctionalThemes({AFThemeState? initial}) {
     AFibD.logThemeAF?.d("Rebuild functional themes only");
-    final themes = initial ?? storeInternalOnly.state.public.themes;
+    final themes = initial ?? storeInternalOnly!.state.public.themes;
     final functionals = themeFactories.createFunctionals(themes.fundamentals);
     return themes.copyWith(
       functionals: functionals
@@ -547,7 +550,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     return primaryUITests.afStateTests;
   }
 
-  AFCreateAFAppDelegate get createApp {
+  AFCreateAFAppDelegate? get createApp {
     return appContext.createApp;
   }
 
@@ -591,7 +594,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   /// You might use this to shut down outstanding listener queries when a user logs out.
   void shutdownOutstandingQueries() {
     for(var query in listenerQueries.values) { 
-      query.afShutdown();
+      query?.afShutdown();
     }
     listenerQueries.clear();
 
@@ -627,17 +630,17 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 /// application.  Globals contain debugging utilities (e.g. logging)
 /// and configuration that is immutable after startup (e.g. configuration).
 class AFibF {
-  static AFibGlobalState global;
+  static AFibGlobalState? global;
 
   static void initialize<TState extends AFAppStateArea>(AFAppExtensionContext appContext) {
     global = AFibGlobalState<TState>(
       appContext: appContext
     );
 
-    global.initialize();
+    global?.initialize();
   }
 
   static AFibGlobalState get g { 
-    return global;
+    return global!;
   }
 }

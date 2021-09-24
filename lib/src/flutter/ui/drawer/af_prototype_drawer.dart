@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'dart:async';
 
 import 'package:afib/afib_flutter.dart';
@@ -22,8 +21,8 @@ class AFPrototypeDrawerRouteParam extends AFRouteParam {
   final Map<String, bool> themeExpanded;
 
   AFPrototypeDrawerRouteParam({
-    @required this.view, 
-    @required this.themeExpanded
+    required this.view, 
+    required this.themeExpanded
   });
 
   factory AFPrototypeDrawerRouteParam.createOncePerScreen(int view) {
@@ -36,7 +35,7 @@ class AFPrototypeDrawerRouteParam extends AFRouteParam {
     return result ?? false;
   }
 
-  AFPrototypeDrawerRouteParam reviseExpanded(String area, { bool expanded }) {
+  AFPrototypeDrawerRouteParam reviseExpanded(String area, { required bool expanded }) {
     final revised = Map<String, bool>.from(themeExpanded);
     revised[area] = expanded;
     return copyWith(themeExpanded: revised);
@@ -47,8 +46,8 @@ class AFPrototypeDrawerRouteParam extends AFRouteParam {
   }
 
   AFPrototypeDrawerRouteParam copyWith({
-    int view,
-    Map<String, bool> themeExpanded
+    int? view,
+    Map<String, bool>? themeExpanded
   }) {
     return AFPrototypeDrawerRouteParam(
       view: view ?? this.view,
@@ -58,13 +57,13 @@ class AFPrototypeDrawerRouteParam extends AFRouteParam {
 }
 
 //--------------------------------------------------------------------------------------
-class AFPrototypeDrawerStateView extends AFStateView3<AFScreenTestContextSimulator, AFSingleScreenTestState, AFScreenPrototype> {
-  AFPrototypeDrawerStateView(AFScreenTestContextSimulator testContext, AFSingleScreenTestState testState, AFScreenPrototype test): 
+class AFPrototypeDrawerStateView extends AFStateView3<AFScreenTestContextSimulator?, AFSingleScreenTestState, AFScreenPrototype> {
+  AFPrototypeDrawerStateView(AFScreenTestContextSimulator? testContext, AFSingleScreenTestState testState, AFScreenPrototype test): 
     super(first: testContext, second: testState, third: test);
 
-  AFScreenTestContextSimulator get testContext { return first; }
-  AFSingleScreenTestState get testState { return second; }
-  AFScreenPrototype get prototype { return third; }
+  AFScreenTestContextSimulator? get testContext { return first; }
+  AFSingleScreenTestState? get testState { return second; }
+  AFScreenPrototype? get prototype { return third; }
 }
 
 //--------------------------------------------------------------------------------------
@@ -75,16 +74,20 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
   AFPrototypeDrawer(): super(AFUIScreenID.screenTestDrawer);
 
   //--------------------------------------------------------------------------------------
-  AFScreenID get primaryScreenId {
+  AFScreenID? get primaryScreenId {
     return null;
   }
 
   //--------------------------------------------------------------------------------------
   @override
-  AFPrototypeDrawerStateView createStateViewAF(AFState state, AFPrototypeDrawerRouteParam param, AFRouteParamWithChildren paramWithChildren) {
+  AFPrototypeDrawerStateView createStateViewAF(AFState state, AFPrototypeDrawerRouteParam param, AFRouteParamWithChildren? paramWithChildren) {
     final testState = state.testState;
-    final test = AFibF.g.findScreenTestById(testState.activeTestId);
-    return AFPrototypeDrawerStateView(testState.findContext(test.id), testState.findState(test.id), test);
+    final test = AFibF.g.findScreenTestById(testState.activeTestId!);
+    if(test == null) throw AFException("Missing test for ${testState.activeTestId}");
+    final testContext = testState.findContext(test.id);
+    final testSubState = testState.findState(test.id);
+    if(testSubState == null) throw AFException("unexpected null context or state for ${test.id}");
+    return AFPrototypeDrawerStateView(testContext as AFScreenTestContextSimulator?, testSubState, test);
   }
 
   //--------------------------------------------------------------------------------------
@@ -94,7 +97,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
 
   //--------------------------------------------------------------------------------------
   @override
-  AFPrototypeDrawerStateView createStateView(AFAppStateArea state, AFPrototypeDrawerRouteParam param) {
+  AFPrototypeDrawerStateView createStateView(AFAppStateArea? state, AFPrototypeDrawerRouteParam param) {
     // this should never be called, because createDataAF replaces it.
     throw UnimplementedError();
   }
@@ -137,7 +140,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     rows.add(Container(
       margin: t.margin.v.s3,
       child: t.childText(
-          context.s.prototype.id.toString(), 
+          context.s.prototype?.id.toString(), 
           style: t.styleOnPrimary.bodyText2
       )
     ));
@@ -165,7 +168,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
           child: Text('Reset'),
           onPressed: () {
               context.closeDrawer();
-              test.onDrawerReset(context.d);
+              test?.onDrawerReset(context.d);
           }
         )
       )
@@ -238,7 +241,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
 
     return Expanded(
       child: MediaQuery.removePadding(
-        context: context.c, 
+        context: context.contextNullCheck, 
         removeTop: true,
         child: ListView(
           children: [Column(
@@ -295,7 +298,11 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     );
   }
 
-  void _overrideThemeValue({AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFThemeID id, dynamic value}) {
+  void _overrideThemeValue({
+    required AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, 
+    required AFThemeID id, 
+    dynamic value
+  }) {
       context.dispatch(AFOverrideThemeValueAction(
         id: id,
         value: value,
@@ -443,12 +450,16 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
   void _onRun(AFUIBuildContext<AFPrototypeDrawerStateView, AFPrototypeDrawerRouteParam> context, AFScreenTestID id) {
     final test = context.s.prototype;
     context.closeDrawer();
-    Timer(Duration(seconds: 1), () async {            
-      await test.onDrawerRun(context.d, context.s.testContext, context.s.testState, id, () {
-        final revised = context.p.reviseView(AFPrototypeDrawerRouteParam.viewResults);
-        updateRouteParam(context, revised);
-        test.openTestDrawer(id);
-      });
+    Timer(Duration(seconds: 1), () async {         
+      final prevContext = context.s.testContext;
+      final testState = context.s.testState;
+      if(testState != null) {   
+        await test?.onDrawerRun(context.d, prevContext, testState, id, () {
+          final revised = context.p.reviseView(AFPrototypeDrawerRouteParam.viewResults);
+          updateRouteParam(context, revised);
+          test.openTestDrawer(id);
+        });
+      }
     });    
   }
 
@@ -459,7 +470,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     final rows = t.column();
     
     for(final test in tests) {
-      var description = test.description ?? "";
+      var description = test.description;
       var descColor;
       if(test.disabled != null) {
         description = "Disabled: ${test.disabled}";
@@ -491,6 +502,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
     final t = context.t;
     final prototype = context.s.prototype;
     final rows = t.column();
+    if(prototype == null) throw AFException("Prototype should not be null");
     rows.add(_childTestList(context, prototype.smokeTests, "Smoke"));
     rows.add(_childTestList(context, prototype.reusableTests, "Resuable"));
     rows.add(_childTestList(context, prototype.regressionTests, "Regression"));
@@ -523,6 +535,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
       return;
     }
 
+    if(testState == null) throw AFException("Test State is null");
     rows.add(t.buildErrorsSection(context, testState.errors));
 
     final headerCols = t.row();

@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:colorize/colorize.dart';
 
 enum AFOutputAlignment {
@@ -17,11 +16,11 @@ class AFCommandOutputColumn {
   final StringBuffer content = StringBuffer();
 
   AFCommandOutputColumn({
-    this.alignment,
-    this.color,
-    this.fontStyle,
-    this.width,
-    this.fill,
+    required this.alignment,
+    this.color = Styles.DEFAULT,
+    this.fontStyle = Styles.DEFAULT,
+    this.width = 0,
+    this.fill = " ",
   });
 
   int get length { return content.length; }
@@ -40,7 +39,13 @@ class AFCommandOutput {
   void indent() { nIndent++; }
   void outdent() { nIndent--; }
 
-  void startColumn({AFOutputAlignment alignment, Styles color, Styles fontStyle, int width, String fill = " "}) {
+  void startColumn({
+    AFOutputAlignment? alignment, 
+    Styles? color, 
+    Styles? fontStyle, 
+    int? width, 
+    String fill = " "
+  }) {
     cols.add(AFCommandOutputColumn(
       alignment: alignment ?? AFOutputAlignment.alignLeft,
       color: color ?? Styles.DEFAULT,

@@ -1,4 +1,3 @@
-// @dart=2.9
 /// AFib code used in the bin/XX_afib command in your project.
 /// 
 /// This code cannot pull in flutter/UI source.

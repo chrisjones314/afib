@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
@@ -49,7 +48,7 @@ Future<void> afUILibraryCommandMain(AFDartParams paramsD, List<String> args, AFE
   ], initExtend);
 }
 
-Future<void> _afCommandMain(AFDartParams paramsD, List<String> args, String cmdName, String cmdDescription, AFExtendBaseDelegate initBase, AFExtendBaseDelegate initBaseThirdParty, List<AFExtendCommandsDelegate> inits, AFExtendCommandsThirdPartyDelegate initExtend) async {
+Future<void> _afCommandMain(AFDartParams paramsD, List<String> args, String cmdName, String cmdDescription, AFExtendBaseDelegate? initBase, AFExtendBaseDelegate? initBaseThirdParty, List<AFExtendCommandsDelegate> inits, AFExtendCommandsThirdPartyDelegate? initExtend) async {
   final definitions = AFCommandExtensionContext(paramsD: paramsD, commands: cmd.CommandRunner(cmdName, cmdDescription));
   final baseContext = AFBaseExtensionContext();
 

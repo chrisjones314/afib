@@ -1,8 +1,11 @@
-// @dart=2.9
+import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
+import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
+
+void nullConfigFunction(AFConfig config) {}
 
 /// Application initialization parameters that do not depend on flutter.
 /// 
@@ -16,17 +19,17 @@ class AFDartParams<AppState> {
   final AFInitConfigurationDelegate initProductionConfig;
   final AFInitConfigurationDelegate initPrototypeConfig;
   final AFInitConfigurationDelegate initTestConfig;
-  final Logger logger;
-  final AFEnvironment forceEnv;
+  final Logger? logger;
+  final AFEnvironment? forceEnv;
    
   
   AFDartParams({
-    @required this.initAfib,
-    @required this.initAppConfig,
-    @required this.initDebugConfig,
-    @required this.initProductionConfig,
-    @required this.initPrototypeConfig,
-    @required this.initTestConfig,
+    required this.initAfib,
+    required this.initAppConfig,
+    required this.initDebugConfig,
+    required this.initProductionConfig,
+    required this.initPrototypeConfig,
+    required this.initTestConfig,
     this.logger,
     this.forceEnv
   });
@@ -35,16 +38,27 @@ class AFDartParams<AppState> {
     return copyWith(forceEnv: env);
   }
 
+  static AFDartParams createEmpty() {
+    return AFDartParams(
+      initAfib: nullConfigFunction,
+      initAppConfig: nullConfigFunction,
+      initDebugConfig: nullConfigFunction,
+      initProductionConfig: nullConfigFunction,
+      initPrototypeConfig: nullConfigFunction,
+      initTestConfig: nullConfigFunction,
+    );
+  }
+
 
   AFDartParams copyWith({
-    AFInitConfigurationDelegate initAfib,
-    AFInitConfigurationDelegate initAppConfig,
-    AFInitConfigurationDelegate initDebugConfig,
-    AFInitConfigurationDelegate initProductionConfig,
-    AFInitConfigurationDelegate initPrototypeConfig,
-    AFInitConfigurationDelegate initTestConfig,
-    Logger logger,
-    AFEnvironment forceEnv,
+    AFInitConfigurationDelegate? initAfib,
+    AFInitConfigurationDelegate? initAppConfig,
+    AFInitConfigurationDelegate? initDebugConfig,
+    AFInitConfigurationDelegate? initProductionConfig,
+    AFInitConfigurationDelegate? initPrototypeConfig,
+    AFInitConfigurationDelegate? initTestConfig,
+    Logger? logger,
+    AFEnvironment? forceEnv,
   }) {
     return AFDartParams(
       initAfib: initAfib ?? this.initAfib,

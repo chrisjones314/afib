@@ -1,6 +1,4 @@
-// @dart=2.9
 import 'package:afib/src/flutter/test/af_test_actions.dart';
-import 'package:meta/meta.dart';
 import 'package:afib/afib_flutter.dart';
 
 class AFWireframes {
@@ -18,10 +16,10 @@ class AFWireframeExecutionContext {
   final AFWireframe wireframe;
 
   AFWireframeExecutionContext({
-    @required this.screen,
-    @required this.widget,
-    @required this.eventParam,
-    @required this.wireframe,
+    required this.screen,
+    required this.widget,
+    required this.eventParam,
+    required this.wireframe,
   });
 
   void navigatePop() {
@@ -29,9 +27,13 @@ class AFWireframeExecutionContext {
     _dispatch(AFStartWireframePopTestAction());
   }
 
-  void navigateTo(AFPrototypeID testId, { AFRouteParam routeParam, AFStateView stateView }) {
+  void navigateTo(AFPrototypeID testId, { AFRouteParam? routeParam, AFStateView? stateView }) {
     final test = AFibF.g.findScreenTestById(testId);
-    test.startScreen(AFibF.g.storeDispatcherInternalOnly, wireframe.registry, routeParam: routeParam, stateView: stateView);
+    final dispatcher = AFibF.g.storeDispatcherInternalOnly;
+    assert(dispatcher != null && test != null);
+    if(dispatcher != null && test != null) {
+      test.startScreen(dispatcher, wireframe.registry, routeParam: routeParam, stateView: stateView);
+    }
   }
 
   dynamic td(dynamic id) {
@@ -52,7 +54,8 @@ class AFWireframeExecutionContext {
   }
 
   void _dispatch(dynamic action) {
-    AFibF.g.storeDispatcherInternalOnly.dispatch(action);
+    assert(AFibF.g.storeDispatcherInternalOnly != null);
+    AFibF.g.storeDispatcherInternalOnly?.dispatch(action);
   }
 }
 
@@ -63,16 +66,16 @@ class AFWireframe {
   final AFCompositeTestDataRegistry registry;
 
   AFWireframe({
-    @required this.name, 
-    @required this.initialScreen, 
-    @required this.body,
-    @required this.registry
+    required this.name, 
+    required this.initialScreen, 
+    required this.body,
+    required this.registry
   });
 
   factory AFWireframe.create({
-    @required String name,
-    @required AFPrototypeID initialScreen,
-    @required AFWireframeExecutionDelegate body
+    required String name,
+    required AFPrototypeID initialScreen,
+    required AFWireframeExecutionDelegate body
   }) {
     final registry = AFibF.g.testData.cloneForWireframe();
     return AFWireframe(name: name, initialScreen: initialScreen, body: body, registry: registry);
@@ -99,15 +102,15 @@ class AFWireframeDefinitionContext {
   final AFCompositeTestDataRegistry testData;
 
   AFWireframeDefinitionContext({
-    this.wireframes,
-    this.testData,
+    required this.wireframes,
+    required this.testData,
   });
 
 
   AFWireframe defineWireframe({
-    @required String name,
-    @required AFPrototypeID initialScreen,
-    @required AFWireframeExecutionDelegate body,
+    required String name,
+    required AFPrototypeID initialScreen,
+    required AFWireframeExecutionDelegate body,
   }) {
     final wf = AFWireframe(
       name: name, 

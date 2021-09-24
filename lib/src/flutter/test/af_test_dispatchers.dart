@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_object_with_key.dart';
 import 'package:afib/src/flutter/ui/screen/af_prototype_widget_screen.dart';
@@ -12,7 +11,7 @@ abstract class AFTestDispatcher extends AFDispatcher {
     return action is AFNavigateAction;
   }
 
-  AFPublicState get debugOnlyPublicState {
+  AFPublicState? get debugOnlyPublicState {
     return main.debugOnlyPublicState;
   }
 }
@@ -35,7 +34,7 @@ class AFStateScreenTestDispatcher extends AFTestDispatcher {
 }
 
 abstract class AFScreenTestDispatcher extends AFTestDispatcher {
-  AFScreenTestContext testContext;
+  AFScreenTestContext? testContext;
   AFScreenTestDispatcher(AFDispatcher main, this.testContext): super(main);
 
   void setContext(AFScreenTestContext context) {
@@ -60,7 +59,7 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
 
     // if this is a test action, then remember it so that we can 
     if(!isTestAct && action is AFObjectWithKey) {
-      AFibF.g.testOnlyRegisterRegisterAction(action);
+      AFibF.g.testOnlyRegisterRegisterAction(action as AFActionWithKey);
       AFibD.logTestAF?.d("Registered action: $action");
     }
   }
@@ -73,16 +72,17 @@ class AFSingleScreenTestDispatcher extends AFScreenTestDispatcher {
   AFSingleScreenTestDispatcher(
     this.testId, 
     AFDispatcher main, 
-    AFScreenTestContext testContext): super(main, testContext);
+    AFScreenTestContext? testContext
+  ): super(main, testContext);
 }
 
 class AFWidgetScreenTestDispatcher extends AFScreenTestDispatcher {
   AFPrototypeWidgetRouteParam originalParam;
   
   AFWidgetScreenTestDispatcher({
-    AFScreenTestContext context,
-    AFDispatcher main,
-    this.originalParam
+    required AFScreenTestContext context,
+    required AFDispatcher main,
+    required this.originalParam
   }): super(main, context);
 
 }

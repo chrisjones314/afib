@@ -1,12 +1,9 @@
-
-// @dart=2.9
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_screen_command.dart';
 import 'package:afib/src/dart/command/commands/af_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_generator.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:meta/meta.dart';
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
@@ -15,6 +12,7 @@ import 'package:afib/src/dart/command/templates/af_template_registry.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:args/command_runner.dart' as cmd;
 import 'package:args/args.dart' as args;
+import 'package:collection/collection.dart';
 
 class AFItemWithNamespace {
   /// The namespace used to differentiate third party commands.
@@ -50,20 +48,23 @@ class AFItemWithNamespace {
 
 /// Parent for commands executed through the afib command line app.
 abstract class AFCommand extends cmd.Command { 
-  AFCommandContext ctx;
+  AFCommandContext? ctx;
 
   /// Override this to implement the command.   The first item in the list is the command name.
   /// 
   /// [afibConfig] contains only the values from initialization/afib.g.dart, which can be 
   /// manipulated from the command line.
   void run() {
+    final ctxLocal = ctx;
+    if(ctxLocal == null) return;
+
     // make sure we are in the project root.
-    if(!errorIfNotProjectRoot(ctx.out)) {
+    if(!errorIfNotProjectRoot(ctxLocal.out)) {
       return;
     }
 
-    ctx.arguments = argResults;
-    execute(ctx);
+    ctxLocal.arguments = argResults;
+    execute(ctxLocal);
   }
 
   void finalize() {}
@@ -83,16 +84,16 @@ class AFCommandContext {
   final AFCommandExtensionContext definitions;
   final AFCommandOutput output;
   final AFCodeGenerator generator;
-  args.ArgResults arguments;
+  args.ArgResults? arguments;
 
   AFCommandContext({
-    @required this.output, 
-    @required this.definitions,
-    @required this.generator
+    required this.output, 
+    required this.definitions,
+    required this.generator
   });
 
-  List<String> get unnamedArguments {
-    return arguments.rest;
+  List<String>? get unnamedArguments {
+    return arguments?.rest;
   }
 
   AFCommandOutput get out { return output; }
@@ -111,9 +112,9 @@ class AFCommandThirdPartyExtensionContext extends AFBaseExtensionContext {
   final AFTemplateRegistry templates;
 
   AFCommandThirdPartyExtensionContext({
-    @required this.paramsD, 
-    @required this.commands, 
-    @required this.templates, 
+    required this.paramsD, 
+    required this.commands, 
+    required this.templates, 
   });
 
   /// Used to register a new root level command 
@@ -127,11 +128,13 @@ class AFCommandThirdPartyExtensionContext extends AFBaseExtensionContext {
   // Used to register a subcommand of afib.dart generate...
   void registerGenerateSubcommand(AFGenerateSubcommand generate) {
     final cmd = findCommandByType<AFGenerateParentCommand>();
+    if(cmd == null) return;
     cmd.addSubcommand(generate);
   }
 
-  AFCommand findCommandByType<T extends AFCommand>() {
-    return commands.commands.values.firstWhere((c) => c is T, orElse: () => null);
+  AFCommand? findCommandByType<T extends AFCommand>() {
+    final result = commands.commands.values.firstWhereOrNull((c) => c is T);
+    return result as AFCommand?;
   }
 
   void finalize(AFCommandContext context) {
@@ -155,8 +158,10 @@ class AFCommandThirdPartyExtensionContext extends AFBaseExtensionContext {
 }
 
 class AFCommandExtensionContext extends AFCommandThirdPartyExtensionContext {
-  AFCommandExtensionContext({AFDartParams paramsD, cmd.CommandRunner commands}):
-    super(
+  AFCommandExtensionContext({
+    required AFDartParams paramsD, 
+    required cmd.CommandRunner commands
+  }): super(
       paramsD: paramsD, 
       commands: commands,
       templates: AFTemplateRegistry()

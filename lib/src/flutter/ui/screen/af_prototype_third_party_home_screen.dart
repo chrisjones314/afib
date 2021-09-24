@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
@@ -15,7 +14,7 @@ import 'package:flutter/material.dart';
 class AFPrototypeThirdPartyHomeParam extends AFRouteParam {
   final AFUILibraryExtensionContext libraryContext;
 
-  AFPrototypeThirdPartyHomeParam({this.libraryContext});
+  AFPrototypeThirdPartyHomeParam({required this.libraryContext});
   
   factory AFPrototypeThirdPartyHomeParam.create(AFUILibraryExtensionContext context) {
     return AFPrototypeThirdPartyHomeParam(libraryContext: context);
@@ -33,12 +32,12 @@ class AFPrototypeThirdPartyHomeScreen extends AFUIConnectedScreen<AFStateView, A
   }
 
   @override
-  AFStateView createStateViewAF(AFState state, AFRouteParam param, AFRouteParamWithChildren withChildren) {
+  AFStateView createStateViewAF(AFState state, AFRouteParam param, AFRouteParamWithChildren? withChildren) {
     return AFStateView.unused();
   }
 
   @override
-  AFStateView createStateView(AFAppStateArea state, AFRouteParam param) {
+  AFStateView createStateView(AFAppStateArea? state, AFRouteParam param) {
     // this should never be called, because createStateViewAF replaces it.
     throw UnimplementedError();
   }
@@ -55,13 +54,15 @@ class AFPrototypeThirdPartyHomeScreen extends AFUIConnectedScreen<AFStateView, A
     final libraryName = libraryContext.id.name;
     
     final libraryTests = AFibF.g.libraryTests(libraryContext.id);
-
+    
     final cardRows = t.column();
-    t.buildTestNavDownAll(
-      context: context,
-      tests: libraryTests,
-      rows: cardRows,
-    );
+    if(libraryTests != null) {
+      t.buildTestNavDownAll(
+        context: context,
+        tests: libraryTests,
+        rows: cardRows,
+      );
+    }
     
     final rows = t.column();
     rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeHeader, "Prototypes and Tests", cardRows, margin: t.margin.b.s3));

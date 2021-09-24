@@ -1,6 +1,4 @@
-// @dart=2.9
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
-import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/id.dart';
@@ -18,9 +16,9 @@ mixin AFUIConnectedUIMixin<TStateView extends AFStateView, TRouteParam extends A
 class AFUIBuildContext<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFBuildContext<AFAppStateArea, TStateView, TRouteParam, AFUITheme> {
   AFUIBuildContext(
     AFStandardBuildContextData standard, 
-    AFStateView stateView,
-    AFRouteParam routeParam,
-    AFFunctionalTheme theme,
+    TStateView stateView,
+    TRouteParam routeParam,
+    AFUITheme theme,
   ): super(standard, stateView, routeParam, theme);
 }
 

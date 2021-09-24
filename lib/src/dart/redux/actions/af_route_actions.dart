@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
@@ -11,13 +10,13 @@ import 'package:meta/meta.dart';
 /// and determines which screen is showing, and what data is visible.
 @immutable
 class AFNavigateAction extends AFActionWithKey {
-  final AFID screen;
+  final AFScreenID screen;
   final AFRouteParam param;
 
   AFNavigateAction({
-    @required AFID id,
-    @required this.screen,
-    this.param
+    AFID? id,
+    required this.screen,
+    required this.param
   }): super(id: id);
 }
 
@@ -40,36 +39,49 @@ enum AFNavigateRoute {
 class AFNavigateSetParamAction extends AFNavigateAction {
   final AFNavigateRoute route;
   AFNavigateSetParamAction({
-    AFID id, 
-    @required AFScreenID screen, 
-    @required AFRouteParam param,
-    @required this.route 
+    AFID? id, 
+    required AFScreenID screen, 
+    required AFRouteParam param,
+    required this.route 
   }): super(id: id, screen: screen, param: param);
 }
 
 
 class AFNavigateActionWithReturn extends AFNavigateAction {
-  final AFActionOnReturnDelegate onReturn;
-  AFNavigateActionWithReturn({AFID id, AFScreenID screen, AFRouteParam param, this.onReturn}): super(id: id, screen: screen, param: param);
+  final AFActionOnReturnDelegate? onReturn;
+  AFNavigateActionWithReturn({
+    AFID? id, 
+    required AFScreenID screen, 
+    required AFRouteParam param, 
+    this.onReturn
+  }): super(id: id, screen: screen, param: param);
 
 }
 
 /// Action that replaces the current leaf screen with a new screen.
 class AFNavigateReplaceAction extends AFNavigateAction {  
-  AFNavigateReplaceAction({AFID id, AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
+  AFNavigateReplaceAction({
+    AFID? id, 
+    required AFScreenID screen, 
+    required AFRouteParam param
+  }): super(id: id, screen: screen, param: param);
 }
 
 /// Action that exits the current test screen in prototype mode.
 class AFNavigateExitTestAction extends AFNavigateAction {  
-  AFNavigateExitTestAction({AFID id}): super(id: id, screen: null, param: null);
+  AFNavigateExitTestAction({AFID? id}): super(id: id, screen: AFUIScreenID.unused, param: AFRouteParam.unused());
 }
 
 /// Action that removes all screens in the route, and replaces them with
 /// a single new screen at the root.
 class AFNavigateReplaceAllAction extends AFNavigateAction {
-  AFNavigateReplaceAllAction({AFID id, @required AFScreenID screen, AFRouteParam param}): super(id: id, screen: screen, param: param);
+  AFNavigateReplaceAllAction({
+    AFID? id, 
+    required AFScreenID screen, 
+    required AFRouteParam param
+  }): super(id: id, screen: screen, param: param);
 
-  factory AFNavigateReplaceAllAction.toStartupScreen({AFRouteParam param}) {
+  factory AFNavigateReplaceAllAction.toStartupScreen({required AFRouteParam param}) {
     return AFNavigateReplaceAllAction(screen: AFUIScreenID.screenStartupWrapper, param: param);
   }
 }
@@ -79,10 +91,10 @@ class AFNavigateReplaceAllAction extends AFNavigateAction {
 /// Subsequently, [AFNavigatePopAction] will return you to the parent screen.
 class AFNavigatePushAction extends AFNavigateActionWithReturn {
   AFNavigatePushAction({
-    AFID id, 
-    @required AFScreenID screen, 
-    @required AFRouteParam routeParam, 
-    AFActionOnReturnDelegate onReturn
+    AFID? id, 
+    required AFScreenID screen, 
+    required AFRouteParam routeParam, 
+    AFActionOnReturnDelegate? onReturn
   }): super(id: id, screen: screen, param: routeParam, onReturn: onReturn);
 }
 
@@ -93,7 +105,11 @@ class AFNavigateActionWithReturnData extends AFNavigateAction {
   /// screen test prototypes, but generally navigation does not
   final bool worksInSingleScreenTest;
 
-  AFNavigateActionWithReturnData({AFID id, this.returnData, this.worksInSingleScreenTest = false}): super(id: id, screen: null, param: null);
+  AFNavigateActionWithReturnData({
+    AFID? id, 
+    required this.returnData, 
+    this.worksInSingleScreenTest = false
+  }): super(id: id, screen: AFUIScreenID.unused, param: AFRouteParam.unused());
 }
 
 /// Action that navigates on screen up in the route, discarding the current leaf route.
@@ -107,7 +123,11 @@ class AFNavigateActionWithReturnData extends AFNavigateAction {
 /// navigate you out of a prototype screen in test mode.
 class AFNavigatePopAction extends AFNavigateActionWithReturnData {
   
-  AFNavigatePopAction({AFID id, dynamic returnData, bool worksInSingleScreenTest = false}): super(id: id, returnData: returnData, worksInSingleScreenTest: worksInSingleScreenTest);
+  AFNavigatePopAction({
+    AFID? id, 
+    dynamic returnData, 
+    bool worksInSingleScreenTest = false
+  }): super(id: id, returnData: returnData, worksInSingleScreenTest: worksInSingleScreenTest);
 }
 
 /// Pops [popCount] screens off the navigation stack.
@@ -115,8 +135,8 @@ class AFNavigatePopNAction extends AFNavigateActionWithReturnData {
   final int popCount;
 
   AFNavigatePopNAction({
-    @required this.popCount,
-    AFID id, 
+    required this.popCount,
+    AFID? id, 
     dynamic returnData, 
     bool worksInPrototypeMode = true
     }): super(
@@ -128,12 +148,12 @@ class AFNavigatePopNAction extends AFNavigateActionWithReturnData {
 
 class AFNavigatePopToAction extends AFNavigateActionWithReturnData {
   final AFScreenID popTo;
-  final AFNavigatePushAction push;
+  final AFNavigatePushAction? push;
 
   AFNavigatePopToAction({
-    @required this.popTo,
+    required this.popTo,
     this.push,
-    AFID id, 
+    AFID? id, 
     dynamic returnData, 
     bool worksInPrototypeMode = true
   }): super(
@@ -146,40 +166,40 @@ class AFNavigatePopToAction extends AFNavigateActionWithReturnData {
 class AFNavigateAddConnectedChildAction extends AFNavigateAction {
   final AFWidgetID widget;
   AFNavigateAddConnectedChildAction({
-    AFID id, 
-    @required AFScreenID screen, 
-    @required AFRouteParam param, 
-    @required this.widget,
+    AFID? id, 
+    required AFScreenID screen, 
+    required AFRouteParam param, 
+    required this.widget,
   }): super(id: id, screen: screen, param: param); 
 }
 
 class AFNavigateRemoveConnectedChildAction extends AFNavigateAction {
   final AFWidgetID widget;
   AFNavigateRemoveConnectedChildAction({
-    AFID id, 
-    @required AFScreenID screen, 
-    @required this.widget,
-  }): super(id: id, screen: screen, param: null); 
+    AFID? id, 
+    required AFScreenID screen, 
+    required this.widget,
+  }): super(id: id, screen: screen, param: AFRouteParam.unused()); 
 }
 
 class AFNavigateSortConnectedChildrenAction extends AFNavigateAction {
   final AFTypedSortDelegate sort;
   final Type typeToSort;
   AFNavigateSortConnectedChildrenAction({
-    AFID id, 
-    @required AFScreenID screen, 
-    @required this.sort,
-    @required this.typeToSort,
-  }): super(id: id, screen: screen, param: null); 
+    AFID? id, 
+    required AFScreenID screen, 
+    required this.sort,
+    required this.typeToSort,
+  }): super(id: id, screen: screen, param: AFRouteParam.unused()); 
 }
 
 class AFNavigateSetChildParamAction extends AFNavigateAction {
   final AFID widget;
   AFNavigateSetChildParamAction({
-    AFID id, 
-    @required AFScreenID screen, 
-    @required this.widget,
-    @required AFRouteParam param,
+    AFID? id, 
+    required AFScreenID screen, 
+    required this.widget,
+    required AFRouteParam param,
   }): super(id: id, screen: screen, param: param); 
 }
 
@@ -189,8 +209,8 @@ class AFNavigateWireframeAction {
   final dynamic eventParam;
 
   AFNavigateWireframeAction({
-    this.screen,
-    this.widget,
+    required this.screen,
+    required this.widget,
     this.eventParam,
   });
 }

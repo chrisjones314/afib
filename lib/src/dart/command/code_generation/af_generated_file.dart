@@ -1,10 +1,8 @@
-
 import 'dart:io';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:colorize/colorize.dart';
-import 'package:meta/meta.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_buffer.dart';
 
@@ -22,15 +20,15 @@ class AFGeneratedFile {
   AFCodeBuffer buffer;
 
   AFGeneratedFile({
-    @required this.projectPath, 
-    @required this.buffer,
-    @required this.action,
+    required this.projectPath, 
+    required this.buffer,
+    required this.action,
   });
 
   factory AFGeneratedFile.fromTemplate({
-    @required List<String> projectPath,
-    @required AFSourceTemplate template,
-    @required AFGeneratedFileAction action
+    required List<String> projectPath,
+    required AFSourceTemplate template,
+    required AFGeneratedFileAction action
   }) {
     return AFGeneratedFile(
       projectPath: projectPath,
@@ -40,7 +38,7 @@ class AFGeneratedFile {
   }
 
   factory AFGeneratedFile.fromPath({
-    @required List<String> projectPath,
+    required List<String> projectPath,
   }) {
     final buffer = AFCodeBuffer.fromPath(projectPath);
     return AFGeneratedFile(
@@ -61,12 +59,15 @@ class AFGeneratedFile {
 
   /// Resolves references to other registered templates.
   void resolveTemplateReferences({
-    @required AFCommandContext context, 
+    required AFCommandContext context, 
   }) {
     final templates = context.definitions.templates;
     for(final id in templates.templateCodes) {
       final template = templates.find(id);
-      buffer.replaceTemplate(context, id.toString(), template);
+      assert(template != null);
+      if(template != null) {
+        buffer.replaceTemplate(context, id.toString(), template);
+      }
     }
   }
 

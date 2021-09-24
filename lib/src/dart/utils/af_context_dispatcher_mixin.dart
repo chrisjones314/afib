@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
@@ -21,7 +20,7 @@ mixin AFContextDispatcherMixin {
   /// This is just here for discoverability, it is no different from
   /// dispatch(action).  You can manually specify the [action], or 
   /// if you don't, a default pop without a a return value is created for you.
-  void dispatchNavigatePop({AFNavigatePopAction action}) {
+  void dispatchNavigatePop({AFNavigatePopAction? action}) {
     if(action == null) {
       action = AFNavigatePopAction();
     }
@@ -41,7 +40,7 @@ mixin AFContextDispatcherMixin {
   void dispatchWireframe(AFScreenID screen, AFID widget, {
     dynamic eventParam
   }) {
-    if(!AFibD.config.isPrototypeMode || AFibF.g.storeInternalOnly.state.testState.activeWireframe == null) {
+    if(!AFibD.config.isPrototypeMode || AFibF.g.storeInternalOnly?.state.testState.activeWireframe == null) {
       return;
     }
     dispatch(AFNavigateWireframeAction(

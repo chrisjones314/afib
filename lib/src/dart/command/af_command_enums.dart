@@ -62,9 +62,9 @@ class AFFormFactorSize {
   final double height;
   final double width;
   const AFFormFactorSize({
-    @required this.identifier,
-    @required this.width, 
-    @required this.height
+    required this.identifier,
+    required this.width, 
+    required this.height,
   });
 
   String get dimensionsText {

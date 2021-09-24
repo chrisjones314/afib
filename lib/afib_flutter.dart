@@ -1,4 +1,3 @@
-// @dart=2.9
 /// AFib code that depends on flutter.
 ///
 /// Be careful not to reference this library from integration tests.

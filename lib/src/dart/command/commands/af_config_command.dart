@@ -23,7 +23,7 @@ class AFConfigCommand extends AFCommand {
     }
   }
 
-  static void updateConfig(AFCommandContext ctx, AFConfig config, List<AFConfigurationItem> items, args.ArgResults argResults) {
+  static void updateConfig(AFCommandContext ctx, AFConfig config, List<AFConfigurationItem> items, args.ArgResults? argResults) {
     final output = ctx.output;
     // go through all the options that were set, and convert them into values
     // in the config.
@@ -32,7 +32,7 @@ class AFConfigCommand extends AFCommand {
         continue;
       }
       final key = entry.name;
-      final value = argResults[key];
+      final value = argResults?[key];
       if(value == null) {
         continue;
       }
@@ -64,7 +64,8 @@ class AFConfigCommand extends AFCommand {
   @override
   void execute(AFCommandContext ctx) {    
 
-    if(ctx.unnamedArguments.length > 0) {
+    final unnamed = ctx.unnamedArguments;
+    if(unnamed != null && unnamed.isNotEmpty) {
       throw AFCommandError("The command has extra unrecognized arguments, did you forgot -- before an argument?");
     }
 

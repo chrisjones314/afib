@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/flutter/core/af_text_field.dart';
@@ -74,22 +73,33 @@ class AFScrollableScrollTracker extends AFScrollTracker {
   
   bool canScrollMore() {
     final controller = _controller();
-    return controller.offset < controller.position.maxScrollExtent;
+    assert(controller != null);
+    if(controller != null) {
+      return controller.offset < controller.position.maxScrollExtent;
+    }
+    return false;
   }
+
   Future<void> scrollMore() async {
     if(!AFibD.config.isWidgetTesterContext) {
       final controller = _controller();
-      var newPos = controller.offset +  200;
-      if(newPos > controller.position.maxScrollExtent) {
-        newPos = controller.position.maxScrollExtent;
+      assert(controller != null);
+      if(controller != null) {
+        var newPos = controller.offset +  200;
+        if(newPos > controller.position.maxScrollExtent) {
+          newPos = controller.position.maxScrollExtent;
+        }
+        await controller.animateTo(newPos, duration: Duration(milliseconds: 500), curve: Curves.ease);
       }
-      await controller.animateTo(newPos, duration: Duration(milliseconds: 500), curve: Curves.ease);
     }
   }
 
-  ScrollController _controller() {
-    final Scrollable s = element.widget;
-    return s.controller;
+  ScrollController? _controller() {
+    if(element.widget is Scrollable) {
+      final s = element.widget as Scrollable;
+      return s.controller;
+    }
+    return null;
   }
 }
 
@@ -167,8 +177,8 @@ class AFTextButtonAction extends AFApplyTapWidgetAction {
   @override
   bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
     final tapOn = elem.widget;
-    if(tapOn is TextButton) {
-      tapOn.onPressed();
+    if(tapOn is TextButton && tapOn.onPressed != null) {
+      tapOn.onPressed?.call();
       return true;
     } 
     return false;
@@ -184,7 +194,7 @@ class AFOutlinedButtonAction extends AFApplyTapWidgetAction {
   bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
     final tapOn = elem.widget;
     if(tapOn is OutlinedButton) {
-      tapOn.onPressed();
+      tapOn.onPressed?.call();
       return true;
     } 
     return false;
@@ -202,7 +212,7 @@ class AFSwitchTapAction extends AFApplyTapWidgetAction {
   bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
     final tapOn = elem.widget;
     if(tapOn is Switch) {
-      tapOn.onChanged(!tapOn.value);
+      tapOn.onChanged?.call(!tapOn.value);
       return true;
     } 
     return false;
@@ -219,7 +229,7 @@ class AFListTileTapAction extends AFApplyTapWidgetAction {
   bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
     final tapOn = elem.widget;
     if(tapOn is ListTile) {
-      tapOn.onTap();
+      tapOn.onTap?.call();
       return true;
     } 
     return false;
@@ -235,7 +245,7 @@ class AFDismissibleSwipeAction extends AFApplyDismissWidgetAction {
   bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
     final swipeOn = elem.widget;
     if(swipeOn is Dismissible) {
-      swipeOn.onDismissed(swipeOn.direction);
+      swipeOn.onDismissed?.call(swipeOn.direction);
       return true;
     } 
     return false;
@@ -251,7 +261,7 @@ class AFGestureDetectorTapAction extends AFApplyTapWidgetAction {
   bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
     final tapOn = elem.widget;
     if(tapOn is GestureDetector) {
-      tapOn.onTap();
+      tapOn.onTap?.call();
       return true;
     } 
     return false;
@@ -267,7 +277,7 @@ class AFIconButtonAction extends AFApplyTapWidgetAction {
   bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
     final tapOn = elem.widget;
     if(tapOn is IconButton) {
-      tapOn.onPressed();
+      tapOn.onPressed?.call();
       return true;
     } 
     return false;
@@ -283,7 +293,7 @@ class AFRaisedButtonAction extends AFApplyTapWidgetAction {
   bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
     final tapOn = elem.widget;
     if(tapOn is ElevatedButton) {
-      tapOn.onPressed();
+      tapOn.onPressed?.call();
       return true;
     } 
     return false;
@@ -301,7 +311,7 @@ class AFRichTextGestureTapAction extends AFApplyTapWidgetAction {
     if(!(selector is AFRichTextGestureTapSpecifier)) {
       throw AFException("If you want to tap on text within a RichText widget, you need to specify an AFRichTextGestureTapSpecifier explicitly as your widget specifier.");
     }
-    AFRichTextGestureTapSpecifier specifier = selector;
+    final specifier = selector;
     final containsText = specifier.containsText;   
     if(tapOn is RichText) {
       if(tapIfMatch(tapOn.text, containsText)) {
@@ -313,10 +323,11 @@ class AFRichTextGestureTapAction extends AFApplyTapWidgetAction {
 
   bool tapIfMatch(InlineSpan span, String containsText) {
     if(span is TextSpan) {
-      if(span.text != null && span.text.contains(containsText) && span.recognizer != null) {
+      final spanText = span.text;
+      if(spanText != null && spanText.contains(containsText) && span.recognizer != null) {
         final recognizer = span.recognizer;
         if(recognizer is TapGestureRecognizer) {
-          recognizer.onTap();
+          recognizer.onTap?.call();
           return true;
         }
       }
@@ -325,9 +336,12 @@ class AFRichTextGestureTapAction extends AFApplyTapWidgetAction {
         return false;
       }
 
-      for(final child in span.children) {
-        if(tapIfMatch(child, containsText)) {
-          return true;
+      final spanChildren = span.children;
+      if(spanChildren != null) {
+        for(final child in spanChildren) {
+          if(tapIfMatch(child, containsText)) {
+            return true;
+          }
         }
       }
     }
@@ -344,7 +358,7 @@ class AFTapChoiceChip extends AFApplyTapWidgetAction {
   bool applyInternal(String applyType, AFWidgetSelector selector, Element element, dynamic data) {
     final widget = element.widget;
     if(widget is ChoiceChip) {
-      widget.onSelected(!widget.selected);
+      widget.onSelected?.call(!widget.selected);
       return true;
     } 
     return false;
@@ -362,7 +376,7 @@ class AFSetChoiceChip extends AFApplySetValueWidgetAction {
     if(widget is ChoiceChip) {
       bool isSel = data;
       if(widget.selected != isSel) {
-        widget.onSelected(isSel);
+        widget.onSelected?.call(isSel);
       }
       return true;
     } 
@@ -381,7 +395,7 @@ class AFSetSwitchValueAction extends AFApplySetValueWidgetAction {
     if(widget is Switch) {
       bool isSel = data;
       if(widget.value != isSel) {
-        widget.onChanged(isSel);
+        widget.onChanged?.call(isSel);
       }
       return true;
     } 
@@ -398,7 +412,7 @@ class AFApplyCupertinoPicker extends AFApplySetValueWidgetAction {
   bool applyInternal(String applyType, AFWidgetSelector selector, Element element, dynamic data) {
     final widget = element.widget;
     if(widget is CupertinoPicker) {
-      widget.onSelectedItemChanged(data);
+      widget.onSelectedItemChanged?.call(data);
       return true;
     } 
     return false;
@@ -414,10 +428,11 @@ class AFApplyTextTextFieldAction extends AFApplySetValueWidgetAction {
   bool applyInternal(String applyType, AFWidgetSelector selector, Element element, dynamic data) {
     final widget = element.widget;
     if(widget is TextField && data is String) {
-      if(widget.controller != null) {
-        widget.controller.text = data;
+      final widCont = widget.controller;
+      if(widCont != null) {
+        widCont.text = data;
       }
-      widget.onChanged(data);
+      widget.onChanged?.call(data);
       return true;
     } 
     return false;
@@ -432,7 +447,22 @@ class AFApplyTextAFTextFieldAction extends AFApplySetValueWidgetAction {
   bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
     final widget = elem.widget;
     if(widget is AFTextField && data is String) {
-      widget.onChanged(data);
+      widget.onChanged?.call(data);
+      return true;
+    } 
+    return false;
+  }
+}
+
+class AFApplySliderAction extends AFApplySetValueWidgetAction {
+
+  AFApplySliderAction(): super(Slider);
+
+  @override
+  bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
+    final widget = elem.widget;
+    if(widget is Slider && data is double) {
+      widget.onChanged?.call(data);
       return true;
     } 
     return false;
@@ -467,6 +497,20 @@ class AFExtractTextTextAction extends AFExtractPrimaryWidgetAction {
   }
 }
 
+class AFExtractSliderAction extends AFExtractPrimaryWidgetAction {
+
+  AFExtractSliderAction(): super(Slider);
+
+  @override
+  dynamic extractInternal(String extractType, AFWidgetSelector selector, Element element) {
+    final widget = element.widget;
+    if(AFExtractWidgetAction.isPrimary(extractType) && widget is Slider) {
+      return widget.value;
+    } 
+    return null;
+  }
+}
+
 class AFExtractTextTextFieldAction extends AFExtractPrimaryWidgetAction {
 
   AFExtractTextTextFieldAction(): super(TextField);
@@ -476,7 +520,7 @@ class AFExtractTextTextFieldAction extends AFExtractPrimaryWidgetAction {
     final widget = element.widget;
     if(AFExtractWidgetAction.isPrimary(extractType) && widget is TextField) {
       if(widget.controller != null) {
-        return widget.controller.value.text;
+        return widget.controller?.value.text;
       } 
     } 
     return null;
@@ -503,8 +547,9 @@ class AFExtractRichTextAction extends AFExtractPrimaryWidgetAction {
       if(span.text != null) {
         dest.write(span.text);
       }
-      if(span.children != null) {
-        for(final child in span.children) {
+      final spanChildren = span.children;
+      if(spanChildren != null) {
+        for(final child in spanChildren) {
           _populateFromSpan(dest, child);
         }
       }
@@ -520,7 +565,7 @@ class AFExtractTextAFTextFieldAction extends AFExtractPrimaryWidgetAction {
 
   @override
   dynamic extractInternal(String extractType, AFWidgetSelector selector, Element element) {
-    String text;
+    String? text;
     final widget = element.widget;
     if(AFExtractWidgetAction.isPrimary(extractType) && widget is AFTextField) {
       final children = this.findChildrenWithWidgetType<TextField>(element);
@@ -531,7 +576,7 @@ class AFExtractTextAFTextFieldAction extends AFExtractPrimaryWidgetAction {
       final elem = children.first;
       final childWidget = elem.widget;
       if(childWidget is TextField) {
-        text = childWidget.controller.value.text; 
+        text = childWidget.controller?.value.text; 
       }
     } 
     return text;

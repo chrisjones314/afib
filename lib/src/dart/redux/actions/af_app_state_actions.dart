@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/src/dart/utils/af_object_with_key.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:meta/meta.dart';
@@ -26,9 +25,10 @@ class AFUpdateAppStateAction extends AFObjectWithKey {
   final Type area;
   final List<Object> toIntegrate;
   
-  AFUpdateAppStateAction({AFID id,
-    @required this.area,
-    @required this.toIntegrate
+  AFUpdateAppStateAction({
+    AFID? id,
+    required this.area,
+    required this.toIntegrate
   }): super(id: id);
 
   /// A utility for creating a list of revised models.   

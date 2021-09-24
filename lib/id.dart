@@ -1,4 +1,3 @@
-
 import 'package:afib/src/dart/utils/af_id.dart';
 
 class AFUILibraryID {
@@ -6,6 +5,7 @@ class AFUILibraryID {
 }
 
 class AFUIScreenID {
+  static const unused = AFScreenID("unused", AFUILibraryID.id);
   static const screenPrototypeWireframesList = AFScreenID("screen_prototype_wireframes_list", AFUILibraryID.id);
   static const screenPrototypeListSingleScreen = AFScreenID("prototype_list_single_screen", AFUILibraryID.id);
   static const screenPrototypeListWorkflow = AFScreenID("prototype_list_multi_screen", AFUILibraryID.id);

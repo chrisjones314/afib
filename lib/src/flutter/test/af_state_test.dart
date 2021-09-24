@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/src/dart/redux/actions/af_always_fail_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
@@ -11,7 +10,6 @@ import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
-import 'package:meta/meta.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
@@ -27,23 +25,23 @@ class AFStateTestDifference {
   final AFState afStateBefore;
   final AFState afStateAfter;
   AFStateTestDifference({
-    @required this.afStateBefore,
-    @required this.afStateAfter,
+    required this.afStateBefore,
+    required this.afStateAfter,
   });
 
   TAppState stateBefore<TAppState extends AFAppStateArea>() {
-    return _findAppState(afStateBefore);
+    return _findAppState(afStateBefore)!;
   }
 
   TAppState stateAfter<TAppState extends AFAppStateArea>() {
-    return _findAppState(afStateAfter);
+    return _findAppState(afStateAfter)!;
   }
 
-  TAppTheme themeBefore<TAppTheme extends AFFunctionalTheme>(AFThemeID themeId) {
+  TAppTheme? themeBefore<TAppTheme extends AFFunctionalTheme>(AFThemeID themeId) {
     return _findAppTheme(afStateBefore, themeId);
   }
 
-  TAppTheme themeAfter<TAppTheme extends AFFunctionalTheme>(AFThemeID themeId) {
+  TAppTheme? themeAfter<TAppTheme extends AFFunctionalTheme>(AFThemeID themeId) {
     return _findAppTheme(afStateAfter, themeId);
   }
 
@@ -55,14 +53,14 @@ class AFStateTestDifference {
     return _routeFor(afStateAfter);
   }
 
-  TAppState _findAppState<TAppState extends AFAppStateArea>(AFState state) {
+  TAppState? _findAppState<TAppState extends AFAppStateArea>(AFState state) {
     final areas = state.public.areas;
-    return areas.stateFor(TAppState);
+    return areas.stateFor(TAppState) as TAppState;
   }
 
-  TAppTheme _findAppTheme<TAppTheme extends AFFunctionalTheme>(AFState state, AFThemeID themeId) {
+  TAppTheme? _findAppTheme<TAppTheme extends AFFunctionalTheme>(AFState state, AFThemeID themeId) {
     final themes = state.public.themes;
-    return themes.findById(themeId);
+    return themes.findById(themeId) as TAppTheme;
   }
 
   AFRouteState _routeFor(AFState state) {
@@ -74,14 +72,14 @@ class AFStateTestContext<TState extends AFAppStateArea> extends AFStateTestExecu
   AFStateTest test;
   final AFStore store;
   AFDispatcher dispatcher;
-  static AFStateTestContext currentTest;
+  static AFStateTestContext? currentTest;
   final bool isTrueTestContext;
   
-  AFStateTestContext(this.test, this.store, this.dispatcher, { @required this.isTrueTestContext} );
+  AFStateTestContext(this.test, this.store, this.dispatcher, { required this.isTrueTestContext} );
 
   AFStateTestID get testID { return this.test.id; }
   AFState get afState { return store.state; }
-  TState get state { return store.state.public.areaStateFor(TState); }
+  TState? get state { return store.state.public.areaStateFor(TState) as TState; }
   AFRouteState get route { return store.state.public.route; }
 
   void processQuery(AFAsyncQuery q) {
@@ -93,7 +91,7 @@ class AFStateTestContext<TState extends AFAppStateArea> extends AFStateTestExecu
 class AFStateTests<TState extends AFAppStateArea> {
   final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
   final List<AFStateTest<dynamic>> tests = <AFStateTest<dynamic>>[];
-  AFStateTestContext<dynamic> context;
+  AFStateTestContext<dynamic>? context;
 
   void addTest(AFStateTestID id, AFProcessTestDelegate handler) {
     final test = AFStateTest<TState>(id, this);
@@ -101,10 +99,10 @@ class AFStateTests<TState extends AFAppStateArea> {
     handler(test);
   }
 
-  AFStateTest findById(AFStateTestID id) {
+  AFStateTest? findById(AFStateTestID id) {
     for(var test in tests) {
       if(test.id == id) {
-        return test;
+        return test as AFStateTest;
       }
     }
     return null;
@@ -113,7 +111,7 @@ class AFStateTests<TState extends AFAppStateArea> {
 
 class _AFStateResultEntry {
   final dynamic querySpecifier;
-  final AFProcessQueryDelegate handler;
+  final AFProcessQueryDelegate? handler;
   _AFStateResultEntry(
     this.querySpecifier, 
     this.handler
@@ -122,14 +120,14 @@ class _AFStateResultEntry {
 
 class _AFStateQueryBody {
   final AFAsyncQuery query;
-  final AFProcessVerifyDifferenceDelegate verify;
+  final AFProcessVerifyDifferenceDelegate? verify;
   _AFStateQueryBody(this.query, this.verify);
 }
 
 class AFStateTest<TState extends AFAppStateArea> {
   final AFStateTests<TState> tests;
   final AFStateTestID id;
-  AFStateTestID idPredecessor;
+  AFStateTestID? idPredecessor;
   final Map<String, _AFStateResultEntry> results = <String, _AFStateResultEntry>{};
   final List<_AFStateQueryBody> queryBodies = <_AFStateQueryBody>[];
 
@@ -145,12 +143,16 @@ class AFStateTest<TState extends AFAppStateArea> {
   void extendsTest(AFStateTestID idTest) {
     idPredecessor = idTest;
     final test = tests.findById(idTest);
-    this.results.addAll(test.results);
+    if(test != null) {
+      this.results.addAll(test.results);
+    }
   }
 
   void initializeVerifyFrom(AFStateTestID idTest) {
     final test = tests.findById(idTest);
-    queryBodies.addAll(test.queryBodies);
+    if(test != null) {
+      queryBodies.addAll(test.queryBodies);
+    }
   }
     
   void registerResult(dynamic querySpecifier, AFProcessQueryDelegate handler) {
@@ -164,8 +166,9 @@ class AFStateTest<TState extends AFAppStateArea> {
     } else if(querySpecifier is Type) {
       return querySpecifier.toString();
     } else if(querySpecifier is AFAsyncQuery) {
-      if(querySpecifier.id != null) {
-        return querySpecifier.id.code;
+      final qsId = querySpecifier.id;
+      if(qsId != null) {
+        return qsId.code;
       }
       return querySpecifier.runtimeType.toString();
     }
@@ -202,7 +205,7 @@ class AFStateTest<TState extends AFAppStateArea> {
   }
 
   void executeQuery(AFAsyncQuery query, {
-    AFProcessVerifyDifferenceDelegate verifyState
+    AFProcessVerifyDifferenceDelegate? verifyState
   }) {
     queryBodies.add(_AFStateQueryBody(query, verifyState));
   }
@@ -212,9 +215,10 @@ class AFStateTest<TState extends AFAppStateArea> {
     AFStateTestContext.currentTest = context;
   
     // first, execute an predecessor tests.
-    if(idPredecessor != null) {
-      final test = tests.findById(idPredecessor);
-      test.execute(context, shouldVerify: false);
+    final idPred = idPredecessor;
+    if(idPred != null) {
+      final test = tests.findById(idPred);
+      test?.execute(context, shouldVerify: false);
     }
 
     // basically, we need to go through an execute each query that they specified.
@@ -229,7 +233,7 @@ class AFStateTest<TState extends AFAppStateArea> {
           afStateBefore: stateBefore,
           afStateAfter: context.afState,
         );
-        q?.verify(e, diff);
+        q.verify?.call(e, diff);
       }
     }
   }
@@ -268,7 +272,9 @@ class AFStateTest<TState extends AFAppStateArea> {
           final consolidatedQuery = consolidatedQueries.query;
           final consolidatedKey = _specifierToId(consolidatedQuery);
           final consolidatedHandler = results[consolidatedKey];
-          consolidatedQueries.result = consolidatedHandler.handler(context, consolidatedQuery);
+          if(consolidatedHandler != null) {
+            consolidatedQueries.result = consolidatedHandler.handler?.call(context, consolidatedQuery);
+          }
 
         }
         query.finishAsyncWithResponseAF(successContext);
@@ -278,8 +284,9 @@ class AFStateTest<TState extends AFAppStateArea> {
       throw AFException("No results specified for query ${_specifierToId(query)}");
     }
 
-    if(h.handler != null) {
-      h.handler(context, query);
+    final handler = h.handler;
+    if(handler != null) {
+      handler(context, query);
     }
   }
 }

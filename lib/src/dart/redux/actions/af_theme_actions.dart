@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:meta/meta.dart';
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
@@ -17,8 +16,8 @@ class AFOverrideThemeValueAction {
   final AFThemeID id;
   final dynamic value;
   AFOverrideThemeValueAction({
-    this.id,
-    this.value,
+    required this.id,
+    required this.value,
   });
 }
 

@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'dart:core';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_route_state.dart';
@@ -34,7 +33,7 @@ void _navigatePushAction(Store<AFState> store, action, NextDispatcher next) {
 
   AFibF.g.doMiddlewareNavigation((navState) {
     Future<dynamic> ret = navState.pushNamed(action.screen.code);
-    if(ret != null && action.onReturn != null) {
+    if(action.onReturn != null) {
       ret.then( (msg) {
         action.onReturn(msg);
       });
@@ -92,8 +91,10 @@ void _navigatePopToAction(Store<AFState> store, action, NextDispatcher next) {
     for(var i = 0; i < popCountTo; i++) {
       navState.pop(action.returnData);
     }
-    if(popTo.push != null) {
-      navState.pushNamed(popTo.push.screen.code);
+    final screenCode = popTo.push?.screen.code;
+    assert(screenCode != null);
+    if(screenCode != null) {
+      navState.pushNamed(screenCode);
     }
   });
   next(action);

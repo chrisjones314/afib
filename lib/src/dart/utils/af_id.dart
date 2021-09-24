@@ -1,20 +1,22 @@
-// @dart=2.9
+import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:quiver/core.dart';
 
 class AFID {
-  final String prefix;
+  final String? prefix;
   final String codeId;
-  final AFLibraryID library;
+  final AFLibraryID? library;
   const AFID(this.prefix, this.codeId, this.library);
 
   String get code {
-    if(library == null) {
+    final lib = library;
+    if(lib == null) {
       return "${prefix}_$codeId";
     }
-    if(prefix == null) {
-      return "${library.codeId}_$codeId";
+    final pref = prefix;
+    if(pref == null) {
+      return "${lib.codeId}_$codeId";
     }
-    return "${library.codeId}_${prefix}_$codeId";
+    return "${lib.codeId}_${prefix}_$codeId";
   }
 
   @override
@@ -38,8 +40,14 @@ class AFID {
     return code.hashCode;
   }
 
+  Never throwLibNotNull() {
+    throw AFException("Library cannot be null");
+  }
+
   AFWidgetID with1(dynamic item) {
-    return AFWidgetID("${code}_${item.toString()}", library);
+    final lib = library;
+    if(lib == null) throwLibNotNull();
+    return AFWidgetID("${code}_${item.toString()}", lib);
   }
 
   AFWidgetID with2(dynamic first, dynamic second) {
@@ -48,7 +56,9 @@ class AFID {
     if(second != null) {
       key.write("_${second.toString()}");
     }
-    return AFWidgetID(key.toString(), library);
+    final lib = library;
+    if(lib == null) throwLibNotNull();
+    return AFWidgetID(key.toString(), lib);
   }
 
   bool endsWith(String ends) {
@@ -59,38 +69,43 @@ class AFID {
 
 class AFIDWithTags extends AFID {
   final dynamic group;
-  final List<String> tags;
+  final List<String>? tags;
 
   const AFIDWithTags(String prefix, String code,  AFLibraryID library, { this.tags, this.group, }): super(prefix, code, library);
 
   String get tagsText {
-    if(tags == null) {
+    final t = tags;
+    if(t == null) {
       return "";
     }
-    return tags.join(", ");
+    return t.join(", ");
   }
 
-  String get effectiveGroup {
+  String? get effectiveGroup {
     if(group != null) {
       return group.toString();
     }
 
-    if(tags != null && tags.isNotEmpty) {
-      return tags.first;
+    final t = tags;
+    if(t != null && t.isNotEmpty) {
+      return t.first;
     }
 
     return null;
   }
 
   bool hasTag(String tag) {
-    return tags != null && tags.contains(tag);
+    final t = tags;
+    return t != null && t.contains(tag);
   }
 
   bool hasTagLike(String tag) {
     if(tag.length < 2 || tags == null) {
       return false;
     }
-    for(final test in tags) {
+    final t = tags;
+    if(t == null) return false;
+    for(final test in t) {
       if(test.contains(tag)) {
         return true;
       }
@@ -100,30 +115,38 @@ class AFIDWithTags extends AFID {
 }
 
 class AFTranslationID extends AFID {
-  final List<dynamic> values;
-  const AFTranslationID(String code, AFLibraryID library, { this.values}) : super("i18n", code, library);
+  final List<dynamic>? values;
+  const AFTranslationID(String code, AFLibraryID library, { this.values }) : super("i18n", code, library);
 
   /// Used to insert values into translated text.  
   /// 
   /// The translation can reference the values using {0}, {1}... {n} allowing you to change the 
   /// word/value order for different locales.
   AFTranslationID insert1(dynamic value) {
-    return AFTranslationID(codeId, library, values: [value]);
+    final lib = library;
+    if(lib == null) throwLibNotNull(); 
+    return AFTranslationID(codeId, lib, values: [value]);
   }
 
   /// See [insert1]
   AFTranslationID insert2(dynamic v1, dynamic v2) {
-    return AFTranslationID(codeId, library, values: [v1, v2]);
+    final lib = library;
+    if(lib == null) throwLibNotNull(); 
+    return AFTranslationID(codeId, lib, values: [v1, v2]);
   }
 
   /// See [insert1]
   AFTranslationID insert3(dynamic v1, dynamic v2, dynamic v3) {
-    return AFTranslationID(codeId, library, values: [v1, v2, v3]);
+    final lib = library;
+    if(lib == null) throwLibNotNull(); 
+    return AFTranslationID(codeId, lib, values: [v1, v2, v3]);
   }
 
   /// See [insert1]
   AFTranslationID insertN(List<dynamic> values) {
-    return AFTranslationID(codeId, library, values: values);
+    final lib = library;
+    if(lib == null) throwLibNotNull(); 
+    return AFTranslationID(codeId, lib, values: values);
   }
 
   bool operator==(Object other) {
@@ -131,13 +154,13 @@ class AFTranslationID extends AFID {
   }
 
   int get hashCode {
-    return hash2(code.hashCode, library.code);
+    return hash2(code.hashCode, library?.code);
   }
 
 }
 
 class AFIDWithTag extends AFID {
-  final String tag;
+  final String? tag;
   const AFIDWithTag(String prefix, String code, AFLibraryID library, { this.tag }): super(prefix, code, library);
 }
 
@@ -147,7 +170,10 @@ class AFScreenID extends AFID {
 
 class AFLibraryID extends AFID {
   final String name;
-  const AFLibraryID({String code, this.name}) : super("lib", code, null);
+  const AFLibraryID({
+    required String code, 
+    required this.name
+  }) : super("lib", code, null);
 }
 
 class AFWidgetID extends AFID {
@@ -155,19 +181,19 @@ class AFWidgetID extends AFID {
 }
 
 class AFBaseTestID extends AFIDWithTags {
-  const AFBaseTestID(String prefix, String code, AFLibraryID library, {String group, List<String> tags}) : super(prefix, code, library, tags: tags, group: group);
+  const AFBaseTestID(String prefix, String code, AFLibraryID library, {String? group, List<String>? tags}) : super(prefix, code, library, tags: tags, group: group);
 }
 
 class AFStateTestID extends AFBaseTestID {
-  const AFStateTestID(String code, AFLibraryID library, {String group, List<String> tags, }) : super("statet", code, library, tags: tags, group: group);
+  const AFStateTestID(String code, AFLibraryID library, {String? group, List<String>? tags, }) : super("statet", code, library, tags: tags, group: group);
 }
 
 class AFScreenTestID extends AFBaseTestID {
-  const AFScreenTestID(String code, AFLibraryID library, {String group, List<String> tags }) : super("rt", code, library, tags: tags, group: group);
+  const AFScreenTestID(String code, AFLibraryID library, {String? group, List<String>? tags }) : super("rt", code, library, tags: tags, group: group);
 }
 
 class AFPrototypeID extends AFBaseTestID {
-  const AFPrototypeID(String code, AFLibraryID library, {String group, List<String> tags, }) : super("pr", code, library, tags: tags, group: group);
+  const AFPrototypeID(String code, AFLibraryID library, {String? group, List<String>? tags, }) : super("pr", code, library, tags: tags, group: group);
 }
 
 class AFQueryTestID extends AFID {

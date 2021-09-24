@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:meta/meta.dart';
@@ -10,7 +9,7 @@ import 'package:meta/meta.dart';
 /// nested data can be plain dart objects.
 @immutable 
 class AFAppStateModel {
-  final String customStateKey;
+  final String? customStateKey;
 
   /// By default each model uses its class name as a key to uniquely 
   /// identify itself in the [AFAppStateArea].  However, if you want
@@ -20,8 +19,9 @@ class AFAppStateModel {
 
   static String stateKeyFor(Object o) {
     if(o is AFAppStateModel) {
-      if(o.customStateKey != null) {
-        return o.customStateKey;
+      final customSK = o.customStateKey;
+      if(customSK != null) {
+        return customSK;
       }
     }
     return o.runtimeType.toString();
@@ -37,7 +37,9 @@ class AFAppStateModel {
 abstract class AFAppStateArea {
   final Map<String, Object> models;
 
-  AFAppStateArea({this.models});
+  AFAppStateArea({
+    required this.models
+  });
 
   /*factory AFAppState.createFrom(Iterable<Object> models) {
     return AFAppState(models: AFAppState.integrate(AFAppState.empty(), models));
@@ -56,12 +58,14 @@ abstract class AFAppStateArea {
     return <String, Object>{};
   }
 
-  Object findModel(Type t) {
-    return models[t.toString()];
+  T findModel<T>() {
+    return findModelWithCustomKey(T.toString());
   }
 
-  Object findModelWithCustomKey(String key) {
-    return models[key];
+  T findModelWithCustomKey<T>(String key) {
+    final result = models[key] as T;
+    if(result == null) throw AFException("No model defined for $key");
+    return result;
   }
   AFAppStateArea mergeWith(AFAppStateArea other) {
     final revisedModels = integrate(this.models, other.models.values);
@@ -91,7 +95,7 @@ class AFAppStateAreas {
   final Map<String, AFAppStateArea> states;
 
   AFAppStateAreas({
-    @required this.states
+    required this.states
   });
 
   factory AFAppStateAreas.createFrom(List<AFAppStateArea> areas) {
@@ -111,8 +115,11 @@ class AFAppStateAreas {
       throw AFException("Attempting to set models on 'AFAppStateArea', this is most likely because you forgot to explicitly specify your AFAppStateArea type as a type parameter somewhere.");
     }
     final initialState = states[key];
-    final revisedState = initialState.reviseModels(models);
-    revisedStates[key] = revisedState;
+    assert(initialState != null);
+    if(initialState != null) {
+      final revisedState = initialState.reviseModels(models);
+      revisedStates[key] = revisedState;
+    }
 
     final log = AFibD.logStateAF;
     if(log != null) {
@@ -122,11 +129,10 @@ class AFAppStateAreas {
       }
     }
 
-
     return AFAppStateAreas(states: revisedStates);    
   }
 
-  AFAppStateArea stateFor(Type areaType) {
+  AFAppStateArea? stateFor(Type areaType) {
     final key = _keyForArea(areaType);
     return states[key];
   }

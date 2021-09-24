@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:flutter/material.dart';
@@ -88,10 +87,10 @@ typedef AFWidgetMapperDelegate = AFWidgetID Function(dynamic);
 ft.Matcher hasWidgetId(AFWidgetID expected) => _AFHasWidgetId(expected);
 ft.Matcher hasOneWidgetId(AFWidgetID expected) => _AFHasWidgetIds([expected]);
 ft.Matcher hasWidgetIds(List<AFWidgetID> expected) => _AFHasWidgetIds(expected);
-ft.Matcher hasWidgetIdsWith(List<dynamic> expected, { @required AFWidgetMapperDelegate mapper }) {
+ft.Matcher hasWidgetIdsWith(List<dynamic> expected, { AFWidgetMapperDelegate? mapper }) {
     if(mapper != null ) {
       return _AFHasWidgetIds(expected.map(mapper).toList());
     } else {
-      return _AFHasWidgetIds(expected);
+      return _AFHasWidgetIds(expected as List<AFWidgetID>);
     }
 }

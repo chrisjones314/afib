@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
@@ -6,6 +5,7 @@ import 'package:afib/src/dart/utils/af_dart_params.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/flutter/utils/af_log_printer.dart';
 import 'package:logger/logger.dart';
+import 'package:collection/collection.dart';
 
 class AFibD<AppState> {
     static final AFConfig _afConfig = AFConfig();
@@ -18,8 +18,8 @@ class AFibD<AppState> {
       configEntries.add(entry);
     }
 
-    static AFConfigurationItem findConfigEntry(String name) {
-      final result = configEntries.firstWhere((e) => e.name == name, orElse: () => null);
+    static AFConfigurationItem? findConfigEntry(String name) {
+      final result = configEntries.firstWhereOrNull((e) => e.name == name);
       return result;
     }
 
@@ -40,7 +40,7 @@ class AFibD<AppState> {
       standardSizes[size.identifier] = size;
     }
 
-    static AFFormFactorSize findSize(String identifier) {
+    static AFFormFactorSize? findSize(String identifier) {
       return standardSizes[identifier];
     }
 
@@ -57,7 +57,7 @@ class AFibD<AppState> {
 
     }
 
-    static void initialize<AppState>(AFDartParams p) {
+    static void initialize<AppState>(AFDartParams? p) {
       //Logger.root.level = Level.ALL;
       //Logger.root.onRecord.listen((LogRecord rec) {
       //  print('${rec.level.name}: ${rec.time}: ${rec.message}');
@@ -99,35 +99,35 @@ class AFibD<AppState> {
 
   }
 
-  static Logger log(String area) {
+  static Logger? log(String area) {
     return logs[area]; 
   }
 
-  static Logger get logQueryAF {
+  static Logger? get logQueryAF {
     return log(AFConfigEntryLogArea.afQuery);
   }
 
-  static Logger get logRouteAF {
+  static Logger? get logRouteAF {
     return log(AFConfigEntryLogArea.afRoute);
   }
 
-  static Logger get logStateAF {
+  static Logger? get logStateAF {
     return log(AFConfigEntryLogArea.afState);
   }
 
-  static Logger get logUIAF {
+  static Logger? get logUIAF {
     return log(AFConfigEntryLogArea.afUI);
   }
 
-  static Logger get logConfigAF {
+  static Logger? get logConfigAF {
     return log(AFConfigEntryLogArea.afConfig);
   }
 
-  static Logger get logTestAF {
+  static Logger? get logTestAF {
     return log(AFConfigEntryLogArea.afTest);
   }
 
-  static Logger get logThemeAF {
+  static Logger? get logThemeAF {
     return log(AFConfigEntryLogArea.afTheme);
   }
 

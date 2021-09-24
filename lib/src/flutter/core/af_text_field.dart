@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -6,14 +5,14 @@ import 'package:flutter/widgets.dart';
 /// the details of the text controller and makes it easier to
 /// manage the text edit in a redux-y way.
 class AFTextField extends StatefulWidget {
-  final Key key;
-  final String text;
-  final ValueChanged<String> onChanged;
-  final bool obscureText;
-  final bool autofocus;
-  final TextAlign textAlign;
-  final InputDecoration decoration;
-  final bool autocorrect;
+  final Key? key;
+  final String? text;
+  final ValueChanged<String>? onChanged;
+  final bool? obscureText;
+  final bool? autofocus;
+  final TextAlign? textAlign;
+  final InputDecoration? decoration;
+  final bool? autocorrect;
 
   AFTextField({
     this.key,
@@ -47,16 +46,17 @@ class _AFTextFieldState extends State<AFTextField> {
 
   @override
   Widget build(BuildContext context) {
-    if(textController.text != widget.text) {
-      textController.text = widget.text;
+    final widText = widget.text;
+    if(textController.text != widText && widText != null) {
+      textController.text = widText;
     }
     return TextField(
       key: Key("${widget.key}_text_field"),
       controller: textController,
       onChanged: widget.onChanged,
-      obscureText: widget.obscureText,
-      autofocus: widget.autofocus,
-      textAlign: widget.textAlign,
+      obscureText: widget.obscureText ?? false,
+      autofocus: widget.autofocus ?? false,
+      textAlign: widget.textAlign ?? TextAlign.start,
       decoration: widget.decoration,
     );
   }

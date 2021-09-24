@@ -1,5 +1,3 @@
-// @dart=2.9
-import 'package:meta/meta.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 
 
@@ -39,7 +37,9 @@ abstract class AFAtomicTestDataRegistry {
   static int uniqueIdBase = 1;
   static List<String> createdTestIds = <String>[];
   
-  AFAtomicTestDataRegistry({this.testData});
+  AFAtomicTestDataRegistry({
+    required this.testData
+  });
 
   void registerAtomic(dynamic id, dynamic data) {
     testData[id] = data;
@@ -62,8 +62,9 @@ class AFCompositeTestDataRegistry extends AFAtomicTestDataRegistry {
   final List<AFTestDataCompositeGeneratorDelegate> generators;
 
   AFCompositeTestDataRegistry({
-    @required Map<dynamic, dynamic> testData, 
-    this.generators}): super(testData: testData);
+    required Map<dynamic, dynamic> testData, 
+    required this.generators
+  }): super(testData: testData);
 
   factory AFCompositeTestDataRegistry.create() {
     return AFCompositeTestDataRegistry(testData: <dynamic, dynamic>{}, generators: <AFTestDataCompositeGeneratorDelegate>[]);
@@ -78,7 +79,7 @@ class AFCompositeTestDataRegistry extends AFAtomicTestDataRegistry {
     registerAtomic(id, data);
   }
 
-  static String filterTestId(dynamic candidate) {
+  static String? filterTestId(dynamic candidate) {
     if(candidate is String) {
       return candidate;
     }
@@ -89,7 +90,8 @@ class AFCompositeTestDataRegistry extends AFAtomicTestDataRegistry {
 
   AFCompositeTestDataRegistry cloneForWireframe() {
     return AFCompositeTestDataRegistry(
-      testData: Map<dynamic, dynamic>.from(testData)
+      testData: Map<dynamic, dynamic>.from(testData),
+      generators: generators,
     );
   }
 

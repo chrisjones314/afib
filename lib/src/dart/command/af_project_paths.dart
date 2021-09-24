@@ -1,5 +1,4 @@
 
-// @dart=2.9
 import 'dart:io';
 import 'package:path/path.dart';
 
@@ -27,7 +26,7 @@ class AFProjectPaths {
   static const afTestConfigFile = "afib_test_config.g.dart";
   static const afTestConfigPath = [testFolder, afibFolder, afTestConfigFile];
 
-  static List<String> extraParentFolder;
+  static List<String>? extraParentFolder;
 
   static bool projectFileExists(List<String> relativePath) {
     final path = fullPathFor(relativePath);
@@ -83,8 +82,9 @@ class AFProjectPaths {
 
     // this is used by the 'new' command, which takes place from one folder below the 
     // project folder, which is where most commands are run.
-    if(allowExtra && extraParentFolder != null) {
-      temp.addAll(extraParentFolder);
+    final extraParent = extraParentFolder;
+    if(allowExtra && extraParent != null) {
+      temp.addAll(extraParent);
     }
     temp.addAll(projectPath);
 

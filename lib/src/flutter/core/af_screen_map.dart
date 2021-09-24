@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/id.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/ui/screen/af_startup_screen.dart';
@@ -9,10 +8,10 @@ import 'package:afib/afib_flutter.dart';
 /// build the correct screen widget for the leaf element in the route.
 class AFScreenMap {
 
-  AFScreenID _startupScreenId;
-  AFCreateRouteParamDelegate _createStartupScreenParam;
-  AFScreenID trueAppStartupScreenId;
-  AFCreateRouteParamDelegate trueCreateStartupScreenParam;
+  AFScreenID? _startupScreenId;
+  AFCreateRouteParamDelegate? _createStartupScreenParam;
+  AFScreenID? trueAppStartupScreenId;
+  AFCreateRouteParamDelegate? trueCreateStartupScreenParam;
   final Map<AFScreenID, WidgetBuilder> _screens = <AFScreenID, WidgetBuilder>{};
   final Map<AFWidgetID, WidgetBuilder> _widgets = <AFWidgetID, WidgetBuilder>{};
 
@@ -20,7 +19,7 @@ class AFScreenMap {
     screen(AFUIScreenID.screenStartupWrapper, (_) => AFStartupScreenWrapper());
   }
 
-  AFScreenID get startupScreenId {
+  AFScreenID? get startupScreenId {
     if(_startupScreenId == AFUIScreenID.screenPrototypeHome) {
       return _startupScreenId;
     }
@@ -28,7 +27,9 @@ class AFScreenMap {
   }
 
   String get appInitialScreenId { 
-    return _startupScreenId.code;
+    final startupId = _startupScreenId;
+    if(startupId == null) throw AFException("Missing startup screen id");
+    return startupId.code;
   }
 
   Map<String, WidgetBuilder> get screens {
@@ -37,18 +38,19 @@ class AFScreenMap {
      });
   }
 
-  WidgetBuilder findBy(AFScreenID id) {
+  WidgetBuilder? findBy(AFScreenID id) {
     return _screens[id];
   }
 
-  Widget createFor(AFScreenID id) {
-    if(!_screens.containsKey(id)) {
+  Widget createFor(AFScreenID id, BuildContext context) {
+    final builder = _screens[id];
+    if(builder == null) {
       throw AFException("Please add an entry for $id in screen_map.dart");
     }
-    return _screens[id](null);
+    return builder(context);
   }
 
-  AFCreateRouteParamDelegate get startupRouteParamFactory {
+  AFCreateRouteParamDelegate? get startupRouteParamFactory {
     return _createStartupScreenParam;
   }
 
@@ -69,7 +71,7 @@ class AFScreenMap {
   }
 
   /// Returns the widget builder for the initial screen.
-  WidgetBuilder get initialScreenBuilder {
+  WidgetBuilder? get initialScreenBuilder {
     if(AFibD.config.requiresPrototypeData) {
       return _screens[AFUIScreenID.screenPrototypeHome];
     }

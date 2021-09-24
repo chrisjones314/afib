@@ -1,6 +1,5 @@
 
 /*
-// @dart=2.9
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';

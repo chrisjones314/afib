@@ -23,7 +23,7 @@ typedef AFActionListenerDelegate = void Function(List<AFActionWithKey> actions);
 typedef AFParamListenerDelegate = void Function(AFRouteParam param);
 
 /// Delegate used to create the initial applications state.
-typedef AFInitializeAppStateDelegate = AFAppStateArea Function();
+typedef AFInitializeAppStateDelegate = AFAppStateArea? Function();
 
 /// Delegate use to define commands that are part of the afib command-line app.
 typedef AFExtendCommandsDelegate = void Function(AFCommandExtensionContext context);

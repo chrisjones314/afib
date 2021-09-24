@@ -17,7 +17,7 @@ class AFPrototypeThirdPartyStateView extends AFStateView1<AFSingleScreenTests> {
   AFPrototypeThirdPartyStateView(AFSingleScreenTests tests): 
     super(first: tests);
   
-  AFSingleScreenTests get tests { return first; }
+  AFSingleScreenTests? get tests { return first; }
 }
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
@@ -31,13 +31,13 @@ class AFPrototypeThirdPartyListScreen extends AFUIConnectedScreen<AFPrototypeThi
   }
 
   @override
-  AFPrototypeThirdPartyStateView createStateViewAF(AFState state, AFRouteParam param, AFRouteParamWithChildren withChildren) {
+  AFPrototypeThirdPartyStateView createStateViewAF(AFState state, AFRouteParam param, AFRouteParamWithChildren? withChildren) {
     final tests = AFibF.g.screenTests;
     return AFPrototypeThirdPartyStateView(tests);
   }
 
   @override
-  AFPrototypeThirdPartyStateView createStateView(AFAppStateArea state, AFRouteParam param) {
+  AFPrototypeThirdPartyStateView createStateView(AFAppStateArea? state, AFRouteParam param) {
     // this should never be called, because createStateViewAF replaces it.
     throw UnimplementedError();
   }

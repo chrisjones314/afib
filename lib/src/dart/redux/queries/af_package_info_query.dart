@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
@@ -7,7 +6,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 class AFPackageInfoQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TState, AFPackageInfoState> {
 
-  AFPackageInfoQuery({List<dynamic> successActions, AFOnResponseDelegate<TState, AFPackageInfoState> onSuccessDelegate}):
+  AFPackageInfoQuery({
+    List<dynamic>? successActions, 
+    AFOnResponseDelegate<TState, AFPackageInfoState>? onSuccessDelegate
+  }):
     super(successActions: successActions, onSuccessDelegate: onSuccessDelegate);
 
   @override

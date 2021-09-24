@@ -22,11 +22,12 @@ class AFGenerateScreenSubcommand extends AFGenerateSubcommand {
 
   @override
   void execute(AFCommandContext ctx) {
-    if(ctx.unnamedArguments.length != 1) {
+    final unnamed = ctx.unnamedArguments;
+    if(unnamed == null || unnamed.length != 1) {
       throw AFCommandError("Please specify the name of the screen to create in mixed case after other arguments");
     }
 
-    final screenName = ctx.unnamedArguments[0];
+    final screenName = unnamed[0];
 
     if(screenName[0].toUpperCase() != screenName[0]) {
       throw AFCommandError("The screen name should be mixed case");

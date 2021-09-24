@@ -1,17 +1,16 @@
-// @dart=2.9
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AFCircularProgressIndicator extends StatelessWidget {
-  final Key key;
-  final Key childKey;
-  final double value;
-  final Color backgroundColor;
-  final Animation<Color> valueColor;
+  final Key? key;
+  final Key? childKey;
+  final double? value;
+  final Color? backgroundColor;
+  final Animation<Color>? valueColor;
   final double strokeWidth;
-  final String semanticsLabel;
-  final String semanticsValue;
+  final String? semanticsLabel;
+  final String? semanticsValue;
   
   AFCircularProgressIndicator({
     this.key,

@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
@@ -23,13 +22,13 @@ class AFUITheme extends AFFunctionalTheme {
 
   @override
   Text childText(dynamic text, {
-    AFWidgetID wid, 
+    AFWidgetID? wid, 
     dynamic style,
     dynamic textColor,
     dynamic fontSize,
     dynamic fontWeight,
-    TextAlign textAlign,
-    TextOverflow overflow,
+    TextAlign? textAlign,
+    TextOverflow? overflow,
   }) {
     return super.childText(text,
       wid: wid,
@@ -50,7 +49,7 @@ class AFUITheme extends AFFunctionalTheme {
   }
 
 
-  Widget childCardHeader(AFBuildContext context, AFWidgetID wid, dynamic title, List<Widget> rows, { EdgeInsets margin }) {
+  Widget childCardHeader(AFBuildContext context, AFWidgetID? wid, dynamic title, List<Widget> rows, { EdgeInsets? margin }) {
     final radius = Radius.circular(4.0);
     final content = column();
     content.add(Container(
@@ -90,9 +89,9 @@ class AFUITheme extends AFFunctionalTheme {
   }    
 
   Widget createTestListTile(AFDispatcher dispatcher, AFScreenPrototype prototype, {
-    String title,
-    String subtitle,
-    AFPressedDelegate onTap,
+    String? title,
+    String? subtitle,
+    AFPressedDelegate? onTap,
   }) {
     final titleText = title ?? prototype.id.code;
     final cols = row();
@@ -122,10 +121,10 @@ class AFUITheme extends AFFunctionalTheme {
   }
 
   Widget childListTileNavDown({
-    AFID wid,
-    Widget title,
-    Widget subtitle,
-    AFPressedDelegate onTap,
+    AFID? wid,
+    Widget? title,
+    Widget? subtitle,
+    AFPressedDelegate? onTap,
   }) {
     return Container(
       key: keyForWID(wid),
@@ -138,7 +137,7 @@ class AFUITheme extends AFFunctionalTheme {
       ));
   }
 
-  Widget buildPrototypeScaffold(dynamic title, List<Widget> rows, { Widget leading }) {
+  Widget buildPrototypeScaffold(dynamic title, List<Widget> rows, { Widget? leading }) {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -234,9 +233,9 @@ class AFUITheme extends AFFunctionalTheme {
   }
 
   void buildTestNavDownAll({
-    AFBuildContext context,
-    List<Widget> rows,
-    AFLibraryTestHolder tests,
+    required AFBuildContext? context,
+    required List<Widget> rows,
+    required AFLibraryTestHolder tests,
   }) {
     rows.add(childTestNavDown(
       context: context,
@@ -258,10 +257,11 @@ class AFUITheme extends AFFunctionalTheme {
   }
 
   Widget childTestNavDown({
-    AFBuildContext context,
+    AFBuildContext? context,
     dynamic title, 
-    List<AFScreenPrototype> tests
+    List<AFScreenPrototype>? tests
   }) {
+    if(context == null || tests == null) throw AFException("Context or tests are null");
     return childListNav(
       title: title,
       onPressed: () {
@@ -271,13 +271,13 @@ class AFUITheme extends AFFunctionalTheme {
 
   Widget childListNav({
     dynamic title,
-    AFPressedDelegate onPressed,
+    AFPressedDelegate? onPressed,
   }) {
     return _createKindRow(title, onPressed);
   }
 
 
-  Widget _createKindRow(dynamic text, Function onTap) {
+  Widget _createKindRow(dynamic text, void Function()? onTap) {
     return ListTile(
       title: childText(text),
       dense: true,

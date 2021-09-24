@@ -1,18 +1,15 @@
-// @dart=2.9
 import 'dart:convert';
 import 'dart:core';
 
-//import 'package:afib/id.dart';
-//import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/id.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
-import 'package:meta/meta.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:args/args.dart' as args;
+import 'package:collection/collection.dart';
 
 /// Superclass for all configuration definitions.
 abstract class AFConfigurationItem {
@@ -32,12 +29,12 @@ abstract class AFConfigurationItem {
   final double ordinal;
     
   AFConfigurationItem({ 
-    @required this.libraryId,
-    @required this.name, 
-    @required this.defaultValue,  
-    @required this.validContexts, 
-    @required this.help, 
-    @required this.ordinal 
+    required this.libraryId,
+    required this.name, 
+    required this.defaultValue,  
+    required this.validContexts, 
+    required this.help, 
+    required this.ordinal 
   }) {
     if(libraryId != AFUILibraryID.id) {
       final prefix = "${libraryId.codeId}_";
@@ -87,7 +84,7 @@ abstract class AFConfigurationItem {
       return result.toString();
   }
 
-  String codeValue(AFConfig config) {
+  String? codeValue(AFConfig config) {
     dynamic val = config.valueFor(this);
     if(val == null) {
       return null;
@@ -113,7 +110,7 @@ abstract class AFConfigurationItem {
   void addArguments(args.ArgParser argParser);
   
   /// Return an error message if the value is invalid, otherwise return null.
-  String validate(dynamic value);
+  String? validate(dynamic value);
 
   void setValueWithString(AFConfig dest, String value) {
     validateWithException(value);
@@ -142,9 +139,9 @@ class AFConfigEntryDescription {
   final dynamic runtimeValue;
   final String help;
   AFConfigEntryDescription({
-    @required this.help,
-    @required this.textValue,
-    @required this.runtimeValue,
+    required this.help,
+    required this.textValue,
+    required this.runtimeValue,
   });
 
 }
@@ -158,12 +155,12 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
   final bool allowMultiple;
   
   AFConfigurationItemOptionChoice({ 
-    @required AFLibraryID libraryId,
-    @required String name, 
-    @required dynamic defaultValue, 
-    @required int validContexts, 
-    @required double ordinal, 
-    String help, 
+    required AFLibraryID libraryId,
+    required String name, 
+    required dynamic defaultValue, 
+    required int validContexts, 
+    required double ordinal, 
+    String help = "", 
     this.allowMultiple = false }): super(
       libraryId: libraryId,
       name: name, 
@@ -173,7 +170,10 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
       help: help
     );
 
-  void addChoice({@required String textValue, String help, dynamic runtimeValue }) {
+  void addChoice({
+    required String textValue, 
+    required String help, 
+    dynamic runtimeValue }) {
     if(runtimeValue == null) {
       runtimeValue = name;
     }
@@ -199,7 +199,7 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
     if(findChoice(wildcardValue) == null) {
        allowed = choices.map((e) => e.textValue);
     }
-    if(choices.first.help != null) {
+    if(choices.first.help.isNotEmpty) {
       allowedHelp = <String, String>{};
 
       for(final choice in choices) {
@@ -223,7 +223,7 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
     
   }
 
-  String validate(dynamic listValue) {
+  String? validate(dynamic listValue) {
     if(listValue is! List) {
       if(listValue is! String) {
         return "Expected value for $name to be a list";
@@ -242,8 +242,8 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
     return null;
   }
 
-  AFConfigEntryDescription findChoice(String val) {
-    return choices.firstWhere((e) => e.textValue == val, orElse: () => null);
+  AFConfigEntryDescription? findChoice(String val) {
+    return choices.firstWhereOrNull((e) => e.textValue == val);
   }
 }
 
@@ -252,12 +252,12 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
 class AFConfigurationitemTrueFalse extends AFConfigurationItemOptionChoice {
 
   AFConfigurationitemTrueFalse({ 
-    @required AFLibraryID libraryId,
-    @required String name, 
-    @required int validContexts, 
-    @required double ordinal, 
-    @required bool defaultValue, 
-    @required String help 
+    required AFLibraryID libraryId,
+    required String name, 
+    required int validContexts, 
+    required double ordinal, 
+    required bool defaultValue, 
+    required String help 
   }): super(
     libraryId: libraryId,
     name: name, 
@@ -265,8 +265,8 @@ class AFConfigurationitemTrueFalse extends AFConfigurationItemOptionChoice {
     validContexts: validContexts, 
     ordinal: ordinal, help: help
   ) {
-    addChoice(textValue: "true", runtimeValue: true);
-    addChoice(textValue: "false", runtimeValue: false);
+    addChoice(textValue: "true", runtimeValue: true, help: "");
+    addChoice(textValue: "false", runtimeValue: false, help: "");
   }
 
   void setValue(AFConfig dest, dynamic value) {
@@ -290,11 +290,11 @@ class AFConfigurationItemOption extends AFConfigurationItem {
   final int options;
 
   AFConfigurationItemOption({
-    @required AFLibraryID libraryId,
-    @required String name, 
-    this.help, 
-    @required int validContexts, 
-    @required double ordinal, 
+    required AFLibraryID libraryId,
+    required String name, 
+    required this.help, 
+    required int validContexts, 
+    required double ordinal, 
     String defaultValue = "",
     this.minChars = -1, 
     this.maxChars = -1, 
@@ -314,7 +314,7 @@ class AFConfigurationItemOption extends AFConfigurationItem {
 
   
   @override
-  String validate(dynamic value) {
+  String? validate(dynamic value) {
     if(minChars > 0 && value.length < minChars ) {
       return "$value must be at least $minChars characters long.";
     }
@@ -407,7 +407,7 @@ class AFConfig {
 
   List<String> stringListFor(AFConfigurationItem entry) {
     List result = valueFor(entry);
-    if(result.length == 0) {
+    if(result.isEmpty) {
       return <String>[];
     }
     return result.map((x) => x.toString()).toList();

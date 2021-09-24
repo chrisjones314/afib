@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
@@ -14,19 +13,19 @@ class AFPublicState {
   final AFAppStateAreas areas;
 
   AFPublicState({
-    @required this.route,
-    @required this.themes,
-    @required this.areas
+    required this.route,
+    required this.themes,
+    required this.areas
   });
 
-  AFAppStateArea areaStateFor(Type areaType) {
+  AFAppStateArea? areaStateFor(Type areaType) {
     return areas.stateFor(areaType);
   }
 
   AFPublicState copyWith({
-    AFRouteState route,
-    AFThemeState themes,
-    AFAppStateAreas areas,
+    AFRouteState? route,
+    AFThemeState? themes,
+    AFAppStateAreas? areas,
   }) {
     return AFPublicState(
       areas: areas ?? this.areas,
@@ -45,8 +44,8 @@ class AFState {
 
   /// Construct an AFib state with the specified route and app state.
   AFState({
-    this.testState,
-    this.public
+    required this.testState,
+    required this.public
   });
 
   /// 
@@ -64,8 +63,8 @@ class AFState {
 
   /// Modify the specified properties and leave everything else the same.
   AFState copyWith({
-    AFTestState testState,
-    AFPublicState public
+    AFTestState? testState,
+    AFPublicState? public
   }) {
     return AFState(
       testState: testState ?? this.testState,

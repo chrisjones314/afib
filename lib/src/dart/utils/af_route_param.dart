@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
@@ -22,7 +21,7 @@ class AFRouteParam {
     return false;
   }
 
-  AFScreenID get effectiveScreenId {
+  AFScreenID? get effectiveScreenId {
     return null;
   }
 
@@ -50,8 +49,8 @@ class AFRouteParamChild {
   final AFRouteParam param;
   
   AFRouteParamChild({
-    @required this.widgetId,
-    @required this.param,
+    required this.widgetId,
+    required this.param,
   });
   
   AFRouteParamChild reviseParam(AFRouteParam revised) {
@@ -86,8 +85,8 @@ class AFRouteParamWithChildrenBuilder {
   }
 
   void sortBy({
-    @required Type typeToSort,
-    @required dynamic sort
+    required Type typeToSort,
+    required dynamic sort
   }) {
     activeSort[typeToSort] = sort;
   }
@@ -107,16 +106,16 @@ class AFRouteParamWithChildren extends AFRouteParam {
   final Map<Type, dynamic> activeSort;
     
   AFRouteParamWithChildren({
-    @required this.primary,
-    @required this.children,
-    @required this.activeSort,
+    required this.primary,
+    required this.children,
+    required this.activeSort,
   });
 
   static AFRouteParamWithChildrenBuilder createBuilder(AFScreenID screen, AFRouteParam param) { return AFRouteParamWithChildrenBuilder.create(screen, param); }
 
-  TRouteParam primaryParam<TRouteParam extends AFRouteParam>() { return primary.param; }
+  TRouteParam primaryParam<TRouteParam extends AFRouteParam>() { return primary.param as TRouteParam; }
 
-  AFRouteParam findByWidget(AFID wid) {
+  AFRouteParam? findByWidget(AFID wid) {
     if(wid == primary.widgetId) {
       return primary.param;
     }
@@ -146,8 +145,9 @@ class AFRouteParamWithChildren extends AFRouteParam {
   List<TChildParam> paramsOfType<TChildParam extends AFRouteParam>() {
     final result = <TChildParam>[];
     for(final child in children) {
-      if(child.param is TChildParam) {
-        result.add(child.param);
+      final param = child.param;
+      if(param is TChildParam) {
+        result.add(param);
       }
     }
     return result;
@@ -208,9 +208,9 @@ class AFRouteParamWithChildren extends AFRouteParam {
   }
 
   AFRouteParamWithChildren copyWith({
-    AFRouteParamChild primary,
-    List<AFRouteParamChild> children,
-    Map<Type, dynamic> activeSort
+    AFRouteParamChild? primary,
+    List<AFRouteParamChild>? children,
+    Map<Type, dynamic>? activeSort
   }) {
     var currentChildren = children ?? this.children;
     final currentSort = activeSort ?? this.activeSort;
@@ -238,7 +238,7 @@ class AFRouteParamWithChildren extends AFRouteParam {
     if(o is! AFRouteParamWithChildren) {
       return false;
     } 
-    final AFRouteParamWithChildren op = o;
+    final op = o;
     if(o.primary != op.primary) {
       return false;
     }

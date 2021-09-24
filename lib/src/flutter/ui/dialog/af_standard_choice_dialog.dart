@@ -1,4 +1,3 @@
-
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/flutter/ui/af_prototype_base.dart';
 import 'package:flutter/material.dart';
@@ -12,9 +11,9 @@ class AFStandardChoiceDialogRouteParam extends AFRouteParam {
 
   //--------------------------------------------------------------------------------------
   AFStandardChoiceDialogRouteParam({
-    @required this.alertBody,
-    @required this.alertTitle,
-    @required this.buttonTitles,
+    required this.alertBody,
+    required this.alertTitle,
+    required this.buttonTitles,
   });
 }
 
@@ -26,9 +25,9 @@ class AFStandardChoiceDialog extends AFUIConnectedDialog<AFStateView, AFStandard
 
   //--------------------------------------------------------------------------------------
   static AFNavigateAction navigatePush({
-    @required String alertTitle,
-    @required String alertBody,
-    @required List<String> buttonTitles,
+    required String alertTitle,
+    required String alertBody,
+    required List<String> buttonTitles,
   }) {
     return AFNavigatePushAction(
       screen: AFUIScreenID.dialogStandardChoice,
@@ -42,7 +41,7 @@ class AFStandardChoiceDialog extends AFUIConnectedDialog<AFStateView, AFStandard
 
   //--------------------------------------------------------------------------------------
   @override
-  AFStateView createStateView(AFAppStateArea state, AFStandardChoiceDialogRouteParam param) {
+  AFStateView createStateView(AFAppStateArea? state, AFStandardChoiceDialogRouteParam param) {
     return AFStateView.unused();
   }
 

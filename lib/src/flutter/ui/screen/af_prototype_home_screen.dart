@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/id.dart';
@@ -16,8 +15,8 @@ class AFScreenTestResultSummary {
   final AFSingleScreenTestState state;
 
   AFScreenTestResultSummary({
-    this.context,
-    this.state,
+    required this.context,
+    required this.state,
   });
 }
 
@@ -34,10 +33,10 @@ class AFPrototypeHomeScreenParam extends AFRouteParam {
   final int view;
 
   AFPrototypeHomeScreenParam({
-    @required this.filter,
-    @required this.textControllers,
-    @required this.results,
-    @required this.view,
+    required this.filter,
+    required this.textControllers,
+    required this.results,
+    required this.view,
   });
 
   AFPrototypeHomeScreenParam reviseFilter(String filter) {
@@ -45,7 +44,7 @@ class AFPrototypeHomeScreenParam extends AFRouteParam {
   }
 
   factory AFPrototypeHomeScreenParam.createOncePerScreen({
-    @required String filter,
+    required String filter,
   }) {
     final controllers = AFTextEditingControllersHolder.createOne(AFUIWidgetID.textTestSearch, filter);
     return AFPrototypeHomeScreenParam(
@@ -57,9 +56,9 @@ class AFPrototypeHomeScreenParam extends AFRouteParam {
   }
 
   AFPrototypeHomeScreenParam copyWith({
-    String filter,
-    List<AFScreenTestResultSummary> results,
-    int view
+    String? filter,
+    List<AFScreenTestResultSummary>? results,
+    int? view
   }) {
     return AFPrototypeHomeScreenParam(
       filter: filter ?? this.filter,
@@ -80,7 +79,7 @@ class APrototypeHomeScreenStateView extends AFStateView1<AFSingleScreenTests> {
   APrototypeHomeScreenStateView(AFSingleScreenTests tests): 
     super(first: tests);
   
-  AFSingleScreenTests get tests { return first; }
+  AFSingleScreenTests? get tests { return first; }
 }
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
@@ -92,13 +91,13 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
   AFPrototypeHomeScreen(): super(AFUIScreenID.screenPrototypeHome);
 
   @override
-  APrototypeHomeScreenStateView createStateViewAF(AFState state, AFPrototypeHomeScreenParam param, AFRouteParamWithChildren withChildren) {
+  APrototypeHomeScreenStateView createStateViewAF(AFState state, AFPrototypeHomeScreenParam param, AFRouteParamWithChildren? withChildren) {
     final tests = AFibF.g.screenTests;
     return APrototypeHomeScreenStateView(tests);
   }
 
   @override
-  APrototypeHomeScreenStateView createStateView(AFAppStateArea state, AFPrototypeHomeScreenParam param) {
+  APrototypeHomeScreenStateView createStateView(AFAppStateArea? state, AFPrototypeHomeScreenParam param) {
     // this should never be called, because createDataAF replaces it.
     throw UnimplementedError();
   }
@@ -153,23 +152,28 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
       // first, we navigate into the screen.
       test.startScreen(context.d, AFibF.g.testData);
 
-      final state = AFibF.g.storeInternalOnly.state;
+      final state = AFibF.g.storeInternalOnly!.state;
       final testState = state.testState;
       final testContext = testState.findContext(test.id);
       final testSpecificState = testState.findState(test.id);
 
       await Future.delayed(Duration(milliseconds: 500));
       
-      await test.onDrawerRun(context.d, testContext, testSpecificState, AFUIReusableTestID.all, () {
+      // note: not sure if this is true.
+      if(testContext == null) throw AFException("Text context should not be null");
+      await test.onDrawerRun(context.d, testContext as AFScreenTestContextSimulator, testSpecificState!, AFUIReusableTestID.all, () {
         context.dispatch(AFNavigateExitTestAction());
       });
 
       await Future.delayed(Duration(milliseconds: 500));
 
-      final stateRevised = AFibF.g.storeInternalOnly.state;
+      final stateRevised = AFibF.g.storeInternalOnly!.state;
       final testStateRevised = stateRevised.testState;
       final contextRevised = testStateRevised.findContext(test.id);
       final testSpecificStateRevised = testStateRevised.findState(test.id);
+
+      // not sure if this is true.
+      if(contextRevised == null || testSpecificStateRevised == null) { throw AFException("Should not be null"); }
       results.add(AFScreenTestResultSummary(
         context: contextRevised,
         state: testSpecificStateRevised 
@@ -307,7 +311,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
 
 
   void _buildFilteredSection(AFUIBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests, List<Widget> rows, ) {
-    if(tests == null || tests.isEmpty) {
+    if(tests.isEmpty) {
       return;
     }
 

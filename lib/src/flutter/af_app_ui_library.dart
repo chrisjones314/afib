@@ -12,13 +12,14 @@ class AFAppUILibrary extends AFMaterialApp<AFAppStateArea> {
   @override
   Widget buildMaterialApp(AFFundamentalThemeState fundamentals) {
     final screenMap = AFibF.g.effectiveScreenMap;
+    assert(screenMap != null);
     return MaterialApp(
         title: 'AFib UI Library',
         supportedLocales: fundamentals.supportedLocales,
         navigatorKey: AFibF.g.navigatorKey,
         theme: fundamentals.themeDataActive,
         initialRoute: AFibF.g.effectiveStartupScreenId.code,
-        routes: screenMap.screens
+        routes: screenMap!.screens
       );
   }
 }

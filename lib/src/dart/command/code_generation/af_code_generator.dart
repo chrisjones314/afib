@@ -1,10 +1,8 @@
-
 import 'package:afib/src/dart/command/af_command_error.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/code_generation/af_generated_file.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
-import 'package:meta/meta.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 
 class AFCodeGenerator { 
@@ -25,7 +23,7 @@ class AFCodeGenerator {
   final modified = <String, AFGeneratedFile>{};
 
   AFCodeGenerator({
-    @required this.definitions
+    required this.definitions
   });
 
   List<String> get idFilePath { 

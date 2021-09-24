@@ -17,7 +17,7 @@ class AFPrototypeWireframesStateView extends AFStateView1<AFSingleScreenTests> {
   AFPrototypeWireframesStateView(AFSingleScreenTests tests): 
     super(first: tests);
   
-  AFSingleScreenTests get tests { return first; }
+  AFSingleScreenTests? get tests { return first; }
 }
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
@@ -31,13 +31,13 @@ class AFPrototypeWireframesListScreen extends AFUIConnectedScreen<AFPrototypeWir
   }
 
   @override
-  AFPrototypeWireframesStateView createStateViewAF(AFState state, AFRouteParam param, AFRouteParamWithChildren withChildren) {
+  AFPrototypeWireframesStateView createStateViewAF(AFState state, AFRouteParam param, AFRouteParamWithChildren? withChildren) {
     final tests = AFibF.g.screenTests;
     return AFPrototypeWireframesStateView(tests);
   }
 
   @override
-  AFPrototypeWireframesStateView createStateView(AFAppStateArea state, AFRouteParam param) {
+  AFPrototypeWireframesStateView createStateView(AFAppStateArea? state, AFRouteParam param) {
     // this should never be called, because createStateViewAF replaces it.
     throw UnimplementedError();
   }
@@ -54,6 +54,10 @@ class AFPrototypeWireframesListScreen extends AFUIConnectedScreen<AFPrototypeWir
 
     for(final wireframe in AFibF.g.wireframes.wireframes) {
       final test = AFibF.g.findScreenTestById(wireframe.initialScreen);
+      if(test == null) {
+        assert(false);
+        continue;
+      }
       rowsCard.add(
         t.createTestListTile(context.d, test,
           title: wireframe.name,

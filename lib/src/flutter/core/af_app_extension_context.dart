@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
@@ -12,7 +11,6 @@ import 'package:afib/src/flutter/ui/theme/af_prototype_theme.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 
 class AFSharedTestExtensionContext {
@@ -39,6 +37,7 @@ class AFSharedTestExtensionContext {
     registerApplicator(AFSetChoiceChip());
     registerApplicator(AFApplyTextTextFieldAction());
     registerApplicator(AFApplyTextAFTextFieldAction());
+    registerApplicator(AFApplySliderAction());
     registerApplicator(AFRichTextGestureTapAction());
     registerApplicator(AFApplyCupertinoPicker());
     registerApplicator(AFIconButtonAction());
@@ -52,6 +51,7 @@ class AFSharedTestExtensionContext {
     registerExtractor(AFExtractTextTextAction());
     registerExtractor(AFExtractTextTextFieldAction());
     registerExtractor(AFExtractTextAFTextFieldAction());
+    registerExtractor(AFExtractSliderAction());
     registerExtractor(AFExtractRichTextAction());
     registerExtractor(AFSwitchExtractor());    
     registerExtractor(AFExtractColumnChildrenAction());
@@ -119,13 +119,13 @@ class AFTestExtensionContext {
   final sharedTestContext = AFSharedTestExtensionContext();
 
   void initializeTestFundamentals({
-    @required AFInitTestDataDelegate initTestData,
-    @required AFInitUnitTestsDelegate initUnitTests,
-    @required AFInitStateTestsDelegate initStateTests,
-    @required AFInitWidgetTestsDelegate initWidgetTests,
-    @required AFInitScreenTestsDelegate initScreenTests,
-    @required AFInitWorkflowStateTestsDelegate initWorkflowStateTests,
-    @required AFInitWireframesDelegate initWireframes,
+    required AFInitTestDataDelegate initTestData,
+    required AFInitUnitTestsDelegate initUnitTests,
+    required AFInitStateTestsDelegate initStateTests,
+    required AFInitWidgetTestsDelegate initWidgetTests,
+    required AFInitScreenTestsDelegate initScreenTests,
+    required AFInitWorkflowStateTestsDelegate initWorkflowStateTests,
+    AFInitWireframesDelegate? initWireframes,
   }) {
     addInitTestData(initTestData);
     addInitUnitTest(initUnitTests);
@@ -164,7 +164,7 @@ class AFTestExtensionContext {
     initWorkflowStateTests.add(init);
   }
 
-  void addInitWireframe(AFInitWireframesDelegate init) {
+  void addInitWireframe(AFInitWireframesDelegate? init) {
     if(init != null) {
       initWireframes.add(init);
     }
@@ -226,13 +226,13 @@ class AFTestExtensionContext {
   }
 
   void initialize({
-    @required AFCompositeTestDataRegistry testData, 
-    @required AFUnitTests unitTests,
-    @required AFStateTests stateTests,
-    @required AFWidgetTests widgetTests,
-    @required AFSingleScreenTests screenTests,
-    @required AFWorkflowStateTests workflowTests,
-    @required AFWireframes wireframes,
+    required AFCompositeTestDataRegistry testData, 
+    required AFUnitTests unitTests,
+    required AFStateTests stateTests,
+    required AFWidgetTests widgetTests,
+    required AFSingleScreenTests screenTests,
+    required AFWorkflowStateTests workflowTests,
+    required AFWireframes wireframes,
   }) {
       _initTestData(testData);
       testData.regenerate();
@@ -282,7 +282,7 @@ class AFFunctionalThemeDefinitionContext {
 
   AFFunctionalThemeDefinitionContext();
 
-  void initUnlessPresent(AFThemeID id, { @required AFCreateFunctionalThemeDelegate createTheme }) {
+  void initUnlessPresent(AFThemeID id, { required AFCreateFunctionalThemeDelegate createTheme }) {
     if(themeFactories.containsKey(id)) {
       return;
     }
@@ -291,12 +291,15 @@ class AFFunctionalThemeDefinitionContext {
 
   AFFunctionalTheme create(AFThemeID id, AFFundamentalThemeState fundamentals) {
     final create = themeFactories[id];
-    assert(create != null, "No theme registered with id $id");
+    if(create == null) throw AFException("No theme registered with id $id");
+
     return create(fundamentals);
   }
 
   AFCreateFunctionalThemeDelegate factoryFor(AFThemeID id) {
-    return themeFactories[id];
+    final factory = themeFactories[id];
+    if(factory == null) throw AFException("No theme factory registered for $id");
+    return factory;
   }
 
 
@@ -304,7 +307,9 @@ class AFFunctionalThemeDefinitionContext {
     final result = <AFThemeID, AFFunctionalTheme>{};
     for(final id in themeFactories.keys) {
       final create = themeFactories[id];
-      result[id] = create(fundamentals);
+      if(create != null) {
+        result[id] = create(fundamentals);
+      }
     }
 
     return result;
@@ -313,8 +318,8 @@ class AFFunctionalThemeDefinitionContext {
 }
 
 class AFPluginExtensionContext {
-  AFCreateAFAppDelegate createApp;
-  AFInitAppFundamentalThemeDelegate initFundamentalThemeArea;
+  AFCreateAFAppDelegate? createApp;
+  AFInitAppFundamentalThemeDelegate? initFundamentalThemeArea;
   final initScreenMaps = <AFInitScreenMapDelegate>[];
   final initialAppStates = <AFInitializeAppStateDelegate>[];
   final createStartupQueries = <AFCreateStartupQueryActionDelegate>[];
@@ -378,7 +383,10 @@ class AFPluginExtensionContext {
 
   void initAppStates(List<AFAppStateArea> appStates) {
     for(final initState in this.initialAppStates) {
-      appStates.add(initState());
+      final s = initState();
+      if(s != null) {
+        appStates.add(s);
+      }
     }
   }
 
@@ -405,7 +413,7 @@ class AFUILibraryExtensionContext<TState extends AFAppStateArea> extends AFPlugi
   final AFLibraryID id;
 
   AFUILibraryExtensionContext({
-    @required this.id,
+    required this.id,
   });
 
   AFLibraryTestHolder<TState> createScreenTestHolder() {
@@ -413,17 +421,19 @@ class AFUILibraryExtensionContext<TState extends AFAppStateArea> extends AFPlugi
   }
 
   void initializeLibraryFundamentals<TState extends AFAppStateArea>({
-    @required AFInitScreenMapDelegate initScreenMap,
-    @required AFInitPluginFundamentalThemeDelegate initFundamentalThemeArea,
-    @required AFInitializeAppStateDelegate initializeAppState,
-    @required AFInitFunctionalThemeDelegate initFunctionalTheme,
+    required AFInitScreenMapDelegate initScreenMap,
+    AFInitPluginFundamentalThemeDelegate? initFundamentalThemeArea,
+    AFInitializeAppStateDelegate? initializeAppState,
+    required AFInitFunctionalThemeDelegate initFunctionalTheme,
   }) {
     this.initScreenMaps.add(initScreenMap);
-    this.initialAppStates.add(initializeAppState);
+    if(initializeAppState != null) {
+      this.initialAppStates.add(initializeAppState);
+    }
     this.initFunctionalThemes.add(initFunctionalTheme);
-    if(initFundamentalThemeAreas != null) {
+    if(initFundamentalThemeArea != null) {
       this.initFundamentalThemeAreas.add(initFundamentalThemeArea);
-    } 
+    }
     _verifyNotNull(initScreenMap, "initScreenMap");
     _verifyNotNull(initializeAppState, "initializeAppState");
   }
@@ -438,13 +448,13 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
   /// Used by the app to specify fundamental configuration/functionality
   /// that AFib requires.
   void initializeAppFundamentals<TState extends AFAppStateArea>({
-    @required AFInitScreenMapDelegate initScreenMap,
-    @required AFInitAppFundamentalThemeDelegate initFundamentalThemeArea,
-    @required AFInitializeAppStateDelegate initializeAppState,
-    @required AFCreateStartupQueryActionDelegate createStartupQueryAction,
-    @required AFCreateAFAppDelegate createApp,
-    @required AFInitFunctionalThemeDelegate initFunctionalThemes,
-    @required AFOnErrorDelegate<TState> queryErrorHandler,
+    required AFInitScreenMapDelegate initScreenMap,
+    required AFInitAppFundamentalThemeDelegate initFundamentalThemeArea,
+    required AFInitializeAppStateDelegate initializeAppState,
+    required AFCreateStartupQueryActionDelegate createStartupQueryAction,
+    required AFCreateAFAppDelegate createApp,
+    required AFInitFunctionalThemeDelegate initFunctionalThemes,
+    required AFOnErrorDelegate<AFAppStateArea> queryErrorHandler,
   }) {
     this.test.initializeForApp();
     this.initScreenMaps.add(initScreenMap);
@@ -462,8 +472,8 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
   }
 
   void fromUILibrary(AFUILibraryExtensionContext source, {
-    @required AFInitAppFundamentalThemeDelegate initFundamentalThemeArea,
-    @required AFCreateAFAppDelegate createApp,
+    required AFInitAppFundamentalThemeDelegate initFundamentalThemeArea,
+    required AFCreateAFAppDelegate createApp,
   }) {
     this.initScreenMaps.addAll(source.initScreenMaps);
     this.initialAppStates.addAll(source.initialAppStates);
@@ -478,7 +488,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     this.initFunctionalThemes.addAll(source.initFunctionalThemes);    
   }
 
-  AFOnErrorDelegate<TState> errorHandlerForState<TState extends AFAppStateArea>() {
+  AFOnErrorDelegate<TState>? errorHandlerForState<TState extends AFAppStateArea>() {
     return errorListenerByState[TState];
   }
 
@@ -504,7 +514,10 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
 
   AFFundamentalThemeState createFundamentalTheme(AFFundamentalDeviceTheme device, AFAppStateAreas areas, Iterable<AFUILibraryExtensionContext> libraries) {
     final builder = AFAppFundamentalThemeAreaBuilder.create();
-    this.initFundamentalThemeArea(device, areas, builder);
+    final initThemeArea = this.initFundamentalThemeArea;
+    if(initThemeArea != null) {
+      initThemeArea(device, areas, builder);
+    }
 
     for(final init in this.initFundamentalThemeAreas) {
       init(device, areas, builder);
@@ -570,7 +583,10 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
   AFAppStateAreas createInitialAppStateAreas(Iterable<AFUILibraryExtensionContext> libraries) {
     final appStates = <AFAppStateArea>[];
     for(final initState in initialAppStates) {
-      appStates.add(initState());
+      final s = initState();
+      if(s != null) {
+        appStates.add(s);
+      }
     }    
 
     for(final thirdParty in libraries) {

@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:flutter/material.dart';
@@ -7,24 +6,24 @@ import 'package:overlay_support/overlay_support.dart';
 
 
 class AFNavigatorObserver extends NavigatorObserver {
-  void didPop(Route route, Route previousRoute) {
+  void didPop(Route route, Route? previousRoute) {
     _logNav("didPPop");
   }
 
-  void didPush(Route route, Route previousRoute) {
+  void didPush(Route route, Route? previousRoute) {
     _logNav("didPush");
   }
 
-  void didRemove(Route route, Route previousRoute) {
+  void didRemove(Route route, Route? previousRoute) {
     _logNav("didRemove");
 
   }
   
-  void didReplace({Route newRoute, Route oldRoute}) {
+  void didReplace({Route? newRoute, Route? oldRoute}) {
     _logNav("didReplace");
   }
 
-  void didStartUserGesture(Route route, Route previousRoute) {
+  void didStartUserGesture(Route route, Route? previousRoute) {
     _logNav("didStartUserGesture");
   }
 
@@ -50,8 +49,10 @@ abstract class AFMaterialApp<AppState> extends AFApp<AppState> {
   /// This widget is the root of your application
   @override
   Widget build(BuildContext context) {
+    final store = AFibF.g.storeInternalOnly;
+    if(store == null) throw AFException("Missing store");
     return StoreProvider(
-      store: AFibF.g.storeInternalOnly,      
+      store: store,      
       child: OverlaySupport(
         child: _buildMaterialApp(context)
       )

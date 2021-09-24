@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/flutter/ui/af_prototype_base.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +8,9 @@ class AFStandardErrorDialogRouteParam extends AFRouteParam {
   final String message;
 
   //--------------------------------------------------------------------------------------
-  AFStandardErrorDialogRouteParam({this.message});
+  AFStandardErrorDialogRouteParam({
+    required this.message
+  });
 
   //--------------------------------------------------------------------------------------
   factory AFStandardErrorDialogRouteParam.createOncePerScreen(String message) {
@@ -33,7 +34,7 @@ class AFStandardErrorDialog extends AFUIConnectedDialog<AFStateView, AFStandardE
 
   //--------------------------------------------------------------------------------------
   @override
-  AFStateView createStateView(AFAppStateArea state, AFStandardErrorDialogRouteParam param) {
+  AFStateView createStateView(AFAppStateArea? state, AFStandardErrorDialogRouteParam param) {
     return AFStateView.unused();
   }
 

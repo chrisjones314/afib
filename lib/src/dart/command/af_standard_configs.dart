@@ -1,4 +1,3 @@
-
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
@@ -216,7 +215,7 @@ class AFConfigEntryTestSize extends AFConfigurationItemOptionChoice {
   }
 
   /// Return an error message if the value is invalid, otherwise return null.
-  String validate(dynamic value) {
+  String? validate(dynamic value) {
     final parsed = _parseValue(value);
     if(parsed is String) {
       return parsed;
@@ -283,7 +282,7 @@ class AFConfigEntryTestOrientation extends AFConfigurationItemOptionChoice {
   }
 
   /// Return an error message if the value is invalid, otherwise return null.
-  String validate(dynamic value) {
+  String? validate(dynamic value) {
     if(value != AFFormFactorSize.idOrientationPortrait && value != AFFormFactorSize.idOrientationLandscape) {
       return "Value for $name must be ${AFFormFactorSize.idOrientationPortrait} or ${AFFormFactorSize.idOrientationLandscape}";
     }

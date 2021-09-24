@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/id.dart';
 import 'package:afib/src/flutter/ui/af_prototype_base.dart';
@@ -12,20 +11,21 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 @immutable
 class AFPrototypeTestScreenParam extends AFRouteParam {
   static const ungroupedGroup = "ungrouped";
-  final String filter;
+  final String? filter;
   final dynamic title;
 
   final Map<String, List<AFScreenPrototype>> screenTestsByGroup;
 
   AFPrototypeTestScreenParam({
-    @required this.screenTestsByGroup,
-    @required this.title,
-    this.filter});
+    required this.screenTestsByGroup,
+    required this.title,
+    this.filter
+  });
 
 
   factory AFPrototypeTestScreenParam.createFromList({
-    @required dynamic title,
-    @required List<AFScreenPrototype> tests
+    required dynamic title,
+    required List<AFScreenPrototype> tests
   }) {
     final groups = <String, List<AFScreenPrototype>>{};
     for(final test in tests) {
@@ -53,9 +53,9 @@ class AFPrototypeTestScreenParam extends AFRouteParam {
   }
 
   AFPrototypeTestScreenParam copyWith({
-    String filter,
-    String title,
-    Map<String, AFScreenPrototype> screenTestsByGroup
+    String? filter,
+    String? title,
+    Map<String, List<AFScreenPrototype>>? screenTestsByGroup
   }) {
     return AFPrototypeTestScreenParam(
       screenTestsByGroup: screenTestsByGroup ?? this.screenTestsByGroup,
@@ -70,7 +70,7 @@ class AFPrototypeTestScreenStateView extends AFStateView1<AFSingleScreenTests> {
   AFPrototypeTestScreenStateView(AFSingleScreenTests tests): 
     super(first: tests);
   
-  AFSingleScreenTests get tests { return first; }
+  AFSingleScreenTests? get tests { return first; }
 }
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
@@ -85,7 +85,7 @@ class AFPrototypeTestScreen extends AFUIConnectedScreen<AFStateView, AFPrototype
   }
 
   @override
-  AFStateView createStateView(AFAppStateArea state, AFPrototypeTestScreenParam param) {
+  AFStateView createStateView(AFAppStateArea? state, AFPrototypeTestScreenParam param) {
     return AFStateView();
   }
 
@@ -106,7 +106,10 @@ class AFPrototypeTestScreen extends AFUIConnectedScreen<AFStateView, AFPrototype
     final groups = _sortIterable(context.p.screenTestsByGroup.keys);
     for(final group in groups) {
       final tests = context.p.screenTestsByGroup[group];
-      rows.add(_addGroup(context, AFUIWidgetID.cardTestGroup.with1(group), group, tests));
+      assert(tests != null);
+      if(tests != null) {
+        rows.add(_addGroup(context, AFUIWidgetID.cardTestGroup.with1(group), group, tests));
+      }
     }
 
     final leading = t.childButtonStandardBack(context, screen: screenId);

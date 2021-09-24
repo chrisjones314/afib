@@ -1,7 +1,7 @@
-// @dart=2.9
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_typedefs_command.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/core/af_app_extension_context.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
@@ -22,10 +22,10 @@ void afMainWrapper(Function() onReady) {
 /// [afMain] handles startup, execution, and shutdown sequence for an afApp
 void afMain<TState extends AFAppStateArea>(
   AFDartParams paramsD, 
-  AFExtendBaseDelegate extendBase,
-  AFExtendBaseDelegate extendBaseThirdParty,
+  AFExtendBaseDelegate? extendBase,
+  AFExtendBaseDelegate? extendBaseThirdParty,
   AFExtendAppDelegate extendApp, 
-  AFExtendThirdPartyDelegate extendThirdParty, 
+  AFExtendThirdPartyDelegate? extendThirdParty, 
   AFExtendTestDelegate extendTest) {
   final baseContext = AFBaseExtensionContext();
   if(extendBase != null) {
@@ -48,7 +48,9 @@ void afMain<TState extends AFAppStateArea>(
 
   AFibF.initialize<TState>(context);
   
-  final app = AFibF.g.createApp();
+  final createApp = AFibF.g.createApp;
+  if(createApp == null) throw AFException("Missing create app function");
+  final app = createApp();
   app.afBeforeRunApp();
   runApp(app);
   app.afAfterRunApp();

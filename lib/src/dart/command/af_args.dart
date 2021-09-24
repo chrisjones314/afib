@@ -1,5 +1,3 @@
-// @dart=2.9
-
 /// Utility for accessing arguments to an afib command. 
 /// 
 /// All methods ignore the command name itself, which is already implied
@@ -21,12 +19,12 @@ class AFArgs {
 
   /// True if the arguments have a first argument, which is the command argument.
   bool get hasCommand {
-    return args.length >= 1;
+    return args.isNotEmpty;
   }
 
   /// The number of arguments to the command (not including the command itself)
   int get count {
-    if(args.length == 0) {
+    if(args.isEmpty) {
       return 0;
     }
     return args.length - 1;
@@ -49,7 +47,7 @@ class AFArgs {
   }
 
   /// The nth space-separated argument (not including the command itself)
-  String at(int i) {
+  String? at(int i) {
     final idx = i+1;
     // ignore the command itself.
     if(idx >= args.length) {
@@ -59,7 +57,7 @@ class AFArgs {
   }
 
   /// The first argument to the command (not including the command itself)
-  String get first {
+  String? get first {
     return at(0);
   }
 
@@ -71,12 +69,12 @@ class AFArgs {
 
 
   /// The second argument to the command (not including the command itself)
-  String get second {
+  String? get second {
     return at(1);
   }
 
   /// The third argument to the command (not including the command itself)
-  String get third {
+  String? get third {
     return at(2);
   }
 

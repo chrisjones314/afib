@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'dart:async';
 
 import 'package:afib/afib_flutter.dart';
@@ -17,14 +16,18 @@ import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:logger/logger.dart';
+import 'package:collection/collection.dart';
 
 class AFStartQueryContext<TResponse> {
   final Function(TResponse) onSuccess;
   final Function(AFQueryError) onError;
 
-  AFStartQueryContext({this.onSuccess, this.onError});
+  AFStartQueryContext({
+    required this.onSuccess, 
+    required this.onError
+  });
 
-  Logger get log {
+  Logger? get log {
     return AFibD.log(AFConfigEntryLogArea.query);
   }
 }
@@ -33,7 +36,10 @@ class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatch
   final AFDispatcher dispatcher;
   final AFState state;
 
-  AFFinishQueryContext({this.dispatcher, this.state});
+  AFFinishQueryContext({
+    required this.dispatcher, 
+    required this.state
+  });
 
   void dispatch(dynamic action) {
     dispatcher.dispatch(action);
@@ -43,15 +49,15 @@ class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatch
     return dispatcher;
   }
 
-  TState get s {
-    return state.public.areaStateFor(TState);
+  TState? get s {
+    return state.public.areaStateFor(TState) as TState;
   }
 
-  AFRouteParam findRouteParam(AFScreenID screen) {
+  AFRouteParam? findRouteParam(AFScreenID screen) {
     return state.public.route.findParamFor(screen);
   }
 
-  Logger get log {
+  Logger? get log {
     return AFibD.log(AFConfigEntryLogArea.query);
   }
 
@@ -72,12 +78,11 @@ class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatch
     dispatch(AFUpdateAppStateAction(area: TState, toIntegrate: toIntegrate));
   }
 
-  material.BuildContext get context {
+  material.BuildContext? get context {
     final route = state.public.route;
     final currentScreenId = route.activeScreenId;
     final activeScreen = AFibF.g.internalOnlyFindScreen(currentScreenId);
-    assert(activeScreen != null);
-    return activeScreen.element;
+    return activeScreen?.element;
   }
 }
 
@@ -85,9 +90,9 @@ class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatch
 class AFFinishQuerySuccessContext<TState extends AFAppStateArea, TResponse> extends AFFinishQueryContext<TState>  {
   final TResponse response;
   AFFinishQuerySuccessContext({
-    AFDispatcher dispatcher, 
-    AFState state, 
-    this.response
+    required AFDispatcher dispatcher, 
+    required AFState state, 
+    required this.response
   }): super(dispatcher: dispatcher, state: state);
 
 
@@ -99,9 +104,9 @@ class AFFinishQuerySuccessContext<TState extends AFAppStateArea, TResponse> exte
 class AFFinishQueryErrorContext<TState extends AFAppStateArea> extends AFFinishQueryContext<TState> {
   final AFQueryError error;
   AFFinishQueryErrorContext({
-    AFDispatcher dispatcher, 
-    AFState state, 
-    this.error
+    required AFDispatcher dispatcher, 
+    required AFState state, 
+    required this.error
   }): super(dispatcher: dispatcher, state: state);
 
   AFQueryError get e {
@@ -112,14 +117,15 @@ class AFFinishQueryErrorContext<TState extends AFAppStateArea> extends AFFinishQ
 /// Superclass for a kind of action that queries some data asynchronously, then knows
 /// how to process the result.
 abstract class AFAsyncQuery<TState extends AFAppStateArea, TResponse> extends AFActionWithKey {
-  final List<dynamic> successActions;
-  final AFOnResponseDelegate<TState, TResponse> onSuccessDelegate;
-  final AFOnErrorDelegate<TState> onErrorDelegate;
+  final List<dynamic>? successActions;
+  final AFOnResponseDelegate<TState, TResponse>? onSuccessDelegate;
+  final AFOnErrorDelegate<TState>? onErrorDelegate;
 
-  AFAsyncQuery({AFID id, this.onSuccessDelegate, this.onErrorDelegate, this.successActions}): super(id: id);
+  AFAsyncQuery({
+    AFID? id, this.onSuccessDelegate, this.onErrorDelegate, this.successActions}): super(id: id);
 
   /// Called internally when redux middleware begins processing a query.
-  void startAsyncAF(AFDispatcher dispatcher, AFStore store, { Function(dynamic) onResponseExtra, Function(dynamic) onErrorExtra }) {
+  void startAsyncAF(AFDispatcher dispatcher, AFStore store, { Function(dynamic)? onResponseExtra, Function(dynamic)? onErrorExtra }) {
     final startContext = AFStartQueryContext<TResponse>(
       onSuccess: (response) { 
         // note: there could be multiple queries outstanding at once, meaning the state
@@ -147,11 +153,13 @@ abstract class AFAsyncQuery<TState extends AFAppStateArea, TResponse> extends AF
   /// Called internally by the framework to do pre and post processing before [finishAsyncWithResponse]
   void finishAsyncWithResponseAF(AFFinishQuerySuccessContext<TState, TResponse> context) {
     finishAsyncWithResponse(context);
-    if(onSuccessDelegate != null) {
-      onSuccessDelegate(context);
+    final onSuccessD = onSuccessDelegate;
+    if(onSuccessD != null) {
+      onSuccessD(context);
     }
-    if(successActions != null) {
-      for(final act in successActions) {
+    final successA = successActions;
+    if(successA != null) {
+      for(final act in successA) {
         context.dispatch(act);
       }
     }
@@ -160,8 +168,9 @@ abstract class AFAsyncQuery<TState extends AFAppStateArea, TResponse> extends AF
 
   void finishAsyncWithErrorAF(AFFinishQueryErrorContext<TState> context) {
     finishAsyncWithError(context);
-    if(onErrorDelegate != null) {
-      onErrorDelegate(context);
+    final onErrorD = onErrorDelegate;
+    if(onErrorD != null) {
+      onErrorD(context);
     }
   }
 
@@ -251,12 +260,12 @@ class AFConsolidatedQueryResponse {
   }
 
   bool get isComplete {
-    final foundIncomplete = responses.firstWhere( (response) => response.isIncomplete, orElse: () => null);
+    final foundIncomplete = responses.firstWhereOrNull( (response) => response.isIncomplete);
     return foundIncomplete == null;
   }
 
   bool get hasError {
-    final foundError = responses.firstWhere( (response) => response.isError, orElse: () => null);
+    final foundError = responses.firstWhereOrNull( (response) => response.isError);
     return foundError != null;
   }
 
@@ -277,18 +286,22 @@ class AFConsolidatedQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TS
 
   final AFConsolidatedQueryResponse queryResponses;
 
-  AFConsolidatedQuery(this.queryResponses, {AFID id, AFOnResponseDelegate<TState, AFConsolidatedQueryResponse> onSuccessDelegate, AFOnErrorDelegate<TState> onErrorDelegate, List<dynamic> successActions}):
-    super(id: id, onSuccessDelegate: onSuccessDelegate, onErrorDelegate: onErrorDelegate, successActions: successActions);
+  AFConsolidatedQuery(this.queryResponses, {
+    AFID? id, 
+    AFOnResponseDelegate<TState, AFConsolidatedQueryResponse>? onSuccessDelegate, 
+    AFOnErrorDelegate<TState>? onErrorDelegate, 
+    List<dynamic>? successActions
+  }): super(id: id, onSuccessDelegate: onSuccessDelegate, onErrorDelegate: onErrorDelegate, successActions: successActions);
 
   static List<AFAsyncQuery> createList() {
     return <AFAsyncQuery>[];
   }
 
   factory AFConsolidatedQuery.createFrom({
-    List<AFAsyncQuery> queries,
-    List<dynamic> successActions,
-    AFOnResponseDelegate<TState, AFConsolidatedQueryResponse> onSuccessDelegate,
-    AFOnErrorDelegate<TState> onErrorDelegate
+    required List<AFAsyncQuery> queries,
+    List<dynamic>? successActions,
+    AFOnResponseDelegate<TState, AFConsolidatedQueryResponse>? onSuccessDelegate,
+    AFOnErrorDelegate<TState>? onErrorDelegate
   }) {
     final response = AFConsolidatedQueryResponse.createFrom(queries);
     return AFConsolidatedQuery(response,
@@ -305,7 +318,7 @@ class AFConsolidatedQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TS
     return result;
   }
 
-  TQuery findQueryWhere<TQuery extends AFAsyncQuery>(Function(TQuery) testQuery) {
+  TQuery? findQueryWhere<TQuery extends AFAsyncQuery>(Function(TQuery) testQuery) {
     for(final qr in queryResponses.responses) {
       final query = qr.query;
       if(query is TQuery) {
@@ -317,11 +330,11 @@ class AFConsolidatedQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TS
     return null;
   }
 
-  TQuery findQueryWithType<TQuery extends AFAsyncQuery>() {
+  TQuery? findQueryWithType<TQuery extends AFAsyncQuery>() {
     return findQueryWhere<TQuery>( (q) => true);
   }
 
-  void startAsyncAF(AFDispatcher dispatcher, AFStore store, { Function(dynamic) onResponseExtra, Function(dynamic) onErrorExtra }) {
+  void startAsyncAF(AFDispatcher dispatcher, AFStore store, { Function(dynamic)? onResponseExtra, Function(dynamic)? onErrorExtra }) {
       final completer = Completer<bool>();
 
       // start all the queries asynchronously.
@@ -385,7 +398,12 @@ class AFConsolidatedQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TS
 /// [AFShutdownQueryListeners] action to call the shutdown method on some or all outstanding
 /// listeners.  
 abstract class AFAsyncQueryListener<TState extends AFAppStateArea, TResponse> extends AFAsyncQuery<TState, TResponse> {
-  AFAsyncQueryListener({AFID id, List<dynamic> successActions, AFOnResponseDelegate<TState, TResponse> onSuccessDelegate, AFOnErrorDelegate<TState> onErrorDelegate}): super(id: id, successActions: successActions, onSuccessDelegate: onSuccessDelegate);
+  AFAsyncQueryListener({
+    AFID? id, 
+    List<dynamic>? successActions, 
+    AFOnResponseDelegate<TState, TResponse>? onSuccessDelegate, 
+    AFOnErrorDelegate<TState>? onErrorDelegate
+  }): super(id: id, successActions: successActions, onSuccessDelegate: onSuccessDelegate);
 
   void afShutdown() {
     AFibD.logQueryAF?.d("Shutting down listener query $this");

@@ -1,4 +1,3 @@
-
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_buffer.dart';
@@ -7,7 +6,7 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 
 class DeclareConfigEntriesT extends AFDynamicSourceTemplate {
   final AFConfig source;
-  final List<AFConfigurationItem> entries;
+  final List<AFConfigurationItem>? entries;
 
   DeclareConfigEntriesT(this.source, this.entries);
     

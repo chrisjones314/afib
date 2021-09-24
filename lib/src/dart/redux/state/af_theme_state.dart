@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'dart:async';
 import 'dart:ui';
 
@@ -24,28 +23,28 @@ class AFFundamentalDeviceTheme {
   final double devicePixelRatio;
 
   AFFundamentalDeviceTheme({
-    @required this.brightnessValue,
-    @required this.alwaysUse24HourFormatValue,
-    @required this.padding,
-    @required this.viewInsets,
-    @required this.viewPadding,
-    @required this.localeValue,
-    @required this.physicalSize,
-    @required this.textScaleFactorValue,
-    @required this.devicePixelRatio,
+    required this.brightnessValue,
+    required this.alwaysUse24HourFormatValue,
+    required this.padding,
+    required this.viewInsets,
+    required this.viewPadding,
+    required this.localeValue,
+    required this.physicalSize,
+    required this.textScaleFactorValue,
+    required this.devicePixelRatio,
   });
 
   factory AFFundamentalDeviceTheme.create() {
-    final window = WidgetsBinding.instance.window;
-    final brightness = window.platformBrightness;
-    final alwaysUse24 = window.alwaysUse24HourFormat;
-    final padding = window.padding;
-    final viewInsets = window.viewInsets;
-    final viewPadding = window.viewPadding;
-    final locale = window.locale;
-    final physicalSize = window.physicalSize;
-    final textScaleFactor = window.textScaleFactor;
-    final devicePixelRatio = window.devicePixelRatio;
+    final window = WidgetsBinding.instance?.window;
+    final brightness = window?.platformBrightness ?? Brightness.light;
+    final alwaysUse24 = window?.alwaysUse24HourFormat ?? false;
+    final padding = window?.padding ?? WindowPadding.zero;
+    final viewInsets = window?.viewInsets ?? WindowPadding.zero;
+    final viewPadding = window?.viewPadding ?? WindowPadding.zero;
+    final locale = window?.locale ?? Locale("en");
+    final physicalSize = window?.physicalSize ?? (Size(1170, 2532));
+    final textScaleFactor = window?.textScaleFactor ?? 1.0;
+    final devicePixelRatio = window?.devicePixelRatio ?? 1.0;
     return AFFundamentalDeviceTheme(
       brightnessValue: brightness,
       alwaysUse24HourFormatValue: alwaysUse24,
@@ -75,22 +74,22 @@ class AFFundamentalDeviceTheme {
   }
 
   Brightness brightness(AFFundamentalThemeState fundamentals) {
-    Brightness b = fundamentals.findValue(AFUIThemeID.brightness);
+    final b = fundamentals.findValue(AFUIThemeID.brightness) as Brightness?;
     return b ?? brightnessValue;
   }
 
   bool alwaysUse24HourFormat(AFFundamentalThemeState fundamentals) {
-    bool b = fundamentals.findValue(AFUIThemeID.alwaysUse24HourFormat);
+    final b = fundamentals.findValue(AFUIThemeID.alwaysUse24HourFormat) as bool?;
     return b ?? alwaysUse24HourFormatValue;
   }
 
   Locale locale(AFFundamentalThemeState fundamentals) {
-    Locale l = fundamentals.findValue(AFUIThemeID.locale);
+    final l = fundamentals.findValue(AFUIThemeID.locale) as Locale?;
     return l ?? localeValue;
   }
 
   double textScaleFactor(AFFundamentalThemeState fundamentals) {
-    double ts = fundamentals.findValue(AFUIThemeID.textScaleFactor);
+    final ts = fundamentals.findValue(AFUIThemeID.textScaleFactor) as double?;
     return ts ?? textScaleFactorValue;
   }
 }
@@ -102,8 +101,8 @@ class AFFundamentalThemeValue {
   final dynamic value;
 
   AFFundamentalThemeValue({
-    @required this.id,
-    @required this.value,
+    required this.id,
+    required this.value,
   });  
 }
 
@@ -117,13 +116,13 @@ abstract class AFThemeResolvableValue {
 class AFTextStyle extends AFThemeResolvableValue {
   final AFThemeID color;
   final AFThemeID fontSize;
-  final AFThemeID weight;
+  final AFThemeID? weight;
 
-  TextStyle styleCache;
+  TextStyle? styleCache;
 
   AFTextStyle({
-    @required this.color,
-    @required this.fontSize,
+    required this.color,
+    required this.fontSize,
     this.weight,
   });
 
@@ -144,19 +143,19 @@ class AFColor extends AFThemeResolvableValue {
   final AFThemeID colorLight;
   final AFThemeID colorDark;
 
-  Color colorLightCache;
-  Color colorDarkCache;
+  Color? colorLightCache;
+  Color? colorDarkCache;
 
   AFColor({
-    @required this.colorLight,
-    @required this.colorDark,
+    required this.colorLight,
+    required this.colorDark,
   });
 
   factory AFColor.createWithOne(AFThemeID color) {
     return AFColor(colorLight: color, colorDark: color);
   }
 
-  Color color(Brightness brightness) { return brightness == Brightness.light ? colorLightCache : colorDarkCache; }
+  Color? color(Brightness brightness) { return brightness == Brightness.light ? colorLightCache : colorDarkCache; }
 
   void resolve(AFFundamentalThemeState theme) {
     colorLightCache = theme.color(colorLight);
@@ -175,15 +174,15 @@ class AFColorPairing extends AFThemeResolvableValue {
   final AFColor background;
 
   AFColorPairing({
-    @required this.foreground,
-    @required this.background,
+    required this.foreground,
+    required this.background,
   });
 
-  Color forgroundColor(Brightness brightness) {
+  Color? forgroundColor(Brightness brightness) {
     return foreground.color(brightness);
   }
 
-  Color backgroundColor(Brightness brightness) {
+  Color? backgroundColor(Brightness brightness) {
     return background.color(brightness);
   }
 
@@ -208,13 +207,13 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
   final Map<AFThemeID, List<dynamic>> optionsForType;
 
   AFFundamentalThemeArea({
-    @required this.themeLight,
-    @required this.themeDark,
-    @required this.values, 
-    @required this.translationSet,
-    @required this.supportedLocalesApp,
-    @required this.overrides,
-    @required this.optionsForType,
+    required this.themeLight,
+    required this.themeDark,
+    required this.values, 
+    required this.translationSet,
+    required this.supportedLocalesApp,
+    required this.overrides,
+    required this.optionsForType,
   });
 
   AFFundamentalThemeArea reviseOverrideThemeValue(AFThemeID id, dynamic value) {
@@ -226,12 +225,12 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
   }
 
   AFFundamentalThemeArea copyWith({
-    ThemeData themeLight,
-    ThemeData themeDark,
-    Map<AFThemeID, AFFundamentalThemeValue> values,
-    Map<Locale, AFTranslationSet> translationSet,
-    List<Locale> supportedLocalesApp,
-    Map<AFThemeID, AFFundamentalThemeValue> overrides,
+    ThemeData? themeLight,
+    ThemeData? themeDark,
+    Map<AFThemeID, AFFundamentalThemeValue>? values,
+    Map<Locale, AFTranslationSet>? translationSet,
+    List<Locale>? supportedLocalesApp,
+    Map<AFThemeID, AFFundamentalThemeValue>? overrides,
   }) {
     return AFFundamentalThemeArea(
       themeLight: themeLight ?? this.themeLight,
@@ -254,7 +253,10 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
   List<String> get areaList {
     final map = <String, bool>{};
     for(final val in this.values.values) {
-      map[val.id.tag] = true;
+      final tag = val.id.tag;
+      if(tag != null) {
+        map[tag] = true;
+      }
     }
     final result = map.keys.toList();
     result.insert(0, AFUIThemeID.tagDevice);
@@ -294,8 +296,9 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
 
   String translate(dynamic idOrText, Locale locale) {
     if(showTranslationIds && (idOrText is AFTranslationID || idOrText is AFWidgetID)) {
-      if(idOrText is AFTranslationID && idOrText.values != null) {
-        return "${idOrText.code}+${idOrText.values.length}";
+      final idOrTextValues = idOrText.values;
+      if(idOrText is AFTranslationID && idOrTextValues != null) {
+        return "${idOrText.code}+${idOrTextValues.length}";
       }
       return idOrText.code;
     }
@@ -303,10 +306,13 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     if(result == null) {
       result = idOrText;
     }
+    if(result == null) {
+      return idOrText.toString();
+    }
     return result;
   }
 
-  dynamic value(AFThemeID id) {
+  dynamic value(AFThemeID? id) {
     return values[id]?.value;
   }
 
@@ -315,10 +321,10 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     return supportedLocales.first;
   }
 
-  String translation(dynamic textOrId, Locale locale) {
+  String? translation(dynamic textOrId, Locale locale) {
     if(textOrId is AFTranslationID) {
       if(textOrId == AFUITranslationID.notTranslated) {
-        return textOrId.values.first.toString();
+        return textOrId.values?.first.toString();
       }
     }
     
@@ -338,7 +344,11 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     if(setT == null) {
       return textOrId.toString();
     }
-    return setT.translate(textOrId, translationSet[AFUILocaleID.universal]);
+    final universal = translationSet[AFUILocaleID.universal];
+    if(universal == null) {
+      return textOrId.toString();
+    }
+    return setT.translate(textOrId, universal);
   }
 
   dynamic findValue(AFThemeID id) {
@@ -372,17 +382,18 @@ class AFTranslationSet {
     translations[idOrText] = trans;
   }
 
-  String translate(dynamic textOrId, AFTranslationSet universal) {
+  String? translate(dynamic textOrId, AFTranslationSet universal) {
     var result = translations[textOrId];
     if(result == null) {
       result = universal.translations[textOrId];
     }      
     if(textOrId is AFTranslationID) {
-      if(textOrId.values != null) {
-        for(var i = 0; i < textOrId.values.length; i++) {
+      final textOrIdValues = textOrId.values;     
+      if(textOrIdValues != null) {
+        for(var i = 0; i < textOrIdValues.length; i++) {
           final key = "{$i}";
-          final value = textOrId.values[i].toString();
-          result = result.replaceAll(key, value);
+          final value = textOrIdValues[i].toString();
+          result = result?.replaceAll(key, value);
         }
       }
 
@@ -421,11 +432,11 @@ class AFPluginFundamentalThemeAreaBuilder {
   /// populates the builder first, this allows the app to override
   /// values for plugins.
   void setValue(AFThemeID id, dynamic value, {
-    AFCreateDynamicDelegate defaultCalculation,
+    AFCreateDynamicDelegate? defaultCalculation,
     bool notNull = true
   }) {
     if(!values.containsKey(id)) {
-      if(value == null) {
+      if(value == null && defaultCalculation != null) {
         value = defaultCalculation();
       }
       if(notNull && value == null) {
@@ -470,7 +481,7 @@ class AFPluginFundamentalThemeAreaBuilder {
 }
 
 mixin AFThemeAreaUtilties {
-  double size(dynamic id, { double scale = 1.0 }) {
+  double? size(dynamic id, { double scale = 1.0 }) {
     if(id == null) {
       return null;
     }
@@ -489,7 +500,7 @@ mixin AFThemeAreaUtilties {
     return number * scale;
   }
 
-  Widget icon(dynamic idOrIcon, {
+  Widget? icon(dynamic idOrIcon, {
     dynamic iconColor, 
     dynamic iconSize
   }) { 
@@ -515,7 +526,7 @@ mixin AFThemeAreaUtilties {
   }
 
 
-  TextStyle textStyle(dynamic idOrTextStyle) {
+  TextStyle? textStyle(dynamic idOrTextStyle) {
     if(idOrTextStyle == null) {
       return null;
     }
@@ -534,7 +545,7 @@ mixin AFThemeAreaUtilties {
     return result;
   }
 
-  FontWeight weight(dynamic id) {
+  FontWeight? weight(dynamic id) {
     if(id == null ) {
       return null;
     }
@@ -551,7 +562,7 @@ mixin AFThemeAreaUtilties {
     return result;
   }
 
-  Color foreground(AFThemeID id, Brightness brightness) {
+  Color foreground(AFThemeID? id, Brightness brightness) {
     final val = value(id);
     var color;
     if(val is Color) {
@@ -566,7 +577,7 @@ mixin AFThemeAreaUtilties {
     return color;
   }
 
-  Color background(AFThemeID id, Brightness brightness) {
+  Color background(AFThemeID? id, Brightness brightness) {
     final val = value(id);
     var color;
     if(val is Color) {
@@ -581,7 +592,7 @@ mixin AFThemeAreaUtilties {
     return color;
   }
 
-  String translate(String idOrText, Locale locale) {
+  String? translate(String idOrText, Locale locale) {
     var result = translation(idOrText, locale);
     if(result == null) {
       result = idOrText;
@@ -600,7 +611,7 @@ mixin AFThemeAreaUtilties {
     return result;
   }
 
-  Color color(dynamic id) {
+  Color? color(dynamic id) {
     if(id is Color) {
       return id;
     }
@@ -630,8 +641,8 @@ mixin AFThemeAreaUtilties {
     return result;
   }
 
-  dynamic value(AFThemeID id);
-  String translation(String idOrText, Locale locale);  
+  dynamic value(AFThemeID? id);
+  String? translation(String idOrText, Locale locale);  
 
   void _throwUnsupportedType(dynamic id, dynamic val) {
     throw AFException("In fundamental theme, $id has unsupported type ${val.runtimeType}");
@@ -661,14 +672,14 @@ mixin AFThemeAreaUtilties {
 }
 
 class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuilder with AFThemeAreaUtilties {
-  ThemeData themeLight;
-  ThemeData themeDark;
+  ThemeData? themeLight;
+  ThemeData? themeDark;
   static const bootstrapStandardMargins = <double>[0, 2.0, 4.0, 8.0, 12.0, 16.0];
   static const bootstrapStandardPadding = bootstrapStandardMargins;
   static const bootstrapStandardBorderRadius = bootstrapStandardMargins;
 
   AFAppFundamentalThemeAreaBuilder({
-    @required Map<AFThemeID, List<dynamic>> optionsForType
+    required Map<AFThemeID, List<dynamic>> optionsForType
   }): super(optionsForType);
 
   factory AFAppFundamentalThemeAreaBuilder.create() {
@@ -680,10 +691,10 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
   /// The app must call this method, or [setFundamentalThemeData] in order
   /// to establish the basic theme of the app.
   void setFlutterFundamentals({
-    ColorScheme colorSchemeLight,
-    ColorScheme colorSchemeDark,
-    TextTheme textThemeLight,
-    TextTheme textThemeDark
+    required ColorScheme colorSchemeLight,
+    required ColorScheme colorSchemeDark,
+    TextTheme? textThemeLight,
+    TextTheme? textThemeDark
   }) {
 
     themeLight = ThemeData.from(colorScheme: colorSchemeLight);
@@ -693,8 +704,8 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
   /// Most apps should use [setFlutterFundamentals], but this method gives you more control
   /// to create the theme data exactly as you wish.
   void setFundamentalThemeData({
-    ThemeData themeLight,
-    ThemeData themeDark
+    ThemeData? themeLight,
+    ThemeData? themeDark
   }) {
     this.themeLight = themeLight;
     this.themeDark = themeDark;
@@ -751,11 +762,11 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
   }
 
 
-  dynamic value(AFThemeID id) {
+  dynamic value(AFThemeID? id) {
     return values[id]?.value;
   }
 
-  String translation(dynamic idOrValue, Locale locale) {
+  String? translation(dynamic idOrValue, Locale locale) {
     /// we shouldn't do translations at build time.
     throw UnimplementedError();
   }
@@ -778,8 +789,8 @@ class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuild
   AFFundamentalThemeArea create() {
     validate();
     return AFFundamentalThemeArea(
-      themeLight: themeLight, 
-      themeDark: themeDark, 
+      themeLight: themeLight!, 
+      themeDark: themeDark!, 
       values: this.values, 
       translationSet: translationSet,
       supportedLocalesApp: supportedLocalesApp,
@@ -822,11 +833,11 @@ class AFBorderRadiusSet {
   final BorderRadius s5;
 
   AFBorderRadiusSet({
-    @required this.s1,
-    @required this.s2,
-    @required this.s3,
-    @required this.s4,
-    @required this.s5,
+    required this.s1,
+    required this.s2,
+    required this.s3,
+    required this.s4,
+    required this.s5,
   });
 
   BorderRadius get size1 { return s1; }
@@ -837,12 +848,8 @@ class AFBorderRadiusSet {
   BorderRadius get standard { return s2; }
 
  factory AFBorderRadiusSet.create({
-    List<double> sizes,
-    final bool tl,
-    final bool tr,
-    final bool bl,
-    final bool br,
-    BorderRadius Function(Radius r) createRadius,
+    required List<double> sizes,
+    required BorderRadius Function(Radius r) createRadius,
    }) {
     final s1 = _createRadius(sizes[1], createRadius);
     final s2 = _createRadius(sizes[2], createRadius);
@@ -852,11 +859,7 @@ class AFBorderRadiusSet {
     return AFBorderRadiusSet(s1: s1, s2: s2, s3: s3, s4: s4, s5: s5);
   }
 
-  static BorderRadius _createRadius(double amount, BorderRadius Function(Radius) createRadius) {
-    if(amount == null) {
-      return null;
-    }
-    
+  static BorderRadius _createRadius(double amount, BorderRadius Function(Radius) createRadius) {    
     final radius = Radius.circular(amount);
     return createRadius(radius);
         
@@ -872,12 +875,12 @@ class AFBorderRadius {
   final AFBorderRadiusSet b;
 
   AFBorderRadius({
-    @required this.sizes,
-    @required this.a,
-    @required this.l,
-    @required this.r,
-    @required this.t,
-    @required this.b,
+    required this.sizes,
+    required this.a,
+    required this.l,
+    required this.r,
+    required this.t,
+    required this.b,
   });
 
   AFBorderRadiusSet get all { return a; }
@@ -918,12 +921,12 @@ class AFSpacingSet {
   final EdgeInsets s5;
 
   AFSpacingSet({
-    @required this.s0,
-    @required this.s1,
-    @required this.s2,
-    @required this.s3,
-    @required this.s4,
-    @required this.s5,
+    required this.s0,
+    required this.s1,
+    required this.s2,
+    required this.s3,
+    required this.s4,
+    required this.s5,
   });
 
   EdgeInsets get sizeNone { return s0; }
@@ -981,14 +984,14 @@ class AFSpacing {
 
 
   AFSpacing({
-    @required this.sizes,
-    @required this.a,
-    @required this.t,
-    @required this.r,
-    @required this.b,
-    @required this.l,
-    @required this.v,
-    @required this.h
+    required this.sizes,
+    required this.a,
+    required this.t,
+    required this.r,
+    required this.b,
+    required this.l,
+    required this.v,
+    required this.h
   });
 
   factory AFSpacing.create(List<double> sizes) {
@@ -1028,7 +1031,7 @@ class AFSpacing {
 /// a fundamental theme.
 class AFFundamentalThemeState {
   static const badSizeIndexError = "You must specify an index into your 6 standard sizes";
-  ThemeData themeData;
+  ThemeData? themeData;
   final AFFundamentalDeviceTheme device;
   final AFFundamentalThemeArea area;
   final AFSpacing marginSpacing;
@@ -1036,15 +1039,15 @@ class AFFundamentalThemeState {
   final AFBorderRadius borderRadius;
 
   AFFundamentalThemeState({
-    @required this.device,
-    @required this.area,
-    @required this.marginSpacing,
-    @required this.paddingSpacing,
-    @required this.borderRadius,
-    @required this.themeData,
+    required this.device,
+    required this.area,
+    required this.marginSpacing,
+    required this.paddingSpacing,
+    required this.borderRadius,
+    required this.themeData,
   });    
 
-  List<dynamic> optionsForType(AFThemeID id) {
+  List<dynamic>? optionsForType(AFThemeID id) {
     return area.optionsForType[id];
   }
 
@@ -1065,9 +1068,9 @@ class AFFundamentalThemeState {
   }
 
   AFFundamentalThemeState copyWith({
-    AFFundamentalDeviceTheme device,
-    AFFundamentalThemeArea area,
-    ThemeData themeData
+    AFFundamentalDeviceTheme? device,
+    AFFundamentalThemeArea? area,
+    ThemeData? themeData
   }) {
     return AFFundamentalThemeState(
       area: area ?? this.area,
@@ -1103,7 +1106,7 @@ class AFFundamentalThemeState {
     return area.themeData(Brightness.dark);
   }
 
-  Color get colorTapableText {
+  Color? get colorTapableText {
     return area.color(AFUIThemeID.colorTapableText);
   }
 
@@ -1193,38 +1196,38 @@ class AFFundamentalThemeState {
     return themeDataActive.accentTextTheme;
   }
 
-  Color color(AFThemeID id) {
+  Color? color(AFThemeID? id) {
     return area.color(id);
   }
 
-  Color foreground(AFThemeID id) {
+  Color foreground(AFThemeID? id) {
     return area.foreground(id, device.brightness(this));
   }
 
-  Color background(AFThemeID id) {
+  Color background(AFThemeID? id) {
     return area.background(id, device.brightness(this));
   }
 
-  double size(AFThemeID id, { double scale = 1.0 }) {
+  double? size(AFThemeID? id, { double scale = 1.0 }) {
     return area.size(id, scale: scale);
   }
 
-  Widget icon(dynamic idOrValue, {
+  Widget? icon(dynamic idOrValue, {
     dynamic iconColor, 
     dynamic iconSize
   }) {
     return area.icon(idOrValue, iconColor: iconColor, iconSize: iconSize);
   }
 
-  TextStyle textStyle(dynamic idOrTextStyle) {
+  TextStyle? textStyle(dynamic idOrTextStyle) {
     return area.textStyle(idOrTextStyle);
   }
 
-  FontWeight weight(dynamic id) {
+  FontWeight? weight(dynamic id) {
     return area.weight(id);
   } 
 
-  dynamic findValue(AFThemeID id) {
+  Object? findValue(AFThemeID id) {
     var result = area.findValue(id);
     if(result == null && id.tag == AFUIThemeID.tagDevice) {
       result = device.findDeviceValue(id);
@@ -1261,13 +1264,13 @@ class AFFundamentalThemeState {
   }
 
   EdgeInsets marginCustom({
-    int horizontal,
-    int vertical,
-    int top,
-    int bottom,
-    int left,
-    int right,
-    int all
+    int? horizontal,
+    int? vertical,
+    int? top,
+    int? bottom,
+    int? left,
+    int? right,
+    int? all
   }) {
     return spacingCustom(
       spacing: marginSpacing,
@@ -1282,13 +1285,13 @@ class AFFundamentalThemeState {
   }
 
   EdgeInsets paddingCustom({
-    int horizontal,
-    int vertical,
-    int top,
-    int bottom,
-    int left,
-    int right,
-    int all
+    int? horizontal,
+    int? vertical,
+    int? top,
+    int? bottom,
+    int? left,
+    int? right,
+    int? all
   }) {
     return spacingCustom(
       spacing: paddingSpacing,
@@ -1303,14 +1306,14 @@ class AFFundamentalThemeState {
   }
 
   EdgeInsets spacingCustom({
-    AFSpacing spacing,
-    int horizontal,
-    int vertical,
-    int top,
-    int bottom,
-    int left,
-    int right,
-    int all
+    required AFSpacing spacing,
+    int? horizontal,
+    int? vertical,
+    int? top,
+    int? bottom,
+    int? left,
+    int? right,
+    int? all
   }) {
     final basicSizes = spacing.sizes;
     final m = 0.0;
@@ -1372,9 +1375,9 @@ class AFFundamentalThemeState {
 
 mixin AFDeviceFormFactorMixin {
   bool deviceHasFormFactor({
-    AFFormFactor atLeast,
-    AFFormFactor atMost,
-    Orientation withOrientation
+    AFFormFactor? atLeast,
+    AFFormFactor? atMost,
+    Orientation? withOrientation
   });
 
   bool get deviceIsTablet {
@@ -1420,11 +1423,11 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   final AFThemeID id;
   final AFFundamentalThemeState fundamentals;
   AFFunctionalTheme({
-    @required this.fundamentals,
-    @required this.id,
+    required this.fundamentals,
+    required this.id,
   });
 
-  ThemeData get themeData {
+  ThemeData? get themeData {
     return fundamentals.themeData;
   }
 
@@ -1454,7 +1457,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   /// Returns a string label fpor hours and minutes that respects the device's 
   /// always24Hours settings
   /// 
-  String textHourMinuteLabel(int hour, int minute, { bool alwaysUse24Hours }) {
+  String textHourMinuteLabel(int hour, int minute, { bool? alwaysUse24Hours }) {
     var always = alwaysUse24Hours ?? deviceAlwaysUse24HourFormat;
     var suffix = ' am';
     var nHour = hour;
@@ -1475,25 +1478,26 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   Widget childConnectedRenderPassthrough<TChildRouteParam extends AFRouteParam>({
-    @required AFBuildContext context,
-    @required AFScreenID screenParent,
-    @required AFWidgetID widChild,
-    @required AFRenderConnectedChildDelegate render
+    required AFBuildContext context,
+    required AFScreenID screenParent,
+    required AFWidgetID widChild,
+    required AFRenderConnectedChildDelegate render
   }) {
     return context.childConnectedRenderPassthrough<TChildRouteParam>(screenParent: screenParent, widChild: widChild, render: render);
   }
 
   Widget childConnectedRender<TChildRouteParam extends AFRouteParam>({
-    @required AFBuildContext context,
-    @required AFScreenID screenParent,
-    @required AFWidgetID widChild,
-    @required AFRenderConnectedChildDelegate render
+    required AFBuildContext context,
+    required AFScreenID screenParent,
+    required AFWidgetID widChild,
+    required AFRenderConnectedChildDelegate render
   }) {
     return context.childConnectedRender<TChildRouteParam>(screenParent: screenParent, widChild: widChild, render: render);
   }
 
   Widget childEmbeddedRender({
-    @required AFRenderEmbeddedChildDelegate render}) {
+    required AFRenderEmbeddedChildDelegate render
+  }) {
     return render();
   }
 
@@ -1577,8 +1581,8 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   ButtonStyle styleTextButton({
-    Color color,
-    Color textColor
+    Color? color,
+    Color? textColor
   }) {
     return TextButton.styleFrom(
       backgroundColor: color,
@@ -1595,12 +1599,12 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   /// See [TextTheme], text theme to use on a card background
   TextTheme get styleOnCard {
-    return themeData.textTheme;
+    return themeData!.textTheme;
   }
 
   /// See [TextTheme], text theme to use on a primary color background
   TextTheme get styleOnPrimary {
-    return themeData.primaryTextTheme;
+    return themeData!.primaryTextTheme;
   }
 
   /// Flutter by default does not have a styleOnSecondary, I am not sure why.
@@ -1609,12 +1613,12 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   /// a more logical style of code where text on top of the secondary color has the
   /// 'OnSecondary' style.
   TextTheme get styleOnSecondary {
-    return themeData.primaryTextTheme;
+    return themeData!.primaryTextTheme;
   }
 
   /// See [TextTheme], text theme to use on an accent color backgroun
   TextTheme get styleOnAccent {
-    return themeData.accentTextTheme;
+    return themeData!.accentTextTheme;
   }
 
   /// Merges bold into whatever the style would have been.
@@ -1652,16 +1656,16 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   BorderRadius borderRadiusScaled({
-    double all,
-    double left,
-    double right,
-    double top,
-    double bottom,
-    double leftTop,
-    double leftBottom,
-    double rightTop,
-    double rightBottom,
-    Radius Function(double) createRadius,
+    double? all,
+    double? left,
+    double? right,
+    double? top,
+    double? bottom,
+    double? leftTop,
+    double? leftBottom,
+    double? rightTop,
+    double? rightBottom,
+    Radius Function(double)? createRadius,
   }) {
     // by default, the radius is half the margin.
     final base = size2;
@@ -1722,7 +1726,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return fundamentals.translate(text);
   }
 
-  FontWeight weight(dynamic weight) {
+  FontWeight? weight(dynamic weight) {
     return fundamentals.weight(weight);
   }
 
@@ -1731,7 +1735,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   AFRichTextBuilder childRichTextBuilder({
-    AFWidgetID wid,
+    AFWidgetID? wid,
     dynamic styleNormal,
     dynamic styleBold,
     dynamic styleTapable,
@@ -1753,24 +1757,24 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   AFRichTextBuilder childRichTextBuilderOnCard({ 
-    AFWidgetID wid
+    AFWidgetID? wid
   }) {
 
     return childRichTextBuilder(
       wid: wid,
       styleNormal: styleOnCard.bodyText2,
       styleBold: styleOnCard.bodyText1,
-      styleTapable: styleOnCard.bodyText2.copyWith(color: colorTapableText),
+      styleTapable: styleOnCard.bodyText2?.copyWith(color: colorTapableText),
       styleMuted: styleOnCard.bodyText2,
     );
   }
 
-  Color get colorTapableText { 
+  Color? get colorTapableText { 
     return fundamentals.colorTapableText;
   }
 
   AFTextBuilder childTextBuilder({
-    AFWidgetID wid,
+    AFWidgetID? wid,
     dynamic style,
   }) {
     return AFTextBuilder(
@@ -1781,11 +1785,11 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   Widget childButtonIcon({
-    AFWidgetID wid,
-    Widget child,
-    AFPressedDelegate onPressed,
-    Color color,
-    VisualDensity visualDensity,
+    AFWidgetID? wid,
+    required Widget child,
+    required AFPressedDelegate onPressed,
+    Color? color,
+    VisualDensity? visualDensity,
   }) {
     return IconButton(
       visualDensity: visualDensity,
@@ -1797,11 +1801,11 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   Widget childButton({
-    AFWidgetID wid,
-    Widget child,
-    AFPressedDelegate onPressed,
-    Color color,
-    Color textColor    
+    AFWidgetID? wid,
+    required Widget child,
+    required AFPressedDelegate onPressed,
+    Color? color,
+    Color? textColor    
   }) {
     final style = TextButton.styleFrom(
       backgroundColor: color,
@@ -1818,9 +1822,9 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   /// Create a button that the user is most likely to click.
   Widget childButtonPrimary({
-    AFWidgetID wid,
-    Widget child,
-    AFPressedDelegate onPressed,
+    AFWidgetID? wid,
+    required Widget child,
+    required AFPressedDelegate onPressed,
   }) {
     return childButton(
       wid: wid,
@@ -1833,9 +1837,9 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   /// Create a button that the user is most likely to click.
   Widget childButtonPrimaryText({
-    AFWidgetID wid,
-    String text,
-    AFPressedDelegate onPressed,
+    AFWidgetID? wid,
+    required String text,
+    required AFPressedDelegate onPressed,
   }) {
     return childButtonPrimary(
       wid: wid,
@@ -1846,9 +1850,9 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   /// Create a button that the user is most likely to click.
   Widget childButtonSecondaryText({
-    AFWidgetID wid,
-    String text,
-    AFPressedDelegate onPressed,
+    AFWidgetID? wid,
+    required String text,
+    required AFPressedDelegate onPressed,
   }) {
     return childButtonSecondary(
       wid: wid,
@@ -1858,9 +1862,9 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   Widget childButtonFlatText({
-    AFWidgetID wid,
-    String text,
-    AFPressedDelegate onPressed,
+    AFWidgetID? wid,
+    required String text,
+    required AFPressedDelegate onPressed,
   }) {
     return childButtonFlat(
       wid: wid,
@@ -1871,9 +1875,9 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   /// Create a button that the user is most likely to click.
   Widget childButtonSecondary({
-    AFWidgetID wid,
-    Widget child,
-    AFPressedDelegate onPressed,
+    AFWidgetID? wid,
+    required Widget child,
+    required AFPressedDelegate onPressed,
   }) {
     return childButton(
       wid: wid,
@@ -1886,9 +1890,9 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   /// Create a button that the user is most likely to click.
   Widget childButtonFlat({
-    AFWidgetID wid,
-    Widget child,
-    AFPressedDelegate onPressed,
+    AFWidgetID? wid,
+    required Widget child,
+    required AFPressedDelegate onPressed,
   }) {
     return childButton(
       wid: wid,
@@ -1900,21 +1904,21 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   /// As long as you are calling [AFFunctionalTheme.childScaffold], you don't need
   /// to worry about this, it will be done for you.
-  Widget childDebugDrawerBegin(Widget beginDrawer) {
+  Widget? childDebugDrawerBegin(Widget? beginDrawer) {
     return _createDebugDrawer(beginDrawer, AFScreenPrototype.testDrawerSideBegin);
   }
 
   /// As long as you are calling [AFFunctionalTheme.childScaffold], you don't need
   /// to worry about this, it will be done for you.
-  Widget childDebugDrawerEnd(Widget endDrawer) {
+  Widget? childDebugDrawerEnd(Widget? endDrawer) {
     return _createDebugDrawer(endDrawer, AFScreenPrototype.testDrawerSideEnd);
   }
 
   Widget childCard({ 
-    Widget child,
-    AFWidgetID wid,
-    EdgeInsets padding,
-    Color color,
+    required Widget child,
+    AFWidgetID? wid,
+    EdgeInsets? padding,
+    Color? color,
   }) {
     return Card(
       key: keyForWID(wid),
@@ -1928,11 +1932,11 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
 
   Widget childCardColumn(List<Widget> rows, {
-    EdgeInsets padding,
-    CrossAxisAlignment align,
-    AFWidgetID widColumn,
-    AFWidgetID widCard,
-    Color color,
+    EdgeInsets? padding,
+    CrossAxisAlignment? align,
+    AFWidgetID? widColumn,
+    AFWidgetID? widCard,
+    Color? color,
   }) {
     return Card(
       color: color,
@@ -1950,12 +1954,13 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   /// As long as you are calling [AFFunctionalTheme.childScaffold], you don't need
   /// to worry about this, it will be done for you.
-  Widget _createDebugDrawer(Widget drawer, int testDrawerSide) {
+  Widget? _createDebugDrawer(Widget? drawer, int testDrawerSide) {
     final store = AFibF.g.storeInternalOnly;
-    final state = store.state;
-    final testState = state.testState;
-    if(testState.activeTestId != null) {
-      final test = AFibF.g.findScreenTestById(testState.activeTestId);
+    final state = store?.state;
+    final testState = state?.testState;
+    final activeTestId = testState?.activeTestId;
+    if(activeTestId != null) {
+      final test = AFibF.g.findScreenTestById(activeTestId);
       if(test != null && test.testDrawerSide == testDrawerSide) {
         return AFPrototypeDrawer();
       }
@@ -1977,29 +1982,29 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   /// conceptual theme, which might fill in many of the parameters (e.g. appBar) with standard values, rather than 
   /// duplicating them on every screen.
   Widget childScaffold<TBuildContext extends AFBuildContext>({
-    Key key,
-    @required AFBuildContext context,
-    AFConnectedUIBase contextSource,
-    PreferredSizeWidget appBar,
-    Widget drawer,
-    AFBuildBodyDelegate<TBuildContext> bodyUnderScaffold,
-    Widget body,
-    Widget bottomNavigationBar,
-    Widget floatingActionButton,
-    Color backgroundColor,
-    FloatingActionButtonLocation floatingActionButtonLocation,
-    FloatingActionButtonAnimator floatingActionButtonAnimator,
-    List<Widget> persistentFooterButtons,
-    Widget endDrawer,
-    Widget bottomSheet,
-    bool resizeToAvoidBottomPadding,
-    bool resizeToAvoidBottomInset,
+    Key? key,
+    required AFBuildContext context,
+    AFConnectedUIBase? contextSource,
+    PreferredSizeWidget? appBar,
+    Widget? drawer,
+    AFBuildBodyDelegate<TBuildContext>? bodyUnderScaffold,
+    Widget? body,
+    Widget? bottomNavigationBar,
+    Widget? floatingActionButton,
+    Color? backgroundColor,
+    FloatingActionButtonLocation? floatingActionButtonLocation,
+    FloatingActionButtonAnimator? floatingActionButtonAnimator,
+    List<Widget>? persistentFooterButtons,
+    Widget? endDrawer,
+    Widget? bottomSheet,
+    bool? resizeToAvoidBottomPadding,
+    bool? resizeToAvoidBottomInset,
     bool primary = true,
     DragStartBehavior drawerDragStartBehavior = DragStartBehavior.start,
     bool extendBody = false,
     bool extendBodyBehindAppBar = false,
-    Color drawerScrimColor, 
-    double drawerEdgeDragWidth, 
+    Color? drawerScrimColor, 
+    double? drawerEdgeDragWidth, 
     bool drawerEnableOpenDragGesture = true,
     bool endDrawerEnableOpenDragGesture = true    
   }) {
@@ -2009,7 +2014,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
       return Scaffold(
         key: key,
         drawer: childDebugDrawerBegin(drawer),
-        body: body ?? AFBuilder<TBuildContext>(parentContext: context, builder: (scaffoldContext) => bodyUnderScaffold(scaffoldContext)),
+        body: body ?? AFBuilder<TBuildContext>(parentContext: context as TBuildContext, builder: (scaffoldContext) => bodyUnderScaffold!(scaffoldContext)),
         appBar: appBar,
         bottomNavigationBar: bottomNavigationBar,
         floatingActionButton: floatingActionButton,
@@ -2031,9 +2036,9 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   Widget childSwitch({
-    AFWidgetID wid,
-    bool value,
-    AFOnChangedBoolDelegate onChanged
+    AFWidgetID? wid,
+    required bool value,
+    required AFOnChangedBoolDelegate onChanged
   }) {
     return Switch(
       key: keyForWID(wid),
@@ -2045,11 +2050,11 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   Widget childChoiceChip({
-    AFWidgetID wid,
-    Widget label,
-    bool selected,
-    Color selectedColor,
-    AFOnChangedBoolDelegate onSelected,
+    AFWidgetID? wid,
+    required Widget label,
+    required bool selected,
+    Color? selectedColor,
+    required AFOnChangedBoolDelegate onSelected,
   }) {
     return ChoiceChip(
       key: keyForWID(wid),
@@ -2061,9 +2066,9 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   Widget childMargin({
-    AFWidgetID wid, 
-    Widget child,
-    EdgeInsets margin,  
+    AFWidgetID? wid, 
+    required Widget child,
+    required EdgeInsets margin,  
   }) {
     return Container(
       key: keyForWID(wid),
@@ -2073,9 +2078,9 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   Widget childPadding({
-    AFWidgetID wid, 
-    Widget child,
-    EdgeInsets padding,  
+    AFWidgetID? wid, 
+    required Widget child,
+    EdgeInsets? padding,  
   }) {
     return Container(
       key: keyForWID(wid),
@@ -2093,26 +2098,26 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   /// should be passed through via the 'copyWith' method, and then 
   /// disposed of the route parameter is disposed.
   Widget childTextField({
-    @required AFWidgetID wid,
-    @required AFTextEditingControllersHolder controllers,
-    @required AFOnChangedStringDelegate onChanged,
-    @required String text,
-    bool enabled,
+    required AFWidgetID wid,
+    required AFTextEditingControllersHolder controllers,
+    required AFOnChangedStringDelegate onChanged,
+    required String text,
+    bool? enabled,
     bool obscureText = false,
     bool autofocus = false,
-    InputDecoration decoration,
+    InputDecoration? decoration,
     bool autocorrect = true,
     TextAlign textAlign = TextAlign.start,
-    TextInputType keyboardType,
-    FocusNode focusNode,
-    TextStyle style,
-    Color cursorColor,
-    ValueChanged<String> onSubmitted,
+    TextInputType? keyboardType,
+    FocusNode? focusNode,
+    TextStyle? style,
+    Color? cursorColor,
+    ValueChanged<String>? onSubmitted,
   }) {
     final textController = controllers.access(wid);
     assert(textController != null, "You must register the text controller for $wid in your route parameter using AFTextEditingControllersHolder.createN or createOne");
-    assert(textController.text == text, '''The text value in the text controller was different from the value you passed into 
-childTextField was different from the value in the text controller for $wid ($text != ${textController.text}).  This will happen
+    assert(textController?.text == text, '''The text value in the text controller was different from the value you passed into 
+childTextField was different from the value in the text controller for $wid ($text != ${textController?.text}).  This will happen
 if you try to change the value of a text field during the render process (which you should not).   It will also happen if you are 
 modifying the value returned to you in the onChanged callback, but are not subsequently calling AFTextEditingControllersOwner.reviseOne.
 In the later case, AFib automatically keeps the controller in sync with the value the user typed, but if you post-process that value, you
@@ -2138,9 +2143,9 @@ need to manually update the value in the controller.
   }
 
   TapGestureRecognizer tapRecognizerFor({
-    @required AFWidgetID wid,
-    @required AFTapGestureRecognizersHolder recognizers,
-    @required AFPressedDelegate onTap,
+    required AFWidgetID wid,
+    required AFTapGestureRecognizersHolder recognizers,
+    required AFPressedDelegate onTap,
   }) {
     final recognizer = recognizers.access(wid);
     recognizer.onTap = onTap;
@@ -2148,15 +2153,15 @@ need to manually update the value in the controller.
   }
 
   Text childText(dynamic text, {
-    AFWidgetID wid, 
+    AFWidgetID? wid, 
     dynamic style,
     dynamic textColor,
     dynamic fontSize,
     dynamic fontWeight,
-    TextAlign textAlign,
-    TextOverflow overflow,
+    TextAlign? textAlign,
+    TextOverflow? overflow,
   }) {
-    TextStyle styleS;
+    TextStyle? styleS;
     if(style != null) {
       styleS = styleText(style);
     }
@@ -2169,7 +2174,7 @@ need to manually update the value in the controller.
       );
     }
 
-    final textT = translate(text);
+    var textT = translate(text);
     return Text(textT, 
       key: keyForWID(wid),
       style: styleS,
@@ -2200,14 +2205,14 @@ need to manually update the value in the controller.
   /// approximation in [AFFormFactor].
   AFFormFactor get deviceFormFactor {
     final dSize = devicePhysicalSize;
-    final AFConvertSizeToFormFactorDelegate delegate = fundamentals.findValue(AFUIThemeID.formFactorDelegate);
+    final delegate = fundamentals.findValue(AFUIThemeID.formFactorDelegate) as AFConvertSizeToFormFactorDelegate;
     return delegate(dSize);
   }
 
   bool deviceHasFormFactor({
-    AFFormFactor atLeast,
-    AFFormFactor atMost,
-    Orientation withOrientation
+    AFFormFactor? atLeast,
+    AFFormFactor? atMost,
+    Orientation? withOrientation
   }) {
     if(withOrientation != null) {
       if(deviceOrientation != withOrientation) {
@@ -2285,16 +2290,16 @@ need to manually update the value in the controller.
   }
   
   /// Returns a unique key for the specified widget.
-  Key keyForWID(AFID wid) {
+  Key? keyForWID(AFID? wid) {
     return keyForWIDStatic(wid);
   }
 
-  static Key keyForWIDStatic(AFID wid) {
+  static Key? keyForWIDStatic(AFID? wid) {
     if(wid == null) { return null; }
     return Key(wid.code);
   }
 
-  Color color(dynamic idOrColor) {
+  Color? color(dynamic idOrColor) {
     if(idOrColor is Color) {
       return idOrColor;
     }
@@ -2315,7 +2320,7 @@ need to manually update the value in the controller.
     return fundamentals.background(idOrColor);
   }
 
-  TextStyle styleText(dynamic idOrTextStyle) {
+  TextStyle? styleText(dynamic idOrTextStyle) {
     if(idOrTextStyle == null) {
       return null;
     }
@@ -2325,7 +2330,7 @@ need to manually update the value in the controller.
     return fundamentals.textStyle(idOrTextStyle);
   }
 
-  double size(dynamic id, { double scale = 1.0 }) {
+  double? size(dynamic id, { double scale = 1.0 }) {
     if(id is double) {
       return id * scale;
     }
@@ -2352,21 +2357,21 @@ need to manually update the value in the controller.
     return fundamentals.size5;
   }
 
-  Widget icon(dynamic id, {
+  Widget? icon(dynamic id, {
     dynamic iconColor,
     dynamic iconSize
   }) {
     return fundamentals.icon(id, iconColor: iconColor, iconSize: iconSize);
   }
 
-  Widget iconNavDown({
+  Widget? iconNavDown({
     dynamic iconColor,
     dynamic iconSize
   }) {
     return icon(AFUIThemeID.iconNavDown, iconColor: iconColor, iconSize: iconSize);
   }
 
-  Widget iconBack({
+  Widget? iconBack({
     dynamic iconColor,
     dynamic iconSize
   }) {
@@ -2388,13 +2393,13 @@ need to manually update the value in the controller.
   /// For example, if the default margin is 8.0, and you pass in all: 2,
   /// you will get 16 all the way around.
   EdgeInsets paddingCustom({
-    int horizontal,
-    int vertical,
-    int top,
-    int bottom,
-    int left,
-    int right,
-    int all
+    int? horizontal,
+    int? vertical,
+    int? top,
+    int? bottom,
+    int? left,
+    int? right,
+    int? all
   }) {
     return fundamentals.paddingCustom(
       horizontal: horizontal,
@@ -2454,13 +2459,13 @@ need to manually update the value in the controller.
   /// 
   /// If a margin side is not specified, it defaults to zero.
   EdgeInsets marginCustom({
-    int all,
-    int horizontal,
-    int vertical,
-    int top,
-    int bottom,
-    int left,
-    int right,
+    int? all,
+    int? horizontal,
+    int? vertical,
+    int? top,
+    int? bottom,
+    int? left,
+    int? right,
   }) {
     return fundamentals.marginCustom(
       all: all,
@@ -2484,16 +2489,16 @@ need to manually update the value in the controller.
   /// See [AFBuildContext.showDialog], this is just a one line call to that method
   /// for discoverability.
   void showDialog({
-    @required AFBuildContext context,
-    AFScreenID screenId,
-    AFRouteParam param,
-    AFNavigatePushAction navigate,
-    AFReturnValueDelegate onReturn,
+    required AFBuildContext context,
+    AFScreenID? screenId,
+    AFRouteParam? param,
+    AFNavigatePushAction? navigate,
+    AFReturnValueDelegate? onReturn,
     bool barrierDismissible = true,
-    Color barrierColor,
+    Color? barrierColor,
     bool useSafeArea = true,
     bool useRootNavigator = true,
-    RouteSettings routeSettings
+    RouteSettings? routeSettings
   }) {
     context.showDialog(
       screenId: screenId,
@@ -2510,21 +2515,21 @@ need to manually update the value in the controller.
 
   /// See [AFBuildContext.showModalBottomSheet], this is a one line call to that method, here for discoverability.
   void showModalBottomSheet({
-    @required AFBuildContext context,
-    AFScreenID screenId,
-    AFRouteParam param,
-    AFNavigatePushAction navigate,
-    AFReturnValueDelegate onReturn,
-    Color backgroundColor,
-    double elevation,
-    ShapeBorder shape,
-    Clip clipBehavior,
-    Color barrierColor,
+    required AFBuildContext context,
+    AFScreenID? screenId,
+    AFRouteParam? param,
+    AFNavigatePushAction? navigate,
+    AFReturnValueDelegate? onReturn,
+    Color? backgroundColor,
+    double? elevation,
+    ShapeBorder? shape,
+    Clip? clipBehavior,
+    Color? barrierColor,
     bool isScrollControlled = false,
     bool useRootNavigator = false,
     bool isDismissible = true,
     bool enableDrag = true,
-    RouteSettings routeSettings,  
+    RouteSettings? routeSettings,  
   }) {
     return context.showModalBottomSheet(
       screenId: screenId,
@@ -2546,14 +2551,14 @@ need to manually update the value in the controller.
 
   /// See [AFBuildContext.showBottomSheet], this is a one line call to that method, here for discoverability.
   void showBottomSheet({
-    @required AFBuildContext context,
-    AFScreenID screenId,
-    AFRouteParam param,
-    AFNavigatePushAction navigate,
-    Color backgroundColor,
-    double elevation,
-    ShapeBorder shape,
-    Clip clipBehavior,
+    required AFBuildContext context,
+    AFScreenID? screenId,
+    AFRouteParam? param,
+    AFNavigatePushAction? navigate,
+    Color? backgroundColor,
+    double? elevation,
+    ShapeBorder? shape,
+    Clip? clipBehavior,
   }) {
     return context.showBottomSheet(
       screenId: screenId,
@@ -2574,7 +2579,7 @@ need to manually update the value in the controller.
   }
 
   Column childColumn(List<Widget> children, {
-   AFWidgetID wid,
+   AFWidgetID? wid,
    MainAxisAlignment mainAxisAlignment =  MainAxisAlignment.start
   }) {
     return Column(children: children,
@@ -2586,8 +2591,8 @@ need to manually update the value in the controller.
   /// Create a widget that has the [bottomControls] and [topControls] permenantly
   /// affixed above/below the [main] widget.
   Widget childTopBottomHostedControls(BuildContext context, Widget main, {
-    Widget bottomControls,
-    Widget topControls,
+    Widget? bottomControls,
+    Widget? topControls,
     double topHeight = 0.0
   }) {
     final stackChildren = column();
@@ -2619,18 +2624,20 @@ need to manually update the value in the controller.
   /// The back button can optionally display a dialog which checks whether the user
   /// should continue, see [standardShouldContinueAlertCheck] for more.
   Widget childButtonStandardBack(AFBuildContext context, {
-    @required AFScreenID screen,
+    required AFScreenID screen,
     AFWidgetID wid = AFUIWidgetID.buttonBack,
     dynamic iconIdOrWidget = AFUIThemeID.iconBack,
     dynamic iconColor,
     dynamic iconSize,
     String tooltip = "Back",
     bool worksInSingleScreenTest = true,
-    AFShouldContinueCheckDelegate shouldContinueCheck,   
+    AFShouldContinueCheckDelegate? shouldContinueCheck,   
   }) {
+    var ico = icon(iconIdOrWidget, iconColor: iconColor, iconSize: iconSize);
+    if(ico == null) throw AFException("Could not create icon");
     return IconButton(
         key: keyForWID(wid),      
-        icon: icon(iconIdOrWidget, iconColor: iconColor, iconSize: iconSize),
+        icon: ico,
         tooltip: translate(tooltip),
         onPressed: () async {
           if(shouldContinueCheck == null || await shouldContinueCheck() == AFShouldContinue.yesContinue) {
@@ -2647,19 +2654,19 @@ need to manually update the value in the controller.
   /// will iterate through all children with route parameters of the specified type, and will call your
   /// render function once for each one.   You must use the widget id passed to you by the render function.
   List<Widget> childrenConnectedRender<TRouteParam extends AFRouteParam>(AFBuildContext context, {
-    @required AFScreenID screenParent,
-    @required AFRenderConnectedChildDelegate render
+    required AFScreenID screenParent,
+    required AFRenderConnectedChildDelegate render
   }) {
     return context.childrenConnectedRender(screenParent: screenParent, render: render);
   }
 
   /// 
   AFShouldContinueCheckDelegate standardShouldContinueAlertCheck({
-    @required AFBuildContext context,
-    @required bool shouldAsk,
-    AFScreenID screen,
-    AFRouteParam param,
-    AFNavigatePushAction navigate
+    required AFBuildContext context,
+    required bool shouldAsk,
+    AFScreenID? screen,
+    AFRouteParam? param,
+    AFNavigatePushAction? navigate
   }) {
     return () {
         final completer = Completer<AFShouldContinue>();
@@ -2681,7 +2688,7 @@ need to manually update the value in the controller.
               if(param is! AFShouldContinueRouteParam) {
                 throw AFException("The dialog for standardShouldContinueAlertCheck must return an AFShouldContinueRouteParam");
               }
-              final AFShouldContinueRouteParam should = param;
+              final should = param;
               completer.complete(should.shouldContinue);
             }
           );
@@ -2700,7 +2707,7 @@ need to manually update the value in the controller.
   /// When I tried ListTile.divideTiles, it didn't seem to maintain a key
   /// on the dividers, which caused text widgets in the list to lose focus
   /// when the list was re-rendered.
-  List<Widget> childrenDivideWidgets(List<Widget> rows, AFWidgetID widBase, {
+  List<Widget> childrenDivideWidgets(List<Widget> rows, AFWidgetID? widBase, {
     dynamic colorLine,
     dynamic thickness,
     dynamic height,
@@ -2716,8 +2723,12 @@ need to manually update the value in the controller.
       final widget = rows[i];
       result.add(widget);
       if(i+1 < rows.length) {
+        var key;
+        if(widBase != null) {
+          key = keyForWID(widBase.with2("divider", i.toString()));
+        }
         result.add(Divider(
-          key: keyForWID(widBase.with2("divider", i.toString())),
+          key: key,
           color: c,
           height: h,
           thickness: thick,
@@ -2741,17 +2752,17 @@ class AFThemeState {
   final Map<AFThemeID, AFFunctionalTheme> functionals;  
 
   AFThemeState({
-    @required this.fundamentals,
-    @required this.functionals
+    required this.fundamentals,
+    required this.functionals
   });
 
-  AFFunctionalTheme findById(AFThemeID id) {
+  AFFunctionalTheme? findById(AFThemeID id) {
     return functionals[id];
   }
 
   factory AFThemeState.create({
-    AFFundamentalThemeState fundamentals,
-    Map<AFThemeID, AFFunctionalTheme> functionals
+    required AFFundamentalThemeState fundamentals,
+    required Map<AFThemeID, AFFunctionalTheme> functionals
   }) {
 
     return AFThemeState(
@@ -2778,8 +2789,8 @@ class AFThemeState {
   }
 
   AFThemeState copyWith({
-    AFFundamentalThemeState fundamentals,
-     Map<AFThemeID, AFFunctionalTheme> functionals,
+    AFFundamentalThemeState? fundamentals,
+     Map<AFThemeID, AFFunctionalTheme>? functionals,
   }) {
     return AFThemeState.create(
       functionals: functionals ?? this.functionals,

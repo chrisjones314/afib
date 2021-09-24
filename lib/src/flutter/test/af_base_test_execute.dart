@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
@@ -23,10 +22,10 @@ class AFTestError {
 
 
 class AFTestErrors {
-  final AFID section;
+  final AFID? section;
   final _errors = <AFTestError>[];
   int pass = 0;
-  String disabled;
+  String? disabled;
 
   AFTestErrors(this.section);
 
@@ -55,7 +54,7 @@ abstract class AFBaseTestExecute {
   static const resultSuffixColWidth = 8;
 
   final sectionErrors = <AFID, AFTestErrors>{};
-  AFID currentSection;
+  AFID? currentSection;
   AFTestErrors defaultErrors = AFTestErrors(null);
 
   void expect(dynamic value, flutter_test.Matcher matcher, {int extraFrames = 0}) {
@@ -68,22 +67,27 @@ abstract class AFBaseTestExecute {
     }
   }
 
-  void expectWidgetIds(List<Widget> widgets, List<AFWidgetID> ids, { AFWidgetMapperDelegate mapper } ) {
+  void expectWidgetIds(List<Widget> widgets, List<AFWidgetID> ids, { AFWidgetMapperDelegate? mapper } ) {
     return expect(widgets, hasWidgetIdsWith(ids, mapper: mapper));
   }
   
   void startSection(AFID id, { bool resetSection = false }) {
     currentSection = id;
     var current = sectionErrors[currentSection];
-    if(current == null || resetSection) {
+    final curSect = currentSection;
+    if(curSect != null && (current == null || resetSection)) {
       current = AFTestErrors(currentSection);
-      sectionErrors[currentSection] = current;
+      sectionErrors[curSect] = current;
     }    
   }
 
   void markDisabled(AFScreenTestBody body) {
     startSection(body.id);
-    errors.markDisabled(body.disabled);
+    final disabled = body.disabled;
+    assert(disabled != null);
+    if(disabled != null) {
+      errors.markDisabled(disabled);
+    }
     endSection();
   }
 
@@ -95,15 +99,19 @@ abstract class AFBaseTestExecute {
     currentSection = null;
   }
 
-  Logger get log {
+  Logger? get log {
     return AFibD.log(AFConfigEntryLogArea.test);
   }
 
   AFBaseTestID get testID;
 
   AFTestErrors get errors {
-    if(currentSection != null) {
-      return sectionErrors[currentSection];
+    final curSect = currentSection;
+    if(curSect != null) {
+      final errors = sectionErrors[curSect];
+      if(errors != null) {
+        return errors;
+      }
     }
     return defaultErrors;
   }
@@ -127,7 +135,7 @@ abstract class AFBaseTestExecute {
       if(sectionErrorReusable.isNotEmpty) {
         for(final sectionError in sectionErrorReusable) {
           if(!sectionError.hasErrors) {
-            _writePassed(output, "${sectionError.section.codeId}", sectionError, stats);
+            _writePassed(output, "${sectionError.section?.codeId}", sectionError, stats);
           }
         }
       }
@@ -166,7 +174,7 @@ abstract class AFBaseTestExecute {
     );
   }
 
-  static void printTotalPass(AFCommandOutput output, String title, int pass, { Stopwatch stopwatch, Styles style = Styles.GREEN, String suffix = "passed" }) {
+  static void printTotalPass(AFCommandOutput output, String title, int pass, { Stopwatch? stopwatch, Styles style = Styles.GREEN, String suffix = "passed" }) {
     final suffixFull = StringBuffer(" $suffix");
     if(stopwatch != null) {
       suffixFull.write(" (in ");
@@ -213,7 +221,7 @@ abstract class AFBaseTestExecute {
     output.write(title);
   }
 
-  static void printResultColumn(AFCommandOutput output, { int count, String suffix, Styles color }) {
+  static void printResultColumn(AFCommandOutput output, { int? count, String? suffix, Styles? color }) {
     output.startColumn(alignment: AFOutputAlignment.alignRight, color: color, width: resultColWidth);
     if(count != null) {
       output.write(count.toString());
@@ -233,11 +241,11 @@ abstract class AFBaseTestExecute {
   }
 
   static void writeTestResult(AFCommandOutput output, { 
-    @required String title, 
-    int count, 
+    required String title, 
+    int? count, 
     String suffix = "",  
-    Styles color, 
-    String tags,
+    Styles? color, 
+    String? tags,
     String fill = " ",
     AFOutputAlignment titleAlign = AFOutputAlignment.alignLeft, 
   }) {
@@ -250,7 +258,7 @@ abstract class AFBaseTestExecute {
     output.endLine();
   }
 
-  bool addPassIf({bool test}) {
+  bool addPassIf({required bool test}) {
     if(test) {
       errors.addPass();
     }

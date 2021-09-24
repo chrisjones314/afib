@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
@@ -28,7 +27,7 @@ abstract class AFDispatcher {
 
   /// Only meant to make the public state visible in the debugger, not for use
   /// in application code.
-  AFPublicState get debugOnlyPublicState;
+  AFPublicState? get debugOnlyPublicState;
 }
 
 /// The production dispatcher which dispatches actions to the store.
@@ -77,7 +76,7 @@ class AFTestDispatcher extends AFDispatcher {
     return null;
   }
 
-  AFPublicState get debugOnlyPublicState {
+  AFPublicState? get debugOnlyPublicState {
     return null;
   }
 

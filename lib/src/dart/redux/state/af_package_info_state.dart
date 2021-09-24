@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 
 /// A utility containing package info that is placed in your own app state 
@@ -9,9 +8,9 @@ class AFPackageInfoState extends AFAppStateModel {
   final String buildNumber;
 
   AFPackageInfoState({
-    this.appName,
-    this.packageName,
-    this.version,
-    this.buildNumber
+    required this.appName,
+    required this.packageName,
+    required this.version,
+    required this.buildNumber
   });
 }

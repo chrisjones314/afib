@@ -1,4 +1,4 @@
-// @dart=2.9
+import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -8,12 +8,13 @@ class AFTextEditingControllersHolder  {
   AFTextEditingControllersHolder(this.controllers);
 
 
-  TextEditingController access(AFWidgetID wid) {
+  TextEditingController? access(AFWidgetID wid) {
     return controllers[wid];
   }
 
   String textFor(AFWidgetID wid) {
     final controller = controllers[wid];
+    if(controller == null) { throw AFException("Missing text controller for wid $wid"); }
     return controller.text;
   }
 
@@ -25,7 +26,7 @@ class AFTextEditingControllersHolder  {
         controller = TextEditingController(text: value);
         controllers[wid] = controller;
       }
-      if(controller.text != value) {
+      if(controller.text != value && value != null) {
         controller.text = value;
       }
     }

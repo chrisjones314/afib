@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:flutter/gestures.dart';
@@ -8,16 +7,16 @@ import 'package:flutter/material.dart';
 /// Used for building up RichText widgets in parts.
 class AFRichTextBuilder {
   final AFFundamentalThemeState theme;
-  final AFWidgetID wid;
-  final TextStyle styleBold;
-  final TextStyle styleNormal;
-  final TextStyle styleTapable;
-  final TextStyle styleMuted;
+  final AFWidgetID? wid;
+  final TextStyle? styleBold;
+  final TextStyle? styleNormal;
+  final TextStyle? styleTapable;
+  final TextStyle? styleMuted;
   
-  final spans = <TextSpan>[];
+  final spans = <InlineSpan>[];
 
   AFRichTextBuilder({
-    @required this.theme,
+    required this.theme,
     this.wid,
     this.styleBold,
     this.styleNormal,
@@ -30,7 +29,7 @@ class AFRichTextBuilder {
   }
 
   bool get isNotEmpty {
-    return spans.length > 0;
+    return spans.isNotEmpty;
   }
 
   void insertNormal(int idx, dynamic idOrText) {
@@ -53,6 +52,10 @@ class AFRichTextBuilder {
     spans.add(TextSpan(text: text, style: styleMuted));
   }
 
+  void writeWidget(Widget widget) {
+    spans.add(WidgetSpan(child: widget));
+  }
+
   void writeStyled(dynamic idOrText, TextStyle style) {
     final text = theme.translate(idOrText);
     spans.add(TextSpan(text: text, style: style));
@@ -68,9 +71,12 @@ class AFRichTextBuilder {
   }
 
   /// Creates a rich text widget with the specified content.
-  Widget toRichText() {
+  Widget toRichText({
+    TextAlign textAlign = TextAlign.start,
+  }) {
     return RichText(
         key: AFFunctionalTheme.keyForWIDStatic(wid),
+        textAlign: textAlign,
         text: TextSpan(
         children: spans
         
@@ -82,12 +88,12 @@ class AFRichTextBuilder {
 /// Used for building up Text widgets in parts.
 class AFTextBuilder {
   final AFFundamentalThemeState theme;
-  final AFWidgetID wid;
-  final TextStyle style;
+  final AFWidgetID? wid;
+  final TextStyle? style;
   final buffer = StringBuffer();
 
   AFTextBuilder({
-    @required this.theme,
+    required this.theme,
     this.wid,
     this.style
   });

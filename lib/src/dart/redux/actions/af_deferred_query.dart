@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'dart:async';
 
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
@@ -14,10 +13,13 @@ import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 /// A version of [AFAsyncQuery] for queries that should be run in the background
 /// after a delay.  
 abstract class AFDeferredQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TState, AFUnused> {
-  Duration nextDelay;
-  Timer timer;
+  Duration? nextDelay;
+  Timer? timer;
 
-  AFDeferredQuery(this.nextDelay, {AFID id, AFOnResponseDelegate<TState, AFUnused> onSuccessDelegate}): super(id: id, onSuccessDelegate: onSuccessDelegate);
+  AFDeferredQuery(this.nextDelay, {
+    AFID? id, 
+    AFOnResponseDelegate<TState, AFUnused>? onSuccessDelegate
+  }): super(id: id, onSuccessDelegate: onSuccessDelegate);
 
   /// Delays for [nextDelay] and then calls [finishAsyncWithResponse] with null as the value.
   /// 
@@ -31,9 +33,11 @@ abstract class AFDeferredQuery<TState extends AFAppStateArea> extends AFAsyncQue
   }
 
   void _delayThenExecute(AFStartQueryContext<AFUnused> context) {
-    timer = Timer.periodic(nextDelay, (_) {
+    final nextD = nextDelay;
+    if(nextD == null) return;
+    timer = Timer.periodic(nextD, (_) {
       AFibD.logQueryAF?.d("Executing finishAsyncExecute for deferred query $this");
-      context.onSuccess(null);
+      context.onSuccess(AFUnused());
       if(nextDelay == null) {
         afShutdown();
       } else {
@@ -52,7 +56,7 @@ abstract class AFDeferredQuery<TState extends AFAppStateArea> extends AFAsyncQue
   /// 
   /// Return null if you are done executing, or return a duration if you'd like to try executing
   /// again after another delay.
-  Duration finishAsyncExecute(AFFinishQuerySuccessContext<TState, AFUnused> context);
+  Duration? finishAsyncExecute(AFFinishQuerySuccessContext<TState, AFUnused> context);
 
   void afShutdown() {
     if(timer != null) {
@@ -65,14 +69,14 @@ abstract class AFDeferredQuery<TState extends AFAppStateArea> extends AFAsyncQue
 
   void shutdown();
 
-  AFFinishQuerySuccessContext createSuccessContext({
-    AFDispatcher dispatcher, 
-    AFState state, 
+  AFFinishQuerySuccessContext<TState, AFUnused> createSuccessContext({
+    required AFDispatcher dispatcher, 
+    required AFState state, 
   }) {
     return AFFinishQuerySuccessContext<TState, AFUnused>(    
       dispatcher: dispatcher,
       state: state,
-      response: null,
+      response: AFUnused(),
     );
   }
 }
@@ -81,10 +85,11 @@ abstract class AFDeferredQuery<TState extends AFAppStateArea> extends AFAsyncQue
 /// but does not otherwise do anything.
 class AFDeferredSuccessQuery<TState extends AFAppStateArea> extends AFDeferredQuery<TState> {
 
-  AFDeferredSuccessQuery(Duration delayOnce, {AFID id, AFOnResponseDelegate<TState, AFUnused> onSuccessDelegate}): super(delayOnce, id: id, onSuccessDelegate: onSuccessDelegate);
-  Duration finishAsyncExecute(AFFinishQuerySuccessContext<TState, AFUnused> context) {
-    if(this.onSuccessDelegate != null) {
-      onSuccessDelegate(context);
+  AFDeferredSuccessQuery(Duration delayOnce, AFOnResponseDelegate<TState, AFUnused> onSuccessDelegate, {AFID? id}): super(delayOnce, id: id, onSuccessDelegate: onSuccessDelegate);
+  Duration? finishAsyncExecute(AFFinishQuerySuccessContext<TState, AFUnused> context) {
+    final onSuccessD = this.onSuccessDelegate;
+    if(onSuccessD != null) {
+      onSuccessD(context);
     }
     return null;
   }

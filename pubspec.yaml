@@ -5,7 +5,7 @@ description: >-
 homepage: https://afibframework.org
 documentation: https://afibframework.org/docs
 environment:
-  sdk: ">=2.9.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
 publish_to: none
 
 dependencies:
@@ -15,8 +15,8 @@ dependencies:
   flutter_redux: ^0.8.2
   intl: ^0.17.0
   colorize: ^3.0.0
-  logger: ^1.0.0  
-  package_info_plus: ^1.0.1
+  logger: ^1.1.0  
+  package_info_plus: ^1.0.6
   quiver: ^3.0.1
   path: ^1.8.0
   overlay_support: ^1.2.1
@@ -25,9 +25,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  stack_trace: ^1.9.5    
-  effective_dart: ^1.2.0  
-  args: ^1.6.0
+  stack_trace: ^1.10.0    
+  effective_dart: ^1.3.2  
+  args: ^2.3.0
   
 executables:
   afib_bootstrap:

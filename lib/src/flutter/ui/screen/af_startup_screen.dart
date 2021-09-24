@@ -1,6 +1,5 @@
-// @dart=2.9
-
 //--------------------------------------------------------------------------------------
+import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
@@ -8,7 +7,7 @@ import 'package:flutter/widgets.dart';
 
 //--------------------------------------------------------------------------------------
 class AFStartupScreenWrapper extends StatefulWidget {
-  const AFStartupScreenWrapper({Key key}) : super(key: key);
+  const AFStartupScreenWrapper({Key? key}) : super(key: key);
 
   //--------------------------------------------------------------------------------------
   @override
@@ -21,7 +20,7 @@ class AFLifecycleEventHandler extends WidgetsBindingObserver {
   final AFOnLifecycleEventDelegate eventHandler;
 
   AFLifecycleEventHandler({
-    this.eventHandler
+    required this.eventHandler
   });
 
   @override
@@ -37,12 +36,16 @@ class _AFStartupScreenState extends State<AFStartupScreenWrapper> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addObserver(AFibF.g.widgetsBindingObserver);
+    WidgetsBinding.instance?.addObserver(AFibF.g.widgetsBindingObserver);
 
     // Kick off the app by firing a query.  In a typical app this might check the user's
     // logged in status while a splash screen displays.
     if(!AFibD.config.requiresPrototypeData) {
-      AFibF.g.dispatchStartupQueries(AFibF.g.storeDispatcherInternalOnly);
+      final storeDisp = AFibF.g.storeDispatcherInternalOnly;
+      assert(storeDisp != null);
+      if(storeDisp != null) {
+        AFibF.g.dispatchStartupQueries(storeDisp);
+      }
     }
   }
 
@@ -57,6 +60,7 @@ class _AFStartupScreenState extends State<AFStartupScreenWrapper> {
   @override
   Widget build(BuildContext context) {
     final builder = AFibF.g.screenMap.initialScreenBuilder;
+    if(builder == null) throw AFException("Error missing initial screen builder");
     return builder(context);
   }
 }

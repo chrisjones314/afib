@@ -1,12 +1,13 @@
-// @dart=2.9
-import 'package:meta/meta.dart';
 import 'package:afib/afib_flutter.dart';
 
 class AFAlwaysFailQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TState, String> {
   final String message;
   
   //------------------------------------------------------------------------
-  AFAlwaysFailQuery({@required this.message, AFID id}): super(id: id) {
+  AFAlwaysFailQuery({
+    required this.message, 
+    AFID? id
+  }): super(id: id) {
     assert(TState != AFAppStateArea);
   }
   

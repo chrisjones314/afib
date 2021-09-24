@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:io';
 import 'package:afib/id.dart';
@@ -8,7 +7,6 @@ import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_generator.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:meta/meta.dart';
 
 /// Used to insert code at a particular point in a file.
 class AFCodeBuffer {
@@ -19,8 +17,8 @@ class AFCodeBuffer {
   bool modified;
 
   AFCodeBuffer({
-    @required this.lines,
-    @required this.modified
+    required this.lines,
+    required this.modified
   });
 
   factory AFCodeBuffer.empty() {

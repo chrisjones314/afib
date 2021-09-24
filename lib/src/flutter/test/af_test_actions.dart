@@ -1,7 +1,5 @@
-// @dart=2.9
 import 'package:afib/src/flutter/test/af_test_data_registry.dart';
 import 'package:afib/src/flutter/test/af_wireframe.dart';
-import 'package:meta/meta.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 
@@ -10,16 +8,16 @@ import 'package:afib/src/flutter/test/af_screen_test.dart';
 class AFStartPrototypeScreenTestContextAction {
     final AFScreenTestContext context;
     final dynamic routeParam;
-    final String routeParamId;
+    final String? routeParamId;
     final dynamic stateViews;
-    final String stateViewId;
+    final String? stateViewId;
     final AFScreenID screen;
     AFStartPrototypeScreenTestContextAction(this.context, { 
-      @required this.routeParam, 
-      @required this.stateViews, 
-      @required this.screen, 
-      @required this.stateViewId,
-      @required this.routeParamId,
+      required this.routeParam, 
+      required this.stateViews, 
+      required this.screen, 
+      required this.stateViewId,
+      required this.routeParamId,
     });
 }
 
@@ -41,22 +39,24 @@ class AFStartPrototypeScreenTestAction {
     final dynamic param;
     final dynamic stateView;
     final AFScreenID screen;
-    final String stateViewId;
-    final String routeParamId;
+    final String? stateViewId;
+    final String? routeParamId;
 
     AFStartPrototypeScreenTestAction(this.test, { 
       this.param, 
       this.stateView, 
-      @required this.screen, 
-      @required this.stateViewId,
-      @required this.routeParamId,
+      required this.screen, 
+      required this.stateViewId,
+      required this.routeParamId,
     });
 }
 
 class AFStartWireframeAction {
   final AFWireframe wireframe;
 
-  AFStartWireframeAction({this.wireframe});
+  AFStartWireframeAction({
+    required this.wireframe
+  });
 }
 
 /// Update the 'store based' data for a prototype screen.

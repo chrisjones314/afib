@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
@@ -51,7 +50,7 @@ Future<void> afTestMainUILibrary<TState extends AFAppStateArea>(AFLibraryID id, 
 }
 
 /// The main function which executes the store test defined in your initStateTests function.
-Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendBaseDelegate extendBase, AFExtendBaseDelegate extendBaseThirdParty, AFExtendAppDelegate extendApp, AFExtendThirdPartyDelegate extendThirdParty, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
+Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendBaseDelegate? extendBase, AFExtendBaseDelegate? extendBaseThirdParty, AFExtendAppDelegate extendApp, AFExtendThirdPartyDelegate? extendThirdParty, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
   final stopwatch = Stopwatch();
   stopwatch.start();
 

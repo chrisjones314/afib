@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'package:afib/src/dart/utils/af_id.dart';
 
 /// Superclass that allows AFIb to identify objects using their type by default,
@@ -13,16 +12,19 @@ import 'package:afib/src/dart/utils/af_id.dart';
 /// different user.   In that case, you can differentiate them by deriving them from this
 /// class, and passing them a distinguishing id in the constructor.
 class AFObjectWithKey {
-  final AFID id;
+  final AFID? id;
 
   /// Creates an object that is uniquely idenfified by its [Object.runtimeType], unless the optional
   /// [id] parameter is specified, in which case it is identified by the runtimeType plus the id.
-  AFObjectWithKey({this.id});
+  AFObjectWithKey({
+    this.id
+  });
   
   String get key {
     final sb = StringBuffer();
-    if(id != null) {
-      sb.write(id.code);
+    final id2 = id;
+    if(id2 != null) {
+      sb.write(id2.code);
     } else {
       sb.write(runtimeType.toString());
     }

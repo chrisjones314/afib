@@ -1,5 +1,3 @@
-
-
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +15,8 @@ void initAFDefaultFundamentalThemeArea(AFFundamentalDeviceTheme device, AFAppSta
   final colorWhite = Colors.white;
   final colorError = Color(0xffbf0603);
   final colorBlack = Colors.black;
-  final colorBackground = Colors.grey[200];
-  final colorSurfaceDark = Colors.grey[900];
+  final colorBackground = Colors.grey[200] ?? Colors.grey;
+  final colorSurfaceDark = Colors.grey[900] ?? Colors.grey;
 
   final colorsLight = ColorScheme(
     primary: colorPrimary,

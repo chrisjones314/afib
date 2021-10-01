@@ -3,24 +3,23 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
-import 'package:afib/src/dart/redux/state/af_theme_state.dart';
-import 'package:afib/src/dart/utils/af_should_continue_route_param.dart';
-import 'package:afib/src/flutter/core/af_app_extension_context.dart';
-import 'package:afib/src/flutter/test/af_state_test.dart';
-import 'package:afib/src/flutter/test/af_unit_tests.dart';
-import 'package:afib/src/flutter/ui/theme/af_prototype_theme.dart';
-import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
-import 'package:afib/src/flutter/ui/screen/af_prototype_widget_screen.dart';
-import 'package:afib/src/flutter/utils/af_dispatcher.dart';
-import 'package:flutter/material.dart';
-
 import 'package:afib/src/dart/redux/state/af_state.dart';
+import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
+import 'package:afib/src/dart/utils/af_should_continue_route_param.dart';
 import 'package:afib/src/flutter/af_app.dart';
+import 'package:afib/src/flutter/core/af_app_extension_context.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/test/af_state_test.dart';
 import 'package:afib/src/flutter/test/af_test_data_registry.dart';
+import 'package:afib/src/flutter/test/af_unit_tests.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/ui/screen/af_prototype_widget_screen.dart';
+import 'package:afib/src/flutter/ui/theme/af_prototype_theme.dart';
+import 'package:afib/src/flutter/utils/af_dispatcher.dart';
+import 'package:flutter/material.dart';
 
 /// Delegate used to populate the screen map used to associate keys with screens.
 typedef AFInitScreenMapDelegate = void Function(AFScreenMap map);

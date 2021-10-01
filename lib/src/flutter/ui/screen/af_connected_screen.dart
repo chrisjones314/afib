@@ -1,25 +1,25 @@
-import 'package:afib/src/dart/command/af_standard_configs.dart';
-import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
-import 'package:afib/src/dart/utils/af_context_dispatcher_mixin.dart';
-import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
-import 'package:afib/src/flutter/utils/af_dispatcher.dart';
-import 'package:afib/src/flutter/utils/af_state_view.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
-import 'package:quiver/core.dart';
 import 'package:afib/afib_flutter.dart';
+import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
+import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
+import 'package:afib/src/dart/utils/af_context_dispatcher_mixin.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/ui/drawer/af_prototype_drawer.dart';
+import 'package:afib/src/flutter/utils/af_dispatcher.dart';
+import 'package:afib/src/flutter/utils/af_state_view.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:logger/logger.dart';
+import 'package:quiver/core.dart';
 
 /// Base call for all screens, widgets, drawers, dialogs and bottom sheets
 /// that connect to the store/state.

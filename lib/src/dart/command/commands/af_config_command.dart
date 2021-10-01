@@ -1,10 +1,10 @@
 
 import 'package:afib/id.dart';
+import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_error.dart';
 import 'package:afib/src/dart/command/templates/dynamic/declare_config_entries.t.dart';
-import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:args/args.dart' as args;
 
 

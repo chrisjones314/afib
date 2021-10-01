@@ -1,11 +1,11 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/id.dart';
+import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/ui/af_prototype_base.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
-import 'package:afib/src/dart/utils/af_route_param.dart';
 
 /// Parameter uses to filter the tests/protoypes shown on the screen.
 @immutable

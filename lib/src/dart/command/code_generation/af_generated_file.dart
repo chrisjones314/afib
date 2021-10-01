@@ -1,10 +1,11 @@
 import 'dart:io';
+
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
-import 'package:afib/src/dart/command/af_source_template.dart';
-import 'package:colorize/colorize.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
+import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_buffer.dart';
+import 'package:colorize/colorize.dart';
 
 enum AFGeneratedFileAction {
   create,

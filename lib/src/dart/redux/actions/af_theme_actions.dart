@@ -1,6 +1,6 @@
+import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:meta/meta.dart';
-import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 
 class AFUpdateThemeStateAction {
   final AFThemeState themes;

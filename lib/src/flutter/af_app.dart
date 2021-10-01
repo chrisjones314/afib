@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:afib/afib_flutter.dart';
+import 'package:flutter/material.dart';
 
 
 /// The parent class of [MaterialApp] based AFib apps.

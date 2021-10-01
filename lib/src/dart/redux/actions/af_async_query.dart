@@ -14,9 +14,9 @@ import 'package:afib/src/flutter/test/af_state_test.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:logger/logger.dart';
-import 'package:collection/collection.dart';
 
 class AFStartQueryContext<TResponse> {
   final void Function(TResponse) onSuccess;

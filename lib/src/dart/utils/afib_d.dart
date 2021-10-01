@@ -1,11 +1,11 @@
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
+import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
-import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/flutter/utils/af_log_printer.dart';
-import 'package:logger/logger.dart';
 import 'package:collection/collection.dart';
+import 'package:logger/logger.dart';
 
 class AFibD<AppState> {
     static final AFConfig _afConfig = AFConfig();

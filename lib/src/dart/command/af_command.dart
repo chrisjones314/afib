@@ -1,17 +1,17 @@
-import 'package:afib/src/dart/command/commands/af_config_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_screen_command.dart';
-import 'package:afib/src/dart/command/commands/af_test_command.dart';
-import 'package:afib/src/dart/command/commands/af_version_command.dart';
-import 'package:afib/src/dart/command/code_generation/af_code_generator.dart';
-import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
+import 'package:afib/src/dart/command/code_generation/af_code_generator.dart';
+import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_screen_command.dart';
+import 'package:afib/src/dart/command/commands/af_test_command.dart';
+import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/command/templates/af_template_registry.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
-import 'package:args/command_runner.dart' as cmd;
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:args/args.dart' as args;
+import 'package:args/command_runner.dart' as cmd;
 import 'package:collection/collection.dart';
 
 class AFItemWithNamespace {

@@ -1,5 +1,5 @@
-import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/afib_flutter.dart';
+import 'package:afib/src/flutter/test/af_test_actions.dart';
 
 class AFWireframes {
   final wireframes = <AFWireframe>[];

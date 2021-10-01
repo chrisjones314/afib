@@ -92,7 +92,6 @@ void _navigatePopToAction(Store<AFState> store, action, NextDispatcher next) {
       navState.pop(action.returnData);
     }
     final screenCode = popTo.push?.screen.code;
-    assert(screenCode != null);
     if(screenCode != null) {
       navState.pushNamed(screenCode);
     }

@@ -247,7 +247,7 @@ class AFStateTest<TState extends AFAppStateArea> {
       /// Ummm, this might be a good place to admit that sometimes the type system
       /// in Dart vexes me.
       if(key.toString().startsWith("AFAlwaysFailQuery")) {
-        h = results["AFAlwaysFailQuery<AFAppStateArea>"];
+        h = results["AFAlwaysFailQuery<AFAppStateAreaUnused>"];
       }
     }
     if(h == null) {

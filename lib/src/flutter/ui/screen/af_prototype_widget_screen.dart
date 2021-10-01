@@ -49,7 +49,7 @@ class AFPrototypeWidgetScreen extends AFUIConnectedScreen<AFPrototypeWidgetState
   static AFNavigateAction navigatePush(AFWidgetPrototype test, {AFID? id}) {
     return AFNavigatePushAction(
       id: id,
-      routeParam: AFPrototypeWidgetRouteParam(test: test, routeParam: AFRouteParam.unused()),
+      routeParam: AFPrototypeWidgetRouteParam(test: test, routeParam: AFRouteParam.unused),
       screen: AFUIScreenID.screenPrototypeWidget,
     );
   }
@@ -82,8 +82,13 @@ class AFPrototypeWidgetScreen extends AFUIConnectedScreen<AFPrototypeWidgetState
     
     Widget resultWidget;
     if(test is AFConnectedWidgetPrototype && sourceWidget is AFConnectedWidget) {
-      final paramChild = context.p.routeParam ?? test.routeParam;
-      final dispatcher = AFWidgetScreenTestDispatcher(context: testContext!, main: context.d, originalParam: context.p);
+      final unusedParam = AFRouteParam.unused;
+      var paramChild = context.p.routeParam;
+      if(paramChild == unusedParam) {
+        paramChild = test.routeParam;
+      }
+      if(paramChild == null) throw AFException("Missing route param in test");
+      final dispatcher = AFWidgetScreenTestDispatcher(context: testContext, main: context.d, originalParam: context.p);
 
       final themeChild = sourceWidget.findFunctionalTheme(AFibF.g.storeInternalOnly!.state);
       final standard = AFStandardBuildContextData(

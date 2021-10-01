@@ -10,20 +10,25 @@ import 'package:quiver/core.dart';
 /// changed (or its route param, or conceptual theme change).  
 @immutable
 class AFStateView<TV1, TV2, TV3, TV4> {
-  final TV1? first;
-  final TV2? second;
-  final TV3? third;
-  final TV4? fourth;
+  final TV1 first;
+  final TV2 second;
+  final TV3 third;
+  final TV4 fourth;
 
   AFStateView({
-    this.first, 
-    this.second, 
-    this.third, 
-    this.fourth
+    required this.first, 
+    required this.second, 
+    required this.third, 
+    required this.fourth
   });
 
-  factory AFStateView.unused() {
-    return AFStateView();
+  static AFStateView unused() {
+    return AFStateView(
+      first: AFUnused.unused,
+      second: AFUnused.unused,
+      third: AFUnused.unused,
+      fourth: AFUnused.unused
+    );
   }
 
   /// Because store connector data is always recreated, it is 
@@ -40,19 +45,28 @@ class AFStateView<TV1, TV2, TV3, TV4> {
 
 }
 
+@immutable 
+class AFStateViewUnused extends AFStateView<AFUnused, AFUnused, AFUnused, AFUnused> {
+  AFStateViewUnused(): super(first: AFUnused.unused, second: AFUnused.unused, third: AFUnused.unused, fourth: AFUnused.unused);
+}
+
 /// A version of [AFStateView] which allows for more type parameters.
 @immutable
 class AFStateViewExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> extends AFStateView<TV1, TV2, TV3, TV4> {
-  final TV5? fifth;
-  final TV6? sixth;
-  final TV7? seventh;
-  final TV8? eighth;
+  final TV5 fifth;
+  final TV6 sixth;
+  final TV7 seventh;
+  final TV8 eighth;
 
   AFStateViewExtended({
     required TV1 first, 
     required TV2 second, 
     required TV3 third, 
-    required TV4 fourth, this.fifth, this.sixth, this.seventh, this.eighth}):
+    required TV4 fourth, 
+    required this.fifth, 
+    required this.sixth, 
+    required this.seventh, 
+    required this.eighth}):
     super(first: first, second: second, third: third, fourth: fourth);
 
   bool operator==(dynamic o) {
@@ -74,7 +88,7 @@ class AFStateViewExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> extends AFStat
 class AFStateView1<TV1> extends AFStateView<TV1, AFUnused, AFUnused, AFUnused> {
   AFStateView1({
     required TV1 first
-  }): super(first: first);
+  }): super(first: first, second: AFUnused.unused, third: AFUnused.unused, fourth: AFUnused.unused);
 }
 
 /// Use this version of [AFStateView] if you need two pieces of data from the store.
@@ -83,7 +97,7 @@ class AFStateView2<TV1, TV2> extends AFStateView<TV1, TV2, AFUnused, AFUnused> {
   AFStateView2({
     required TV1 first, 
     required TV2 second
-  }): super(first: first, second: second);
+  }): super(first: first, second: second, third: AFUnused.unused, fourth: AFUnused.unused);
 }
 
 /// Use this version of [AFStateView] if you need three pieces of data from the store.
@@ -93,7 +107,7 @@ class AFStateView3<TV1, TV2, TV3> extends AFStateView<TV1, TV2, TV3, AFUnused> {
     required TV1 first, 
     required TV2 second, 
     required TV3 third
-  }): super(first: first, second: second, third: third);
+  }): super(first: first, second: second, third: third, fourth: AFUnused.unused);
 }
 
 /// Use this version of [AFStateView] if you need four pieces of data from the store.
@@ -115,7 +129,7 @@ class AFStateView5<TV1, TV2, TV3, TV4, TV5> extends AFStateViewExtended<TV1, TV2
     required TV3 third, 
     required TV4 fourth, 
     required TV5 fifth
-  }): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth);
+  }): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth, sixth: AFUnused.unused, seventh: AFUnused.unused, eighth: AFUnused.unused);
 
 }
 
@@ -127,7 +141,7 @@ class AFStateView6<TV1, TV2, TV3, TV4, TV5, TV6> extends AFStateViewExtended<TV1
     required TV4 fourth, 
     required TV5 fifth, 
     required TV6 sixth
-  }): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth, sixth: sixth);
+  }): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth, sixth: sixth, seventh: AFUnused.unused, eighth: AFUnused.unused);
 }
 
 class AFStateView7<TV1, TV2, TV3, TV4, TV5, TV6, TV7> extends AFStateViewExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, AFUnused> {
@@ -139,7 +153,7 @@ class AFStateView7<TV1, TV2, TV3, TV4, TV5, TV6, TV7> extends AFStateViewExtende
     required TV5 fifth, 
     required TV6 sixth, 
     required TV7 seventh
-  }): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth, sixth: sixth, seventh: seventh);
+  }): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth, sixth: sixth, seventh: seventh, eighth: AFUnused.unused);
 }
 
 class AFStateView8<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> extends AFStateViewExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> {

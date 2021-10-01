@@ -1,4 +1,4 @@
-import 'package:afib/afib_command.dart';
+import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_buffer.dart';
 
 /// An insertion point in a file, with an optional whitespace indentation before each line.

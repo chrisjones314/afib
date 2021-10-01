@@ -89,6 +89,17 @@ abstract class AFAppStateArea {
   AFAppStateArea createWith(Map<String, Object> models);
 }
 
+@immutable
+class AFAppStateAreaUnused extends AFAppStateArea {
+  AFAppStateAreaUnused(Map<String, Object> models): super(models: models);
+
+  AFAppStateArea createWith(Map<String, Object> models) {
+    return AFAppStateAreaUnused(models);
+  }
+
+}
+
+
 /// Tracks the application state and any state provided by third parties.
 @immutable
 class AFAppStateAreas {
@@ -104,6 +115,12 @@ class AFAppStateAreas {
       final areaType = _keyForArea(area);
       states[areaType] = area;
     }
+
+    // if you don't have a state, you can use AFAppStateArea as a substitute.  We need to have this
+    // be non-null, so we add an empty one.
+    final tempModel = AFAppStateAreaUnused(<String, Object>{});
+    final areaType = _keyForArea(tempModel);
+    states[areaType] = tempModel;
 
     return AFAppStateAreas(states: states);
   }

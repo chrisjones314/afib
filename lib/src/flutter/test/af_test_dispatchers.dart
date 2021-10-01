@@ -80,7 +80,7 @@ class AFWidgetScreenTestDispatcher extends AFScreenTestDispatcher {
   AFPrototypeWidgetRouteParam originalParam;
   
   AFWidgetScreenTestDispatcher({
-    required AFScreenTestContext context,
+    required AFScreenTestContext? context,
     required AFDispatcher main,
     required this.originalParam
   }): super(main, context);

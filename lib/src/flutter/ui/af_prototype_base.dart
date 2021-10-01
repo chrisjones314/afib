@@ -13,7 +13,7 @@ mixin AFUIConnectedUIMixin<TStateView extends AFStateView, TRouteParam extends A
 }
 
 
-class AFUIBuildContext<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFBuildContext<AFAppStateArea, TStateView, TRouteParam, AFUITheme> {
+class AFUIBuildContext<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFBuildContext<AFAppStateAreaUnused, TStateView, TRouteParam, AFUITheme> {
   AFUIBuildContext(
     AFStandardBuildContextData standard, 
     TStateView stateView,
@@ -23,16 +23,16 @@ class AFUIBuildContext<TStateView extends AFStateView, TRouteParam extends AFRou
 }
 
 
-abstract class AFUIConnectedScreen<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreen<AFAppStateArea, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFUIConnectedUIMixin<TStateView, TRouteParam> {
+abstract class AFUIConnectedScreen<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreen<AFAppStateAreaUnused, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFUIConnectedUIMixin<TStateView, TRouteParam> {
   AFUIConnectedScreen(AFScreenID screen): super(screen, AFUIThemeID.conceptualUI);
 }
 
-abstract class AFProtoConnectedDrawer<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedDrawer<AFAppStateArea, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFUIConnectedUIMixin<TStateView, TRouteParam> {
+abstract class AFProtoConnectedDrawer<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedDrawer<AFAppStateAreaUnused, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFUIConnectedUIMixin<TStateView, TRouteParam> {
   AFProtoConnectedDrawer(
     AFScreenID screen,
   ): super(screen, AFUIThemeID.conceptualUI);
 }
 
-abstract class AFUIConnectedDialog<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedDialog<AFAppStateArea, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFUIConnectedUIMixin<TStateView, TRouteParam> {
+abstract class AFUIConnectedDialog<TStateView extends AFStateView, TRouteParam extends AFRouteParam> extends AFConnectedDialog<AFAppStateAreaUnused, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFUIConnectedUIMixin<TStateView, TRouteParam> {
   AFUIConnectedDialog(AFScreenID screen): super(screen, AFUIThemeID.conceptualUI);
 }

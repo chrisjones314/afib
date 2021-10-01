@@ -64,7 +64,7 @@ typedef AFCreateDataDelegate<TStateView, TState> = TStateView Function(TState st
 typedef AFFindParamDelegate = AFRouteParam Function(AFState state);
 
 /// Used to pass in a functiont hat handles route parameter updates in AFEmbeddedWidget
-typedef AFUpdateRouteParamDelegate = void Function(AFBuildContext context, AFRouteParam revised, { AFID? id });
+typedef AFUpdateRouteParamDelegate<TRouteParam extends AFRouteParam> = void Function(AFBuildContext context, TRouteParam revised, { AFID? id });
 
 /// Delegate used in widget testing to wrap additional widgets around the widget being tested 
 /// (e.g. to position that widget on the screen, limit its width, etc.)
@@ -153,7 +153,7 @@ typedef AFOverrideCreateThemeDataDelegate = ThemeData Function(AFFundamentalDevi
 
 typedef AFCreateDynamicDelegate = dynamic Function();
 
-typedef AFReturnValueDelegate = void Function(dynamic param);
+typedef AFReturnValueDelegate = void Function(Object? param);
 
 typedef AFRenderConnectedChildDelegate = Widget Function(AFScreenID screenParent, AFWidgetID widChild);
 

@@ -86,7 +86,7 @@ class AFPrototypeTestScreen extends AFUIConnectedScreen<AFStateView, AFPrototype
 
   @override
   AFStateView createStateView(AFAppStateArea? state, AFPrototypeTestScreenParam param) {
-    return AFStateView();
+    return AFStateView.unused();
   }
 
   @override

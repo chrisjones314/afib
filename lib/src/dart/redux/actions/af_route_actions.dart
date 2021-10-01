@@ -69,7 +69,7 @@ class AFNavigateReplaceAction extends AFNavigateAction {
 
 /// Action that exits the current test screen in prototype mode.
 class AFNavigateExitTestAction extends AFNavigateAction {  
-  AFNavigateExitTestAction({AFID? id}): super(id: id, screen: AFUIScreenID.unused, param: AFRouteParam.unused());
+  AFNavigateExitTestAction({AFID? id}): super(id: id, screen: AFUIScreenID.unused, param: AFRouteParam.unused);
 }
 
 /// Action that removes all screens in the route, and replaces them with
@@ -109,7 +109,7 @@ class AFNavigateActionWithReturnData extends AFNavigateAction {
     AFID? id, 
     required this.returnData, 
     this.worksInSingleScreenTest = false
-  }): super(id: id, screen: AFUIScreenID.unused, param: AFRouteParam.unused());
+  }): super(id: id, screen: AFUIScreenID.unused, param: AFRouteParam.unused);
 }
 
 /// Action that navigates on screen up in the route, discarding the current leaf route.
@@ -179,7 +179,7 @@ class AFNavigateRemoveConnectedChildAction extends AFNavigateAction {
     AFID? id, 
     required AFScreenID screen, 
     required this.widget,
-  }): super(id: id, screen: screen, param: AFRouteParam.unused()); 
+  }): super(id: id, screen: screen, param: AFRouteParam.unused); 
 }
 
 class AFNavigateSortConnectedChildrenAction extends AFNavigateAction {
@@ -190,7 +190,7 @@ class AFNavigateSortConnectedChildrenAction extends AFNavigateAction {
     required AFScreenID screen, 
     required this.sort,
     required this.typeToSort,
-  }): super(id: id, screen: screen, param: AFRouteParam.unused()); 
+  }): super(id: id, screen: screen, param: AFRouteParam.unused); 
 }
 
 class AFNavigateSetChildParamAction extends AFNavigateAction {

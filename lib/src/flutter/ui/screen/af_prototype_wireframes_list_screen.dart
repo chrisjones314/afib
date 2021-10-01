@@ -27,7 +27,8 @@ class AFPrototypeWireframesListScreen extends AFUIConnectedScreen<AFPrototypeWir
 
   static AFNavigatePushAction navigateTo() {
     return AFNavigatePushAction(screen: AFUIScreenID.screenPrototypeWireframesList,
-      routeParam: AFRouteParam.unused());
+      routeParam: AFRouteParam.unused
+    );
   }
 
   @override

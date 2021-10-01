@@ -11,11 +11,9 @@ import 'package:quiver/core.dart';
 /// in the [AFRoute]
 @immutable
 class AFRouteParam {
-  AFRouteParam();
+  static const unused = AFRouteParam();
 
-  factory AFRouteParam.unused() { 
-    return AFRouteParam();
-  }
+  const AFRouteParam();
 
   bool matchesScreen(AFScreenID screen) {
     return false;

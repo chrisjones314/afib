@@ -31,7 +31,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
 
 typedef AFTestScreenExecuteDelegate = Future<void> Function(AFScreenTestExecute ste);
-typedef AFVerifyReturnValueDelegate = void Function(dynamic value);
+typedef AFVerifyReturnValueDelegate = void Function(Object? value);
 
 /// A utility class used to pass 
 abstract class AFWidgetSelector {

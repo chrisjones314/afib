@@ -25,7 +25,7 @@ class AFStandardErrorDialog extends AFUIConnectedDialog<AFStateView, AFStandardE
   AFStandardErrorDialog(): super(AFUIScreenID.dialogStandardError);
 
   //--------------------------------------------------------------------------------------
-  static AFNavigateAction navigatePush(String message) {
+  static AFNavigatePushAction navigatePush(String message) {
     return AFNavigatePushAction(
       screen: AFUIScreenID.dialogStandardError,
       routeParam: AFStandardErrorDialogRouteParam.createOncePerScreen(message)

@@ -24,7 +24,7 @@ class AFStandardChoiceDialog extends AFUIConnectedDialog<AFStateView, AFStandard
   AFStandardChoiceDialog(): super(AFUIScreenID.dialogStandardChoice);
 
   //--------------------------------------------------------------------------------------
-  static AFNavigateAction navigatePush({
+  static AFNavigatePushAction navigatePush({
     required String alertTitle,
     required String alertBody,
     required List<String> buttonTitles,

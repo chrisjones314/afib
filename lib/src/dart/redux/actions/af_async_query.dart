@@ -19,8 +19,8 @@ import 'package:logger/logger.dart';
 import 'package:collection/collection.dart';
 
 class AFStartQueryContext<TResponse> {
-  final Function(TResponse) onSuccess;
-  final Function(AFQueryError) onError;
+  final void Function(TResponse) onSuccess;
+  final void Function(AFQueryError) onError;
 
   AFStartQueryContext({
     required this.onSuccess, 
@@ -49,8 +49,10 @@ class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatch
     return dispatcher;
   }
 
-  TState? get s {
-    return state.public.areaStateFor(TState) as TState;
+  TState get s {
+    var result = state.public.areaStateFor(TState) as TState?;
+    if(result == null) throw AFException("Missing $TState");
+    return result;
   }
 
   AFRouteParam? findRouteParam(AFScreenID screen) {
@@ -125,7 +127,7 @@ abstract class AFAsyncQuery<TState extends AFAppStateArea, TResponse> extends AF
     AFID? id, this.onSuccessDelegate, this.onErrorDelegate, this.successActions}): super(id: id);
 
   /// Called internally when redux middleware begins processing a query.
-  void startAsyncAF(AFDispatcher dispatcher, AFStore store, { Function(dynamic)? onResponseExtra, Function(dynamic)? onErrorExtra }) {
+  void startAsyncAF(AFDispatcher dispatcher, AFStore store, { void Function(dynamic)? onResponseExtra, void Function(dynamic)? onErrorExtra }) {
     final startContext = AFStartQueryContext<TResponse>(
       onSuccess: (response) { 
         // note: there could be multiple queries outstanding at once, meaning the state

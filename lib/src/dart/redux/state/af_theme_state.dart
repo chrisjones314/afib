@@ -2068,7 +2068,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   Widget childMargin({
     AFWidgetID? wid, 
     required Widget child,
-    required EdgeInsets margin,  
+    required EdgeInsets? margin,  
   }) {
     return Container(
       key: keyForWID(wid),
@@ -2298,6 +2298,13 @@ need to manually update the value in the controller.
     if(wid == null) { return null; }
     return Key(wid.code);
   }
+
+    /// Returns a unique key for the specified widget.
+  Key keyForWIDNotNull(AFID wid) {
+    var result = keyForWIDStatic(wid);
+    return result!;
+  }
+
 
   Color? color(dynamic idOrColor) {
     if(idOrColor is Color) {

@@ -204,11 +204,15 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
   /// screen tests.
   TStateView createStateViewPublic(AFPublicState public, TRouteParam param, AFRouteParamWithChildren? paramWithChildren) {
     final state = public.areaStateFor(TState) as TState?;
+    if(state == null) {
+      assert(false);
+      throw AFException("Root application state $TState cannot be null");
+    }
     return createStateView(state, param);
   }
 
   /// Override this to create an [AFStateView] with the required data from the state.
-  TStateView createStateView(TState? state, TRouteParam param);
+  TStateView createStateView(TState state, TRouteParam param);
 
   /// Builds a Widget using the data extracted from the state.
   material.Widget buildWithContext(TBuildContext context);
@@ -303,7 +307,7 @@ abstract class AFEmbeddedWidget<TState extends AFAppStateArea,  TTheme extends A
   final TRouteParam? routeParamOverride;
   final TRouteParam? paramWithChildren;
   final TTheme? themeOverride;
-  final AFUpdateRouteParamDelegate? updateRouteParamDelegate;
+  final AFUpdateRouteParamDelegate<TRouteParam>? updateRouteParamDelegate;
   
   AFEmbeddedWidget({
     AFWidgetID? wid,
@@ -791,7 +795,13 @@ class AFBuildContext<TState extends AFAppStateArea, TStateView extends AFStateVi
   TStateView get s { return stateView; }
 
 
-  material.BuildContext? get context { return standard.context; }  
+  material.BuildContext get context { 
+    // there is a brief time where we don't have a context internally, as the AFBuildContext is 
+    // being constructed.   But, for the purposes of users of the framework, there will always
+    // be a build context for any case where they have access to an AFBuildContext. 
+    return standard.context!; 
+  }  
+
   AFDispatcher get dispatcher { return standard.dispatcher; }
   AFRouteParamWithChildren? get paramWithChildren { return standard.paramWithChildren; }
   AFScreenPrototype? get screenTest { return standard.screenTest; }
@@ -809,7 +819,7 @@ class AFBuildContext<TState extends AFAppStateArea, TStateView extends AFStateVi
   AFDispatcher get d { return standard.dispatcher; }
 
   /// Shorthand for accessing the flutter build context
-  material.BuildContext? get c { return context; }
+  material.BuildContext get c { return context; }
 
   /// Dispatch an action or query.
   void dispatch(dynamic action) { 

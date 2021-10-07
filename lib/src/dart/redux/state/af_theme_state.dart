@@ -2495,12 +2495,12 @@ need to manually update the value in the controller.
 
   /// See [AFBuildContext.showDialog], this is just a one line call to that method
   /// for discoverability.
-  void showDialog({
+  void showDialog<TReturn>({
     required AFBuildContext context,
     AFScreenID? screenId,
     AFRouteParam? param,
     AFNavigatePushAction? navigate,
-    AFReturnValueDelegate? onReturn,
+    void Function(TReturn?)? onReturn,
     bool barrierDismissible = true,
     Color? barrierColor,
     bool useSafeArea = true,

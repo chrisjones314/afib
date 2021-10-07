@@ -10,7 +10,10 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
+import 'package:afib/src/flutter/ui/af_prototype_base.dart';
 import 'package:afib/src/flutter/ui/drawer/af_prototype_drawer.dart';
+import 'package:afib/src/flutter/ui/screen/af_exception_screen.dart';
+import 'package:afib/src/flutter/ui/theme/af_prototype_theme.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
@@ -43,35 +46,65 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
   @override
   material.Widget build(material.BuildContext context) {
     return StoreConnector<AFState, AFBuildContext?>(
-        converter: (store) {
-          final context = _createNonBuildContext(store as AFStore);
-          return context;
+        converter: (store) {          
+          try {
+            final context = _createNonBuildContext(store as AFStore);
+            return context;
+          } on Exception catch(e, stackTrace) {
+            final context = _createExceptionBuildContext(store as AFStore, e, stackTrace);
+            return context;
+          }
         },
         distinct: true,
         builder: (buildContext, dataContext) {
           if(dataContext == null) {
             return material.Container(child: material.Text("Loading..."));
           }
+          try {
 
-          var screenIdRegister = this.primaryScreenId;          
-          if(screenIdRegister != null) {            
-            AFibF.g.registerScreen(screenIdRegister, buildContext, this);
-            AFibD.logUIAF?.d("Rebuilding screen $screenIdRegister");
-          } else {
-            AFibD.logUIAF?.d("Rebuilding widget $runtimeType");
-          }
+            final standard = AFStandardBuildContextData(
+              context: buildContext,
+              dispatcher: dataContext.d,
+              paramWithChildren: dataContext.paramWithChildren,
+              container: this,
+              themes: dataContext.standard.themes
+            );
+            if(dataContext is AFUIBuildContext<AFExceptionScreenStateView, AFExceptionScreenRouteParam>) {
+              return _buildExceptionScreen(AFUIBuildContext<AFExceptionScreenStateView, AFExceptionScreenRouteParam>(
+                standard,
+                dataContext.s,
+                dataContext.p,
+                dataContext.theme,
+              ));
+            }
 
-          _updateFundamentalThemeState(buildContext);
-          final standard = AFStandardBuildContextData(
-            context: buildContext,
-            dispatcher: dataContext.d,
-            paramWithChildren: dataContext.paramWithChildren,
-            container: this,
-            themes: dataContext.standard.themes,
-          );
-          final withContext = createContext(standard, dataContext.s as TStateView, dataContext.p as TRouteParam, dataContext.theme as TTheme);
-          final widgetResult = buildWithContext(withContext);
-          return widgetResult;
+            var screenIdRegister = this.primaryScreenId;          
+            if(screenIdRegister != null) {            
+              AFibF.g.registerScreen(screenIdRegister, buildContext, this);
+              AFibD.logUIAF?.d("Rebuilding screen $screenIdRegister");
+            } else {
+              AFibD.logUIAF?.d("Rebuilding widget $runtimeType");
+            }
+
+            _updateFundamentalThemeState(buildContext);
+            final withContext = createContext(standard, dataContext.s as TStateView, dataContext.p as TRouteParam, dataContext.theme as TTheme);
+            final widgetResult = buildWithContext(withContext);
+            return widgetResult;
+          } on Exception catch(e, stackTrace) {
+            final standard = AFStandardBuildContextData(
+              context: buildContext,
+              dispatcher: dataContext.d,
+              paramWithChildren: null,
+              container: this,
+              themes: dataContext.standard.themes,
+            );
+            return _buildExceptionScreen(AFUIBuildContext<AFExceptionScreenStateView, AFExceptionScreenRouteParam>(
+              standard,
+              AFExceptionScreenStateView(dataContext.debugOnlyPublicState),
+              AFExceptionScreenRouteParam(exception: e, stack: stackTrace),
+              dataContext.findTheme(AFUIThemeID.conceptualUI) as AFUITheme,
+            ));
+          }          
         }
     );
   }
@@ -90,6 +123,25 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
   /// the screen id to match.  However, when we popup little screens on top of the main screen
   /// e.g. a dialog, bottomsheet, or drawer, that is not the case.
   bool get testOnlyRequireScreenIdMatchForTestContext { return false; }
+
+  //AFBuildContext<DFState, TStateView, TRouteParam, DFFunctionalTheme>
+  AFUIBuildContext<AFExceptionScreenStateView, AFExceptionScreenRouteParam> _createExceptionBuildContext(AFStore store, Exception e, StackTrace stackTrace) {
+    final themes = store.state.public.themes;
+    final standard = AFStandardBuildContextData(
+      context: null,
+      dispatcher:  createDispatcher(store),
+      paramWithChildren: null,
+      container: this,
+      themes: themes,
+    );
+
+    return AFUIBuildContext<AFExceptionScreenStateView, AFExceptionScreenRouteParam>(
+      standard,
+      AFExceptionScreenStateView(store.state.public),
+      AFExceptionScreenRouteParam(exception: e, stack: stackTrace),
+      themes.findById(AFUIThemeID.conceptualUI) as AFUITheme, 
+    );
+  }
 
   TBuildContext? _createNonBuildContext(AFStore store) {
     if(AFibD.config.isTestContext) {
@@ -219,6 +271,17 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
 
   /// Update the route parameter for this screen, widget, etc.
   void updateRouteParam(AFBuildContext context,TRouteParam revised, { AFID? id });
+
+
+  Widget _buildExceptionScreen(AFUIBuildContext<AFExceptionScreenStateView, AFExceptionScreenRouteParam> context) {
+    // look up the correct screen.
+    final exceptionScreenBuilder = AFibF.g.screenMap.exceptionScreenBuilder;
+    assert(exceptionScreenBuilder != null);
+    if(exceptionScreenBuilder == null) {
+      return Text("An exception occurred, but no exception screen exists");
+    }
+    return exceptionScreenBuilder(context);
+  }
 }
 
 /// Superclass for a screen Widget, which combined data from the store with data from
@@ -531,11 +594,11 @@ mixin AFContextShowMixin {
   /// context.closeDialog(context.p);
   /// ```
   /// inside the dialog screen.
-  void showDialog({
+  void showDialog<TReturn>({
     AFScreenID? screenId,
     AFRouteParam? param,
     AFNavigatePushAction? navigate,
-    AFReturnValueDelegate? onReturn,
+    void Function(TReturn?)? onReturn,
     bool barrierDismissible = true,
     material.Color? barrierColor,
     bool useSafeArea = true,
@@ -557,7 +620,7 @@ mixin AFContextShowMixin {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
     final ctx = contextNullCheck;
-    final result = await material.showDialog<dynamic>(
+    final result = await material.showDialog<TReturn>(
       context: ctx,
       builder: builder,
       barrierDismissible: barrierDismissible,

@@ -20,6 +20,7 @@ import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_data_registry.dart';
 import 'package:afib/src/flutter/ui/dialog/af_standard_choice_dialog.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/ui/screen/af_exception_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 
@@ -150,9 +151,13 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 
   void initialize() {
     final libraries = thirdPartyLibraries;
-    appContext.initScreenMap(screenMap, libraries);
+    screenMap.exceptionScreen((ctx) {
+      final screen = AFExceptionScreen();
+      return screen.buildWithContext(ctx);
+    });
     screenMap.screen(AFUIScreenID.dialogStandardError, (_) => AFStandardErrorDialog());
     screenMap.screen(AFUIScreenID.dialogStandardChoice, (_) => AFStandardChoiceDialog());
+    appContext.initScreenMap(screenMap, libraries);
 
     appContext.initializeFunctionalThemeFactories(themeFactories, libraries);
     

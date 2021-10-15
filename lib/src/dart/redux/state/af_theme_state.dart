@@ -1192,10 +1192,6 @@ class AFFundamentalThemeState {
     return themeDataActive.primaryTextTheme;
   }
 
-  TextTheme get styleOnAccent {
-    return themeDataActive.accentTextTheme;
-  }
-
   Color? color(AFThemeID? id) {
     return area.color(id);
   }
@@ -1477,6 +1473,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return buffer.toString();
   }
 
+  /*
   Widget childConnectedRenderPassthrough<TChildRouteParam extends AFRouteParam>({
     required AFBuildContext context,
     required AFScreenID screenParent,
@@ -1494,7 +1491,8 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }) {
     return context.childConnectedRender<TChildRouteParam>(screenParent: screenParent, widChild: widChild, render: render);
   }
-
+  */
+  
   Widget childEmbeddedRender({
     required AFRenderEmbeddedChildDelegate render
   }) {
@@ -1614,11 +1612,6 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   /// 'OnSecondary' style.
   TextTheme get styleOnSecondary {
     return themeData!.primaryTextTheme;
-  }
-
-  /// See [TextTheme], text theme to use on an accent color backgroun
-  TextTheme get styleOnAccent {
-    return themeData!.accentTextTheme;
   }
 
   /// Merges bold into whatever the style would have been.
@@ -2655,6 +2648,7 @@ need to manually update the value in the controller.
     );
   }
   
+  /*
   /// Create a list of connected children.  
   /// 
   /// The calling context must have a [AFRouteParamWithChildren] as its route parameter.   This method
@@ -2666,6 +2660,7 @@ need to manually update the value in the controller.
   }) {
     return context.childrenConnectedRender(screenParent: screenParent, render: render);
   }
+  */
 
   /// 
   AFShouldContinueCheckDelegate standardShouldContinueAlertCheck({
@@ -2678,7 +2673,7 @@ need to manually update the value in the controller.
     return () {
         final completer = Completer<AFShouldContinue>();
         if(navigate != null) {
-          screen = navigate.screen;
+          screen = navigate.param.id as AFScreenID;
           param = navigate.param;
         }
 
@@ -2692,11 +2687,11 @@ need to manually update the value in the controller.
             screenId: screen,
             param: param,
             onReturn: (param) {
-              if(param is! AFShouldContinueRouteParam) {
-                throw AFException("The dialog for standardShouldContinueAlertCheck must return an AFShouldContinueRouteParam");
+              if(param is! AFShouldContinue) {
+                throw AFException("The dialog for standardShouldContinueAlertCheck must return an AFShouldContinue value");
               }
               final should = param;
-              completer.complete(should.shouldContinue);
+              completer.complete(should);
             }
           );
         } else {

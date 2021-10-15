@@ -3,6 +3,7 @@
 import 'package:afib/id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -26,13 +27,13 @@ class AFPrototypeWireframesListScreen extends AFUIConnectedScreen<AFPrototypeWir
   AFPrototypeWireframesListScreen(): super(AFUIScreenID.screenPrototypeWireframesList);
 
   static AFNavigatePushAction navigateTo() {
-    return AFNavigatePushAction(screen: AFUIScreenID.screenPrototypeWireframesList,
-      routeParam: AFRouteParam.unused
+    return AFNavigatePushAction(
+      routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeWireframesList)
     );
   }
 
   @override
-  AFPrototypeWireframesStateView createStateViewAF(AFState state, AFRouteParam param, AFRouteParamWithChildren? withChildren) {
+  AFPrototypeWireframesStateView createStateViewAF(AFState state, AFRouteParam param, AFRouteSegmentChildren? children) {
     final tests = AFibF.g.screenTests;
     return AFPrototypeWireframesStateView(tests);
   }

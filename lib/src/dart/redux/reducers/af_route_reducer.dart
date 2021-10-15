@@ -15,28 +15,27 @@ final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigatePopToAction>(_navPopTo),
   TypedReducer<AFRouteState, AFNavigateSetParamAction>(_navSetParam),
   TypedReducer<AFRouteState, AFNavigateExitTestAction>(_navExitTest),
+  TypedReducer<AFRouteState, AFNavigateSetChildParamAction>(_navSetChildParam),
+  TypedReducer<AFRouteState, AFNavigateAddChildParamAction>(_navAddChildParam),
+  TypedReducer<AFRouteState, AFNavigateRemoveChildParamAction>(_navRemoveChildParam),
   TypedReducer<AFRouteState, AFShutdownOngoingQueriesAction>(_shutdownQueries),
-  TypedReducer<AFRouteState, AFNavigateAddConnectedChildAction>(_addConnectedChild),
-  TypedReducer<AFRouteState, AFNavigateRemoveConnectedChildAction>(_removeConnectedChild),
-  TypedReducer<AFRouteState, AFNavigateSortConnectedChildrenAction>(_sortConnectedChildren),
-  TypedReducer<AFRouteState, AFNavigateSetChildParamAction>(_setChildParam),
   TypedReducer<AFRouteState, AFResetToInitialRouteAction>(_resetToInitialRoute),
 ]);
 
 //---------------------------------------------------------------------------
 AFRouteState _navReplace(AFRouteState state, AFNavigateReplaceAction action) {
-  return state.popAndPushNamed(action.screen, action.param);
+  return state.popAndPushNamed(action.param, action.children);
 }
 
 //---------------------------------------------------------------------------
 AFRouteState _navReplaceAll(AFRouteState state, AFNavigateReplaceAllAction action) {
-  return state.replaceAll(action.screen, action.param);
+  return state.replaceAll(action.param, action.children);
 }
 
 //---------------------------------------------------------------------------
 AFRouteState _navPush(AFRouteState state, AFNavigatePushAction action) {
 
-  return state.pushNamed(action.screen, action.param);
+  return state.pushNamed(action.param, action.children);
 }
 
 //---------------------------------------------------------------------------
@@ -51,12 +50,28 @@ AFRouteState _navPopN(AFRouteState state, AFNavigatePopNAction action) {
 
 //---------------------------------------------------------------------------
 AFRouteState _navPopTo(AFRouteState state, AFNavigatePopToAction action) {
-  return state.popTo(action.popTo, action.push?.screen, action.push?.param, action.returnData);
+  return state.popTo(action.popTo, action.push?.param, action.push?.children, action.returnData);
 }
 
 //---------------------------------------------------------------------------
 AFRouteState _navSetParam(AFRouteState state, AFNavigateSetParamAction action) {
-  return state.setParam(action.screen, action.param, action.route);
+  final screen = action.param.id as AFScreenID;
+  return state.setParam(screen, action.param, action.route);
+}
+
+//---------------------------------------------------------------------------
+AFRouteState _navSetChildParam(AFRouteState state, AFNavigateSetChildParamAction action) {
+  return state.setChildParam(action.screen, action.route, action.param, useParentParam: action.useParentParam);
+}
+
+//---------------------------------------------------------------------------
+AFRouteState _navAddChildParam(AFRouteState state, AFNavigateAddChildParamAction action) {
+  return state.addChildParam(action.screen, action.route, action.param);
+}
+
+//---------------------------------------------------------------------------
+AFRouteState _navRemoveChildParam(AFRouteState state, AFNavigateRemoveChildParamAction action) {
+  return state.removeChildParam(action.screen, action.widget, action.route);
 }
 
 //---------------------------------------------------------------------------
@@ -68,26 +83,6 @@ AFRouteState _navExitTest(AFRouteState state, AFNavigateExitTestAction action) {
 AFRouteState _shutdownQueries(AFRouteState state, AFShutdownOngoingQueriesAction action) {
   AFibF.g.shutdownOutstandingQueries();
   return state;
-}
-
-//---------------------------------------------------------------------------
-AFRouteState _addConnectedChild(AFRouteState state, AFNavigateAddConnectedChildAction action) {
-  return state.addConnectedChild(action.screen, action.widget, action.param);
-}
-
-//---------------------------------------------------------------------------
-AFRouteState _removeConnectedChild(AFRouteState state, AFNavigateRemoveConnectedChildAction action) {
-  return state.removeConnectedChild(action.screen, action.widget);
-}
-
-//---------------------------------------------------------------------------
-AFRouteState _sortConnectedChildren(AFRouteState state, AFNavigateSortConnectedChildrenAction action) {
-  return state.sortConnectedChildren(action.screen, action.sort, action.typeToSort);
-}
-
-//---------------------------------------------------------------------------
-AFRouteState _setChildParam(AFRouteState state, AFNavigateSetChildParamAction action) {
-  return state.setConnectedChildParam(action.screen, action.widget, action.param);
 }
 
 //---------------------------------------------------------------------------

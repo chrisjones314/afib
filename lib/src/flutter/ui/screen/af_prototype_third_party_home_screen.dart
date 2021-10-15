@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 class AFPrototypeThirdPartyHomeParam extends AFRouteParam {
   final AFUILibraryExtensionContext libraryContext;
 
-  AFPrototypeThirdPartyHomeParam({required this.libraryContext});
+  AFPrototypeThirdPartyHomeParam({required this.libraryContext}): super(id: AFUIScreenID.screenPrototypeThirdPartyHome);
   
   factory AFPrototypeThirdPartyHomeParam.create(AFUILibraryExtensionContext context) {
     return AFPrototypeThirdPartyHomeParam(libraryContext: context);
@@ -27,12 +27,12 @@ class AFPrototypeThirdPartyHomeScreen extends AFUIConnectedScreen<AFStateView, A
   AFPrototypeThirdPartyHomeScreen(): super(AFUIScreenID.screenPrototypeThirdPartyHome);
 
   static AFNavigatePushAction navigatePush(AFUILibraryExtensionContext libraryContext) {
-    return AFNavigatePushAction(screen: AFUIScreenID.screenPrototypeThirdPartyHome,
+    return AFNavigatePushAction(
       routeParam: AFPrototypeThirdPartyHomeParam.create(libraryContext));
   }
 
   @override
-  AFStateView createStateViewAF(AFState state, AFRouteParam param, AFRouteParamWithChildren? withChildren) {
+  AFStateView createStateViewAF(AFState state, AFRouteParam param, AFRouteSegmentChildren? children) {
     return AFStateView.unused();
   }
 

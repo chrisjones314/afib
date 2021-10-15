@@ -22,8 +22,8 @@ class AFPrototypeDrawerRouteParam extends AFRouteParam {
 
   AFPrototypeDrawerRouteParam({
     required this.view, 
-    required this.themeExpanded
-  });
+    required this.themeExpanded,
+  }): super(id: AFUIScreenID.screenTestDrawer);
 
   factory AFPrototypeDrawerRouteParam.createOncePerScreen(int view) {
     final themeExpanded = <String, bool>{};
@@ -80,7 +80,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
 
   //--------------------------------------------------------------------------------------
   @override
-  AFPrototypeDrawerStateView createStateViewAF(AFState state, AFPrototypeDrawerRouteParam param, AFRouteParamWithChildren? paramWithChildren) {
+  AFPrototypeDrawerStateView createStateViewAF(AFState state, AFPrototypeDrawerRouteParam param, AFRouteSegmentChildren? children) {
     final testState = state.testState;
     final test = AFibF.g.findScreenTestById(testState.activeTestId!);
     if(test == null) throw AFException("Missing test for ${testState.activeTestId}");

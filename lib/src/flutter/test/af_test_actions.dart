@@ -1,3 +1,4 @@
+import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_data_registry.dart';
@@ -7,15 +8,13 @@ import 'package:afib/src/flutter/test/af_wireframe.dart';
 /// by both the prototype screen and the debug drawer
 class AFStartPrototypeScreenTestContextAction {
     final AFScreenTestContext context;
-    final dynamic routeParam;
     final String? routeParamId;
     final dynamic stateViews;
     final String? stateViewId;
-    final AFScreenID screen;
+    final AFNavigatePushAction navigate;
     AFStartPrototypeScreenTestContextAction(this.context, { 
-      required this.routeParam, 
+      required this.navigate, 
       required this.stateViews, 
-      required this.screen, 
       required this.stateViewId,
       required this.routeParamId,
     });
@@ -36,16 +35,14 @@ class AFTestUpdateWireframeStateViews {
 }
 class AFStartPrototypeScreenTestAction {
     final AFScreenPrototype test;
-    final dynamic param;
     final dynamic stateView;
-    final AFScreenID screen;
+    final AFNavigatePushAction navigate;
     final String? stateViewId;
     final String? routeParamId;
 
     AFStartPrototypeScreenTestAction(this.test, { 
-      this.param, 
       this.stateView, 
-      required this.screen, 
+      required this.navigate, 
       required this.stateViewId,
       required this.routeParamId,
     });

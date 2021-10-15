@@ -29,13 +29,14 @@ AFRouteState _getRouteState(Store<AFState> store) {
 }
 
 //---------------------------------------------------------------------------
-void _navigatePushAction(Store<AFState> store, action, NextDispatcher next) {
+void _navigatePushAction(Store<AFState> store, AFNavigatePushAction action, NextDispatcher next) {
 
   AFibF.g.doMiddlewareNavigation((navState) {
-    Future<dynamic> ret = navState.pushNamed(action.screen.code);
-    if(action.onReturn != null) {
+    Future<dynamic> ret = navState.pushNamed(action.param.id.code);
+    final onReturn = action.onReturn;
+    if(onReturn != null) {
       ret.then( (msg) {
-        action.onReturn(msg);
+        onReturn(msg);
       });
     }
   });
@@ -43,7 +44,7 @@ void _navigatePushAction(Store<AFState> store, action, NextDispatcher next) {
 }
 
 //---------------------------------------------------------------------------
-void _navigatePopAction(Store<AFState> store, action, NextDispatcher next) {
+void _navigatePopAction(Store<AFState> store, AFNavigatePopAction action, NextDispatcher next) {
 
   final route = _getRouteState(store);
 
@@ -59,17 +60,16 @@ void _navigatePopAction(Store<AFState> store, action, NextDispatcher next) {
 }
 
 //---------------------------------------------------------------------------
-void _navigatePopNAction(Store<AFState> store, action, NextDispatcher next) {
-  final AFNavigatePopNAction popN = action;
+void _navigatePopNAction(Store<AFState> store, AFNavigatePopNAction action, NextDispatcher next) {
   final route = _getRouteState(store);
 
   /// If the segment count is 1
-  if(route.segmentCount <= popN.popCount) {
-    throw AFException("You popped ${popN.popCount} screen but the route only has ${route.segmentCount} segments");
+  if(route.segmentCount <= action.popCount) {
+    throw AFException("You popped ${action.popCount} screen but the route only has ${route.segmentCount} segments");
   }
 
   AFibF.g.doMiddlewareNavigation( (navState) {
-    for(var i = 0; i < popN.popCount; i++) {
+    for(var i = 0; i < action.popCount; i++) {
       navState.pop(action.returnData);
     }
   });
@@ -77,21 +77,20 @@ void _navigatePopNAction(Store<AFState> store, action, NextDispatcher next) {
 }
 
 //---------------------------------------------------------------------------
-void _navigatePopToAction(Store<AFState> store, action, NextDispatcher next) {
-  final AFNavigatePopToAction popTo = action;
+void _navigatePopToAction(Store<AFState> store, AFNavigatePopToAction action, NextDispatcher next) {
   final route = _getRouteState(store);
 
-  final popCountTo = route.popCountToScreen(popTo.popTo);
+  final popCountTo = route.popCountToScreen(action.popTo);
   /// If the segment count is 1
   if(popCountTo < 0) {
-    throw AFException("Could not pop to ${popTo.popTo} because that screen is not in the route.");
+    throw AFException("Could not pop to ${action.popTo} because that screen is not in the route.");
   }
 
   AFibF.g.doMiddlewareNavigation( (navState) {
     for(var i = 0; i < popCountTo; i++) {
       navState.pop(action.returnData);
     }
-    final screenCode = popTo.push?.screen.code;
+    final screenCode = action.push?.param.id.code;
     if(screenCode != null) {
       navState.pushNamed(screenCode);
     }
@@ -101,8 +100,8 @@ void _navigatePopToAction(Store<AFState> store, action, NextDispatcher next) {
 
 
 //---------------------------------------------------------------------------
-void _navigateReplaceAction(Store<AFState> store, action, NextDispatcher next) {
-  final String screen = action.screen.code;
+void _navigateReplaceAction(Store<AFState> store, AFNavigateReplaceAction action, NextDispatcher next) {
+  final screen = action.param.id.code;
 
   // first, we do the navigation itself
   AFibF.g.doMiddlewareNavigation( (navState) {
@@ -115,8 +114,8 @@ void _navigateReplaceAction(Store<AFState> store, action, NextDispatcher next) {
 }
 
 //---------------------------------------------------------------------------
-void _navigateReplaceAllAction(Store<AFState> store, action, NextDispatcher next) {
-  final String screen = action.screen.code;
+void _navigateReplaceAllAction(Store<AFState> store, AFNavigateReplaceAllAction action, NextDispatcher next) {
+  final screen = action.param.id.code;
   
   // In prototype mode, we don't want to remove any afib screens, so we need to remove only those screens
   // below test.
@@ -136,7 +135,7 @@ void _navigateReplaceAllAction(Store<AFState> store, action, NextDispatcher next
 }
 
 //---------------------------------------------------------------------------
-void _navigateExitTestAction(Store<AFState> store, action, NextDispatcher next) {
+void _navigateExitTestAction(Store<AFState> store, AFNavigateExitTestAction action, NextDispatcher next) {
   /// Clear out our cache of screen info for the next test.
   //AFibF.g.resetTestScreens();
 

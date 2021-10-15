@@ -14,7 +14,7 @@ class AFStandardChoiceDialogRouteParam extends AFRouteParam {
     required this.alertBody,
     required this.alertTitle,
     required this.buttonTitles,
-  });
+  }): super(id: AFUIScreenID.dialogStandardChoice);
 }
 
 //--------------------------------------------------------------------------------------
@@ -30,7 +30,6 @@ class AFStandardChoiceDialog extends AFUIConnectedDialog<AFStateView, AFStandard
     required List<String> buttonTitles,
   }) {
     return AFNavigatePushAction(
-      screen: AFUIScreenID.dialogStandardChoice,
       routeParam: AFStandardChoiceDialogRouteParam(
         alertTitle: alertTitle,
         alertBody: alertBody,

@@ -37,7 +37,7 @@ class AFPrototypeHomeScreenParam extends AFRouteParam {
     required this.textControllers,
     required this.results,
     required this.view,
-  });
+  }): super(id: AFUIScreenID.screenPrototypeHome);
 
   AFPrototypeHomeScreenParam reviseFilter(String filter) {
     return copyWith(filter: filter);
@@ -48,10 +48,10 @@ class AFPrototypeHomeScreenParam extends AFRouteParam {
   }) {
     final controllers = AFTextEditingControllersHolder.createOne(AFUIWidgetID.textTestSearch, filter);
     return AFPrototypeHomeScreenParam(
-      filter: filter,
       view: viewFilter,
       results: <AFScreenTestResultSummary>[],
       textControllers: controllers,
+      filter: ""
     );
   }
 
@@ -91,7 +91,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
   AFPrototypeHomeScreen(): super(AFUIScreenID.screenPrototypeHome);
 
   @override
-  APrototypeHomeScreenStateView createStateViewAF(AFState state, AFPrototypeHomeScreenParam param, AFRouteParamWithChildren? withChildren) {
+  APrototypeHomeScreenStateView createStateViewAF(AFState state, AFPrototypeHomeScreenParam param, AFRouteSegmentChildren? withChildren) {
     final tests = AFibF.g.screenTests;
     return APrototypeHomeScreenStateView(tests);
   }
@@ -119,7 +119,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
     );
     
     protoRows.add(t.childListNav(title: AFUITranslationID.thirdParty, onPressed: () {
-      context.dispatch(AFPrototypeThirdPartyListScreen.navigateTo());
+      context.dispatch(AFPrototypeThirdPartyListScreen.navigatePush());
     }));
 
     protoRows.add(t.childListNav(title: AFUITranslationID.wireframes, onPressed: () {

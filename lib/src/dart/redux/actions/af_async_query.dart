@@ -55,8 +55,13 @@ class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatch
     return result;
   }
 
-  AFRouteParam? findRouteParam(AFScreenID screen) {
+  AFRouteSegment? findRouteSegment(AFScreenID screen) {
     return state.public.route.findParamFor(screen);
+  }
+
+  TRouteParam? findRouteParam<TRouteParam extends AFRouteParam>(AFScreenID screen) {
+    final seg = findRouteSegment(screen);
+    return seg?.param as TRouteParam?;
   }
 
   Logger? get log {
@@ -64,8 +69,8 @@ class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatch
   }
 
   /// Dispatches an action that updates the route parameter for the specified screen.
-  void updateRouteParam(AFScreenID screen, AFRouteParam param) {
-    dispatch(AFNavigateSetParamAction(screen: screen, param: param, route: AFNavigateRoute.routeHierarchy));
+  void updateRouteParam(AFRouteParam param) {
+    dispatch(AFNavigateSetParamAction(param: param, route: AFNavigateRoute.routeHierarchy));
   }
 
   /// Dispatches an action that updates a single value in the app state area associated

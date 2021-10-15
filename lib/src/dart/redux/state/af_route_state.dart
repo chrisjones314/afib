@@ -8,21 +8,117 @@ import 'package:afib/src/flutter/ui/screen/af_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:meta/meta.dart';
 
+
+@immutable
+class AFRouteSegmentChildren {
+  final Map<AFID, AFRouteSegment> children;
+
+  AFRouteSegmentChildren({
+    required this.children
+  });
+
+  factory AFRouteSegmentChildren.fromList(List<AFRouteParam> children) {
+    final result = <AFID, AFRouteSegment>{};
+    for(final child in children) {
+      result[child.id] = AFRouteSegment(param: child, children: null);
+    }
+    return AFRouteSegmentChildren(children: result);
+  }
+
+  factory AFRouteSegmentChildren.create() {
+    return AFRouteSegmentChildren(children: <AFID, AFRouteSegment>{});
+  }
+
+  int get size {
+    return children.length;
+  }
+
+  AFRouteSegmentChildren reviseAddChild(AFRouteParam param) {
+    final revised = Map<AFID, AFRouteSegment>.from(children);
+    revised[param.id] = AFRouteSegment(param: param, children: null);
+    return AFRouteSegmentChildren(children: revised);
+  }
+
+  AFRouteSegmentChildren reviseRemoveChild(AFID widChild) {
+    final revised = Map<AFID, AFRouteSegment>.from(children);
+    revised.remove(widChild);
+    return AFRouteSegmentChildren(children: revised);
+  }
+
+  AFRouteSegmentChildren reviseSetChild(AFRouteParam param) {
+    final revised = Map<AFID, AFRouteSegment>.from(children);
+    revised[param.id] = AFRouteSegment(param: param, children: null);
+    return AFRouteSegmentChildren(children: revised);
+  }
+
+  AFRouteSegment? findSegmentById(AFID id) {
+    return children[id];
+  }
+
+  TRouteParam? findParamById<TRouteParam extends AFRouteParam>(AFID id) {
+    final seg = findSegmentById(id);
+    if(seg == null) {
+      return null;
+    }
+    return seg.param as TRouteParam?;
+  }
+
+  int countOfChildren<TChildParam extends AFRouteParam>() {
+    var result = 0;
+    for(final childSeg in children.values) {
+      final childParam = childSeg.param;
+      if(childParam is TChildParam) {
+        result++;
+      }
+    }
+    return result;
+  }
+
+  List<TChildParam> paramsWithType<TChildParam extends AFRouteParam>() {
+    final result = <TChildParam>[];
+
+    for(final childSeg in children.values) {
+      final childParam = childSeg.param;
+      if(childParam is TChildParam) {
+        result.add(childParam);
+      }
+    }
+    return result;
+  }
+
+  Iterable<AFRouteSegment> get values {
+    return children.values;
+  }
+}
+
 /// A segment in the route which specifies a screen to display, and 
 /// transient data associated with that screen.
 @immutable 
 class AFRouteSegment {
-  final AFScreenID screen;
   final AFRouteParam param;
+  final AFRouteSegmentChildren? children;
 
   AFRouteSegment({
-    required this.screen, 
-    required this.param
+    required this.param,
+    required this.children,
   });
+
+  AFScreenID get screen  {
+    return param.id as AFScreenID;
+  }
+
+  AFRouteSegment? findChild(AFID wid) {
+    return children?.findSegmentById(wid);
+  }
+
+  AFRouteSegment reviseChildren(AFRouteSegmentChildren children) {
+    return copyWith(children: children);
+  }
 
   AFRouteSegment copyWith({
     AFScreenID? screen,
-    AFRouteParam? param
+    AFRouteParam? param,
+    AFRouteSegmentChildren? children,
   }) {
     final testParam = this.param;
     if(param != null && AFibD.config.isTestContext) {
@@ -38,8 +134,8 @@ class AFRouteSegment {
       }
     }
     return AFRouteSegment(
-      screen: screen ?? this.screen,
-      param: param ?? this.param
+      param: param ?? this.param,
+      children: children ?? this.children,
     );
   }
 
@@ -78,10 +174,14 @@ class AFRouteSegment {
     param.dispose();
   }
 
-  factory AFRouteSegment.withParam(AFScreenID screen, AFRouteParam param) {
+  factory AFRouteSegment.withParam(AFRouteParam param, List<AFRouteParam>? children) {
+    var childrenSeg;
+    if(children != null) {
+      childrenSeg = AFRouteSegmentChildren.fromList(children);
+    }
     return AFRouteSegment(
-      screen: screen,
-      param: param);
+      param: param,
+      children: childrenSeg);
   }
 }
 
@@ -199,11 +299,11 @@ class AFRouteStateSegments {
 
   /// Removes the current leaf from the route, and adds the specified screen
   /// and data in its place.
-  AFRouteStateSegments popAndPushNamed(AFScreenID screen, AFRouteParam param) {
+  AFRouteStateSegments popAndPushNamed(AFScreenID screen, AFRouteParam param, List<AFRouteParam>? children) {
     final revised = copyActive();
     final priorLastSegment = _cyclePrior(revised, 1);
 
-    revised.add(AFRouteSegment.withParam(screen, param));
+    revised.add(AFRouteSegment.withParam(param, children));
     return copyWith(
       active: revised,
       prior: priorLastSegment
@@ -211,9 +311,9 @@ class AFRouteStateSegments {
   }
 
   /// Adds a new screen/data below the current screen in the route.
-  AFRouteStateSegments pushNamed(AFScreenID screen, AFRouteParam param) {
+  AFRouteStateSegments pushNamed(AFRouteParam param, List<AFRouteParam>? children) {
     final newRoute = copyActive();
-    newRoute.add(AFRouteSegment.withParam(screen, param));
+    newRoute.add(AFRouteSegment.withParam( param, children));
     return copyWith(
       active: newRoute
     );
@@ -249,6 +349,7 @@ class AFRouteStateSegments {
     return popN(popCount, null);
   }
 
+  /*
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
   AFRouteStateSegments updateRouteParam(AFScreenID screen, AFRouteParam param) {
@@ -263,16 +364,32 @@ class AFRouteStateSegments {
 
     return copyWith(active: revised);
   }
+  */
+
+  AFRouteStateSegments updateRouteSegment(AFScreenID screen, AFRouteSegment revisedSeg) {
+    final revised = copyActive();
+    for(var i = revised.length - 1; i >= 0; i--) {
+      final seg = revised[i];
+      if(seg.matchesScreen(screen)) {
+        revised[i] = revisedSeg;
+        break;
+      }
+    }
+
+    return copyWith(active: revised);
+  }
+
+
 
   /// Removes all existing segments in the route, and adds back the specified screen/data.
-  AFRouteStateSegments replaceAll(AFScreenID screen, AFRouteParam param) {
+  AFRouteStateSegments replaceAll(AFRouteParam param, List<AFRouteParam>? children) {
 
     // this prevent us from removing afib test screens.
     final revised = List<AFRouteSegment>.of(active);
     final popCount = this.popCountToRoot;
     final priorLastSegment = _cyclePrior(revised, popCount);
 
-    revised.add(AFRouteSegment.withParam(screen, param));
+    revised.add(AFRouteSegment.withParam(param, children));
     return copyWith(
       active: revised,
       prior: priorLastSegment
@@ -349,7 +466,7 @@ class AFRouteState {
     final screen = <AFRouteSegment>[];
     final routeParamFactory = AFibF.g.startupRouteParamFactory;
     if(routeParamFactory == null) throw AFException("Missing startup route");
-    screen.add(AFRouteSegment.withParam(AFibF.g.effectiveStartupScreenId, routeParamFactory()));
+    screen.add(AFRouteSegment.withParam(routeParamFactory(), null));
     final screenSegs = AFRouteStateSegments(active: screen, prior: emptySegments);
     final globalPool = <AFScreenID, AFRouteSegment>{};
     return AFRouteState(screenHierarchy: screenSegs, globalPool: globalPool);
@@ -412,24 +529,24 @@ class AFRouteState {
   /// If [includePrior] is true, it will also include the most recent final segment
   /// in the search.  This is useful when the final segement has been popped off the route,
   /// but still needs to be included in the search.
-  AFRouteParam? findParamFor(AFScreenID screen, { bool includePrior = true }) {
+  AFRouteSegment? findParamFor(AFScreenID screen, { bool includePrior = true }) {
     final gp = globalPool;
     if(gp.containsKey(screen)) {
-      return gp[screen]?.param;
+      return gp[screen];
     }
     if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
       screen = AFUIScreenID.screenStartupWrapper;
     }
     final seg = screenHierarchy.findSegmentFor(screen, includePrior: includePrior);
-    return seg?.param.paramFor(screen);
+    return seg; //?.param.paramFor(screen);
   }
 
   /// Finds a drawer param for the drawer with the specified screen id. 
   /// 
   /// This may return null, in which case you should use the drawer's createRouteParam method
   /// to create an initial value.
-  AFRouteParam? findGlobalParam(AFScreenID screen) {
-    return globalPool[screen]?.param;
+  AFRouteSegment? findGlobalParam(AFScreenID screen) {
+    return globalPool[screen];
   }
 
   bool routeEntryExists(AFScreenID screen, { bool includePrior = true }) {
@@ -452,20 +569,21 @@ class AFRouteState {
 
   /// Removes the current leaf from the route, and adds the specified screen
   /// and data in its place.
-  AFRouteState popAndPushNamed(AFScreenID screen, AFRouteParam? param) {
+  AFRouteState popAndPushNamed(AFRouteParam? param, List<AFRouteParam>? children) {
     assert(param != null);
     if(param != null) {
+      final screen = param.id as AFScreenID;
       AFibD.logRouteAF?.d("popAndPushNamed: $screen / $param");
-      final revisedScreen = screenHierarchy.popAndPushNamed(screen, param);
+      final revisedScreen = screenHierarchy.popAndPushNamed(screen, param, children);
       return _reviseScreen(revisedScreen);
     }
     return this;
   }
 
   /// Adds a new screen/data below the current screen in the route.
-  AFRouteState pushNamed(AFScreenID screen, AFRouteParam param) {
-    AFibD.logRouteAF?.d("pushNamed: $screen / $param");
-    return _reviseScreen(screenHierarchy.pushNamed(screen, param));
+  AFRouteState pushNamed(AFRouteParam param, List<AFRouteParam>? children) {
+    AFibD.logRouteAF?.d("pushNamed: $param");
+    return _reviseScreen(screenHierarchy.pushNamed(param, children));
   }
 
   /// 
@@ -482,12 +600,12 @@ class AFRouteState {
 
   /// Remove the leaf element from the route, returning back to the parent
   /// screen.
-  AFRouteState popTo(AFScreenID screen, AFScreenID? push, AFRouteParam? pushParam, dynamic childReturn) {
-    AFibD.logRouteAF?.d("popTo: $screen and push($push, $pushParam) with return $childReturn");
+  AFRouteState popTo(AFScreenID screen, AFRouteParam? pushParam, List<AFRouteParam>? pushChildren, dynamic childReturn) {
+    AFibD.logRouteAF?.d("popTo: $screen and push($pushParam) with return $childReturn");
     final popCount = popCountToScreen(screen);
     var revised = popN(popCount, childReturn);
-    if(push != null && pushParam != null) {
-      revised = pushNamed(push, pushParam);
+    if(pushParam != null) {
+      revised = pushNamed(pushParam, pushChildren);
     }
     return revised;
   }
@@ -513,9 +631,21 @@ class AFRouteState {
         screen = AFUIScreenID.screenStartupWrapper;
       }
       AFibD.logRouteAF?.d("updateHierarchyParam: $screen, $param");
-      return _reviseScreen(screenHierarchy.updateRouteParam(screen, param));
+      final seg = screenHierarchy.findSegmentFor(screen, includePrior: true);
+      if(seg == null) {
+        throw AFException("No route segment for screen $screen");
+      }
+      final revisedSeg = seg.copyWith(param: param);      
+      return _reviseScreen(screenHierarchy.updateRouteSegment(screen, revisedSeg));
     } else {
-      return setGlobalPoolParam(screen, param);
+      var globalSeg = globalPool[screen];
+      if(globalSeg == null) {
+        globalSeg = AFRouteSegment(param: param, children: null);
+      } else {
+        globalSeg = globalSeg.copyWith(param: param);
+      }
+
+      return setGlobalPoolParam(screen, globalSeg);
     }
   }
 
@@ -526,11 +656,11 @@ class AFRouteState {
     final revisedRootSegs = this.screenHierarchy.popN(popCount, null);
     final screenMap = AFibF.g.screenMap;
 
-    final startupScreenId = screenMap.trueAppStartupScreenId;
-    final startupScreenParam = screenMap.trueCreateStartupScreenParam?.call();
-    if(startupScreenId == null || startupScreenParam == null) throw AFException("Missing startup screen id or parameter");
+    //final startupScreenId = screenMap.trueAppStartupScreenId;
+    var startupScreenParam = screenMap.trueCreateStartupScreenParam?.call();
+    if(startupScreenParam == null) throw AFException("Missing startup screen id or parameter");
 
-    final revisedSegs = revisedRootSegs.pushNamed(startupScreenId, startupScreenParam);
+    final revisedSegs = revisedRootSegs.pushNamed(startupScreenParam, null);
 
     return copyWith(
       globalPool: <AFScreenID, AFRouteSegment>{},
@@ -541,81 +671,74 @@ class AFRouteState {
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteState addConnectedChild(AFScreenID screen, AFWidgetID widget, AFRouteParam param) {
+  AFRouteState addChildParam(AFScreenID screen, AFNavigateRoute route, AFRouteParam param) {
+    final widget = param.id;
     AFibD.logRouteAF?.d("addConnectedChild $screen/$widget with $param");
-    return _reviseParamWithChildren(screen, widget, param, (pwc) => pwc.reviseAddChild(widget, param));
+    return _reviseParamWithChildren(screen, widget, route, param, (pwc) => pwc.reviseAddChild(param));
   }
 
   /// Removes the route parameter for the specified child widget from the screen.
-  AFRouteState removeConnectedChild(AFScreenID screen, AFWidgetID widget) {
+  AFRouteState removeChildParam(AFScreenID screen, AFID widget, AFNavigateRoute route) {
     AFibD.logRouteAF?.d("addConnectedChild $screen/$widget");
-    return _reviseParamWithChildren(screen, widget, null, (pwc) => pwc.reviseRemoveChild(widget));
+    return _reviseParamWithChildren(screen, widget, route, null, (pwc) => pwc.reviseRemoveChild(widget));
   }
 
-  AFRouteState setConnectedChildParam(AFScreenID screen, AFID widget, AFRouteParam param) {
-    AFibD.logRouteAF?.d("setConnectedChild $screen/$widget with $param");
-    return _reviseParamWithChildren(screen, widget, param, (pwc) => pwc.reviseChild(widget, param));
-  }
-
-  
-  AFRouteState sortConnectedChildren(AFScreenID screen, AFTypedSortDelegate sort, Type typeToSort) {
-    AFibD.logRouteAF?.d("addConnectedChild $screen/$sort");
-    return _reviseParamWithChildren(screen, null, null, (pwc) => pwc.reviseSortChildren(typeToSort, sort));
-  }
-
-  AFRouteState _reviseParamWithChildren(AFScreenID screen, AFID? wid, AFRouteParam? paramNew, AFRouteParamWithChildren Function(AFRouteParamWithChildren original) revise) { 
-    final p = _findParamInHierOrPool(screen);
-    var revisedParam;
-    if(p is! AFRouteParamWithChildren) {
-      final isPassthrough = wid?.endsWith(AFUIWidgetID.afibPassthroughSuffix) ?? false;
-      assert(paramNew != null && isPassthrough, "This should only happen for passthrough widgets");
-      assert(paramNew.runtimeType == p.runtimeType || p.runtimeType == AFPrototypeWidgetRouteParam);
-      revisedParam = paramNew;
-    } else {
-      final pwc = p;
-      revisedParam = revise(pwc);      
+  AFRouteState setChildParam(AFScreenID screen, AFNavigateRoute route, AFRouteParam param, { required bool useParentParam }) {
+    final widget = param.id;
+    if(useParentParam) {
+      return setParam(screen, param, AFNavigateRoute.routeHierarchy);
     }
-    return _setParamInHierOrPool(screen, revisedParam);
+    AFibD.logRouteAF?.d("setConnectedChild $screen/$widget with $param");
+    return _reviseParamWithChildren(screen, widget, route, param, (pwc) => pwc.reviseSetChild(param));
   }
 
-  AFRouteState _setParamInHierOrPool(AFScreenID screen, AFRouteParam revised) {
-    if(globalPool.containsKey(screen)) {
+  AFRouteState _reviseParamWithChildren(AFScreenID screen, AFID? wid, AFNavigateRoute route, AFRouteParam? paramNew, AFRouteSegmentChildren Function(AFRouteSegmentChildren original) revise) { 
+    final p = _findParamInHierOrPool(screen, route);
+    if(p == null) {
+      throw AFException("Could not find route parameter for screen $screen");
+    }
+    var children = p.children;
+    if(children == null) { 
+      if(paramNew != null) {
+        children = AFRouteSegmentChildren.create();
+      } else {
+        throw AFException("Cannot remove or sort empty list of children!");
+      }
+    }
+    final revisedChildren = revise(children);   
+    final revisedSeg = p.reviseChildren(revisedChildren);  
+    
+    return _setParamInHierOrPool(screen, route, revisedSeg);
+  }
+
+  AFRouteState _setParamInHierOrPool(AFScreenID screen, AFNavigateRoute route, AFRouteSegment revised) {
+    if(route == AFNavigateRoute.routeGlobalPool) {
       return setGlobalPoolParam(screen, revised);
     } else {
-      return _reviseScreen(screenHierarchy.updateRouteParam(screen, revised));    
+      return _reviseScreen(screenHierarchy.updateRouteSegment(screen, revised));    
     }
   }
 
-  AFRouteParam? _findParamInHierOrPool(AFScreenID screen) {
-    var p = globalPool[screen]?.param;
-    if(p == null) {
-      final segment = screenHierarchy.findSegmentFor(screen, includePrior: true);
-      p = segment?.param;
+  AFRouteSegment? _findParamInHierOrPool(AFScreenID screen, AFNavigateRoute route) {
+    if(route == AFNavigateRoute.routeGlobalPool) {
+      return globalPool[screen];
+    } else { 
+      return screenHierarchy.findSegmentFor(screen, includePrior: true);
     }
-    p = p?.paramFor(screen);
-    return p;
   }
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteState setGlobalPoolParam(AFScreenID screen, AFRouteParam param) {
-    AFibD.logRouteAF?.d("updateGlobalPoolParam: $screen, $param");
+  AFRouteState setGlobalPoolParam(AFScreenID screen, AFRouteSegment revisedSeg) {
     final revised = Map<AFScreenID, AFRouteSegment>.from(globalPool);
-    final current = revised[screen];
-    var revisedSeg;
-    if(current != null) {
-      revisedSeg = current.copyWith(param: param);
-    } else {
-      revisedSeg = AFRouteSegment(param: param, screen: screen);
-    }
     revised[screen] = revisedSeg;
-    AFibD.logRouteAF?.d("Set global param for $screen to $param");
     return copyWith(globalPool: revised);
   }
 
+
   /// Removes all existing segments in the route, and adds back the specified screen/data.
-  AFRouteState replaceAll(AFScreenID screen, AFRouteParam param) {
-    return _reviseScreen(screenHierarchy.replaceAll(screen, param));
+  AFRouteState replaceAll(AFRouteParam param, List<AFRouteParam>? children) {
+    return _reviseScreen(screenHierarchy.replaceAll(param, children));
   }
 
   //---------------------------------------------------------------------------------------

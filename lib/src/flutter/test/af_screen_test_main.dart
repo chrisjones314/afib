@@ -96,7 +96,7 @@ Future<void> _afStandardScreenTestMain<TState extends AFAppStateArea>(
       final dispatcher = AFSingleScreenTestDispatcher(prototype.id, storeDispatcher, null);
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, prototype.id, output, localStats);
       storeDispatcher.dispatch(AFResetToInitialStateAction());
-      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, stateViews: prototype.stateViews, screen: prototype.screenId, routeParam: prototype.routeParam, stateViewId: null, routeParamId: null));
+      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, stateViews: prototype.stateViews, navigate: prototype.navigate, stateViewId: null, routeParamId: null));
       dispatcher.setContext(context);
       simpleContexts.add(context);
 
@@ -125,7 +125,7 @@ Future<void> _afStandardScreenTestMain<TState extends AFAppStateArea>(
 Future<void> _afWidgetTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
   return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.widgetTests.all, "Widget", (test) {
     return [
-      AFStartPrototypeScreenTestAction(test, param: test.routeParam, stateView: test.stateViews, screen: test.screenId, stateViewId: null, routeParamId: null),
+      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, stateView: test.stateViews, stateViewId: null, routeParamId: null),
       AFPrototypeWidgetScreen.navigatePush(test as AFWidgetPrototype)
     ];
   });
@@ -135,11 +135,10 @@ Future<void> _afSingleScreenTestMain<TState extends AFAppStateArea>(AFCommandOut
   return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.screenTests.all, "Single-Screen", (test) {
     final stateViews = AFibF.g.testData.findStateViews(test.stateViews);
     return [
-      AFStartPrototypeScreenTestAction(test, param: test.routeParam, stateView: stateViews, screen: test.screenId, stateViewId: null, routeParamId: null),
+      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, stateView: stateViews, stateViewId: null, routeParamId: null),
       AFNavigatePushAction(
-        screen: test.screenId,
-        routeParam: test.routeParam
-        
+        routeParam: test.navigate.param,
+        children: test.navigate.children,
       )
     ];
   });

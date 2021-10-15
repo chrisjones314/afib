@@ -20,7 +20,7 @@ class AFPrototypeTestScreenParam extends AFRouteParam {
     required this.screenTestsByGroup,
     required this.title,
     this.filter
-  });
+  }): super(id: AFUIScreenID.screenPrototypeListSingleScreen);
 
 
   factory AFPrototypeTestScreenParam.createFromList({
@@ -80,7 +80,7 @@ class AFPrototypeTestScreen extends AFUIConnectedScreen<AFStateView, AFPrototype
   AFPrototypeTestScreen(): super(AFUIScreenID.screenPrototypeListSingleScreen);
 
   static AFNavigatePushAction navigatePush(List<AFScreenPrototype> tests, dynamic title) {
-    return AFNavigatePushAction(screen: AFUIScreenID.screenPrototypeListSingleScreen,
+    return AFNavigatePushAction(
       routeParam: AFPrototypeTestScreenParam.createFromList(title: title, tests: tests));
   }
 

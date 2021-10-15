@@ -12,11 +12,10 @@ typedef AFExceptionScreenBuilder = Widget Function(AFUIBuildContext<AFExceptionS
 /// build the correct screen widget for the leaf element in the route.
 class AFScreenMap {
 
-  AFScreenID? _startupScreenId;
   AFCreateRouteParamDelegate? _createStartupScreenParam;
-  AFScreenID? trueAppStartupScreenId;
   AFCreateRouteParamDelegate? trueCreateStartupScreenParam;
   AFExceptionScreenBuilder? exceptionScreenBuilder;
+  AFScreenID? _startupScreenId;
   final Map<AFScreenID, WidgetBuilder> _screens = <AFScreenID, WidgetBuilder>{};
   final Map<AFWidgetID, WidgetBuilder> _widgets = <AFWidgetID, WidgetBuilder>{};
 
@@ -57,12 +56,11 @@ class AFScreenMap {
 
   AFCreateRouteParamDelegate? get startupRouteParamFactory {
     return _createStartupScreenParam;
-  }
+}
 
   /// Call [startupScreen] once to specify the initial screen for your app.
   void startupScreen(AFScreenID screenId, AFCreateRouteParamDelegate createParam) {    
     if(_startupScreenId == null) {
-      trueAppStartupScreenId = screenId;
       trueCreateStartupScreenParam = createParam;
     }
     _startupScreenId = screenId;

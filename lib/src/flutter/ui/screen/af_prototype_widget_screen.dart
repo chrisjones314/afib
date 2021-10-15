@@ -18,7 +18,7 @@ class AFPrototypeWidgetRouteParam extends AFRouteParam {
   AFPrototypeWidgetRouteParam({
     required this.test, 
     required this.routeParam
-  });
+  }): super(id: AFUIScreenID.screenPrototypeWidget);
 
   AFPrototypeWidgetRouteParam copyWith({
     AFWidgetPrototype? test,
@@ -49,13 +49,12 @@ class AFPrototypeWidgetScreen extends AFUIConnectedScreen<AFPrototypeWidgetState
   static AFNavigateAction navigatePush(AFWidgetPrototype test, {AFID? id}) {
     return AFNavigatePushAction(
       id: id,
-      routeParam: AFPrototypeWidgetRouteParam(test: test, routeParam: AFRouteParam.unused),
-      screen: AFUIScreenID.screenPrototypeWidget,
+      routeParam: AFPrototypeWidgetRouteParam(test: test, routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeWidget)),
     );
   }
 
   @override
-  AFPrototypeWidgetStateView createStateViewAF(AFState state, AFPrototypeWidgetRouteParam param, AFRouteParamWithChildren? paramWithChildren) {
+  AFPrototypeWidgetStateView createStateViewAF(AFState state, AFPrototypeWidgetRouteParam param, AFRouteSegmentChildren? children) {
     return AFPrototypeWidgetStateView(state.testState, state.public.themes);
   }
 
@@ -78,13 +77,13 @@ class AFPrototypeWidgetScreen extends AFUIConnectedScreen<AFPrototypeWidgetState
     final testContext = testStateSource.findContext(test.id);
     final testState = testStateSource.findState(test.id);
     final testData = testState?.stateView ?? test.stateViews;
-    final sourceWidget = test.render(screenId, AFUIWidgetID.widgetPrototypeTest.with1(AFUIWidgetID.afibPassthroughSuffix));
+    final sourceWidget = test.render(this, AFUIWidgetID.widgetPrototypeTest);
     
     Widget resultWidget;
     if(test is AFConnectedWidgetPrototype && sourceWidget is AFConnectedWidget) {
-      final unusedParam = AFRouteParam.unused;
+      final unusedParam = AFRouteParamUnused.unused;
       var paramChild = context.p.routeParam;
-      if(paramChild == unusedParam) {
+      if(paramChild is AFRouteParamUnused) {
         paramChild = test.routeParam;
       }
       if(paramChild == null) throw AFException("Missing route param in test");
@@ -92,14 +91,14 @@ class AFPrototypeWidgetScreen extends AFUIConnectedScreen<AFPrototypeWidgetState
 
       final themeChild = sourceWidget.findFunctionalTheme(AFibF.g.storeInternalOnly!.state);
       final standard = AFStandardBuildContextData(
+        screenId: this.primaryScreenId,
         context: context.c,
         dispatcher: dispatcher,
         container: this,
-        paramWithChildren: null,
         themes: context.standard.themes,
       );
 
-      final childContext = sourceWidget.createContext(standard, testData, paramChild, themeChild);
+      final childContext = sourceWidget.createContext(standard, testData, paramChild, context.children, themeChild);
       resultWidget = sourceWidget.buildWithContext(childContext);
     } else {
       resultWidget = sourceWidget;

@@ -1,5 +1,6 @@
 
 
+import 'package:afib/afib_flutter.dart';
 import 'package:afib/id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
@@ -25,13 +26,13 @@ class AFPrototypeThirdPartyStateView extends AFStateView1<AFSingleScreenTests> {
 class AFPrototypeThirdPartyListScreen extends AFUIConnectedScreen<AFPrototypeThirdPartyStateView, AFRouteParam>{
   AFPrototypeThirdPartyListScreen(): super(AFUIScreenID.screenPrototypeThirdPartyList);
 
-  static AFNavigatePushAction navigateTo() {
-    return AFNavigatePushAction(screen: AFUIScreenID.screenPrototypeThirdPartyList,
-      routeParam: AFRouteParam.unused);
+  static AFNavigatePushAction navigatePush() {
+    return AFNavigatePushAction(
+      routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeThirdPartyList));
   }
 
   @override
-  AFPrototypeThirdPartyStateView createStateViewAF(AFState state, AFRouteParam param, AFRouteParamWithChildren? withChildren) {
+  AFPrototypeThirdPartyStateView createStateViewAF(AFState state, AFRouteParam param, AFRouteSegmentChildren? children) {
     final tests = AFibF.g.screenTests;
     return AFPrototypeThirdPartyStateView(tests);
   }

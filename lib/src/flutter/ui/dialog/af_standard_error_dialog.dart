@@ -10,7 +10,7 @@ class AFStandardErrorDialogRouteParam extends AFRouteParam {
   //--------------------------------------------------------------------------------------
   AFStandardErrorDialogRouteParam({
     required this.message
-  });
+  }): super(id: AFUIScreenID.dialogStandardError);
 
   //--------------------------------------------------------------------------------------
   factory AFStandardErrorDialogRouteParam.createOncePerScreen(String message) {
@@ -27,7 +27,6 @@ class AFStandardErrorDialog extends AFUIConnectedDialog<AFStateView, AFStandardE
   //--------------------------------------------------------------------------------------
   static AFNavigatePushAction navigatePush(String message) {
     return AFNavigatePushAction(
-      screen: AFUIScreenID.dialogStandardError,
       routeParam: AFStandardErrorDialogRouteParam.createOncePerScreen(message)
     );
   }

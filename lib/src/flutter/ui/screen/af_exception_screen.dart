@@ -19,7 +19,7 @@ class AFExceptionScreenRouteParam extends AFRouteParam {
   AFExceptionScreenRouteParam({
     required this.exception,
     required this.stack
-  });
+  }): super(id: AFUIScreenID.screenException);
 }
 
 /// Data used to render the screen
@@ -39,7 +39,7 @@ class AFExceptionScreen extends AFUIConnectedScreen<AFExceptionScreenStateView, 
   AFExceptionScreen(): super(AFUIScreenID.screenException);
 
   @override
-  AFExceptionScreenStateView createStateViewPublic(AFPublicState state, AFExceptionScreenRouteParam param, AFRouteParamWithChildren? withChildren) {
+  AFExceptionScreenStateView createStateViewPublic(AFPublicState state, AFExceptionScreenRouteParam param, AFRouteSegmentChildren? children) {
     return AFExceptionScreenStateView(state);
   }
 

@@ -1,9 +1,6 @@
 import 'package:afib/id.dart';
-import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
-import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:meta/meta.dart';
-import 'package:quiver/core.dart';
 
 /// Can be used in cases where no route param is necessary
 
@@ -11,9 +8,12 @@ import 'package:quiver/core.dart';
 /// in the [AFRoute]
 @immutable
 class AFRouteParam {
-  static const unused = AFRouteParam();
+  // a screen or widget id this route parameter is associated with.
+  final AFID id;
 
-  const AFRouteParam();
+  const AFRouteParam({
+    required this.id
+  });
 
   bool matchesScreen(AFScreenID screen) {
     return false;
@@ -41,6 +41,33 @@ class AFRouteParam {
   }
 }
 
+/// Used internally in test cases where we need to substitute a different screen id,
+/// for the original screen id in a route param passed to a test.   You can call 
+/// unwrap to get the original route param of the correct type.
+@immutable
+class AFRouteParamWrapper extends AFRouteParam {
+  final AFRouteParam original;
+
+  AFRouteParamWrapper({
+    required AFID screenId,
+    required this.original,
+  }): super(id: screenId);
+  
+  AFRouteParam unwrap() { return original; }
+}
+
+
+class AFRouteParamUnused extends AFRouteParam {
+  static const unused = AFRouteParamUnused(id: AFUIScreenID.unused);
+
+  const AFRouteParamUnused({ required AFScreenID id} ): super(id: id);
+
+  factory AFRouteParamUnused.create({
+    required AFScreenID id
+  }) {
+    return AFRouteParamUnused(id: id);
+  }
+}
 
 class AFRouteParamChild {
   final AFID widgetId;
@@ -63,6 +90,7 @@ class AFRouteParamChild {
   }
 }
 
+/*
 /// A utility to build AFRouteParamWithChildren
 class AFRouteParamWithChildrenBuilder {
   final AFRouteParamChild primary;
@@ -93,7 +121,6 @@ class AFRouteParamWithChildrenBuilder {
     return AFRouteParamWithChildren(children: children, primary: primary, activeSort: activeSort);
   }
 }
-
 
 /// Used in cases where a parent screen has children which 
 /// are independently connected to the store.
@@ -267,3 +294,4 @@ class AFRouteParamWithChildren extends AFRouteParam {
     }
   }
 }
+*/

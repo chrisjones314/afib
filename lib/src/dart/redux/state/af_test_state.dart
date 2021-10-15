@@ -1,3 +1,4 @@
+import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -13,19 +14,17 @@ class AFSingleScreenTestState {
   final List<String> errors;
   final String? stateViewId;
   final dynamic stateView;
-  final dynamic param;
+  final AFNavigatePushAction navigate;
   final dynamic routeParamId;
-  final AFScreenID screen;
 
   AFSingleScreenTestState({
     required this.testId,
+    required this.navigate,
     required this.pass, 
     required this.errors, 
     required this.stateViewId,
     required this.stateView, 
-    required this.param, 
     required this.routeParamId,
-    required this.screen
   });
 
   AFSingleScreenTestState reviseStateView(dynamic data) {
@@ -84,8 +83,7 @@ class AFSingleScreenTestState {
       stateView: stateView ?? this.stateView,
       errors: errors ?? this.errors,
       pass: pass ?? this.pass,
-      param: this.param,
-      screen: this.screen,
+      navigate: this.navigate,
       testId: this.testId,
       stateViewId: this.stateViewId,
       routeParamId: this.routeParamId,
@@ -119,7 +117,7 @@ class AFTestState {
 
   AFBaseTestID? findTestForScreen(AFScreenID? screen) {
     for(final testState in testStates.values) {
-      if(testState.screen == screen) {
+      if(testState.navigate.screenId == screen) {
         return testState.testId;
       }
     }
@@ -144,8 +142,8 @@ class AFTestState {
     return testStates[id];
   }
 
-  AFTestState navigateToTest(AFScreenPrototype test, dynamic param, dynamic data, AFScreenID screen, String? stateViewId, String? routeParamId) {
-    final revisedStates = _createTestState(test.id, param, data, screen, stateViewId, routeParamId);
+  AFTestState navigateToTest(AFScreenPrototype test, AFNavigatePushAction navigate, dynamic data, String? stateViewId, String? routeParamId) {
+    final revisedStates = _createTestState(test.id, test.navigate, data, stateViewId, routeParamId);
     final revisedActive = List<AFBaseTestID>.from(activeTestIds);
     revisedActive.add(test.id);
     return copyWith(activeTestIds: revisedActive, testStates: revisedStates);
@@ -185,11 +183,11 @@ class AFTestState {
     return copyWith(activeWireframe: wireframe);
   }
 
-  Map<AFBaseTestID, AFSingleScreenTestState> _createTestState(AFBaseTestID testId, dynamic param, dynamic data, AFScreenID screen, String? stateViewId, String? routeParamId) {
+  Map<AFBaseTestID, AFSingleScreenTestState> _createTestState(AFBaseTestID testId, AFNavigatePushAction navigate, dynamic data, String? stateViewId, String? routeParamId) {
     final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
       final orig = testStates[testId];
     if(orig == null) {
-      revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: <String>[], stateView: data, routeParamId: routeParamId, stateViewId: stateViewId, param: param, screen: screen);
+      revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: <String>[], stateView: data, routeParamId: routeParamId, stateViewId: stateViewId, navigate: navigate);
     } else {
       revisedStates[testId] = orig.copyWith(pass: 0, errors: <String>[]);
     }
@@ -197,11 +195,11 @@ class AFTestState {
 
   }
 
-  AFTestState startTest(AFScreenTestContext simulator, dynamic param, dynamic data, AFScreenID screen, String? stateViewId, String? routeParamId) {
+  AFTestState startTest(AFScreenTestContext simulator, AFNavigatePushAction navigate, dynamic data, String? stateViewId, String? routeParamId) {
     final testId = simulator.testId;
     final revisedContexts = Map<AFBaseTestID, AFScreenTestContext>.from(testContexts);
     revisedContexts[testId] = simulator;
-    final revisedStates = _createTestState(testId, param, data, screen, stateViewId, routeParamId);
+    final revisedStates = _createTestState(testId, navigate, data, stateViewId, routeParamId);
     var revisedActive = activeTestIds;
     if(activeTestIds.isEmpty || activeTestIds.last != simulator.testId) {
       revisedActive = List<AFBaseTestID>.from(activeTestIds);

@@ -111,7 +111,14 @@ class AFUITheme extends AFFunctionalTheme {
       tagsText.write("tags: ");
       tagsText.write(prototype.id.tagsText);
     }
-    final onPressed = onTap ?? () => prototype.startScreen(dispatcher, AFibF.g.testData);
+    final onPressed = onTap ?? () {
+      dispatcher.dispatch(AFNavigateSetParamAction(
+        param: AFPrototypeDrawerRouteParam.createOncePerScreen(AFPrototypeDrawerRouteParam.viewTest),
+        children: null,
+        route: AFNavigateRoute.routeGlobalPool
+      ));
+      prototype.startScreen(dispatcher, AFibF.g.testData);
+    };
     return childListTileNavDown(
       wid: prototype.id,
       title: titleRow,

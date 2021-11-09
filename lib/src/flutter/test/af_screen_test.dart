@@ -2065,6 +2065,10 @@ class AFStateTestDefinitionContext extends AFBaseTestDefinitionContext {
     test.createResponse(querySpecifier, delegate);
   }
 
+  void specifyDynamicCrossQueryResponse(AFStateTest test, dynamic querySpecifier, dynamic listenerSpecifier, List<AFCreateQueryResultDelegate> delegates) {
+    test.createCrossQueryResponse(querySpecifier, listenerSpecifier, delegates);
+  }
+
   /// Use this method to execute a query and validate the state change which it causes.
   void executeQuery(AFStateTest test, AFAsyncQuery query, {
     AFProcessVerifyDifferenceDelegate? verify

@@ -1537,6 +1537,14 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return fundamentals.colorPrimary;
   }
 
+  Color get colorPrimaryDisabled {
+    final result = Colors.grey[400];
+    if(result == null) {
+      return Colors.grey;
+    }
+    return result;
+  }
+
   /// The foreground color on a primary background from [ThemeData]
   Color get colorOnPrimary {
     return fundamentals.colorOnPrimary;
@@ -1796,7 +1804,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   Widget childButton({
     AFWidgetID? wid,
     required Widget child,
-    required AFPressedDelegate onPressed,
+    required AFPressedDelegate? onPressed,
     Color? color,
     Color? textColor    
   }) {
@@ -1817,12 +1825,13 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   Widget childButtonPrimary({
     AFWidgetID? wid,
     required Widget child,
-    required AFPressedDelegate onPressed,
+    required AFPressedDelegate? onPressed,
   }) {
     return childButton(
       wid: wid,
       child: child,
       color: colorPrimary,
+      
       textColor: colorOnPrimary,
       onPressed: onPressed
     );
@@ -2683,16 +2692,16 @@ need to manually update the value in the controller.
         if(shouldAsk && !AFibD.config.isTestContext) {
           // set up the buttons
           // show the dialog
-          context.showDialog(
+          context.showDialog<AFShouldContinueRouteParam>(
             screenId: screen,
             param: param,
             onReturn: (param) {
-              if(param is! AFShouldContinue) {
-                throw AFException("The dialog for standardShouldContinueAlertCheck must return an AFShouldContinue value");
+              if(param != null) {
+                final should = param;
+                completer.complete(should.shouldContinue);
               }
-              final should = param;
-              completer.complete(should);
             }
+
           );
         } else {
           completer.complete(AFShouldContinue.yesContinue);

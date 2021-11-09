@@ -618,6 +618,10 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     }
   }
 
+  AFAsyncQueryListener? findListenerQueryById(String key) {
+    return listenerQueries[key];
+  }
+
   /// testOnlySetForcedStartupScreen
   void testOnlySetForcedStartupScreen(AFScreenID id) {
     forcedStartupScreen = id;

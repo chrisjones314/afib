@@ -924,6 +924,20 @@ class AFBuildContext<TState extends AFAppStateArea, TStateView extends AFStateVi
     standard.dispatcher.dispatch(action); 
   }
 
+  TChildRouteParam? findChild<TChildRouteParam extends AFRouteParam>(AFWidgetID wid) {
+    final childrenN = children;
+    if(childrenN == null) {
+      return null;
+    }
+    for(final child in childrenN.values) {
+      final param = child.param;
+      if(param is TChildRouteParam) {
+        return param;
+      }
+    }
+    return null;
+  }
+
   Iterable<TChildRouteParam> childrenOfType<TChildRouteParam extends AFRouteParam>() {
     final result = <TChildRouteParam>[];
     final childrenN = children;

@@ -35,9 +35,16 @@ abstract class AFDeferredQuery<TState extends AFAppStateArea> extends AFAsyncQue
   void _delayThenExecute(AFStartQueryContext<AFUnused> context) {
     final nextD = nextDelay;
     if(nextD == null) return;
+    if(nextD.inMicroseconds == 0) {
+      context.onSuccess(AFUnused.unused);
+      if(nextDelay == null) {
+        afShutdown();
+      }
+      return;
+    }
     timer = Timer.periodic(nextD, (_) {
       AFibD.logQueryAF?.d("Executing finishAsyncExecute for deferred query $this");
-      context.onSuccess(AFUnused());
+      context.onSuccess(AFUnused.unused);
       if(nextDelay == null) {
         afShutdown();
       } else {

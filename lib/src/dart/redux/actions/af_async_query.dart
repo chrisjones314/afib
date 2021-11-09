@@ -34,7 +34,7 @@ class AFStartQueryContext<TResponse> {
 
 class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatcherMixin, AFContextShowMixin {
   final AFDispatcher dispatcher;
-  final AFState state;
+  AFState state;
 
   AFFinishQueryContext({
     required this.dispatcher, 
@@ -63,15 +63,37 @@ class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatch
     final seg = findRouteSegment(screen);
     return seg?.param as TRouteParam?;
   }
+  TRouteParam? findChildRouteParam<TRouteParam extends AFRouteParam>(AFScreenID screen, AFID child) {
+    final seg = findRouteSegment(screen);
+    final result = seg?.children?.findParamById(child);
+    return result as TRouteParam?;
+  }
+
 
   Logger? get log {
     return AFibD.log(AFConfigEntryLogArea.query);
   }
 
   /// Dispatches an action that updates the route parameter for the specified screen.
-  void updateRouteParam(AFRouteParam param) {
-    dispatch(AFNavigateSetParamAction(param: param, route: AFNavigateRoute.routeHierarchy));
+  void updateRouteParam(AFRouteParam param, { 
+    AFNavigateRoute route = AFNavigateRoute.routeHierarchy
+  }) {
+    dispatch(AFNavigateSetParamAction(param: param, route: route));
   }
+
+  /// Dispatches an action that updates the route parameter for the specified screen.
+  void updateChildRouteParam(AFScreenID screen, AFRouteParam param, { 
+    bool useParentParam = false,
+    AFNavigateRoute route = AFNavigateRoute.routeHierarchy
+  }) {
+    dispatch(AFNavigateSetChildParamAction(
+      screen: screen,
+      param: param, 
+      route: route,
+      useParentParam: useParentParam
+    ));
+  }
+
 
   /// Dispatches an action that updates a single value in the app state area associated
   /// with the [TState] type parameter.
@@ -161,6 +183,9 @@ abstract class AFAsyncQuery<TState extends AFAppStateArea, TResponse> extends AF
   void finishAsyncWithResponseAF(AFFinishQuerySuccessContext<TState, TResponse> context) {
     finishAsyncWithResponse(context);
     final onSuccessD = onSuccessDelegate;
+
+    // finishAsyncWithResponse might have updated the state.
+    context.state = AFibF.global!.storeInternalOnly!.state;
     if(onSuccessD != null) {
       onSuccessD(context);
     }
@@ -202,9 +227,10 @@ abstract class AFAsyncQuery<TState extends AFAppStateArea, TResponse> extends AF
 
   /// Called during testing to simulate results from an asynchronous call.
   void testFinishAsyncWithResponse(AFStateTestContext context, TResponse response) {
+    final afState = AFibF.g.storeInternalOnly!.state;
     final successContext = AFFinishQuerySuccessContext<TState, TResponse>(
       dispatcher: context.dispatcher, 
-      state: context.afState, 
+      state: afState, 
       response: response
     );
     finishAsyncWithResponseAF(successContext);

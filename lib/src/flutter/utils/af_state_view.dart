@@ -83,6 +83,55 @@ class AFStateViewExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> extends AFStat
   }
 }
 
+/// A version of [AFStateView] which allows for more type parameters.
+@immutable
+class AFStateViewExtended2<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8, TV9, TV10, TV11, TV12> extends AFStateViewExtended<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> {
+  final TV9 ninth;
+  final TV10 tenth;
+  final TV11 eleventh;
+  final TV12 twelfth;
+
+  AFStateViewExtended2({
+    required TV1 first, 
+    required TV2 second, 
+    required TV3 third, 
+    required TV4 fourth, 
+    required TV5 fifth, 
+    required TV6 sixth, 
+    required TV7 seventh, 
+    required TV8 eighth,
+    required this.ninth,
+    required this.tenth,
+    required this.eleventh,
+    required this.twelfth,
+    }):
+    super(
+      first: first, 
+      second: second, 
+      third: third, 
+      fourth: fourth,
+      fifth: fifth,
+      sixth: sixth,
+      seventh: seventh,
+      eighth: eighth,
+  );
+
+  bool operator==(dynamic o) {
+    final result = (o is AFStateViewExtended2<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8, TV9, TV10, TV11, TV12> 
+      && first == o.first && second == o.second && third == o.third && fourth == o.fourth
+      && fifth == o.fifth && sixth == o.sixth && seventh == o.seventh && eighth == o.eighth
+      && ninth == o.ninth && tenth == o.tenth && eleventh == o.eleventh && twelfth == o.twelfth);
+    return result;
+  }
+
+  int get hashCode {
+    final start = super.hashCode;
+    final next = hash4(fifth?.hashCode, sixth?.hashCode, seventh?.hashCode, eighth?.hashCode);
+    final next2 = hash4(ninth?.hashCode, tenth?.hashCode, eleventh?.hashCode, twelfth?.hashCode);
+    return hash3(start, next, next2);
+  }
+}
+
 /// Use this version of [AFStateView] if you only need one piece of data from the store.
 @immutable 
 class AFStateView1<TV1> extends AFStateView<TV1, AFUnused, AFUnused, AFUnused> {
@@ -168,4 +217,120 @@ class AFStateView8<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8> extends AFStateViewEx
     required TV8 eighth
   }): super(first: first, second: second, third: third, fourth: fourth, fifth: fifth, sixth: sixth, seventh: seventh, eighth: eighth);
 }
+
+class AFStateView9<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8, TV9> extends AFStateViewExtended2<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8, TV9, AFUnused, AFUnused, AFUnused> {
+  AFStateView9({
+    required TV1 first, 
+    required TV2 second, 
+    required TV3 third, 
+    required TV4 fourth, 
+    required TV5 fifth, 
+    required TV6 sixth, 
+    required TV7 seventh, 
+    required TV8 eighth,
+    required TV9 ninth,
+  }): super(
+    first: first, 
+    second: second, 
+    third: third, 
+    fourth: fourth, 
+    fifth: fifth, 
+    sixth: sixth, 
+    seventh: seventh, 
+    eighth: eighth, 
+    ninth: ninth,
+    tenth: AFUnused.unused,
+    eleventh: AFUnused.unused,
+    twelfth: AFUnused.unused,
+  );
+}
+
+class AFStateView10<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8, TV9, TV10> extends AFStateViewExtended2<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8, TV9, TV10, AFUnused, AFUnused> {
+  AFStateView10({
+    required TV1 first, 
+    required TV2 second, 
+    required TV3 third, 
+    required TV4 fourth, 
+    required TV5 fifth, 
+    required TV6 sixth, 
+    required TV7 seventh, 
+    required TV8 eighth,
+    required TV9 ninth,
+    required TV10 tenth,
+  }): super(
+    first: first, 
+    second: second, 
+    third: third, 
+    fourth: fourth, 
+    fifth: fifth, 
+    sixth: sixth, 
+    seventh: seventh, 
+    eighth: eighth, 
+    ninth: ninth,
+    tenth: tenth,
+    eleventh: AFUnused.unused,
+    twelfth: AFUnused.unused,
+  );
+}
+
+class AFStateView11<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8, TV9, TV10, TV11> extends AFStateViewExtended2<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8, TV9, TV10, TV11, AFUnused> {
+  AFStateView11({
+    required TV1 first, 
+    required TV2 second, 
+    required TV3 third, 
+    required TV4 fourth, 
+    required TV5 fifth, 
+    required TV6 sixth, 
+    required TV7 seventh, 
+    required TV8 eighth,
+    required TV9 ninth,
+    required TV10 tenth,
+    required TV11 eleventh,
+  }): super(
+    first: first, 
+    second: second, 
+    third: third, 
+    fourth: fourth, 
+    fifth: fifth, 
+    sixth: sixth, 
+    seventh: seventh, 
+    eighth: eighth, 
+    ninth: ninth,
+    tenth: tenth,
+    eleventh: eleventh,
+    twelfth: AFUnused.unused,
+  );
+}
+
+class AFStateView12<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8, TV9, TV10, TV11, TV12> extends AFStateViewExtended2<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8, TV9, TV10, TV11, TV12> {
+  AFStateView12({
+    required TV1 first, 
+    required TV2 second, 
+    required TV3 third, 
+    required TV4 fourth, 
+    required TV5 fifth, 
+    required TV6 sixth, 
+    required TV7 seventh, 
+    required TV8 eighth,
+    required TV9 ninth,
+    required TV10 tenth,
+    required TV11 eleventh,
+    required TV12 twelfth,
+  }): super(
+    first: first, 
+    second: second, 
+    third: third, 
+    fourth: fourth, 
+    fifth: fifth, 
+    sixth: sixth, 
+    seventh: seventh, 
+    eighth: eighth, 
+    ninth: ninth,
+    tenth: tenth,
+    eleventh: eleventh,
+    twelfth: twelfth,
+  );
+}
+
+
 

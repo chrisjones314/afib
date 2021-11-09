@@ -14,6 +14,7 @@ import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 
 abstract class AFStateTestExecute extends AFBaseTestExecute {
 
@@ -112,10 +113,31 @@ class AFStateTests<TState extends AFAppStateArea> {
 class _AFStateResultEntry {
   final dynamic querySpecifier;
   final AFProcessQueryDelegate? handler;
+  final Map<String, AFProcessQueryDelegate?>? crossHandlers;
   _AFStateResultEntry(
-    this.querySpecifier, 
-    this.handler
+    this.querySpecifier,
+    this.handler,
+    this.crossHandlers,
   );
+
+  _AFStateResultEntry reviseAddCross(String specifier, AFProcessQueryDelegate? handler) {
+    final orig = crossHandlers;
+    final cross = (orig == null) ? <String, AFProcessQueryDelegate?>{} : Map<String, AFProcessQueryDelegate?>.from(orig);
+    cross[specifier] = handler;
+    return copyWith(crossHandlers: cross);
+  }
+
+  _AFStateResultEntry copyWith({
+    AFProcessQueryDelegate? handler,
+    Map<String, AFProcessQueryDelegate?>? crossHandlers
+  }) {
+    return _AFStateResultEntry(
+      querySpecifier,
+      handler ?? this.handler,
+      crossHandlers ?? this.crossHandlers,
+    );
+  }
+
 }
 
 class _AFStateQueryBody {
@@ -155,9 +177,29 @@ class AFStateTest<TState extends AFAppStateArea> {
     }
   }
     
-  void registerResult(dynamic querySpecifier, AFProcessQueryDelegate handler) {
+  void registerResult(dynamic querySpecifier, AFProcessQueryDelegate? handler) {
+    _registerHandler(querySpecifier, handler);
+  }
+
+  void registerCrossResult(dynamic querySpecifier, dynamic listenerSpecifier, AFProcessQueryDelegate? handler) {
     final key = _specifierToId(querySpecifier);
-    results[key] = _AFStateResultEntry(querySpecifier, handler);
+    var result = results[key];
+    if(result == null) {
+      result = _AFStateResultEntry(querySpecifier, null, null);
+      results[key] = result;
+    }
+    final listenerId = _specifierToId(listenerSpecifier);
+    results[key] = result.reviseAddCross(listenerId, handler);
+  }
+
+  void _registerHandler(dynamic querySpecifier, AFProcessQueryDelegate? handler) {
+    final key = _specifierToId(querySpecifier);
+    var result = results[key];
+    if(result == null) {
+      result = _AFStateResultEntry(querySpecifier, handler, null);
+      results[key] = result;
+    } 
+    results[key] = result.copyWith(handler: handler);
   }
 
   String _specifierToId(dynamic querySpecifier) {
@@ -185,14 +227,33 @@ class AFStateTest<TState extends AFAppStateArea> {
   }
 
   void specifyNoResponse(dynamic querySpecifier, AFStateTestDefinitionContext definitions) {
-    final key = _specifierToId(querySpecifier);
-    results[key] = _AFStateResultEntry(querySpecifier, null);    
+    _registerHandler(querySpecifier, null);
   }
 
   void createResponse(dynamic querySpecifier, AFCreateQueryResultDelegate delegate) {
     registerResult(querySpecifier, (context, query) {
       final result = delegate(context, query);
       query.testFinishAsyncWithResponse(context, result);
+      return result;
+    });
+  }
+
+  void createCrossQueryResponse(dynamic querySpecifier, dynamic listenerSpecifier, List<AFCreateQueryResultDelegate> delegates) {
+    registerResult(querySpecifier, (context, query) {
+      final listenerId = _specifierToId(listenerSpecifier);
+      final listenerQuery = AFibF.g.findListenerQueryById(listenerId);
+
+      if(listenerQuery == null) {
+        return;
+      }
+
+      var result;
+      for(final delegate in delegates) {
+        result = delegate(context, query);
+        // in this case, we don't send the result to the original query, but rather a
+        // listener query they specified
+        listenerQuery.testFinishAsyncWithResponse(context, result);
+      }
       return result;
     });
   }

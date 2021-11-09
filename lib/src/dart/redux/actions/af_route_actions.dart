@@ -83,9 +83,9 @@ class AFNavigateReplaceAllAction extends AFNavigateAction {
     List<AFRouteParam>? children,
   }): super(id: id, param: param, children: children);
 
-  //factory AFNavigateReplaceAllAction.toStartupScreen({required AFRouteParam param}) {
-  //  return AFNavigateReplaceAllAction(screen: AFUIScreenID.screenStartupWrapper, param: param);
-  //}
+  factory AFNavigateReplaceAllAction.toStartupScreen({required AFRouteParam param}) {
+    return AFNavigateReplaceAllAction(param: param);
+  }
 }
 
 /// Action that adds a new screen after the current screen in the route.

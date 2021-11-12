@@ -81,7 +81,6 @@ class AFPrototypeWidgetScreen extends AFUIConnectedScreen<AFPrototypeWidgetState
     
     Widget resultWidget;
     if(test is AFConnectedWidgetPrototype && sourceWidget is AFConnectedWidget) {
-      final unusedParam = AFRouteParamUnused.unused;
       var paramChild = context.p.routeParam;
       if(paramChild is AFRouteParamUnused) {
         paramChild = test.routeParam;

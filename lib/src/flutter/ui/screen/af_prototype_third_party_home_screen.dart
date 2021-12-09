@@ -37,7 +37,7 @@ class AFPrototypeThirdPartyHomeScreen extends AFUIConnectedScreen<AFStateView, A
   }
 
   @override
-  AFStateView createStateView(AFAppStateArea? state, AFRouteParam param) {
+  AFStateView createStateView(AFBuildStateViewContext<AFAppStateArea?, AFRouteParam> context) {
     // this should never be called, because createStateViewAF replaces it.
     throw UnimplementedError();
   }

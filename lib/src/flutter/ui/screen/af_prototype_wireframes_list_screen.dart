@@ -9,6 +9,7 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/ui/af_prototype_base.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +40,7 @@ class AFPrototypeWireframesListScreen extends AFUIConnectedScreen<AFPrototypeWir
   }
 
   @override
-  AFPrototypeWireframesStateView createStateView(AFAppStateArea? state, AFRouteParam param) {
+  AFPrototypeWireframesStateView createStateView(AFBuildStateViewContext<AFAppStateArea?, AFRouteParam> context) {
     // this should never be called, because createStateViewAF replaces it.
     throw UnimplementedError();
   }

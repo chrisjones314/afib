@@ -59,7 +59,7 @@ class AFPrototypeWidgetScreen extends AFUIConnectedScreen<AFPrototypeWidgetState
   }
 
   @override
-  AFPrototypeWidgetStateView createStateView(AFAppStateArea? state, AFPrototypeWidgetRouteParam param) {
+  AFPrototypeWidgetStateView createStateView(AFBuildStateViewContext<AFAppStateArea?, AFPrototypeWidgetRouteParam> context) {
     // this should never be called, because createDataAF supercedes it.
     throw UnimplementedError();
   }

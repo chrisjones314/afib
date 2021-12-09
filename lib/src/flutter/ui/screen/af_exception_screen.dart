@@ -39,12 +39,12 @@ class AFExceptionScreen extends AFUIConnectedScreen<AFExceptionScreenStateView, 
   AFExceptionScreen(): super(AFUIScreenID.screenException);
 
   @override
-  AFExceptionScreenStateView createStateViewPublic(AFPublicState state, AFExceptionScreenRouteParam param, AFRouteSegmentChildren? children) {
-    return AFExceptionScreenStateView(state);
+  AFExceptionScreenStateView createStateViewAF(AFState state, AFExceptionScreenRouteParam param, AFRouteSegmentChildren? children) {
+    return AFExceptionScreenStateView(state.public);
   }
 
   @override
-  AFExceptionScreenStateView createStateView(AFAppStateArea? state, AFExceptionScreenRouteParam param) {
+  AFExceptionScreenStateView createStateView(AFBuildStateViewContext<AFAppStateArea?, AFExceptionScreenRouteParam> context) {
     // this should never be called, because createDataAF replaces it.
     throw UnimplementedError();
   }

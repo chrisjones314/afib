@@ -33,7 +33,7 @@ class AFStandardErrorDialog extends AFUIConnectedDialog<AFStateView, AFStandardE
 
   //--------------------------------------------------------------------------------------
   @override
-  AFStateView createStateView(AFAppStateArea? state, AFStandardErrorDialogRouteParam param) {
+  AFStateView createStateView(AFBuildStateViewContext<AFAppStateArea?, AFStandardErrorDialogRouteParam> context) {
     return AFStateView.unused();
   }
 

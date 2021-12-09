@@ -40,7 +40,7 @@ class AFStandardChoiceDialog extends AFUIConnectedDialog<AFStateView, AFStandard
 
   //--------------------------------------------------------------------------------------
   @override
-  AFStateView createStateView(AFAppStateArea? state, AFStandardChoiceDialogRouteParam param) {
+  AFStateView createStateView(AFBuildStateViewContext<AFAppStateArea?, AFStandardChoiceDialogRouteParam> context) {
     return AFStateView.unused();
   }
 

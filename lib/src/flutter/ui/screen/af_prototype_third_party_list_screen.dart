@@ -38,7 +38,7 @@ class AFPrototypeThirdPartyListScreen extends AFUIConnectedScreen<AFPrototypeThi
   }
 
   @override
-  AFPrototypeThirdPartyStateView createStateView(AFAppStateArea? state, AFRouteParam param) {
+  AFPrototypeThirdPartyStateView createStateView(AFBuildStateViewContext<AFAppStateArea?, AFRouteParam> context) {
     // this should never be called, because createStateViewAF replaces it.
     throw UnimplementedError();
   }

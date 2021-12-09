@@ -97,7 +97,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
   }
 
   @override
-  APrototypeHomeScreenStateView createStateView(AFAppStateArea? state, AFPrototypeHomeScreenParam param) {
+  APrototypeHomeScreenStateView createStateView(AFBuildStateViewContext<AFAppStateArea?, AFPrototypeHomeScreenParam> context) {
     // this should never be called, because createDataAF replaces it.
     throw UnimplementedError();
   }

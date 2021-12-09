@@ -1919,14 +1919,14 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   Widget childCard({ 
     required Widget child,
     AFWidgetID? wid,
-    EdgeInsets? padding,
+    EdgeInsets? margin,
     Color? color,
   }) {
     return Card(
       key: keyForWID(wid),
       color: color,
       child: Container(
-        margin: padding,
+        margin: margin,
         child: child,
       )
     );

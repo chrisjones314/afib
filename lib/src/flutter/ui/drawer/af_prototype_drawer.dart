@@ -97,7 +97,7 @@ class AFPrototypeDrawer extends AFProtoConnectedDrawer<AFPrototypeDrawerStateVie
 
   //--------------------------------------------------------------------------------------
   @override
-  AFPrototypeDrawerStateView createStateView(AFAppStateArea? state, AFPrototypeDrawerRouteParam param) {
+  AFPrototypeDrawerStateView createStateView(AFBuildStateViewContext<AFAppStateArea?, AFPrototypeDrawerRouteParam> context) {
     // this should never be called, because createDataAF replaces it.
     throw UnimplementedError();
   }

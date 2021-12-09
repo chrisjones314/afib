@@ -254,25 +254,18 @@ abstract class AFConnectedUIBase<TState extends AFAppStateArea, TTheme extends A
   bool routeEntryExists(AFState state) { return true; }
 
   TStateView createStateViewAF(AFState state, TRouteParam param, AFRouteSegmentChildren? children) {
-    return createStateViewPublic(state.public, param, children);
-  }
-
-  /// Override this instead of [createStateView] if you need access
-  /// to the full route state. 
-  /// 
-  /// However, be aware that a full route state does not exist in single
-  /// screen tests.
-  TStateView createStateViewPublic(AFPublicState public, TRouteParam param, AFRouteSegmentChildren? children) {
-    final state = public.areaStateFor(TState) as TState?;
-    if(state == null) {
+    final public = state.public;
+    final stateApp = public.areaStateFor(TState) as TState?;
+    if(stateApp == null) {
       assert(false);
       throw AFException("Root application state $TState cannot be null");
     }
-    return createStateView(state, param);
+    final stateViewCtx = AFBuildStateViewContext<TState, TRouteParam>(stateApp: stateApp, routeParam: param, statePublic: public, children: children);
+    return createStateView(stateViewCtx);
   }
 
   /// Override this to create an [AFStateView] with the required data from the state.
-  TStateView createStateView(TState state, TRouteParam param);
+  TStateView createStateView(AFBuildStateViewContext<TState, TRouteParam> state);
 
   /// Builds a Widget using the data extracted from the state.
   material.Widget buildWithContext(TBuildContext context);
@@ -855,6 +848,19 @@ class AFStandardBuildContextData {
     this.screenTest,
     required this.container,
     required this.themes,
+  });
+}
+
+class AFBuildStateViewContext<TState extends AFAppStateArea?, TRouteParam extends AFRouteParam> {
+  final AFPublicState statePublic;
+  final TState stateApp;
+  final AFRouteSegmentChildren? children;
+  final TRouteParam routeParam;
+  AFBuildStateViewContext({
+    required this.stateApp,
+    required this.statePublic,
+    required this.routeParam,
+    required this.children,
   });
 }
 

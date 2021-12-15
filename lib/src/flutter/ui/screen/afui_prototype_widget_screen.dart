@@ -1,76 +1,56 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/id.dart';
-import 'package:afib/src/dart/redux/state/af_test_state.dart';
+import 'package:afib/src/dart/redux/state/stateviews/afui_prototype_state_view.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
-import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
-import 'package:afib/src/flutter/ui/af_prototype_base.dart';
-import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
 /// Parameter uses to filter the tests shown on the screen.
 @immutable
-class AFPrototypeWidgetRouteParam extends AFRouteParam {
+class AFUIPrototypeWidgetRouteParam extends AFRouteParam {
   final AFWidgetPrototype test;
   final AFRouteParam? routeParam;
 
-  AFPrototypeWidgetRouteParam({
+  AFUIPrototypeWidgetRouteParam({
     required this.test, 
     required this.routeParam
   }): super(id: AFUIScreenID.screenPrototypeWidget);
 
-  AFPrototypeWidgetRouteParam copyWith({
+  AFUIPrototypeWidgetRouteParam copyWith({
     AFWidgetPrototype? test,
     AFRouteParam? param
   }) {
-    return AFPrototypeWidgetRouteParam(
+    return AFUIPrototypeWidgetRouteParam(
       test: test ?? this.test,
       routeParam: param ?? this.routeParam
     );
   }
 }
 
-/// Data used to render the screen
-class AFPrototypeWidgetStateView extends AFStateView2<AFTestState, AFThemeState> {
-  AFPrototypeWidgetStateView(AFTestState testState, AFThemeState themes): 
-    super(first: testState, second: themes);
-  
-  AFTestState? get testState { return first; }
-  AFThemeState? get themeState { return second; }
-}
-
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeWidgetScreen extends AFUIConnectedScreen<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam>{
+class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetRouteParam>{
 
-  AFPrototypeWidgetScreen(): super(AFUIScreenID.screenPrototypeWidget);
+  AFUIPrototypeWidgetScreen(): super(AFUIScreenID.screenPrototypeWidget);
 
   static AFNavigateAction navigatePush(AFWidgetPrototype test, {AFID? id}) {
     return AFNavigatePushAction(
       id: id,
-      routeParam: AFPrototypeWidgetRouteParam(test: test, routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeWidget)),
+      routeParam: AFUIPrototypeWidgetRouteParam(test: test, routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeWidget)),
     );
   }
 
   @override
-  AFPrototypeWidgetStateView createStateViewAF(AFState state, AFPrototypeWidgetRouteParam param, AFRouteSegmentChildren? children) {
-    return AFPrototypeWidgetStateView(state.testState, state.public.themes);
-  }
-
-  @override
-  AFPrototypeWidgetStateView createStateView(AFBuildStateViewContext<AFAppStateArea?, AFPrototypeWidgetRouteParam> context) {
-    // this should never be called, because createDataAF supercedes it.
-    throw UnimplementedError();
-  }
-
-  @override
-  Widget buildWithContext(AFUIBuildContext<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam> context) {    
+  Widget buildWithContext(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context) {    
     /// Remember what screen we are on for testing purposes.  Maybe eventually try to do this in navigator observer.
     return _buildScreen(context);
   }
 
-  Widget _buildScreen(AFUIBuildContext<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam> context) {
+  Widget _buildScreen(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context) {
+    /*
+    TODO: STATE VIEW REFACTOR FIX
     final test = context.p.test;
     final testStateSource = context.s.testState;
     if(testStateSource == null) { throw AFException("Missing test state source"); }
@@ -88,7 +68,7 @@ class AFPrototypeWidgetScreen extends AFUIConnectedScreen<AFPrototypeWidgetState
       if(paramChild == null) throw AFException("Missing route param in test");
       final dispatcher = AFWidgetScreenTestDispatcher(context: testContext, main: context.d, originalParam: context.p);
 
-      final themeChild = sourceWidget.findFunctionalTheme(AFibF.g.storeInternalOnly!.state);
+      final themeChild = sourceWidget.findPrimaryTheme(AFibF.g.storeInternalOnly!.state);
       final standard = AFStandardBuildContextData(
         screenId: this.primaryScreenId,
         context: context.c,
@@ -104,9 +84,11 @@ class AFPrototypeWidgetScreen extends AFUIConnectedScreen<AFPrototypeWidgetState
     }
 
     return _createScaffold(context, resultWidget);
+    */
+    return Text("TODO");
   }
 
-  Widget _createScaffold(AFUIBuildContext<AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam> context, Widget resultWidget) {
+  Widget _createScaffold(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context, Widget resultWidget) {
     final createWidget = context.p.test.createWidgetWrapperDelegate;
     if(createWidget != null) {
       return createWidget(context, resultWidget);

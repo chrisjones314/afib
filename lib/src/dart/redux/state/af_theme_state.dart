@@ -1427,6 +1427,20 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return fundamentals.themeData;
   }
 
+
+  // This function can be overriden to request that app-specific data 
+  // be included the AFFlexibleStateView passed by third-party components
+  // to theme functions that create widgets.  
+  //
+  // If you are overriding a function in a third party theme that creates
+  // a widget, and you need data from your state in that override, then 
+  // you can add the model objects you need access to here, and 
+  // access them within the override by calling [AFFlexibleStateView.findType]
+  // or [AFFlexibleStateView.findId].
+  void augmentModels(AFPublicState public, List<Object> models) {
+    
+  }
+
   /// A utility for creating a list of widgets in a row.   
   /// 
   /// This allows for a readable syntax like:
@@ -1959,12 +1973,12 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   Widget? _createDebugDrawer(Widget? drawer, int testDrawerSide) {
     final store = AFibF.g.storeInternalOnly;
     final state = store?.state;
-    final testState = state?.testState;
+    final testState = state?.private.testState;
     final activeTestId = testState?.activeTestId;
     if(activeTestId != null) {
       final test = AFibF.g.findScreenTestById(activeTestId);
       if(test != null && test.testDrawerSide == testDrawerSide) {
-        return AFPrototypeDrawer();
+        return AFUIPrototypeDrawer();
       }
     }
     return drawer;

@@ -30,12 +30,12 @@ class AFStateTestDifference {
     required this.afStateAfter,
   });
 
-  TAppState stateBefore<TAppState extends AFAppStateArea>() {
-    return _findAppState(afStateBefore)!;
+  TAppState stateBefore<TAppState extends AFFlexibleState>() {
+    return _findComponentState(afStateBefore)!;
   }
 
-  TAppState stateAfter<TAppState extends AFAppStateArea>() {
-    return _findAppState(afStateAfter)!;
+  TAppState stateAfter<TAppState extends AFFlexibleState>() {
+    return _findComponentState(afStateAfter)!;
   }
 
   TAppTheme? themeBefore<TAppTheme extends AFFunctionalTheme>(AFThemeID themeId) {
@@ -54,9 +54,9 @@ class AFStateTestDifference {
     return _routeFor(afStateAfter);
   }
 
-  TAppState? _findAppState<TAppState extends AFAppStateArea>(AFState state) {
-    final areas = state.public.areas;
-    return areas.stateFor(TAppState) as TAppState;
+  TComponentState? _findComponentState<TComponentState extends AFFlexibleState>(AFState state) {
+    final areas = state.public.components;
+    return areas.stateFor(TComponentState) as TComponentState;
   }
 
   TAppTheme? _findAppTheme<TAppTheme extends AFFunctionalTheme>(AFState state, AFThemeID themeId) {
@@ -69,7 +69,7 @@ class AFStateTestDifference {
   }
 }
 
-class AFStateTestContext<TState extends AFAppStateArea> extends AFStateTestExecute {
+class AFStateTestContext<TState extends AFFlexibleState> extends AFStateTestExecute {
   AFStateTest test;
   final AFStore store;
   AFDispatcher dispatcher;
@@ -80,7 +80,7 @@ class AFStateTestContext<TState extends AFAppStateArea> extends AFStateTestExecu
 
   AFStateTestID get testID { return this.test.id; }
   AFState get afState { return store.state; }
-  TState? get state { return store.state.public.areaStateFor(TState) as TState; }
+  TState? get state { return store.state.public.componentStateOrNull<TState>(); }
   AFRouteState get route { return store.state.public.route; }
 
   void processQuery(AFAsyncQuery q) {
@@ -89,7 +89,7 @@ class AFStateTestContext<TState extends AFAppStateArea> extends AFStateTestExecu
   }
 }
 
-class AFStateTests<TState extends AFAppStateArea> {
+class AFStateTests<TState extends AFFlexibleState> {
   final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
   final List<AFStateTest<dynamic>> tests = <AFStateTest<dynamic>>[];
   AFStateTestContext<dynamic>? context;
@@ -146,7 +146,7 @@ class _AFStateQueryBody {
   _AFStateQueryBody(this.query, this.verify);
 }
 
-class AFStateTest<TState extends AFAppStateArea> {
+class AFStateTest<TState extends AFFlexibleState> {
   final AFStateTests<TState> tests;
   final AFStateTestID id;
   AFStateTestID? idPredecessor;
@@ -157,7 +157,7 @@ class AFStateTest<TState extends AFAppStateArea> {
     registerResult(AFAlwaysFailQuery, (context, query) {
       query.testFinishAsyncWithError(context, AFQueryError(message: "Always fail in state test"));
     });
-    if(TState.runtimeType == AFAppStateArea) {
+    if(TState.runtimeType == AFFlexibleState) {
       throw AFException("You must explicitly specify your app state on AFStateTest instances");
     }
   }

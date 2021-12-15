@@ -40,7 +40,7 @@ mixin AFContextDispatcherMixin {
   void dispatchWireframe(AFScreenID screen, AFID widget, {
     dynamic eventParam
   }) {
-    if(!AFibD.config.isPrototypeMode || AFibF.g.storeInternalOnly?.state.testState.activeWireframe == null) {
+    if(!AFibD.config.isPrototypeMode || AFibF.g.storeInternalOnly?.state.private.testState.activeWireframe == null) {
       return;
     }
     dispatch(AFNavigateWireframeAction(

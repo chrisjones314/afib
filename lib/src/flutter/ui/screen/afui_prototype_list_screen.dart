@@ -1,29 +1,29 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/id.dart';
+import 'package:afib/src/dart/redux/state/stateviews/afui_prototype_state_view.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
-import 'package:afib/src/flutter/ui/af_prototype_base.dart';
-import 'package:afib/src/flutter/utils/af_state_view.dart';
+import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
 /// Parameter uses to filter the tests/protoypes shown on the screen.
 @immutable
-class AFPrototypeTestScreenParam extends AFRouteParam {
+class AFUIPrototypeTestScreenParam extends AFRouteParam {
   static const ungroupedGroup = "ungrouped";
   final String? filter;
   final dynamic title;
 
   final Map<String, List<AFScreenPrototype>> screenTestsByGroup;
 
-  AFPrototypeTestScreenParam({
+  AFUIPrototypeTestScreenParam({
     required this.screenTestsByGroup,
     required this.title,
     this.filter
   }): super(id: AFUIScreenID.screenPrototypeListSingleScreen);
 
 
-  factory AFPrototypeTestScreenParam.createFromList({
+  factory AFUIPrototypeTestScreenParam.createFromList({
     required dynamic title,
     required List<AFScreenPrototype> tests
   }) {
@@ -49,15 +49,15 @@ class AFPrototypeTestScreenParam extends AFRouteParam {
       });
     });
 
-    return AFPrototypeTestScreenParam(title: title, screenTestsByGroup: groups);
+    return AFUIPrototypeTestScreenParam(title: title, screenTestsByGroup: groups);
   }
 
-  AFPrototypeTestScreenParam copyWith({
+  AFUIPrototypeTestScreenParam copyWith({
     String? filter,
     String? title,
     Map<String, List<AFScreenPrototype>>? screenTestsByGroup
   }) {
-    return AFPrototypeTestScreenParam(
+    return AFUIPrototypeTestScreenParam(
       screenTestsByGroup: screenTestsByGroup ?? this.screenTestsByGroup,
       filter: filter ?? this.filter,
       title: title ?? this.title
@@ -65,32 +65,19 @@ class AFPrototypeTestScreenParam extends AFRouteParam {
   }
 }
 
-/// Data used to render the screen
-class AFPrototypeTestScreenStateView extends AFStateView1<AFSingleScreenTests> {
-  AFPrototypeTestScreenStateView(AFSingleScreenTests tests): 
-    super(first: tests);
-  
-  AFSingleScreenTests? get tests { return first; }
-}
-
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeTestScreen extends AFUIConnectedScreen<AFStateView, AFPrototypeTestScreenParam>{
+class AFUIPrototypeTestScreen extends AFUIConnectedScreen<AFUIPrototypeTestScreenParam>{
 
-  AFPrototypeTestScreen(): super(AFUIScreenID.screenPrototypeListSingleScreen);
+  AFUIPrototypeTestScreen(): super(AFUIScreenID.screenPrototypeListSingleScreen);
 
   static AFNavigatePushAction navigatePush(List<AFScreenPrototype> tests, dynamic title) {
     return AFNavigatePushAction(
-      routeParam: AFPrototypeTestScreenParam.createFromList(title: title, tests: tests));
+      routeParam: AFUIPrototypeTestScreenParam.createFromList(title: title, tests: tests));
   }
 
   @override
-  AFStateView createStateView(AFBuildStateViewContext<AFAppStateArea?, AFPrototypeTestScreenParam> context) {
-    return AFStateView.unused();
-  }
-
-  @override
-  Widget buildWithContext(AFUIBuildContext<AFStateView, AFPrototypeTestScreenParam> context) {
+  Widget buildWithContext(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeTestScreenParam> context) {
     return _buildList(context);
   }
 
@@ -100,7 +87,7 @@ class AFPrototypeTestScreen extends AFUIConnectedScreen<AFStateView, AFPrototype
     return result;
   }
 
-  Widget _buildList(AFUIBuildContext<AFStateView, AFPrototypeTestScreenParam> context) {
+  Widget _buildList(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeTestScreenParam> context) {
     final t = context.t;
     final rows = t.column();
     final groups = _sortIterable(context.p.screenTestsByGroup.keys);
@@ -116,7 +103,7 @@ class AFPrototypeTestScreen extends AFUIConnectedScreen<AFStateView, AFPrototype
     return context.t.buildPrototypeScaffold(context.p.title, rows, leading: leading);
   }
 
-  Widget _addGroup(AFUIBuildContext<AFStateView, AFPrototypeTestScreenParam> context, AFWidgetID widGroup, String group, List<AFScreenPrototype> tests) {
+  Widget _addGroup(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeTestScreenParam> context, AFWidgetID widGroup, String group, List<AFScreenPrototype> tests) {
     final t = context.t;
     final rows = t.column();
     for(final test in tests) {

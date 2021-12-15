@@ -11,7 +11,7 @@ import 'package:afib/src/flutter/test/af_unit_tests.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 
 /// The main function which executes the tests defined in your initUnitTests function.
-void afUnitTestMain<TState extends AFAppStateArea>(AFCommandOutput output, AFTestStats stats, AFDartParams paramsD) {
+void afUnitTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, AFDartParams paramsD) {
   if(!AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.unitTests)) {
     return;
   }

@@ -10,64 +10,88 @@ import 'package:meta/meta.dart';
 class AFPublicState {
   final AFRouteState route;
   final AFThemeState themes;
-  final AFAppStateAreas areas;
+  final AFComponentStates components;
 
   AFPublicState({
     required this.route,
     required this.themes,
-    required this.areas
+    required this.components
   });
 
-  AFAppStateArea? areaStateFor(Type areaType) {
-    return areas.stateFor(areaType);
+  T componentState<T extends AFFlexibleState>() {
+    return components.stateFor(T) as T;
+  }
+
+  T? componentStateOrNull<T extends AFFlexibleState>() {
+    return components.stateFor(T) as T?;
   }
 
   AFPublicState copyWith({
     AFRouteState? route,
     AFThemeState? themes,
-    AFAppStateAreas? areas,
+    AFComponentStates? components,
   }) {
     return AFPublicState(
-      areas: areas ?? this.areas,
+      components: components ?? this.components,
       themes: themes ?? this.themes,
       route: route ?? this.route,
     );
   }
 }
 
+
+class AFPrivateState {
+  final AFTestState testState;
+  
+  AFPrivateState({
+    required this.testState,
+  });
+
+  AFPrivateState copyWith({
+    AFTestState? testState,
+  }) {
+    return AFPrivateState(
+      testState: testState ?? this.testState,
+    );
+  }
+
+}
+
 /// The full application state of an Afib app, which contains 
 /// routing state managed by AFib, and the custom application state.
 @immutable
 class AFState {
-  final AFTestState testState;
   final AFPublicState public;
+  final AFPrivateState private;
 
   /// Construct an AFib state with the specified route and app state.
   AFState({
-    required this.testState,
+    required this.private,
     required this.public
   });
 
   /// 
   factory AFState.initialState() {
-    final areas = AFibF.g.createInitialAppStateAreas();
+    final components = AFibF.g.createInitialComponentStates();
     return AFState(
-      testState: AFTestState.initial(),
       public: AFPublicState(
         route: AFRouteState.initialState(),
-      themes: AFibF.g.initializeThemeState(areas: areas),
-        areas: areas
+        themes: AFibF.g.initializeThemeState(components: components),
+        components: components
       ),
+      private: AFPrivateState(
+        testState: AFTestState.initial(),
+      )
     );
   }  
 
   /// Modify the specified properties and leave everything else the same.
   AFState copyWith({
-    AFTestState? testState,
+    AFPrivateState? private,
     AFPublicState? public
   }) {
     return AFState(
-      testState: testState ?? this.testState,
+      private: private ?? this.private,
       public: public ?? this.public,
     );
   }

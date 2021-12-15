@@ -35,7 +35,7 @@ class AFibTestsFailedMatcher extends Matcher {
   }
 }
 
-Future<void> afTestMainUILibrary<TState extends AFAppStateArea>(AFLibraryID id, AFExtendBaseDelegate extendBase, AFExtendBaseDelegate extendBaseThirdParty, AFExtendUILibraryDelegate extendApp, AFExtendThirdPartyDelegate extendThirdParty, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
+Future<void> afTestMainUILibrary<TState extends AFFlexibleState>(AFLibraryID id, AFExtendBaseDelegate extendBase, AFExtendBaseDelegate extendBaseThirdParty, AFExtendUILibraryDelegate extendApp, AFExtendThirdPartyDelegate extendThirdParty, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
   final contextLibrary = AFUILibraryExtensionContext(id: id);
   extendApp(contextLibrary);
 
@@ -50,7 +50,7 @@ Future<void> afTestMainUILibrary<TState extends AFAppStateArea>(AFLibraryID id, 
 }
 
 /// The main function which executes the store test defined in your initStateTests function.
-Future<void> afTestMain<TState extends AFAppStateArea>(AFExtendBaseDelegate? extendBase, AFExtendBaseDelegate? extendBaseThirdParty, AFExtendAppDelegate extendApp, AFExtendThirdPartyDelegate? extendThirdParty, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
+Future<void> afTestMain<TState extends AFFlexibleState>(AFExtendBaseDelegate? extendBase, AFExtendBaseDelegate? extendBaseThirdParty, AFExtendAppDelegate extendApp, AFExtendThirdPartyDelegate? extendThirdParty, AFExtendTestDelegate extendTest, AFDartParams paramsD, WidgetTester widgetTester) async {
   final stopwatch = Stopwatch();
   stopwatch.start();
 

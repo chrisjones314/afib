@@ -32,7 +32,7 @@ class AFStartQueryContext<TResponse> {
   }
 }
 
-class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatcherMixin, AFContextShowMixin {
+class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextDispatcherMixin, AFContextShowMixin {
   final AFDispatcher dispatcher;
   AFState state;
 
@@ -50,7 +50,7 @@ class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatch
   }
 
   TState get s {
-    var result = state.public.areaStateFor(TState) as TState?;
+    var result = state.public.componentState<TState>();
     if(result == null) throw AFException("Missing $TState");
     return result;
   }
@@ -116,7 +116,7 @@ class AFFinishQueryContext<TState extends AFAppStateArea> with AFContextDispatch
 }
 
 
-class AFFinishQuerySuccessContext<TState extends AFAppStateArea, TResponse> extends AFFinishQueryContext<TState>  {
+class AFFinishQuerySuccessContext<TState extends AFFlexibleState, TResponse> extends AFFinishQueryContext<TState>  {
   final TResponse response;
   AFFinishQuerySuccessContext({
     required AFDispatcher dispatcher, 
@@ -130,7 +130,7 @@ class AFFinishQuerySuccessContext<TState extends AFAppStateArea, TResponse> exte
   }
 }
 
-class AFFinishQueryErrorContext<TState extends AFAppStateArea> extends AFFinishQueryContext<TState> {
+class AFFinishQueryErrorContext<TState extends AFFlexibleState> extends AFFinishQueryContext<TState> {
   final AFQueryError error;
   AFFinishQueryErrorContext({
     required AFDispatcher dispatcher, 
@@ -145,7 +145,7 @@ class AFFinishQueryErrorContext<TState extends AFAppStateArea> extends AFFinishQ
 
 /// Superclass for a kind of action that queries some data asynchronously, then knows
 /// how to process the result.
-abstract class AFAsyncQuery<TState extends AFAppStateArea, TResponse> extends AFActionWithKey {
+abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends AFActionWithKey {
   final List<dynamic>? successActions;
   final AFOnResponseDelegate<TState, TResponse>? onSuccessDelegate;
   final AFOnErrorDelegate<TState>? onErrorDelegate;
@@ -313,7 +313,7 @@ class AFConsolidatedQueryResponse {
   }
 }
 
-class AFConsolidatedQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TState, AFConsolidatedQueryResponse> {
+class AFConsolidatedQuery<TState extends AFFlexibleState> extends AFAsyncQuery<TState, AFConsolidatedQueryResponse> {
   static const queryFailedCode = 792;
   static const queryFailedMessage = "At least one query in a consolidated query failed.";
 
@@ -430,7 +430,7 @@ class AFConsolidatedQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TS
 /// Afib will automatically track these queries when you dispatch them.  You can dispatch the
 /// [AFShutdownQueryListeners] action to call the shutdown method on some or all outstanding
 /// listeners.  
-abstract class AFAsyncQueryListener<TState extends AFAppStateArea, TResponse> extends AFAsyncQuery<TState, TResponse> {
+abstract class AFAsyncQueryListener<TState extends AFFlexibleState, TResponse> extends AFAsyncQuery<TState, TResponse> {
   AFAsyncQueryListener({
     AFID? id, 
     List<dynamic>? successActions, 

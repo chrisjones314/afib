@@ -1,45 +1,40 @@
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/flutter/ui/af_prototype_base.dart';
+import 'package:afib/src/dart/redux/state/stateviews/afui_prototype_state_view.dart';
+import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:flutter/material.dart';
 
 //--------------------------------------------------------------------------------------
 @immutable
-class AFStandardErrorDialogRouteParam extends AFRouteParam {
+class AFUIStandardErrorDialogRouteParam extends AFRouteParam {
   final String message;
 
   //--------------------------------------------------------------------------------------
-  AFStandardErrorDialogRouteParam({
+  AFUIStandardErrorDialogRouteParam({
     required this.message
   }): super(id: AFUIScreenID.dialogStandardError);
 
   //--------------------------------------------------------------------------------------
-  factory AFStandardErrorDialogRouteParam.createOncePerScreen(String message) {
-    return AFStandardErrorDialogRouteParam(message: message);
+  factory AFUIStandardErrorDialogRouteParam.createOncePerScreen(String message) {
+    return AFUIStandardErrorDialogRouteParam(message: message);
   }
 }
 
 //--------------------------------------------------------------------------------------
-class AFStandardErrorDialog extends AFUIConnectedDialog<AFStateView, AFStandardErrorDialogRouteParam> {
+class AFUIStandardErrorDialog extends AFUIConnectedDialog<AFUIStandardErrorDialogRouteParam> {
 
   //--------------------------------------------------------------------------------------
-  AFStandardErrorDialog(): super(AFUIScreenID.dialogStandardError);
+  AFUIStandardErrorDialog(): super(AFUIScreenID.dialogStandardError);
 
   //--------------------------------------------------------------------------------------
   static AFNavigatePushAction navigatePush(String message) {
     return AFNavigatePushAction(
-      routeParam: AFStandardErrorDialogRouteParam.createOncePerScreen(message)
+      routeParam: AFUIStandardErrorDialogRouteParam.createOncePerScreen(message)
     );
   }
 
   //--------------------------------------------------------------------------------------
   @override
-  AFStateView createStateView(AFBuildStateViewContext<AFAppStateArea?, AFStandardErrorDialogRouteParam> context) {
-    return AFStateView.unused();
-  }
-
-  //--------------------------------------------------------------------------------------
-  @override
-  Dialog buildDialogWithContext(AFUIBuildContext<AFStateView, AFStandardErrorDialogRouteParam> context) {
+  Dialog buildDialogWithContext(AFUIBuildContext<AFUIPrototypeStateView, AFUIStandardErrorDialogRouteParam> context) {
     final t = context.t;
     final rows = t.column();
     

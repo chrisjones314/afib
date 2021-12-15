@@ -9,7 +9,7 @@ import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 
 /// The main function which executes the store test defined in your initStateTests function.
-void afStateTestMain<TState extends AFAppStateArea> (AFCommandOutput output, AFTestStats stats, AFDartParams paramsD) {
+void afStateTestMain<TState extends AFFlexibleState> (AFCommandOutput output, AFTestStats stats, AFDartParams paramsD) {
   if(!AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.stateTests)) {
     return;
   }
@@ -28,7 +28,7 @@ void afStateTestMain<TState extends AFAppStateArea> (AFCommandOutput output, AFT
       if(localStats.isEmpty) {
         printTestKind(output, testKind);
       }
-      final context = AFStateTestContext<TState>(test as AFStateTest<AFAppStateArea>, store, dispatcher, isTrueTestContext: true);
+      final context = AFStateTestContext<TState>(test as AFStateTest<AFFlexibleState>, store, dispatcher, isTrueTestContext: true);
       
       context.store.dispatch(AFResetToInitialStateAction());
       context.store.dispatch(AFResetToInitialRouteAction());

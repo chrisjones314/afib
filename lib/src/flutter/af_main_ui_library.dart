@@ -9,7 +9,7 @@ import 'package:afib/src/flutter/ui/theme/af_default_fundamental_theme.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 
 /// [afMain] handles startup, execution, and shutdown sequence for an afApp
-void afMainUILibrary<TState extends AFAppStateArea>(AFLibraryID id, AFDartParams paramsD, AFExtendBaseDelegate extendBase, AFExtendBaseDelegate extendBaseThirdParty, AFExtendUILibraryDelegate extendApp, AFExtendTestDelegate extendTest) {
+void afMainUILibrary<TState extends AFFlexibleState>(AFLibraryID id, AFDartParams paramsD, AFExtendBaseDelegate extendBase, AFExtendBaseDelegate extendBaseThirdParty, AFExtendUILibraryDelegate extendApp, AFExtendTestDelegate extendTest) {
   final contextLibrary = AFUILibraryExtensionContext(id: id);
   extendApp(contextLibrary);
 

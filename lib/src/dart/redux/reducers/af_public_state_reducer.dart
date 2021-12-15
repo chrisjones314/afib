@@ -10,6 +10,6 @@ AFPublicState afPublicStateReducer(AFPublicState state, dynamic action) {
   return state.copyWith(
     route: routeReducer(state.route, action),
     themes: afThemeStateReducer(state.themes, action),
-    areas: afAppAreaStateReducer(state.areas, action)
+    components: afComponentStateReducer(state.components, action)
   );
 }

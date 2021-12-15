@@ -9,12 +9,12 @@ import 'package:afib/src/flutter/test/af_wireframe.dart';
 class AFStartPrototypeScreenTestContextAction {
     final AFScreenTestContext context;
     final String? routeParamId;
-    final dynamic stateViews;
+    final dynamic models;
     final String? stateViewId;
     final AFNavigatePushAction navigate;
     AFStartPrototypeScreenTestContextAction(this.context, { 
       required this.navigate, 
-      required this.stateViews, 
+      required this.models, 
       required this.stateViewId,
       required this.routeParamId,
     });
@@ -35,15 +35,15 @@ class AFTestUpdateWireframeStateViews {
 }
 class AFStartPrototypeScreenTestAction {
     final AFScreenPrototype test;
-    final dynamic stateView;
+    final dynamic models;
     final AFNavigatePushAction navigate;
-    final String? stateViewId;
+    final String? modelsId;
     final String? routeParamId;
 
     AFStartPrototypeScreenTestAction(this.test, { 
-      this.stateView, 
+      this.models, 
       required this.navigate, 
-      required this.stateViewId,
+      required this.modelsId,
       required this.routeParamId,
     });
 }
@@ -57,10 +57,10 @@ class AFStartWireframeAction {
 }
 
 /// Update the 'store based' data for a prototype screen.
-class AFUpdatePrototypeScreenTestDataAction {
+class AFUpdatePrototypeScreenTestModelsAction {
   AFBaseTestID testId;
-  dynamic stateView;
-  AFUpdatePrototypeScreenTestDataAction(this.testId, this.stateView);
+  dynamic models;
+  AFUpdatePrototypeScreenTestModelsAction(this.testId, this.models);
 }
 
 class AFPrototypeScreenTestIncrementPassCount {

@@ -1,12 +1,8 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/id.dart';
-import 'package:afib/src/flutter/ui/af_prototype_base.dart';
-import 'package:afib/src/flutter/ui/screen/af_exception_screen.dart';
 import 'package:afib/src/flutter/ui/screen/af_startup_screen.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:flutter/material.dart';
-
-typedef AFExceptionScreenBuilder = Widget Function(AFUIBuildContext<AFExceptionScreenStateView, AFExceptionScreenRouteParam>);
 
 /// A mapping of screen identifiers to screen.  This mapping is used to 
 /// build the correct screen widget for the leaf element in the route.
@@ -14,7 +10,6 @@ class AFScreenMap {
 
   AFCreateRouteParamDelegate? _createStartupScreenParam;
   AFCreateRouteParamDelegate? trueCreateStartupScreenParam;
-  AFExceptionScreenBuilder? exceptionScreenBuilder;
   AFScreenID? _startupScreenId;
   final Map<AFScreenID, WidgetBuilder> _screens = <AFScreenID, WidgetBuilder>{};
   final Map<AFWidgetID, WidgetBuilder> _widgets = <AFWidgetID, WidgetBuilder>{};
@@ -70,10 +65,6 @@ class AFScreenMap {
   /// [screenKey] and screens built by the [WidgetBuilder]
   void screen(AFScreenID screenKey, WidgetBuilder screenBuilder) {
     _screens[screenKey] = screenBuilder;
-  }
-
-  void exceptionScreen(AFExceptionScreenBuilder screenBuilder) {
-    exceptionScreenBuilder = screenBuilder;
   }
 
   /// Returns the widget builder for the initial screen.

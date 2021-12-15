@@ -12,7 +12,7 @@ import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 
 /// A version of [AFAsyncQuery] for queries that should be run in the background
 /// after a delay.  
-abstract class AFDeferredQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TState, AFUnused> {
+abstract class AFDeferredQuery<TState extends AFFlexibleState> extends AFAsyncQuery<TState, AFUnused> {
   Duration? nextDelay;
   Timer? timer;
 
@@ -90,7 +90,7 @@ abstract class AFDeferredQuery<TState extends AFAppStateArea> extends AFAsyncQue
 
 /// A deferred query which waits a specified duration, then calls its onSuccessDelegate,
 /// but does not otherwise do anything.
-class AFDeferredSuccessQuery<TState extends AFAppStateArea> extends AFDeferredQuery<TState> {
+class AFDeferredSuccessQuery<TState extends AFFlexibleState> extends AFDeferredQuery<TState> {
 
   AFDeferredSuccessQuery(Duration delayOnce, AFOnResponseDelegate<TState, AFUnused> onSuccessDelegate, {AFID? id}): super(delayOnce, id: id, onSuccessDelegate: onSuccessDelegate);
   Duration? finishAsyncExecute(AFFinishQuerySuccessContext<TState, AFUnused> context) {

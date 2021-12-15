@@ -48,10 +48,13 @@ class AFTestErrors {
 
 
 
-abstract class AFBaseTestExecute {
+abstract class AFBaseTestExecute extends AFModelWithCustomID {
+  static const testExecuteId = "base_test_execute";
   static const titleColWidth = 60;
   static const resultColWidth = 5;
   static const resultSuffixColWidth = 8;
+
+  AFBaseTestExecute(): super(customStateId: testExecuteId);
 
   final sectionErrors = <AFID, AFTestErrors>{};
   AFID? currentSection;

@@ -5,7 +5,7 @@ import 'package:afib/src/flutter/af_material_app.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 
-class AFAppUILibrary extends AFMaterialApp<AFAppStateArea> {
+class AFAppUILibrary extends AFMaterialApp<AFFlexibleState> {
   AFAppUILibrary() : super();
 
   //----------------------------------------------------------------------------

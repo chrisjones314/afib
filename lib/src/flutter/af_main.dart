@@ -20,7 +20,7 @@ void afMainWrapper(Function() onReady) {
 
 
 /// [afMain] handles startup, execution, and shutdown sequence for an afApp
-void afMain<TState extends AFAppStateArea>(
+void afMain<TState extends AFFlexibleState>(
   AFDartParams paramsD, 
   AFExtendBaseDelegate? extendBase,
   AFExtendBaseDelegate? extendBaseThirdParty,

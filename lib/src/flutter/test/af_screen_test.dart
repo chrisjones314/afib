@@ -18,7 +18,7 @@ import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
 import 'package:afib/src/flutter/test/af_widget_actions.dart';
-import 'package:afib/src/flutter/ui/screen/af_prototype_widget_screen.dart';
+import 'package:afib/src/flutter/ui/screen/afui_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:collection/collection.dart';
@@ -1036,8 +1036,8 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   
   @override
   Future<void> updateStateViews(dynamic stateViews) {
-    final sv = AFibF.g.testData.findStateViews(stateViews);
-    dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.testId, sv));
+    final sv = AFibF.g.testData.findModels(stateViews);
+    dispatcher.dispatch(AFUpdatePrototypeScreenTestModelsAction(this.testId, sv));
     return pauseForRender();
   }
 
@@ -1169,12 +1169,12 @@ abstract class AFScreenPrototype {
   AFNavigatePushAction get navigate;
   List<String> paramDescriptions(AFScreenTestID id) { return <String>[]; }
   List<AFScreenTestID> get sectionIds { return <AFScreenTestID>[]; }
-  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, AFStateView? stateView });
+  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models });
   Future<void> run(AFScreenTestContext context, { Function onEnd});
   void onDrawerReset(AFDispatcher dispatcher);
   Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator? prevContext, AFSingleScreenTestState state, AFScreenTestID testId, Function onEnd);
   void openTestDrawer(AFScreenTestID id);
-  dynamic get stateViews;
+  dynamic get models;
   bool get isTestDrawerEnd { return testDrawerSide == testDrawerSideEnd; }
   bool get isTestDrawerBegin { return testDrawerSide == testDrawerSideBegin; }
 
@@ -1188,7 +1188,7 @@ abstract class AFScreenPrototype {
     }
 
     final testContext = AFScreenTestContextSimulator(dispatcher, this.id, runNumber, idSelected);
-    dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(testContext, navigate: navigate, stateViews: this.stateViews, stateViewId: null, routeParamId: null));
+    dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(testContext, navigate: navigate, models: this.models, stateViewId: null, routeParamId: null));
     return testContext;
   }
 
@@ -1197,14 +1197,14 @@ abstract class AFScreenPrototype {
 /// All the information necessary to render a single screen for
 /// prototyping and testing.
 class AFSingleScreenPrototype extends AFScreenPrototype {
-  dynamic stateViews;
+  dynamic models;
   final AFSingleScreenPrototypeBody body;
   //final AFConnectedScreenWithoutRoute screen;
   final AFNavigatePushAction navigate;
 
   AFSingleScreenPrototype({
     required AFPrototypeID id,
-    required this.stateViews,
+    required this.models,
     required this.navigate,
     required this.body,
   }): super(id: id);
@@ -1214,17 +1214,17 @@ class AFSingleScreenPrototype extends AFScreenPrototype {
   List<AFScreenTestDescription> get regressionTests { return  List<AFScreenTestDescription>.from(body.regressionTests); }
   
   @override
-  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, AFStateView? stateView }) {
-    final svp = stateView ?? this.stateViews;
+  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
+    final ms = models ?? this.models;
     final rvp = routeParam ?? this.navigate.param;
-    final sv = registry.f(svp);
+    final actualModels = registry.resolveStateViewModels(ms);
     final rp = registry.f(rvp);
 
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(
       this, 
       navigate: this.navigate,
-      stateView: sv, 
-      stateViewId: AFCompositeTestDataRegistry.filterTestId(svp),
+      models: actualModels, 
+      modelsId: AFCompositeTestDataRegistry.filterTestId(actualModels),
       routeParamId: AFCompositeTestDataRegistry.filterTestId(rvp),
     ));
     dispatcher.dispatch(AFNavigatePushAction(
@@ -1248,8 +1248,8 @@ class AFSingleScreenPrototype extends AFScreenPrototype {
 
   void onDrawerReset(AFDispatcher dispatcher) {
     AFSingleScreenPrototype.resetTestParam(dispatcher, this.id, this.navigate);
-    final sv = AFibF.g.testData.findStateViews(this.stateViews);
-    dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.id, sv));
+    final sv = AFibF.g.testData.findModels(this.models);
+    dispatcher.dispatch(AFUpdatePrototypeScreenTestModelsAction(this.id, sv));
   }
 
   @override
@@ -1265,7 +1265,7 @@ class AFSingleScreenPrototype extends AFScreenPrototype {
 
 
 abstract class AFWidgetPrototype extends AFScreenPrototype {
-  final dynamic stateViews;
+  final dynamic models;
   final AFSingleScreenPrototypeBody body;
   final AFRenderConnectedChildDelegate render;
   final AFCreateWidgetWrapperDelegate? createWidgetWrapperDelegate;
@@ -1273,7 +1273,7 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
   AFWidgetPrototype({
     required AFPrototypeID id,
     required this.body,
-    required this.stateViews,
+    required this.models,
     required this.render,
     this.createWidgetWrapperDelegate,
     String? title
@@ -1287,19 +1287,19 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
     body.openTestDrawer(id);
   }
 
-  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, AFStateView? stateView }) {
-    final svp = stateView ?? this.stateViews;
+  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
+    final ms = models ?? this.models;
     final rpp = routeParam ?? this.navigate.param;
 
-    final sv = registry.f(svp);
+    final actualModels = registry.f(ms);
     final rp = registry.f(rpp);
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, 
-      stateView: sv, 
+      models: actualModels, 
       navigate: AFNavigatePushAction(routeParam: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
-      stateViewId: AFCompositeTestDataRegistry.filterTestId(svp),
+      modelsId: AFCompositeTestDataRegistry.filterTestId(actualModels),
       routeParamId: AFCompositeTestDataRegistry.filterTestId(rpp),
     ));
-    dispatcher.dispatch(AFPrototypeWidgetScreen.navigatePush(this, id: this.id));    
+    dispatcher.dispatch(AFUIPrototypeWidgetScreen.navigatePush(this, id: this.id));    
   }
   
   Future<void> run(AFScreenTestExecute context, { Function? onEnd }) {
@@ -1324,11 +1324,11 @@ class AFConnectedWidgetPrototype extends AFWidgetPrototype {
 
   AFConnectedWidgetPrototype({
     required AFPrototypeID id,
-    required dynamic stateViews,
+    required dynamic models,
     required this.routeParam,
     required AFRenderConnectedChildDelegate render,
     required AFSingleScreenPrototypeBody body,
-  }): super(id: id, body: body, stateViews: stateViews, render: render);
+  }): super(id: id, body: body, models: models, render: render);
 
   List<AFScreenTestDescription> get smokeTests { return List<AFScreenTestDescription>.from(body.smokeTests); }
   List<AFScreenTestDescription> get reusableTests { return  List<AFScreenTestDescription>.from(body.reusableTests); }
@@ -1339,11 +1339,11 @@ class AFConnectedWidgetPrototype extends AFWidgetPrototype {
 
   void onDrawerReset(AFDispatcher dispatcher) {
     dispatcher.dispatch(AFNavigateSetParamAction(
-      param: AFPrototypeWidgetRouteParam(test: this, routeParam: this.routeParam),
+      param: AFUIPrototypeWidgetRouteParam(test: this, routeParam: this.routeParam),
       route: AFNavigateRoute.routeHierarchy
     ));
-    final sv = AFibF.g.testData.findStateViews(this.stateViews);
-    dispatcher.dispatch(AFUpdatePrototypeScreenTestDataAction(this.id, sv));
+    final sv = AFibF.g.testData.findModels(this.models);
+    dispatcher.dispatch(AFUpdatePrototypeScreenTestModelsAction(this.id, sv));
   }
 
 }
@@ -1351,7 +1351,7 @@ class AFConnectedWidgetPrototype extends AFWidgetPrototype {
 
 /// The information necessary to start a test with a baseline state
 /// (determined by a state test) and an initial screen/route.
-class AFWorkflowStatePrototype<TState extends AFAppStateArea> extends AFScreenPrototype {
+class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenPrototype {
   final dynamic subpath;
   final AFStateTestID stateTestId;
   final AFWorkflowStateTestPrototype body;
@@ -1367,7 +1367,7 @@ class AFWorkflowStatePrototype<TState extends AFAppStateArea> extends AFScreenPr
   List<AFScreenTestDescription> get reusableTests { return  List<AFScreenTestDescription>.from(body.reusableTests); }
   List<AFScreenTestDescription> get regressionTests { return  List<AFScreenTestDescription>.from(body.regressionTests); }
 
-  dynamic get stateViews { return null; }
+  dynamic get models { return null; }
   dynamic get routeParam { return null; }
   AFNavigatePushAction get navigate { return AFNavigatePushAction(routeParam: AFRouteParamUnused.unused); }
 
@@ -1383,17 +1383,17 @@ class AFWorkflowStatePrototype<TState extends AFAppStateArea> extends AFScreenPr
     return AFibF.g.screenTests;
   }
 
-  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, AFStateView? stateView }) {
+  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
     initializeMultiscreenPrototype<TState>(dispatcher, this);
   }
 
-  static void initializeMultiscreenPrototype<TState extends AFAppStateArea>(AFDispatcher dispatcher, AFWorkflowStatePrototype test) {
+  static void initializeMultiscreenPrototype<TState extends AFFlexibleState>(AFDispatcher dispatcher, AFWorkflowStatePrototype test) {
     dispatcher.dispatch(AFResetToInitialStateAction());
     final screenMap = AFibF.g.screenMap;
     dispatcher.dispatch(AFNavigatePushAction(
       routeParam: screenMap.trueCreateStartupScreenParam!.call()
     ));
-    dispatcher.dispatch(AFStartPrototypeScreenTestAction(test, navigate: test.navigate, stateViewId: null, routeParamId: null));
+    dispatcher.dispatch(AFStartPrototypeScreenTestAction(test, navigate: test.navigate, modelsId: null, routeParamId: null));
 
     // lookup the test.
     final testImpl = AFibF.g.stateTests.findById(test.stateTestId);
@@ -1455,10 +1455,10 @@ class AFWidgetTests<TState> {
     required AFRouteParam routeParam,
     AFNavigatePushAction? navigate,
   }) {
-    final sv = AFibF.g.testData.findStateViews(stateViews);    
+    final sv = AFibF.g.testData.findModels(stateViews);    
     final instance = AFConnectedWidgetPrototype(
       id: id,
-      stateViews: sv,
+      models: sv,
       routeParam: routeParam,
       render: render,
       body: AFSingleScreenPrototypeBody(id)
@@ -1599,13 +1599,13 @@ class AFSingleScreenTests<TState> {
   /// test for the screen.
   AFSingleScreenPrototypeBody addPrototype({
     required AFPrototypeID   id,
-    required dynamic stateViews,
+    required dynamic models,
     required AFNavigatePushAction navigate
   }) {
 
     final instance = AFSingleScreenPrototype(
       id: id,
-      stateViews: stateViews,
+      models: models,
       navigate: navigate,
       body: AFSingleScreenPrototypeBody(id, screenId: navigate.screenId)
     );
@@ -1642,11 +1642,11 @@ abstract class AFWorkflowTestExecute {
     bool verifyScreen = true
   });
 
-  Future<void> expectState<TState extends AFAppStateArea>( Future<void> Function(TState, AFRouteState) withState) async {
-    assert(TState != AFAppStateArea, "You must specify the state type as a type parameter");
+  Future<void> expectState<TState extends AFFlexibleState>( Future<void> Function(TState, AFRouteState) withState) async {
+    assert(TState != AFFlexibleState, "You must specify the state type as a type parameter");
     final public = AFibF.g.storeInternalOnly?.state.public;
     if(public == null) throw AFException("Missing public state");
-    return withState(public.areaStateFor(TState) as TState, public.route);
+    return withState(public.componentState<TState>(), public.route);
   }
 
   Logger? get log {
@@ -1675,7 +1675,7 @@ abstract class AFWorkflowTestExecute {
     required Function(AFScreenTestExecute) body,
   });
   
-  Future<void> pushQueryListener<TState extends AFAppStateArea, TQueryResponse>(AFAsyncQueryListener specifier, AFWorkflowTestDefinitionContext definitions, dynamic testData);
+  Future<void> pushQueryListener<TState extends AFFlexibleState, TQueryResponse>(AFAsyncQueryListener specifier, AFWorkflowTestDefinitionContext definitions, dynamic testData);
 }
 
 
@@ -1703,8 +1703,8 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     } 
   }
 
-  Future<void> pushQueryListener<TState extends AFAppStateArea, TQueryResponse>(AFAsyncQueryListener query, AFWorkflowTestDefinitionContext definitions, dynamic testData) async {
-    assert(TState != AFAppStateArea, "You need to specify a AFAppStateArea subclass as a type parameter");
+  Future<void> pushQueryListener<TState extends AFFlexibleState, TQueryResponse>(AFAsyncQueryListener query, AFWorkflowTestDefinitionContext definitions, dynamic testData) async {
+    assert(TState != AFFlexibleState, "You need to specify a AFFlexibleState subclass as a type parameter");
     assert(TQueryResponse != dynamic, "You need to specify a type for the query response");
     final td = definitions.td(testData);
     final successContext = AFFinishQuerySuccessContext<TState, TQueryResponse>(
@@ -1926,7 +1926,7 @@ class AFWorkflowStateTestPrototype {
 /// 
 /// These tests by combine an initial state from an [AFStateTest] with a series
 /// of screen manipulations from an [AFScreenTest]
-class AFWorkflowStateTests<TState extends AFAppStateArea> {
+class AFWorkflowStateTests<TState extends AFFlexibleState> {
   final stateTests = <AFWorkflowStatePrototype>[];
 
   AFWorkflowStateTestPrototype addPrototype({
@@ -2127,17 +2127,16 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
   /// Define a prototype which shows a  single screen in a particular 
   /// screen view state/route param state.
   /// 
-  /// As a short cut, rather than passing in routeParam/screenId, you can pass
-  /// in a navigate action, which has both of those values within it.
+  /// 
   AFSingleScreenPrototypeBody definePrototype({
     required AFPrototypeID   id,
-    required dynamic stateViews,
+    required dynamic models,
     required AFNavigatePushAction navigate,
     String? title,
   }) {
     return tests.addPrototype(
       id: id,
-      stateViews: stateViews,
+      models: models,
       navigate: navigate,
     );
   }

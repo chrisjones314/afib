@@ -3,7 +3,7 @@ import 'package:afib/src/dart/redux/state/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
-import 'package:afib/src/flutter/ui/screen/af_prototype_list_screen.dart';
+import 'package:afib/src/flutter/ui/screen/afui_prototype_list_screen.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:flutter/material.dart';
 
@@ -113,7 +113,7 @@ class AFUITheme extends AFFunctionalTheme {
     }
     final onPressed = onTap ?? () {
       dispatcher.dispatch(AFNavigateSetParamAction(
-        param: AFPrototypeDrawerRouteParam.createOncePerScreen(AFPrototypeDrawerRouteParam.viewTest),
+        param: AFUIPrototypeDrawerRouteParam.createOncePerScreen(AFUIPrototypeDrawerRouteParam.viewTest),
         children: null,
         route: AFNavigateRoute.routeGlobalPool
       ));
@@ -272,7 +272,7 @@ class AFUITheme extends AFFunctionalTheme {
     return childListNav(
       title: title,
       onPressed: () {
-      context.dispatchNavigatePush(AFPrototypeTestScreen.navigatePush(tests, title));
+      context.dispatchNavigatePush(AFUIPrototypeTestScreen.navigatePush(tests, title));
     });    
   }
 

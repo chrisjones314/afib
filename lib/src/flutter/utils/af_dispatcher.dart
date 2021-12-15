@@ -19,7 +19,7 @@ abstract class AFDispatcher {
 
     return ( shouldPop ||
              action is AFNavigateExitTestAction || 
-             action is AFUpdatePrototypeScreenTestDataAction || 
+             action is AFUpdatePrototypeScreenTestModelsAction || 
              action is AFPrototypeScreenTestAddError ||
              action is AFPrototypeScreenTestIncrementPassCount ||
              action is AFStartPrototypeScreenTestContextAction );

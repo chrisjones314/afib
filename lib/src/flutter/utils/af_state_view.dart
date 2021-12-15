@@ -1,8 +1,47 @@
-import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/dart/utils/af_unused.dart';
+import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:meta/meta.dart';
-import 'package:quiver/core.dart';
 
+
+@immutable
+abstract class AFFlexibleStateView extends AFFlexibleState {
+  AFFlexibleStateView({
+    required Map<String, Object> models,
+    required AFCreateStateViewDelegate create,
+  }): super(models: models, create: create);
+
+  static Map<String, Object> createModels(Iterable<Object> toIntegrate) {
+    return AFFlexibleState.createModels(toIntegrate);
+  }
+
+}
+
+@immutable 
+class AFStateViewUnused extends AFFlexibleStateView {
+  static final unused = AFStateViewUnused(<String, Object>{});
+  static final AFCreateStateViewDelegate creator = (models) => AFStateViewUnused(models);
+
+  AFStateViewUnused(Map<String, Object> models): super(models: models, create: (models) => AFStateViewUnused(models));
+}
+
+class AFUIStateView<TStateView extends AFFlexibleStateView> {
+  final List<AFThemeID>? secondaryThemeIds;
+  final Iterable<Object?> models;
+
+  AFUIStateView({
+    required this.models,
+    this.secondaryThemeIds
+  });
+
+  static AFUIStateView<AFStateViewUnused> createUnused() {
+    return AFUIStateView<AFStateViewUnused>(
+      models: []
+    );
+  }
+}
+
+/*
 /// Utility class used to capture the aspects of the global state
 /// that are used by/impact a particular screen or widget.
 /// 
@@ -45,10 +84,12 @@ class AFStateView<TV1, TV2, TV3, TV4> {
 
 }
 
+/*
 @immutable 
 class AFStateViewUnused extends AFStateView<AFUnused, AFUnused, AFUnused, AFUnused> {
   AFStateViewUnused(): super(first: AFUnused.unused, second: AFUnused.unused, third: AFUnused.unused, fourth: AFUnused.unused);
 }
+*/
 
 /// A version of [AFStateView] which allows for more type parameters.
 @immutable
@@ -331,6 +372,6 @@ class AFStateView12<TV1, TV2, TV3, TV4, TV5, TV6, TV7, TV8, TV9, TV10, TV11, TV1
     twelfth: twelfth,
   );
 }
-
+*/
 
 

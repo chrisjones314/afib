@@ -1,16 +1,17 @@
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/flutter/ui/af_prototype_base.dart';
+import 'package:afib/src/dart/redux/state/stateviews/afui_flexible_state_view.dart';
+import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:flutter/material.dart';
 
 //--------------------------------------------------------------------------------------
 @immutable
-class AFStandardChoiceDialogRouteParam extends AFRouteParam {
+class AFUIStandardChoiceDialogRouteParam extends AFRouteParam {
   final String alertBody;
   final String alertTitle;
   final List<String> buttonTitles;
 
   //--------------------------------------------------------------------------------------
-  AFStandardChoiceDialogRouteParam({
+  AFUIStandardChoiceDialogRouteParam({
     required this.alertBody,
     required this.alertTitle,
     required this.buttonTitles,
@@ -18,10 +19,10 @@ class AFStandardChoiceDialogRouteParam extends AFRouteParam {
 }
 
 //--------------------------------------------------------------------------------------
-class AFStandardChoiceDialog extends AFUIConnectedDialog<AFStateView, AFStandardChoiceDialogRouteParam> {
+class AFUIStandardChoiceDialog extends AFUIConnectedDialog<AFUIStandardChoiceDialogRouteParam> {
 
   //--------------------------------------------------------------------------------------
-  AFStandardChoiceDialog(): super(AFUIScreenID.dialogStandardChoice);
+  AFUIStandardChoiceDialog(): super(AFUIScreenID.dialogStandardChoice);
 
   //--------------------------------------------------------------------------------------
   static AFNavigatePushAction navigatePush({
@@ -30,7 +31,7 @@ class AFStandardChoiceDialog extends AFUIConnectedDialog<AFStateView, AFStandard
     required List<String> buttonTitles,
   }) {
     return AFNavigatePushAction(
-      routeParam: AFStandardChoiceDialogRouteParam(
+      routeParam: AFUIStandardChoiceDialogRouteParam(
         alertTitle: alertTitle,
         alertBody: alertBody,
         buttonTitles: buttonTitles,
@@ -40,13 +41,7 @@ class AFStandardChoiceDialog extends AFUIConnectedDialog<AFStateView, AFStandard
 
   //--------------------------------------------------------------------------------------
   @override
-  AFStateView createStateView(AFBuildStateViewContext<AFAppStateArea?, AFStandardChoiceDialogRouteParam> context) {
-    return AFStateView.unused();
-  }
-
-  //--------------------------------------------------------------------------------------
-  @override
-  Widget buildDialogWithContext(AFUIBuildContext<AFStateView, AFStandardChoiceDialogRouteParam> context) {
+  Widget buildDialogWithContext(AFUIBuildContext<AFUIFlexibleStateView, AFUIStandardChoiceDialogRouteParam> context) {
     final t = context.t;
     final actions = t.row();
     final buttonTitles = context.p.buttonTitles;

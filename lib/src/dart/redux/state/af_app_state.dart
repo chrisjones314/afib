@@ -1,55 +1,89 @@
 import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:meta/meta.dart';
 
-/// All models in the [AFAppStateArea] must be derived from
-/// AFAppStateModel.  
-/// 
-/// Note that this is only at the root level of AFAppState,
-/// nested data can be plain dart objects.
-@immutable 
-class AFAppStateModel {
-  final String? customStateKey;
+/// When wrapped around a model object, causes it to be 
+/// referenced by the specified id in an 
+/// [AFFlexibleState] or [AFFlexibleStateView].
+///
+class AFWrapModelWithCustomID {
+  final String id;
+  final Object? model;
+  AFWrapModelWithCustomID(this.id, this.model);
+}
+
+
+// When an object is derived from this method.
+class AFModelWithCustomID {
+  final String? customStateId;
 
   /// By default each model uses its class name as a key to uniquely 
-  /// identify itself in the [AFAppStateArea].  However, if you want
+  /// identify itself in the [AFFlexibleState].  However, if you want
   /// to have two objects of the same class in the AFAppState,
   /// you can pass each one a unique [customStateKey].
-  AFAppStateModel({this.customStateKey});
+  AFModelWithCustomID({this.customStateId});
 
   static String stateKeyFor(Object o) {
-    if(o is AFAppStateModel) {
-      final customSK = o.customStateKey;
+    if(o is AFModelWithCustomID) {
+      final customSK = o.customStateId;
       if(customSK != null) {
         return customSK;
       }
     }
+
+    if(o is AFWrapModelWithCustomID) {
+      return o.id;
+    }
+
     return o.runtimeType.toString();
+  }
+
+  static Object? modelFor(Object? source) {
+    if(source is AFWrapModelWithCustomID) {
+      return source.model;
+    }
+    return source;
   }
 
 }
 
-/// The route application state must be an AFAppState.
-/// 
-/// AFAppState enables one or more subtrees of the state
-/// to be replaced.
-@immutable
-abstract class AFAppStateArea {
-  final Map<String, Object> models;
+abstract class AFStateModelAccess {
+  T findModel<T extends Object>();
+  T? findModelOrNull<T extends Object>();
+  T findId<T extends Object>(String id);
+  T? findIdOrNull<T extends Object>(String id);
+  Iterable<Object> get allModels;
+}
 
-  AFAppStateArea({
-    required this.models
+/// 
+/// 
+@immutable
+abstract class AFFlexibleState extends AFStateModelAccess {
+  final Map<String, Object> models;
+  final AFCreateComponentStateDelegate create;
+
+  AFFlexibleState({
+    required this.models,
+    required this.create,
   });
 
   /*factory AFAppState.createFrom(Iterable<Object> models) {
     return AFAppState(models: AFAppState.integrate(AFAppState.empty(), models));
   }*/
 
+  static Map<String, Object> createModels(Iterable<Object> toIntegrate) {
+    return integrate(<String, Object>{}, toIntegrate);
+  }
+
   static Map<String, Object> integrate(Map<String, Object> original, Iterable<Object> toIntegrate) {
     final revised = Map<String, Object>.of(original);
-    for(final model in toIntegrate) {
-      final key = AFAppStateModel.stateKeyFor(model);
-      revised[key] = model;
+    for(final sourceModel in toIntegrate) {
+      final key = AFModelWithCustomID.stateKeyFor(sourceModel);
+      final model = AFModelWithCustomID.modelFor(sourceModel);
+      if(model != null) {
+        revised[key] = model;
+      }
     }
     return revised;
   }
@@ -58,8 +92,24 @@ abstract class AFAppStateArea {
     return <String, Object>{};
   }
 
-  T findModel<T>() {
+  Iterable<Object> get allModels {
+    return models.values;
+  }
+
+  T findModel<T extends Object>() {
     return findModelWithCustomKey(T.toString());
+  }
+
+  T? findModelOrNull<T extends Object>() {
+    return findModelWithCustomKeyOrNull(T.toString());
+  }
+
+  T findId<T extends Object>(String id) {
+    return findModelWithCustomKey(id);
+  }
+
+  T? findIdOrNull<T extends Object>(String id) {
+    return findModelWithCustomKeyOrNull(id);
   }
 
   T findModelWithCustomKey<T>(String key) {
@@ -67,69 +117,78 @@ abstract class AFAppStateArea {
     if(result == null) throw AFException("No model defined for $key");
     return result;
   }
-  AFAppStateArea mergeWith(AFAppStateArea other) {
+
+  T? findModelWithCustomKeyOrNull<T extends Object?>(String key) {
+    final result = models[key] as T?;
+    return result;
+  }
+
+  AFFlexibleState mergeWith(AFFlexibleState other) {
     final revisedModels = integrate(this.models, other.models.values);
     return createWith(revisedModels);    
   }
 
-  AFAppStateArea copyWith(List<Object> toIntegrate) {
-    return createWith(AFAppStateArea.integrate(models, toIntegrate));
+  AFFlexibleState copyWith(List<Object> toIntegrate) {
+    return createWith(AFFlexibleState.integrate(models, toIntegrate));
   }
 
-  AFAppStateArea reviseModels(List<Object> toIntegrate) {
-    return createWith(AFAppStateArea.integrate(models, toIntegrate));
+  AFFlexibleState reviseModels(List<Object> toIntegrate) {
+    return createWith(AFFlexibleState.integrate(models, toIntegrate));
   }
 
-  AFAppStateArea copyWithOne(Object toIntegrate) {
+  AFFlexibleState copyWithOne(Object toIntegrate) {
     final toI = <Object>[];
     toI.add(toIntegrate);
     return copyWith(toI);
   }
 
-  AFAppStateArea createWith(Map<String, Object> models);
+  AFFlexibleState createWith(Map<String, Object> models) {
+    return create(models);
+  }
 }
 
 @immutable
-class AFAppStateAreaUnused extends AFAppStateArea {
-  AFAppStateAreaUnused(Map<String, Object> models): super(models: models);
+class AFComponentStateUnused extends AFFlexibleState {
+  static final AFCreateComponentStateDelegate creator = (models) => AFComponentStateUnused(models);
+  AFComponentStateUnused(Map<String, Object> models): super(models: models, create: creator);
 
-  AFAppStateArea createWith(Map<String, Object> models) {
-    return AFAppStateAreaUnused(models);
-  }
+
+  static AFComponentStateUnused initialValue() { return AFComponentStateUnused(<String, Object>{}); }
+
 
 }
 
 
 /// Tracks the application state and any state provided by third parties.
 @immutable
-class AFAppStateAreas {
-  final Map<String, AFAppStateArea> states;
+class AFComponentStates {
+  final Map<String, AFFlexibleState> states;
 
-  AFAppStateAreas({
+  AFComponentStates({
     required this.states
   });
 
-  factory AFAppStateAreas.createFrom(List<AFAppStateArea> areas) {
-    final states = <String, AFAppStateArea>{};
+  factory AFComponentStates.createFrom(List<AFFlexibleState> areas) {
+    final states = <String, AFFlexibleState>{};
     for(final area in areas) {
-      final areaType = _keyForArea(area);
+      final areaType = _keyForComponent(area);
       states[areaType] = area;
     }
 
-    // if you don't have a state, you can use AFAppStateArea as a substitute.  We need to have this
+    // if you don't have a state, you can use AFFlexibleState as a substitute.  We need to have this
     // be non-null, so we add an empty one.
-    final tempModel = AFAppStateAreaUnused(<String, Object>{});
-    final areaType = _keyForArea(tempModel);
+    final tempModel = AFComponentStateUnused(<String, Object>{});
+    final areaType = _keyForComponent(tempModel);
     states[areaType] = tempModel;
 
-    return AFAppStateAreas(states: states);
+    return AFComponentStates(states: states);
   }
 
-  AFAppStateAreas reviseArea(Type areaType, List<Object> models) {
-    final revisedStates = Map<String, AFAppStateArea>.of(states);
-    final key = _keyForArea(areaType);
-    if(key == "AFAppStateArea") {
-      throw AFException("Attempting to set models on 'AFAppStateArea', this is most likely because you forgot to explicitly specify your AFAppStateArea type as a type parameter somewhere.");
+  AFComponentStates reviseComponent(Type areaType, List<Object> models) {
+    final revisedStates = Map<String, AFFlexibleState>.of(states);
+    final key = _keyForComponent(areaType);
+    if(key == "AFFlexibleState") {
+      throw AFException("Attempting to set models on 'AFFlexibleState', this is most likely because you forgot to explicitly specify your AFFlexibleState type as a type parameter somewhere.");
     }
     final initialState = states[key];
     assert(initialState != null);
@@ -146,15 +205,15 @@ class AFAppStateAreas {
       }
     }
 
-    return AFAppStateAreas(states: revisedStates);    
+    return AFComponentStates(states: revisedStates);    
   }
 
-  AFAppStateArea? stateFor(Type areaType) {
-    final key = _keyForArea(areaType);
+  AFFlexibleState? stateFor(Type areaType) {
+    final key = _keyForComponent(areaType);
     return states[key];
   }
 
-  static _keyForArea(dynamic area) {
+  static _keyForComponent(dynamic area) {
     if(area is Type) {
       return area.toString();
     }

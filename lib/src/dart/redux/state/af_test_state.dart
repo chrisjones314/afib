@@ -12,8 +12,7 @@ class AFSingleScreenTestState {
   final AFBaseTestID testId;
   final int pass;
   final List<String> errors;
-  final String? stateViewId;
-  final dynamic stateView;
+  final Map<String, Object> models;
   final AFNavigatePushAction navigate;
   final dynamic routeParamId;
 
@@ -22,13 +21,12 @@ class AFSingleScreenTestState {
     required this.navigate,
     required this.pass, 
     required this.errors, 
-    required this.stateViewId,
-    required this.stateView, 
+    required this.models, 
     required this.routeParamId,
   });
 
-  AFSingleScreenTestState reviseStateView(dynamic data) {
-    return copyWith(stateView: data);
+  AFSingleScreenTestState reviseModels(dynamic data) {
+    return copyWith(models: data);
   }
 
   AFSingleScreenTestState incrementPassCount() {
@@ -40,22 +38,6 @@ class AFSingleScreenTestState {
     final revised = List<String>.from(errors);
     revised.add(err);
     return copyWith(errors: revised);
-  }
-
-  TStateView? findViewStateFor<TStateView extends AFStateView>() {
-    if(stateView is TStateView) {
-      return stateView;
-    }
-
-    if(stateView is Iterable) {
-      for(final testData in stateView) {
-        if(testData is TStateView) {
-          return testData;
-        }
-      }
-    } 
-
-    return null;    
   }
 
   String get summaryText {
@@ -77,15 +59,14 @@ class AFSingleScreenTestState {
   AFSingleScreenTestState copyWith({
     int? pass, 
     List<String>? errors, 
-    dynamic stateView
+    dynamic models
   }) {
     return AFSingleScreenTestState(
-      stateView: stateView ?? this.stateView,
+      models: models ?? this.models,
       errors: errors ?? this.errors,
       pass: pass ?? this.pass,
       navigate: this.navigate,
       testId: this.testId,
-      stateViewId: this.stateViewId,
       routeParamId: this.routeParamId,
     );
   }
@@ -142,20 +123,23 @@ class AFTestState {
     return testStates[id];
   }
 
-  AFTestState navigateToTest(AFScreenPrototype test, AFNavigatePushAction navigate, dynamic data, String? stateViewId, String? routeParamId) {
-    final revisedStates = _createTestState(test.id, test.navigate, data, stateViewId, routeParamId);
+  AFTestState navigateToTest(AFScreenPrototype test, AFNavigatePushAction navigate, dynamic models, String? modelsId, String? routeParamId) {
+    final revisedStates = _createTestState(test.id, test.navigate, models, modelsId, routeParamId);
     final revisedActive = List<AFBaseTestID>.from(activeTestIds);
     revisedActive.add(test.id);
     return copyWith(activeTestIds: revisedActive, testStates: revisedStates);
   }
 
   AFTestState updateWireframeStateViews(AFCompositeTestDataRegistry registry) {
+    /* TODO: STATE VIEW REFACTOR
     final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(this.testStates);
     for(final testState in testStates.values) {
       final stateView = registry.f(testState.stateViewId);
       revisedStates[testState.testId] = testState.reviseStateView(stateView);
     }
     return copyWith(testStates: revisedStates);
+    */
+    return copyWith();
   }
 
   AFTestState popWireframeTest() {
@@ -183,11 +167,11 @@ class AFTestState {
     return copyWith(activeWireframe: wireframe);
   }
 
-  Map<AFBaseTestID, AFSingleScreenTestState> _createTestState(AFBaseTestID testId, AFNavigatePushAction navigate, dynamic data, String? stateViewId, String? routeParamId) {
+  Map<AFBaseTestID, AFSingleScreenTestState> _createTestState(AFBaseTestID testId, AFNavigatePushAction navigate, dynamic models, String? stateViewId, String? routeParamId) {
     final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
-      final orig = testStates[testId];
+    final orig = testStates[testId];
     if(orig == null) {
-      revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: <String>[], stateView: data, routeParamId: routeParamId, stateViewId: stateViewId, navigate: navigate);
+      revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: <String>[], models: models, routeParamId: routeParamId, navigate: navigate);
     } else {
       revisedStates[testId] = orig.copyWith(pass: 0, errors: <String>[]);
     }
@@ -212,13 +196,13 @@ class AFTestState {
     );
   }
 
-  AFTestState updateStateView(AFBaseTestID testId, dynamic stateView) {
+  AFTestState updateModels(AFBaseTestID testId, dynamic models) {
     final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
     final currentState = revisedStates[testId];
     if(currentState == null) {
       throw AFException("Internal error, calling updateStateView when there is no test state for $testId");
     } else {
-      revisedStates[testId] = currentState.reviseStateView(stateView);
+      revisedStates[testId] = currentState.reviseModels(models);
 
     }
     return copyWith(

@@ -18,9 +18,8 @@ import 'package:afib/src/flutter/core/af_screen_map.dart';
 import 'package:afib/src/flutter/test/af_init_prototype_screen_map.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_data_registry.dart';
-import 'package:afib/src/flutter/ui/dialog/af_standard_choice_dialog.dart';
+import 'package:afib/src/flutter/ui/dialog/afui_standard_choice_dialog.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
-import 'package:afib/src/flutter/ui/screen/af_exception_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 
@@ -72,7 +71,7 @@ class AFWidgetsBindingObserver extends WidgetsBindingObserver {
   }
 }
 
-class AFLibraryTestHolder<TState extends AFAppStateArea> {
+class AFLibraryTestHolder<TState extends AFFlexibleState> {
   final AFStateTests afStateTests = AFStateTests<TState>();
   final AFUnitTests afUnitTests = AFUnitTests();
   final AFSingleScreenTests afScreenTests = AFSingleScreenTests();
@@ -102,7 +101,7 @@ class AFTestMissingTranslations {
 }
 
 
-class AFibGlobalState<TState extends AFAppStateArea> {
+class AFibGlobalState<TState extends AFFlexibleState> {
   final AFAppExtensionContext appContext;
 
   final AFScreenMap screenMap = AFScreenMap();
@@ -151,12 +150,8 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 
   void initialize() {
     final libraries = thirdPartyLibraries;
-    screenMap.exceptionScreen((ctx) {
-      final screen = AFExceptionScreen();
-      return screen.buildWithContext(ctx);
-    });
-    screenMap.screen(AFUIScreenID.dialogStandardError, (_) => AFStandardErrorDialog());
-    screenMap.screen(AFUIScreenID.dialogStandardChoice, (_) => AFStandardChoiceDialog());
+    screenMap.screen(AFUIScreenID.dialogStandardError, (_) => AFUIStandardErrorDialog());
+    screenMap.screen(AFUIScreenID.dialogStandardChoice, (_) => AFUIStandardChoiceDialog());
     appContext.initScreenMap(screenMap, libraries);
 
     appContext.initializeFunctionalThemeFactories(themeFactories, libraries);
@@ -209,7 +204,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     return appContext.thirdParty.libraries.values;
   }
 
-  void finishAsyncWithError<TState extends AFAppStateArea>(AFFinishQueryErrorContext context) {
+  void finishAsyncWithError<TState extends AFFlexibleState>(AFFinishQueryErrorContext context) {
     final handler = appContext.errorHandlerForState<TState>();
     if(handler != null) {
       handler(context as AFFinishQueryErrorContext<TState>);
@@ -413,8 +408,8 @@ class AFibGlobalState<TState extends AFAppStateArea> {
   }
 
   /// Returns a function that creates the initial applications state, used to reset the state.
-  AFAppStateAreas createInitialAppStateAreas() {
-    return appContext.createInitialAppStateAreas(thirdPartyLibraries);
+  AFComponentStates createInitialComponentStates() {
+    return appContext.createInitialComponentStates(thirdPartyLibraries);
   }
 
   /// This is called internally by AFib and should not really exist.
@@ -432,14 +427,14 @@ class AFibGlobalState<TState extends AFAppStateArea> {
     fundamentals.updateThemeData(themeData);
   }
 
-  AFThemeState initializeThemeState({AFAppStateAreas? areas}) {
+  AFThemeState initializeThemeState({AFComponentStates? components}) {
     AFibD.logThemeAF?.d("Rebuild fundamental and functional themes");
-    if(areas == null) {
-      areas = storeInternalOnly!.state.public.areas;
+    if(components == null) {
+      components = storeInternalOnly!.state.public.components;
     }
     final device = AFFundamentalDeviceTheme.create();
     
-    var fundamentals = appContext.createFundamentalTheme(device, areas, thirdPartyLibraries);
+    var fundamentals = appContext.createFundamentalTheme(device, components, thirdPartyLibraries);
     if(AFibD.config.startInDarkMode) {
       fundamentals = fundamentals.reviseOverrideThemeValue(AFUIThemeID.brightness, Brightness.dark);
     }
@@ -641,7 +636,7 @@ class AFibGlobalState<TState extends AFAppStateArea> {
 class AFibF {
   static AFibGlobalState? global;
 
-  static void initialize<TState extends AFAppStateArea>(AFAppExtensionContext appContext) {
+  static void initialize<TState extends AFFlexibleState>(AFAppExtensionContext appContext) {
     global = AFibGlobalState<TState>(
       appContext: appContext
     );

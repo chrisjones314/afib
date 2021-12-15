@@ -27,12 +27,12 @@ class AFWireframeExecutionContext {
     _dispatch(AFStartWireframePopTestAction());
   }
 
-  void navigateTo(AFPrototypeID testId, { AFRouteParam? routeParam, AFStateView? stateView }) {
+  void navigateTo(AFPrototypeID testId, { AFRouteParam? routeParam, List<Object>? models }) {
     final test = AFibF.g.findScreenTestById(testId);
     final dispatcher = AFibF.g.storeDispatcherInternalOnly;
     assert(dispatcher != null && test != null);
     if(dispatcher != null && test != null) {
-      test.startScreen(dispatcher, wireframe.registry, routeParam: routeParam, stateView: stateView);
+      test.startScreen(dispatcher, wireframe.registry, routeParam: routeParam, models: models);
     }
   }
 

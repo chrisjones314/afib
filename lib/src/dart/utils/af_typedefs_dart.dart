@@ -3,6 +3,7 @@ import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
+import 'package:afib/src/flutter/utils/af_state_view.dart';
 
 /// Delegate used in various subclasses of [AFNavigateAction] to return data from a child screen to a parent.
 typedef AFActionOnReturnDelegate = void Function(dynamic returnData);
@@ -23,7 +24,7 @@ typedef AFActionListenerDelegate = void Function(List<AFActionWithKey> actions);
 typedef AFParamListenerDelegate = void Function(AFRouteParam param);
 
 /// Delegate used to create the initial applications state.
-typedef AFInitializeAppStateDelegate = AFAppStateArea? Function();
+typedef AFInitializeComponentStateDelegate = AFFlexibleState? Function();
 
 /// Delegate use to define commands that are part of the afib command-line app.
 typedef AFExtendCommandsDelegate = void Function(AFCommandExtensionContext context);
@@ -33,3 +34,9 @@ typedef AFExtendCommandsThirdPartyDelegate = void Function(AFCommandThirdPartyEx
 
 /// Just a typed sort function.
 typedef AFTypedSortDelegate<TSort> = int Function(TSort left, TSort right);
+
+// Used to work around inability to instantiate templated types
+typedef AFCreateStateViewDelegate<TStateView extends AFFlexibleStateView> = TStateView Function(Map<String, Object> models);
+
+// Used to work around inability to instantiate templated types
+typedef AFCreateComponentStateDelegate = AFFlexibleState Function(Map<String, Object> models);

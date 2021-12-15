@@ -5,6 +5,7 @@ import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
+import 'package:afib/src/dart/redux/state/stateviews/afui_prototype_state_view.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_should_continue_route_param.dart';
@@ -16,7 +17,7 @@ import 'package:afib/src/flutter/test/af_state_test.dart';
 import 'package:afib/src/flutter/test/af_test_data_registry.dart';
 import 'package:afib/src/flutter/test/af_unit_tests.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
-import 'package:afib/src/flutter/ui/screen/af_prototype_widget_screen.dart';
+import 'package:afib/src/flutter/ui/screen/afui_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/ui/theme/af_prototype_theme.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:flutter/material.dart';
@@ -67,7 +68,7 @@ typedef AFUpdateRouteParamDelegate<TRouteParam extends AFRouteParam> = void Func
 
 /// Delegate used in widget testing to wrap additional widgets around the widget being tested 
 /// (e.g. to position that widget on the screen, limit its width, etc.)
-typedef AFCreateWidgetWrapperDelegate = Widget Function(AFBuildContext<AFAppStateArea, AFPrototypeWidgetStateView, AFPrototypeWidgetRouteParam, AFUITheme> context, Widget testWidget);
+typedef AFCreateWidgetWrapperDelegate = Widget Function(AFBuildContext<AFFlexibleState, AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam, AFUITheme> context, Widget testWidget);
 
 /// Delegate used to create a push action that moves us into a test screen.
 typedef AFTestCreatePushActionDelegate = List<dynamic> Function(AFScreenPrototype test);
@@ -111,10 +112,10 @@ typedef AFProcessVerifyDifferenceDelegate = void Function(AFStateTestExecute exe
 typedef AFUnitTestBodyExecuteDelegate = void Function(AFUnitTestExecute e);
 
 /// Delegate used when an [AFAsyncQuery] results in a successful response.
-typedef AFOnResponseDelegate<TState extends AFAppStateArea, TResponse> = void Function(AFFinishQuerySuccessContext<TState, TResponse> context);
+typedef AFOnResponseDelegate<TState extends AFFlexibleState, TResponse> = void Function(AFFinishQuerySuccessContext<TState, TResponse> context);
 
 /// Delegate used when an [AFAsyncQuery] results in an error.
-typedef AFOnErrorDelegate<TState extends AFAppStateArea> = void Function(AFFinishQueryErrorContext<TState> context);
+typedef AFOnErrorDelegate<TState extends AFFlexibleState> = void Function(AFFinishQueryErrorContext<TState> context);
 
 /// Delegate used to process an [AFAsyncQuery]
 typedef AFAsyncQueryListenerDelegate = void Function(AFAsyncQuery query);
@@ -139,16 +140,16 @@ typedef AFExtendTestDelegate = void Function(AFTestExtensionContext context);
 typedef AFExtendThirdPartyDelegate = void Function(AFAppThirdPartyExtensionContext context);
 
 /// Allows plug-ins to contribute fundamental theme values
-typedef AFInitPluginFundamentalThemeDelegate = void Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState, AFPluginFundamentalThemeAreaBuilder builder);
+typedef AFInitPluginFundamentalThemeDelegate = void Function(AFFundamentalDeviceTheme device, AFComponentStates appState, AFPluginFundamentalThemeAreaBuilder builder);
 
 /// Allows the app to contribute fundamental theme values
-typedef AFInitAppFundamentalThemeDelegate = void Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState, AFAppFundamentalThemeAreaBuilder builder);
+typedef AFInitAppFundamentalThemeDelegate = void Function(AFFundamentalDeviceTheme device, AFComponentStates appState, AFAppFundamentalThemeAreaBuilder builder);
 
 /// Create a conceptual theme used by a subset of the app, or used by a third party plugin.
 typedef AFInitFunctionalThemeDelegate = void Function(AFFunctionalThemeDefinitionContext context);
 
 /// Optional delegate used to create the flutter ThemeData, rather than allowing AFib to do it for you based on the primary fundamental theme.
-typedef AFOverrideCreateThemeDataDelegate = ThemeData Function(AFFundamentalDeviceTheme device, AFAppStateAreas appState, AFFundamentalThemeArea primary);
+typedef AFOverrideCreateThemeDataDelegate = ThemeData Function(AFFundamentalDeviceTheme device, AFComponentStates appState, AFFundamentalThemeArea primary);
 
 typedef AFCreateDynamicDelegate = dynamic Function();
 
@@ -173,3 +174,4 @@ typedef AFTestDataCompositeGeneratorDelegate = void Function(AFCompositeTestData
 typedef AFFilterWidgetDelegate = bool Function(Widget);
 
 typedef AFConvertSizeToFormFactorDelegate = AFFormFactor Function(Size);
+

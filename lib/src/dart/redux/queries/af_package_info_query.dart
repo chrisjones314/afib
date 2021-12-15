@@ -4,7 +4,7 @@ import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_package_info_state.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-class AFPackageInfoQuery<TState extends AFAppStateArea> extends AFAsyncQuery<TState, AFPackageInfoState> {
+class AFPackageInfoQuery<TState extends AFFlexibleState> extends AFAsyncQuery<TState, AFPackageInfoState> {
 
   AFPackageInfoQuery({
     List<dynamic>? successActions, 

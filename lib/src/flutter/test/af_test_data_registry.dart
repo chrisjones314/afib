@@ -1,3 +1,5 @@
+import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 
 
@@ -117,12 +119,47 @@ class AFCompositeTestDataRegistry extends AFAtomicTestDataRegistry {
     return id;
   }
 
+  Map<String, Object> resolveStateViewModels(dynamic sources) {
+    final result = <String, Object>{};
+    _internalResolveStateViewModels(sources, result);
+    return result;
+  }
+
+  void _internalResolveStateViewModels(dynamic sources, Map<String, Object> models) {
+
+    if(sources is List) {
+      for(final items in sources) {
+        _internalResolveStateViewModels(items, models);
+      }
+    } else if(sources is String) {
+      final item = f(sources);
+      _internalResolveStateViewModels(item, models);
+    } else if(sources is AFFlexibleState) {
+      _internalApplyModels(sources.models, models);
+    } else if(sources is AFFlexibleStateView) {
+      _internalApplyModels(sources.models, models);      
+    } else {
+      final key = AFModelWithCustomID.stateKeyFor(sources);
+      models[key] = sources;
+    }
+  }
+
+  void _internalApplyModels(Map<String, Object> source, Map<String, Object> models) {
+      for(final itemKey in source.keys) {
+        final toApply = source[itemKey];
+        if(toApply != null) {
+          models[itemKey] = toApply;
+        }
+      }
+  }
+
+
   /// See the shortened version [f].
   dynamic find(dynamic id) {
     return f(id);
   }
 
-  dynamic findStateViews(dynamic id) {
+  dynamic findModels(dynamic id) {
     if(id is String || id is int) {
       return f(id);
     } else if(id is List) {

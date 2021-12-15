@@ -1,11 +1,11 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/id.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
+import 'package:afib/src/dart/redux/state/stateviews/afui_prototype_state_view.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
-import 'package:afib/src/flutter/ui/af_prototype_base.dart';
-import 'package:afib/src/flutter/ui/screen/af_prototype_third_party_list_screen.dart';
-import 'package:afib/src/flutter/ui/screen/af_prototype_wireframes_list_screen.dart';
-import 'package:afib/src/flutter/utils/af_state_view.dart';
+import 'package:afib/src/flutter/ui/afui_connected_base.dart';
+import 'package:afib/src/flutter/ui/screen/afui_prototype_third_party_list_screen.dart';
+import 'package:afib/src/flutter/ui/screen/afui_prototype_wireframes_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
@@ -23,7 +23,7 @@ class AFScreenTestResultSummary {
 
 /// Parameter uses to filter the tests/protoypes shown on the screen.
 @immutable
-class AFPrototypeHomeScreenParam extends AFRouteParam {
+class AFUIPrototypeHomeScreenParam extends AFRouteParam {
   static const filterTextId = 1;
   static const viewFilter = 1;
   static const viewResults = 2;
@@ -32,22 +32,22 @@ class AFPrototypeHomeScreenParam extends AFRouteParam {
   final List<AFScreenTestResultSummary> results;
   final int view;
 
-  AFPrototypeHomeScreenParam({
+  AFUIPrototypeHomeScreenParam({
     required this.filter,
     required this.textControllers,
     required this.results,
     required this.view,
   }): super(id: AFUIScreenID.screenPrototypeHome);
 
-  AFPrototypeHomeScreenParam reviseFilter(String filter) {
+  AFUIPrototypeHomeScreenParam reviseFilter(String filter) {
     return copyWith(filter: filter);
   }
 
-  factory AFPrototypeHomeScreenParam.createOncePerScreen({
+  factory AFUIPrototypeHomeScreenParam.createOncePerScreen({
     required String filter,
   }) {
     final controllers = AFTextEditingControllersHolder.createOne(AFUIWidgetID.textTestSearch, filter);
-    return AFPrototypeHomeScreenParam(
+    return AFUIPrototypeHomeScreenParam(
       view: viewFilter,
       results: <AFScreenTestResultSummary>[],
       textControllers: controllers,
@@ -55,12 +55,12 @@ class AFPrototypeHomeScreenParam extends AFRouteParam {
     );
   }
 
-  AFPrototypeHomeScreenParam copyWith({
+  AFUIPrototypeHomeScreenParam copyWith({
     String? filter,
     List<AFScreenTestResultSummary>? results,
     int? view
   }) {
-    return AFPrototypeHomeScreenParam(
+    return AFUIPrototypeHomeScreenParam(
       filter: filter ?? this.filter,
       results: results ?? this.results,
       view: view ?? this.view,
@@ -74,41 +74,21 @@ class AFPrototypeHomeScreenParam extends AFRouteParam {
   }
 }
 
-/// Data used to render the screen
-class APrototypeHomeScreenStateView extends AFStateView1<AFSingleScreenTests> {
-  APrototypeHomeScreenStateView(AFSingleScreenTests tests): 
-    super(first: tests);
-  
-  AFSingleScreenTests? get tests { return first; }
-}
-
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam>{
+class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFUIPrototypeHomeScreenParam>{
   static const runWidgetTestsId = "run_widget_tests";
   static const runScreenTestsId = "run_screen_tests";
   static const runWorkflowTestsId = "run_workflow_tests";
   AFPrototypeHomeScreen(): super(AFUIScreenID.screenPrototypeHome);
 
   @override
-  APrototypeHomeScreenStateView createStateViewAF(AFState state, AFPrototypeHomeScreenParam param, AFRouteSegmentChildren? withChildren) {
-    final tests = AFibF.g.screenTests;
-    return APrototypeHomeScreenStateView(tests);
-  }
-
-  @override
-  APrototypeHomeScreenStateView createStateView(AFBuildStateViewContext<AFAppStateArea?, AFPrototypeHomeScreenParam> context) {
-    // this should never be called, because createDataAF replaces it.
-    throw UnimplementedError();
-  }
-
-  @override
-  Widget buildWithContext(AFUIBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context) {
+  Widget buildWithContext(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeHomeScreenParam> context) {
     return _buildHome(context);
   }
 
   /// 
-  Widget _buildHome(AFUIBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context) {
+  Widget _buildHome(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeHomeScreenParam> context) {
     final t = context.t;
     final protoRows = t.column();
     final primaryTests = AFibF.g.primaryUITests;
@@ -119,11 +99,11 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
     );
     
     protoRows.add(t.childListNav(title: AFUITranslationID.thirdParty, onPressed: () {
-      context.dispatch(AFPrototypeThirdPartyListScreen.navigatePush());
+      context.dispatch(AFUIPrototypeThirdPartyListScreen.navigatePush());
     }));
 
     protoRows.add(t.childListNav(title: AFUITranslationID.wireframes, onPressed: () {
-      ;;context.dispatch(AFPrototypeWireframesListScreen.navigateTo());
+      ;;context.dispatch(AFUIPrototypeWireframesListScreen.navigateTo());
     }));
 
     final areas = context.p.filter.split(" ");
@@ -132,7 +112,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
     final filterRows = t.column();
     filterRows.add(_buildFilterAndRunControls(context, tests));
     
-    if(context.p.view == AFPrototypeHomeScreenParam.viewFilter) {
+    if(context.p.view == AFUIPrototypeHomeScreenParam.viewFilter) {
       _buildFilteredSection(context, tests, filterRows);
     } else {
       _buildResultsSection(context, tests, filterRows);
@@ -145,7 +125,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
     return context.t.buildPrototypeScaffold(AFUITranslationID.afibPrototypeMode, rows);
   }
 
-  void _onRunTests(AFUIBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests) async { 
+  void _onRunTests(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests) async { 
     
     final results = <AFScreenTestResultSummary>[];
     for(final test in tests) {
@@ -153,7 +133,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
       test.startScreen(context.d, AFibF.g.testData);
 
       final state = AFibF.g.storeInternalOnly!.state;
-      final testState = state.testState;
+      final testState = state.private.testState;
       final testContext = testState.findContext(test.id);
       final testSpecificState = testState.findState(test.id);
 
@@ -168,7 +148,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
       await Future.delayed(Duration(milliseconds: 500));
 
       final stateRevised = AFibF.g.storeInternalOnly!.state;
-      final testStateRevised = stateRevised.testState;
+      final testStateRevised = stateRevised.private.testState;
       final contextRevised = testStateRevised.findContext(test.id);
       final testSpecificStateRevised = testStateRevised.findState(test.id);
 
@@ -181,15 +161,15 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
       
     }
 
-    updateRouteParam(context, context.p.copyWith(results: results, view: AFPrototypeHomeScreenParam.viewResults));
+    updateRouteParam(context, context.p.copyWith(results: results, view: AFUIPrototypeHomeScreenParam.viewResults));
   }
 
-  void _updateFilter(AFUIBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, String value) {
+  void _updateFilter(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeHomeScreenParam> context, String value) {
     final revised = context.p.reviseFilter(value);
     updateRouteParam(context, revised);
   }
 
-  Widget _buildFilterAndRunControls(AFUIBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests) {
+  Widget _buildFilterAndRunControls(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests) {
     final t = context.t;
 
     final rows = t.column();
@@ -224,7 +204,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
       child: TextButton(
         child: t.childText(AFUITranslationID.searchResults, textColor: colorSearchText),
         onPressed: () {
-          updateRouteParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewFilter));
+          updateRouteParam(context, context.p.copyWith(view: AFUIPrototypeHomeScreenParam.viewFilter));
         },
       )
     ));
@@ -233,7 +213,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
       child: TextButton(
         child: t.childText(AFUITranslationID.testResults, textColor: colorResultsText),
         onPressed: () {
-          updateRouteParam(context, context.p.copyWith(view: AFPrototypeHomeScreenParam.viewResults));
+          updateRouteParam(context, context.p.copyWith(view: AFUIPrototypeHomeScreenParam.viewResults));
         }
     )));
 
@@ -310,7 +290,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
   }
 
 
-  void _buildFilteredSection(AFUIBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests, List<Widget> rows, ) {
+  void _buildFilteredSection(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests, List<Widget> rows, ) {
     if(tests.isEmpty) {
       return;
     }
@@ -320,7 +300,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<APrototypeHomeScreenStat
     }
   }
 
-  void _buildResultsSection(AFUIBuildContext<APrototypeHomeScreenStateView, AFPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests, List<Widget> rows) {
+  void _buildResultsSection(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeHomeScreenParam> context, List<AFScreenPrototype> tests, List<Widget> rows) {
     final t = context.t;
     final results = context.p.results;
     if(results.isEmpty) {

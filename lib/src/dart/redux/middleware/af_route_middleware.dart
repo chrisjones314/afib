@@ -152,7 +152,7 @@ void _navigateExitTestAction(Store<AFState> store, AFNavigateExitTestAction acti
 //---------------------------------------------------------------------------
 void _navigateWireframe(Store<AFState> store, AFNavigateWireframeAction action, NextDispatcher next) {
   /// see if we are under a wireframe.
-  final testState = store.state.testState;
+  final testState = store.state.private.testState;
   final wireframe = testState.activeWireframe;
   if(wireframe != null) {
     wireframe.updateState(action.screen, action.widget, action.eventParam);

@@ -21,7 +21,7 @@ class AFUIPrototypeThirdPartyHomeParam extends AFRouteParam {
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFUIPrototypeThirdPartyHomeScreen extends AFUIConnectedScreen<AFUIPrototypeThirdPartyHomeParam>{
+class AFUIPrototypeThirdPartyHomeScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeThirdPartyHomeParam>{
   AFUIPrototypeThirdPartyHomeScreen(): super(AFUIScreenID.screenPrototypeThirdPartyHome);
 
   static AFNavigatePushAction navigatePush(AFUILibraryExtensionContext libraryContext) {

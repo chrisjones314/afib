@@ -19,7 +19,7 @@ class AFUIStandardChoiceDialogRouteParam extends AFRouteParam {
 }
 
 //--------------------------------------------------------------------------------------
-class AFUIStandardChoiceDialog extends AFUIConnectedDialog<AFUIStandardChoiceDialogRouteParam> {
+class AFUIStandardChoiceDialog extends AFUIDefaultConnectedDialog<AFUIStandardChoiceDialogRouteParam> {
 
   //--------------------------------------------------------------------------------------
   AFUIStandardChoiceDialog(): super(AFUIScreenID.dialogStandardChoice);

@@ -49,8 +49,8 @@ class AFModelWithCustomID {
 }
 
 abstract class AFStateModelAccess {
-  T findModel<T extends Object>();
-  T? findModelOrNull<T extends Object>();
+  T findType<T extends Object>();
+  T? findTypeOrNull<T extends Object>();
   T findId<T extends Object>(String id);
   T? findIdOrNull<T extends Object>(String id);
   Iterable<Object> get allModels;
@@ -96,11 +96,11 @@ abstract class AFFlexibleState extends AFStateModelAccess {
     return models.values;
   }
 
-  T findModel<T extends Object>() {
+  T findType<T extends Object>() {
     return findModelWithCustomKey(T.toString());
   }
 
-  T? findModelOrNull<T extends Object>() {
+  T? findTypeOrNull<T extends Object>() {
     return findModelWithCustomKeyOrNull(T.toString());
   }
 

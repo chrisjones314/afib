@@ -20,7 +20,7 @@ class AFUIStandardErrorDialogRouteParam extends AFRouteParam {
 }
 
 //--------------------------------------------------------------------------------------
-class AFUIStandardErrorDialog extends AFUIConnectedDialog<AFUIStandardErrorDialogRouteParam> {
+class AFUIStandardErrorDialog extends AFUIDefaultConnectedDialog<AFUIStandardErrorDialogRouteParam> {
 
   //--------------------------------------------------------------------------------------
   AFUIStandardErrorDialog(): super(AFUIScreenID.dialogStandardError);

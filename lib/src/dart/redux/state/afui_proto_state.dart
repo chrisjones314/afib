@@ -7,10 +7,10 @@ import 'package:flutter/foundation.dart';
 
 
 mixin AFUIPrototypeStateModelAccess on AFStateModelAccess {
-  AFSingleScreenTests get screenTests { return findModel<AFSingleScreenTests>();}
+  AFSingleScreenTests get screenTests { return findType<AFSingleScreenTests>();}
   AFScreenPrototype? get prototype { return findIdOrNull<AFScreenPrototype>(AFUIPrototypeState.prototypeModel); }
   AFScreenTestContext? get testContext { return findIdOrNull<AFScreenTestContext>(AFBaseTestExecute.testExecuteId); }
-  AFSingleScreenTestState get testState { return findModel<AFSingleScreenTestState>(); }
+  AFSingleScreenTestState get testState { return findType<AFSingleScreenTestState>(); }
 }
 
 //---------------------------------------------------------------------------------------

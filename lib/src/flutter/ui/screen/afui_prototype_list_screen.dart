@@ -67,7 +67,7 @@ class AFUIPrototypeTestScreenParam extends AFRouteParam {
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFUIPrototypeTestScreen extends AFUIConnectedScreen<AFUIPrototypeTestScreenParam>{
+class AFUIPrototypeTestScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeTestScreenParam>{
 
   AFUIPrototypeTestScreen(): super(AFUIScreenID.screenPrototypeListSingleScreen);
 

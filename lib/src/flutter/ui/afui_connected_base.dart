@@ -52,12 +52,12 @@ class AFUIBuildContext<TStateView extends AFFlexibleStateView, TRouteParam exten
 
 
 
-abstract class AFUIConnectedScreen<TRouteParam extends AFRouteParam> extends AFConnectedScreen<AFUIPrototypeState, AFUITheme, AFUIBuildContext<AFUIPrototypeStateView, TRouteParam>, AFUIPrototypeStateView, TRouteParam> with AFUIConnectedUIMixin<AFUIPrototypeStateView, TRouteParam>, AFUIDefaultStateViewMixin<TRouteParam> {
-  AFUIConnectedScreen(AFScreenID screen): super(screen, AFUIThemeID.conceptualUI, AFUIPrototypeStateView.creator);
+abstract class AFUIDefaultConnectedScreen<TRouteParam extends AFRouteParam> extends AFConnectedScreen<AFUIPrototypeState, AFUITheme, AFUIBuildContext<AFUIPrototypeStateView, TRouteParam>, AFUIPrototypeStateView, TRouteParam> with AFUIConnectedUIMixin<AFUIPrototypeStateView, TRouteParam>, AFUIDefaultStateViewMixin<TRouteParam> {
+  AFUIDefaultConnectedScreen(AFScreenID screen): super(screen, AFUIThemeID.conceptualUI, AFUIPrototypeStateView.creator);
 }
 
-abstract class AFUIConnectedFilteredScreen<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreen<TStateView, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFUIConnectedUIMixin<TStateView, TRouteParam> {
-  AFUIConnectedFilteredScreen(AFScreenID screen, AFCreateStateViewDelegate<TStateView> creator): super(screen, AFUIThemeID.conceptualUI, creator);
+abstract class AFUIConnectedScreen<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreen<TStateView, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFUIConnectedUIMixin<TStateView, TRouteParam> {
+  AFUIConnectedScreen(AFScreenID screen, AFCreateStateViewDelegate<TStateView> creator): super(screen, AFUIThemeID.conceptualUI, creator);
 }
 
 abstract class AFUIConnectedDrawer<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedDrawer<AFUIPrototypeState, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFUIConnectedUIMixin<TStateView, TRouteParam> {
@@ -67,10 +67,10 @@ abstract class AFUIConnectedDrawer<TStateView extends AFFlexibleStateView, TRout
   ): super(screen, AFUIThemeID.conceptualUI, creator);
 }
 
-abstract class AFUIConnectedDialog<TRouteParam extends AFRouteParam> extends AFConnectedDialog<AFUIPrototypeState, AFUITheme, AFUIBuildContext<AFUIPrototypeStateView, TRouteParam>, AFUIPrototypeStateView, TRouteParam> with AFUIConnectedUIMixin<AFUIPrototypeStateView, TRouteParam>, AFUIDefaultStateViewMixin<TRouteParam> {
-  AFUIConnectedDialog(AFScreenID screen): super(screen, AFUIThemeID.conceptualUI, AFUIPrototypeStateView.creator);
+abstract class AFUIDefaultConnectedDialog<TRouteParam extends AFRouteParam> extends AFConnectedDialog<AFUIPrototypeState, AFUITheme, AFUIBuildContext<AFUIPrototypeStateView, TRouteParam>, AFUIPrototypeStateView, TRouteParam> with AFUIConnectedUIMixin<AFUIPrototypeStateView, TRouteParam>, AFUIDefaultStateViewMixin<TRouteParam> {
+  AFUIDefaultConnectedDialog(AFScreenID screen): super(screen, AFUIThemeID.conceptualUI, AFUIPrototypeStateView.creator);
 }
 
-abstract class AFUIConnectedFilteredDialog<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedDialog<AFUIPrototypeStateView, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFUIConnectedUIMixin<TStateView, TRouteParam> {
-  AFUIConnectedFilteredDialog(AFScreenID screen, AFCreateStateViewDelegate<TStateView> creator): super(screen, AFUIThemeID.conceptualUI, creator);
+abstract class AFUIConnectedDialog<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedDialog<AFUIPrototypeStateView, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam> with AFUIConnectedUIMixin<TStateView, TRouteParam> {
+  AFUIConnectedDialog(AFScreenID screen, AFCreateStateViewDelegate<TStateView> creator): super(screen, AFUIThemeID.conceptualUI, creator);
 }

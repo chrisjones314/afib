@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFUIPrototypeThirdPartyListScreen extends AFUIConnectedScreen<AFRouteParam>{
+class AFUIPrototypeThirdPartyListScreen extends AFUIDefaultConnectedScreen<AFRouteParam>{
   AFUIPrototypeThirdPartyListScreen(): super(AFUIScreenID.screenPrototypeThirdPartyList);
 
   static AFNavigatePushAction navigatePush() {

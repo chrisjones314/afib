@@ -76,7 +76,7 @@ class AFUIPrototypeHomeScreenParam extends AFRouteParam {
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFUIPrototypeHomeScreenParam>{
+class AFPrototypeHomeScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeHomeScreenParam>{
   static const runWidgetTestsId = "run_widget_tests";
   static const runScreenTestsId = "run_screen_tests";
   static const runWorkflowTestsId = "run_workflow_tests";

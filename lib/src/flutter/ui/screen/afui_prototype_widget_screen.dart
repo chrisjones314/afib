@@ -2,6 +2,7 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/id.dart';
 import 'package:afib/src/dart/redux/state/stateviews/afui_prototype_state_view.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
+import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -50,7 +51,6 @@ class AFUIPrototypeWidgetScreen extends AFUIDefaultConnectedScreen<AFUIPrototype
 
   Widget _buildScreen(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context) {
     /*
-    TODO: STATE VIEW REFACTOR FIX
     final test = context.p.test;
     final testStateSource = context.s.testState;
     if(testStateSource == null) { throw AFException("Missing test state source"); }

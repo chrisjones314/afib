@@ -197,7 +197,7 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
       themes: store.state.public.themes,
     );
 
-    var models = activeState.models;
+    var models = activeState.models ?? <String, Object>{};
     final stateView = this.stateViewCreator(models) as TStateView;
 
     final param = paramSeg?.param as TRouteParam;

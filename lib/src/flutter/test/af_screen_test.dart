@@ -1036,7 +1036,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   
   @override
   Future<void> updateStateViews(dynamic stateViews) {
-    final sv = AFibF.g.testData.findModels(stateViews);
+    final sv = AFibF.g.testData.resolveStateViewModels(stateViews);
     dispatcher.dispatch(AFUpdatePrototypeScreenTestModelsAction(this.testId, sv));
     return pauseForRender();
   }
@@ -1248,7 +1248,7 @@ class AFSingleScreenPrototype extends AFScreenPrototype {
 
   void onDrawerReset(AFDispatcher dispatcher) {
     AFSingleScreenPrototype.resetTestParam(dispatcher, this.id, this.navigate);
-    final sv = AFibF.g.testData.findModels(this.models);
+    final sv = AFibF.g.testData.resolveStateViewModels(this.models);
     dispatcher.dispatch(AFUpdatePrototypeScreenTestModelsAction(this.id, sv));
   }
 
@@ -1342,7 +1342,7 @@ class AFConnectedWidgetPrototype extends AFWidgetPrototype {
       param: AFUIPrototypeWidgetRouteParam(test: this, routeParam: this.routeParam),
       route: AFNavigateRoute.routeHierarchy
     ));
-    final sv = AFibF.g.testData.findModels(this.models);
+    final sv = AFibF.g.testData.resolveStateViewModels(this.models);
     dispatcher.dispatch(AFUpdatePrototypeScreenTestModelsAction(this.id, sv));
   }
 
@@ -1451,11 +1451,11 @@ class AFWidgetTests<TState> {
   AFSingleScreenPrototypeBody addConnectedPrototype({
     required AFPrototypeID   id,
     required AFRenderConnectedChildDelegate render,
-    dynamic stateViews,
+    dynamic models,
     required AFRouteParam routeParam,
     AFNavigatePushAction? navigate,
   }) {
-    final sv = AFibF.g.testData.findModels(stateViews);    
+    final sv = AFibF.g.testData.resolveStateViewModels(models);    
     final instance = AFConnectedWidgetPrototype(
       id: id,
       models: sv,
@@ -2094,13 +2094,13 @@ class AFWidgetTestDefinitionContext extends AFBaseTestDefinitionContext {
   AFSingleScreenPrototypeBody definePrototype({
     required AFPrototypeID id,
     required AFRenderConnectedChildDelegate render,
-    dynamic stateViews,
+    dynamic models,
     required AFRouteParam routeParam,
   }) {
     return tests.addConnectedPrototype(
       id: id,
       render: render,
-      stateViews: stateViews,
+      models: models,
       routeParam: routeParam,
     );
   }

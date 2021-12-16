@@ -4,7 +4,6 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_data_registry.dart';
 import 'package:afib/src/flutter/test/af_wireframe.dart';
-import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:meta/meta.dart';
 
 @immutable 
@@ -12,7 +11,7 @@ class AFSingleScreenTestState {
   final AFBaseTestID testId;
   final int pass;
   final List<String> errors;
-  final Map<String, Object> models;
+  final Map<String, Object>? models;
   final AFNavigatePushAction navigate;
   final dynamic routeParamId;
 

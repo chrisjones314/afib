@@ -2,6 +2,7 @@ import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:meta/meta.dart';
+import 'package:quiver/core.dart';
 
 /// When wrapped around a model object, causes it to be 
 /// referenced by the specified id in an 
@@ -90,6 +91,33 @@ abstract class AFFlexibleState extends AFStateModelAccess {
 
   static Map<String, Object> empty() {
     return <String, Object>{};
+  }
+
+  bool operator==(Object other) {
+    if(other is! AFFlexibleState) {
+      return false;
+    }
+    final modelsO = other.models;
+    if(models.length != modelsO.length) {
+      return false;
+    }
+
+    for(final keyT in models.keys) {
+      final modelT = models[keyT];
+      final modelO = modelsO[keyT];
+      if(modelT != modelO) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  int get hashCode {
+    var code = 0;
+    for(final model in models.values) {
+      code = hash2(code, model.hashCode);
+    }
+    return code;    
   }
 
   Iterable<Object> get allModels {

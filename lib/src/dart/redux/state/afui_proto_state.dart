@@ -10,7 +10,7 @@ mixin AFUIPrototypeStateModelAccess on AFStateModelAccess {
   AFSingleScreenTests get screenTests { return findType<AFSingleScreenTests>();}
   AFScreenPrototype? get prototype { return findIdOrNull<AFScreenPrototype>(AFUIPrototypeState.prototypeModel); }
   AFScreenTestContext? get testContext { return findIdOrNull<AFScreenTestContext>(AFBaseTestExecute.testExecuteId); }
-  AFSingleScreenTestState get testState { return findType<AFSingleScreenTestState>(); }
+  AFSingleScreenTestState get singleScreenTestState { return findType<AFSingleScreenTestState>(); }
 }
 
 //---------------------------------------------------------------------------------------

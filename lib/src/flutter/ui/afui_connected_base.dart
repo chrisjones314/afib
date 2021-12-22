@@ -21,7 +21,6 @@ mixin AFUIDefaultStateViewMixin<TRouteParam extends AFRouteParam> {
 
 
   //--------------------------------------------------------------------------------------
-   @override
   AFUIStateView<AFUIPrototypeStateView> createStateViewAF(AFState state, TRouteParam param, AFRouteSegmentChildren? withChildren) {
     final tests = AFibF.g.screenTests;
     return AFUIStateView<AFUIPrototypeStateView>(
@@ -32,10 +31,7 @@ mixin AFUIDefaultStateViewMixin<TRouteParam extends AFRouteParam> {
 
   //--------------------------------------------------------------------------------------
   AFUIStateView<AFUIPrototypeStateView> createStateView(AFBuildStateViewContext<AFUIPrototypeState, TRouteParam> context) {
-    final state = context.stateApp;
-    return AFUIStateView<AFUIPrototypeStateView>(
-      models: state.allModels
-    );
+    throw UnimplementedError();
   }
 
 }

@@ -50,13 +50,17 @@ class AFUIPrototypeWidgetScreen extends AFUIDefaultConnectedScreen<AFUIPrototype
   }
 
   Widget _buildScreen(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context) {
-    /*
     final test = context.p.test;
-    final testStateSource = context.s.testState;
-    if(testStateSource == null) { throw AFException("Missing test state source"); }
+    final testStateSource = AFibF.g.storeInternalOnly?.state.private.testState;    
+
+    if(testStateSource == null) {
+      throw AFException("Missing test state");
+    }
+
     final testContext = testStateSource.findContext(test.id);
     final testState = testStateSource.findState(test.id);
-    final testData = testState?.stateView ?? test.stateViews;
+    final testModels = testState?.models ?? test.models;
+
     final sourceWidget = test.render(this, AFUIWidgetID.widgetPrototypeTest);
     
     Widget resultWidget;
@@ -77,15 +81,14 @@ class AFUIPrototypeWidgetScreen extends AFUIDefaultConnectedScreen<AFUIPrototype
         themes: context.standard.themes,
       );
 
-      final childContext = sourceWidget.createContext(standard, testData, paramChild, context.children, themeChild);
+      final stateView = sourceWidget.stateViewCreator(testModels);
+
+      final childContext = sourceWidget.createContext(standard, stateView, paramChild, context.children, themeChild);
       resultWidget = sourceWidget.buildWithContext(childContext);
     } else {
       resultWidget = sourceWidget;
     }
-
     return _createScaffold(context, resultWidget);
-    */
-    return Text("TODO");
   }
 
   Widget _createScaffold(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context, Widget resultWidget) {

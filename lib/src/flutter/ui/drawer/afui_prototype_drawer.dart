@@ -442,7 +442,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeStateView, AF
     context.closeDrawer();
     Timer(Duration(seconds: 1), () async {         
       final prevContext = context.s.testContext as AFScreenTestContextSimulator?;
-      final testState = context.s.testState;
+      final testState = context.s.singleScreenTestState;
       if(testState != null) {   
         await test?.onDrawerRun(context.d, prevContext, testState, id, () {
           final revised = context.p.reviseView(AFUIPrototypeDrawerRouteParam.viewResults);
@@ -519,7 +519,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeStateView, AF
   void _buildTestReport(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> context, List<Widget> rows) {
     final t = context.t;
     final testContext = context.s.testContext;
-    final testState = context.s.testState;
+    final testState = context.s.singleScreenTestState;
     
     if(testContext == null) {
       return;

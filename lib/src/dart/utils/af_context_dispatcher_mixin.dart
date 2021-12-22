@@ -37,16 +37,14 @@ mixin AFContextDispatcherMixin {
   }
 
 
-  void dispatchWireframe(AFScreenID screen, AFID widget, {
-    Object? eventParam
-  }) {
+  void dispatchWireframeEvent(AFScreenID screen, AFID widget, Object? eventData) {
     if(!AFibD.config.isPrototypeMode || AFibF.g.storeInternalOnly?.state.private.testState.activeWireframe == null) {
       return;
     }
     dispatch(AFWireframeEventAction(
       screen: screen,
       widget: widget,
-      eventParam: eventParam
+      eventParam: eventData
     ));
   }
 

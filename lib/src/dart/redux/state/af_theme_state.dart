@@ -2665,7 +2665,7 @@ need to manually update the value in the controller.
         onPressed: () async {
           if(shouldContinueCheck == null || await shouldContinueCheck() == AFShouldContinue.yesContinue) {
             context.dispatchNavigate(AFNavigatePopAction(id: wid, worksInSingleScreenTest: worksInSingleScreenTest));
-            context.dispatchWireframe(screen, wid);
+            context.dispatchWireframeEvent(screen, wid, null);
           } 
         }
     );

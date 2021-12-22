@@ -241,7 +241,7 @@ class AFStateTest<TState extends AFFlexibleState> {
   void createCrossQueryResponse(dynamic querySpecifier, dynamic listenerSpecifier, List<AFCreateQueryResultDelegate> delegates) {
     registerResult(querySpecifier, (context, query) {
       final listenerId = _specifierToId(listenerSpecifier);
-      final listenerQuery = AFibF.g.findListenerQueryById(listenerId);
+      final listenerQuery = AFibF.g.storeInternalOnly?.state.public.queries.findListenerQueryById(listenerId);
 
       if(listenerQuery == null) {
         return;

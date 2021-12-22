@@ -151,7 +151,7 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
 
     // now, create the state view.
     final modelMap = AFFlexibleStateView.createModels(models);
-    final data = stateViewCreator(modelMap) as TStateView;
+    final data = stateViewCreator(modelMap);
 
     final context = createContext(standard, data, param, paramSeg.children, primaryTheme);
     return context;
@@ -164,12 +164,9 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
     if(activeTestId == null) {
       return null;
     }
-
     if(AFibF.g.testOnlyIsWorkflowTest(activeTestId)) {
       return null;
-    }
-
-    
+    }    
     final testContext = testState.findContext(activeTestId);
     final activeState = testState.findState(activeTestId);
     if(activeState == null) {
@@ -177,7 +174,7 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
     }
 
     final screen = activeState.navigate.screenId;
-    if(this.testOnlyRequireScreenIdMatchForTestContext && screen != this.primaryScreenId) {
+    if(testState.activeWireframe == null && this.testOnlyRequireScreenIdMatchForTestContext && screen != this.primaryScreenId) {
       return null;
     }
     if(this is AFUIPrototypeDrawer) {
@@ -198,7 +195,7 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
     );
 
     var models = activeState.models ?? <String, Object>{};
-    final stateView = this.stateViewCreator(models) as TStateView;
+    final stateView = this.stateViewCreator(models);
 
     final param = paramSeg?.param as TRouteParam;
     return createContext(standard, stateView, param, paramSeg?.children, tempTheme);
@@ -884,7 +881,8 @@ class AFBuildContext<TState extends AFFlexibleState, TStateView extends AFFlexib
   material.BuildContext get c { return context; }
 
   /// Dispatch an action or query.
-  void dispatch(dynamic action) { 
+  void dispatch(dynamic action) {
+
     if(_isInWireframe) {
       if(action is AFNavigateAction) {
         if(action is AFNavigatePopAction || 

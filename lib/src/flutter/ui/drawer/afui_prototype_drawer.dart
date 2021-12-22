@@ -443,13 +443,11 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeStateView, AF
     Timer(Duration(seconds: 1), () async {         
       final prevContext = context.s.testContext as AFScreenTestContextSimulator?;
       final testState = context.s.singleScreenTestState;
-      if(testState != null) {   
-        await test?.onDrawerRun(context.d, prevContext, testState, id, () {
-          final revised = context.p.reviseView(AFUIPrototypeDrawerRouteParam.viewResults);
-          updateRouteParam(context, revised);
-          test.openTestDrawer(id);
-        });
-      }
+      await test?.onDrawerRun(context.d, prevContext, testState, id, () {
+        final revised = context.p.reviseView(AFUIPrototypeDrawerRouteParam.viewResults);
+        updateRouteParam(context, revised);
+        test.openTestDrawer(id);
+      });
     });    
   }
 
@@ -525,7 +523,6 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeStateView, AF
       return;
     }
 
-    if(testState == null) throw AFException("Test State is null");
     rows.add(t.buildErrorsSection(context, testState.errors));
 
     final headerCols = t.row();

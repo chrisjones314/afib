@@ -167,7 +167,7 @@ typedef AFOnChangedStringDelegate = void Function(String);
 
 typedef AFCreateFunctionalThemeDelegate = AFFunctionalTheme Function(AFFundamentalThemeState fundamentals);
 
-typedef AFWireframeExecutionDelegate = void Function(AFWireframeExecutionContext we);
+typedef AFWireframeExecutionDelegate<TStateView extends AFFlexibleStateView> = void Function(AFWireframeExecutionContext<TStateView> we);
 
 typedef AFTestDataCompositeGeneratorDelegate = void Function(AFCompositeTestDataRegistry destination);
 

@@ -96,7 +96,7 @@ Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
       final dispatcher = AFSingleScreenTestDispatcher(prototype.id, storeDispatcher, null);
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, prototype.id, output, localStats);
       storeDispatcher.dispatch(AFResetToInitialStateAction());
-      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, models: prototype.models, navigate: prototype.navigate, stateViewId: null, routeParamId: null));
+      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, models: prototype.models, navigate: prototype.navigate));
       dispatcher.setContext(context);
       simpleContexts.add(context);
 
@@ -125,7 +125,7 @@ Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
 Future<void> _afWidgetTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
   return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.widgetTests.all, "Widget", (test) {
     return [
-      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models, modelsId: null, routeParamId: null),
+      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models),
       AFUIPrototypeWidgetScreen.navigatePush(test as AFWidgetPrototype)
     ];
   });
@@ -135,7 +135,7 @@ Future<void> _afSingleScreenTestMain<TState extends AFFlexibleState>(AFCommandOu
   return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.screenTests.all, "Single-Screen", (test) {
     final stateViews = AFibF.g.testData.resolveStateViewModels(test.models);
     return [
-      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: stateViews, modelsId: null, routeParamId: null),
+      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: stateViews),
       AFNavigatePushAction(
         routeParam: test.navigate.param,
         children: test.navigate.children,

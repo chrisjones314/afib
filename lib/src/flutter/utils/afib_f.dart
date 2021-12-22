@@ -2,9 +2,7 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/id.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
-import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
-import 'package:afib/src/dart/redux/middleware/af_async_queries.dart';
 import 'package:afib/src/dart/redux/middleware/af_query_middleware.dart';
 import 'package:afib/src/dart/redux/middleware/af_route_middleware.dart';
 import 'package:afib/src/dart/redux/reducers/af_reducer.dart';
@@ -105,7 +103,6 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   final AFAppExtensionContext appContext;
 
   final AFScreenMap screenMap = AFScreenMap();
-  final AFAsyncQueries _afAsyncQueries = AFAsyncQueries();
   final AFCompositeTestDataRegistry _afTestData = AFCompositeTestDataRegistry.create();
   final primaryUITests = AFLibraryTestHolder<TState>();
   final thirdPartyUITests = <AFLibraryID, AFLibraryTestHolder>{};
@@ -125,8 +122,6 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   AFScreenMap? _afPrototypeScreenMap;
   AFScreenID? forcedStartupScreen;
   int navDepth = 0;
-  Map<String, AFAsyncQueryListener?> listenerQueries = <String, AFAsyncQueryListener>{};
-  Map<String, AFDeferredQuery> deferredQueries = <String, AFDeferredQuery>{};
 
   /// The redux store, which contains the application state, NOT FOR PUBLIC USE.
   /// 
@@ -469,13 +464,6 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     appContext.dispatchLifecycleActions(dispatcher, lifecycle);
   }
 
-  /// A list of asynchronous queries the app uses to retrieve or manipulate remote data.
-  /// 
-  /// In redux terms, each query is a middleware processor, 
-  AFAsyncQueries get asyncQueries {
-    return _afAsyncQueries;
-  }
-
   /// Retrieves screen/data pairings used for prototyping and for screen-specific
   /// testing.
   AFSingleScreenTests get screenTests {
@@ -560,62 +548,6 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     appContext.updateQueryListeners(query, successContext);
   }
 
-  /// Register an ongoing listener query which must eventually be shut down.  
-  /// 
-  /// This is used internally by AFib anytime you dispatch a listener query,
-  /// you should not call it directly.
-  void registerListenerQuery(AFAsyncQueryListener query) {
-    final key = query.key;
-    AFibD.logQueryAF?.d("Registering listener query $key");
-    final current = listenerQueries[key];
-    if(current != null) {
-      current.afShutdown();
-    }
-    listenerQueries[key] = query;
-    
-  }
-
-  /// Register a query which executes asynchronously later.
-  /// 
-  /// This is used internally by AFib anytime you dispatch a deferred query,
-  /// you should not call it directly.
-  void registerDeferredQuery(AFDeferredQuery query) {
-    final key = query.key;
-    AFibD.logQueryAF?.d("Registering deferred query $key");
-    final current = deferredQueries[key];
-    if(current != null) {
-      current.afShutdown();
-    }
-    deferredQueries[key] = query; 
-  }
-
-  /// Shutdown all outstanding listener queries using [AFAsyncQueryListener.shutdown]
-  /// 
-  /// You might use this to shut down outstanding listener queries when a user logs out.
-  void shutdownOutstandingQueries() {
-    for(var query in listenerQueries.values) { 
-      query?.afShutdown();
-    }
-    listenerQueries.clear();
-
-    for(var query in deferredQueries.values) {
-      query.afShutdown();
-    }
-    deferredQueries.clear();
-  }
-
-  /// Shutdown a single outstanding listener query using [AFAsyncQueryListener.shutdown]
-  void shutdownListenerQuery(String key) {
-    final query = listenerQueries[key];
-    if(query != null) {
-      query.shutdown();
-      listenerQueries[key] = null;
-    }
-  }
-
-  AFAsyncQueryListener? findListenerQueryById(String key) {
-    return listenerQueries[key];
-  }
 
   /// testOnlySetForcedStartupScreen
   void testOnlySetForcedStartupScreen(AFScreenID id) {

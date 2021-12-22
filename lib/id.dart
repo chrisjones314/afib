@@ -43,6 +43,7 @@ class AFUIReusableTestID {
   static const smoke = AFScreenTestID("smoke", AFUILibraryID.id);
   static const all = AFScreenTestID("all", AFUILibraryID.id);
   static const workflow = AFScreenTestID("workflow", AFUILibraryID.id);
+  static const wireframe = AFScreenTestID("wireframe", AFUILibraryID.id);
 }
 
 class AFUITranslationID {

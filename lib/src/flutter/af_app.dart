@@ -17,7 +17,6 @@ abstract class AFApp<AppState> extends StatelessWidget {
 
   void afAfterRunApp() {
     afterRunApp();
-    AFibF.g.shutdownOutstandingQueries();
   }
 
   /// Called before the main flutter runApp loop.  

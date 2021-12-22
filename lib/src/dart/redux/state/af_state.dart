@@ -1,4 +1,5 @@
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/af_query_state.dart';
 import 'package:afib/src/dart/redux/state/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/af_test_state.dart';
 import 'package:afib/src/dart/redux/state/af_theme_state.dart';
@@ -10,12 +11,14 @@ import 'package:meta/meta.dart';
 class AFPublicState {
   final AFRouteState route;
   final AFThemeState themes;
+  final AFQueryState queries;
   final AFComponentStates components;
 
   AFPublicState({
     required this.route,
     required this.themes,
-    required this.components
+    required this.components,
+    required this.queries,
   });
 
   T componentState<T extends AFFlexibleState>() {
@@ -30,11 +33,13 @@ class AFPublicState {
     AFRouteState? route,
     AFThemeState? themes,
     AFComponentStates? components,
+    AFQueryState? queries,
   }) {
     return AFPublicState(
       components: components ?? this.components,
       themes: themes ?? this.themes,
       route: route ?? this.route,
+      queries: queries ?? this.queries,
     );
   }
 }
@@ -77,7 +82,8 @@ class AFState {
       public: AFPublicState(
         route: AFRouteState.initialState(),
         themes: AFibF.g.initializeThemeState(components: components),
-        components: components
+        components: components,
+        queries: AFQueryState.initialState()
       ),
       private: AFPrivateState(
         testState: AFTestState.initial(),

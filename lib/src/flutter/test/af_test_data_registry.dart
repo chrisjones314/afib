@@ -88,15 +88,7 @@ class AFCompositeTestDataRegistry extends AFAtomicTestDataRegistry {
     return null;
   }
 
-
-
-  AFCompositeTestDataRegistry cloneForWireframe() {
-    return AFCompositeTestDataRegistry(
-      testData: Map<dynamic, dynamic>.from(testData),
-      generators: generators,
-    );
-  }
-
+  
   void regenerate() {
     for(final gen in generators) {
       gen(this);

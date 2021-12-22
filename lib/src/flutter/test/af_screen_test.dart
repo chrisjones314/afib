@@ -1188,7 +1188,7 @@ abstract class AFScreenPrototype {
     }
 
     final testContext = AFScreenTestContextSimulator(dispatcher, this.id, runNumber, idSelected);
-    dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(testContext, navigate: navigate, models: this.models, stateViewId: null, routeParamId: null));
+    dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(testContext, navigate: navigate, models: this.models));
     return testContext;
   }
 
@@ -1224,8 +1224,6 @@ class AFSingleScreenPrototype extends AFScreenPrototype {
       this, 
       navigate: this.navigate,
       models: actualModels, 
-      modelsId: AFCompositeTestDataRegistry.filterTestId(actualModels),
-      routeParamId: AFCompositeTestDataRegistry.filterTestId(rvp),
     ));
     dispatcher.dispatch(AFNavigatePushAction(
       routeParam: rp,
@@ -1296,8 +1294,6 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, 
       models: actualModels, 
       navigate: AFNavigatePushAction(routeParam: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
-      modelsId: AFCompositeTestDataRegistry.filterTestId(actualModels),
-      routeParamId: AFCompositeTestDataRegistry.filterTestId(rpp),
     ));
     dispatcher.dispatch(AFUIPrototypeWidgetScreen.navigatePush(this, id: this.id));    
   }
@@ -1393,7 +1389,7 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
     dispatcher.dispatch(AFNavigatePushAction(
       routeParam: screenMap.trueCreateStartupScreenParam!.call()
     ));
-    dispatcher.dispatch(AFStartPrototypeScreenTestAction(test, navigate: test.navigate, modelsId: null, routeParamId: null));
+    dispatcher.dispatch(AFStartPrototypeScreenTestAction(test, navigate: test.navigate));
 
     // lookup the test.
     final testImpl = AFibF.g.stateTests.findById(test.stateTestId);
@@ -1675,7 +1671,7 @@ abstract class AFWorkflowTestExecute {
     required Function(AFScreenTestExecute) body,
   });
   
-  Future<void> pushQueryListener<TState extends AFFlexibleState, TQueryResponse>(AFAsyncQueryListener specifier, AFWorkflowTestDefinitionContext definitions, dynamic testData);
+  Future<void> pushQueryListener<TState extends AFFlexibleState, TQueryResponse>(AFAsyncListenerQuery specifier, AFWorkflowTestDefinitionContext definitions, dynamic testData);
 }
 
 
@@ -1703,7 +1699,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     } 
   }
 
-  Future<void> pushQueryListener<TState extends AFFlexibleState, TQueryResponse>(AFAsyncQueryListener query, AFWorkflowTestDefinitionContext definitions, dynamic testData) async {
+  Future<void> pushQueryListener<TState extends AFFlexibleState, TQueryResponse>(AFAsyncListenerQuery query, AFWorkflowTestDefinitionContext definitions, dynamic testData) async {
     assert(TState != AFFlexibleState, "You need to specify a AFFlexibleState subclass as a type parameter");
     assert(TQueryResponse != dynamic, "You need to specify a type for the query response");
     final td = definitions.td(testData);

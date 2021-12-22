@@ -4,6 +4,7 @@ import 'package:afib/id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/stateviews/afui_prototype_state_view.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
+import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
@@ -32,18 +33,21 @@ class AFUIPrototypeWireframesListScreen extends AFUIDefaultConnectedScreen<AFRou
     final rowsCard = t.column();
 
     for(final wireframe in AFibF.g.wireframes.wireframes) {
-      final test = AFibF.g.findScreenTestById(wireframe.initialScreen);
-      if(test == null) {
-        assert(false);
-        continue;
-      }
+
+      final body = AFSingleScreenPrototypeBody(wireframe.id);
+      final test = AFSingleScreenPrototype(
+        id: wireframe.id,
+        navigate: wireframe.navigate,
+        models: wireframe.models,
+        body: body
+      );
+
       rowsCard.add(
         t.createTestListTile(context.d, test,
-          title: wireframe.name,
-          subtitle: test.id.toString(),
-          onTap: () {
+          title: wireframe.id.toString(),
+          onTap: () {            
             context.dispatch(AFStartWireframeAction(wireframe: wireframe));
-            test.startScreen(context.d, wireframe.registry);
+            test.startScreen(context.d, wireframe.testData);
           }
         )
       );

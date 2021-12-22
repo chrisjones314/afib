@@ -9,22 +9,51 @@ class AFWireframes {
   }  
 }
 
-class AFWireframeExecutionContext {
+class AFWireframeExecutionContext<TStateView extends AFFlexibleStateView> {
   final AFScreenID screen;
   final AFID widget;
   final dynamic eventParam;
   final AFWireframe wireframe;
+  Map<String, Object> models;
+  TStateView stateView;
+  final AFCreateStateViewDelegate<TStateView> stateViewCreator;
+
 
   AFWireframeExecutionContext({
     required this.screen,
     required this.widget,
     required this.eventParam,
     required this.wireframe,
+    required this.models,
+    required this.stateView,
+    required this.stateViewCreator,
   });
+
+  TStateView get s { 
+    return stateView;
+  }
+
+  bool isScreen(AFScreenID screenId) {
+    return this.screen == screenId;
+  }
+
+  bool isWidget(AFWidgetID widgetId) {
+    return this.widget == widgetId;
+  }
 
   void navigatePop() {
     _dispatch(AFNavigatePopAction());
     _dispatch(AFStartWireframePopTestAction());
+  }
+
+  void updateModel(dynamic source) {
+    updateModels([source]);
+  }
+
+  void updateModels(dynamic sourceModels) {
+    final resolved = wireframe.testData.resolveStateViewModels(sourceModels);
+    models = AFFlexibleState.integrate(models, resolved.values);
+    stateView = stateViewCreator(models);
   }
 
   void navigateTo(AFPrototypeID testId, { AFRouteParam? routeParam, List<Object>? models }) {
@@ -32,25 +61,12 @@ class AFWireframeExecutionContext {
     final dispatcher = AFibF.g.storeDispatcherInternalOnly;
     assert(dispatcher != null && test != null);
     if(dispatcher != null && test != null) {
-      test.startScreen(dispatcher, wireframe.registry, routeParam: routeParam, models: models);
+      test.startScreen(dispatcher, wireframe.testData, routeParam: routeParam, models: models);
     }
   }
 
   dynamic td(dynamic id) {
-    return wireframe.registry.f(id);
-  }
-
-  void updateTestData(dynamic objectId, dynamic value, { bool updateStates = true }) {
-    wireframe.updateTestData(objectId, value);
-    if(!updateStates) {
-      return;
-    }
-    // now, regenerate the composite objects.
-    wireframe.registry.regenerate();
-
-    // then, go through all active screens in the hierarchy, and update their stateViews.
-    _dispatch(AFTestUpdateWireframeStateViews(wireframe.registry));
-
+    return wireframe.testData.f(id);
   }
 
   void _dispatch(dynamic action) {
@@ -59,41 +75,60 @@ class AFWireframeExecutionContext {
   }
 }
 
-class AFWireframe {
-  final String name;
-  final AFPrototypeID initialScreen;
-  final AFWireframeExecutionDelegate body;
-  final AFCompositeTestDataRegistry registry;
+class AFWireframe<TStateView extends AFFlexibleStateView> {
+  final AFPrototypeID id;
+  final AFNavigatePushAction navigate;
+  final AFWireframeExecutionDelegate<TStateView> body;
+  final AFCompositeTestDataRegistry testData;
+  final dynamic models;
+  final AFCreateStateViewDelegate<TStateView> stateViewCreator;
 
   AFWireframe({
-    required this.name, 
-    required this.initialScreen, 
+    required this.id,
+    required this.navigate, 
     required this.body,
-    required this.registry
+    required this.testData,
+    required this.models,
+    required this.stateViewCreator,
   });
 
   factory AFWireframe.create({
-    required String name,
-    required AFPrototypeID initialScreen,
-    required AFWireframeExecutionDelegate body
+    required AFPrototypeID id,
+    required AFNavigatePushAction navigate,
+    required AFWireframeExecutionDelegate body,
+    required dynamic models,
+    required AFCreateStateViewDelegate<TStateView> stateViewCreator,
   }) {
-    final registry = AFibF.g.testData.cloneForWireframe();
-    return AFWireframe(name: name, initialScreen: initialScreen, body: body, registry: registry);
-  }
-
-  void updateTestData(dynamic objectId, dynamic value) {
-    registry.registerAtomic(objectId, value);
+    final testData = AFibF.g.testData;
+    return AFWireframe<TStateView>(id: id, navigate: navigate, body: body, testData: testData, models: models, stateViewCreator: stateViewCreator);
   }
 
 
-  void updateState(AFScreenID screen, AFID widget, dynamic param) {
+  void onEvent(AFScreenID screen, AFID widget, dynamic param, Map<String, Object> models) {
+    final modelsCopy = Map<String, Object>.from(models);
+    final stateViewOrig = stateViewCreator(modelsCopy);
     final context = AFWireframeExecutionContext(
       screen: screen,
       widget: widget,
       eventParam: param,
       wireframe: this,
+      models: modelsCopy,
+      stateView: stateViewOrig,
+      stateViewCreator: this.stateViewCreator
     );
+
     body(context);
+
+    // if the state view changed, then we need to update the models
+    // in the test data state.
+    if(stateViewOrig != context.stateView) {
+      AFibF.g.storeInternalOnly?.dispatch(AFUpdatePrototypeScreenTestModelsAction(
+        AFUIReusableTestID.wireframe,
+        context.models 
+      ));
+    }
+
+
   }
 }
 
@@ -107,16 +142,20 @@ class AFWireframeDefinitionContext {
   });
 
 
-  AFWireframe defineWireframe({
-    required String name,
-    required AFPrototypeID initialScreen,
-    required AFWireframeExecutionDelegate body,
+  AFWireframe defineWireframe<TStateView extends AFFlexibleStateView>({
+    required AFPrototypeID id,
+    required AFNavigatePushAction navigate,
+    required AFWireframeExecutionDelegate<TStateView> body,
+    required dynamic models,
+    required AFCreateStateViewDelegate<TStateView> stateViewCreator,
   }) {
-    final wf = AFWireframe(
-      name: name, 
-      initialScreen: initialScreen, 
+    final wf = AFWireframe<TStateView>(
+      id: id,
+      navigate: navigate, 
       body: body,
-      registry: AFibF.g.testData
+      testData: AFibF.g.testData,
+      models: models,
+      stateViewCreator: stateViewCreator,
     );
     wireframes.add(wf);
     return wf;

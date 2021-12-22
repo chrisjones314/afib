@@ -19,16 +19,22 @@ import 'package:flutter/material.dart' as material;
 import 'package:logger/logger.dart';
 
 class AFStartQueryContext<TResponse> {
+  final AFDispatcher dispatcher;
   final void Function(TResponse) onSuccess;
   final void Function(AFQueryError) onError;
 
   AFStartQueryContext({
+    required this.dispatcher,
     required this.onSuccess, 
     required this.onError
   });
 
   Logger? get log {
     return AFibD.log(AFConfigEntryLogArea.query);
+  }
+
+  void dispatch(dynamic action) {
+    dispatcher.dispatch(action);
   }
 }
 
@@ -50,7 +56,7 @@ class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextDispatc
   }
 
   TState get s {
-    var result = state.public.componentState<TState>();
+    var result = state.public.componentStateOrNull<TState>();
     if(result == null) throw AFException("Missing $TState");
     return result;
   }
@@ -156,6 +162,7 @@ abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends A
   /// Called internally when redux middleware begins processing a query.
   void startAsyncAF(AFDispatcher dispatcher, AFStore store, { void Function(dynamic)? onResponseExtra, void Function(dynamic)? onErrorExtra }) {
     final startContext = AFStartQueryContext<TResponse>(
+      dispatcher: dispatcher,
       onSuccess: (response) { 
         // note: there could be multiple queries outstanding at once, meaning the state
         // might be changed by some other query while we are waiting for a responser.  
@@ -430,8 +437,8 @@ class AFConsolidatedQuery<TState extends AFFlexibleState> extends AFAsyncQuery<T
 /// Afib will automatically track these queries when you dispatch them.  You can dispatch the
 /// [AFShutdownQueryListeners] action to call the shutdown method on some or all outstanding
 /// listeners.  
-abstract class AFAsyncQueryListener<TState extends AFFlexibleState, TResponse> extends AFAsyncQuery<TState, TResponse> {
-  AFAsyncQueryListener({
+abstract class AFAsyncListenerQuery<TState extends AFFlexibleState, TResponse> extends AFAsyncQuery<TState, TResponse> {
+  AFAsyncListenerQuery({
     AFID? id, 
     List<dynamic>? successActions, 
     AFOnResponseDelegate<TState, TResponse>? onSuccessDelegate, 

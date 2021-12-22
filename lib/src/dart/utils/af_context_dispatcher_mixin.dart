@@ -38,12 +38,12 @@ mixin AFContextDispatcherMixin {
 
 
   void dispatchWireframe(AFScreenID screen, AFID widget, {
-    dynamic eventParam
+    Object? eventParam
   }) {
     if(!AFibD.config.isPrototypeMode || AFibF.g.storeInternalOnly?.state.private.testState.activeWireframe == null) {
       return;
     }
-    dispatch(AFNavigateWireframeAction(
+    dispatch(AFWireframeEventAction(
       screen: screen,
       widget: widget,
       eventParam: eventParam
@@ -79,12 +79,12 @@ mixin AFContextDispatcherMixin {
     dispatch(query);
   }
 
-  /// Dispatch an [AFAsyncQueryListener], which establishes a channel that
+  /// Dispatch an [AFAsyncListenerQuery], which establishes a channel that
   /// recieves results on an ongoing basis (e.g. via a websocket).
   /// 
   /// This is just here for discoverability, it is no different from
   /// dispatch(query).
-  void dispatchQueryListener(AFAsyncQueryListener query) {
+  void dispatchQueryListener(AFAsyncListenerQuery query) {
     dispatch(query);
   }
 

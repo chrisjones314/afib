@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
+import 'package:afib/src/dart/redux/actions/af_query_actions.dart';
 import 'package:afib/src/dart/redux/state/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
@@ -38,7 +38,7 @@ abstract class AFDeferredQuery<TState extends AFFlexibleState> extends AFAsyncQu
     if(nextD.inMicroseconds == 0) {
       context.onSuccess(AFUnused.unused);
       if(nextDelay == null) {
-        afShutdown();
+        afShutdown(context);
       }
       return;
     }
@@ -46,7 +46,7 @@ abstract class AFDeferredQuery<TState extends AFFlexibleState> extends AFAsyncQu
       AFibD.logQueryAF?.d("Executing finishAsyncExecute for deferred query $this");
       context.onSuccess(AFUnused.unused);
       if(nextDelay == null) {
-        afShutdown();
+        afShutdown(context);
       } else {
         AFibD.logQueryAF?.d("Waiting $nextDelay to execute $key again");
       }
@@ -65,9 +65,12 @@ abstract class AFDeferredQuery<TState extends AFFlexibleState> extends AFAsyncQu
   /// again after another delay.
   Duration? finishAsyncExecute(AFFinishQuerySuccessContext<TState, AFUnused> context);
 
-  void afShutdown() {
+  void afShutdown(AFStartQueryContext<AFUnused>? context) {
     if(timer != null) {
       AFibD.logQueryAF?.d("Shutting down deferred query $this");
+      if(context != null) {
+        context.dispatch(AFShutdownDeferredQueryAction(this.key));
+      }
       timer?.cancel();
       timer = null;
       shutdown();
@@ -107,10 +110,5 @@ class AFDeferredSuccessQuery<TState extends AFFlexibleState> extends AFDeferredQ
 
 }
 
-/// Shuts down outstanding deferred and listener queries.
-class AFShutdownOngoingQueriesAction extends AFActionWithKey {
-
-
-}
 
 

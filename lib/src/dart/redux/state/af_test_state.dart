@@ -2,7 +2,6 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
-import 'package:afib/src/flutter/test/af_test_data_registry.dart';
 import 'package:afib/src/flutter/test/af_wireframe.dart';
 import 'package:meta/meta.dart';
 
@@ -13,7 +12,6 @@ class AFSingleScreenTestState {
   final List<String> errors;
   final Map<String, Object>? models;
   final AFNavigatePushAction navigate;
-  final dynamic routeParamId;
 
   AFSingleScreenTestState({
     required this.testId,
@@ -21,7 +19,6 @@ class AFSingleScreenTestState {
     required this.pass, 
     required this.errors, 
     required this.models, 
-    required this.routeParamId,
   });
 
   AFSingleScreenTestState reviseModels(dynamic data) {
@@ -66,7 +63,6 @@ class AFSingleScreenTestState {
       pass: pass ?? this.pass,
       navigate: this.navigate,
       testId: this.testId,
-      routeParamId: this.routeParamId,
     );
   }
 }
@@ -119,26 +115,19 @@ class AFTestState {
   }
 
   AFSingleScreenTestState? findState(AFBaseTestID id) {
+    // if we are in an active wireframe, then use the test state for that wireframe.
+    if(activeWireframe != null) {
+      return testStates[AFUIReusableTestID.wireframe];
+    }
+
     return testStates[id];
   }
 
-  AFTestState navigateToTest(AFScreenPrototype test, AFNavigatePushAction navigate, dynamic models, String? modelsId, String? routeParamId) {
-    final revisedStates = _createTestState(test.id, test.navigate, models, modelsId, routeParamId);
+  AFTestState navigateToTest(AFScreenPrototype test, AFNavigatePushAction navigate, dynamic models) {
+    final revisedStates = _createTestState(test.id, test.navigate, models);
     final revisedActive = List<AFBaseTestID>.from(activeTestIds);
     revisedActive.add(test.id);
     return copyWith(activeTestIds: revisedActive, testStates: revisedStates);
-  }
-
-  AFTestState updateWireframeStateViews(AFCompositeTestDataRegistry registry) {
-    /* TODO: STATE VIEW REFACTOR
-    final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(this.testStates);
-    for(final testState in testStates.values) {
-      final stateView = registry.f(testState.stateViewId);
-      revisedStates[testState.testId] = testState.reviseStateView(stateView);
-    }
-    return copyWith(testStates: revisedStates);
-    */
-    return copyWith();
   }
 
   AFTestState popWireframeTest() {
@@ -163,14 +152,29 @@ class AFTestState {
 
 
   AFTestState startWireframe(AFWireframe wireframe) {
-    return copyWith(activeWireframe: wireframe);
+
+    final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
+    final testId = AFUIReusableTestID.wireframe;
+    final models = AFibF.g.testData.resolveStateViewModels(wireframe.models);
+    final currentState = revisedStates[testId] ?? AFSingleScreenTestState(
+      testId: AFUIReusableTestID.wireframe,
+      models: models,
+      pass: 0, 
+      errors: <String>[],
+      navigate: AFNavigatePushAction(routeParam: AFRouteParamUnused.unused)
+    );
+    revisedStates[testId] = currentState.reviseModels(models);
+    return copyWith(
+      activeWireframe: wireframe,
+      testStates: revisedStates
+    );
   }
 
-  Map<AFBaseTestID, AFSingleScreenTestState> _createTestState(AFBaseTestID testId, AFNavigatePushAction navigate, dynamic models, String? stateViewId, String? routeParamId) {
+  Map<AFBaseTestID, AFSingleScreenTestState> _createTestState(AFBaseTestID testId, AFNavigatePushAction navigate, dynamic models) {
     final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
     final orig = testStates[testId];
     if(orig == null) {
-      revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: <String>[], models: models, routeParamId: routeParamId, navigate: navigate);
+      revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: <String>[], models: models, navigate: navigate);
     } else {
       revisedStates[testId] = orig.copyWith(pass: 0, errors: <String>[]);
     }
@@ -178,11 +182,11 @@ class AFTestState {
 
   }
 
-  AFTestState startTest(AFScreenTestContext simulator, AFNavigatePushAction navigate, dynamic data, String? stateViewId, String? routeParamId) {
+  AFTestState startTest(AFScreenTestContext simulator, AFNavigatePushAction navigate, dynamic data) {
     final testId = simulator.testId;
     final revisedContexts = Map<AFBaseTestID, AFScreenTestContext>.from(testContexts);
     revisedContexts[testId] = simulator;
-    final revisedStates = _createTestState(testId, navigate, data, stateViewId, routeParamId);
+    final revisedStates = _createTestState(testId, navigate, data);
     var revisedActive = activeTestIds;
     if(activeTestIds.isEmpty || activeTestIds.last != simulator.testId) {
       revisedActive = List<AFBaseTestID>.from(activeTestIds);

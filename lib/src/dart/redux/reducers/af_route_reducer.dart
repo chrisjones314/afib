@@ -1,8 +1,6 @@
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_route_state.dart';
-import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:redux/redux.dart';
 
 //---------------------------------------------------------------------------
@@ -18,7 +16,6 @@ final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigateSetChildParamAction>(_navSetChildParam),
   TypedReducer<AFRouteState, AFNavigateAddChildParamAction>(_navAddChildParam),
   TypedReducer<AFRouteState, AFNavigateRemoveChildParamAction>(_navRemoveChildParam),
-  TypedReducer<AFRouteState, AFShutdownOngoingQueriesAction>(_shutdownQueries),
   TypedReducer<AFRouteState, AFResetToInitialRouteAction>(_resetToInitialRoute),
 ]);
 
@@ -77,12 +74,6 @@ AFRouteState _navRemoveChildParam(AFRouteState state, AFNavigateRemoveChildParam
 //---------------------------------------------------------------------------
 AFRouteState _navExitTest(AFRouteState state, AFNavigateExitTestAction action) {
   return state.exitTest();
-}
-
-//---------------------------------------------------------------------------
-AFRouteState _shutdownQueries(AFRouteState state, AFShutdownOngoingQueriesAction action) {
-  AFibF.g.shutdownOutstandingQueries();
-  return state;
 }
 
 //---------------------------------------------------------------------------

@@ -391,6 +391,34 @@ class AFSparsePathWidgetSelector extends AFWidgetSelector {
 
 }
 
+class AFTestParams {
+  final List<Object?> params;
+  AFTestParams(this.params);
+
+  T getParam<T extends Object>(int idx) {
+    final result = getParamOrNull<T>(idx);
+    if(result == null) {
+      throw AFException("Expected test parameter at $idx to be non-null, if it can be null use getParamOrNull instead");
+    }
+    return result;
+  }
+
+  T? getParamOrNull<T extends Object>(int idx) {
+    if(idx < 0 || idx >= params.length) {
+      throw AFException("Attempting to access test parameter at $idx but there are only ${params.length} params");
+    }
+
+    final obj = params[idx];
+    if(obj == null) {
+      return null;
+    }
+    if(obj is! T?) {
+      throw AFException("Expected test parameter at $idx to have type ${T.toString()}, but it is a ${obj.runtimeType.toString()}");
+    }
+    return obj as T?;
+  }
+}
+
 abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFactorMixin {
   AFBaseTestID testId;
   final underPaths = <AFSparsePathWidgetSelector?>[];
@@ -409,7 +437,6 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
 
   AFScreenID get activeScreenId;
   bool isEnabled(AFBaseTestID id) { return true; }
-
 
   @override
   AFBaseTestID get testID => testId;
@@ -774,11 +801,9 @@ class AFScreenTestDescription {
 
 
 class AFScreenTestBody extends AFScreenTestDescription {
-  final AFReusableScreenTestBodyExecuteDelegate3 body;
+  final AFReusableScreenTestBodyExecuteDelegate body;
   final AFSingleScreenReusableBody? bodyReusable;
-  final dynamic param1;
-  final dynamic param2;
-  final dynamic param3;
+  final List<Object?> params;
   
   
   AFScreenTestBody({
@@ -786,9 +811,7 @@ class AFScreenTestBody extends AFScreenTestDescription {
     required String? description,
     required this.body, 
     this.bodyReusable,
-    required this.param1,
-    required this.param2,
-    required this.param3,
+    required this.params,
     required String? disabled,
   }): super(id, description, disabled);
 
@@ -816,13 +839,11 @@ class AFSingleScreenPrototypeBody {
 
   factory AFSingleScreenPrototypeBody.createReusable(AFScreenTestID id, {
     String? disabled,
-    dynamic param1,
-    dynamic param2,
-    dynamic param3,
+    required List<Object?> params,
     String? description,
-    required AFReusableScreenTestBodyExecuteDelegate3 body
+    required AFReusableScreenTestBodyExecuteDelegate body
   }) {
-    final bodyTest = AFScreenTestBody(id: id, description: description, disabled: disabled, param1: param1, param2: param2, param3: param3, bodyReusable: null, body: body);
+    final bodyTest = AFScreenTestBody(id: id, description: description, disabled: disabled, params: params, bodyReusable: null, body: body);
     final proto = AFSingleScreenPrototypeBody(null);
     proto.addReusable(bodyTest);
     return proto;
@@ -853,8 +874,8 @@ class AFSingleScreenPrototypeBody {
 
   void defineSmokeTest(AFScreenTestID id, { required AFScreenTestBodyExecuteDelegate body, String? description, String? disabled }) async {
     // in the first section, always add a scaffold widget collector.
-  
-    addSmokeTest(AFScreenTestBody(id: id, description: description, disabled: disabled, param1: null, param2: null, param3: null, bodyReusable: null, body: (sse, p1, p2, p3) async {
+
+    addSmokeTest(AFScreenTestBody(id: id, description: description, disabled: disabled, params: [], bodyReusable: null, body: (sse, params) async {
       await body(sse);
     }));
   }
@@ -866,15 +887,13 @@ class AFSingleScreenPrototypeBody {
   void executeReusable(AFSingleScreenTests tests, AFScreenTestID bodyId, {
     String? description,
     String? disabled,
-    dynamic param1,
-    dynamic param2,
-    dynamic param3
+    required List<Object?> params,
   }) {
     final body = tests.findReusable(bodyId);
     if(body == null) {
       throw AFException("The reusable test $bodyId must be defined using tests.defineReusable");
     }
-    final bodyTest = AFScreenTestBody(id: bodyId, description: description, disabled: disabled, body: body.body, bodyReusable: body, param1: param1, param2: param2, param3: param3);;
+    final bodyTest = AFScreenTestBody(id: bodyId, description: description, disabled: disabled, body: body.body, bodyReusable: body, params: params);;
     addReusable(bodyTest);
   }
 
@@ -904,7 +923,7 @@ class AFSingleScreenPrototypeBody {
     return result;
   }
 
-  Future<void> _runTests(AFScreenTestExecute context, List<AFScreenTestBody> sections, { dynamic param1, dynamic param2, dynamic param3}) async {
+  Future<void> _runTests(AFScreenTestExecute context, List<AFScreenTestBody> sections, { List<Object?>? params }) async {
     var sectionGuard = 0;
     var sectionPrev;
     for(final section in sections) {
@@ -928,14 +947,13 @@ class AFSingleScreenPrototypeBody {
       sectionPrev = section;
 
 
-      if(param1 == null) {
-        param1 = section.param1;
-        param2 = section.param2;
-        param3 = section.param3;
+      if(params == null) {
+        params = section.params;
       }
 
       context.startSection(section.id, resetSection: true);
-      final fut = section.body(context, param1, param2, param3);
+      final paramsFull = AFTestParams(params);
+      final fut = section.body(context, paramsFull);
       _checkFutureExists(fut);
       await fut;
       context.endSection();
@@ -945,10 +963,10 @@ class AFSingleScreenPrototypeBody {
     }
   }
 
-  Future<void> run(AFScreenTestExecute context, { dynamic param1, dynamic param2, dynamic param3, Function? onEnd}) async {
-    await _runTests(context, smokeTests, param1: param1, param2: param2, param3: param3);
-    await _runTests(context, reusableTests, param1: param1, param2: param2, param3: param3);
-    await _runTests(context, regressionTests, param1: param1, param2: param2, param3: param3);
+  Future<void> run(AFScreenTestExecute context, { List<Object?>? params, Function? onEnd}) async {
+    await _runTests(context, smokeTests, params: params);
+    await _runTests(context, reusableTests, params: params);
+    await _runTests(context, regressionTests, params: params);
     if(onEnd != null) {
       onEnd();
     }
@@ -1231,8 +1249,8 @@ class AFSingleScreenPrototype extends AFScreenPrototype {
     ));
   }
 
-  Future<void> run(AFScreenTestExecute context, { dynamic param1, dynamic param2, dynamic param3, Function? onEnd}) {
-    return body.run(context, onEnd: onEnd, param1: param1, param2: param2, param3: param3);
+  Future<void> run(AFScreenTestExecute context, { List<Object?>? params, Function? onEnd}) {
+    return body.run(context, onEnd: onEnd, params: params);
   }
 
   static void resetTestParam(AFDispatcher dispatcher, AFBaseTestID testId, AFNavigatePushAction navigate) {
@@ -1476,7 +1494,7 @@ class AFWidgetTests<TState> {
 class AFSingleScreenReusableBody {
   final AFScreenTestID id;
   final AFSingleScreenPrototypeBody prototype;
-  final AFReusableScreenTestBodyExecuteDelegate3 body;
+  final AFReusableScreenTestBodyExecuteDelegate body;
 
   AFSingleScreenReusableBody({
     required this.id,
@@ -1503,28 +1521,11 @@ class AFSingleScreenTests<TState> {
     return _singleScreenTests;
   }
 
-  void defineReusableTest1({
+  void defineReusableTest({
     required AFScreenTestID id, 
     required AFSingleScreenPrototypeBody prototype, 
-    required AFReusableScreenTestBodyExecuteDelegate1 body
-  }) {
-    if(reusable.containsKey(id)) {
-      throw AFException("Duplicate definition for $id");
-    }
-
-    
-    reusable[id] = AFSingleScreenReusableBody(
-      id: id,
-      prototype: prototype,
-      body: (sse, p1, p2, p3) async {
-      await body(sse, p1);
-    });
-  }
-
-  void defineReusableTest2({
-    required AFScreenTestID id, 
-    required AFSingleScreenPrototypeBody prototype, 
-    required AFReusableScreenTestBodyExecuteDelegate2 body,
+    required AFReusableScreenTestBodyExecuteDelegate body,
+    required List<Object?> params
   }) {
     if(reusable.containsKey(id)) {
       throw AFException("Duplicate definition for $id");
@@ -1533,26 +1534,8 @@ class AFSingleScreenTests<TState> {
     reusable[id] = AFSingleScreenReusableBody(
       id: id,
       prototype: prototype,
-      body: (sse, p1, p2, p3) async {
-        await body(sse, p1, p2);
-      }
-    );
-  }
-
-  void defineReusableTest3({
-    required AFScreenTestID id, 
-    required AFSingleScreenPrototypeBody prototype, 
-    required AFReusableScreenTestBodyExecuteDelegate3 body,
-  }) {
-    if(reusable.containsKey(id)) {
-      throw AFException("Duplicate definition for $id");
-    }
-
-    reusable[id] = AFSingleScreenReusableBody(
-      id: id,
-      prototype: prototype,
-      body: (sse, p1, p2, p3) async {
-        await body(sse, p1, p2, p3);
+      body: (sse, params) async {
+        await body(sse, params);
       }
     );
   }
@@ -1651,7 +1634,7 @@ abstract class AFWorkflowTestExecute {
 
   void expect(dynamic value, ft.Matcher matcher, {int extraFrames = 0});
 
-  Future<void> runScreenTest(AFScreenTestID screenTestId, AFWorkflowTestDefinitionContext definitions, {AFScreenID? terminalScreen, dynamic param1, dynamic param2, dynamic param3, AFBaseTestID? queryResults});
+  Future<void> runScreenTest(AFScreenTestID screenTestId, AFWorkflowTestDefinitionContext definitions, {AFScreenID? terminalScreen, List<Object?>? params, AFBaseTestID? queryResults});
   Future<void> runWidgetTest(AFBaseTestID widgetTestId, AFScreenID originScreen, {AFScreenID? terminalScreen, AFBaseTestID? queryResults});
   Future<void> onScreen({
     required AFScreenID startScreen, 
@@ -1687,12 +1670,10 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
 
   /// Execute the specified screen tests, with query-responses provided by the specified state test.
   @override
-  Future<void> runScreenTest(AFScreenTestID screenTestId, AFWorkflowTestDefinitionContext definitions, {AFScreenID? terminalScreen, dynamic param1, dynamic param2, dynamic param3, AFBaseTestID? queryResults}) async {
+  Future<void> runScreenTest(AFScreenTestID screenTestId, AFWorkflowTestDefinitionContext definitions, {AFScreenID? terminalScreen, List<Object?>? params, AFBaseTestID? queryResults}) async {
     _installQueryResults(queryResults);
-    final p1 = definitions.td(param1);
-    final p2 = definitions.td(param2);
-    final p3 = definitions.td(param3);
-    final originalScreenId = await internalRunScreenTest(screenTestId, screenContext, p1, p2, p3);
+    final paramsFull = params?.map<Object?>( (e) => definitions.td(e)).toList();
+    final originalScreenId = await internalRunScreenTest(screenTestId, screenContext, paramsFull);
 
     if(terminalScreen != null && originalScreenId != terminalScreen) {
       await screenContext.pauseForRender();
@@ -1712,7 +1693,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
   }
 
 
-  static Future<AFScreenID> internalRunScreenTest(AFScreenTestID screenTestId, AFSingleScreenTestExecute sse, dynamic param1, dynamic param2, dynamic param3 ) async {
+  static Future<AFScreenID> internalRunScreenTest(AFScreenTestID screenTestId, AFSingleScreenTestExecute sse, List<Object?>? params ) async {
     final screenTest = AFibF.g.screenTests.findById(screenTestId);
     var screenId;
     var testId;
@@ -1738,12 +1719,12 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
       }
       screenId = reusable.prototype.screenId;
       testId = reusable.id;
-      body = AFSingleScreenPrototypeBody.createReusable(screenTestId, body: reusable.body);
+      body = AFSingleScreenPrototypeBody.createReusable(screenTestId, body: reusable.body, params: params ?? <Object>[]);
     }
 
     sse.pushScreen(screenId);
     sse.startSection(testId);
-    await body.run(sse, param1: param1, param2: param2, param3: param3);
+    await body.run(sse);
     sse.endSection();
     sse.popScreen();
     return screenId;
@@ -2149,85 +2130,34 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
     prototype.defineSmokeTest(id, body: body, disabled: disabled);
   }
 
-  /// Used to define a reusable test which takes a single parameter.
-  /// 
-  /// The test author should write it so that it automatically executes a test
-  /// appropriate for its parameterized values.   The prototype mode UI will show
-  /// the test with a 'reusable' tag.   The intent is that when building multiple
-  /// screen 'workflow' tests, it is useful to be able to assemble several single screen
-  /// tests which were designed to be parameterized into a composite workflow.  This 
-  /// feature is intended to make reusable tests discoverable.
-  /// 
-  /// Defining a reusable test does not execute it, use [executeReusableTest] to do that.
-  void defineReusableTest1({
-    required AFScreenTestID id, 
-    required AFSingleScreenPrototypeBody prototype,
-    required dynamic param1,
-    required AFReusableScreenTestBodyExecuteDelegate1 body,
-    String? disabled,
-  }) {
-    tests.defineReusableTest1(
-      id: id, 
-      prototype: prototype,
-      body: body
-    );
-
-    executeReusableTest(prototype, id, param1: param1, disabled: disabled);
-  }
-
-  /// Used to define a reusable test which takes a two parameters.
-  /// 
-  /// See [defineReusableTest1] for more.
-  void defineReusableTest2({
-    required AFScreenTestID id, 
-    required AFSingleScreenPrototypeBody prototype, 
-    required AFReusableScreenTestBodyExecuteDelegate2 body,
-    required dynamic param1,
-    required dynamic param2,
-    String? disabled,
-  }) {
-    tests.defineReusableTest2(
-      id: id, 
-      prototype: prototype,
-      body: body,
-    );
-
-    executeReusableTest(prototype, id, param1: param1, param2: param2, disabled: disabled);
-  }
-
   /// Used to define a reusable test which takes three parameters.
   /// 
   /// See [defineReusableTest1] for more.
-  void defineReusableTest3({
+  void defineReusableTest({
     required AFScreenTestID id, 
     required AFSingleScreenPrototypeBody prototype, 
-    required AFReusableScreenTestBodyExecuteDelegate3 body,
-    required dynamic param1,
-    required dynamic param2,
-    required dynamic param3,
+    required AFReusableScreenTestBodyExecuteDelegate body,
+    required List<Object> params,
     String? disabled,
   }) {
-    tests.defineReusableTest3(
+    tests.defineReusableTest(
       id: id, 
       prototype: prototype,
       body: body,
+      params: params,
     );
 
-    executeReusableTest(prototype, id, param1: param1, param2: param2, param3: param3, disabled: disabled);
+    executeReusableTest(prototype, id, params: params, disabled: disabled);
   }
 
   /// Executes a test defined with [defineResuable1] or one of its variants, allowing
   /// you to provide values from the 1-3 parameters required by the test.
   void executeReusableTest(AFSingleScreenPrototypeBody body, AFScreenTestID bodyId, {
-    dynamic param1,
-    dynamic param2,
-    dynamic param3,
+    List<Object> params = const <Object>[],
     String? disabled,
   }) {
-    final p1 = td(param1);
-    final p2 = td(param2);
-    final p3 = td(param3);
-    body.executeReusable(tests, bodyId, param1: p1, param2: p2, param3: p3, disabled: disabled);
+    final paramsFull = params.map<Object>((e) => td(e)).toList();
+    body.executeReusable(tests, bodyId, params: paramsFull, disabled: disabled);
   }
 }
 

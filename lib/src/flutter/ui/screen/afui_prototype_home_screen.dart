@@ -51,7 +51,7 @@ class AFUIPrototypeHomeScreenParam extends AFRouteParam {
       view: viewFilter,
       results: <AFScreenTestResultSummary>[],
       textControllers: controllers,
-      filter: ""
+      filter: filter
     );
   }
 

@@ -77,9 +77,7 @@ typedef AFTestCreatePushActionDelegate = List<dynamic> Function(AFScreenPrototyp
 typedef AFScreenTestBodyExecuteDelegate = Future<void> Function(AFScreenTestExecute ste);
 
 /// Delegate used to implement the body of a reusable single screen test that 
-typedef AFReusableScreenTestBodyExecuteDelegate1 = Future<void> Function(AFScreenTestExecute ste, dynamic param1);
-typedef AFReusableScreenTestBodyExecuteDelegate2 = Future<void> Function(AFScreenTestExecute ste, dynamic param1, dynamic param2);
-typedef AFReusableScreenTestBodyExecuteDelegate3 = Future<void> Function(AFScreenTestExecute ste, dynamic param1, dynamic param2, dynamic param3);
+typedef AFReusableScreenTestBodyExecuteDelegate = Future<void> Function(AFScreenTestExecute e, AFTestParams params);
 
 /// Delegate used to implement the boyd of a multi screen test.
 typedef AFWorkflowTestBodyExecuteDelegate = Future<void> Function(AFWorkflowTestExecute mse);

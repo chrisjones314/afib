@@ -58,7 +58,11 @@ class AFCompositeTestDataRegistry {
 
   void _internalResolveStateViewModels(dynamic sources, Map<String, Object> models) {
 
-    if(sources is List) {
+    if(sources is Map<String, Object>) {
+      for(final items in sources.values) {
+        _internalResolveStateViewModels(items, models);
+      }
+    } else if(sources is List) {
       for(final items in sources) {
         _internalResolveStateViewModels(items, models);
       }

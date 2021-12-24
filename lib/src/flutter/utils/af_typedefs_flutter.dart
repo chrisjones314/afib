@@ -169,8 +169,6 @@ typedef AFCreateFunctionalThemeDelegate = AFFunctionalTheme Function(AFFundament
 
 typedef AFWireframeExecutionDelegate<TStateView extends AFFlexibleStateView> = void Function(AFWireframeExecutionContext<TStateView> we);
 
-typedef AFTestDataCompositeGeneratorDelegate = void Function(AFCompositeTestDataRegistry destination);
-
 typedef AFFilterWidgetDelegate = bool Function(Widget);
 
 typedef AFConvertSizeToFormFactorDelegate = AFFormFactor Function(Size);

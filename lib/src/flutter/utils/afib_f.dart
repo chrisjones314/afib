@@ -179,7 +179,6 @@ class AFibGlobalState<TState extends AFFlexibleState> {
           wireframes: wireframes
         );
       }
-      testData.regenerate();
       sharedTestContext.mergeWith(appContext.test.sharedTestContext);
     }
     if(AFibD.config.requiresPrototypeData) {

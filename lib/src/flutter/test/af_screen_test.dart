@@ -1614,7 +1614,7 @@ class AFSingleScreenTests<TState> {
   }
 
   void registerData(dynamic id, dynamic data) {
-    AFibF.g.testData.registerAtomic(id, data);
+    AFibF.g.testData.register(id, data);
   }
 
   dynamic findData(dynamic id) {

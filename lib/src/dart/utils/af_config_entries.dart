@@ -36,6 +36,18 @@ class AFConfigEntries {
     help: "Set to true if you'd like to run the app in dark mode, regardless of the device setting", 
     defaultValue: false);
 
+
+  /// Used to specify the year from which [AFTimeState] 'absolute' values are measured.
+  ///
+  /// If you specify 2004 as the absolute base year, then 
+  static final absoluteBaseYear = AFConfigurationitemTrueFalse(
+    libraryId: AFUILibraryID.id,
+    name: "absolute-base-year", 
+    validContexts: AFConfigurationItem.validContextNewProjectCommand,
+    ordinal: 400.0,
+    help: "The earliest year which your app will have reason to reference, generally good to set it 1-2 years before you started creating the app", 
+    defaultValue: false);
+
   /// Set to true only when running under a flutter WidgetTester test.
   /// 
   /// The WidgetTester is thrown off by 'infinite' animations like CircularProgressIndicator:

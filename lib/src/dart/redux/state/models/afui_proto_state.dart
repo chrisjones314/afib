@@ -1,5 +1,8 @@
-import 'package:afib/src/dart/redux/state/af_app_state.dart';
-import 'package:afib/src/dart/redux/state/af_test_state.dart';
+import 'package:afib/id.dart';
+import 'package:afib/src/dart/redux/queries/af_time_update_listener_query.dart';
+import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_test_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -11,6 +14,8 @@ mixin AFUIPrototypeStateModelAccess on AFStateModelAccess {
   AFScreenPrototype? get prototype { return findIdOrNull<AFScreenPrototype>(AFUIPrototypeState.prototypeModel); }
   AFScreenTestContext? get testContext { return findIdOrNull<AFScreenTestContext>(AFBaseTestExecute.testExecuteId); }
   AFSingleScreenTestState get singleScreenTestState { return findType<AFSingleScreenTestState>(); }
+  AFTimeState get time { return findType<AFTimeState>(); }
+  AFTimeUpdateListenerQuery? get timeQuery { return findIdOrNull<AFTimeUpdateListenerQuery>(AFUIQueryID.time.toString()); }
 }
 
 //---------------------------------------------------------------------------------------

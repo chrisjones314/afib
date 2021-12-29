@@ -1,5 +1,4 @@
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AFCircularProgressIndicator extends StatelessWidget {

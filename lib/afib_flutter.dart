@@ -16,11 +16,13 @@ export "src/dart/redux/actions/af_query_actions.dart";
 export 'src/dart/redux/actions/af_route_actions.dart';
 export "src/dart/redux/middleware/af_async_queries.dart";
 export "src/dart/redux/queries/af_package_info_query.dart";
-export "src/dart/redux/state/af_app_state.dart";
-export "src/dart/redux/state/af_package_info_state.dart";
-export "src/dart/redux/state/af_route_state.dart";
+export "src/dart/redux/queries/af_time_update_listener_query.dart";
 export "src/dart/redux/state/af_state.dart";
-export 'src/dart/redux/state/af_theme_state.dart';
+export "src/dart/redux/state/models/af_app_state.dart";
+export "src/dart/redux/state/models/af_package_info_state.dart";
+export "src/dart/redux/state/models/af_route_state.dart";
+export 'src/dart/redux/state/models/af_theme_state.dart';
+export "src/dart/redux/state/models/af_time_state.dart";
 export "src/dart/utils/af_config.dart";  // ok
 export 'src/dart/utils/af_config_entries.dart'; // ok
 export "src/dart/utils/af_exception.dart"; // ok

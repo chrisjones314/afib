@@ -400,6 +400,14 @@ class AFConfig {
     return boolFor(AFConfigEntries.forceDarkMode);
   }
 
+  int get absoluteBaseYear {
+    return intFor(AFConfigEntries.absoluteBaseYear);
+  }
+
+  DateTime get absoluteBaseDate {
+    return DateTime(absoluteBaseYear, DateTime.january, 1);
+  }
+
   /// Casts the value for [entry] to a string and returns it.
   String stringFor(AFConfigurationItem entry) {
     return valueFor(entry);
@@ -415,6 +423,11 @@ class AFConfig {
 
   /// Casts the value for [entry] to a boolean and returns it.
   bool boolFor(AFConfigurationItem entry) {
+    return valueFor(entry);
+  }
+
+  /// Casts the value for [entry] to a boolean and returns it.
+  int intFor(AFConfigurationItem entry) {
     return valueFor(entry);
   }
 

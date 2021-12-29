@@ -1,34 +1,28 @@
 import 'dart:async';
 
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/id.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
-import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
-import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
-import 'package:afib/src/dart/redux/state/af_test_state.dart';
-import 'package:afib/src/dart/utils/af_exception.dart';
-import 'package:afib/src/dart/utils/af_id.dart';
-import 'package:afib/src/dart/utils/af_route_param.dart';
-import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:afib/src/dart/redux/state/models/af_test_state.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
-import 'package:afib/src/flutter/test/af_widget_actions.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_widget_screen.dart';
-import 'package:afib/src/flutter/utils/af_dispatcher.dart';
-import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:collection/collection.dart';
 import 'package:colorize/colorize.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
 import 'package:logger/logger.dart';
-import 'package:meta/meta.dart';
 import 'package:quiver/core.dart';
+
+enum AFTestTimeHandling {
+  running,
+  paused
+}
+
 
 typedef AFTestScreenExecuteDelegate = Future<void> Function(AFScreenTestExecute ste);
 typedef AFVerifyReturnValueDelegate = void Function(Object? value);
@@ -145,7 +139,7 @@ class AFWidgetTypeSelector extends AFWidgetSelector {
   Type widgetType;
   AFWidgetTypeSelector(this.widgetType);
 
-  bool matches(Element elem) {
+bool matches(Element elem) {
     return elem.widget.runtimeType == widgetType;
   }
 
@@ -437,6 +431,27 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
 
   AFScreenID get activeScreenId;
   bool isEnabled(AFBaseTestID id) { return true; }
+
+  AFTimeState get currentTime {
+    final state = AFibF.g.storeInternalOnly?.state;
+    final testState = state?.private.testState.findState(testId);
+    if(testState == null) {
+      throw AFException("No test state for test $testId");
+    }
+    final models = testState.models;
+    var timeState;
+    if(models == null) {
+      // this is a workflow test.
+      timeState = state?.public.time;
+    } else {
+      timeState = testState.models!["AFTimeState"] as AFTimeState?;
+    }
+
+    if(timeState == null) {
+      throw AFException("You called currentTime in a test, but you don't have an AFTimeState in the models for the test");
+    }
+    return timeState;
+  }
 
   @override
   AFBaseTestID get testID => testId;
@@ -1173,6 +1188,7 @@ abstract class AFScreenPrototype {
   List<AFScreenTestDescription> get smokeTests;
   List<AFScreenTestDescription> get reusableTests;
   List<AFScreenTestDescription> get regressionTests;
+  AFTestTimeHandling get timeHandling;
 
   bool get hasTests { 
     return (smokeTests.isNotEmpty ||
@@ -1206,7 +1222,7 @@ abstract class AFScreenPrototype {
     }
 
     final testContext = AFScreenTestContextSimulator(dispatcher, this.id, runNumber, idSelected);
-    dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(testContext, navigate: navigate, models: this.models));
+    dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(testContext, navigate: navigate, models: this.models, timeHandling: this.timeHandling));
     return testContext;
   }
 
@@ -1219,12 +1235,14 @@ class AFSingleScreenPrototype extends AFScreenPrototype {
   final AFSingleScreenPrototypeBody body;
   //final AFConnectedScreenWithoutRoute screen;
   final AFNavigatePushAction navigate;
+  final AFTestTimeHandling timeHandling;
 
   AFSingleScreenPrototype({
     required AFPrototypeID id,
     required this.models,
     required this.navigate,
     required this.body,
+    required this.timeHandling,
   }): super(id: id);
 
   List<AFScreenTestDescription> get smokeTests { return List<AFScreenTestDescription>.from(body.smokeTests); }
@@ -1238,6 +1256,14 @@ class AFSingleScreenPrototype extends AFScreenPrototype {
     final actualModels = registry.resolveStateViewModels(ms);
     final rp = registry.f(rvp);
 
+    if(timeHandling == AFTestTimeHandling.running) {
+      final baseTime = actualModels["AFTimeState"] as AFTimeState?;
+      if(baseTime == null) {
+        throw AFException("If you specify runTine for a screen or widget test, you must include an AFTimeState instance in your models.");
+      }
+      dispatcher.dispatch(AFTimeUpdateListenerQuery(baseTime: baseTime));
+    }
+
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(
       this, 
       navigate: this.navigate,
@@ -1247,6 +1273,7 @@ class AFSingleScreenPrototype extends AFScreenPrototype {
       routeParam: rp,
       children: navigate.children,
     ));
+
   }
 
   Future<void> run(AFScreenTestExecute context, { List<Object?>? params, Function? onEnd}) {
@@ -1335,6 +1362,7 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
 /// prototyping and testing.
 class AFConnectedWidgetPrototype extends AFWidgetPrototype {
   final AFRouteParam routeParam;
+  final AFTestTimeHandling timeHandling;
 
   AFConnectedWidgetPrototype({
     required AFPrototypeID id,
@@ -1342,6 +1370,7 @@ class AFConnectedWidgetPrototype extends AFWidgetPrototype {
     required this.routeParam,
     required AFRenderConnectedChildDelegate render,
     required AFSingleScreenPrototypeBody body,
+    required this.timeHandling,
   }): super(id: id, body: body, models: models, render: render);
 
   List<AFScreenTestDescription> get smokeTests { return List<AFScreenTestDescription>.from(body.smokeTests); }
@@ -1380,6 +1409,7 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
   List<AFScreenTestDescription> get smokeTests { return List<AFScreenTestDescription>.from(body.smokeTests); }
   List<AFScreenTestDescription> get reusableTests { return  List<AFScreenTestDescription>.from(body.reusableTests); }
   List<AFScreenTestDescription> get regressionTests { return  List<AFScreenTestDescription>.from(body.regressionTests); }
+  AFTestTimeHandling get timeHandling { return AFTestTimeHandling.running; }
 
   dynamic get models { return null; }
   dynamic get routeParam { return null; }
@@ -1468,6 +1498,7 @@ class AFWidgetTests<TState> {
     dynamic models,
     required AFRouteParam routeParam,
     AFNavigatePushAction? navigate,
+    AFTestTimeHandling timeHandling = AFTestTimeHandling.paused,
   }) {
     final sv = AFibF.g.testData.resolveStateViewModels(models);    
     final instance = AFConnectedWidgetPrototype(
@@ -1475,7 +1506,8 @@ class AFWidgetTests<TState> {
       models: sv,
       routeParam: routeParam,
       render: render,
-      body: AFSingleScreenPrototypeBody(id)
+      body: AFSingleScreenPrototypeBody(id),
+      timeHandling: timeHandling,
     );
     _connectedTests.add(instance);
     return instance.body;
@@ -1579,14 +1611,16 @@ class AFSingleScreenTests<TState> {
   AFSingleScreenPrototypeBody addPrototype({
     required AFPrototypeID   id,
     required dynamic models,
-    required AFNavigatePushAction navigate
+    required AFNavigatePushAction navigate,
+    required AFTestTimeHandling timeHandling
   }) {
 
     final instance = AFSingleScreenPrototype(
       id: id,
       models: models,
       navigate: navigate,
-      body: AFSingleScreenPrototypeBody(id, screenId: navigate.screenId)
+      body: AFSingleScreenPrototypeBody(id, screenId: navigate.screenId),
+      timeHandling: timeHandling
     );
     _singleScreenTests.add(instance);
     return instance.body;
@@ -2109,12 +2143,14 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
     required AFPrototypeID   id,
     required dynamic models,
     required AFNavigatePushAction navigate,
+    AFTestTimeHandling timeHandling = AFTestTimeHandling.paused,
     String? title,
   }) {
     return tests.addPrototype(
       id: id,
       models: models,
       navigate: navigate,
+      timeHandling: timeHandling,
     );
   }
 

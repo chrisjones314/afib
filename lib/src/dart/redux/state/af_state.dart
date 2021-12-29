@@ -1,8 +1,9 @@
-import 'package:afib/src/dart/redux/state/af_app_state.dart';
-import 'package:afib/src/dart/redux/state/af_query_state.dart';
-import 'package:afib/src/dart/redux/state/af_route_state.dart';
-import 'package:afib/src/dart/redux/state/af_test_state.dart';
-import 'package:afib/src/dart/redux/state/af_theme_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_query_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_test_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_theme_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:meta/meta.dart';
 
@@ -13,12 +14,14 @@ class AFPublicState {
   final AFThemeState themes;
   final AFQueryState queries;
   final AFComponentStates components;
+  final AFTimeState time;
 
   AFPublicState({
     required this.route,
     required this.themes,
     required this.components,
     required this.queries,
+    required this.time,
   });
 
   T componentState<T extends AFFlexibleState>() {
@@ -34,12 +37,14 @@ class AFPublicState {
     AFThemeState? themes,
     AFComponentStates? components,
     AFQueryState? queries,
+    AFTimeState? time,
   }) {
     return AFPublicState(
       components: components ?? this.components,
       themes: themes ?? this.themes,
       route: route ?? this.route,
       queries: queries ?? this.queries,
+      time: time ?? this.time
     );
   }
 }
@@ -83,7 +88,8 @@ class AFState {
         route: AFRouteState.initialState(),
         themes: AFibF.g.initializeThemeState(components: components),
         components: components,
-        queries: AFQueryState.initialState()
+        queries: AFQueryState.initialState(),
+        time: AFTimeState.initialState(),
       ),
       private: AFPrivateState(
         testState: AFTestState.initial(),

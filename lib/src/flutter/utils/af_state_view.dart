@@ -1,4 +1,4 @@
-import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:meta/meta.dart';

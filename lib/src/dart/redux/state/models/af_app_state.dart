@@ -1,4 +1,5 @@
 import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/utils/af_object_with_key.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:meta/meta.dart';
@@ -35,6 +36,10 @@ class AFModelWithCustomID {
 
     if(o is AFWrapModelWithCustomID) {
       return o.id;
+    }
+
+    if(o is AFObjectWithKey) {
+      return o.key;
     }
 
     return o.runtimeType.toString();

@@ -1,6 +1,7 @@
 
-import 'package:afib/afib_flutter.dart';
 import 'package:afib/id.dart';
+import 'package:afib/src/dart/utils/af_config_entries.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_home_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_list_screen.dart';

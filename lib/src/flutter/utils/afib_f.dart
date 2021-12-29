@@ -1,23 +1,10 @@
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/id.dart';
-import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
-import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/redux/middleware/af_query_middleware.dart';
 import 'package:afib/src/dart/redux/middleware/af_route_middleware.dart';
 import 'package:afib/src/dart/redux/reducers/af_reducer.dart';
-import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
-import 'package:afib/src/dart/redux/state/af_theme_state.dart';
-import 'package:afib/src/dart/utils/af_exception.dart';
-import 'package:afib/src/dart/utils/af_id.dart';
-import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:afib/src/flutter/core/af_screen_map.dart';
 import 'package:afib/src/flutter/test/af_init_prototype_screen_map.dart';
-import 'package:afib/src/flutter/test/af_screen_test.dart';
-import 'package:afib/src/flutter/test/af_test_data_registry.dart';
-import 'package:afib/src/flutter/ui/dialog/afui_standard_choice_dialog.dart';
-import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 

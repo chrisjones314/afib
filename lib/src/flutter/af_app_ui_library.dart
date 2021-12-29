@@ -1,6 +1,6 @@
 
-import 'package:afib/src/dart/redux/state/af_app_state.dart';
-import 'package:afib/src/dart/redux/state/af_theme_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_theme_state.dart';
 import 'package:afib/src/flutter/af_material_app.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';

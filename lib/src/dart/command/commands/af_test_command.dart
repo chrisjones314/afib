@@ -2,7 +2,6 @@
 import 'dart:io';
 
 import 'package:afib/afib_command.dart';
-import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';

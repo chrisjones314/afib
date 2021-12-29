@@ -1,6 +1,6 @@
-import 'package:afib/afib_command.dart';
+import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
-import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';

@@ -1,33 +1,55 @@
 
 import 'dart:async';
-
-import 'package:afib/afib_flutter.dart';
 import 'package:afib/id.dart';
+import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
-import 'package:afib/src/dart/redux/state/afui_proto_state.dart';
+import 'package:afib/src/dart/redux/queries/af_time_update_listener_query.dart';
+import 'package:afib/src/dart/redux/state/af_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
+import 'package:afib/src/dart/redux/state/models/afui_proto_state.dart';
 import 'package:afib/src/dart/redux/state/stateviews/afui_prototype_state_view.dart';
+import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
+import 'package:afib/src/flutter/ui/dialog/afui_standard_error_dialog.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/utils/af_param_ui_state_holder.dart';
+import 'package:afib/src/flutter/utils/af_state_view.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 //--------------------------------------------------------------------------------------
 class AFUIPrototypeDrawerRouteParam extends AFRouteParam {
+  static const viewTime = 0;
   static const viewTheme = 1;
   static const viewTest  = 2;
   static const viewResults = 3;
   final int view;
   final Map<String, bool> themeExpanded;
+  final String timeText;
+  final String timeAdjustText;
+  final AFTextEditingControllersHolder textControllers;
 
   AFUIPrototypeDrawerRouteParam({
     required this.view, 
     required this.themeExpanded,
+    required this.timeText,
+    required this.timeAdjustText,
+    required this.textControllers,
   }): super(id: AFUIScreenID.screenTestDrawer);
 
   factory AFUIPrototypeDrawerRouteParam.createOncePerScreen(int view) {
     final themeExpanded = <String, bool>{};
-    return AFUIPrototypeDrawerRouteParam(view: view, themeExpanded: themeExpanded);
+    final textControllers = AFTextEditingControllersHolder.createN({
+      AFUIWidgetID.textTime: "",
+      AFUIWidgetID.textTimeAdjust: "",
+    });
+
+    return AFUIPrototypeDrawerRouteParam(view: view, themeExpanded: themeExpanded, textControllers: textControllers, timeText: "", timeAdjustText: "");
   }
 
   bool isExpanded(String area) {
@@ -45,13 +67,28 @@ class AFUIPrototypeDrawerRouteParam extends AFRouteParam {
     return copyWith(view: view);
   }
 
+  AFUIPrototypeDrawerRouteParam reviseTimeText(String timeText) {
+    return copyWith(timeText: timeText);
+  }
+
+  AFUIPrototypeDrawerRouteParam reviseTimeAdjust(String timeText) {
+    return copyWith(timeAdjustText: timeText);
+  }
+
+
   AFUIPrototypeDrawerRouteParam copyWith({
     int? view,
-    Map<String, bool>? themeExpanded
+    Map<String, bool>? themeExpanded,
+    String? timeText,
+    String ? timeAdjustText,
   }) {
     return AFUIPrototypeDrawerRouteParam(
       view: view ?? this.view,
-      themeExpanded: themeExpanded ?? this.themeExpanded
+      themeExpanded: themeExpanded ?? this.themeExpanded,
+      textControllers: this.textControllers,
+      timeText: timeText ?? this.timeText,
+      timeAdjustText: timeAdjustText ?? this.timeAdjustText
+
     );
   }
 }
@@ -82,7 +119,9 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeStateView, AF
       models: [
         AFWrapModelWithCustomID(AFUIPrototypeState.prototypeModel, test),
         testSubState,
-        testContext
+        testContext,
+        context.statePublic.time,
+        context.statePublic.queries.findListenerQueryById(AFUIQueryID.time.toString())
       ]
     );
   }
@@ -135,9 +174,10 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeStateView, AF
       )
     ));
 
-    final buttonStyle = TextButton.styleFrom(
+    final buttonStyle = OutlinedButton.styleFrom(
       primary: t.colorOnPrimary,
       textStyle: TextStyle(color: t.colorSecondary),
+      side: BorderSide(width: 1, color: t.colorOnPrimary),
     );
 
     final cols = t.row();
@@ -153,7 +193,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeStateView, AF
     cols.add(
       Container(
         margin: t.margin.l.s3,
-        child: TextButton(
+        child: OutlinedButton(
           style: buttonStyle,
           child: Text('Reset'),
           onPressed: () {
@@ -181,25 +221,29 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeStateView, AF
 
   Widget _buildChoiceButton(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> context,
     String title,
+    IconData icon,
     int view
   ) {
     final t = context.t;
     final isActive = view == context.p.view;
-    final color = isActive ? t.colorSecondary : Colors.grey[400];
-    final colorText = isActive ? t.colorOnPrimary : t.colorOnBackground;
-
-    final buttonStyle = TextButton.styleFrom(
-      primary: color, 
-      textStyle: TextStyle(color: colorText),
-      shape: RoundedRectangleBorder(),
-    );
+    final color = isActive ? t.colorSecondary : Colors.grey[400] ?? Colors.grey;
       
-    return TextButton(
-      child: t.childText(title),
-      style: buttonStyle,
+    final button = IconButton(
+      padding: t.paddingNone,
+      visualDensity: VisualDensity.compact,
+      icon: Icon(icon),
       onPressed: () {
         updateRouteParam(context, context.p.copyWith(view: view));
       },
+    );
+
+    return Container(
+      padding: t.paddingNone,
+      margin: t.margin.b.s3,
+      child: button,
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: color))
+      )
     );
   }
 
@@ -208,13 +252,13 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeStateView, AF
     final t = context.t;
 
     final cols = t.row();
-
-    cols.add(_buildChoiceButton(context, "Theme", AFUIPrototypeDrawerRouteParam.viewTheme));
-    cols.add(_buildChoiceButton(context, "Tests", AFUIPrototypeDrawerRouteParam.viewTest));
-    cols.add(_buildChoiceButton(context, "Results", AFUIPrototypeDrawerRouteParam.viewResults));
+    cols.add(_buildChoiceButton(context, "Time", Icons.access_time, AFUIPrototypeDrawerRouteParam.viewTime));
+    cols.add(_buildChoiceButton(context, "Theme", Icons.brush, AFUIPrototypeDrawerRouteParam.viewTheme));
+    cols.add(_buildChoiceButton(context, "Tests", Icons.run_circle, AFUIPrototypeDrawerRouteParam.viewTest));
+    cols.add(_buildChoiceButton(context, "Results", Icons.checklist, AFUIPrototypeDrawerRouteParam.viewResults));
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: cols);
   }
 
@@ -227,6 +271,8 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeStateView, AF
       item = _childTestLists(context);
     } else if(view == AFUIPrototypeDrawerRouteParam.viewResults) {
       item = _buildResultsContent(context);
+    } else if(view == AFUIPrototypeDrawerRouteParam.viewTime) {
+      item = _buildTimeContent(context);
     }
 
     return Expanded(
@@ -512,6 +558,226 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeStateView, AF
         child: Column(children: rows, crossAxisAlignment: CrossAxisAlignment.stretch)
       )
     );
+  }
+
+  TableRow _buildAbsoluteRow(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> context, String title, int abs) {
+    final t = context.t;
+    final cols = t.row();
+    cols.add(t.childMargin(
+      margin: t.margin.r.s3,
+      child: Text(title, textAlign: TextAlign.right)
+    ));
+    cols.add(Text(abs.toString()));
+    return TableRow(children: cols);
+  }
+
+  TableRow _createTimeRow(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> context, String title, AFTimeState value) {
+    final t = context.t;
+    final cols = t.column();
+    cols.add(t.childMargin(
+      margin: t.margin.r.s3,
+      child: Text("$title:", textAlign: TextAlign.right)
+    ));
+    cols.add(Text(value.toString()));
+    return TableRow(children: cols);
+  }
+
+  Widget _buildTimeContent(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> context) {
+    final t = context.t;
+    final time = context.s.time;
+    final timeUTC = time.reviseToUTC();
+    final rowsCurrent = t.column();
+
+    final trsCurrent = t.childrenTable();
+    trsCurrent.add(_createTimeRow(context, "Local", time));
+    trsCurrent.add(_createTimeRow(context, "UTC", timeUTC));
+
+    final columnWidths = <int, TableColumnWidth>{};
+    columnWidths[0] = FixedColumnWidth(50);
+    columnWidths[1] = FlexColumnWidth();
+
+    rowsCurrent.add(Table(
+      children: trsCurrent,
+      columnWidths: columnWidths,
+    ));
+    final timeQuery = context.s.timeQuery;
+    if(timeQuery == null) {
+      return t.childMargin(
+        margin: t.marginStandard,
+        child: Text("A AFTimeUpdateListenerQuery is not running.  Either start one in a workflow test, or pass in runTime: true in a screen or widget test.")
+      );
+    }
+
+    final colsPlayPause = t.row();
+    colsPlayPause.add(OutlinedButton(
+      child: Icon(Icons.play_arrow),
+      onPressed: () {
+        final revisedBase = timeQuery.baseTime.reviseForPlay();
+        context.dispatchQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
+      }
+    ));
+
+    colsPlayPause.add(OutlinedButton(
+      child: Icon(Icons.pause),
+      onPressed: () {
+        final revisedBase = timeQuery.baseTime.reviseForPause();
+        context.dispatchQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
+      }
+    ));
+
+    rowsCurrent.add(Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: colsPlayPause
+    ));
+
+    final rowsAdjust = t.column();
+    rowsAdjust.add(t.childTextField(
+      wid: AFUIWidgetID.textTimeAdjust,
+      controllers: context.p.textControllers,
+      text: context.p.timeAdjustText,
+      obscureText: false,
+      autofocus: false,
+      textAlign: TextAlign.left,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(),
+        labelText: "Adjustment"
+      ),
+      onChanged: (val) {
+        context.updateRouteParam(this, context.p.reviseTimeAdjust(val));
+      },       
+    ));
+
+
+    rowsAdjust.add(Container(
+      margin: t.marginStandard,
+      child: Text("space separated with suffix, eg 1d 2h 3m 4s 5ms", style: t.styleHint())
+    ));
+
+    final colsAdd = t.row();
+    colsAdd.add(OutlinedButton(
+      child: Text("Add"),
+      onPressed: () {
+        final duration = AFTimeState.parseDuration(context.p.timeAdjustText);
+        if(duration == null) {
+          return;
+        }
+        final revisedBase = timeQuery.baseTime.reviseAdjustOffset(duration);
+        context.dispatchQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
+      }
+    ));
+
+    colsAdd.add(OutlinedButton(
+      child: Text("Subtract"),
+      onPressed: () {
+        final duration = AFTimeState.parseDuration(context.p.timeAdjustText);
+        if(duration == null) {
+          context.showDialog(navigate: AFUIStandardErrorDialog.navigatePush("Could not parse duration"));
+          return;
+        }
+        final revisedBase = timeQuery.baseTime.reviseAdjustOffset(-duration);
+        context.dispatchQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
+      }
+    ));
+
+    rowsAdjust.add(Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: colsAdd));
+    
+    final rowsSet = t.column();
+    rowsSet.add(t.childTextField(
+      wid: AFUIWidgetID.textTime,
+      controllers: context.p.textControllers,
+      text: context.p.timeText,
+      obscureText: false,
+      autofocus: false,
+      textAlign: TextAlign.left,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(),
+        labelText: "Enter Time"
+      ),
+      onChanged: (val) {
+        context.updateRouteParam(this, context.p.reviseTimeText(val));
+      },        
+
+    ));
+
+    final colsActions = t.row();
+    colsActions.add(OutlinedButton(
+      child: Row(children: [
+        Text("Get"),
+        Icon(Icons.arrow_downward)
+      ]),
+      onPressed: () {
+        final timeStr = time.toString();
+        context.p.textControllers.reviseOne(AFUIWidgetID.textTime, timeStr);
+        context.updateRouteParam(this, context.p.reviseTimeText(timeStr));
+      }
+    ));
+
+    colsActions.add(OutlinedButton(
+      child: Row(children: [
+        Text("Set"),
+        Icon(Icons.arrow_upward)
+      ]),
+      onPressed: () {
+        final textVal = context.p.textControllers.textFor(AFUIWidgetID.textTime);
+        final revised = DateTime.tryParse(textVal);
+        if(revised == null) {
+          // TODO: handle error case
+          return;
+        }
+        final revisedBase = timeQuery.baseTime.reviseForDesiredNow(DateTime.now(), revised);
+        context.dispatchQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
+      }
+    ));
+
+
+    rowsSet.add(Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: colsActions));
+
+
+
+    final rowsOverall = t.column();
+    rowsOverall.add(t.childCardHeader(context, null, "Current Time", rowsCurrent));
+
+    rowsOverall.add(t.childCardHeader(context, null, "Adjust Time", [
+      t.childMargin(
+        margin: t.marginStandard,
+        child: Column(children: rowsAdjust)
+      )
+    ]));
+
+    rowsOverall.add(t.childCardHeader(context, null, "Set Local Time", [
+      t.childMargin(
+        margin: t.marginStandard,
+        child: Column(children: rowsSet)
+      )
+    ]));
+
+    rowsOverall.add(_buildAbsoluteTimes(context, "Absolute Time", time));
+    rowsOverall.add(_buildAbsoluteTimes(context, "Absolute Time - UTC", timeUTC));
+
+    return Column(children: rowsOverall);
+  }
+
+  Widget _buildAbsoluteTimes(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> context, String title, AFTimeState time) {
+    final t = context.t;
+    final rowsAbsolute = t.column();
+    
+    final childrenAbsolute = t.childrenTable();
+    childrenAbsolute.add(_buildAbsoluteRow(context, "Second", time.absoluteSecond));
+    childrenAbsolute.add(_buildAbsoluteRow(context, "Minute", time.absoluteMinute));
+    childrenAbsolute.add(_buildAbsoluteRow(context, "Hour", time.absoluteHour));
+    childrenAbsolute.add(_buildAbsoluteRow(context, "Day", time.absoluteDay));
+    childrenAbsolute.add(_buildAbsoluteRow(context, "Month", time.absoluteMonth));
+    childrenAbsolute.add(_buildAbsoluteRow(context, "Year", time.absoluteYear));
+    rowsAbsolute.add(t.childMargin(
+      margin: t.marginStandard,
+      child: Table(children: childrenAbsolute)
+    ));
+
+    return t.childCardHeader(context, null, title, rowsAbsolute);
   }
 
   void _buildTestReport(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> context, List<Widget> rows) {

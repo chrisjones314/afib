@@ -1,13 +1,13 @@
 
 
-import 'package:afib/src/dart/redux/state/af_test_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_test_state.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 
 /// This reducer handles the default behavior of the app state, which 
 /// is just to set one or more 
 AFTestState afTestStateReducer(AFTestState state, dynamic action) {
   if(action is AFStartPrototypeScreenTestContextAction) {
-    return state.startTest(action.context, action.navigate, action.models);
+    return state.startTest(action.context, action.navigate, action.models, timeHandling: action.timeHandling);
   } else if(action is AFUpdatePrototypeScreenTestModelsAction) {
     return state.updateModels(action.testId, action.models);
   } else if(action is AFPrototypeScreenTestIncrementPassCount) {

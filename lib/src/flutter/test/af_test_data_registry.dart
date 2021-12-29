@@ -1,4 +1,4 @@
-import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 
 

@@ -1,8 +1,9 @@
 import 'dart:core';
-import 'package:afib/afib_flutter.dart';
+
+import 'package:afib/id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
-import 'package:afib/src/dart/redux/state/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:redux/redux.dart';

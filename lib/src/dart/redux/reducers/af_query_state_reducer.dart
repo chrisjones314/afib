@@ -1,7 +1,7 @@
 
 
 import 'package:afib/src/dart/redux/actions/af_query_actions.dart';
-import 'package:afib/src/dart/redux/state/af_query_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_query_state.dart';
 
 AFQueryState afQueryStateReducer(AFQueryState state, dynamic action) {
   if(action is AFRegisterListenerQueryAction) {

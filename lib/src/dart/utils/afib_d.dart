@@ -48,6 +48,7 @@ class AFibD<AppState> {
       registerConfigEntry(AFConfigEntries.appNamespace);
       registerConfigEntry(AFConfigEntries.packageName);
       registerConfigEntry(AFConfigEntries.forceDarkMode);
+      registerConfigEntry(AFConfigEntries.absoluteBaseYear);
       registerConfigEntry(AFConfigEntries.environment);
       registerConfigEntry(AFConfigEntries.testsEnabled);
       registerConfigEntry(AFConfigEntries.logsEnabled);

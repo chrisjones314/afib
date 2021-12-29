@@ -1,8 +1,11 @@
-import 'package:afib/afib_flutter.dart';
+import 'package:afib/id.dart';
+import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_wireframe.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:meta/meta.dart';
 
 @immutable 
@@ -12,6 +15,7 @@ class AFSingleScreenTestState {
   final List<String> errors;
   final Map<String, Object>? models;
   final AFNavigatePushAction navigate;
+  final AFTestTimeHandling timeHandling;
 
   AFSingleScreenTestState({
     required this.testId,
@@ -19,6 +23,7 @@ class AFSingleScreenTestState {
     required this.pass, 
     required this.errors, 
     required this.models, 
+    required this.timeHandling,
   });
 
   AFSingleScreenTestState reviseModels(dynamic data) {
@@ -63,6 +68,7 @@ class AFSingleScreenTestState {
       pass: pass ?? this.pass,
       navigate: this.navigate,
       testId: this.testId,
+      timeHandling: this.timeHandling
     );
   }
 }
@@ -124,7 +130,7 @@ class AFTestState {
   }
 
   AFTestState navigateToTest(AFScreenPrototype test, AFNavigatePushAction navigate, dynamic models) {
-    final revisedStates = _createTestState(test.id, test.navigate, models);
+    final revisedStates = _createTestState(test.id, test.navigate, models, timeHandling: test.timeHandling);
     final revisedActive = List<AFBaseTestID>.from(activeTestIds);
     revisedActive.add(test.id);
     return copyWith(activeTestIds: revisedActive, testStates: revisedStates);
@@ -161,7 +167,8 @@ class AFTestState {
       models: models,
       pass: 0, 
       errors: <String>[],
-      navigate: AFNavigatePushAction(routeParam: AFRouteParamUnused.unused)
+      navigate: AFNavigatePushAction(routeParam: AFRouteParamUnused.unused),
+      timeHandling: AFTestTimeHandling.running,
     );
     revisedStates[testId] = currentState.reviseModels(models);
     return copyWith(
@@ -170,11 +177,11 @@ class AFTestState {
     );
   }
 
-  Map<AFBaseTestID, AFSingleScreenTestState> _createTestState(AFBaseTestID testId, AFNavigatePushAction navigate, dynamic models) {
+  Map<AFBaseTestID, AFSingleScreenTestState> _createTestState(AFBaseTestID testId, AFNavigatePushAction navigate, dynamic models, { required AFTestTimeHandling timeHandling }) {
     final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
     final orig = testStates[testId];
     if(orig == null) {
-      revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: <String>[], models: models, navigate: navigate);
+      revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: <String>[], models: models, navigate: navigate, timeHandling: timeHandling);
     } else {
       revisedStates[testId] = orig.copyWith(pass: 0, errors: <String>[]);
     }
@@ -182,11 +189,11 @@ class AFTestState {
 
   }
 
-  AFTestState startTest(AFScreenTestContext simulator, AFNavigatePushAction navigate, dynamic data) {
+  AFTestState startTest(AFScreenTestContext simulator, AFNavigatePushAction navigate, dynamic data, { required AFTestTimeHandling timeHandling }) {
     final testId = simulator.testId;
     final revisedContexts = Map<AFBaseTestID, AFScreenTestContext>.from(testContexts);
     revisedContexts[testId] = simulator;
-    final revisedStates = _createTestState(testId, navigate, data);
+    final revisedStates = _createTestState(testId, navigate, data, timeHandling: timeHandling);
     var revisedActive = activeTestIds;
     if(activeTestIds.isEmpty || activeTestIds.last != simulator.testId) {
       revisedActive = List<AFBaseTestID>.from(activeTestIds);

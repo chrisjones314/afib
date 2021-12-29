@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 /// A control similar to Flutter's [TextField], which hides
 /// the details of the text controller and makes it easier to

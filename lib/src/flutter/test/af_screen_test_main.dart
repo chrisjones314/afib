@@ -2,11 +2,15 @@ import 'package:afib/id.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
+import 'package:afib/src/dart/redux/actions/af_query_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
-import 'package:afib/src/dart/redux/state/af_app_state.dart';
+import 'package:afib/src/dart/redux/queries/af_time_update_listener_query.dart';
+import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
+import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/af_app.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
@@ -96,9 +100,17 @@ Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
       final dispatcher = AFSingleScreenTestDispatcher(prototype.id, storeDispatcher, null);
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, prototype.id, output, localStats);
       storeDispatcher.dispatch(AFResetToInitialStateAction());
-      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, models: prototype.models, navigate: prototype.navigate));
+      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, models: prototype.models, navigate: prototype.navigate, timeHandling: prototype.timeHandling));
       dispatcher.setContext(context);
       simpleContexts.add(context);
+      if(prototype.timeHandling == AFTestTimeHandling.running) {
+        final resolvedModels = AFibF.g.testData.resolveStateViewModels(prototype.models);
+        final baseTime = resolvedModels["AFTimeState"] as AFTimeState?;
+        if(baseTime == null) {
+          throw AFException("If you set runTime to true in a screen or widget test, one of your models must be an AFTimeState");
+        }
+        AFibF.g.storeInternalOnly!.dispatch(AFTimeUpdateListenerQuery(baseTime: baseTime));
+      }
 
       // tell the store to go to the correct screen.
       await tester.pumpAndSettle(Duration(seconds: 1));
@@ -110,6 +122,9 @@ Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
       output.outdent();
       // pop this test screen off so that we are ready for the next one.
       AFibF.g.storeInternalOnly!.dispatch(AFNavigateExitTestAction());
+      if(prototype.timeHandling == AFTestTimeHandling.running) {
+        AFibF.g.storeInternalOnly!.dispatch(AFShutdownOngoingQueriesAction());
+      }
       
       dispatcher.setContext(context);
       await tester.pumpAndSettle(Duration(seconds: 1));
@@ -176,6 +191,7 @@ Future<void> _afWorkflowTestMain<TState extends AFFlexibleState>(AFCommandOutput
 
       // pop this test screen off so that we are ready for the next one.
       AFibF.g.storeInternalOnly!.dispatch(AFNavigateExitTestAction());
+      AFibF.g.storeInternalOnly!.dispatch(AFShutdownOngoingQueriesAction());
       
       //dispatcher.setContext(context);
       await tester.pumpAndSettle(Duration(seconds: 1));

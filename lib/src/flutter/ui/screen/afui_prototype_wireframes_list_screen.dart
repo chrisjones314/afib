@@ -39,7 +39,8 @@ class AFUIPrototypeWireframesListScreen extends AFUIDefaultConnectedScreen<AFRou
         id: wireframe.id,
         navigate: wireframe.navigate,
         models: wireframe.models,
-        body: body
+        body: body,
+        timeHandling: AFTestTimeHandling.running
       );
 
       rowsCard.add(

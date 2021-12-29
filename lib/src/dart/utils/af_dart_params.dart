@@ -1,4 +1,3 @@
-import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';

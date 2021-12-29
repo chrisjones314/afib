@@ -1,4 +1,4 @@
-import 'package:afib/afib_flutter.dart';
+import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_wireframe.dart';
@@ -9,9 +9,11 @@ class AFStartPrototypeScreenTestContextAction {
     final AFScreenTestContext context;
     final dynamic models;
     final AFNavigatePushAction navigate;
+    final AFTestTimeHandling timeHandling;
     AFStartPrototypeScreenTestContextAction(this.context, { 
       required this.navigate, 
       required this.models, 
+      required this.timeHandling,
     });
 }
 

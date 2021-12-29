@@ -1,7 +1,7 @@
 import 'package:afib/id.dart';
-import 'package:afib/src/dart/redux/state/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
-import 'package:afib/src/dart/redux/state/afui_proto_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
+import 'package:afib/src/dart/redux/state/models/afui_proto_state.dart';
 import 'package:afib/src/dart/redux/state/stateviews/afui_prototype_state_view.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';

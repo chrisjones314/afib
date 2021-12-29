@@ -1,6 +1,5 @@
 
 
-import 'package:afib/afib_flutter.dart';
 import 'package:afib/id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/stateviews/afui_prototype_state_view.dart';

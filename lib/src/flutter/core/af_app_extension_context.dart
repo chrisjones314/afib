@@ -1,17 +1,7 @@
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/dart/redux/actions/af_async_query.dart';
-import 'package:afib/src/dart/redux/state/af_app_state.dart';
-import 'package:afib/src/dart/redux/state/af_theme_state.dart';
-import 'package:afib/src/dart/redux/state/afui_proto_state.dart';
-import 'package:afib/src/dart/utils/af_exception.dart';
-import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
-import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:afib/src/flutter/core/af_screen_map.dart';
-import 'package:afib/src/flutter/test/af_test_data_registry.dart';
+import 'package:afib/src/dart/redux/state/models/afui_proto_state.dart';
 import 'package:afib/src/flutter/ui/theme/af_prototype_area.dart';
 import 'package:afib/src/flutter/ui/theme/af_prototype_theme.dart';
-import 'package:afib/src/flutter/utils/af_dispatcher.dart';
-import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:flutter/material.dart';
 
 class AFSharedTestExtensionContext {

@@ -1,20 +1,9 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
-import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
-import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_context_dispatcher_mixin.dart';
-import 'package:afib/src/dart/utils/af_id.dart';
-import 'package:afib/src/dart/utils/af_route_param.dart';
-import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
-import 'package:afib/src/flutter/ui/drawer/afui_prototype_drawer.dart';
-import 'package:afib/src/flutter/utils/af_dispatcher.dart';
-import 'package:afib/src/flutter/utils/af_state_view.dart';
-import 'package:afib/src/flutter/utils/afib_f.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_redux/flutter_redux.dart';
@@ -195,6 +184,11 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
     );
 
     var models = activeState.models ?? <String, Object>{};
+    if(activeState.timeHandling == AFTestTimeHandling.running) {
+      final currentTime = store.state.public.time;
+      models = Map<String, Object>.from(models);
+      models["AFTimeState"] = currentTime;
+    }
     final stateView = this.stateViewCreator(models);
 
     final param = paramSeg?.param as TRouteParam;

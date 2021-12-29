@@ -4,6 +4,10 @@ class AFUILibraryID {
   static const id = AFLibraryID(code: "af", name: "AFib Core Library");
 }
 
+class AFUIQueryID {
+  static const time = AFQueryID("time", AFUILibraryID.id);
+}
+
 class AFUIScreenID {
   static const unused = AFScreenID("unused", AFUILibraryID.id);
   static const screenPrototypeWireframesList = AFScreenID("screen_prototype_wireframes_list", AFUILibraryID.id);
@@ -37,6 +41,8 @@ class AFUIWidgetID {
   static const textFilter = AFWidgetID("filter_text", AFUILibraryID.id);
   static const widgetPrototypeTest = AFWidgetID("widget_prototype_test", AFUILibraryID.id);
   static const cardThirdParty = AFWidgetID("third_party", AFUILibraryID.id);
+  static const textTime = AFWidgetID("text_time", AFUILibraryID.id);
+  static const textTimeAdjust = AFWidgetID("text_time_adjust", AFUILibraryID.id);
 }
 
 class AFUIReusableTestID {

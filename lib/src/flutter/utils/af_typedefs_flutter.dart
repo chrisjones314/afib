@@ -109,6 +109,10 @@ typedef AFProcessVerifyDifferenceDelegate = void Function(AFStateTestExecute exe
 /// Delegate used to implement the body of a unit test.
 typedef AFUnitTestBodyExecuteDelegate = void Function(AFUnitTestExecute e);
 
+/// Delegate used to allow a query's on success handler to be called immediately with the specified response, in addition
+/// to being called with any actual async response.
+typedef AFPreExecuteResponseDelegate<TResponse> = TResponse Function();
+
 /// Delegate used when an [AFAsyncQuery] results in a successful response.
 typedef AFOnResponseDelegate<TState extends AFFlexibleState, TResponse> = void Function(AFFinishQuerySuccessContext<TState, TResponse> context);
 

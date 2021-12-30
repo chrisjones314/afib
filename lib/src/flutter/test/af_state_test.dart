@@ -83,6 +83,7 @@ class AFStateTestContext<TState extends AFFlexibleState> extends AFStateTestExec
   AFState get afState { return store.state; }
   TState? get state { return store.state.public.componentStateOrNull<TState>(); }
   AFRouteState get route { return store.state.public.route; }
+  AFPublicState get public { return store.state.public; }
 
   void processQuery(AFAsyncQuery q) {
     AFibD.logQueryAF?.d("Processing ${q.runtimeType} for test $testID");
@@ -304,6 +305,7 @@ class AFStateTest<TState extends AFFlexibleState> {
   /// and then feeding them to its testAsyncResponse method.
   void processQuery(AFStateTestContext context, AFAsyncQuery query) {
     final key = _specifierToId(query);
+
     var h = results[key];
     if(h == null) {
       /// Ummm, this might be a good place to admit that sometimes the type system

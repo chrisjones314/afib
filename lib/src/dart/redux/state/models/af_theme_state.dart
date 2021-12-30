@@ -1742,8 +1742,10 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return fundamentals.weight(weight);
   }
 
-  Widget childDivider() {
-    return Divider();
+  Widget childDivider({
+    Color? color
+  }) {
+    return Divider(color: color, height: 2);
   }
 
   AFRichTextBuilder childRichTextBuilder({

@@ -6,11 +6,11 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 class AFPackageInfoQuery<TState extends AFFlexibleState> extends AFAsyncQuery<TState, AFPackageInfoState> {
 
-  AFPackageInfoQuery({
-    List<dynamic>? successActions, 
-    AFOnResponseDelegate<TState, AFPackageInfoState>? onSuccessDelegate
+  AFPackageInfoQuery({    
+    AFOnResponseDelegate<TState, AFPackageInfoState>? onSuccessDelegate,
+    AFPreExecuteResponseDelegate<AFPackageInfoState>? onPreExecuteResponseDelegate,
   }):
-    super(successActions: successActions, onSuccessDelegate: onSuccessDelegate);
+    super(onSuccessDelegate: onSuccessDelegate, onPreExecuteResponseDelegate: onPreExecuteResponseDelegate);
 
   @override
   void startAsync(AFStartQueryContext<AFPackageInfoState> context) {

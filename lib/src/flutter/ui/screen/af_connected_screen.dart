@@ -4,10 +4,12 @@ import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_context_dispatcher_mixin.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
+import 'package:afib/src/flutter/ui/dialog/afui_standard_notification.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:logger/logger.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:quiver/core.dart';
 
 /// Base call for all screens, widgets, drawers, dialogs and bottom sheets
@@ -476,7 +478,7 @@ abstract class AFConnectedScreenWithGlobalParam<TState extends AFFlexibleState, 
 /// Drawers are special because the user can drag in from the left or right to open them.
 /// Consequently, you will need to override [AFConnectedScreenWithGlobalParam.createDefaultRouteParam],
 /// which will be used to create your route parameter if the drawer was dragged onto the
-/// screen without you explicitly calling [AFBuildContext.openDrawer].
+/// screen without you explicitly calling [AFBuildContext.showDrawer].
 abstract class AFConnectedDrawer<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithGlobalParam<TState, TTheme, TBuildContext, TStateView, TRouteParam> {
   AFConnectedDrawer(
     AFScreenID screenId,
@@ -565,9 +567,7 @@ mixin AFContextShowMixin {
   /// ```
   /// inside the dialog screen.
   void showDialog<TReturn>({
-    AFScreenID? screenId,
-    AFRouteParam? param,
-    AFNavigatePushAction? navigate,
+    required AFNavigatePushAction navigate,
     void Function(TReturn?)? onReturn,
     bool barrierDismissible = true,
     material.Color? barrierColor,
@@ -575,12 +575,8 @@ mixin AFContextShowMixin {
     bool useRootNavigator = true,
     material.RouteSettings? routeSettings
   }) async {
-    if(navigate != null) {
-      assert(screenId == null);
-      assert(param == null);
-      screenId = navigate.param.id as AFScreenID;
-      param = navigate.param;
-    }
+    final screenId = navigate.param.id as AFScreenID;
+    final param = navigate.param;
 
     final verifiedScreenId = _nullCheckScreenId(screenId);
     _updateOptionalGlobalParam(verifiedScreenId, param);
@@ -604,6 +600,211 @@ mixin AFContextShowMixin {
     if(onReturn != null) {
       onReturn(result);
     }
+  }
+
+  void showDialogInfoText({
+    AFThemeID? themeId,
+    AFFunctionalTheme? theme,
+    required String title,
+    String? body,
+    List<String>? buttonTitles,   
+    void Function(int)? onReturn
+  }) {
+    showDialogChoiceText(
+      theme: theme,
+      themeId: themeId,
+      icon: AFUIStandardChoiceDialogIcon.info,
+      title: title,
+      body: body,
+      buttonTitles: buttonTitles,
+      onReturn: onReturn
+    );
+  }
+
+  void showDialogWarningText({
+    AFThemeID? themeId,
+    AFFunctionalTheme? theme,
+    required String title,
+    String? body,
+    List<String>? buttonTitles,   
+    void Function(int)? onReturn
+  }) {
+    showDialogChoiceText(
+      themeId: themeId,
+      theme: theme,
+      icon: AFUIStandardChoiceDialogIcon.warning,
+      title: title,
+      body: body,
+      buttonTitles: buttonTitles,
+      onReturn: onReturn
+    );
+  }
+
+  void showDialogErrorText({
+    AFThemeID? themeId,
+    AFFunctionalTheme? theme,
+    required String title,
+    String? body,
+    List<String>? buttonTitles,   
+    void Function(int)? onReturn
+  }) {
+    showDialogChoiceText(
+      themeId: themeId,
+      theme: theme,
+      icon: AFUIStandardChoiceDialogIcon.error,
+      title: title,
+      body: body,
+      buttonTitles: buttonTitles,
+      onReturn: onReturn
+    );
+  }
+
+  AFFunctionalTheme _findTheme(AFFunctionalTheme? theme, AFThemeID? themeId) {
+    if(theme == null) {
+      if(themeId == null) {
+        throw AFException("You must specify either a theme or a themeId");
+      }
+      theme = AFibF.g.storeInternalOnly?.state.public.themes.findById(themeId);
+      if(theme == null) {
+        throw AFException("Could not find the $themeId theme");
+      }
+    }    
+    return theme;
+  }
+
+  void showDialogChoiceText({
+    AFThemeID? themeId,
+    AFFunctionalTheme? theme,
+    AFUIStandardChoiceDialogIcon icon = AFUIStandardChoiceDialogIcon.question,
+    required String title,
+    String? body,
+    required List<String>? buttonTitles,   
+    void Function(int)? onReturn
+  }) {
+    var richBody; 
+
+    var themeActual = _findTheme(theme, themeId);        
+    final richTitle = themeActual.childRichTextBuilderOnCard();
+    richTitle.writeBold(title);
+
+    if(body != null) {
+      richBody = themeActual.childRichTextBuilderOnCard();
+      richBody.writeNormal(body);
+    }
+
+    if(buttonTitles == null) {
+      buttonTitles = ["OK"];
+    }
+    showDialog<int>(
+       navigate: AFUIStandardChoiceDialog.navigatePush(
+          icon: icon,
+          title: richTitle, 
+          body: richBody, 
+          buttonTitles: buttonTitles,
+      ),
+      onReturn: (result) {
+        if(result != null && onReturn != null) {
+          onReturn(result);
+        }
+      },
+    );
+  }
+
+  void showDialogChoice({
+    AFUIStandardChoiceDialogIcon icon = AFUIStandardChoiceDialogIcon.question,
+    required AFRichTextBuilder title,
+    required AFRichTextBuilder? body,
+    required List<String> buttonTitles,   
+    required void Function(int?)? onReturn
+  }) {
+    showDialog<int>(
+       navigate: AFUIStandardChoiceDialog.navigatePush(
+            icon: icon,
+            title: title, 
+            body: body, 
+            buttonTitles: buttonTitles,
+        ),
+        onReturn: onReturn,
+    );
+  }
+
+  void showInAppNotificationText({
+    AFThemeID? themeId,
+    AFFunctionalTheme? theme,
+    VoidCallback? onAction,
+    String? actionText,
+    Color? colorBackground,
+    Color? colorForeground,
+    required String title,
+    String? body,
+    Duration? duration,
+    NotificationPosition position = NotificationPosition.top,
+  }) {
+    var themeActual = _findTheme(theme, themeId);        
+    colorBackground = colorBackground ?? themeActual.colorSecondary;
+    colorForeground = colorForeground ?? themeActual.colorOnSecondary;
+
+    var richAction;
+    if(actionText != null) {
+      richAction = themeActual.childRichTextBuilder();
+      richAction.writeNormal(actionText);
+    }
+
+    var richBody;
+    if(body != null) {
+      richBody = themeActual.childRichTextBuilder();
+      richBody.writeNormal(body);
+    }
+
+    final richTitle = themeActual.childRichTextBuilder();
+    richTitle.writeBold(title);
+
+    showInAppNotification(
+      colorBackground: colorBackground, 
+      colorForeground: colorForeground, 
+      title: richTitle,
+      body: richBody,
+      actionText: richAction,
+      onAction: onAction,
+      duration: duration,
+      position: position,
+    );
+  }
+
+
+  void showInAppNotification({
+    VoidCallback? onAction,
+    AFRichTextBuilder? actionText,
+    required Color colorBackground,
+    required Color colorForeground,
+    required AFRichTextBuilder title,
+    AFRichTextBuilder? body,
+    Duration? duration,
+    NotificationPosition position = NotificationPosition.top,
+  }) {
+
+    if(onAction != null || actionText != null) {
+      if(onAction == null || actionText == null) {
+        throw AFException("If you specify onAction or actionText, you must specify both of them.");
+      }
+    }
+    showOverlayNotification( (context) {
+      return AFUIStandardNotification(
+        colorBackground: colorBackground,
+        colorForeground: colorForeground,
+        actionText: actionText,
+        title: title,
+        body: body,
+        onAction: () {
+          if(onAction != null) {
+            onAction();
+          }
+          OverlaySupportEntry.of(context)?.dismiss();
+        });
+      },
+      duration: duration,
+      position: position,
+    );
   }
 
   AFScreenID _nullCheckScreenId(AFScreenID? screenId) {
@@ -742,7 +943,7 @@ mixin AFContextShowMixin {
   /// then your [AFConnectedDrawer.createDefaultRouteParam]
   /// method will be called to create it the very first time the drawer is shown.  Subsequently, it will
   /// use the param you pass to this function, or if you omit it, the value that is already in the global route pool.
-  void openDrawer({
+  void showDrawer({
     required AFScreenID screenId,
     required AFRouteParam param,
   }) {
@@ -756,7 +957,7 @@ mixin AFContextShowMixin {
   }
 
   /// Open the end drawer that you specified for your [Scaffold].
-  void openEndDrawer({
+  void showEndDrawer({
     required AFScreenID screenId,
     required AFRouteParam param,
   }) {

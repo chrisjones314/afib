@@ -1,47 +1,54 @@
+
+/*
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/state/stateviews/afui_prototype_state_view.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:flutter/material.dart';
 
+enum AFAlertDialogType {
+  info,
+  warning,
+  error,
+}
+
 //--------------------------------------------------------------------------------------
 @immutable
-class AFUIStandardErrorDialogRouteParam extends AFRouteParam {
+class AFUIStandardAlertDialogRouteParam extends AFRouteParam {
   final String message;
 
   //--------------------------------------------------------------------------------------
-  AFUIStandardErrorDialogRouteParam({
+  AFUIStandardAlertDialogRouteParam({
     required this.message
-  }): super(id: AFUIScreenID.dialogStandardError);
+  }): super(id: AFUIScreenID.dialogStandardAlert);
 
   //--------------------------------------------------------------------------------------
-  factory AFUIStandardErrorDialogRouteParam.createOncePerScreen(String message) {
-    return AFUIStandardErrorDialogRouteParam(message: message);
+  factory AFUIStandardAlertDialogRouteParam.createOncePerScreen(String message) {
+    return AFUIStandardAlertDialogRouteParam(message: message);
   }
 }
 
 //--------------------------------------------------------------------------------------
-class AFUIStandardErrorDialog extends AFUIDefaultConnectedDialog<AFUIStandardErrorDialogRouteParam> {
+class AFUIStandardAlertDialog extends AFUIDefaultConnectedDialog<AFUIStandardAlertDialogRouteParam> {
 
   //--------------------------------------------------------------------------------------
-  AFUIStandardErrorDialog(): super(AFUIScreenID.dialogStandardError);
+  AFUIStandardAlertDialog(): super(AFUIScreenID.dialogStandardAlert);
 
   //--------------------------------------------------------------------------------------
   static AFNavigatePushAction navigatePush(String message) {
     return AFNavigatePushAction(
-      routeParam: AFUIStandardErrorDialogRouteParam.createOncePerScreen(message)
+      routeParam: AFUIStandardAlertDialogRouteParam.createOncePerScreen(message)
     );
   }
 
   //--------------------------------------------------------------------------------------
   @override
-  Dialog buildDialogWithContext(AFUIBuildContext<AFUIPrototypeStateView, AFUIStandardErrorDialogRouteParam> context) {
+  Dialog buildDialogWithContext(AFUIBuildContext<AFUIPrototypeStateView, AFUIStandardAlertDialogRouteParam> context) {
     final t = context.t;
     final rows = t.column();
     
     rows.add(Icon(Icons.report,
       size: 80.0,
       color: Colors.red,
-    
     ));
 
     rows.add(t.childText("An unexpected error occcured, please wait a few minutes and try again.", style: t.styleOnCard.bodyText1));
@@ -75,3 +82,4 @@ class AFUIStandardErrorDialog extends AFUIDefaultConnectedDialog<AFUIStandardErr
 
 
 }
+*/

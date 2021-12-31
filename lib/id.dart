@@ -19,7 +19,7 @@ class AFUIScreenID {
   static const screenPrototypeHome = AFScreenID("prototype_home", AFUILibraryID.id);
   static const screenPrototypeWidget = AFScreenID("prototype_widget", AFUILibraryID.id);
   static const screenStartupWrapper = AFScreenID("startup_wrapper", AFUILibraryID.id);
-  static const dialogStandardError = AFScreenID("standard_error_dialog", AFUILibraryID.id);
+  static const dialogStandardAlert = AFScreenID("standard_alert_dialog", AFUILibraryID.id);
   static const screenPrototypeThirdPartyList = AFScreenID("protoype_third_party_list", AFUILibraryID.id);
   static const screenPrototypeThirdPartyHome = AFScreenID("protoype_third_party_home", AFUILibraryID.id);
   static const dialogStandardChoice = AFScreenID("standard_choice_dialog", AFUILibraryID.id);

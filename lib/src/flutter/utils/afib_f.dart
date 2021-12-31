@@ -102,7 +102,6 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   final testOnlyDialogReturn = <AFScreenID, dynamic>{};
   final testOnlyBottomSheetReturn = <AFScreenID, dynamic>{};
   final themeFactories = AFFunctionalThemeDefinitionContext();
-  final themeCache = <AFThemeID, AFFunctionalTheme>{};
   final testMissingTranslations = AFTestMissingTranslations();
   final wireframes = AFWireframes();
 
@@ -132,7 +131,6 @@ class AFibGlobalState<TState extends AFFlexibleState> {
 
   void initialize() {
     final libraries = thirdPartyLibraries;
-    screenMap.screen(AFUIScreenID.dialogStandardError, (_) => AFUIStandardErrorDialog());
     screenMap.screen(AFUIScreenID.dialogStandardChoice, (_) => AFUIStandardChoiceDialog());
     appContext.initScreenMap(screenMap, libraries);
 

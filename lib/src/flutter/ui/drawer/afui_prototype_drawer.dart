@@ -14,7 +14,6 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
-import 'package:afib/src/flutter/ui/dialog/afui_standard_error_dialog.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/utils/af_param_ui_state_holder.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
@@ -671,7 +670,12 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeStateView, AF
       onPressed: () {
         final duration = AFTimeState.parseDuration(context.p.timeAdjustText);
         if(duration == null) {
-          context.showDialog(navigate: AFUIStandardErrorDialog.navigatePush("Could not parse duration"));
+          context.showDialogErrorText(
+            theme: context.t,
+            title: "Could not parse duration",
+            body: "Please specify duration as a space separated set of tokens, each starting with a number and ending with a suffix, like 2d 1h 3m 4s 5ms"
+            
+          );
           return;
         }
         final revisedBase = timeQuery.baseTime.reviseAdjustOffset(-duration);

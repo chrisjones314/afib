@@ -1484,26 +1484,6 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return buffer.toString();
   }
 
-  /*
-  Widget childConnectedRenderPassthrough<TChildRouteParam extends AFRouteParam>({
-    required AFBuildContext context,
-    required AFScreenID screenParent,
-    required AFWidgetID widChild,
-    required AFRenderConnectedChildDelegate render
-  }) {
-    return context.childConnectedRenderPassthrough<TChildRouteParam>(screenParent: screenParent, widChild: widChild, render: render);
-  }
-
-  Widget childConnectedRender<TChildRouteParam extends AFRouteParam>({
-    required AFBuildContext context,
-    required AFScreenID screenParent,
-    required AFWidgetID widChild,
-    required AFRenderConnectedChildDelegate render
-  }) {
-    return context.childConnectedRender<TChildRouteParam>(screenParent: screenParent, widChild: widChild, render: render);
-  }
-  */
-  
   Widget childEmbeddedRender({
     required AFRenderEmbeddedChildDelegate render
   }) {
@@ -2379,6 +2359,31 @@ need to manually update the value in the controller.
     return fundamentals.size5;
   }
 
+  Widget? iconStandard(AFUIStandardChoiceDialogIcon icon, { double? size }) {
+    if(icon == AFUIStandardChoiceDialogIcon.error) {
+      return Icon(Icons.report,
+        size: size,
+        color: Colors.red,
+      );
+    } else if(icon == AFUIStandardChoiceDialogIcon.info) {
+      return Icon(Icons.info,
+        size: size,
+        color: Colors.blue,
+      );
+    } else if(icon == AFUIStandardChoiceDialogIcon.warning) {
+      return Icon(Icons.warning,
+        size: size,
+        color: Colors.yellow[700] ?? Colors.yellow,
+      );    
+    } else if(icon == AFUIStandardChoiceDialogIcon.question) {
+      return Icon(Icons.help,
+        size: size,
+        color: Colors.blue);
+    }
+    return null;
+  }
+
+
   Widget? icon(dynamic id, {
     dynamic iconColor,
     dynamic iconSize
@@ -2512,9 +2517,7 @@ need to manually update the value in the controller.
   /// for discoverability.
   void showDialog<TReturn>({
     required AFBuildContext context,
-    AFScreenID? screenId,
-    AFRouteParam? param,
-    AFNavigatePushAction? navigate,
+    required AFNavigatePushAction navigate,
     void Function(TReturn?)? onReturn,
     bool barrierDismissible = true,
     Color? barrierColor,
@@ -2523,8 +2526,6 @@ need to manually update the value in the controller.
     RouteSettings? routeSettings
   }) {
     context.showDialog(
-      screenId: screenId,
-      param: param,
       navigate: navigate,
       onReturn: onReturn,
       barrierDismissible: barrierDismissible,
@@ -2538,9 +2539,7 @@ need to manually update the value in the controller.
   /// See [AFBuildContext.showModalBottomSheet], this is a one line call to that method, here for discoverability.
   void showModalBottomSheet({
     required AFBuildContext context,
-    AFScreenID? screenId,
-    AFRouteParam? param,
-    AFNavigatePushAction? navigate,
+    required AFNavigatePushAction navigate,
     AFReturnValueDelegate? onReturn,
     Color? backgroundColor,
     double? elevation,
@@ -2554,8 +2553,6 @@ need to manually update the value in the controller.
     RouteSettings? routeSettings,  
   }) {
     return context.showModalBottomSheet(
-      screenId: screenId,
-      param: param,
       navigate: navigate,
       onReturn: onReturn,
       backgroundColor: backgroundColor,
@@ -2574,17 +2571,13 @@ need to manually update the value in the controller.
   /// See [AFBuildContext.showBottomSheet], this is a one line call to that method, here for discoverability.
   void showBottomSheet({
     required AFBuildContext context,
-    AFScreenID? screenId,
-    AFRouteParam? param,
-    AFNavigatePushAction? navigate,
+    required AFNavigatePushAction navigate,
     Color? backgroundColor,
     double? elevation,
     ShapeBorder? shape,
     Clip? clipBehavior,
   }) {
     return context.showBottomSheet(
-      screenId: screenId,
-      param: param,
       navigate: navigate,
       backgroundColor: backgroundColor,
       elevation: elevation,
@@ -2688,26 +2681,16 @@ need to manually update the value in the controller.
   AFShouldContinueCheckDelegate standardShouldContinueAlertCheck({
     required AFBuildContext context,
     required bool shouldAsk,
-    AFScreenID? screen,
-    AFRouteParam? param,
-    AFNavigatePushAction? navigate
+    required AFNavigatePushAction navigate
   }) {
     return () {
         final completer = Completer<AFShouldContinue>();
-        if(navigate != null) {
-          screen = navigate.param.id as AFScreenID;
-          param = navigate.param;
-        }
-
-        assert(screen != null);
-        assert(param != null);
 
         if(shouldAsk && !AFibD.config.isTestContext) {
           // set up the buttons
           // show the dialog
           context.showDialog<AFShouldContinueRouteParam>(
-            screenId: screen,
-            param: param,
+            navigate: navigate,
             onReturn: (param) {
               if(param != null) {
                 final should = param;

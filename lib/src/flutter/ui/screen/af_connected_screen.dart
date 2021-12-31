@@ -603,16 +603,14 @@ mixin AFContextShowMixin {
   }
 
   void showDialogInfoText({
-    AFThemeID? themeId,
-    AFFunctionalTheme? theme,
+    required Object themeOrId,
     required String title,
     String? body,
     List<String>? buttonTitles,   
     void Function(int)? onReturn
   }) {
     showDialogChoiceText(
-      theme: theme,
-      themeId: themeId,
+      themeOrId: themeOrId,
       icon: AFUIStandardChoiceDialogIcon.info,
       title: title,
       body: body,
@@ -622,16 +620,14 @@ mixin AFContextShowMixin {
   }
 
   void showDialogWarningText({
-    AFThemeID? themeId,
-    AFFunctionalTheme? theme,
+    required Object themeOrId,
     required String title,
     String? body,
     List<String>? buttonTitles,   
     void Function(int)? onReturn
   }) {
     showDialogChoiceText(
-      themeId: themeId,
-      theme: theme,
+      themeOrId: themeOrId,
       icon: AFUIStandardChoiceDialogIcon.warning,
       title: title,
       body: body,
@@ -641,16 +637,14 @@ mixin AFContextShowMixin {
   }
 
   void showDialogErrorText({
-    AFThemeID? themeId,
-    AFFunctionalTheme? theme,
+    required Object themeOrId,
     required String title,
     String? body,
     List<String>? buttonTitles,   
     void Function(int)? onReturn
   }) {
     showDialogChoiceText(
-      themeId: themeId,
-      theme: theme,
+      themeOrId: themeOrId,
       icon: AFUIStandardChoiceDialogIcon.error,
       title: title,
       body: body,
@@ -659,22 +653,24 @@ mixin AFContextShowMixin {
     );
   }
 
-  AFFunctionalTheme _findTheme(AFFunctionalTheme? theme, AFThemeID? themeId) {
+  AFFunctionalTheme _findTheme(Object themeOrId) {
+    var theme;
+    if(themeOrId is AFFunctionalTheme) {
+      theme = themeOrId;
+    }
+
+    if(themeOrId is AFThemeID) {
+      theme = AFibF.g.storeInternalOnly?.state.public.themes.findById(themeOrId);
+    } 
+
     if(theme == null) {
-      if(themeId == null) {
-        throw AFException("You must specify either a theme or a themeId");
-      }
-      theme = AFibF.g.storeInternalOnly?.state.public.themes.findById(themeId);
-      if(theme == null) {
-        throw AFException("Could not find the $themeId theme");
-      }
+      throw AFException("You must specify either an AFFunctionalTheme or an AFThemeID");
     }    
     return theme;
   }
 
   void showDialogChoiceText({
-    AFThemeID? themeId,
-    AFFunctionalTheme? theme,
+    required Object themeOrId,
     AFUIStandardChoiceDialogIcon icon = AFUIStandardChoiceDialogIcon.question,
     required String title,
     String? body,
@@ -683,7 +679,7 @@ mixin AFContextShowMixin {
   }) {
     var richBody; 
 
-    var themeActual = _findTheme(theme, themeId);        
+    var themeActual = _findTheme(themeOrId);        
     final richTitle = themeActual.childRichTextBuilderOnCard();
     richTitle.writeBold(title);
 
@@ -729,8 +725,7 @@ mixin AFContextShowMixin {
   }
 
   void showInAppNotificationText({
-    AFThemeID? themeId,
-    AFFunctionalTheme? theme,
+    required Object themeOrId,
     VoidCallback? onAction,
     String? actionText,
     Color? colorBackground,
@@ -740,7 +735,7 @@ mixin AFContextShowMixin {
     Duration? duration,
     NotificationPosition position = NotificationPosition.top,
   }) {
-    var themeActual = _findTheme(theme, themeId);        
+    var themeActual = _findTheme(themeOrId);        
     colorBackground = colorBackground ?? themeActual.colorSecondary;
     colorForeground = colorForeground ?? themeActual.colorOnSecondary;
 
@@ -758,6 +753,12 @@ mixin AFContextShowMixin {
 
     final richTitle = themeActual.childRichTextBuilder();
     richTitle.writeBold(title);
+
+    // in testing, the notification library starts a timer, which doesn't get shut 
+    // down, and causes error messages at the end of the test.
+    if(AFibD.config.isWidgetTesterContext) {
+      duration = Duration(seconds: 0);
+    }
 
     showInAppNotification(
       colorBackground: colorBackground, 

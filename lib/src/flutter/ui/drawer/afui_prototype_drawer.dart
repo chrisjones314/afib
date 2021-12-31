@@ -671,7 +671,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeStateView, AF
         final duration = AFTimeState.parseDuration(context.p.timeAdjustText);
         if(duration == null) {
           context.showDialogErrorText(
-            theme: context.t,
+            themeOrId: context.t,
             title: "Could not parse duration",
             body: "Please specify duration as a space separated set of tokens, each starting with a number and ending with a suffix, like 2d 1h 3m 4s 5ms"
             

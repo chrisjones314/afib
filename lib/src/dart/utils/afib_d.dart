@@ -104,6 +104,14 @@ class AFibD<AppState> {
     return logs[area]; 
   }
 
+  static Logger? get logUIApp {
+    return logs[AFConfigEntryLogArea.ui];
+  }
+
+  static Logger? get logQueryApp {
+    return logs[AFConfigEntryLogArea.query];
+  }
+
   static Logger? get logQueryAF {
     return log(AFConfigEntryLogArea.afQuery);
   }

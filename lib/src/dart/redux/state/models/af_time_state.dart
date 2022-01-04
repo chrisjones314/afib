@@ -454,6 +454,10 @@ class AFTimeState {
       return this.absoluteSecond == other.absoluteSecond;
     } else if(leastSpecificity == AFTimeStateUpdateSpecificity.minute) {
       return this.absoluteMinute == other.absoluteMinute;
+    } else if(leastSpecificity == AFTimeStateUpdateSpecificity.hour) {
+      return this.absoluteHour == other.absoluteHour;
+    } else if(leastSpecificity == AFTimeStateUpdateSpecificity.day) {
+      return this.absoluteDay == other.absoluteDay;
     }
     return actualNow == other.actualNow;
   }

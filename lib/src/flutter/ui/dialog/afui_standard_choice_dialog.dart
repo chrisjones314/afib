@@ -1,6 +1,6 @@
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/dart/redux/state/stateviews/afui_flexible_state_view.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
+import 'package:afib/src/flutter/ui/stateviews/afui_prototype_state_view.dart';
 import 'package:flutter/material.dart';
 
 enum AFUIStandardChoiceDialogIcon {

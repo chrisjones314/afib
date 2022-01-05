@@ -197,10 +197,6 @@ class AFTimeState {
     required int absoluteDay,
     int minuteInDay = 0
   }) {
-    final abd = absoluteBaseDate;
-    if(abd == null) {
-      throw AFException("Missing absoltue base date");
-    }
   
     // an absolute day is just that, absolute, so it doesn't make sense to 
     // adjust it by the simulated offset.
@@ -389,17 +385,11 @@ class AFTimeState {
   int get absoluteYear {
     final ct = currentTime;
     final abd = absoluteBaseDate;
-    if(abd == null) {
-      throw AFException("You must specify an absolute base date");
-    }
     return ct.year - abd.year;
   }
 
   Duration get absoluteDuration {
     final abd = absoluteBaseDate;
-    if(abd == null) {
-      throw AFException("You must specify an absolute base date");
-    }
     final dur = currentTime.difference(abd);
     return dur;
   }

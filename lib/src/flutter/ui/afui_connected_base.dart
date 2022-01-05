@@ -1,5 +1,4 @@
 import 'package:afib/id.dart';
-import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/models/afui_proto_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';

@@ -2614,22 +2614,26 @@ need to manually update the value in the controller.
 
     if(topControls != null) {
       stackChildren.add(Positioned(
+        key: keyForWID(AFUIWidgetID.positionedTopHosted),
         top: 0, left:0, right: 0,
         child: topControls
       ));
     }
 
     stackChildren.add(Positioned(
+      key: keyForWID(AFUIWidgetID.positionedCenterHosted),
       top: topHeight, left: 0, bottom: 0, right: 0,
       child: main));
 
     if(bottomControls != null) {
       stackChildren.add(Positioned(
+        key: keyForWID(AFUIWidgetID.positionedBottomHosted),
         left: 0, right: 0, bottom: 0,
         child: bottomControls
       ));
     }
     return Container(
+      key: keyForWID(AFUIWidgetID.contHostedControls),
       margin: EdgeInsets.all(4.0),
       child: Stack(children: stackChildren));
   }

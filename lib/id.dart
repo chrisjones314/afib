@@ -43,6 +43,10 @@ class AFUIWidgetID {
   static const cardThirdParty = AFWidgetID("third_party", AFUILibraryID.id);
   static const textTime = AFWidgetID("text_time", AFUILibraryID.id);
   static const textTimeAdjust = AFWidgetID("text_time_adjust", AFUILibraryID.id);
+  static const positionedTopHosted = AFWidgetID("positioned_top_hosted", AFUILibraryID.id);
+  static const positionedBottomHosted = AFWidgetID("positioned_bottom_hosted", AFUILibraryID.id);
+  static const positionedCenterHosted = AFWidgetID("positioned_center_hosted", AFUILibraryID.id);
+  static const contHostedControls = AFWidgetID("cont_hosted_controls", AFUILibraryID.id);
 }
 
 class AFUIReusableTestID {

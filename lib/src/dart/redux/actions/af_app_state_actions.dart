@@ -1,3 +1,4 @@
+import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_object_with_key.dart';
 import 'package:meta/meta.dart';
@@ -21,7 +22,7 @@ class AFResetToInitialRouteAction {
 /// If you have nested data that you need to update, update the leaf objects
 /// and use copyWith to propogate the change up to a root object in [AFAppState],
 /// then issue an [AFUpdateAppStateAction]
-class AFUpdateAppStateAction extends AFObjectWithKey {
+class AFUpdateAppStateAction extends AFActionWithKey {
   final Type area;
   final List<Object> toIntegrate;
   

@@ -174,4 +174,3 @@ typedef AFWireframeExecutionDelegate<TStateView extends AFFlexibleStateView> = v
 typedef AFFilterWidgetDelegate = bool Function(Widget);
 
 typedef AFConvertSizeToFormFactorDelegate = AFFormFactor Function(Size);
-

@@ -1272,6 +1272,7 @@ class AFSingleScreenPrototype extends AFScreenPrototype {
     dispatcher.dispatch(AFNavigatePushAction(
       routeParam: rp,
       children: navigate.children,
+      createDefaultChildParam: navigate.createDefaultChildParam,
     ));
 
   }

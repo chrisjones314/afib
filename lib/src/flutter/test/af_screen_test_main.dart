@@ -154,6 +154,7 @@ Future<void> _afSingleScreenTestMain<TState extends AFFlexibleState>(AFCommandOu
       AFNavigatePushAction(
         routeParam: test.navigate.param,
         children: test.navigate.children,
+        createDefaultChildParam: test.navigate.createDefaultChildParam,
       )
     ];
   });

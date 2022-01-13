@@ -22,18 +22,18 @@ final routeReducer = combineReducers<AFRouteState>([
 
 //---------------------------------------------------------------------------
 AFRouteState _navReplace(AFRouteState state, AFNavigateReplaceAction action) {
-  return state.popAndPushNamed(action.param, action.children);
+  return state.popAndPushNamed(action.param, action.children, action.createDefaultChildParam);
 }
 
 //---------------------------------------------------------------------------
 AFRouteState _navReplaceAll(AFRouteState state, AFNavigateReplaceAllAction action) {
-  return state.replaceAll(action.param, action.children);
+  return state.replaceAll(action.param, action.children, action.createDefaultChildParam);
 }
 
 //---------------------------------------------------------------------------
 AFRouteState _navPush(AFRouteState state, AFNavigatePushAction action) {
 
-  return state.pushNamed(action.param, action.children);
+  return state.pushNamed(action.param, action.children, action.createDefaultChildParam);
 }
 
 //---------------------------------------------------------------------------
@@ -48,7 +48,7 @@ AFRouteState _navPopN(AFRouteState state, AFNavigatePopNAction action) {
 
 //---------------------------------------------------------------------------
 AFRouteState _navPopTo(AFRouteState state, AFNavigatePopToAction action) {
-  return state.popTo(action.popTo, action.push?.param, action.push?.children, action.returnData);
+  return state.popTo(action.popTo, action.push?.param, action.push?.children, action.push?.createDefaultChildParam, action.returnData);
 }
 
 //---------------------------------------------------------------------------

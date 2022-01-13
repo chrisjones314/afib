@@ -428,7 +428,13 @@ abstract class AFConnectedWidget<TState extends AFFlexibleState, TTheme extends 
       assert(paramParent.param is TRouteParam);
       return paramParent;
     }
-    return paramParent.findChild(widgetId);
+    var seg = paramParent.findChild(widgetId);
+    final createDefault = paramParent.createDefaultChildParam;
+    if(seg == null && createDefault != null) {
+      final newParam = createDefault(widgetId, state.public, paramParent);
+      seg = AFRouteSegment(param: newParam, children: null, createDefaultChildParam: null);
+    } 
+    return seg;
   }
 
   void updateRouteParam(AFBuildContext context, TRouteParam revised, { AFID? id }) {
@@ -495,7 +501,7 @@ abstract class AFConnectedDrawer<TState extends AFFlexibleState, TTheme extends 
     // application explictly opening it, we need to have the drawer create a default
     // route parameter if one does not already exist. 
     if(current == null) {
-      current = AFRouteSegment(param: createDefaultRouteParam(state), children: null);
+      current = AFRouteSegment(param: createDefaultRouteParam(state), children: null, createDefaultChildParam: null);
     }
     return current;
   }

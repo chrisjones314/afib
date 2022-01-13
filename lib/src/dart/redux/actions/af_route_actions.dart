@@ -50,22 +50,26 @@ class AFNavigateSetParamAction extends AFNavigateAction {
 
 class AFNavigateActionWithReturn extends AFNavigateAction {
   final AFActionOnReturnDelegate? onReturn;
+  final AFCreateDefaultChildParamDelegate? createDefaultChildParam;
   AFNavigateActionWithReturn({
     AFID? id, 
     required AFRouteParam param, 
     this.onReturn,
     List<AFRouteParam>? children,
+    this.createDefaultChildParam,
   }): super(id: id, param: param, children: children);
 
 }
 
 /// Action that replaces the current leaf screen with a new screen.
 class AFNavigateReplaceAction extends AFNavigateAction {  
+  final AFCreateDefaultChildParamDelegate? createDefaultChildParam;
   AFNavigateReplaceAction({
     AFID? id, 
     required AFScreenID screen, 
     required AFRouteParam param,
     List<AFRouteParam>? children,
+    this.createDefaultChildParam,
   }): super(id: id, param: param, children: children);
 }
 
@@ -77,10 +81,12 @@ class AFNavigateExitTestAction extends AFNavigateAction {
 /// Action that removes all screens in the route, and replaces them with
 /// a single new screen at the root.
 class AFNavigateReplaceAllAction extends AFNavigateAction {
+  final AFCreateDefaultChildParamDelegate? createDefaultChildParam;
   AFNavigateReplaceAllAction({
     AFID? id, 
     required AFRouteParam param,
     List<AFRouteParam>? children,
+    this.createDefaultChildParam,
   }): super(id: id, param: param, children: children);
 
   factory AFNavigateReplaceAllAction.toStartupScreen({required AFRouteParam param}) {
@@ -96,8 +102,9 @@ class AFNavigatePushAction extends AFNavigateActionWithReturn {
     AFID? id, 
     required AFRouteParam routeParam, 
     List<AFRouteParam>? children,
-    AFActionOnReturnDelegate? onReturn
-  }): super(id: id, param: routeParam, children: children, onReturn: onReturn);
+    AFActionOnReturnDelegate? onReturn,
+    AFCreateDefaultChildParamDelegate? createDefaultChildParam,
+  }): super(id: id, param: routeParam, children: children, onReturn: onReturn, createDefaultChildParam: createDefaultChildParam);
 
 }
 

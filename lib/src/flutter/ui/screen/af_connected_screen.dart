@@ -389,6 +389,7 @@ abstract class AFConnectedWidget<TState extends AFFlexibleState, TTheme extends 
   final AFWidgetID widgetId;
   final AFNavigateRoute route;
   final bool useParentParam;
+  final TRouteParam? initialParam;
   
   AFConnectedWidget({
     required this.parent,
@@ -396,6 +397,7 @@ abstract class AFConnectedWidget<TState extends AFFlexibleState, TTheme extends 
     required AFThemeID themeId,
     required AFCreateStateViewDelegate<TStateView> stateViewCreator, 
     this.useParentParam = false,
+    this.initialParam,
     this.route = AFNavigateRoute.routeHierarchy,
   }): super(key: AFFunctionalTheme.keyForWIDStatic(widgetId), themeId: themeId, stateViewCreator: stateViewCreator);
 
@@ -429,9 +431,14 @@ abstract class AFConnectedWidget<TState extends AFFlexibleState, TTheme extends 
       return paramParent;
     }
     var seg = paramParent.findChild(widgetId);
-    final createDefault = paramParent.createDefaultChildParam;
-    if(seg == null && createDefault != null) {
-      final newParam = createDefault(widgetId, state.public, paramParent);
+    if(seg == null) {
+      var newParam;
+      final createDefault = paramParent.createDefaultChildParam;
+      if(createDefault != null) {
+        newParam = createDefault(widgetId, state.public, paramParent);
+      } else {
+        newParam = initialParam;
+      }
       seg = AFRouteSegment(param: newParam, children: null, createDefaultChildParam: null);
     } 
     return seg;

@@ -43,4 +43,4 @@ typedef AFCreateStateViewDelegate<TStateView extends AFFlexibleStateView> = TSta
 typedef AFCreateComponentStateDelegate = AFFlexibleState Function(Map<String, Object> models);
 
 /// Used to create a default child param the first time a particular child wid is used.
-typedef AFCreateDefaultChildParamDelegate = AFRouteParam Function(AFID wid, dynamic public, dynamic segParent);
+typedef AFCreateDefaultChildParamDelegate = AFRouteParam? Function(AFID wid, dynamic public, dynamic segParent);

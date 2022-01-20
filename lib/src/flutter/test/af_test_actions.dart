@@ -17,6 +17,13 @@ class AFStartPrototypeScreenTestContextAction {
     });
 }
 
+class AFUpdateActivePrototypeAction {
+  final AFPrototypeID prototypeId;
+  AFUpdateActivePrototypeAction({
+    required this.prototypeId
+  });
+}
+
 class AFStartWireframePopTestAction {
   
 }

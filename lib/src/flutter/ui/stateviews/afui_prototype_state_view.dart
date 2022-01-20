@@ -8,6 +8,7 @@ import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
+import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 
 class AFUIPrototypeStateView extends AFUIFlexibleStateView with AFUIPrototypeStateModelAccess {
@@ -36,10 +37,10 @@ mixin AFUIDefaultStateViewMixin<TRouteParam extends AFRouteParam> {
 
 }
 
-abstract class AFUIDefaultConnectedScreen<TRouteParam extends AFRouteParam> extends AFUIConnectedScreen<AFUIPrototypeStateView, TRouteParam> with AFUIDefaultStateViewMixin<TRouteParam> {
-  AFUIDefaultConnectedScreen(AFScreenID screen): super(screen, AFUIPrototypeStateView.creator);
+abstract class AFUIDefaultConnectedScreen<TSPI extends AFStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIConnectedScreen<TSPI, AFUIPrototypeStateView, TRouteParam> with AFUIDefaultStateViewMixin<TRouteParam> {
+  AFUIDefaultConnectedScreen(AFScreenID screen, AFCreateSPIDelegate<TSPI, AFUIBuildContext<AFUIPrototypeStateView, TRouteParam>> spiCreator): super(screen, AFUIPrototypeStateView.creator, spiCreator);
 }
 
-abstract class AFUIDefaultConnectedDialog<TRouteParam extends AFRouteParam> extends AFUIConnectedDialog<AFUIPrototypeStateView, TRouteParam> with AFUIDefaultStateViewMixin<TRouteParam> {
-  AFUIDefaultConnectedDialog(AFScreenID screen): super(screen, AFUIPrototypeStateView.creator);
+abstract class AFUIDefaultConnectedDialog<TSPI extends AFStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIConnectedDialog<TSPI, AFUIPrototypeStateView, TRouteParam> with AFUIDefaultStateViewMixin<TRouteParam> {
+  AFUIDefaultConnectedDialog(AFScreenID screen, AFCreateSPIDelegate<TSPI, AFUIBuildContext<AFUIPrototypeStateView, TRouteParam>> spiCreator): super(screen, AFUIPrototypeStateView.creator, spiCreator);
 }

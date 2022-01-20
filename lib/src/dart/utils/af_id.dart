@@ -28,6 +28,10 @@ class AFID {
     return library == lib;
   }
 
+  bool isKindOf(AFID other) {
+    return code.startsWith(other.code);
+  }
+
   int compareTo(AFID other) {
     return code.compareTo(other.code);
   }

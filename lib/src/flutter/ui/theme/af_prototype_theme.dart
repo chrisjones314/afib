@@ -1,4 +1,5 @@
 import 'package:afib/afib_flutter.dart';
+import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_list_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -90,7 +91,7 @@ class AFUITheme extends AFFunctionalTheme {
   }) {
     final titleText = title ?? prototype.id.code;
     final cols = row();
-    cols.add(childText(titleText));
+    cols.add(Expanded(child: childText(titleText, overflow: TextOverflow.fade)));
     if(prototype.hasReusable) {
       cols.add(createReusableTag());
     }
@@ -112,6 +113,7 @@ class AFUITheme extends AFFunctionalTheme {
         children: null,
         route: AFNavigateRoute.routeGlobalPool
       ));
+      dispatcher.dispatch(AFUpdateActivePrototypeAction(prototypeId: prototype.id));
       prototype.startScreen(dispatcher, AFibF.g.testData);
     };
     return childListTileNavDown(

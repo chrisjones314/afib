@@ -207,7 +207,13 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     if(info?.element == null) {
       throw AFException("Screen $screenId is active, but has not rendered (as there is no screen element), this might be an intenral problem in Afib.");
     }
+  }
 
+
+  AFPrototypeID? get testOnlyActivePrototypeId {
+    final state = AFibF.g.storeInternalOnly?.state;
+    final testId = state?.private.testState.activePrototypeId;
+    return testId;
   }
 
   AFScreenID get testOnlyActiveScreenId {
@@ -217,17 +223,19 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     return routeState.activeScreenId;
   }
 
-  bool testOnlyIsWorkflowTest(AFBaseTestID testId) {
-    if(primaryUITests.afWorkflowStateTests.findById(testId) != null) {
-      return true;
+  bool get testOnlyIsInWorkflowTest {
+    final activePrototypeId = testOnlyActivePrototypeId;
+    if(activePrototypeId == null) {
+      return false;
     }
 
-    for(final tests in thirdPartyUITests.values) {
-      if(tests.afWorkflowStateTests.findById(testId) != null) {
-        return true;
-      }
+    final test = AFibF.g.findScreenTestById(activePrototypeId);
+    if(test == null) {
+      return false;
     }
-    return false;
+
+    return test is AFWorkflowStatePrototype;
+    
   }
 
   void doMiddlewareNavigation( Function(NavigatorState) underHere ) {
@@ -441,6 +449,15 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   /// or [AFAppExtensionContext.addStartupAction]
   void dispatchStartupQueries(AFDispatcher dispatcher) {
     appContext.dispatchStartupQueries(dispatcher);
+  }
+
+  Iterable<AFAsyncQuery> createStartupQueries() {
+    final factories = appContext.createStartupQueries;
+    final result = <AFAsyncQuery>[];
+    for(final factory in factories) {
+      result.add(factory());
+    }
+    return result;
   }
 
   /// Used internally by the framework.

@@ -22,6 +22,8 @@ AFTestState afTestStateReducer(AFTestState state, dynamic action) {
     return state.reset();
   } else if(action is AFStartWireframeAction) {
     return state.startWireframe(action.wireframe);
+  } else if(action is AFUpdateActivePrototypeAction) {
+    return state.reviseActivePrototype(action.prototypeId);
   }
 
 

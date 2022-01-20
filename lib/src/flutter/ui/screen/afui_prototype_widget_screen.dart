@@ -33,11 +33,18 @@ class AFUIPrototypeWidgetRouteParam extends AFRouteParam {
   }
 }
 
+class AFUIPrototypeWidgetScreenSPI extends AFUIDefaultSPI<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> {
+  AFUIPrototypeWidgetScreenSPI(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context, AFConnectedUIBase screen): super(context, screen);
+  factory AFUIPrototypeWidgetScreenSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context, AFConnectedUIBase screen) {
+    return AFUIPrototypeWidgetScreenSPI(context, screen);
+  }
+}
+
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFUIPrototypeWidgetScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeWidgetRouteParam>{
+class AFUIPrototypeWidgetScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeWidgetScreenSPI, AFUIPrototypeWidgetRouteParam>{
 
-  AFUIPrototypeWidgetScreen(): super(AFUIScreenID.screenPrototypeWidget);
+  AFUIPrototypeWidgetScreen(): super(AFUIScreenID.screenPrototypeWidget, AFUIPrototypeWidgetScreenSPI.create);
 
   static AFNavigateAction navigatePush(AFWidgetPrototype test, {AFID? id}) {
     return AFNavigatePushAction(
@@ -47,9 +54,9 @@ class AFUIPrototypeWidgetScreen extends AFUIDefaultConnectedScreen<AFUIPrototype
   }
 
   @override
-  Widget buildWithContext(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context) {    
+  Widget buildWithContext(AFUIPrototypeWidgetScreenSPI spi) {    
     /// Remember what screen we are on for testing purposes.  Maybe eventually try to do this in navigator observer.
-    return _buildScreen(context);
+    return _buildScreen(spi.context);
   }
 
   Widget _buildScreen(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context) {
@@ -87,7 +94,8 @@ class AFUIPrototypeWidgetScreen extends AFUIDefaultConnectedScreen<AFUIPrototype
       final stateView = sourceWidget.stateViewCreator(testModels);
 
       final childContext = sourceWidget.createContext(standard, stateView, paramChild, context.children, themeChild);
-      resultWidget = sourceWidget.buildWithContext(childContext);
+      final childSpi = sourceWidget.createSPI(childContext);
+      resultWidget = sourceWidget.buildWithContext(childSpi);
     } else {
       resultWidget = sourceWidget;
     }

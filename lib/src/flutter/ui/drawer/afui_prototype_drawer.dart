@@ -93,13 +93,19 @@ class AFUIPrototypeDrawerRouteParam extends AFRouteParam {
   }
 }
 
+class AFUIPrototypeDrawerSPI extends AFUIDefaultSPI<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> {
+  AFUIPrototypeDrawerSPI(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> context, AFConnectedUIBase screen): super(context, screen);
+  factory AFUIPrototypeDrawerSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> context, AFConnectedUIBase screen) {
+    return AFUIPrototypeDrawerSPI(context, screen);
+  }
+}
 
 //--------------------------------------------------------------------------------------
-class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> {
+class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> {
   static final timeFormat = DateFormat('Hms');
 
   //--------------------------------------------------------------------------------------
-  AFUIPrototypeDrawer(): super(AFUIScreenID.screenTestDrawer, AFUIPrototypeStateView.creator);
+  AFUIPrototypeDrawer(): super(AFUIScreenID.screenTestDrawer, AFUIPrototypeStateView.creator, AFUIPrototypeDrawerSPI.create);
 
   //--------------------------------------------------------------------------------------
   AFScreenID? get primaryScreenId {
@@ -133,8 +139,8 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeStateView, AF
 
   //--------------------------------------------------------------------------------------
   @override
-  Widget buildWithContext(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> context) {
-    return _buildDrawer(context);
+  Widget buildWithContext(AFUIPrototypeDrawerSPI spi) {
+    return _buildDrawer(spi.context);
   }
 
   //--------------------------------------------------------------------------------------

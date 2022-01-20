@@ -37,6 +37,7 @@ class AFSharedTestExtensionContext {
     registerApplicator(AFDismissibleSwipeAction());
     registerApplicator(AFSwitchTapAction());
     registerApplicator(AFSetSwitchValueAction());
+    registerApplicator(AFCheckboxTapAction());
 
     registerExtractor(AFSelectableChoiceChip());
     registerExtractor(AFExtractTextTextAction());
@@ -46,6 +47,7 @@ class AFSharedTestExtensionContext {
     registerExtractor(AFExtractRichTextAction());
     registerExtractor(AFSwitchExtractor());    
     registerExtractor(AFExtractColumnChildrenAction());
+    registerExtractor(AFExtractWidgetListAction());
 
     registerScroller(AFScrollableScrollerAction());
   }
@@ -186,7 +188,7 @@ class AFTestExtensionContext {
     }
   }
 
-  void _initStateTests(AFStateTestDefinitionContext context) {
+  void _initStateTests(AFStateTestDefinitionsContext context) {
     for(final init in initStateTests) {
       init(context);
     }
@@ -233,7 +235,7 @@ class AFTestExtensionContext {
       );
       _initUnitTests(unitTestDefineContext);
       
-      final stateTestDefineContext = AFStateTestDefinitionContext(
+      final stateTestDefineContext = AFStateTestDefinitionsContext(
         tests: stateTests,
         testData: testData
       );

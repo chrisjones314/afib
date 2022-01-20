@@ -389,6 +389,11 @@ class AFTestParams {
   final List<Object?> params;
   AFTestParams(this.params);
 
+
+  Iterable<Object?> get values {
+    return params;
+  }
+
   T getParam<T extends Object>(int idx) {
     final result = getParamOrNull<T>(idx);
     if(result == null) {
@@ -710,7 +715,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
     return elems.map( (e) => e.widget ).toList();
   }
 
-  Future<List<Widget>> matchDirectChildrenOf(dynamic selector, { List<AFWidgetID>? expectedIds, bool shouldScroll = true, 
+  Future<List<Widget>> matchDirectChildrenOf(dynamic selector, { List<AFWidgetID?>? expectedIds, bool shouldScroll = true, 
     bool ignoreUnderWidget = false, AFFilterWidgetDelegate? filterWidgets }) async {
     final elems = await findElementsFor(selector, ignoreUnderWidget: ignoreUnderWidget, shouldScroll: shouldScroll);
     if(elems.isEmpty) {
@@ -1434,6 +1439,8 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
 
   static void initializeMultiscreenPrototype<TState extends AFFlexibleState>(AFDispatcher dispatcher, AFWorkflowStatePrototype test) {
     dispatcher.dispatch(AFResetToInitialStateAction());
+    dispatcher.dispatch(AFUpdateActivePrototypeAction(prototypeId: test.id));
+
     final screenMap = AFibF.g.screenMap;
     dispatcher.dispatch(AFNavigatePushAction(
       routeParam: screenMap.trueCreateStartupScreenParam!.call()
@@ -2003,8 +2010,15 @@ class AFBaseTestDefinitionContext {
 
   /// Looks up the test data defined in your test_data.dart file for a particular
   /// test data id.
-  dynamic testData(dynamic testDataId) {
-    return registry.f(testDataId);
+  T testData<T extends Object>(dynamic testDataId) {
+    final value = registry.f(testDataId);
+    if(value == null) {
+      throw AFException("Missing test value for id $testDataId");
+    }
+    if(value is! T) {
+      throw AFException("Test value with id $testDataId had type ${value.runtimeType.toString()} when ${T.toString()} was required.");
+    }
+    return value;
   }
 
   Logger? get log {
@@ -2031,10 +2045,10 @@ class AFUnitTestDefinitionContext extends AFBaseTestDefinitionContext {
 /// This class is intended to provide a quick start for the most common
 /// methods in defining state tests, and to enable extensions
 /// later without changing the test definition function profile.
-class AFStateTestDefinitionContext extends AFBaseTestDefinitionContext {
+class AFStateTestDefinitionsContext extends AFBaseTestDefinitionContext {
   final AFStateTests tests;
 
-  AFStateTestDefinitionContext({
+  AFStateTestDefinitionsContext({
     required this.tests,
     required AFCompositeTestDataRegistry testData
   }): super(testData);
@@ -2045,47 +2059,8 @@ class AFStateTestDefinitionContext extends AFBaseTestDefinitionContext {
   /// execute a query.  Note that state tests are usually built in a 
   /// kind of tree, with a cumulative state being build from
   /// a series of query/response cycles across multiple tests.
-  void addTest(AFStateTestID id, AFProcessTestDelegate handler) {
-    tests.addTest(id, handler);
-  }
-
-  /// Specify a response for a particular query.
-  /// 
-  /// When the query 'executes', its [AFAsyncQuery.startAsync] method will be skipped
-  /// and its [AFAsyncQuery.finishAsyncWithResponse] method will be called with the 
-  /// test data with the specified [idData] in the test data registry.
-  void specifyFixedResponse(AFStateTest test, dynamic querySpecifier, dynamic idData) {
-    test.specifyResponse(querySpecifier, this, idData);
-  }
-
-  void specifyNoResponse(AFStateTest test, dynamic querySpecifier) {
-    test.specifyNoResponse(querySpecifier, this);
-  }
-
-  /// Create a response dynamically for a particular query.
-  /// 
-  /// This method is useful when you have query methods which 'write' data, where often
-  /// the data doesn't change at all when it is writen, or the changes are simple (like 
-  /// a new identifier is returned, or the update-timestamp for the data is created by the server).
-  /// Using this method, in many cases you can cause 'workflow' prototypes to behave very much
-  /// like they have a back end server, despite the fact that they do not.
-  /// 
-  /// When the query 'executes', its [AFAsyncQuery.startAsync] method will be skipped
-  /// and its [AFAsyncQuery.finishAsyncWithResponse] method will be called with the 
-  /// test data that is created by [delegate].
-  void specifyDynamicResponse(AFStateTest test, dynamic querySpecifier, AFCreateQueryResultDelegate delegate) {
-    test.createResponse(querySpecifier, delegate);
-  }
-
-  void specifyDynamicCrossQueryResponse(AFStateTest test, dynamic querySpecifier, dynamic listenerSpecifier, List<AFCreateQueryResultDelegate> delegates) {
-    test.createCrossQueryResponse(querySpecifier, listenerSpecifier, delegates);
-  }
-
-  /// Use this method to execute a query and validate the state change which it causes.
-  void executeQuery(AFStateTest test, AFAsyncQuery query, {
-    AFProcessVerifyDifferenceDelegate? verify
-  }) {
-    test.executeQuery(query, verifyState: verify);
+  void addTest(AFStateTestID id, AFStateTestDefinitionDelegate handler) {
+    tests.addTest(id, this, handler);
   }
 
 }

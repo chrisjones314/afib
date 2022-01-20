@@ -6,15 +6,22 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_prototype_state_view.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 
+class AFUIPrototypeWireframesListScreenSPI extends AFUIDefaultSPI<AFUIPrototypeStateView, AFRouteParam> {
+  AFUIPrototypeWireframesListScreenSPI(AFUIBuildContext<AFUIPrototypeStateView, AFRouteParam> context, AFConnectedUIBase screen): super(context, screen);
+  factory AFUIPrototypeWireframesListScreenSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFRouteParam> context, AFConnectedUIBase screen) {
+    return AFUIPrototypeWireframesListScreenSPI(context, screen);
+  }
+}
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFUIPrototypeWireframesListScreen extends AFUIDefaultConnectedScreen<AFRouteParam>{
-  AFUIPrototypeWireframesListScreen(): super(AFUIScreenID.screenPrototypeWireframesList);
+class AFUIPrototypeWireframesListScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeWireframesListScreenSPI, AFRouteParam>{
+  AFUIPrototypeWireframesListScreen(): super(AFUIScreenID.screenPrototypeWireframesList, AFUIPrototypeWireframesListScreenSPI.create);
 
   static AFNavigatePushAction navigateTo() {
     return AFNavigatePushAction(
@@ -23,8 +30,8 @@ class AFUIPrototypeWireframesListScreen extends AFUIDefaultConnectedScreen<AFRou
   }
 
   @override
-  Widget buildWithContext(AFUIBuildContext<AFUIPrototypeStateView, AFRouteParam> context) {
-    return _buildWireframes(context);
+  Widget buildWithContext(AFUIPrototypeWireframesListScreenSPI spi) {
+    return _buildWireframes(spi.context);
   }
 
   /// 

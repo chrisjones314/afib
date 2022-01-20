@@ -4,6 +4,7 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_prototype_state_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -66,11 +67,18 @@ class AFUIPrototypeTestScreenParam extends AFRouteParam {
   }
 }
 
+class AFUIPrototypeTestScreenSPI extends AFUIDefaultSPI<AFUIPrototypeStateView, AFUIPrototypeTestScreenParam> {
+  AFUIPrototypeTestScreenSPI(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeTestScreenParam> context, AFConnectedUIBase screen): super(context, screen);
+  factory AFUIPrototypeTestScreenSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeTestScreenParam> context, AFConnectedUIBase screen) {
+    return AFUIPrototypeTestScreenSPI(context, screen);
+  }
+}
+
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFUIPrototypeTestScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeTestScreenParam>{
+class AFUIPrototypeTestScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeTestScreenSPI, AFUIPrototypeTestScreenParam>{
 
-  AFUIPrototypeTestScreen(): super(AFUIScreenID.screenPrototypeListSingleScreen);
+  AFUIPrototypeTestScreen(): super(AFUIScreenID.screenPrototypeListSingleScreen, AFUIPrototypeTestScreenSPI.create);
 
   static AFNavigatePushAction navigatePush(List<AFScreenPrototype> tests, dynamic title) {
     return AFNavigatePushAction(
@@ -78,8 +86,8 @@ class AFUIPrototypeTestScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeTe
   }
 
   @override
-  Widget buildWithContext(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeTestScreenParam> context) {
-    return _buildList(context);
+  Widget buildWithContext(AFUIPrototypeTestScreenSPI spi) {
+    return _buildList(spi.context);
   }
 
   List<String> _sortIterable(Iterable<String> items) {

@@ -28,11 +28,18 @@ class AFUIStandardChoiceDialogRouteParam extends AFRouteParam {
   }): super(id: AFUIScreenID.dialogStandardChoice);
 }
 
+class AFUIStandardChoiceDialogSPI extends AFUIDefaultSPI<AFUIPrototypeStateView, AFUIStandardChoiceDialogRouteParam> {
+  AFUIStandardChoiceDialogSPI(AFUIBuildContext<AFUIPrototypeStateView, AFUIStandardChoiceDialogRouteParam> context, AFConnectedUIBase screen): super(context, screen);
+  factory AFUIStandardChoiceDialogSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFUIStandardChoiceDialogRouteParam> context, AFConnectedUIBase screen) {
+    return AFUIStandardChoiceDialogSPI(context, screen);
+  }
+}
+
 //--------------------------------------------------------------------------------------
-class AFUIStandardChoiceDialog extends AFUIDefaultConnectedDialog<AFUIStandardChoiceDialogRouteParam> {
+class AFUIStandardChoiceDialog extends AFUIDefaultConnectedDialog<AFUIStandardChoiceDialogSPI, AFUIStandardChoiceDialogRouteParam> {
 
   //--------------------------------------------------------------------------------------
-  AFUIStandardChoiceDialog(): super(AFUIScreenID.dialogStandardChoice);
+  AFUIStandardChoiceDialog(): super(AFUIScreenID.dialogStandardChoice, AFUIStandardChoiceDialogSPI.create);
 
   //--------------------------------------------------------------------------------------
   static AFNavigatePushAction navigatePush({
@@ -53,7 +60,8 @@ class AFUIStandardChoiceDialog extends AFUIDefaultConnectedDialog<AFUIStandardCh
 
   //--------------------------------------------------------------------------------------
   @override
-  Widget buildDialogWithContext(AFUIBuildContext<AFUIFlexibleStateView, AFUIStandardChoiceDialogRouteParam> context) {
+  Widget buildDialogWithContext(AFUIStandardChoiceDialogSPI spi) {
+    final context = spi.context;
     final t = context.t;
 
     final rows = t.column();

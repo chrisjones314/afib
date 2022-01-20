@@ -2,6 +2,7 @@ import 'package:afib/id.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/screen/af_startup_screen.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:flutter/material.dart';
@@ -13,12 +14,10 @@ class AFScreenMap {
   AFCreateRouteParamDelegate? _createStartupScreenParam;
   AFCreateRouteParamDelegate? trueCreateStartupScreenParam;
   AFScreenID? _startupScreenId;
-  final Map<AFScreenID, WidgetBuilder> _screens = <AFScreenID, WidgetBuilder>{};
-  final Map<AFWidgetID, WidgetBuilder> _widgets = <AFWidgetID, WidgetBuilder>{};
+  final Map<AFScreenID, AFConnectedUIBuilderDelegate> _screens = <AFScreenID, AFConnectedUIBuilderDelegate>{};
+  final Map<AFWidgetID, AFConnectedUIBuilderDelegate> _widgets = <AFWidgetID, AFConnectedUIBuilderDelegate>{};
 
-  AFScreenMap() {
-    screen(AFUIScreenID.screenStartupWrapper, (_) => AFStartupScreenWrapper());
-  }
+  AFScreenMap();
 
   AFScreenID? get startupScreenId {
     if(_startupScreenId == AFUIScreenID.screenPrototypeHome) {
@@ -34,18 +33,31 @@ class AFScreenMap {
   }
 
   Map<String, WidgetBuilder> get screens {
-     return _screens.map<String, WidgetBuilder>((k, v) {
+     final result = _screens.map<String, WidgetBuilder>((k, v) {
        return MapEntry(k.code, v);
      });
+     result[AFUIScreenID.screenStartupWrapper.code] = (_) => AFStartupScreenWrapper();
+     return result;
   }
 
   WidgetBuilder? findBy(AFScreenID id) {
     return _screens[id];
   }
 
+  AFConnectedUIBase createInstance(AFScreenID id, BuildContext? buildContext) {
+    final builder = _screens[id];
+    if(builder == null) {
+      throw AFException("Please add an entry for $id in screen_map.dart");
+    }
+    return builder(buildContext);
+  }
+
   Widget createFor(AFScreenID id, BuildContext context) {
     final builder = _screens[id];
     if(builder == null) {
+      if(id == AFUIScreenID.screenStartupWrapper) {
+        return AFStartupScreenWrapper();
+      }
       throw AFException("Please add an entry for $id in screen_map.dart");
     }
     return builder(context);
@@ -65,7 +77,7 @@ class AFScreenMap {
   }
   /// Call [screen] multiple times to specify the relationship between 
   /// [screenKey] and screens built by the [WidgetBuilder]
-  void screen(AFScreenID screenKey, WidgetBuilder screenBuilder) {
+  void screen(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
     _screens[screenKey] = screenBuilder;
   }
 
@@ -83,7 +95,7 @@ class AFScreenMap {
     return _screens;
   }
 
-  void widget(AFWidgetID widget, WidgetBuilder widgetBuilder) {
+  void widget(AFWidgetID widget, AFConnectedUIBuilderDelegate widgetBuilder) {
     _widgets[widget] = widgetBuilder;
   }
 }

@@ -73,7 +73,7 @@ abstract class AFBaseTestExecute extends AFModelWithCustomID {
     }
   }
 
-  void expectWidgetIds(List<Widget> widgets, List<AFWidgetID> ids, { AFWidgetMapperDelegate? mapper } ) {
+  void expectWidgetIds(List<Widget> widgets, List<AFWidgetID?> ids, { AFWidgetMapperDelegate? mapper } ) {
     return expect(widgets, hasWidgetIdsWith(ids, mapper: mapper));
   }
   

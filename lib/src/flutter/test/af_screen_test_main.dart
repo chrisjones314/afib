@@ -140,6 +140,7 @@ Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
 Future<void> _afWidgetTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
   return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.widgetTests.all, "Widget", (test) {
     return [
+      AFUpdateActivePrototypeAction(prototypeId: test.id),
       AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models),
       AFUIPrototypeWidgetScreen.navigatePush(test as AFWidgetPrototype)
     ];
@@ -150,6 +151,7 @@ Future<void> _afSingleScreenTestMain<TState extends AFFlexibleState>(AFCommandOu
   return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.screenTests.all, "Single-Screen", (test) {
     final stateViews = AFibF.g.testData.resolveStateViewModels(test.models);
     return [
+      AFUpdateActivePrototypeAction(prototypeId: test.id),
       AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: stateViews),
       AFNavigatePushAction(
         routeParam: test.navigate.param,

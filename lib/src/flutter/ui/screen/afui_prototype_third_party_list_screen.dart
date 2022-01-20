@@ -4,16 +4,23 @@ import 'package:afib/id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_third_party_home_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_prototype_state_view.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 
+class AFUIPrototypeThirdPartyListScreenSPI extends AFUIDefaultSPI<AFUIPrototypeStateView, AFRouteParam> {
+  AFUIPrototypeThirdPartyListScreenSPI(AFUIBuildContext<AFUIPrototypeStateView, AFRouteParam> context, AFConnectedUIBase screen): super(context, screen);
+  factory AFUIPrototypeThirdPartyListScreenSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFRouteParam> context, AFConnectedUIBase screen) {
+    return AFUIPrototypeThirdPartyListScreenSPI(context, screen);
+  }
+}
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFUIPrototypeThirdPartyListScreen extends AFUIDefaultConnectedScreen<AFRouteParam>{
-  AFUIPrototypeThirdPartyListScreen(): super(AFUIScreenID.screenPrototypeThirdPartyList);
+class AFUIPrototypeThirdPartyListScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeThirdPartyListScreenSPI, AFRouteParam>{
+  AFUIPrototypeThirdPartyListScreen(): super(AFUIScreenID.screenPrototypeThirdPartyList, AFUIPrototypeThirdPartyListScreenSPI.create);
 
   static AFNavigatePushAction navigatePush() {
     return AFNavigatePushAction(
@@ -21,8 +28,8 @@ class AFUIPrototypeThirdPartyListScreen extends AFUIDefaultConnectedScreen<AFRou
   }
 
   @override
-  Widget buildWithContext(AFUIBuildContext<AFUIPrototypeStateView, AFRouteParam> context) {
-    return _buildThirdParty(context);
+  Widget buildWithContext(AFUIPrototypeThirdPartyListScreenSPI spi) {
+    return _buildThirdParty(spi.context);
   }
 
   /// 

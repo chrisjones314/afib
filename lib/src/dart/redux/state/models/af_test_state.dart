@@ -78,6 +78,7 @@ class AFSingleScreenTestState {
 class AFTestState {
   final List<AFBaseTestID> activeTestIds;
   final AFWireframe? activeWireframe;
+  final AFPrototypeID? activePrototypeId;
   final Map<AFBaseTestID, AFScreenTestContext> testContexts;
   final Map<AFBaseTestID, AFSingleScreenTestState> testStates;
 
@@ -85,7 +86,8 @@ class AFTestState {
     required this.activeTestIds, 
     required this.activeWireframe,
     required this.testContexts, 
-    required this.testStates
+    required this.testStates,
+    required this.activePrototypeId,
   });
 
   factory AFTestState.initial() {
@@ -93,7 +95,8 @@ class AFTestState {
       activeTestIds: <AFBaseTestID>[],
       activeWireframe: null,
       testContexts: <AFBaseTestID, AFScreenTestContext>{}, 
-      testStates:<AFBaseTestID, AFSingleScreenTestState>{}
+      testStates:<AFBaseTestID, AFSingleScreenTestState>{},
+      activePrototypeId: null,
     );
   }
 
@@ -156,6 +159,9 @@ class AFTestState {
     return AFTestState.initial();
   }
 
+  AFTestState reviseActivePrototype(AFPrototypeID prototypeId) {
+    return copyWith(activePrototypeId: prototypeId);
+  }
 
   AFTestState startWireframe(AFWireframe wireframe) {
 
@@ -247,13 +253,15 @@ class AFTestState {
     AFWireframe? activeWireframe,
     bool? clearActiveWireframe,
     Map<AFBaseTestID, AFScreenTestContext>? testContexts,
-    Map<AFBaseTestID, AFSingleScreenTestState>? testStates
+    Map<AFBaseTestID, AFSingleScreenTestState>? testStates,
+    AFPrototypeID? activePrototypeId,
   }) {
     var wf = activeWireframe ?? this.activeWireframe;
     if(clearActiveWireframe != null && clearActiveWireframe) {
       wf = null;
     }
     return AFTestState(
+      activePrototypeId: activePrototypeId ?? this.activePrototypeId,
       activeTestIds: activeTestIds ?? this.activeTestIds,
       testContexts: testContexts ?? this.testContexts,
       testStates: testStates ?? this.testStates,

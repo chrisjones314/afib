@@ -4,7 +4,9 @@ import 'package:afib/src/dart/redux/state/models/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_third_party_list_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_wireframes_list_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_prototype_state_view.dart';
@@ -76,17 +78,24 @@ class AFUIPrototypeHomeScreenParam extends AFRouteParam {
   }
 }
 
+class AFPrototypeHomeScreenSPI extends AFUIDefaultSPI<AFUIPrototypeStateView, AFUIPrototypeHomeScreenParam> {
+  AFPrototypeHomeScreenSPI(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeHomeScreenParam> context, AFConnectedUIBase screen): super(context, screen);
+  factory AFPrototypeHomeScreenSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeHomeScreenParam> context, AFConnectedUIBase screen) {
+    return AFPrototypeHomeScreenSPI(context, screen);
+  }
+}
+
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFPrototypeHomeScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeHomeScreenParam>{
+class AFPrototypeHomeScreen extends AFUIDefaultConnectedScreen<AFPrototypeHomeScreenSPI, AFUIPrototypeHomeScreenParam>{
   static const runWidgetTestsId = "run_widget_tests";
   static const runScreenTestsId = "run_screen_tests";
   static const runWorkflowTestsId = "run_workflow_tests";
-  AFPrototypeHomeScreen(): super(AFUIScreenID.screenPrototypeHome);
+  AFPrototypeHomeScreen(): super(AFUIScreenID.screenPrototypeHome, AFPrototypeHomeScreenSPI.create);
 
   @override
-  Widget buildWithContext(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeHomeScreenParam> context) {
-    return _buildHome(context);
+  Widget buildWithContext(AFPrototypeHomeScreenSPI spi) {
+    return _buildHome(spi.context);
   }
 
   /// 
@@ -132,6 +141,7 @@ class AFPrototypeHomeScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeHome
     final results = <AFScreenTestResultSummary>[];
     for(final test in tests) {
       // first, we navigate into the screen.
+      context.dispatch(AFUpdateActivePrototypeAction(prototypeId: test.id));
       test.startScreen(context.d, AFibF.g.testData);
 
       final state = AFibF.g.storeInternalOnly!.state;

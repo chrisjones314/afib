@@ -217,6 +217,24 @@ class AFSwitchTapAction extends AFApplyTapWidgetAction {
 }
 
 
+class AFCheckboxTapAction extends AFApplyTapWidgetAction {
+
+  AFCheckboxTapAction(): super(Checkbox);
+
+  /// [data] is ignored.
+  @override
+  bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
+    final tapOn = elem.widget;
+    if(tapOn is Checkbox) {
+      final value = tapOn.value ?? false;
+      tapOn.onChanged?.call(!value);
+      return true;
+    } 
+    return false;
+  }
+}
+
+
 class AFListTileTapAction extends AFApplyTapWidgetAction {
 
   AFListTileTapAction(): super(ListTile);
@@ -473,6 +491,19 @@ class AFExtractColumnChildrenAction extends AFExtractChildrenWidgetAction {
   dynamic extractInternal(String extractType, AFWidgetSelector selector, Element element) {
     final widget = element.widget;
     if(AFExtractWidgetAction.isChildren(extractType) && widget is Column) {
+      return widget.children;
+    } 
+    return null;
+  }
+}
+
+class AFExtractWidgetListAction extends AFExtractChildrenWidgetAction {
+  AFExtractWidgetListAction(): super(AFUIWidgetListWrapper);
+
+  @override
+  dynamic extractInternal(String extractType, AFWidgetSelector selector, Element element) {
+    final widget = element.widget;
+    if(AFExtractWidgetAction.isChildren(extractType) && widget is AFUIWidgetListWrapper) {
       return widget.children;
     } 
     return null;

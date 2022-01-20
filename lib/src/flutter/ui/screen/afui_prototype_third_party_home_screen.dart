@@ -3,6 +3,7 @@ import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/core/af_app_extension_context.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_prototype_state_view.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
@@ -20,10 +21,17 @@ class AFUIPrototypeThirdPartyHomeParam extends AFRouteParam {
   }
 }
 
+class AFUIPrototypeThirdPartyHomeScreenSPI extends AFUIDefaultSPI<AFUIPrototypeStateView, AFUIPrototypeThirdPartyHomeParam> {
+  AFUIPrototypeThirdPartyHomeScreenSPI(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeThirdPartyHomeParam> context, AFConnectedUIBase screen): super(context, screen);
+  factory AFUIPrototypeThirdPartyHomeScreenSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeThirdPartyHomeParam> context, AFConnectedUIBase screen) {
+    return AFUIPrototypeThirdPartyHomeScreenSPI(context, screen);
+  }
+}
+
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFUIPrototypeThirdPartyHomeScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeThirdPartyHomeParam>{
-  AFUIPrototypeThirdPartyHomeScreen(): super(AFUIScreenID.screenPrototypeThirdPartyHome);
+class AFUIPrototypeThirdPartyHomeScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeThirdPartyHomeScreenSPI, AFUIPrototypeThirdPartyHomeParam>{
+  AFUIPrototypeThirdPartyHomeScreen(): super(AFUIScreenID.screenPrototypeThirdPartyHome, AFUIPrototypeThirdPartyHomeScreenSPI.create);
 
   static AFNavigatePushAction navigatePush(AFUILibraryExtensionContext libraryContext) {
     return AFNavigatePushAction(
@@ -31,8 +39,8 @@ class AFUIPrototypeThirdPartyHomeScreen extends AFUIDefaultConnectedScreen<AFUIP
   }
 
   @override
-  Widget buildWithContext(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeThirdPartyHomeParam> context) {
-    return _buildThirdParty(context);
+  Widget buildWithContext(AFUIPrototypeThirdPartyHomeScreenSPI spi) {
+    return _buildThirdParty(spi.context);
   }
 
   /// 

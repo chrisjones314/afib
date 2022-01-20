@@ -92,7 +92,7 @@ typedef AFInitTestDataDelegate = void Function(AFCompositeTestDataRegistry regis
 typedef AFInitUnitTestsDelegate = void Function(AFUnitTestDefinitionContext context);
 
 /// Delegate used to initialize state tests.
-typedef AFInitStateTestsDelegate = void Function(AFStateTestDefinitionContext context);
+typedef AFInitStateTestsDelegate = void Function(AFStateTestDefinitionsContext context);
 
 /// Delegate 
 typedef AFProcessQueryDelegate = dynamic Function(AFStateTestContext context, AFAsyncQuery query);
@@ -101,7 +101,7 @@ typedef AFProcessQueryDelegate = dynamic Function(AFStateTestContext context, AF
 typedef AFCreateQueryResultDelegate = dynamic Function(AFStateTestContext context, AFAsyncQuery query);
 
 /// Delegate used to process a state test.
-typedef AFProcessTestDelegate = void Function(AFStateTest test);
+typedef AFStateTestDefinitionDelegate = void Function(AFStateTestDefinitionContext test);
 
 /// Delegate used to verify a state change, from before to after
 typedef AFProcessVerifyDifferenceDelegate = void Function(AFStateTestExecute execute, AFStateTestDifference diff);
@@ -174,3 +174,11 @@ typedef AFWireframeExecutionDelegate<TStateView extends AFFlexibleStateView> = v
 typedef AFFilterWidgetDelegate = bool Function(Widget);
 
 typedef AFConvertSizeToFormFactorDelegate = AFFormFactor Function(Size);
+
+typedef AFConnectedUIBuilderDelegate = AFConnectedUIBase Function(BuildContext? context);
+
+typedef AFStateTestScreenHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestScreenContext<TSPI> context);
+
+typedef AFStateTestScreenBuildContextDelegate<TSPI extends AFStateProgrammingInterface> = void Function(TSPI context);
+
+typedef AFCreateSPIDelegate<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext> = TSPI Function(TBuildContext context, AFConnectedUIBase screen);

@@ -21,15 +21,17 @@ import 'package:quiver/core.dart';
 /// * [AFConnectedDrawer]
 /// * [AFConnectedDialog]
 /// * [AFConnectedBottomSheet]
-abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends material.StatelessWidget {
+abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> extends material.StatelessWidget {
   final AFThemeID themeId;
   final AFCreateStateViewDelegate<TStateView> stateViewCreator;
+  final AFCreateSPIDelegate<TSPI, TBuildContext> spiCreator;
     
   //--------------------------------------------------------------------------------------
   AFConnectedUIBase({
     Key? key, 
     required this.themeId,
     required this.stateViewCreator,
+    required this.spiCreator,
   }): super(key: key);
 
   //--------------------------------------------------------------------------------------
@@ -37,7 +39,7 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
   material.Widget build(material.BuildContext context) {
     return StoreConnector<AFState, AFBuildContext?>(
         converter: (store) {          
-          final context = _createNonBuildContext(store as AFStore);
+          final context = createNonBuildContext(store as AFStore);
           return context;
         },
         distinct: true,
@@ -63,10 +65,15 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
 
           _updateFundamentalThemeState(buildContext);
           final withContext = createContext(standard, dataContext.s as TStateView, dataContext.p as TRouteParam, dataContext.children, dataContext.theme as TTheme);
-          final widgetResult = buildWithContext(withContext);
+          final spi = createSPI(withContext);
+          final widgetResult = buildWithContext(spi);
           return widgetResult;
         }
     );
+  }
+
+  TSPI createSPI(TBuildContext context) {
+    return spiCreator(context, this);
   }
 
   TBuildContext createContext(AFStandardBuildContextData standard, TStateView stateView, TRouteParam param, AFRouteSegmentChildren? children, TTheme theme);
@@ -90,7 +97,7 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
   /// e.g. a dialog, bottomsheet, or drawer, that is not the case.
   bool get testOnlyRequireScreenIdMatchForTestContext { return false; }
 
-  TBuildContext? _createNonBuildContext(AFStore store) {
+  TBuildContext? createNonBuildContext(AFStore store) {
     if(AFibD.config.isTestContext) {
       final testContext = _createTestContext(store);
       if(testContext != null) {
@@ -150,14 +157,15 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
 
   TBuildContext? _createTestContext(AFStore store) {
     // find the test state.
+    if(AFibF.g.testOnlyIsInWorkflowTest) {
+      return null;
+    }    
+
     final testState = store.state.private.testState;
     final activeTestId = testState.findTestForScreen(primaryScreenId);
     if(activeTestId == null) {
       return null;
     }
-    if(AFibF.g.testOnlyIsWorkflowTest(activeTestId)) {
-      return null;
-    }    
     final testContext = testState.findContext(activeTestId);
     final activeState = testState.findState(activeTestId);
     if(activeState == null) {
@@ -233,7 +241,7 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
   AFUIStateView<TStateView> createStateView(AFBuildStateViewContext<TState, TRouteParam> state);
 
   /// Builds a Widget using the data extracted from the state.
-  material.Widget buildWithContext(TBuildContext context);
+  material.Widget buildWithContext(TSPI spi);
 
   /// Update the route parameter for this screen, widget, etc.
   void updateRouteParam(AFBuildContext context,TRouteParam revised, { AFID? id });
@@ -270,11 +278,11 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
 
 /// Superclass for a screen Widget, which combined data from the store with data from
 /// the route in order to render itself.
-abstract class AFConnectedScreen<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedUIBase<TState, TTheme, TBuildContext, TStateView, TRouteParam> {
+abstract class AFConnectedScreen<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> extends AFConnectedUIBase<TState, TTheme, TBuildContext, TStateView, TRouteParam, TSPI> {
   final AFScreenID screenId;
   final AFNavigateRoute route;
 
-  AFConnectedScreen(this.screenId, AFThemeID themeId, AFCreateStateViewDelegate<TStateView> stateViewCreator, { Key? key, this.route = AFNavigateRoute.routeHierarchy }): super(key: key, themeId: themeId, stateViewCreator: stateViewCreator);
+  AFConnectedScreen(this.screenId, AFThemeID themeId, AFCreateStateViewDelegate<TStateView> stateViewCreator, AFCreateSPIDelegate<TSPI, TBuildContext> spiCreator, { Key? key, this.route = AFNavigateRoute.routeHierarchy }): super(key: key, themeId: themeId, stateViewCreator: stateViewCreator, spiCreator: spiCreator);
 
   bool get testOnlyRequireScreenIdMatchForTestContext { return true; }
   bool get isPrimaryScreen { return true; }
@@ -332,74 +340,23 @@ abstract class AFConnectedScreen<TState extends AFFlexibleState, TTheme extends 
 
 }
 
-abstract class AFEmbeddedWidget<TState extends AFFlexibleState,  TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends StatelessWidget { 
-  final AFBuildContext parentContext;
-  final TStateView? stateViewOverride;
-  final TRouteParam? routeParamOverride;
-  final TRouteParam? paramWithChildren;
-  final TTheme? themeOverride;
-  final AFUpdateRouteParamDelegate<TRouteParam>? updateRouteParamDelegate;
-  
-  AFEmbeddedWidget({
-    AFWidgetID? wid,
-    required this.parentContext,
-    this.stateViewOverride,
-    this.routeParamOverride,
-    this.paramWithChildren,
-    this.themeOverride,
-    this.updateRouteParamDelegate,
-
-  }): super(key: AFFunctionalTheme.keyForWIDStatic(wid));
-
-  @override
-  material.Widget build(material.BuildContext context) {
-    final standard = AFStandardBuildContextData(
-      screenId: null,
-      context: context,
-      dispatcher: parentContext.d,
-      container: null,
-      themes: parentContext.standard.themes
-    );
-
-    final afContext = createContext(
-      standard,
-      stateViewOverride ?? parentContext.stateView as TStateView,
-      routeParamOverride ?? parentContext.routeParam as TRouteParam,
-      parentContext.children,
-      themeOverride ?? parentContext.theme as TTheme,
-    );
-
-    return buildWithContext(afContext);    
-  }
-
-  TBuildContext createContext(AFStandardBuildContextData standard, TStateView stateView, TRouteParam param, AFRouteSegmentChildren? children, TTheme theme);
-
-  material.Widget buildWithContext(TBuildContext context);
-
-  
-  void updateRouteParam(AFBuildContext context, TRouteParam revised, { AFID? id }) {
-    final update = updateRouteParamDelegate;
-    if(update == null) throw AFException("If you want to call updateRouteParam from an AFEmbeddedWidget, you need to pass an updateRouteParamDelegate to it's constructor, or us an AFConnectedWidget instead.");
-    update(context, revised, id: id);
-  }
-}
-
-abstract class AFConnectedWidget<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedUIBase<TState, TTheme, TBuildContext, TStateView, TRouteParam> { 
+abstract class AFConnectedWidget<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> extends AFConnectedUIBase<TState, TTheme, TBuildContext, TStateView, TRouteParam, TSPI> { 
   final AFConnectedUIBase parent;
-  final AFWidgetID widgetId;
+  final AFWidgetID wid;
   final AFNavigateRoute route;
   final bool useParentParam;
-  final TRouteParam? initialParam;
+  final TRouteParam? launchParam;
   
   AFConnectedWidget({
     required this.parent,
-    required this.widgetId,
+    required this.wid,
     required AFThemeID themeId,
     required AFCreateStateViewDelegate<TStateView> stateViewCreator, 
+    required AFCreateSPIDelegate<TSPI, TBuildContext> spiCreator,
     this.useParentParam = false,
-    this.initialParam,
+    this.launchParam,
     this.route = AFNavigateRoute.routeHierarchy,
-  }): super(key: AFFunctionalTheme.keyForWIDStatic(widgetId), themeId: themeId, stateViewCreator: stateViewCreator);
+  }): super(key: AFFunctionalTheme.keyForWIDStatic(wid), themeId: themeId, stateViewCreator: stateViewCreator, spiCreator: spiCreator);
 
   AFScreenID? get primaryScreenId {
     return null;
@@ -430,15 +387,20 @@ abstract class AFConnectedWidget<TState extends AFFlexibleState, TTheme extends 
       assert(paramParent.param is TRouteParam);
       return paramParent;
     }
-    var seg = paramParent.findChild(widgetId);
+    var seg = paramParent.findChild(wid);
     if(seg == null) {
       var newParam;
       final createDefault = paramParent.createDefaultChildParam;
       if(createDefault != null) {
-        newParam = createDefault(widgetId, state.public, paramParent);
-      } else {
-        newParam = initialParam;
+        newParam = createDefault(wid, state.public, paramParent);
       }
+      if(newParam == null) {
+        newParam = launchParam;
+      }
+      if(newParam == null && (TRouteParam == AFRouteParamUnused || TRouteParam == AFRouteParam)) {
+        newParam = AFRouteParamUnused.unused;
+      } 
+
       seg = AFRouteSegment(param: newParam, children: null, createDefaultChildParam: null);
     } 
     return seg;
@@ -456,12 +418,13 @@ abstract class AFConnectedWidget<TState extends AFFlexibleState, TTheme extends 
 
 }
 
-abstract class AFConnectedScreenWithGlobalParam<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreen<TState, TTheme, TBuildContext, TStateView, TRouteParam> {
+abstract class AFConnectedScreenWithGlobalParam<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> extends AFConnectedScreen<TState, TTheme, TBuildContext, TStateView, TRouteParam, TSPI> {
   AFConnectedScreenWithGlobalParam(
     AFScreenID screenId,
     AFThemeID themeId,
-    AFCreateStateViewDelegate<TStateView> creator
-  ): super(screenId, themeId, creator, route: AFNavigateRoute.routeGlobalPool);
+    AFCreateStateViewDelegate<TStateView> creator,
+    AFCreateSPIDelegate<TSPI, TBuildContext> createSPI,
+  ): super(screenId, themeId, creator, createSPI, route: AFNavigateRoute.routeGlobalPool);
 
   bool get testOnlyRequireScreenIdMatchForTestContext { return false; }
   bool get isPrimaryScreen { return false; }
@@ -492,12 +455,13 @@ abstract class AFConnectedScreenWithGlobalParam<TState extends AFFlexibleState, 
 /// Consequently, you will need to override [AFConnectedScreenWithGlobalParam.createDefaultRouteParam],
 /// which will be used to create your route parameter if the drawer was dragged onto the
 /// screen without you explicitly calling [AFBuildContext.showDrawer].
-abstract class AFConnectedDrawer<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithGlobalParam<TState, TTheme, TBuildContext, TStateView, TRouteParam> {
+abstract class AFConnectedDrawer<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> extends AFConnectedScreenWithGlobalParam<TState, TTheme, TBuildContext, TStateView, TRouteParam, TSPI> {
   AFConnectedDrawer(
     AFScreenID screenId,
     AFThemeID themeId,
-    AFCreateStateViewDelegate<TStateView> creator
-  ): super(screenId, themeId, creator);
+    AFCreateStateViewDelegate<TStateView> creator,
+    AFCreateSPIDelegate<TSPI, TBuildContext> createSPI
+  ): super(screenId, themeId, creator, createSPI);
 
   /// Look for this screens route parameter in the global pool, 
   /// rather than in the navigational hierarchy.
@@ -526,39 +490,41 @@ abstract class AFConnectedDrawer<TState extends AFFlexibleState, TTheme extends 
 /// Use this to connect a dialog to the store.
 /// 
 /// You can open a dialog with [AFBuildContext.showDialog].
-abstract class AFConnectedDialog<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithGlobalParam<TState, TTheme, TBuildContext, TStateView, TRouteParam> {
+abstract class AFConnectedDialog<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> extends AFConnectedScreenWithGlobalParam<TState, TTheme, TBuildContext, TStateView, TRouteParam, TSPI> {
   AFConnectedDialog(
     AFScreenID screenId,
     AFThemeID themeId,
-    AFCreateStateViewDelegate<TStateView> creator
-  ): super(screenId, themeId, creator);
+    AFCreateStateViewDelegate<TStateView> creator,
+    AFCreateSPIDelegate<TSPI, TBuildContext> spiCreator,
+  ): super(screenId, themeId, creator, spiCreator);
 
 
   @override
-  material.Widget buildWithContext(TBuildContext context) {
-    return buildDialogWithContext(context);
+  material.Widget buildWithContext(TSPI spi) {
+    return buildDialogWithContext(spi);
   }
 
-  material.Widget buildDialogWithContext(TBuildContext context);
+  material.Widget buildDialogWithContext(TSPI context);
 }
 
 /// Use this to connect a bottom sheet to the store.
 /// 
 /// You can open a bottom sheet with [AFBuildContext.showBottomSheet]
 /// or [AFBuildContext.showModalBottomSheeet].
-abstract class AFConnectedBottomSheet<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreenWithGlobalParam<TState, TTheme, TBuildContext, TStateView, TRouteParam> {
+abstract class AFConnectedBottomSheet<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> extends AFConnectedScreenWithGlobalParam<TState, TTheme, TBuildContext, TStateView, TRouteParam, TSPI> {
   AFConnectedBottomSheet(
     AFScreenID screenId,
     AFThemeID themeId,
-    AFCreateStateViewDelegate<TStateView> creator
-  ): super(screenId, themeId, creator);
+    AFCreateStateViewDelegate<TStateView> creator,
+    AFCreateSPIDelegate<TSPI, TBuildContext> spiCreator,
+  ): super(screenId, themeId, creator, spiCreator);
 
   @override
-  material.Widget buildWithContext(TBuildContext context) {
-    return buildBottomSheetWithContext(context);
+  material.Widget buildWithContext(TSPI spi) {
+    return buildBottomSheetWithContext(spi);
   }
 
-  material.Widget buildBottomSheetWithContext(TBuildContext context);
+  material.Widget buildBottomSheetWithContext(TSPI context);
 }
 
 mixin AFContextShowMixin {
@@ -1043,6 +1009,7 @@ class AFBuildStateViewContext<TState extends AFFlexibleState?, TRouteParam exten
 
 }
 
+
 /// A utility class which you can use when you have a complex screen which passes the dispatcher,
 /// screen data and param to many functions, to make things more concise.  
 /// 
@@ -1062,7 +1029,6 @@ class AFBuildContext<TState extends AFFlexibleState, TStateView extends AFFlexib
 
   /// Shorthand for accessing data from the store
   TStateView get s { return stateView; }
-
 
   material.BuildContext get context { 
     // there is a brief time where we don't have a context internally, as the AFBuildContext is 
@@ -1399,3 +1365,10 @@ class AFBuildContext<TState extends AFFlexibleState, TStateView extends AFFlexib
   }
 }
 
+@immutable
+class AFStateProgrammingInterface<TBuildContext extends AFBuildContext> {
+  final TBuildContext context;
+  final AFConnectedUIBase screen;
+
+  AFStateProgrammingInterface(this.context, this.screen);
+}

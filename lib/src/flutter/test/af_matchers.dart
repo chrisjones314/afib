@@ -41,7 +41,7 @@ class _AFHasWidgetId extends ft.Matcher {
 
 
 class _AFHasWidgetIds extends ft.Matcher {
-  final List<AFWidgetID> _expected;
+  final List<AFWidgetID?> _expected;
 
   const _AFHasWidgetIds(this._expected);
 
@@ -91,6 +91,6 @@ ft.Matcher hasWidgetIdsWith(List<dynamic> expected, { AFWidgetMapperDelegate? ma
     if(mapper != null ) {
       return _AFHasWidgetIds(expected.map(mapper).toList());
     } else {
-      return _AFHasWidgetIds(expected as List<AFWidgetID>);
+      return _AFHasWidgetIds(expected as List<AFWidgetID?>);
     }
 }

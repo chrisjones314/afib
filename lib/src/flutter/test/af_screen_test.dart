@@ -2117,14 +2117,15 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
   /// 
   AFSingleScreenPrototypeBody definePrototype({
     required AFPrototypeID   id,
-    required dynamic models,
+    required Object? models,
     required AFNavigatePushAction navigate,
     AFTestTimeHandling timeHandling = AFTestTimeHandling.paused,
     String? title,
   }) {
+    final modelsActual = models ?? <Object>[];
     return tests.addPrototype(
       id: id,
-      models: models,
+      models: modelsActual,
       navigate: navigate,
       timeHandling: timeHandling,
     );

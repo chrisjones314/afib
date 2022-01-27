@@ -322,6 +322,12 @@ class AFStateTestWidgetContext<TSPI extends AFStateProgrammingInterface> {
     return delegate(spi);
   }
 
+  void executeBuildWithExecute(AFStateTestExecute e, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> delegate) {
+    final spi = AFStateTestScreenContext.createSPI<TSPI>(widget);
+    delegate(e, spi);
+  }
+
+
 }
 
 class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface> {
@@ -342,11 +348,18 @@ class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface> {
   }
 
 
-  void executeWidget<TSPIWidget extends AFStateProgrammingInterface>(AFCreateConnectedWidgetDelegate create, AFStateTestWidgetHandlerDelegate<TSPIWidget> delegate) {
-    final widget = create(screen);
+  void executeWidget<TSPIWidget extends AFStateProgrammingInterface>(AFWidgetID wid, AFCreateConnectedWidgetDelegate create, AFStateTestWidgetHandlerDelegate<TSPIWidget> delegate) {
+    final widget = create(screen, wid);
     final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widget: widget);
     return delegate(widgetContext);
   }
+
+  void executeWidgetWithExecute<TSPIWidget extends AFStateProgrammingInterface>(AFWidgetID wid, AFCreateConnectedWidgetDelegate create, AFStateTestExecute e, AFStateTestWidgetWithExecuteHandlerDelegate<TSPIWidget> delegate) {
+    final widget = create(screen, wid);
+    final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widget: widget);
+  return delegate(e, widgetContext);
+  }
+
 
   static TSPI createSPI<TSPI extends AFStateProgrammingInterface>(AFConnectedUIBase widget) {
     final context = widget.createNonBuildContext(AFibF.g.storeInternalOnly!);
@@ -448,15 +461,25 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
 
   void executeScreenWidgetBuild<TSPIWidget extends AFStateProgrammingInterface>(
     AFScreenID screenId, 
+    AFWidgetID wid,
     AFCreateConnectedWidgetDelegate createWidget,
-    AFStateTestScreenBuildContextDelegate<TSPIWidget> widgetHandler, {
-      AFStateTestVerifyStateDelegate? verify
-    }) {
+    AFStateTestScreenBuildWithExecuteContextDelegate<TSPIWidget> widgetHandler) {
     test.executeScreen<AFStateProgrammingInterface>(screenId, (e, screenContext) {
-      screenContext.executeWidget<TSPIWidget>(createWidget, (widgetContext) {
-        widgetContext.executeBuild(widgetHandler);
+      screenContext.executeWidget<TSPIWidget>(wid, createWidget, (widgetContext) {
+        widgetContext.executeBuildWithExecute(e, widgetHandler);
       });
-        
+    });
+  }
+
+
+  void executeScreenWidget<TSPIWidget extends AFStateProgrammingInterface>(
+    AFScreenID screenId, 
+    AFWidgetID wid,
+    AFCreateConnectedWidgetDelegate createWidget,
+    AFStateTestWidgetWithExecuteHandlerDelegate<TSPIWidget> widgetHandler) {
+    
+    test.executeScreen<AFStateProgrammingInterface>(screenId, (e, screenContext) {
+      screenContext.executeWidgetWithExecute<TSPIWidget>(wid, createWidget, e, widgetHandler);
     });
   }
 
@@ -473,7 +496,15 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
 
   void executeDrawer<TSPI extends AFStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> screenHandler) {
     test.executeScreen<TSPI>(screenId, screenHandler);
-}
+  }
+
+  void executeDialog<TSPI extends AFStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> buildHandler) {
+    executeScreen<TSPI>(screenId, buildHandler);
+  }
+
+  void executeBottomSheet<TSPI extends AFStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> buildHandler) {
+    executeScreen<TSPI>(screenId, buildHandler);
+  }
 
 }
 

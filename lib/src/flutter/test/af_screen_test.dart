@@ -1468,20 +1468,6 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
     // now, perform an action that navigates to the specified path, only in flutter.
     final route = store.state.public.route;
     dispatcher.dispatch(AFNavigateSyncNavigatorStateWithRoute(route));
-
-    /*
-    final subpath = test.subpath;
-    if(subpath is AFNavigatePushAction || subpath is AFNavigateReplaceAllAction) {
-      dispatcher.dispatch(subpath);
-    } else if(subpath is List) {
-      for(final push in subpath) {
-        if(push is AFNavigatePushAction) {
-          dispatcher.dispatch(push);
-        }
-      }
-    }
-    */
-
   }
 
 

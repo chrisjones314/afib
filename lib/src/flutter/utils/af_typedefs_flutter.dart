@@ -181,10 +181,12 @@ typedef AFStateTestScreenHandlerDelegate<TSPI extends AFStateProgrammingInterfac
 
 typedef AFStateTestWidgetHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestWidgetContext<TSPI> context);
 
+typedef AFStateTestWidgetWithExecuteHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, AFStateTestWidgetContext<TSPI> context);
+
 typedef AFStateTestScreenBuildContextDelegate<TSPI extends AFStateProgrammingInterface> = void Function(TSPI context);
 
 typedef AFStateTestScreenBuildWithExecuteContextDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, TSPI context);
 
 typedef AFCreateSPIDelegate<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext> = TSPI Function(TBuildContext context, AFConnectedUIBase screen);
 
-typedef AFCreateConnectedWidgetDelegate = AFConnectedUIBase Function(AFConnectedUIBase parent);
+typedef AFCreateConnectedWidgetDelegate = AFConnectedUIBase Function(AFConnectedUIBase parent, AFWidgetID wid);

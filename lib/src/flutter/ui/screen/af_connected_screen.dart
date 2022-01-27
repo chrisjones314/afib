@@ -1383,7 +1383,11 @@ class AFBuildContext<TState extends AFFlexibleState, TStateView extends AFFlexib
 @immutable
 class AFStateProgrammingInterface<TBuildContext extends AFBuildContext> {
   final TBuildContext context;
-  final AFConnectedUIBase widgetOwner;
+  final AFConnectedUIBase owner;
 
-  AFStateProgrammingInterface(this.context, this.widgetOwner);
+  AFStateProgrammingInterface(this.context, this.owner);
+
+  void onTapStandardBackButton() {
+    context.dispatch(AFNavigatePopAction());
+  }
 }

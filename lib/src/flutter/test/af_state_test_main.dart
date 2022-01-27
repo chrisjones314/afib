@@ -1,6 +1,7 @@
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
+import 'package:afib/src/dart/redux/actions/af_query_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
@@ -33,13 +34,20 @@ void afStateTestMain<TState extends AFFlexibleState> (AFCommandOutput output, AF
       if(localStats.isEmpty) {
         printTestKind(output, testKind);
       }
+      printPrototypeStart(output, test.id);
       final context = AFStateTestContext<TState>(test as AFStateTest<AFFlexibleState>, store, dispatcher, isTrueTestContext: true);
       
       context.store.dispatch(AFResetToInitialStateAction());
       context.store.dispatch(AFResetToInitialRouteAction());
       test.execute(context);
       contexts.add(context);
+
+      output.indent();
       printTestResult(output, testKind, context, localStats);
+      output.outdent();
+
+      AFibF.g.storeInternalOnly!.dispatch(AFShutdownOngoingQueriesAction());
+
     }
   }
 

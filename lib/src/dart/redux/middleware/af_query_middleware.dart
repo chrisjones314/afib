@@ -24,6 +24,7 @@ class AFQueryMiddleware implements MiddlewareClass<AFState>
       final testContext = AFStateTestContext.currentTest;
       if(testContext != null) {
         testContext.processQuery(query);
+        return;
       } else {
         query.startAsyncAF(
           AFStoreDispatcher(store as AFStore),

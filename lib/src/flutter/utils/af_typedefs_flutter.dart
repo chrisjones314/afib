@@ -104,7 +104,7 @@ typedef AFCreateQueryResultDelegate = dynamic Function(AFStateTestContext contex
 typedef AFStateTestDefinitionDelegate = void Function(AFStateTestDefinitionContext test);
 
 /// Delegate used to verify a state change, from before to after
-typedef AFProcessVerifyDifferenceDelegate = void Function(AFStateTestExecute execute, AFStateTestDifference diff);
+typedef AFStateTestVerifyStateDelegate = void Function(AFStateTestExecute execute, AFStateTestStateVerificationContext context);
 
 /// Delegate used to implement the body of a unit test.
 typedef AFUnitTestBodyExecuteDelegate = void Function(AFUnitTestExecute e);
@@ -177,8 +177,14 @@ typedef AFConvertSizeToFormFactorDelegate = AFFormFactor Function(Size);
 
 typedef AFConnectedUIBuilderDelegate = AFConnectedUIBase Function(BuildContext? context);
 
-typedef AFStateTestScreenHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestScreenContext<TSPI> context);
+typedef AFStateTestScreenHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, AFStateTestScreenContext<TSPI> context);
+
+typedef AFStateTestWidgetHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestWidgetContext<TSPI> context);
 
 typedef AFStateTestScreenBuildContextDelegate<TSPI extends AFStateProgrammingInterface> = void Function(TSPI context);
 
+typedef AFStateTestScreenBuildWithExecuteContextDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, TSPI context);
+
 typedef AFCreateSPIDelegate<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext> = TSPI Function(TBuildContext context, AFConnectedUIBase screen);
+
+typedef AFCreateConnectedWidgetDelegate = AFConnectedUIBase Function(AFConnectedUIBase parent);

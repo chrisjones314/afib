@@ -53,7 +53,7 @@ class AFUIPrototypeWireframesListScreen extends AFUIDefaultConnectedScreen<AFUIP
       rowsCard.add(
         t.createTestListTile(context.d, test,
           title: wireframe.id.toString(),
-          onTap: () {            
+          onTap: () {               
             context.dispatch(AFStartWireframeAction(wireframe: wireframe));
             test.startScreen(context.d, wireframe.testData);
           }

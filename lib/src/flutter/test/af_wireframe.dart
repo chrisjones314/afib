@@ -7,6 +7,15 @@ class AFWireframes {
   void add(AFWireframe wf) {
     wireframes.add(wf);
   }  
+
+  AFWireframe find(AFPrototypeID id) {
+    for(final wireframe in wireframes) { 
+      if(wireframe.id == id) {
+        return wireframe;
+      }
+    }
+    throw AFException("Unknown wireframe $id");
+  }
 }
 
 class AFWireframeExecutionContext<TStateView extends AFFlexibleStateView> {

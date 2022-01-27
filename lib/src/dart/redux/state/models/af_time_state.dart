@@ -183,6 +183,13 @@ class AFTimeState {
     return copyWith(actualNow: revisedNow);
   }
 
+  AFTimeState reviseToAbsoluteTime(DateTime revisedNow) {
+    return copyWith(
+      actualNow: revisedNow,
+      simulatedOffset: Duration(milliseconds: 0)
+    );
+  }
+
   int absoluteMinuteLocalToUTC(int absoluteMinuteLocal) {
     final offset = currentTime.timeZoneOffset.inMinutes;
     return absoluteMinuteLocal - offset;

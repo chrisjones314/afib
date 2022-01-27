@@ -17,6 +17,7 @@ class AFUIScreenID {
   static const screenPrototypeWorkflow = AFScreenID("prototype_multi_screen", AFUILibraryID.id);
   static const screenTestDrawer = AFScreenID("prototype_test_drawer", AFUILibraryID.id);
   static const screenPrototypeHome = AFScreenID("prototype_home", AFUILibraryID.id);
+  static const screenPrototypeLoading = AFScreenID("prototype_loading", AFUILibraryID.id);
   static const screenPrototypeWidget = AFScreenID("prototype_widget", AFUILibraryID.id);
   static const screenStartupWrapper = AFScreenID("startup_wrapper", AFUILibraryID.id);
   static const dialogStandardAlert = AFScreenID("standard_alert_dialog", AFUILibraryID.id);
@@ -70,6 +71,7 @@ class AFUITranslationID {
   static const widgetPrototypes = AFTranslationID("widget_prototypes", AFUILibraryID.id);
   static const appTitle = AFTranslationID("app_title", AFUILibraryID.id);
   static const notTranslated = AFTranslationID("not_translated", AFUILibraryID.id);
+  static const afibPrototypeLoading = AFTranslationID("afib_prototype_loading", AFUILibraryID.id);
 }
 
 /// Identifiers for the fundamental theme

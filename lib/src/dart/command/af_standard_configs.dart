@@ -3,6 +3,7 @@ import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 class AFConfigEntryEnvironment extends AFConfigurationItemOptionChoice {
+  static const specificItemConfigLocation = "(specified in initialization/environments/prototype.dart)";
   static const optionName = "environment";
   static const allEnvironments = AFEnvironment.values;
   
@@ -13,10 +14,15 @@ class AFConfigEntryEnvironment extends AFConfigurationItemOptionChoice {
     validContexts: AFConfigurationItem.validContextsAllButNew, 
     ordinal: 100.0,
   ) {
+
     addChoice(textValue: "debug", help: "For debugging", runtimeValue: AFEnvironment.debug);
     addChoice(textValue: "production", help: "For production", runtimeValue: AFEnvironment.production);
     addChoice(textValue: "prototype", help: "Interact with prototype screens, and run tests against them on the simulator", runtimeValue: AFEnvironment.prototype);
+    addChoice(textValue: "wireframe", help: "Startup in a wireframe specified by AFConfig.setStartupWireframe $specificItemConfigLocation", runtimeValue: AFEnvironment.wireframe);
+      addChoice(textValue: "workflowPrototype", help: "Startup in a specific workflow prototype specified by AFConfig.setStartupWorkflowPrototype $specificItemConfigLocation", runtimeValue: AFEnvironment.workflowPrototype);
+    addChoice(textValue: "screenPrototype", help: "Startup in a specific screen prototype specified by AFConfig.setStartupScreenPrototype $specificItemConfigLocation", runtimeValue: AFEnvironment.screenPrototype);
     addChoice(textValue: "test", help: "Used internally when command-line tests are executing, not usually explicitly used by developers", runtimeValue: AFEnvironment.test);
+
   }
 
   void setValueWithString(AFConfig dest, String value) {
@@ -28,8 +34,7 @@ class AFConfigEntryEnvironment extends AFConfigurationItemOptionChoice {
   }
 
   bool requiresPrototypeData(AFConfig config) {
-    final env = config.valueFor(this);
-    return env == AFEnvironment.prototype;
+    return config.isPrototypeEnvironment;
   }
 
   bool requiresTestData(AFConfig config) {

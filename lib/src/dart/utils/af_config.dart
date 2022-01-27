@@ -343,9 +343,46 @@ class AFConfigurationItemOption extends AFConfigurationItem {
 /// 
 /// All get methods return null if the key does not have a value. 
 class AFConfig {
-
+  AFPrototypeID? startupWireframe;
+  AFPrototypeID? startupScreenPrototype;
+  AFPrototypeID? startupWorkflowPrototype;
   final Map<AFConfigurationItem, dynamic> values = <AFConfigurationItem, dynamic>{};
 
+  void setStartupWireframe(AFPrototypeID id) {
+    startupWireframe = id;
+  }  
+
+  void setStartupScreenPrototype(AFPrototypeID id) {
+    startupScreenPrototype = id;
+  }
+
+  void setStartupWorkflowPrototype(AFPrototypeID id) {
+    startupWorkflowPrototype = id;
+  }
+
+  AFPrototypeID get startupPrototypeId {
+    final env = environment;
+    AFPrototypeID? proto;
+    String? call;
+    if(env == AFEnvironment.wireframe) {
+      proto = startupWireframe;
+      call = "Wireframe";
+    } else if(env == AFEnvironment.screenPrototype) {
+      proto = startupScreenPrototype;
+      call = "ScreenPrototype";
+    } else if(env == AFEnvironment.workflowPrototype) {
+      proto = startupWorkflowPrototype;
+      call = "WorkflowPrototype";
+    } else { 
+      throw AFException("Invalid environment $env for calling startPrototypeId");
+    }
+
+    if(proto == null) {
+      throw AFException("You set the environment to $env, but you also need to call AFConfig.setStartup$call to specify which prototype to start");
+    }
+    return proto;
+  }
+  
   String get appNamespace {
     return stringFor(AFConfigEntries.appNamespace);
   }
@@ -390,6 +427,17 @@ class AFConfig {
   bool get isProduction {
     return environment == AFEnvironment.production;
   }
+
+  bool get isPrototypeEnvironment {
+      return ( 
+        environment == AFEnvironment.prototype ||
+        environment == AFEnvironment.wireframe || 
+        environment == AFEnvironment.screenPrototype || 
+        environment == AFEnvironment.workflowPrototype
+      );
+  }
+
+  
 
   /// 
   bool get isWidgetTesterContext {

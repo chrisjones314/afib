@@ -5,6 +5,7 @@ import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:redux/redux.dart';
 
@@ -19,6 +20,7 @@ List<Middleware<AFState>> createRouteMiddleware() {
     TypedMiddleware<AFState, AFNavigatePopToAction>(_navigatePopToAction),
     TypedMiddleware<AFState, AFNavigateExitTestAction>(_navigateExitTestAction),
     TypedMiddleware<AFState, AFWireframeEventAction>(_navigateWireframe),
+    TypedMiddleware<AFState, AFNavigateSyncNavigatorStateWithRoute>(_navigateSyncNavigatorState),
   ];
 }
 
@@ -31,10 +33,15 @@ AFRouteState _getRouteState(Store<AFState> store) {
 }
 
 //---------------------------------------------------------------------------
+String _screenIdToNavigatorName(AFID id) {
+  return id.code;
+}
+
+//---------------------------------------------------------------------------
 void _navigatePushAction(Store<AFState> store, AFNavigatePushAction action, NextDispatcher next) {
 
   AFibF.g.doMiddlewareNavigation((navState) {
-    Future<dynamic> ret = navState.pushNamed(action.param.id.code);
+    Future<dynamic> ret = navState.pushNamed(_screenIdToNavigatorName(action.param.id));
     final onReturn = action.onReturn;
     if(onReturn != null) {
       ret.then( (msg) {
@@ -103,7 +110,7 @@ void _navigatePopToAction(Store<AFState> store, AFNavigatePopToAction action, Ne
 
 //---------------------------------------------------------------------------
 void _navigateReplaceAction(Store<AFState> store, AFNavigateReplaceAction action, NextDispatcher next) {
-  final screen = action.param.id.code;
+  final screen = _screenIdToNavigatorName(action.param.id);
 
   // first, we do the navigation itself
   AFibF.g.doMiddlewareNavigation( (navState) {
@@ -115,9 +122,11 @@ void _navigateReplaceAction(Store<AFState> store, AFNavigateReplaceAction action
 
 }
 
+
+
 //---------------------------------------------------------------------------
 void _navigateReplaceAllAction(Store<AFState> store, AFNavigateReplaceAllAction action, NextDispatcher next) {
-  final screen = action.param.id.code;
+  final screen = _screenIdToNavigatorName(action.param.id);
   
   // In prototype mode, we don't want to remove any afib screens, so we need to remove only those screens
   // below test.
@@ -160,5 +169,29 @@ void _navigateWireframe(Store<AFState> store, AFWireframeEventAction action, Nex
     final testState = testStateSource.findState(AFUIReusableTestID.wireframe);
     wireframe.onEvent(action.screen, action.widget, action.eventParam, testState?.models ?? <String, Object>{});
   }
+  next(action);
+}
+
+//---------------------------------------------------------------------------
+void _navigateSyncNavigatorState(Store<AFState> store, AFNavigateSyncNavigatorStateWithRoute action, NextDispatcher next) {
+  final route = action.route;
+  final hierarchy = route.screenHierarchy.active;
+
+  AFibF.g.doMiddlewareNavigation( (navState) {
+    // first, pop off all but one screen.
+    while(navState.canPop()) {
+      navState.pop();
+    }
+    for(var i = 0; i < hierarchy.length; i++) {
+      final segment = hierarchy[i];
+      final screenName = _screenIdToNavigatorName(segment.screen);
+      if(i == 0) {
+        navState.popAndPushNamed(screenName);
+      } else {
+        navState.pushNamed(screenName);
+      }
+    }
+  });
+
   next(action);
 }

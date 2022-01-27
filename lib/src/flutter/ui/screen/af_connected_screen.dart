@@ -564,20 +564,24 @@ mixin AFContextShowMixin {
     if(builder == null) {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
-    final ctx = contextNullCheck;
-    final result = await material.showDialog<TReturn>(
-      context: ctx,
-      builder: builder,
-      barrierDismissible: barrierDismissible,
-      barrierColor: barrierColor,
-      useSafeArea: useSafeArea,
-      useRootNavigator: useRootNavigator,
-      routeSettings: routeSettings
-    );
 
-    AFibF.g.testOnlyDialogRegisterReturn(verifiedScreenId, result);
-    if(onReturn != null) {
-      onReturn(result);
+    final ctx = context;
+    // this happens in state testing, where there is no BuildContext.
+    if(ctx != null) {
+      final result = await material.showDialog<TReturn>(
+        context: ctx,
+        builder: builder,
+        barrierDismissible: barrierDismissible,
+        barrierColor: barrierColor,
+        useSafeArea: useSafeArea,
+        useRootNavigator: useRootNavigator,
+        routeSettings: routeSettings
+      );
+
+      AFibF.g.testOnlyDialogRegisterReturn(verifiedScreenId, result);
+      if(onReturn != null) {
+        onReturn(result);
+      }
     }
   }
 
@@ -798,7 +802,10 @@ mixin AFContextShowMixin {
   /// 
   /// See also [showSnackbarText]
   void showSnackbarText(String text, { Duration duration = const Duration(seconds: 2)}) {
-    ScaffoldMessenger.of(contextNullCheck).showSnackBar(SnackBar(content: Text(text), duration: duration));
+    final ctx = context;
+    if(ctx != null) {
+      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(text), duration: duration));
+    }
   }
 
   /// Show a snackbar.
@@ -807,8 +814,10 @@ mixin AFContextShowMixin {
   /// 
   /// See also [showSnackbarText]
   void showSnackbar(SnackBar snackbar) {
-    final ctx = contextNullCheck;
-    ScaffoldMessenger.of(ctx).showSnackBar(snackbar);
+    final ctx = context;
+    if(ctx != null) {
+      ScaffoldMessenger.of(ctx).showSnackBar(snackbar);
+    }
   }
 
   /// Show a modal bottom sheet.
@@ -855,26 +864,28 @@ mixin AFContextShowMixin {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
 
-    final ctx = contextNullCheck;
-    final result = await material.showModalBottomSheet<dynamic>(
-      context: ctx,
-      builder: builder,
-      backgroundColor: backgroundColor,
-      elevation: elevation,
-      shape: shape,
-      clipBehavior: clipBehavior,
-      barrierColor: barrierColor,
-      isScrollControlled: isScrollControlled,
-      useRootNavigator: useRootNavigator,
-      isDismissible: isDismissible,
-      enableDrag: enableDrag,
-      routeSettings: routeSettings,
-    );
+    final ctx = context;
+    if(ctx != null) {
+      final result = await material.showModalBottomSheet<dynamic>(
+        context: ctx,
+        builder: builder,
+        backgroundColor: backgroundColor,
+        elevation: elevation,
+        shape: shape,
+        clipBehavior: clipBehavior,
+        barrierColor: barrierColor,
+        isScrollControlled: isScrollControlled,
+        useRootNavigator: useRootNavigator,
+        isDismissible: isDismissible,
+        enableDrag: enableDrag,
+        routeSettings: routeSettings,
+      );
 
-    AFibF.g.testOnlyBottomSheetRegisterReturn(verifiedScreenId, result);
+      AFibF.g.testOnlyBottomSheetRegisterReturn(verifiedScreenId, result);
 
-    if(onReturn != null) {
-      onReturn(result);
+      if(onReturn != null) {
+        onReturn(result);
+      }
     }
   }
 
@@ -905,14 +916,16 @@ mixin AFContextShowMixin {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
 
-    final ctx = contextNullCheck;
-    material.Scaffold.of(ctx).showBottomSheet<dynamic>(
-      builder,
-      backgroundColor: backgroundColor,
-      elevation: elevation,
-      shape: shape,
-      clipBehavior: clipBehavior,
-    );
+    final ctx = context;
+    if(ctx != null) {
+      material.Scaffold.of(ctx).showBottomSheet<dynamic>(
+        builder,
+        backgroundColor: backgroundColor,
+        elevation: elevation,
+        shape: shape,
+        clipBehavior: clipBehavior,
+      );
+    }
   }
 
   /// Open the drawer that you specified for your [Scaffold].
@@ -928,12 +941,12 @@ mixin AFContextShowMixin {
     required AFRouteParam param,
   }) {
     _updateOptionalGlobalParam(screenId, param);
-    final ctx = contextNullCheck;
-    final scaffold = material.Scaffold.of(ctx);
-    //if(scaffold == null) {
-    //  throw AFException("Could not find a scaffold, you probably need to add an AFBuilder just under the scaffold but above the widget that calls this function");
-    //}
-    scaffold.openDrawer();
+    final ctx = context;
+    // this happens in state testing, where there is no BuildContext.
+    if(ctx != null) {
+      final scaffold = material.Scaffold.of(ctx);
+      scaffold.openDrawer();
+    }
   }
 
   /// Open the end drawer that you specified for your [Scaffold].
@@ -942,12 +955,12 @@ mixin AFContextShowMixin {
     required AFRouteParam param,
   }) {
     _updateOptionalGlobalParam(screenId, param);
-    final ctx = contextNullCheck;
-    final scaffold = material.Scaffold.of(ctx);
-    //if(scaffold == null) {
-    //  throw AFException("Could not find a scaffold, you probably need to add an AFBuilder just under the scaffold but above the widget that calls this function");
-    //}
-    scaffold.openEndDrawer();
+    // this happens in state testing, where there is no BuildContext.
+    final ctx = context;
+    if(ctx != null) {
+      final scaffold = material.Scaffold.of(ctx);
+      scaffold.openEndDrawer();
+    }
   }
 
   BuildContext get contextNullCheck {
@@ -1030,11 +1043,11 @@ class AFBuildContext<TState extends AFFlexibleState, TStateView extends AFFlexib
   /// Shorthand for accessing data from the store
   TStateView get s { return stateView; }
 
-  material.BuildContext get context { 
+  material.BuildContext? get context { 
     // there is a brief time where we don't have a context internally, as the AFBuildContext is 
     // being constructed.   But, for the purposes of users of the framework, there will always
     // be a build context for any case where they have access to an AFBuildContext. 
-    return standard.context!; 
+    return standard.context; 
   }  
 
   AFDispatcher get dispatcher { return standard.dispatcher; }
@@ -1053,7 +1066,7 @@ class AFBuildContext<TState extends AFFlexibleState, TStateView extends AFFlexib
   AFDispatcher get d { return standard.dispatcher; }
 
   /// Shorthand for accessing the flutter build context
-  material.BuildContext get c { return context; }
+  material.BuildContext get c { return context!; }
 
   /// Dispatch an action or query.
   void dispatch(dynamic action) {
@@ -1211,7 +1224,9 @@ class AFBuildContext<TState extends AFFlexibleState, TStateView extends AFFlexib
   /// close the drawer, and then do something else, like navigate to a new screen.
   void closeDrawer() {
     AFibF.g.doMiddlewareNavigation( (navState) {
-      material.Navigator.pop(contextNullCheck);
+      if(context != null) {
+        material.Navigator.pop(contextNullCheck);
+      }
     });
   }
 
@@ -1368,7 +1383,7 @@ class AFBuildContext<TState extends AFFlexibleState, TStateView extends AFFlexib
 @immutable
 class AFStateProgrammingInterface<TBuildContext extends AFBuildContext> {
   final TBuildContext context;
-  final AFConnectedUIBase screen;
+  final AFConnectedUIBase widgetOwner;
 
-  AFStateProgrammingInterface(this.context, this.screen);
+  AFStateProgrammingInterface(this.context, this.widgetOwner);
 }

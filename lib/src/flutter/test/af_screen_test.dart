@@ -1401,13 +1401,11 @@ class AFConnectedWidgetPrototype extends AFWidgetPrototype {
 /// The information necessary to start a test with a baseline state
 /// (determined by a state test) and an initial screen/route.
 class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenPrototype {
-  final dynamic subpath;
   final AFStateTestID stateTestId;
   final AFWorkflowStateTestPrototype body;
 
   AFWorkflowStatePrototype({
     required AFPrototypeID id,
-    required this.subpath,
     required this.stateTestId,
     required this.body,
   }): super(id: id);
@@ -1425,9 +1423,11 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
     body.openTestDrawer(id);
   }
 
+  /*
   AFScreenID get screenId {
     return body.initialScreenId;
   }
+  */
 
   AFSingleScreenTests get screenTests {
     return AFibF.g.screenTests;
@@ -1462,9 +1462,14 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
 
 
     if(stateTestContext.errors.hasErrors) {
+      // TODO: this has errors, need to investigate why!
     }
 
-    // then, navigate into the desired path.
+    // now, perform an action that navigates to the specified path, only in flutter.
+    final route = store.state.public.route;
+    dispatcher.dispatch(AFNavigateSyncNavigatorStateWithRoute(route));
+
+    /*
     final subpath = test.subpath;
     if(subpath is AFNavigatePushAction || subpath is AFNavigateReplaceAllAction) {
       dispatcher.dispatch(subpath);
@@ -1475,6 +1480,8 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
         }
       }
     }
+    */
+
   }
 
 
@@ -1889,15 +1896,14 @@ class AFWorkflowStateTestBodyWithParam extends AFScreenTestDescription {
 
 class AFWorkflowStateTestPrototype {
   final AFWorkflowStateTests tests;
-  final AFScreenID initialScreenId;
   final smokeTests = <AFWorkflowStateTestBodyWithParam>[];
   final reusableTests = <AFWorkflowStateTestBodyWithParam>[];
   final regressionTests = <AFWorkflowStateTestBodyWithParam>[];
 
-  AFWorkflowStateTestPrototype(this.tests, this.initialScreenId);
+  AFWorkflowStateTestPrototype(this.tests);
 
-  factory AFWorkflowStateTestPrototype.create(AFWorkflowStateTests tests, AFScreenID initialScreenId, AFBaseTestID testId) {
-    return AFWorkflowStateTestPrototype(tests, initialScreenId);
+  factory AFWorkflowStateTestPrototype.create(AFWorkflowStateTests tests, AFBaseTestID testId) {
+    return AFWorkflowStateTestPrototype(tests);
   }
 
   void defineSmokeTest({
@@ -1950,32 +1956,15 @@ class AFWorkflowStateTests<TState extends AFFlexibleState> {
 
   AFWorkflowStateTestPrototype addPrototype({
     required AFPrototypeID id,
-    required dynamic subpath,
     required AFBaseTestID stateTestId,
   }) {
-    final screenId = _initialScreenIdFromSubpath(subpath);
     final instance = AFWorkflowStatePrototype<TState>(
       id: id,
-      subpath: subpath,
       stateTestId: stateTestId as AFStateTestID,
-      body: AFWorkflowStateTestPrototype.create(this, screenId, id)
+      body: AFWorkflowStateTestPrototype.create(this, id)
     );
     stateTests.add(instance);
     return instance.body;
-  }
-
-  AFScreenID _initialScreenIdFromSubpath(dynamic subpath) {
-    if(subpath is AFNavigateAction) {
-      return subpath.param.id as AFScreenID;
-    }
-    if(subpath is List) {
-      final last = subpath.last;
-      if(last is AFNavigateAction) {
-        return last.param.id as AFScreenID;
-      }
-    }
-
-    throw AFException("Unexpected type ${subpath.runtimeType} specified as subpath");
   }
 
   List<AFWorkflowStatePrototype> get all {
@@ -2059,10 +2048,12 @@ class AFStateTestDefinitionsContext extends AFBaseTestDefinitionContext {
   /// execute a query.  Note that state tests are usually built in a 
   /// kind of tree, with a cumulative state being build from
   /// a series of query/response cycles across multiple tests.
-  void addTest(AFStateTestID id, AFStateTestDefinitionDelegate handler) {
-    tests.addTest(id, this, handler);
+  void addTest(AFStateTestID id, {
+    required AFStateTestID? extendTest,
+    required AFStateTestDefinitionDelegate body
+  }) {
+    tests.addTest(id, extendTest, this, body);
   }
-
 }
 
 /// A context wrapper for definining a widget test
@@ -2184,12 +2175,10 @@ class AFWorkflowTestDefinitionContext extends AFBaseTestDefinitionContext {
 
   AFWorkflowStateTestPrototype definePrototype({
     required AFPrototypeID id,
-    required dynamic subpath,
     required AFBaseTestID stateTestId,
   }) {
     return tests.addPrototype(
       id: id,
-      subpath: subpath,
       stateTestId: stateTestId
     );
   }

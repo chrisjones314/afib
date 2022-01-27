@@ -70,6 +70,19 @@ class AFRichTextBuilder {
     spans.add(TextSpan(text: text, style: styleNormal));
   }
 
+  String toSimpleText() {
+    final result = StringBuffer();
+    for(final span in spans) {
+      if(span is TextSpan) {
+        final text = span.text;
+        if(text != null) {
+          result.write(text);
+        }
+      }
+    }
+    return result.toString();
+  }
+
   /// Creates a rich text widget with the specified content.
   Widget toRichText({
     TextAlign textAlign = TextAlign.start,

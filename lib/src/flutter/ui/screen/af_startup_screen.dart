@@ -1,4 +1,6 @@
 //--------------------------------------------------------------------------------------
+import 'package:afib/src/dart/command/af_command_enums.dart';
+import 'package:afib/src/dart/redux/queries/af_start_specific_prototype_query.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
@@ -38,11 +40,19 @@ class _AFStartupScreenState extends State<AFStartupScreenWrapper> {
 
     WidgetsBinding.instance?.addObserver(AFibF.g.widgetsBindingObserver);
 
-    // Kick off the app by firing a query.  In a typical app this might check the user's
-    // logged in status while a splash screen displays.
-    if(!AFibD.config.requiresPrototypeData) {
-      final storeDisp = AFibF.g.storeDispatcherInternalOnly;
-      assert(storeDisp != null);
+    final storeDisp = AFibF.g.storeDispatcherInternalOnly;
+    assert(storeDisp != null);
+    if(AFibD.config.requiresPrototypeData) {
+      // if this is not the general prototype mode, then fire a startup query which 
+      // loads that specific prototype.
+      if(AFibD.config.environment != AFEnvironment.prototype) {
+        if(storeDisp != null) {
+          storeDisp.dispatch(AFStartSpecificPrototypeQuery());
+        }
+      }
+    } else {
+      // Kick off the app by firing a query.  In a typical app this might check the user's
+      // logged in status while a splash screen displays.
       if(storeDisp != null) {
         AFibF.g.dispatchStartupQueries(storeDisp);
       }

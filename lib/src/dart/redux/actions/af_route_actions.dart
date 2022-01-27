@@ -1,4 +1,5 @@
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
+import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
@@ -76,6 +77,11 @@ class AFNavigateReplaceAction extends AFNavigateAction {
 /// Action that exits the current test screen in prototype mode.
 class AFNavigateExitTestAction extends AFNavigateAction {  
   AFNavigateExitTestAction({AFID? id}): super(id: id, param: AFRouteParamUnused.unused, children: null);
+}
+
+class AFNavigateSyncNavigatorStateWithRoute extends AFNavigateAction {
+  final AFRouteState route;
+  AFNavigateSyncNavigatorStateWithRoute(this.route, {AFID? id}): super(id: id, param: AFRouteParamUnused.unused, children: null);
 }
 
 /// Action that removes all screens in the route, and replaces them with

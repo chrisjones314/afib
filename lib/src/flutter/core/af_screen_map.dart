@@ -1,4 +1,5 @@
 import 'package:afib/id.dart';
+import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
@@ -83,8 +84,13 @@ class AFScreenMap {
 
   /// Returns the widget builder for the initial screen.
   WidgetBuilder? get initialScreenBuilder {
-    if(AFibD.config.requiresPrototypeData) {
+    final environment = AFibD.config.environment;
+    if(environment == AFEnvironment.prototype) {
       return _screens[AFUIScreenID.screenPrototypeHome];
+    } else if(environment == AFEnvironment.wireframe ||
+              environment == AFEnvironment.screenPrototype ||
+              environment == AFEnvironment.workflowPrototype) {
+      return _screens[AFUIScreenID.screenPrototypeLoading];
     }
 
     return _screens[_startupScreenId];

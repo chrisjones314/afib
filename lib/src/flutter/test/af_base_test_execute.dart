@@ -130,25 +130,25 @@ abstract class AFBaseTestExecute extends AFModelWithCustomID {
   void printFinishTest(AFID id) {}
 
 
-  void printPassMessages(AFCommandOutput output, AFTestStats stats) {
+  void printPassMessages(AFCommandOutput output, AFTestStats stats, { String? testIdOutput }) {
     if(sectionErrors.isNotEmpty) {
       final sectionErrorSmoke = sectionErrors.values.where((section) => section.section == AFUIReusableTestID.smoke);
       final sectionErrorReusable = sectionErrors.values.where((section) => section.section != AFUIReusableTestID.smoke);
       if(sectionErrorSmoke.isNotEmpty) {
-        _writePassed(output, "${testID.codeId}", sectionErrorSmoke.first, stats);
+        _writePassed(output, testIdOutput ?? testID, sectionErrorSmoke.first, stats);
       }
 
       if(sectionErrorReusable.isNotEmpty) {
         for(final sectionError in sectionErrorReusable) {
           if(!sectionError.hasErrors) {
-            _writePassed(output, "${sectionError.section?.codeId}", sectionError, stats);
+            _writePassed(output, "${sectionError.section}", sectionError, stats);
           }
         }
       }
     } 
     
     if(!defaultErrors.hasErrors && defaultErrors.pass > 0) {
-      _writePassed(output, testID.codeId, defaultErrors, stats);
+      _writePassed(output, testIdOutput ?? testID, defaultErrors, stats);
     }
   }
 
@@ -300,7 +300,7 @@ abstract class AFBaseTestExecute extends AFModelWithCustomID {
 
 }
 
-void printPrototypeStart(AFCommandOutput output, AFPrototypeID id) {
+void printPrototypeStart(AFCommandOutput output, AFID id) {
   AFBaseTestExecute.printPrototypeIntro(output, id.toString());
 }
 
@@ -313,7 +313,7 @@ void printTestKind(AFCommandOutput output, String kind) {
 
 
 void printTestResult(AFCommandOutput output, String kind, AFBaseTestExecute context, AFTestStats stats) {
-   context.printPassMessages(output, stats);
+   context.printPassMessages(output, stats, testIdOutput: AFUIReusableTestID.smoke.code);
 }
 
 void printTestTotal(AFCommandOutput output, List<AFBaseTestExecute> baseContexts, AFTestStats stats) {

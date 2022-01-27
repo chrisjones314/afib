@@ -1,12 +1,15 @@
+import 'package:afib/id.dart';
 import 'package:afib/src/dart/redux/actions/af_always_fail_query.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
+import 'package:afib/src/dart/redux/actions/af_time_actions.dart';
 import 'package:afib/src/dart/redux/queries/af_time_update_listener_query.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_theme_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
@@ -17,6 +20,8 @@ import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
+import 'package:collection/collection.dart';
+import 'package:flutter_test/flutter_test.dart' as ft;
 
 abstract class AFStateTestExecute extends AFBaseTestExecute {
 
@@ -24,39 +29,29 @@ abstract class AFStateTestExecute extends AFBaseTestExecute {
   
 }
 
-class AFStateTestDifference {
-  final AFState afStateBefore;
-  final AFState afStateAfter;
-  AFStateTestDifference({
-    required this.afStateBefore,
-    required this.afStateAfter,
+class AFStateTestStateVerificationContext {
+  final AFState afState;
+  AFStateTestStateVerificationContext({
+    required this.afState,
   });
 
-  TAppState stateBefore<TAppState extends AFFlexibleState>() {
-    return _findComponentState(afStateBefore)!;
+  TAppState stateApp<TAppState extends AFFlexibleState>() {
+    return _findComponentState<TAppState>(afState);
   }
 
-  TAppState stateAfter<TAppState extends AFFlexibleState>() {
-    return _findComponentState(afStateAfter)!;
+  TAppTheme? theme<TAppTheme extends AFFunctionalTheme>(AFThemeID themeId) {
+    return _findAppTheme(afState, themeId);
   }
 
-  TAppTheme? themeBefore<TAppTheme extends AFFunctionalTheme>(AFThemeID themeId) {
-    return _findAppTheme(afStateBefore, themeId);
+  AFRouteState get route {
+    return _routeFor(afState);
   }
 
-  TAppTheme? themeAfter<TAppTheme extends AFFunctionalTheme>(AFThemeID themeId) {
-    return _findAppTheme(afStateAfter, themeId);
+  AFPublicState get public {
+    return afState.public;
   }
 
-  AFRouteState get routeBefore {
-    return _routeFor(afStateBefore);
-  }
-
-  AFRouteState get routeAfter {
-    return _routeFor(afStateAfter);
-  }
-
-  TComponentState? _findComponentState<TComponentState extends AFFlexibleState>(AFState state) {
+  TComponentState _findComponentState<TComponentState extends AFFlexibleState>(AFState state) {
     final areas = state.public.components;
     return areas.stateFor(TComponentState) as TComponentState;
   }
@@ -97,8 +92,11 @@ class AFStateTests<TState extends AFFlexibleState> {
   final List<AFStateTest<dynamic>> tests = <AFStateTest<dynamic>>[];
   AFStateTestContext<dynamic>? context;
 
-  void addTest(AFStateTestID id, AFStateTestDefinitionsContext definitions, AFStateTestDefinitionDelegate handler) {
+  void addTest(AFStateTestID id, AFStateTestID? extendTest, AFStateTestDefinitionsContext definitions, AFStateTestDefinitionDelegate handler) {
     final test = AFStateTest<TState>(id, this);
+    if(extendTest != null) {
+      test.extendsTest(extendTest);
+    }
     tests.add(test);
     final defContext = AFStateTestDefinitionContext(definitions, test);
     handler(defContext);
@@ -141,51 +139,189 @@ class _AFStateResultEntry {
       crossHandlers ?? this.crossHandlers,
     );
   }
-
 }
 
-abstract class _AFStateExecutionBody {
-  final AFProcessVerifyDifferenceDelegate? verify;
-  _AFStateExecutionBody(this.verify);
+abstract class _AFStateTestExecutionStatement {
+  _AFStateTestExecutionStatement();
+
+  void execute(AFStateTestContext context, { required bool verify });
+}
+
+abstract class _AFStateTestDefinitionStatement {
+  _AFStateTestDefinitionStatement();
 
   void execute(AFStateTestContext context);
-
 }
 
-class _AFStateScreenBody<TSPI extends AFStateProgrammingInterface> extends _AFStateExecutionBody {
+
+class _AFStateTestScreenStatement<TSPI extends AFStateProgrammingInterface> extends _AFStateTestExecutionStatement {
   final AFScreenID screenId;
   final AFStateTestScreenHandlerDelegate<TSPI> screenHandler;
 
-  _AFStateScreenBody(
+  _AFStateTestScreenStatement(
     this.screenId,
     this.screenHandler,
-    AFProcessVerifyDifferenceDelegate? verify
-  ): super(verify);  
+  );
 
-  void execute(AFStateTestContext context) {
+  void execute(AFStateTestContext context, { required bool verify }) {
     final screen = AFibF.g.screenMap.createInstance(screenId, null);
-    final context = AFStateTestScreenContext<TSPI>(screen: screen);
-    screenHandler(context);
+    final ctx = AFStateTestScreenContext<TSPI>(screen: screen);
+    screenHandler(context, ctx);
   }
 }
 
-class _AFStateQueryBody extends _AFStateExecutionBody {
+class _AFStateTestQueryStatement extends _AFStateTestExecutionStatement {
   final List<AFAsyncQuery> queries;
-  _AFStateQueryBody(this.queries, AFProcessVerifyDifferenceDelegate? verify): super(verify);
+  _AFStateTestQueryStatement(this.queries);
 
-  factory _AFStateQueryBody.fromOne(
-    AFAsyncQuery query,
-    { AFProcessVerifyDifferenceDelegate? verify }
+  factory _AFStateTestQueryStatement.fromOne(
+    AFAsyncQuery query
   ) {
     final queries = [query];
-    return _AFStateQueryBody(queries, verify);
+    return _AFStateTestQueryStatement(queries);
   }
-
-  void execute(AFStateTestContext context) {
+  void execute(AFStateTestContext context, { required bool verify }) {
     for(final query in queries) {
       AFStateTest.processQuery(context, query);
     }
   }
+}
+
+class _AFStateTestStartupStatement extends _AFStateTestQueryStatement {
+  _AFStateTestStartupStatement(List<AFAsyncQuery> queries): super(queries);  
+}
+
+class _AFStateTestVerifyStatement extends _AFStateTestExecutionStatement {
+  final AFStateTestVerifyStateDelegate verifyDelegate;
+  _AFStateTestVerifyStatement(this.verifyDelegate);
+  void execute(AFStateTestContext context, { required bool verify }) {
+    if(!verify) {
+      return;
+    }
+    final verifyContext = AFStateTestStateVerificationContext(afState: AFibF.g.storeInternalOnly!.state);
+    verifyDelegate(context, verifyContext);
+  }
+}
+
+class _AFStateTestAdvanceTimeStatement extends _AFStateTestExecutionStatement {
+ final Duration duration;
+  _AFStateTestAdvanceTimeStatement(this.duration);
+  void execute(AFStateTestContext context, { required bool verify }) {
+    if(!verify) {
+      return;
+    }
+    final state = AFibF.g.storeInternalOnly!.state;
+    final currentTime = state.public.time;
+    final revised = currentTime.reviseAdjustOffset(duration);
+    context.dispatcher.dispatch(AFUpdateTimeStateAction(revised));
+  }
+
+
+}
+
+class _AFStateTestSetAbsoluteTimeStatement extends _AFStateTestExecutionStatement {
+ final DateTime time;
+  _AFStateTestSetAbsoluteTimeStatement(this.time);
+  void execute(AFStateTestContext context, { required bool verify }) {
+    if(!verify) {
+      return;
+    }
+    final state = AFibF.g.storeInternalOnly!.state;
+    final currentTime = state.public.time;
+    final revised = currentTime.reviseToAbsoluteTime(this.time);
+    context.dispatcher.dispatch(AFUpdateTimeStateAction(revised));
+  }
+
+
+}
+
+
+class _AFStateRegisterFixedResultStatement extends _AFStateTestDefinitionStatement {
+  final Object querySpecifier;
+  final AFStateTestDefinitionsContext definitions;
+  final Object idData;
+
+  _AFStateRegisterFixedResultStatement(this.querySpecifier, this.definitions, this.idData);
+
+  void execute(AFStateTestContext context) {
+    final test = context.test;
+    test.registerResult(querySpecifier, (context, query) {
+      final data = definitions.td(idData);
+      query.testFinishAsyncWithResponse(context, data);
+      return data;
+    });
+
+  }
+}
+
+class _AFStateRegisterDynamicResultStatement extends _AFStateTestDefinitionStatement {
+  final Object querySpecifier;
+  final AFCreateQueryResultDelegate delegate;
+  _AFStateRegisterDynamicResultStatement(this.querySpecifier, this.delegate);
+
+  void execute(AFStateTestContext context) {
+    final test = context.test;
+    test.registerResult(querySpecifier, (context, query) {
+      final result = delegate(context, query);
+      query.testFinishAsyncWithResponse(context, result);
+      return result;
+    });
+  }
+}
+
+class _AFStateRegisterDynamicCrossQueryResultStatement extends _AFStateTestDefinitionStatement {
+  final dynamic querySpecifier; 
+  final dynamic listenerSpecifier; 
+  final List<AFCreateQueryResultDelegate> delegates;
+   _AFStateRegisterDynamicCrossQueryResultStatement(this.querySpecifier, this.listenerSpecifier, this.delegates);
+
+  void execute(AFStateTestContext context) {
+    final test = context.test;
+    test.registerResult(querySpecifier, (context, query) {
+      final listenerId = AFStateTest.specifierToId(listenerSpecifier);
+      final listenerQuery = AFibF.g.storeInternalOnly?.state.public.queries.findListenerQueryById(listenerId);
+
+      if(listenerQuery == null) {
+        return;
+      }
+
+      var result;
+      for(final delegate in delegates) {
+        result = delegate(context, query);
+        // in this case, we don't send the result to the original query, but rather a
+        // listener query they specified
+        listenerQuery.testFinishAsyncWithResponse(context, result);
+      }
+      return result;
+    });
+  }
+}
+
+
+
+
+class _AFStateRegisterNoResultStatement extends _AFStateTestDefinitionStatement {
+  final Object querySpecifier;
+
+  _AFStateRegisterNoResultStatement(this.querySpecifier);
+
+  void execute(AFStateTestContext context) {
+    final test = context.test;
+    test.registerResult(querySpecifier, null);
+  }
+}
+
+class AFStateTestWidgetContext<TSPI extends AFStateProgrammingInterface> {
+  final AFConnectedUIBase widget;
+  AFStateTestWidgetContext({
+    required this.widget,
+  });
+
+  void executeBuild(AFStateTestScreenBuildContextDelegate<TSPI> delegate) {
+    final spi = AFStateTestScreenContext.createSPI<TSPI>(widget);
+    return delegate(spi);
+  }
+
 }
 
 class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface> {
@@ -194,14 +330,30 @@ class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface> {
     required this.screen,
   });
 
+
   void executeBuild(AFStateTestScreenBuildContextDelegate<TSPI> delegate) {
-    final context = screen.createNonBuildContext(AFibF.g.storeInternalOnly!);
-    if(context == null) {
-      assert(false);
-      return;
-    }
-    final spi = screen.createSPI(context) as TSPI;
+    final spi = createSPI<TSPI>(screen);
     delegate(spi);
+  }
+
+  void executeBuildWithExecute(AFStateTestExecute e, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> delegate) {
+    final spi = createSPI<TSPI>(screen);
+    delegate(e, spi);
+  }
+
+
+  void executeWidget<TSPIWidget extends AFStateProgrammingInterface>(AFCreateConnectedWidgetDelegate create, AFStateTestWidgetHandlerDelegate<TSPIWidget> delegate) {
+    final widget = create(screen);
+    final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widget: widget);
+    return delegate(widgetContext);
+  }
+
+  static TSPI createSPI<TSPI extends AFStateProgrammingInterface>(AFConnectedUIBase widget) {
+    final context = widget.createNonBuildContext(AFibF.g.storeInternalOnly!);
+    if(context == null) {
+      throw AFException("Failed to create context");
+    }
+    return widget.createSPI(context) as TSPI;
   }
 }
 
@@ -217,28 +369,12 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
   /// and its [AFAsyncQuery.finishAsyncWithResponse] method will be called with the 
   /// test data with the specified [idData] in the test data registry.
   void defineQueryResponseFixed(dynamic querySpecifier, dynamic idData) {
-    test.specifyResponse(querySpecifier, definitions, idData);
+    test.defineQueryResponse(querySpecifier, definitions, idData);
   }
-
-  void defineExtendTest(AFStateTestID testId) {
-    test.extendsTest(testId);
-  }
-
-  void defineExtendTestVerification(AFStateTestID idTest) {
-    test.initializeVerifyFrom(idTest);
-  }
-
 
   void defineQueryResponseNone(dynamic querySpecifier) {
-    test.specifyNoResponse(querySpecifier, definitions);
+    test.defineQueryResponseNone(querySpecifier, definitions);
   }
-
-  void executeStartup({
-    AFProcessVerifyDifferenceDelegate? verify
-  }) {
-    test.executeStartup(verifyState: verify);
-  }
-
 
   /// Create a response dynamically for a particular query.
   /// 
@@ -252,27 +388,121 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
   /// and its [AFAsyncQuery.finishAsyncWithResponse] method will be called with the 
   /// test data that is created by [delegate].
   void defineQueryResponseDynamic(dynamic querySpecifier, AFCreateQueryResultDelegate delegate) {
-    test.createResponse(querySpecifier, delegate);
+    test.defineQueryResponseDynamic(querySpecifier, delegate);
   }
 
-  void specifyDynamicCrossQueryResponse(dynamic querySpecifier, dynamic listenerSpecifier, List<AFCreateQueryResultDelegate> delegates) {
-    test.createCrossQueryResponse(querySpecifier, listenerSpecifier, delegates);
+  void defineDynamicCrossQueryResponse(Object querySpecifier, Object listenerSpecifier, List<AFCreateQueryResultDelegate> delegates) {
+    test.defineDynamicCrossQueryResponse(querySpecifier, listenerSpecifier, delegates);
+  }
+
+  void defineInitialTime(Object timeOrId) {
+    final time = definitions.td(timeOrId);
+    test.defineQueryResponseDynamic(AFUIQueryID.time,  (e, q) {
+      if(time is AFTimeState) {
+        return time;
+      }
+      assert(time is DateTime);
+      return AFTimeState(
+        actualNow: time,
+        timeZone: AFTimeZone.local,
+        pauseTime: null,
+        simulatedOffset: Duration(milliseconds: 0),
+        updateFrequency: Duration(minutes: 1000),
+        updateSpecificity: AFTimeStateUpdateSpecificity.minute
+      );
+    });    
+  }
+
+  void executeVerifyActiveScreenId(AFScreenID screenId) {
+    executeVerifyState((e, verify) {
+      final route = verify.route;
+      e.expect(route.activeScreenId, ft.equals(screenId));
+    });
+
+  }
+
+  void executeStartup() {
+    test.executeStartup();
+  }
+
+  void executeVerifyState(AFStateTestVerifyStateDelegate verify) {
+    test.executeVerifyState(verify);
+  }
+
+  void executeAdvanceTime(Duration duration) {
+    test.executeAdvanceTime(duration);
+  }
+
+  void executeSetAbsoluteTime(DateTime dateTime) {
+    test.executeSetAbsoluteTime(dateTime);
   }
 
   /// Use this method to execute a query and validate the state change which it causes.
-  void executeQuery(AFAsyncQuery query, {
-    AFProcessVerifyDifferenceDelegate? verify
-  }) {
-    test.executeQuery(query, verifyState: verify);
+  void executeQuery(AFAsyncQuery query) {
+    test.executeQuery(query);
   }
 
-  void executeScreen<TSPI extends AFStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> screenHandler, {
-    AFProcessVerifyDifferenceDelegate? verify
-  }) {
-    test.executeScreen<TSPI>(screenId, screenHandler, verifyState: verify);
+  void executeScreen<TSPI extends AFStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> screenHandler) {
+    test.executeScreen<TSPI>(screenId, screenHandler);
+  }
+
+  void executeScreenWidgetBuild<TSPIWidget extends AFStateProgrammingInterface>(
+    AFScreenID screenId, 
+    AFCreateConnectedWidgetDelegate createWidget,
+    AFStateTestScreenBuildContextDelegate<TSPIWidget> widgetHandler, {
+      AFStateTestVerifyStateDelegate? verify
+    }) {
+    test.executeScreen<AFStateProgrammingInterface>(screenId, (e, screenContext) {
+      screenContext.executeWidget<TSPIWidget>(createWidget, (widgetContext) {
+        widgetContext.executeBuild(widgetHandler);
+      });
+        
+    });
   }
 
 
+  void executeScreenBuild<TSPI extends AFStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> buildHandler) {
+    test.executeScreen<TSPI>(screenId, (e, screenContext) {
+      screenContext.executeBuildWithExecute(e, buildHandler);
+    });
+  }
+
+  void executeDrawerBuild<TSPI extends AFStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> buildHandler) {
+    executeScreenBuild<TSPI>(screenId, buildHandler);
+  }
+
+  void executeDrawer<TSPI extends AFStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> screenHandler) {
+    test.executeScreen<TSPI>(screenId, screenHandler);
+}
+
+}
+
+class _AFStateExecutionConfiguration {
+  final List<_AFStateTestDefinitionStatement> definitionStatements = <_AFStateTestDefinitionStatement>[];
+  final List<_AFStateTestExecutionStatement> executionStatements = <_AFStateTestExecutionStatement>[];
+
+  void addAll(_AFStateExecutionConfiguration other) {
+    definitionStatements.addAll(other.definitionStatements);
+    executionStatements.addAll(other.executionStatements);
+  }
+
+  bool get hasExecutionStatements {
+    return executionStatements.isNotEmpty;
+  }
+
+  void addExecutionStatement(_AFStateTestExecutionStatement statement, { required bool hasPreviousStatements }) {
+    if(!hasPreviousStatements && executionStatements.isEmpty && statement is! _AFStateTestStartupStatement) {
+      throw AFException("The first execution statement in a state test must be executeStartup (unless this test extends from another test that callsed executeStartup).");
+    }
+    executionStatements.add(statement);
+  }
+
+  void addDefinitionStatement(_AFStateTestDefinitionStatement statement, { required bool hasExecutionStatements }) {
+    if(hasExecutionStatements) {
+      throw AFException("In a state test body, first do all definition statements, then do execution statements.  Note that because you can override definitions when you extend a test, all definitions are done first, then all executions are done after that, so it doesn't make sense to interleave them.");
+    }
+    definitionStatements.add(statement);
+  }
 }
 
 class AFStateTest<TState extends AFFlexibleState> {
@@ -280,7 +510,8 @@ class AFStateTest<TState extends AFFlexibleState> {
   final AFStateTestID id;
   AFStateTestID? idPredecessor;
   final Map<String, _AFStateResultEntry> results = <String, _AFStateResultEntry>{};
-  final List<_AFStateExecutionBody> executionBodies = <_AFStateExecutionBody>[];
+  final _AFStateExecutionConfiguration extendedStatements = _AFStateExecutionConfiguration();
+  final _AFStateExecutionConfiguration currentStatements = _AFStateExecutionConfiguration();
 
   AFStateTest(this.id, this.tests) {
     registerResult(AFAlwaysFailQuery, (context, query) {
@@ -295,14 +526,8 @@ class AFStateTest<TState extends AFFlexibleState> {
     idPredecessor = idTest;
     final test = tests.findById(idTest);
     if(test != null) {
-      this.results.addAll(test.results);
-    }
-  }
-
-  void initializeVerifyFrom(AFStateTestID idTest) {
-    final test = tests.findById(idTest);
-    if(test != null) {
-      executionBodies.addAll(test.executionBodies);
+      this.extendedStatements.addAll(test.extendedStatements);
+      this.extendedStatements.addAll(test.currentStatements);
     }
   }
     
@@ -352,6 +577,13 @@ class AFStateTest<TState extends AFFlexibleState> {
     final key = AFStateTest.specifierToId(query);
     final results = context.test.results;
 
+    if(query is AFTimeUpdateListenerQuery) {
+      if(AFibF.g.testOnlyIsInWorkflowTest) {
+        query.startAsyncAF(context.dispatcher, context.store);
+        return;
+      }
+    }
+
     var h = results[key];
     if(h == null) {
       /// Ummm, this might be a good place to admit that sometimes the type system
@@ -361,12 +593,7 @@ class AFStateTest<TState extends AFFlexibleState> {
       }
     }
 
-    if(h == null) {
-      if(query is AFTimeUpdateListenerQuery) {
-        query.startAsyncAF(context.dispatcher, context.store);
-        return;
-      }
-    
+    if(h == null) {    
       /// deferred queries don't have any results.
       if(query is AFDeferredQuery) {
         final successContext = query.createSuccessContext(
@@ -396,6 +623,10 @@ class AFStateTest<TState extends AFFlexibleState> {
         query.finishAsyncWithResponseAF(successContext);
         return;
       }
+
+      if(key == AFUIQueryID.time.code) {
+        throw AFException("Please call defineInitialTime in your state tests if you use AFTimeUpdateListenerQuery to listen to the time");
+      }
     
       throw AFException("No results specified for query ${AFStateTest.specifierToId(query)}");
     }
@@ -407,44 +638,20 @@ class AFStateTest<TState extends AFFlexibleState> {
   }  
 
   /// 
-  void specifyResponse(dynamic querySpecifier, AFStateTestDefinitionsContext definitions, dynamic idData) {
-    registerResult(querySpecifier, (context, query) {
-      final data = definitions.td(idData);
-      query.testFinishAsyncWithResponse(context, data);
-      return data;
-    });
+  void defineQueryResponse(dynamic querySpecifier, AFStateTestDefinitionsContext definitions, dynamic idData) {
+    currentStatements.addDefinitionStatement(_AFStateRegisterFixedResultStatement(querySpecifier, definitions, idData), hasExecutionStatements: currentStatements.hasExecutionStatements);
   }
 
-  void specifyNoResponse(dynamic querySpecifier, AFStateTestDefinitionsContext definitions) {
-    _registerHandler(querySpecifier, null);
+  void defineQueryResponseNone(dynamic querySpecifier, AFStateTestDefinitionsContext definitions) {
+    currentStatements.addDefinitionStatement(_AFStateRegisterNoResultStatement(querySpecifier), hasExecutionStatements: currentStatements.hasExecutionStatements);
   }
 
-  void createResponse(dynamic querySpecifier, AFCreateQueryResultDelegate delegate) {
-    registerResult(querySpecifier, (context, query) {
-      final result = delegate(context, query);
-      query.testFinishAsyncWithResponse(context, result);
-      return result;
-    });
+  void defineQueryResponseDynamic(dynamic querySpecifier, AFCreateQueryResultDelegate delegate) {
+    currentStatements.addDefinitionStatement(_AFStateRegisterDynamicResultStatement(querySpecifier, delegate), hasExecutionStatements: currentStatements.hasExecutionStatements);
   }
 
-  void createCrossQueryResponse(dynamic querySpecifier, dynamic listenerSpecifier, List<AFCreateQueryResultDelegate> delegates) {
-    registerResult(querySpecifier, (context, query) {
-      final listenerId = specifierToId(listenerSpecifier);
-      final listenerQuery = AFibF.g.storeInternalOnly?.state.public.queries.findListenerQueryById(listenerId);
-
-      if(listenerQuery == null) {
-        return;
-      }
-
-      var result;
-      for(final delegate in delegates) {
-        result = delegate(context, query);
-        // in this case, we don't send the result to the original query, but rather a
-        // listener query they specified
-        listenerQuery.testFinishAsyncWithResponse(context, result);
-      }
-      return result;
-    });
+  void defineDynamicCrossQueryResponse(dynamic querySpecifier, dynamic listenerSpecifier, List<AFCreateQueryResultDelegate> delegates) {
+    currentStatements.addDefinitionStatement(_AFStateRegisterDynamicCrossQueryResultStatement(querySpecifier, listenerSpecifier, delegates), hasExecutionStatements: currentStatements.hasExecutionStatements);
   }
 
   void specifySecondaryError(dynamic querySpecifier, dynamic error) {
@@ -454,52 +661,60 @@ class AFStateTest<TState extends AFFlexibleState> {
     });
   }
 
-  void executeStartup({
-    AFProcessVerifyDifferenceDelegate? verifyState
-  }) {
+  void executeVerifyState(AFStateTestVerifyStateDelegate verifyState) {
+    currentStatements.addExecutionStatement(_AFStateTestVerifyStatement(verifyState), hasPreviousStatements: extendedStatements.hasExecutionStatements);
+  }
+
+  void executeAdvanceTime(Duration duration) {
+    currentStatements.addExecutionStatement(_AFStateTestAdvanceTimeStatement(duration), hasPreviousStatements: extendedStatements.hasExecutionStatements);
+  }
+
+  void executeSetAbsoluteTime(DateTime time) {
+    currentStatements.addExecutionStatement(_AFStateTestSetAbsoluteTimeStatement(time), hasPreviousStatements: extendedStatements.hasExecutionStatements);
+  }
+
+  void executeStartup() {
+    final prevStartup = extendedStatements.executionStatements.firstWhereOrNull((e) => e is _AFStateTestStartupStatement);
+    if(prevStartup != null) {
+      throw AFException("Do not call executeStartup in a test, if it extends a test that has already called executeStartup");
+    }
     final queries = AFibF.g.createStartupQueries().toList();
-    executionBodies.add(_AFStateQueryBody(queries, verifyState));
+    currentStatements.addExecutionStatement(_AFStateTestStartupStatement(queries), hasPreviousStatements: extendedStatements.hasExecutionStatements);
   }
 
-  void executeQuery(AFAsyncQuery query, {
-    AFProcessVerifyDifferenceDelegate? verifyState
-  }) {
-    executionBodies.add(_AFStateQueryBody.fromOne(query, verify: verifyState));
+  void executeQuery(AFAsyncQuery query) {
+    currentStatements.addExecutionStatement(_AFStateTestQueryStatement.fromOne(query), hasPreviousStatements: extendedStatements.hasExecutionStatements);
   }
 
-  void executeScreen<TSPI extends AFStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> screenHandler, {
-    AFProcessVerifyDifferenceDelegate? verifyState
-  }) {
-    executionBodies.add(_AFStateScreenBody<TSPI>(screenId, screenHandler, verifyState));
+  void executeScreen<TSPI extends AFStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> screenHandler) {
+    currentStatements.addExecutionStatement(_AFStateTestScreenStatement<TSPI>(screenId, screenHandler), hasPreviousStatements: extendedStatements.hasExecutionStatements);
   }
 
   /// Execute the test by kicking of its queries, then 
   void execute(AFStateTestContext context, { bool shouldVerify = true }) {    
     AFStateTestContext.currentTest = context;
   
-    // first, execute an predecessor tests.
-    final idPred = idPredecessor;
-    if(idPred != null) {
-      final test = tests.findById(idPred);
-      test?.execute(context, shouldVerify: false);
+    // first, execute all the predecessor definitons.
+    for(final exec in extendedStatements.definitionStatements) {
+      exec.execute(context);
+    }
+
+    // then, execute all the current definitions, this may override some of the 
+    // previous definitions
+    for(final exec in currentStatements.definitionStatements) {
+      exec.execute(context);
+    }
+
+    // then, execute all the predecessor executions, but don't do any verification,
+    // not just because it would be redundant, but because it may be inaccurate due
+    // to overriden definitions that impact the results of queries.
+    for(final exec in extendedStatements.executionStatements) {
+      exec.execute(context, verify: false);
     }
 
     // basically, we need to go through an execute each query that they specified.
-    for(final eb in executionBodies) {
-      final stateBefore = context.afState;
-      eb.execute(context);
-
-      // lookup the result for that query
-      AFStateTestExecute e = context;
-      if(shouldVerify) {
-        final diff = AFStateTestDifference(
-          afStateBefore: stateBefore,
-          afStateAfter: context.afState,
-        );
-        eb.verify?.call(e, diff);
-      }
+    for(final exec in currentStatements.executionStatements) {
+      exec.execute(context, verify: true);
     }
   }
-
-
 }

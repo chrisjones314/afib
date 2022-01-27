@@ -78,7 +78,7 @@ class AFibD<AppState> {
           p.initDebugConfig(AFibD.config);
         } else if(env == AFEnvironment.production) {
           p.initProductionConfig(AFibD.config);
-        } else if(env == AFEnvironment.prototype) {
+        } else if(AFibD.config.isPrototypeEnvironment) {
           p.initPrototypeConfig(AFibD.config);
         } else if(env == AFEnvironment.test) {
           p.initTestConfig(AFibD.config);

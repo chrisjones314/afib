@@ -37,10 +37,10 @@ mixin AFUIDefaultStateViewMixin<TRouteParam extends AFRouteParam> {
 
 }
 
-abstract class AFUIDefaultConnectedScreen<TSPI extends AFStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIConnectedScreen<TSPI, AFUIPrototypeStateView, TRouteParam> with AFUIDefaultStateViewMixin<TRouteParam> {
+abstract class AFUIDefaultConnectedScreen<TSPI extends AFScreenStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIConnectedScreen<TSPI, AFUIPrototypeStateView, TRouteParam> with AFUIDefaultStateViewMixin<TRouteParam> {
   AFUIDefaultConnectedScreen(AFScreenID screen, AFCreateSPIDelegate<TSPI, AFUIBuildContext<AFUIPrototypeStateView, TRouteParam>> spiCreator): super(screen, AFUIPrototypeStateView.creator, spiCreator);
 }
 
-abstract class AFUIDefaultConnectedDialog<TSPI extends AFStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIConnectedDialog<TSPI, AFUIPrototypeStateView, TRouteParam> with AFUIDefaultStateViewMixin<TRouteParam> {
+abstract class AFUIDefaultConnectedDialog<TSPI extends AFScreenStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIConnectedDialog<TSPI, AFUIPrototypeStateView, TRouteParam> with AFUIDefaultStateViewMixin<TRouteParam> {
   AFUIDefaultConnectedDialog(AFScreenID screen, AFCreateSPIDelegate<TSPI, AFUIBuildContext<AFUIPrototypeStateView, TRouteParam>> spiCreator): super(screen, AFUIPrototypeStateView.creator, spiCreator);
 }

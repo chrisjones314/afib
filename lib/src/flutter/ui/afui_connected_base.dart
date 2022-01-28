@@ -34,15 +34,15 @@ class AFUIBuildContext<TStateView extends AFFlexibleStateView, TRouteParam exten
   ): super(standard, stateView, routeParam, children, theme);
 }
 
-class AFUIDefaultSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFStateProgrammingInterface<AFUIBuildContext<TStateView, TRouteParam>> {
-  AFUIDefaultSPI(AFUIBuildContext<TStateView, TRouteParam> context, AFConnectedUIBase screen): super(context, screen);
+class AFUIScreenDefaultSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFScreenStateProgrammingInterface<AFUIBuildContext<TStateView, TRouteParam>> {
+  AFUIScreenDefaultSPI(AFUIBuildContext<TStateView, TRouteParam> context, AFConnectedUIBase screen): super(context, screen);
 }
 
-abstract class AFUIConnectedScreen<TSPI extends AFStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreen<AFUIPrototypeState, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam, TSPI> with AFUICreateContextMixin<TStateView, TRouteParam> {
+abstract class AFUIConnectedScreen<TSPI extends AFScreenStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreen<AFUIPrototypeState, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam, TSPI> with AFUICreateContextMixin<TStateView, TRouteParam> {
   AFUIConnectedScreen(AFScreenID screen, AFCreateStateViewDelegate<TStateView> creator, AFCreateSPIDelegate<TSPI, AFUIBuildContext<TStateView, TRouteParam>> spiCreator): super(screen, AFUIThemeID.conceptualUI, creator, spiCreator);
 }
 
-abstract class AFUIConnectedDrawer<TSPI extends AFStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedDrawer<AFUIPrototypeState, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam, TSPI> with AFUICreateContextMixin<TStateView, TRouteParam> {
+abstract class AFUIConnectedDrawer<TSPI extends AFScreenStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedDrawer<AFUIPrototypeState, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam, TSPI> with AFUICreateContextMixin<TStateView, TRouteParam> {
   AFUIConnectedDrawer(
     AFScreenID screen,
     AFCreateStateViewDelegate<TStateView> creator,
@@ -51,6 +51,6 @@ abstract class AFUIConnectedDrawer<TSPI extends AFStateProgrammingInterface, TSt
 }
 
 
-abstract class AFUIConnectedDialog<TSPI extends AFStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedDialog<AFUIPrototypeState, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam, TSPI> with AFUICreateContextMixin<TStateView, TRouteParam> {
+abstract class AFUIConnectedDialog<TSPI extends AFScreenStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedDialog<AFUIPrototypeState, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam, TSPI> with AFUICreateContextMixin<TStateView, TRouteParam> {
   AFUIConnectedDialog(AFScreenID screen, AFCreateStateViewDelegate<TStateView> creator, AFCreateSPIDelegate<TSPI, AFUIBuildContext<TStateView, TRouteParam>> spiCreator): super(screen, AFUIThemeID.conceptualUI, creator, spiCreator);
 }

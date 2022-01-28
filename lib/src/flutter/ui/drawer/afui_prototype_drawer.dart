@@ -93,7 +93,7 @@ class AFUIPrototypeDrawerRouteParam extends AFRouteParam {
   }
 }
 
-class AFUIPrototypeDrawerSPI extends AFUIDefaultSPI<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> {
+class AFUIPrototypeDrawerSPI extends AFUIScreenDefaultSPI<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> {
   AFUIPrototypeDrawerSPI(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> context, AFConnectedUIBase screen): super(context, screen);
   factory AFUIPrototypeDrawerSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeDrawerRouteParam> context, AFConnectedUIBase screen) {
     return AFUIPrototypeDrawerSPI(context, screen);

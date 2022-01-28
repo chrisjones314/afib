@@ -33,7 +33,7 @@ class AFUIPrototypeWidgetRouteParam extends AFRouteParam {
   }
 }
 
-class AFUIPrototypeWidgetScreenSPI extends AFUIDefaultSPI<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> {
+class AFUIPrototypeWidgetScreenSPI extends AFUIScreenDefaultSPI<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> {
   AFUIPrototypeWidgetScreenSPI(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context, AFConnectedUIBase screen): super(context, screen);
   factory AFUIPrototypeWidgetScreenSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context, AFConnectedUIBase screen) {
     return AFUIPrototypeWidgetScreenSPI(context, screen);

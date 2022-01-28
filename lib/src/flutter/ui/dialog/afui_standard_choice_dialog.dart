@@ -28,7 +28,7 @@ class AFUIStandardChoiceDialogRouteParam extends AFRouteParam {
   }): super(id: AFUIScreenID.dialogStandardChoice);
 }
 
-class AFUIStandardChoiceDialogSPI extends AFUIDefaultSPI<AFUIPrototypeStateView, AFUIStandardChoiceDialogRouteParam> {
+class AFUIStandardChoiceDialogSPI extends AFUIScreenDefaultSPI<AFUIPrototypeStateView, AFUIStandardChoiceDialogRouteParam> {
   AFUIStandardChoiceDialogSPI(AFUIBuildContext<AFUIPrototypeStateView, AFUIStandardChoiceDialogRouteParam> context, AFConnectedUIBase screen): super(context, screen);
   factory AFUIStandardChoiceDialogSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFUIStandardChoiceDialogRouteParam> context, AFConnectedUIBase screen) {
     return AFUIStandardChoiceDialogSPI(context, screen);

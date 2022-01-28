@@ -78,7 +78,7 @@ class AFUIPrototypeHomeScreenParam extends AFRouteParam {
   }
 }
 
-class AFPrototypeHomeScreenSPI extends AFUIDefaultSPI<AFUIPrototypeStateView, AFUIPrototypeHomeScreenParam> {
+class AFPrototypeHomeScreenSPI extends AFUIScreenDefaultSPI<AFUIPrototypeStateView, AFUIPrototypeHomeScreenParam> {
   AFPrototypeHomeScreenSPI(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeHomeScreenParam> context, AFConnectedUIBase screen): super(context, screen);
   factory AFPrototypeHomeScreenSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeHomeScreenParam> context, AFConnectedUIBase screen) {
     return AFPrototypeHomeScreenSPI(context, screen);

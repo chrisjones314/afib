@@ -2,6 +2,7 @@ import 'package:afib/id.dart';
 import 'package:afib/src/dart/redux/actions/af_always_fail_query.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
+import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_time_actions.dart';
 import 'package:afib/src/dart/redux/queries/af_time_update_listener_query.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
@@ -13,6 +14,7 @@ import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
+import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -311,10 +313,38 @@ class _AFStateRegisterNoResultStatement extends _AFStateTestDefinitionStatement 
   }
 }
 
-class AFStateTestWidgetContext<TSPI extends AFStateProgrammingInterface> {
+mixin AFExecuteWidgetMixin {
+  AFConnectedUIBase get screen;
+
+  void executeWidget<TSPIWidget extends AFStateProgrammingInterface>(AFWidgetID wid, AFCreateConnectedWidgetDelegate create, AFStateTestWidgetHandlerDelegate<TSPIWidget> delegate) {
+    final widget = create(screen, wid);
+    final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widget: widget, screen: screen);
+    return delegate(widgetContext);
+  }
+
+  void executeWidgetWithExecute<TSPIWidget extends AFStateProgrammingInterface>(AFWidgetID wid, AFCreateConnectedWidgetDelegate create, AFStateTestExecute e, AFStateTestWidgetWithExecuteHandlerDelegate<TSPIWidget> delegate) {
+    final widget = create(screen, wid);
+    final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widget: widget, screen: screen);
+    return delegate(e, widgetContext);
+  }
+
+  void executeWidgetWithLaunchParam<TSPIWidget extends AFStateProgrammingInterface>(AFRouteParam launchParam, AFCreateConnectedWidgetWithLaunchParamDelegate create, AFStateTestWidgetHandlerDelegate<TSPIWidget> delegate) {
+    final widget = create(screen, launchParam);    
+    // in this scenario, we need to install the paramter in the state, so that it can be referenced in the future.
+    final store = AFibF.g.storeInternalOnly!;
+    store.dispatch(AFNavigateSetChildParamAction(screen: screen.parentScreenId, route: screen.parentRoute, param: launchParam, useParentParam: false));
+    final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widget: widget, screen: screen);
+    return delegate(widgetContext);
+  }
+
+}
+
+class AFStateTestWidgetContext<TSPI extends AFStateProgrammingInterface> with AFExecuteWidgetMixin {
   final AFConnectedUIBase widget;
+  final AFConnectedUIBase screen;
   AFStateTestWidgetContext({
     required this.widget,
+    required this.screen,
   });
 
   void executeBuild(AFStateTestScreenBuildContextDelegate<TSPI> delegate) {
@@ -330,7 +360,7 @@ class AFStateTestWidgetContext<TSPI extends AFStateProgrammingInterface> {
 
 }
 
-class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface> {
+class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface>  with AFExecuteWidgetMixin  {
   final AFConnectedUIBase screen;
   AFStateTestScreenContext({
     required this.screen,
@@ -346,20 +376,6 @@ class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface> {
     final spi = createSPI<TSPI>(screen);
     delegate(e, spi);
   }
-
-
-  void executeWidget<TSPIWidget extends AFStateProgrammingInterface>(AFWidgetID wid, AFCreateConnectedWidgetDelegate create, AFStateTestWidgetHandlerDelegate<TSPIWidget> delegate) {
-    final widget = create(screen, wid);
-    final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widget: widget);
-    return delegate(widgetContext);
-  }
-
-  void executeWidgetWithExecute<TSPIWidget extends AFStateProgrammingInterface>(AFWidgetID wid, AFCreateConnectedWidgetDelegate create, AFStateTestExecute e, AFStateTestWidgetWithExecuteHandlerDelegate<TSPIWidget> delegate) {
-    final widget = create(screen, wid);
-    final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widget: widget);
-  return delegate(e, widgetContext);
-  }
-
 
   static TSPI createSPI<TSPI extends AFStateProgrammingInterface>(AFConnectedUIBase widget) {
     final context = widget.createNonBuildContext(AFibF.g.storeInternalOnly!);

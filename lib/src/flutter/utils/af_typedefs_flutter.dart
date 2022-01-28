@@ -177,16 +177,18 @@ typedef AFConvertSizeToFormFactorDelegate = AFFormFactor Function(Size);
 
 typedef AFConnectedUIBuilderDelegate = AFConnectedUIBase Function(BuildContext? context);
 
-typedef AFStateTestScreenHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, AFStateTestScreenContext<TSPI> context);
+typedef AFStateTestScreenHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, AFStateTestScreenContext<TSPI> spi);
 
 typedef AFStateTestWidgetHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestWidgetContext<TSPI> context);
 
-typedef AFStateTestWidgetWithExecuteHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, AFStateTestWidgetContext<TSPI> context);
+typedef AFStateTestWidgetWithExecuteHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, AFStateTestWidgetContext<TSPI> spi);
 
-typedef AFStateTestScreenBuildContextDelegate<TSPI extends AFStateProgrammingInterface> = void Function(TSPI context);
+typedef AFStateTestScreenBuildContextDelegate<TSPI extends AFStateProgrammingInterface> = void Function(TSPI spi);
 
-typedef AFStateTestScreenBuildWithExecuteContextDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, TSPI context);
+typedef AFStateTestScreenBuildWithExecuteContextDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, TSPI spi);
 
 typedef AFCreateSPIDelegate<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext> = TSPI Function(TBuildContext context, AFConnectedUIBase screen);
 
 typedef AFCreateConnectedWidgetDelegate = AFConnectedUIBase Function(AFConnectedUIBase parent, AFWidgetID wid);
+
+typedef AFCreateConnectedWidgetWithLaunchParamDelegate = AFConnectedUIBase Function(AFConnectedUIBase parent, AFRouteParam param);

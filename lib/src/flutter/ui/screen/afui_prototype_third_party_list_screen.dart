@@ -10,7 +10,7 @@ import 'package:afib/src/flutter/ui/stateviews/afui_prototype_state_view.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 
-class AFUIPrototypeThirdPartyListScreenSPI extends AFUIDefaultSPI<AFUIPrototypeStateView, AFRouteParam> {
+class AFUIPrototypeThirdPartyListScreenSPI extends AFUIScreenDefaultSPI<AFUIPrototypeStateView, AFRouteParam> {
   AFUIPrototypeThirdPartyListScreenSPI(AFUIBuildContext<AFUIPrototypeStateView, AFRouteParam> context, AFConnectedUIBase screen): super(context, screen);
   factory AFUIPrototypeThirdPartyListScreenSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFRouteParam> context, AFConnectedUIBase screen) {
     return AFUIPrototypeThirdPartyListScreenSPI(context, screen);

@@ -11,7 +11,7 @@ import 'package:afib/src/flutter/ui/stateviews/afui_prototype_state_view.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 
-class AFUIPrototypeWireframesListScreenSPI extends AFUIDefaultSPI<AFUIPrototypeStateView, AFRouteParam> {
+class AFUIPrototypeWireframesListScreenSPI extends AFUIScreenDefaultSPI<AFUIPrototypeStateView, AFRouteParam> {
   AFUIPrototypeWireframesListScreenSPI(AFUIBuildContext<AFUIPrototypeStateView, AFRouteParam> context, AFConnectedUIBase screen): super(context, screen);
   factory AFUIPrototypeWireframesListScreenSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFRouteParam> context, AFConnectedUIBase screen) {
     return AFUIPrototypeWireframesListScreenSPI(context, screen);

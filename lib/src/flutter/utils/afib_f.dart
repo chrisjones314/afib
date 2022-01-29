@@ -104,6 +104,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   final themeFactories = AFFunctionalThemeDefinitionContext();
   final testMissingTranslations = AFTestMissingTranslations();
   final wireframes = AFWireframes();
+  final testOnlyDialogCompleters = <AFScreenID, void Function(dynamic)>{}; 
 
   AFScreenMap? _afPrototypeScreenMap;
   AFScreenID? forcedStartupScreen;
@@ -238,7 +239,19 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     
   }
 
-  void doMiddlewareNavigation( Function(NavigatorState) underHere ) {
+  void testOnlySimulateCloseDialogOrSheet<TResult>(AFScreenID screenId, TResult result) {
+    final completer = testOnlyDialogCompleters[screenId];
+    if(completer == null) {
+      throw AFException("No dialog completer for $screenId, did you try to close a dialog you didn't open in a state test?");
+    }
+    completer(result);
+  }
+
+  void testOnlySimulateShowDialogOrSheet<TResult>(AFScreenID screenId, Function(dynamic) onReturn) async {
+    testOnlyDialogCompleters[screenId] = onReturn;
+  }
+
+  bool doMiddlewareNavigation( Function(NavigatorState) underHere ) {
     navDepth++;
     if(navDepth > 1) {
       throw AFException("Unexpected navigation depth greater than 1");
@@ -251,6 +264,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     if(navDepth < 0) {
       throw AFException("Unexpected navigation depth less than 0");
     }
+    return navState != null;
   }
 
   bool get withinMiddewareNavigation {

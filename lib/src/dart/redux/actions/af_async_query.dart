@@ -118,7 +118,7 @@ class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextDispatc
     dispatch(AFUpdateAppStateAction(area: TState, toIntegrate: toIntegrate));
   }
 
-  material.BuildContext? get context {
+  material.BuildContext? get flutterContext {
     final route = state.public.route;
     final currentScreenId = route.activeScreenId;
     final activeScreen = AFibF.g.internalOnlyFindScreen(currentScreenId);

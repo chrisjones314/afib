@@ -38,6 +38,10 @@ class AFUIScreenDefaultSPI<TStateView extends AFFlexibleStateView, TRouteParam e
   AFUIScreenDefaultSPI(AFUIBuildContext<TStateView, TRouteParam> context, AFConnectedUIBase screen): super(context, screen);
 }
 
+class AFUIDefaultDialogSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFDialogStateProgrammingInterface<AFUIBuildContext<TStateView, TRouteParam>> {
+  AFUIDefaultDialogSPI(AFUIBuildContext<TStateView, TRouteParam> context, AFConnectedUIBase screen): super(context, screen);
+}
+
 abstract class AFUIConnectedScreen<TSPI extends AFScreenStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreen<AFUIPrototypeState, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam, TSPI> with AFUICreateContextMixin<TStateView, TRouteParam> {
   AFUIConnectedScreen(AFScreenID screen, AFCreateStateViewDelegate<TStateView> creator, AFCreateSPIDelegate<TSPI, AFUIBuildContext<TStateView, TRouteParam>> spiCreator): super(screen, AFUIThemeID.conceptualUI, creator, spiCreator);
 }
@@ -51,6 +55,6 @@ abstract class AFUIConnectedDrawer<TSPI extends AFScreenStateProgrammingInterfac
 }
 
 
-abstract class AFUIConnectedDialog<TSPI extends AFScreenStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedDialog<AFUIPrototypeState, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam, TSPI> with AFUICreateContextMixin<TStateView, TRouteParam> {
+abstract class AFUIConnectedDialog<TSPI extends AFDialogStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedDialog<AFUIPrototypeState, AFUITheme, AFUIBuildContext<TStateView, TRouteParam>, TStateView, TRouteParam, TSPI> with AFUICreateContextMixin<TStateView, TRouteParam> {
   AFUIConnectedDialog(AFScreenID screen, AFCreateStateViewDelegate<TStateView> creator, AFCreateSPIDelegate<TSPI, AFUIBuildContext<TStateView, TRouteParam>> spiCreator): super(screen, AFUIThemeID.conceptualUI, creator, spiCreator);
 }

@@ -28,7 +28,7 @@ class AFUIStandardChoiceDialogRouteParam extends AFRouteParam {
   }): super(id: AFUIScreenID.dialogStandardChoice);
 }
 
-class AFUIStandardChoiceDialogSPI extends AFUIScreenDefaultSPI<AFUIPrototypeStateView, AFUIStandardChoiceDialogRouteParam> {
+class AFUIStandardChoiceDialogSPI extends AFUIDefaultDialogSPI<AFUIPrototypeStateView, AFUIStandardChoiceDialogRouteParam> {
   AFUIStandardChoiceDialogSPI(AFUIBuildContext<AFUIPrototypeStateView, AFUIStandardChoiceDialogRouteParam> context, AFConnectedUIBase screen): super(context, screen);
   factory AFUIStandardChoiceDialogSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFUIStandardChoiceDialogRouteParam> context, AFConnectedUIBase screen) {
     return AFUIStandardChoiceDialogSPI(context, screen);
@@ -97,7 +97,7 @@ class AFUIStandardChoiceDialog extends AFUIDefaultConnectedDialog<AFUIStandardCh
           child: t.childButtonFlatText(
             text: buttonTitle,
             onPressed:  () {
-              context.closeDialog(i);
+              spi.closeDialog(i);
             },
         )));
       } else {
@@ -106,7 +106,7 @@ class AFUIStandardChoiceDialog extends AFUIDefaultConnectedDialog<AFUIStandardCh
           child: t.childButtonPrimaryText(
           text: buttonTitle,
           onPressed:  () {
-            context.closeDialog(i);
+            spi.closeDialog(i);
           },
         )));
       }

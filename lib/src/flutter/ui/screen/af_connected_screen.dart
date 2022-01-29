@@ -490,7 +490,7 @@ abstract class AFConnectedDrawer<TState extends AFFlexibleState, TTheme extends 
 /// Use this to connect a dialog to the store.
 /// 
 /// You can open a dialog with [AFBuildContext.showDialog].
-abstract class AFConnectedDialog<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFScreenStateProgrammingInterface> extends AFConnectedScreenWithGlobalParam<TState, TTheme, TBuildContext, TStateView, TRouteParam, TSPI> {
+abstract class AFConnectedDialog<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFDialogStateProgrammingInterface> extends AFConnectedScreenWithGlobalParam<TState, TTheme, TBuildContext, TStateView, TRouteParam, TSPI> {
   AFConnectedDialog(
     AFScreenID screenId,
     AFThemeID themeId,
@@ -511,7 +511,7 @@ abstract class AFConnectedDialog<TState extends AFFlexibleState, TTheme extends 
 /// 
 /// You can open a bottom sheet with [AFBuildContext.showBottomSheet]
 /// or [AFBuildContext.showModalBottomSheeet].
-abstract class AFConnectedBottomSheet<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFScreenStateProgrammingInterface> extends AFConnectedScreenWithGlobalParam<TState, TTheme, TBuildContext, TStateView, TRouteParam, TSPI> {
+abstract class AFConnectedBottomSheet<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TBuildContext extends AFBuildContext, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFBottomSheetStateProgrammingInterface> extends AFConnectedScreenWithGlobalParam<TState, TTheme, TBuildContext, TStateView, TRouteParam, TSPI> {
   AFConnectedBottomSheet(
     AFScreenID screenId,
     AFThemeID themeId,
@@ -565,9 +565,10 @@ mixin AFContextShowMixin {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
 
-    final ctx = context;
-    // this happens in state testing, where there is no BuildContext.
+    final ctx = flutterContext;
     if(ctx != null) {
+      // in the normal UI, we let the flutter navigation stuff handle returning 
+      // the return value.
       final result = await material.showDialog<TReturn>(
         context: ctx,
         builder: builder,
@@ -582,6 +583,14 @@ mixin AFContextShowMixin {
       if(onReturn != null) {
         onReturn(result);
       }
+    } else {
+      // this happens in state testing, where there is no BuildContext.  We still
+      // need to handle calling onReturn when someone calls closeDialog.
+       AFibF.g.testOnlySimulateShowDialogOrSheet<TReturn>(verifiedScreenId, (val) {
+        if(onReturn != null) {
+          onReturn(val);
+        }
+       });
     }
   }
 
@@ -802,7 +811,7 @@ mixin AFContextShowMixin {
   /// 
   /// See also [showSnackbarText]
   void showSnackbarText(String text, { Duration duration = const Duration(seconds: 2)}) {
-    final ctx = context;
+    final ctx = flutterContext;
     if(ctx != null) {
       ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(text), duration: duration));
     }
@@ -814,7 +823,7 @@ mixin AFContextShowMixin {
   /// 
   /// See also [showSnackbarText]
   void showSnackbar(SnackBar snackbar) {
-    final ctx = context;
+    final ctx = flutterContext;
     if(ctx != null) {
       ScaffoldMessenger.of(ctx).showSnackBar(snackbar);
     }
@@ -864,7 +873,7 @@ mixin AFContextShowMixin {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
 
-    final ctx = context;
+    final ctx = flutterContext;
     if(ctx != null) {
       final result = await material.showModalBottomSheet<dynamic>(
         context: ctx,
@@ -886,7 +895,16 @@ mixin AFContextShowMixin {
       if(onReturn != null) {
         onReturn(result);
       }
+    } else {
+      // this happens in state testing, where there is no BuildContext.  We still
+      // need to handle calling onReturn when someone calls closeDialog.
+      final result = AFibF.g.testOnlySimulateShowDialogOrSheet(verifiedScreenId, (val) {
+        if(onReturn != null) {
+          onReturn(val);
+        }
+      });
     }
+
   }
 
   /// Shows a bottom sheet
@@ -916,7 +934,7 @@ mixin AFContextShowMixin {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
 
-    final ctx = context;
+    final ctx = flutterContext;
     if(ctx != null) {
       material.Scaffold.of(ctx).showBottomSheet<dynamic>(
         builder,
@@ -925,7 +943,7 @@ mixin AFContextShowMixin {
         shape: shape,
         clipBehavior: clipBehavior,
       );
-    }
+    } 
   }
 
   /// Open the drawer that you specified for your [Scaffold].
@@ -941,7 +959,7 @@ mixin AFContextShowMixin {
     required AFRouteParam param,
   }) {
     _updateOptionalGlobalParam(screenId, param);
-    final ctx = context;
+    final ctx = flutterContext;
     // this happens in state testing, where there is no BuildContext.
     if(ctx != null) {
       final scaffold = material.Scaffold.of(ctx);
@@ -956,7 +974,7 @@ mixin AFContextShowMixin {
   }) {
     _updateOptionalGlobalParam(screenId, param);
     // this happens in state testing, where there is no BuildContext.
-    final ctx = context;
+    final ctx = flutterContext;
     if(ctx != null) {
       final scaffold = material.Scaffold.of(ctx);
       scaffold.openEndDrawer();
@@ -964,7 +982,7 @@ mixin AFContextShowMixin {
   }
 
   BuildContext get contextNullCheck {
-    final ctx = context;
+    final ctx = flutterContext;
     if(ctx == null) { throw AFException("Missing build context"); }
     return ctx;
   }
@@ -978,7 +996,7 @@ mixin AFContextShowMixin {
     ));
   }
 
-  BuildContext? get context;
+  BuildContext? get flutterContext;
   void dispatch(dynamic action);
 
 }
@@ -1043,7 +1061,8 @@ class AFBuildContext<TState extends AFFlexibleState, TStateView extends AFFlexib
   /// Shorthand for accessing data from the store
   TStateView get s { return stateView; }
 
-  material.BuildContext? get context { 
+  
+  material.BuildContext? get flutterContext { 
     // there is a brief time where we don't have a context internally, as the AFBuildContext is 
     // being constructed.   But, for the purposes of users of the framework, there will always
     // be a build context for any case where they have access to an AFBuildContext. 
@@ -1066,7 +1085,7 @@ class AFBuildContext<TState extends AFFlexibleState, TStateView extends AFFlexib
   AFDispatcher get d { return standard.dispatcher; }
 
   /// Shorthand for accessing the flutter build context
-  material.BuildContext get c { return context!; }
+  material.BuildContext get c { return flutterContext!; }
 
   /// Dispatch an action or query.
   void dispatch(dynamic action) {
@@ -1224,7 +1243,7 @@ class AFBuildContext<TState extends AFFlexibleState, TStateView extends AFFlexib
   /// close the drawer, and then do something else, like navigate to a new screen.
   void closeDrawer() {
     AFibF.g.doMiddlewareNavigation( (navState) {
-      if(context != null) {
+      if(flutterContext != null) {
         material.Navigator.pop(contextNullCheck);
       }
     });
@@ -1235,11 +1254,13 @@ class AFBuildContext<TState extends AFFlexibleState, TStateView extends AFFlexib
   /// 
   /// This is intended to be called from within an AFConnectedDialog.  If you call it 
   /// and a dialog is not open, it will mess up the navigation state.
-  void closeDialog(dynamic returnValue) {
-    AFibF.g.doMiddlewareNavigation( (navState) {
+  void closeDialog(AFScreenID dialogId, dynamic returnValue) {
+    if(!AFibF.g.doMiddlewareNavigation( (navState) {
       final ctx = contextNullCheck;
       material.Navigator.pop(ctx, returnValue); 
-    });
+      })) {
+      AFibF.g.testOnlySimulateCloseDialogOrSheet(dialogId, returnValue);
+    };
   }
 
   /// Closes the dialog, and returns the [returnValue] to the callback function that was
@@ -1247,11 +1268,13 @@ class AFBuildContext<TState extends AFFlexibleState, TStateView extends AFFlexib
   /// 
   /// This is intended to be called from within an AFConnectedDialog.  If you call it 
   /// and a dialog is not open, it will mess up the navigation state.
-  void closeBottomSheet(dynamic returnValue) {
-    AFibF.g.doMiddlewareNavigation( (navState) {
+  void closeBottomSheet(AFScreenID sheetId, dynamic returnValue) {
+    if(!AFibF.g.doMiddlewareNavigation( (navState) {
       final ctx = contextNullCheck;
       material.Navigator.pop(ctx, returnValue); 
-    });
+    })) {
+      AFibF.g.testOnlySimulateCloseDialogOrSheet(sheetId, returnValue);      
+    }
   }
 
   /// Log to the appRender topic.  
@@ -1341,11 +1364,19 @@ class AFBuildContext<TState extends AFFlexibleState, TStateView extends AFFlexib
 }
 
 @immutable
-class AFStateProgrammingInterface<TBuildContext extends AFBuildContext> {
+class AFStateProgrammingInterface<TBuildContext extends AFBuildContext> with AFContextShowMixin {
   final TBuildContext context;
   final AFConnectedUIBase owner;
 
   AFStateProgrammingInterface(this.context, this.owner);
+
+  BuildContext get flutterContext {
+    return context.c;
+  }
+
+  void dispatch(dynamic action) {
+    context.dispatch(action);
+  }
 
   void updateRouteParam(AFRouteParam param) {
     context.updateRouteParam(owner, param);
@@ -1361,6 +1392,18 @@ class AFStateProgrammingInterface<TBuildContext extends AFBuildContext> {
 
   void removeChildRouteParam(AFWidgetID wid) {
     context.updateRemoveChildParam(owner, wid);
+  }
+
+
+  void closeBottomSheetFromScreen(AFScreenID sheetId, dynamic result) {
+    context.closeBottomSheet(sheetId, result);
+  }
+  void closeBottomDialogFromScreen(AFScreenID dialogId, dynamic result) {
+    context.closeDialog(dialogId, result);
+  }
+
+  void closeDrawer() {
+    context.closeDrawer();
   }
 
   TChildRouteParam? findChild<TChildRouteParam extends AFRouteParam>(AFWidgetID wid) {
@@ -1392,6 +1435,45 @@ class AFScreenStateProgrammingInterface<TBuildContext extends AFBuildContext> ex
     context.dispatch(AFNavigatePopAction());
   }
 }
+
+@immutable
+class AFDialogStateProgrammingInterface<TBuildContext extends AFBuildContext> extends AFScreenStateProgrammingInterface<TBuildContext> {
+  AFDialogStateProgrammingInterface(
+    TBuildContext context,
+    AFConnectedUIBase owner,
+  ): super(context, owner);
+
+  void onTapStandardBackButton() {
+    context.dispatch(AFNavigatePopAction());
+  }
+
+  void closeDialog(dynamic result) {
+    context.closeDialog(owner.parentScreenId, result);
+  }
+}
+
+
+@immutable
+class AFBottomSheetStateProgrammingInterface<TBuildContext extends AFBuildContext> extends AFScreenStateProgrammingInterface<TBuildContext> {
+  AFBottomSheetStateProgrammingInterface(
+    TBuildContext context,
+    AFConnectedUIBase owner,
+  ): super(context, owner);
+
+
+  void closeBottomSheet(dynamic result) {
+    context.closeBottomSheet(owner.parentScreenId, result);
+  }
+}
+
+@immutable
+class AFDrawerStateProgrammingInterface<TBuildContext extends AFBuildContext> extends AFScreenStateProgrammingInterface<TBuildContext> {
+  AFDrawerStateProgrammingInterface(
+    TBuildContext context,
+    AFConnectedUIBase owner,
+  ): super(context, owner);
+}
+
 
 @immutable
 class AFWidgetStateProgrammingInterface<TBuildContext extends AFBuildContext> extends AFStateProgrammingInterface<TBuildContext> {

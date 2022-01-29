@@ -2,6 +2,7 @@
 
 import 'package:afib/afib_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:collection/collection.dart';
 
 enum AFTimeStateUpdateSpecificity {
   day,
@@ -285,31 +286,22 @@ class AFTimeState {
     return currentTime.second;
   }
 
-  static int? _parseToken(List<String> tokens, String suffix) {
-    for(final token in tokens) {
-      if(!token.endsWith(suffix)) {
-        continue;
-      }
-
-      final val = token.substring(0, token.length - suffix.length);
-      final nVal = int.tryParse(val);
-      return nVal;
-    }
-
-    return 0;
-  }
-
-  static Duration? parseDuration(String text) {
+  static Duration parseDuration(String text) {
     final tokens = text.split(" ");
     var amounts = [0,0,0,0,0];
     var suffixes = ["d", "h", "m", "s", "ms"];
-    for(var i = 0; i < suffixes.length; i++) {
-      final suffix = suffixes[i];
-      final amount = _parseToken(tokens, suffix);
-      if(amount == null) {
-        return null;
+    for(final token in tokens) {
+      final suffix = suffixes.firstWhereOrNull((suffix) => token.endsWith(suffix));
+      if(suffix == null) {
+        throw FormatException("Token $token does not have a recognized suffix");
       }
-      amounts[i] = amount;
+      final idxSuffix = suffixes.indexOf(suffix);
+      final amountStr = token.substring(0, token.length-suffix.length);
+      final amount = int.tryParse(amountStr);
+      if(amount == null) {
+        throw FormatException("Invalid amount $amountStr for token $token");
+      }
+      amounts[idxSuffix] = amount;
     }
 
     return Duration(

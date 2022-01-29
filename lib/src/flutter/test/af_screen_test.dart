@@ -1983,6 +1983,10 @@ class AFBaseTestDefinitionContext {
     return registry.f(testDataId);
   }
 
+  TResult td2<TResult extends Object>(dynamic testDataId) {
+    return registry.f(testDataId) as TResult;
+  }
+
   /// Looks up the test data defined in your test_data.dart file for a particular
   /// test data id.
   T testData<T extends Object>(dynamic testDataId) {

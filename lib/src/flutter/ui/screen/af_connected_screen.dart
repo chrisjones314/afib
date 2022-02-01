@@ -256,8 +256,6 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
     ));
   }
 
-
-
   void updateAddChildParam<TChildRouteParam extends AFRouteParam>(AFBuildContext context, TChildRouteParam revised, { AFID? id }) {
     context.dispatch(AFNavigateAddChildParamAction(
       id: id,

@@ -189,6 +189,6 @@ typedef AFStateTestScreenBuildWithExecuteContextDelegate<TSPI extends AFStatePro
 
 typedef AFCreateSPIDelegate<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext> = TSPI Function(TBuildContext context, AFConnectedUIBase screen);
 
-typedef AFCreateConnectedWidgetDelegate = AFConnectedUIBase Function(AFConnectedUIBase parent, AFWidgetID wid);
+typedef AFCreateConnectedWidgetDelegate = AFConnectedUIBase Function(AFConnectedUIBase parent, AFWidgetID wid, { required bool useParentParam });
 
 typedef AFCreateConnectedWidgetWithLaunchParamDelegate = AFConnectedUIBase Function(AFConnectedUIBase parent, AFRouteParam param);

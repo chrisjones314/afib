@@ -45,6 +45,7 @@ void afStateTestMain<TState extends AFFlexibleState> (AFCommandOutput output, AF
       output.indent();
       printTestResult(output, testKind, context, localStats);
       output.outdent();
+      context.finishAndUpdateStats(localStats);
 
       AFibF.g.storeInternalOnly!.dispatch(AFShutdownOngoingQueriesAction());
 

@@ -68,19 +68,49 @@ class AFScreenMap {
     return _createStartupScreenParam;
 }
 
-  /// Call [startupScreen] once to specify the initial screen for your app.
-  void startupScreen(AFScreenID screenId, AFCreateRouteParamDelegate createParam) {    
+  /// Call [registerStartupScreen] once to specify the initial screen for your app.
+  void registerStartupScreen(AFScreenID screenId, AFCreateRouteParamDelegate createParam) {    
     if(_startupScreenId == null) {
       trueCreateStartupScreenParam = createParam;
     }
     _startupScreenId = screenId;
     _createStartupScreenParam = createParam;
   }
-  /// Call [screen] multiple times to specify the relationship between 
+  /// Call [registerScreen] multiple times to specify the relationship between 
   /// [screenKey] and screens built by the [WidgetBuilder]
-  void screen(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
+  void registerScreen(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
+    assert(_isValidBuilder<AFConnectedScreen>(screenBuilder));
     _screens[screenKey] = screenBuilder;
   }
+
+  void registerDrawer(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
+    assert(_isValidDrawerBuilder(screenBuilder));
+    _screens[screenKey] = screenBuilder;
+  }
+
+  void registerDialog(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
+    assert(_isValidBuilder<AFConnectedDialog>(screenBuilder));
+    _screens[screenKey] = screenBuilder;
+  }
+
+  void registerBottomSheet(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
+    assert(_isValidBuilder<AFConnectedBottomSheet>(screenBuilder));
+    _screens[screenKey] = screenBuilder;
+  }
+
+  bool _isValidBuilder<TScreen extends AFConnectedUIBase>(AFConnectedUIBuilderDelegate screenBuilder) {
+    final screen = screenBuilder(null);
+    assert(screen is TScreen);
+    return true;
+  }
+
+  bool _isValidDrawerBuilder(AFConnectedUIBuilderDelegate screenBuilder) {
+    final screen = screenBuilder(null);
+    assert(screen is AFConnectedDrawer);
+    assert(screen.launchParam != null, "You must specify a launch parameter for a drawer, since it can be dragged onto the screen spontaneously.");
+    return true;
+  }
+
 
   /// Returns the widget builder for the initial screen.
   WidgetBuilder? get initialScreenBuilder {

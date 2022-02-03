@@ -1,8 +1,8 @@
 
 
 import 'package:afib/afib_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:collection/collection.dart';
+import 'package:intl/intl.dart';
 
 enum AFTimeStateUpdateSpecificity {
   day,

@@ -18,17 +18,17 @@ void afInitPrototypeScreenMap(AFScreenMap screens) {
   final config = AFibD.config;
   final env = config.environment;
   if(env == AFEnvironment.prototype) {
-    screens.startupScreen(AFUIScreenID.screenPrototypeHome, () => AFUIPrototypeHomeScreenParam.createOncePerScreen(filter: enabledTests.join(" ")));
+    screens.registerStartupScreen(AFUIScreenID.screenPrototypeHome, () => AFUIPrototypeHomeScreenParam.createOncePerScreen(filter: enabledTests.join(" ")));
   } else {
     assert(config.isPrototypeEnvironment);
-    screens.startupScreen(AFUIScreenID.screenPrototypeLoading, () => AFRouteParam(id: AFUIScreenID.screenPrototypeLoading));
+    screens.registerStartupScreen(AFUIScreenID.screenPrototypeLoading, () => AFRouteParam(id: AFUIScreenID.screenPrototypeLoading));
   }
 
-  screens.screen(AFUIScreenID.screenPrototypeHome, (_) => AFPrototypeHomeScreen());
-  screens.screen(AFUIScreenID.screenPrototypeLoading, (_) => AFPrototypeLoadingScreen());
-  screens.screen(AFUIScreenID.screenPrototypeListSingleScreen, (_) => AFUIPrototypeTestScreen());
-  screens.screen(AFUIScreenID.screenPrototypeWidget, (_) => AFUIPrototypeWidgetScreen());
-  screens.screen(AFUIScreenID.screenPrototypeThirdPartyList, (_) => AFUIPrototypeThirdPartyListScreen());
-  screens.screen(AFUIScreenID.screenPrototypeThirdPartyHome, (_) => AFUIPrototypeThirdPartyHomeScreen());
-  screens.screen(AFUIScreenID.screenPrototypeWireframesList, (_) => AFUIPrototypeWireframesListScreen());
+  screens.registerScreen(AFUIScreenID.screenPrototypeHome, (_) => AFPrototypeHomeScreen());
+  screens.registerScreen(AFUIScreenID.screenPrototypeLoading, (_) => AFPrototypeLoadingScreen());
+  screens.registerScreen(AFUIScreenID.screenPrototypeListSingleScreen, (_) => AFUIPrototypeTestScreen());
+  screens.registerScreen(AFUIScreenID.screenPrototypeWidget, (_) => AFUIPrototypeWidgetScreen());
+  screens.registerScreen(AFUIScreenID.screenPrototypeThirdPartyList, (_) => AFUIPrototypeThirdPartyListScreen());
+  screens.registerScreen(AFUIScreenID.screenPrototypeThirdPartyHome, (_) => AFUIPrototypeThirdPartyHomeScreen());
+  screens.registerScreen(AFUIScreenID.screenPrototypeWireframesList, (_) => AFUIPrototypeWireframesListScreen());
 }

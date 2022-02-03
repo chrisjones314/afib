@@ -536,7 +536,7 @@ class AFRouteState {
   /// If [includePrior] is true, it will also include the most recent final segment
   /// in the search.  This is useful when the final segement has been popped off the route,
   /// but still needs to be included in the search.
-  AFRouteSegment? findParamFor(AFScreenID screen, { bool includePrior = true }) {
+  AFRouteSegment? findParamFor(AFID screen, { bool includePrior = true }) {
     final gp = globalPool;
     if(gp.containsKey(screen)) {
       return gp[screen];
@@ -544,7 +544,7 @@ class AFRouteState {
     if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
       screen = AFUIScreenID.screenStartupWrapper;
     }
-    final seg = screenHierarchy.findSegmentFor(screen, includePrior: includePrior);
+    final seg = screenHierarchy.findSegmentFor(screen as AFScreenID, includePrior: includePrior);
     return seg; //?.param.paramFor(screen);
   }
 
@@ -552,7 +552,7 @@ class AFRouteState {
   /// 
   /// This may return null, in which case you should use the drawer's createRouteParam method
   /// to create an initial value.
-  AFRouteSegment? findGlobalParam(AFScreenID screen) {
+  AFRouteSegment? findGlobalParam(AFID screen) {
     return globalPool[screen];
   }
 

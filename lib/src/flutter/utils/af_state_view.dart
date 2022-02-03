@@ -15,6 +15,10 @@ abstract class AFFlexibleStateView extends AFFlexibleState {
     return AFFlexibleState.createModels(toIntegrate);
   }
 
+  TStateView castToStateView<TStateView extends AFFlexibleStateView>(AFCreateStateViewDelegate<TStateView> creator) {
+    return creator(models);
+  }
+
 }
 
 @immutable 

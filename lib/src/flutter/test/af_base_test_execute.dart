@@ -132,8 +132,8 @@ abstract class AFBaseTestExecute extends AFModelWithCustomID {
 
   void printPassMessages(AFCommandOutput output, AFTestStats stats, { String? testIdOutput }) {
     if(sectionErrors.isNotEmpty) {
-      final sectionErrorSmoke = sectionErrors.values.where((section) => section.section == AFUIReusableTestID.smoke);
-      final sectionErrorReusable = sectionErrors.values.where((section) => section.section != AFUIReusableTestID.smoke);
+      final sectionErrorSmoke = sectionErrors.values.where((section) => section.section == AFUIScreenTestID.smoke);
+      final sectionErrorReusable = sectionErrors.values.where((section) => section.section != AFUIScreenTestID.smoke);
       if(sectionErrorSmoke.isNotEmpty) {
         _writePassed(output, testIdOutput ?? testID, sectionErrorSmoke.first, stats);
       }
@@ -313,7 +313,7 @@ void printTestKind(AFCommandOutput output, String kind) {
 
 
 void printTestResult(AFCommandOutput output, String kind, AFBaseTestExecute context, AFTestStats stats) {
-   context.printPassMessages(output, stats, testIdOutput: AFUIReusableTestID.smoke.code);
+   context.printPassMessages(output, stats, testIdOutput: AFUIScreenTestID.smoke.code);
 }
 
 void printTestTotal(AFCommandOutput output, List<AFBaseTestExecute> baseContexts, AFTestStats stats) {

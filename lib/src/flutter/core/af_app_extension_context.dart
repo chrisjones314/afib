@@ -1,7 +1,7 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/state/models/afui_proto_state.dart';
 import 'package:afib/src/flutter/ui/theme/af_prototype_area.dart';
-import 'package:afib/src/flutter/ui/theme/af_prototype_theme.dart';
+import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:flutter/material.dart';
 
 class AFSharedTestExtensionContext {
@@ -566,7 +566,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
       init(context);
     }
 
-    context.initUnlessPresent(AFUIThemeID.conceptualUI, createTheme: (f) => AFUITheme(f));
+    context.initUnlessPresent(AFUIThemeID.defaultTheme, createTheme: (f) => AFUIDefaultTheme(f));
 
     for(final thirdParty in libraries) {
       thirdParty.initFunctional(context);
@@ -588,7 +588,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     }
 
     if(AFibD.config.requiresPrototypeData) {
-      componentStates.add(AFUIPrototypeState.initialValue());
+      componentStates.add(AFUIState.initialValue());
     }
 
     componentStates.add(AFComponentStateUnused.initialValue());

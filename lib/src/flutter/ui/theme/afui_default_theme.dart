@@ -3,13 +3,13 @@ import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_list_screen.dart';
 import 'package:flutter/material.dart';
 
-class AFUITheme extends AFFunctionalTheme {
+class AFUIDefaultTheme extends AFFunctionalTheme {
   static const columnWidthsForNumValueTable = {
       0: FixedColumnWidth(20.0),
       1: FlexColumnWidth(),
     };
 
-  AFUITheme(AFFundamentalThemeState fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualUI);
+  AFUIDefaultTheme(AFFundamentalThemeState fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.defaultTheme);
 
 
   Color get colorDisabled {
@@ -156,12 +156,12 @@ class AFUITheme extends AFFunctionalTheme {
     );
   }
 
-  Widget buildErrorsSection(AFBuildContext context, List<String> errors) {
+  Widget buildErrorsSection(List<String> errors) {
     var content;
     if(errors.isNotEmpty) {
       final headerColsErrors = row();
-      headerColsErrors.add(testResultTableValue(context, "#", TextAlign.left, showError: true));
-      headerColsErrors.add(testResultTableValue(context, "Errors", TextAlign.left, showError: true));
+      headerColsErrors.add(testResultTableValue("#", TextAlign.left, showError: true));
+      headerColsErrors.add(testResultTableValue("Errors", TextAlign.left, showError: true));
       
       final tableRowsErrors = childrenTable();
       tableRowsErrors.add(TableRow(children: headerColsErrors));
@@ -169,8 +169,8 @@ class AFUITheme extends AFFunctionalTheme {
       for(var i = 0; i < errors.length; i++) {
         final error = stripErrorPath(errors[i]);
         final errorCols = row();
-        errorCols.add(testResultTableErrorLine(context, childText((i+1).toString()), i));
-        errorCols.add(testResultTableErrorLine(context, childText(error), i));
+        errorCols.add(testResultTableErrorLine(childText((i+1).toString()), i));
+        errorCols.add(testResultTableErrorLine(childText(error), i));
         tableRowsErrors.add(TableRow(children: errorCols));
       }
 
@@ -193,38 +193,36 @@ class AFUITheme extends AFFunctionalTheme {
     );
   }
 
-  Widget testResultTableHeader(AFBuildContext context, String text, TextAlign textAlign) {
-    final t = context.t;
+  Widget testResultTableHeader(String text, TextAlign textAlign) {
     return Container(
-      padding: t.paddingStandard,
-      color: t.colorPrimary,
-      child: t.childText(text, textColor: t.colorOnPrimary, textAlign: textAlign)
+      padding: paddingStandard,
+      color: colorPrimary,
+      child: childText(text, textColor: colorOnPrimary, textAlign: textAlign)
     );
   }
 
-  Widget testResultTableErrorLine(AFBuildContext context, Widget text, int row) {
+  Widget testResultTableErrorLine(Widget text, int row) {
     final color = (row % 2 == 0) ? Colors.white : Colors.grey[350];
     return Container(
-      padding: context.t.padding.a.standard,
+      padding: padding.a.standard,
       color: color,
       child: text
     );
   }
 
-  Widget testResultTableValue(AFBuildContext context, String text, TextAlign textAlign, {
+  Widget testResultTableValue(String text, TextAlign textAlign, {
     bool showError = false
   }) {
-    final t = context.t;
     var color;
     var colorText;
     if(showError) {
-      color = t.colorError;
-      colorText = t.colorOnError;
+      color = colorError;
+      colorText = colorOnError;
     }
     return Container(
       color: color,
-      padding: t.paddingStandard,
-      child: t.childText(text, textColor: colorText, textAlign: textAlign)
+      padding: paddingStandard,
+      child: childText(text, textColor: colorText, textAlign: textAlign)
     );
   }
 

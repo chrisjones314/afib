@@ -126,7 +126,7 @@ class AFTestState {
   AFSingleScreenTestState? findState(AFBaseTestID id) {
     // if we are in an active wireframe, then use the test state for that wireframe.
     if(activeWireframe != null) {
-      return testStates[AFUIReusableTestID.wireframe];
+      return testStates[AFUIScreenTestID.wireframe];
     }
 
     return testStates[id];
@@ -166,10 +166,10 @@ class AFTestState {
   AFTestState startWireframe(AFWireframe wireframe) {
 
     final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
-    final testId = AFUIReusableTestID.wireframe;
+    final testId = AFUIScreenTestID.wireframe;
     final models = AFibF.g.testData.resolveStateViewModels(wireframe.models);
     final currentState = revisedStates[testId] ?? AFSingleScreenTestState(
-      testId: AFUIReusableTestID.wireframe,
+      testId: AFUIScreenTestID.wireframe,
       models: models,
       pass: 0, 
       errors: <String>[],

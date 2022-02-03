@@ -189,11 +189,11 @@ class AFBaseTestID extends AFIDWithTags {
 }
 
 class AFStateTestID extends AFBaseTestID {
-  const AFStateTestID(String code, AFLibraryID library, {String? group, List<String>? tags, }) : super("statet", code, library, tags: tags, group: group);
+  const AFStateTestID(String code, AFLibraryID library, {String? group, List<String>? tags, }) : super("statetest", code, library, tags: tags, group: group);
 }
 
 class AFScreenTestID extends AFBaseTestID {
-  const AFScreenTestID(String code, AFLibraryID library, {String? group, List<String>? tags }) : super("rt", code, library, tags: tags, group: group);
+  const AFScreenTestID(String code, AFLibraryID library, {String? group, List<String>? tags }) : super("screentest", code, library, tags: tags, group: group);
 }
 
 class AFPrototypeID extends AFBaseTestID {
@@ -201,7 +201,7 @@ class AFPrototypeID extends AFBaseTestID {
 }
 
 class AFQueryTestID extends AFID {
-  const AFQueryTestID(String code, AFLibraryID library) : super("qt", code, library);
+  const AFQueryTestID(String code, AFLibraryID library) : super("querytest", code, library);
 }
 
 class AFQueryID extends AFID {

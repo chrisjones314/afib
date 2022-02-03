@@ -132,7 +132,7 @@ class AFWireframe<TStateView extends AFFlexibleStateView> {
     // in the test data state.
     if(stateViewOrig != context.stateView) {
       AFibF.g.storeInternalOnly?.dispatch(AFUpdatePrototypeScreenTestModelsAction(
-        AFUIReusableTestID.wireframe,
+        AFUIScreenTestID.wireframe,
         context.models 
       ));
     }

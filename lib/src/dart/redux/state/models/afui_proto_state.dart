@@ -9,9 +9,9 @@ import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:flutter/foundation.dart';
 
 
-mixin AFUIPrototypeStateModelAccess on AFStateModelAccess {
+mixin AFUIStateModelAccess on AFStateModelAccess {
   AFSingleScreenTests get screenTests { return findType<AFSingleScreenTests>();}
-  AFScreenPrototype? get prototype { return findIdOrNull<AFScreenPrototype>(AFUIPrototypeState.prototypeModel); }
+  AFScreenPrototype? get prototype { return findIdOrNull<AFScreenPrototype>(AFUIState.prototypeModel); }
   AFScreenTestContext? get testContext { return findIdOrNull<AFScreenTestContext>(AFBaseTestExecute.testExecuteId); }
   AFSingleScreenTestState get singleScreenTestState { return findType<AFSingleScreenTestState>(); }
   AFTimeState get time { return findType<AFTimeState>(); }
@@ -20,15 +20,15 @@ mixin AFUIPrototypeStateModelAccess on AFStateModelAccess {
 
 //---------------------------------------------------------------------------------------
 @immutable
-class AFUIPrototypeState extends AFFlexibleState with AFUIPrototypeStateModelAccess {
+class AFUIState extends AFFlexibleState with AFUIStateModelAccess {
   static const prototypeModel = "prototype_model";
 
   //---------------------------------------------------------------------------------------
-  static final AFCreateComponentStateDelegate creator = (models) => AFUIPrototypeState(models);
-  AFUIPrototypeState(Map<String, Object> models): super(models: models, create: creator);
+  static final AFCreateComponentStateDelegate creator = (models) => AFUIState(models);
+  AFUIState(Map<String, Object> models): super(models: models, create: creator);
 
-  static AFUIPrototypeState initialValue() { 
-    return AFUIPrototypeState(AFFlexibleState.createModels([
+  static AFUIState initialValue() { 
+    return AFUIState(AFFlexibleState.createModels([
       ]));
   }
 }

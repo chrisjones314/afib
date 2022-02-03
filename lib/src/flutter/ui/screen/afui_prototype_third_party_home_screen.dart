@@ -1,10 +1,12 @@
 import 'package:afib/id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/core/af_app_extension_context.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
-import 'package:afib/src/flutter/ui/stateviews/afui_prototype_state_view.dart';
+import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
+import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 
@@ -21,17 +23,24 @@ class AFUIPrototypeThirdPartyHomeParam extends AFRouteParam {
   }
 }
 
-class AFUIPrototypeThirdPartyHomeScreenSPI extends AFUIScreenDefaultSPI<AFUIPrototypeStateView, AFUIPrototypeThirdPartyHomeParam> {
-  AFUIPrototypeThirdPartyHomeScreenSPI(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeThirdPartyHomeParam> context, AFConnectedUIBase screen): super(context, screen);
-  factory AFUIPrototypeThirdPartyHomeScreenSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeThirdPartyHomeParam> context, AFConnectedUIBase screen) {
-    return AFUIPrototypeThirdPartyHomeScreenSPI(context, screen);
+class AFUIPrototypeThirdPartyHomeScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeThirdPartyHomeParam> {
+  AFUIPrototypeThirdPartyHomeScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeThirdPartyHomeParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
+  
+  factory AFUIPrototypeThirdPartyHomeScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeThirdPartyHomeParam> context, AFUIDefaultTheme theme, AFScreenID screenId, AFWidgetID wid) {
+    return AFUIPrototypeThirdPartyHomeScreenSPI(context, screenId, theme,
+    );
   }
 }
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFUIPrototypeThirdPartyHomeScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeThirdPartyHomeScreenSPI, AFUIPrototypeThirdPartyHomeParam>{
-  AFUIPrototypeThirdPartyHomeScreen(): super(AFUIScreenID.screenPrototypeThirdPartyHome, AFUIPrototypeThirdPartyHomeScreenSPI.create);
+class AFUIPrototypeThirdPartyHomeScreen extends AFUIConnectedScreen<AFUIPrototypeThirdPartyHomeScreenSPI, AFUIDefaultStateView, AFUIPrototypeThirdPartyHomeParam> {
+
+  static final config =  AFUIDefaultScreenConfig<AFUIPrototypeThirdPartyHomeScreenSPI, AFUIPrototypeThirdPartyHomeParam> (
+    spiCreator: AFUIPrototypeThirdPartyHomeScreenSPI.create,
+  );
+
+  AFUIPrototypeThirdPartyHomeScreen(): super(screenId: AFUIScreenID.screenPrototypeThirdPartyHome, config: config);
 
   static AFNavigatePushAction navigatePush(AFUILibraryExtensionContext libraryContext) {
     return AFNavigatePushAction(
@@ -39,13 +48,14 @@ class AFUIPrototypeThirdPartyHomeScreen extends AFUIDefaultConnectedScreen<AFUIP
   }
 
   @override
-  Widget buildWithContext(AFUIPrototypeThirdPartyHomeScreenSPI spi) {
-    return _buildThirdParty(spi.context);
+  Widget buildWithSPI(AFUIPrototypeThirdPartyHomeScreenSPI spi) {
+    return _buildThirdParty(spi);
   }
 
   /// 
-  Widget _buildThirdParty(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeThirdPartyHomeParam> context) {
-    final t = context.t;
+  Widget _buildThirdParty(AFUIPrototypeThirdPartyHomeScreenSPI spi) {
+    final t = spi.t;
+    final context = spi.context;
     final libraryContext = context.p.libraryContext;
     final libraryName = libraryContext.id.name;
     

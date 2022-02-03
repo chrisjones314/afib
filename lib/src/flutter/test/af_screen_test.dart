@@ -844,7 +844,7 @@ class AFScreenTestBody extends AFScreenTestDescription {
     if(br != null) {
       return br.id;
     }
-    return AFUIReusableTestID.smoke;
+    return AFUIScreenTestID.smoke;
   }
 }
 
@@ -1894,7 +1894,7 @@ class AFWorkflowStateTestPrototype {
 
   void defineSmokeTest({
     required AFWorkflowTestBodyExecuteDelegate body, 
-    AFScreenTestID id = AFUIReusableTestID.smoke,
+    AFScreenTestID id = AFUIScreenTestID.smoke,
     String? description,
     String? disabled 
   }) async {
@@ -2073,7 +2073,7 @@ class AFWidgetTestDefinitionContext extends AFBaseTestDefinitionContext {
     );
   }
 
-  void defineSmokeTest(AFSingleScreenPrototypeBody prototype, { required AFScreenTestBodyExecuteDelegate body, String? disabled, AFScreenTestID id = AFUIReusableTestID.smoke }) {
+  void defineSmokeTest(AFSingleScreenPrototypeBody prototype, { required AFScreenTestBodyExecuteDelegate body, String? disabled, AFScreenTestID id = AFUIScreenTestID.smoke }) {
     prototype.defineSmokeTest(id, body: body, disabled: disabled);
   }
 }
@@ -2118,7 +2118,7 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
   /// it in various states, it is not intended to be reused.
   void defineSmokeTest(AFSingleScreenPrototypeBody prototype, {
     required AFScreenTestBodyExecuteDelegate body,
-    AFScreenTestID id = AFUIReusableTestID.smoke,
+    AFScreenTestID id = AFUIScreenTestID.smoke,
     String? disabled
   }) {
     prototype.defineSmokeTest(id, body: body, disabled: disabled);
@@ -2175,7 +2175,7 @@ class AFWorkflowTestDefinitionContext extends AFBaseTestDefinitionContext {
   
   void defineSmokeTest(AFWorkflowStateTestPrototype prototype, { 
     String? description,
-    AFScreenTestID id = AFUIReusableTestID.smoke,
+    AFScreenTestID id = AFUIScreenTestID.smoke,
     required AFWorkflowTestBodyExecuteDelegate body, 
     String? disabled }) {
     prototype.defineSmokeTest(body: body, id: id, description: description, disabled: disabled);

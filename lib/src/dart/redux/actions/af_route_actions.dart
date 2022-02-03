@@ -33,7 +33,7 @@ enum AFNavigateRoute {
   /// for things like drawers that can be dragged onto the screen, dialogs and popups, and 
   /// third party widgets that want to maintain a global root parameter across many different
   /// screens.
-  routeGlobalPool
+  routeGlobalPool, 
 }
 
 /// Action that changes the data associated with the current screen, but 

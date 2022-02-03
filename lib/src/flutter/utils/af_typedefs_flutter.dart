@@ -16,8 +16,7 @@ import 'package:afib/src/flutter/test/af_unit_tests.dart';
 import 'package:afib/src/flutter/test/af_wireframe.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_widget_screen.dart';
-import 'package:afib/src/flutter/ui/stateviews/afui_prototype_state_view.dart';
-import 'package:afib/src/flutter/ui/theme/af_prototype_theme.dart';
+import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/material.dart';
@@ -68,7 +67,7 @@ typedef AFUpdateRouteParamDelegate<TRouteParam extends AFRouteParam> = void Func
 
 /// Delegate used in widget testing to wrap additional widgets around the widget being tested 
 /// (e.g. to position that widget on the screen, limit its width, etc.)
-typedef AFCreateWidgetWrapperDelegate = Widget Function(AFBuildContext<AFFlexibleState, AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam, AFUITheme> context, Widget testWidget);
+typedef AFCreateWidgetWrapperDelegate = Widget Function(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> context, Widget testWidget);
 
 /// Delegate used to create a push action that moves us into a test screen.
 typedef AFTestCreatePushActionDelegate = List<dynamic> Function(AFScreenPrototype test);
@@ -157,11 +156,9 @@ typedef AFCreateDynamicDelegate = dynamic Function();
 
 typedef AFReturnValueDelegate = void Function(Object? param);
 
-typedef AFRenderConnectedChildDelegate = Widget Function(AFConnectedScreen screen, AFWidgetID widChild);
+typedef AFRenderConnectedChildDelegate = Widget Function(AFScreenID screenId, AFWidgetID wid);
 
 typedef AFRenderEmbeddedChildDelegate = Widget Function();
-
-typedef AFBuildBodyDelegate<TBuildContext extends AFBuildContext> = Widget Function(TBuildContext context);
 
 typedef AFOnChangedBoolDelegate = void Function(bool);
 
@@ -187,8 +184,11 @@ typedef AFStateTestScreenBuildContextDelegate<TSPI extends AFStateProgrammingInt
 
 typedef AFStateTestScreenBuildWithExecuteContextDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, TSPI spi);
 
-typedef AFCreateSPIDelegate<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext> = TSPI Function(TBuildContext context, AFConnectedUIBase screen);
+typedef AFCreateSPIDelegate<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> = TSPI Function(TBuildContext context, TTheme theme, AFScreenID screenId, AFWidgetID wid);
+
 
 typedef AFCreateConnectedWidgetDelegate = AFConnectedUIBase Function(AFConnectedUIBase parent, AFWidgetID wid, { required bool useParentParam });
 
 typedef AFCreateConnectedWidgetWithLaunchParamDelegate = AFConnectedUIBase Function(AFConnectedUIBase parent, AFRouteParam param);
+
+

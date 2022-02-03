@@ -132,7 +132,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
 
   void initialize() {
     final libraries = thirdPartyLibraries;
-    screenMap.screen(AFUIScreenID.dialogStandardChoice, (_) => AFUIStandardChoiceDialog());
+    screenMap.registerDialog(AFUIScreenID.dialogStandardChoice, (_) => AFUIStandardChoiceDialog());
     appContext.initScreenMap(screenMap, libraries);
 
     appContext.initializeFunctionalThemeFactories(themeFactories, libraries);

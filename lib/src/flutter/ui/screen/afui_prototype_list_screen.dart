@@ -5,7 +5,8 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
-import 'package:afib/src/flutter/ui/stateviews/afui_prototype_state_view.dart';
+import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
+import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -67,18 +68,23 @@ class AFUIPrototypeTestScreenParam extends AFRouteParam {
   }
 }
 
-class AFUIPrototypeTestScreenSPI extends AFUIScreenDefaultSPI<AFUIPrototypeStateView, AFUIPrototypeTestScreenParam> {
-  AFUIPrototypeTestScreenSPI(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeTestScreenParam> context, AFConnectedUIBase screen): super(context, screen);
-  factory AFUIPrototypeTestScreenSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeTestScreenParam> context, AFConnectedUIBase screen) {
-    return AFUIPrototypeTestScreenSPI(context, screen);
+class AFUIPrototypeTestScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> {
+  AFUIPrototypeTestScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
+  
+  factory AFUIPrototypeTestScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> context, AFUIDefaultTheme theme, AFScreenID screenId, AFWidgetID wid) {
+    return AFUIPrototypeTestScreenSPI(context, screenId, theme,
+    );
   }
 }
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFUIPrototypeTestScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeTestScreenSPI, AFUIPrototypeTestScreenParam>{
+class AFUIPrototypeTestScreen extends AFUIConnectedScreen<AFUIPrototypeTestScreenSPI, AFUIDefaultStateView, AFUIPrototypeTestScreenParam>{
+  static final config =  AFUIDefaultScreenConfig<AFUIPrototypeTestScreenSPI, AFUIPrototypeTestScreenParam> (
+    spiCreator: AFUIPrototypeTestScreenSPI.create,
+  );
 
-  AFUIPrototypeTestScreen(): super(AFUIScreenID.screenPrototypeListSingleScreen, AFUIPrototypeTestScreenSPI.create);
+  AFUIPrototypeTestScreen(): super(screenId: AFUIScreenID.screenPrototypeListSingleScreen, config: config);
 
   static AFNavigatePushAction navigatePush(List<AFScreenPrototype> tests, dynamic title) {
     return AFNavigatePushAction(
@@ -86,8 +92,8 @@ class AFUIPrototypeTestScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeTe
   }
 
   @override
-  Widget buildWithContext(AFUIPrototypeTestScreenSPI spi) {
-    return _buildList(spi.context);
+  Widget buildWithSPI(AFUIPrototypeTestScreenSPI spi) {
+    return _buildList(spi);
   }
 
   List<String> _sortIterable(Iterable<String> items) {
@@ -96,24 +102,26 @@ class AFUIPrototypeTestScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeTe
     return result;
   }
 
-  Widget _buildList(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeTestScreenParam> context) {
-    final t = context.t;
+  Widget _buildList(AFUIPrototypeTestScreenSPI spi) {
+    final t = spi.t;
+    final context = spi.context;
     final rows = t.column();
     final groups = _sortIterable(context.p.screenTestsByGroup.keys);
     for(final group in groups) {
       final tests = context.p.screenTestsByGroup[group];
       assert(tests != null);
       if(tests != null) {
-        rows.add(_addGroup(context, AFUIWidgetID.cardTestGroup.with1(group), group, tests));
+        rows.add(_addGroup(spi, AFUIWidgetID.cardTestGroup.with1(group), group, tests));
       }
     }
 
     final leading = t.childButtonStandardBack(context, screen: screenId);
-    return context.t.buildPrototypeScaffold(context.p.title, rows, leading: leading);
+    return spi.t.buildPrototypeScaffold(context.p.title, rows, leading: leading);
   }
 
-  Widget _addGroup(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeTestScreenParam> context, AFWidgetID widGroup, String group, List<AFScreenPrototype> tests) {
-    final t = context.t;
+  Widget _addGroup(AFUIPrototypeTestScreenSPI spi, AFWidgetID widGroup, String group, List<AFScreenPrototype> tests) {
+    final t = spi.t;
+    final context = spi.context;
     final rows = t.column();
     for(final test in tests) {
       rows.add(t.createTestListTile(context.d, test));

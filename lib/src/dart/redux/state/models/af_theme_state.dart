@@ -1957,7 +1957,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     if(activeTestId != null) {
       final test = AFibF.g.findScreenTestById(activeTestId);
       if(test != null && test.testDrawerSide == testDrawerSide) {
-        return AFUIPrototypeDrawer();
+        return AFUIPrototypeDrawer(launchParam: AFUIPrototypeDrawerRouteParam.createOncePerScreen(AFUIPrototypeDrawerRouteParam.viewTest));
       }
     }
     return drawer;
@@ -1982,8 +1982,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     AFConnectedUIBase? contextSource,
     PreferredSizeWidget? appBar,
     Widget? drawer,
-    AFBuildBodyDelegate<TBuildContext>? bodyUnderScaffold,
-    Widget? body,
+    required Widget body,
     Widget? bottomNavigationBar,
     Widget? floatingActionButton,
     Color? backgroundColor,
@@ -2003,13 +2002,11 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     bool drawerEnableOpenDragGesture = true,
     bool endDrawerEnableOpenDragGesture = true    
   }) {
-      assert(body == null || bodyUnderScaffold == null, "You cannot specify both body and bodyUnderScaffold");
-      assert(body != null || bodyUnderScaffold != null, "You must specify exactly one of body or bodyUnderScaffold");
 
       return Scaffold(
         key: key,
         drawer: childDebugDrawerBegin(drawer),
-        body: body ?? AFBuilder<TBuildContext>(parentContext: context as TBuildContext, builder: (scaffoldContext) => bodyUnderScaffold!(scaffoldContext)),
+        body: body,
         appBar: appBar,
         bottomNavigationBar: bottomNavigationBar,
         floatingActionButton: floatingActionButton,
@@ -2753,7 +2750,7 @@ need to manually update the value in the controller.
 
 /// Can be used as a template parameter when you don't want a theme.
 class AFFunctionalThemeUnused extends AFFunctionalTheme {
-  AFFunctionalThemeUnused(AFFundamentalThemeState fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.conceptualUnused);
+  AFFunctionalThemeUnused(AFFundamentalThemeState fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.unused);
 }
 
 /// Captures the current state of the primary theme, and

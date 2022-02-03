@@ -4,10 +4,10 @@ import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
-import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
-import 'package:afib/src/flutter/ui/stateviews/afui_prototype_state_view.dart';
+import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
+import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 
@@ -33,18 +33,24 @@ class AFUIPrototypeWidgetRouteParam extends AFRouteParam {
   }
 }
 
-class AFUIPrototypeWidgetScreenSPI extends AFUIScreenDefaultSPI<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> {
-  AFUIPrototypeWidgetScreenSPI(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context, AFConnectedUIBase screen): super(context, screen);
-  factory AFUIPrototypeWidgetScreenSPI.create(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context, AFConnectedUIBase screen) {
-    return AFUIPrototypeWidgetScreenSPI(context, screen);
+class AFUIPrototypeWidgetScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> {
+  AFUIPrototypeWidgetScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
+  
+  factory AFUIPrototypeWidgetScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId, AFWidgetID wid) {
+    return AFUIPrototypeWidgetScreenSPI(context, screenId, theme,
+    );
   }
 }
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFUIPrototypeWidgetScreen extends AFUIDefaultConnectedScreen<AFUIPrototypeWidgetScreenSPI, AFUIPrototypeWidgetRouteParam>{
+class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetScreenSPI, AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam>{
 
-  AFUIPrototypeWidgetScreen(): super(AFUIScreenID.screenPrototypeWidget, AFUIPrototypeWidgetScreenSPI.create);
+  static final config = AFUIDefaultScreenConfig<AFUIPrototypeWidgetScreenSPI, AFUIPrototypeWidgetRouteParam> (
+    spiCreator: AFUIPrototypeWidgetScreenSPI.create,
+  );
+
+  AFUIPrototypeWidgetScreen(): super(screenId: AFUIScreenID.screenPrototypeWidget, config: config);
 
   static AFNavigateAction navigatePush(AFWidgetPrototype test, {AFID? id}) {
     return AFNavigatePushAction(
@@ -54,12 +60,13 @@ class AFUIPrototypeWidgetScreen extends AFUIDefaultConnectedScreen<AFUIPrototype
   }
 
   @override
-  Widget buildWithContext(AFUIPrototypeWidgetScreenSPI spi) {    
+  Widget buildWithSPI(AFUIPrototypeWidgetScreenSPI spi) {    
     /// Remember what screen we are on for testing purposes.  Maybe eventually try to do this in navigator observer.
-    return _buildScreen(spi.context);
+    return _buildScreen(spi);
   }
 
-  Widget _buildScreen(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context) {
+  Widget _buildScreen(AFUIPrototypeWidgetScreenSPI spi) {
+    final context = spi.context;
     final test = context.p.test;
     final testStateSource = AFibF.g.storeInternalOnly?.state.private.testState;    
 
@@ -71,8 +78,8 @@ class AFUIPrototypeWidgetScreen extends AFUIDefaultConnectedScreen<AFUIPrototype
     final testState = testStateSource.findState(test.id);
     final testModels = testState?.models ?? test.models;
 
-    final sourceWidget = test.render(this, AFUIWidgetID.widgetPrototypeTest);
-    
+    final sourceWidget = test.render(screenId, AFUIWidgetID.widgetPrototypeTest);
+    /*
     Widget resultWidget;
     if(test is AFConnectedWidgetPrototype && sourceWidget is AFConnectedWidget) {
       var paramChild = context.p.routeParam;
@@ -99,19 +106,22 @@ class AFUIPrototypeWidgetScreen extends AFUIDefaultConnectedScreen<AFUIPrototype
     } else {
       resultWidget = sourceWidget;
     }
-    return _createScaffold(context, resultWidget);
+    */
+    final resultWidget = Text("REFACTOR TODO");
+    return _createScaffold(spi, resultWidget);
   }
 
-  Widget _createScaffold(AFUIBuildContext<AFUIPrototypeStateView, AFUIPrototypeWidgetRouteParam> context, Widget resultWidget) {
+  Widget _createScaffold(AFUIPrototypeWidgetScreenSPI spi, Widget resultWidget) {
+    final context = spi.context;
     final createWidget = context.p.test.createWidgetWrapperDelegate;
     if(createWidget != null) {
       return createWidget(context, resultWidget);
     }
 
-    final t = context.t;
+    final t = spi.t;
 
     final widgets = [resultWidget];
-    return context.t.childScaffold(
+    return t.childScaffold(
       context: context,
       //key: _mainScaffoldKey,
       body: CustomScrollView(

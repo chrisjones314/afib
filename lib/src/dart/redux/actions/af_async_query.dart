@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
-import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
@@ -22,6 +21,7 @@ import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:logger/logger.dart';
+
 
 class AFStartQueryContext<TResponse> {
   final AFDispatcher dispatcher;
@@ -43,7 +43,7 @@ class AFStartQueryContext<TResponse> {
   }
 }
 
-class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextDispatcherMixin, AFContextShowMixin {
+class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextDispatcherMixin, AFContextShowMixin, AFUpdateAppStateMixin<TState> {
   final AFDispatcher dispatcher;
   AFState state;
 
@@ -103,19 +103,6 @@ class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextDispatc
       route: route,
       useParentParam: useParentParam
     ));
-  }
-
-
-  /// Dispatches an action that updates a single value in the app state area associated
-  /// with the [TState] type parameter.
-  void updateAppStateOne(Object toIntegrate) {
-    dispatch(AFUpdateAppStateAction(area: TState, toIntegrate: [toIntegrate]));
-  }
-
-  /// Dispatches an action that updates several blaues in the app state area associated
-  /// with the [TState] type parameter.
-  void updateAppStateMany(List<Object> toIntegrate) {
-    dispatch(AFUpdateAppStateAction(area: TState, toIntegrate: toIntegrate));
   }
 
   material.BuildContext? get flutterContext {

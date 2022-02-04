@@ -19,7 +19,7 @@ class AFUIScreenID extends AFScreenID {
   static const screenPrototypeListWorkflow = AFUIScreenID("prototype_list_multi_screen");
   static const screenPrototypeSingleScreen = AFUIScreenID("prototype_single_screen");
   static const screenPrototypeWorkflow = AFUIScreenID("prototype_multi_screen");
-  static const screenTestDrawer = AFUIScreenID("prototype_test_drawer");
+  static const drawerPrototype = AFUIScreenID("drawer_prototype");
   static const screenPrototypeHome = AFUIScreenID("prototype_home");
   static const screenPrototypeLoading = AFUIScreenID("prototype_loading");
   static const screenPrototypeWidget = AFUIScreenID("prototype_widget");

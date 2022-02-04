@@ -23,7 +23,7 @@ enum AFUIType {
 abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> {
   final AFThemeID themeId;
   final AFCreateStateViewDelegate<TStateView> stateViewCreator;
-  final AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator;
+  final AFCreateWidgetSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator;
   final AFNavigateRoute route;
   final AFUIType uiType;
 
@@ -35,16 +35,15 @@ abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extend
     required this.uiType
   });
 
-  AFBuildContext<TStateView, TRouteParam>? createContextForDiff(AFStore store, AFScreenID parentScreenId, AFID? wid, { required bool useParentParam }) {
-    wid = wid ?? parentScreenId;
+  AFBuildContext<TStateView, TRouteParam>? createContextForDiff(AFStore store, AFScreenID screenId, AFID wid, { required AFWidgetParamSource paramSource, required TRouteParam? launchParam }) {
     if(AFibD.config.isTestContext) {
-      final testContext = _createTestContext(store, parentScreenId, wid, useParentParam: useParentParam);
+      final testContext = _createTestContext(store, screenId, wid, paramSource: paramSource, launchParam: launchParam);
       if(testContext != null) {
         return testContext;
       }
     }
 
-    var paramSeg = findRouteSegment(store.state, parentScreenId, wid, useParentParam: useParentParam);
+    var paramSeg = findRouteSegment(store.state, screenId, wid, paramSource: paramSource, launchParam: launchParam);
     //if(TRouteParam == AFRouteParamUnused && param == null) {
     //  param = AFRouteParamUnused.unused;
     //}
@@ -59,7 +58,7 @@ abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extend
     // lookup all the themes
 
     final standard = AFStandardBuildContextData(
-      screenId: parentScreenId,
+      screenId: screenId,
       context: null,
       config: this,
       dispatcher:  createDispatcher(store),
@@ -78,14 +77,14 @@ abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extend
     return context;
   }
 
-  AFBuildContext<TStateView, TRouteParam>? _createTestContext(AFStore store, AFScreenID parentScreenId, AFID? widgetId, { required bool useParentParam }) {
+  AFBuildContext<TStateView, TRouteParam>? _createTestContext(AFStore store, AFScreenID screenId, AFID wid, { required AFWidgetParamSource paramSource, required TRouteParam? launchParam }) {
     // find the test state.
     if(AFibF.g.testOnlyIsInWorkflowTest) {
       return null;
     }    
 
     final testState = store.state.private.testState;
-    final activeTestId = testState.findTestForScreen(parentScreenId);
+    final activeTestId = testState.findTestForScreen(screenId);
     if(activeTestId == null) {
       return null;
     }
@@ -96,19 +95,20 @@ abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extend
     }
 
     final screen = activeState.navigate.screenId;
-    if(testState.activeWireframe == null && uiType == AFUIType.screen && screen != parentScreenId) {
+    if(testState.activeWireframe == null && uiType == AFUIType.screen && screen != screenId) {
       return null;
     }
-    if(this is AFUIPrototypeDrawer) {
+    if(screenId == AFUIScreenID.drawerPrototype) {
       return null;
     }
+    
 
-    final paramSeg = findRouteSegment(store.state, parentScreenId, widgetId, useParentParam: useParentParam);
+    final paramSeg = findRouteSegment(store.state, screenId, wid, paramSource: paramSource, launchParam: launchParam);
 
     final mainDispatcher = AFStoreDispatcher(store);
     final dispatcher = AFSingleScreenTestDispatcher(activeTestId, mainDispatcher, testContext);
     final standard = AFStandardBuildContextData(
-      screenId: parentScreenId,
+      screenId: screenId,
       context: null,
       config: this,
       dispatcher: dispatcher,
@@ -151,35 +151,73 @@ abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extend
   } 
 
   /// Find the route parameter for the specified named screen
-  AFRouteSegment? findRouteSegment(AFState state, AFScreenID parentScreen, AFID? wid, { required bool useParentParam }) {
+  AFRouteSegment? findRouteSegment(AFState state, AFScreenID parentScreen, AFID wid, { required AFWidgetParamSource paramSource, required TRouteParam? launchParam }) {
     final route = state.public.route;
     if(isHierarchyRoute) {
-      return _findHierarchyRouteSegment(state, route, parentScreen, wid, useParentParam: useParentParam);
+      return _findHierarchyRouteSegment(state, route, parentScreen, wid, paramSource: paramSource, launchParam: launchParam);
     } else {
       assert(isGlobalRoute);
-      return _findGlobalRouteSegment(route, parentScreen, wid);
+      return _findGlobalRouteSegment(route, parentScreen, wid, launchParam: launchParam);
     }
   }
 
-  AFRouteSegment? _findGlobalRouteSegment(AFRouteState route, AFScreenID parentScreen, AFID? wid) {
-    var current = route.findGlobalParam(wid ?? parentScreen);
-    return current;
+  TStateView createStateView(Map<String, Object> models) {
+    return stateViewCreator(models);
   }
 
-  AFRouteSegment? _findHierarchyRouteSegment(AFState state, AFRouteState route, AFScreenID parentScreenId, AFID? wid, { required bool useParentParam }) {
-    if(wid == null) {
-      final pTest = route.findParamFor(parentScreenId, includePrior: true);
-      return pTest;
-    } else {
-      final paramParent = route.findParamFor(parentScreenId);
+  AFRouteSegment? _findGlobalRouteSegment(AFRouteState route, AFScreenID parentScreen, AFID wid, { required TRouteParam? launchParam }) {
+    final idLookup = wid == AFUIWidgetID.unused ? parentScreen : wid;
+    var seg = route.findGlobalParam(idLookup);
+    if(seg == null) {
+      seg = _createDefaultRouteSegment(newParam: null, launchParam: launchParam);
+    }
+    return seg;
+  }
+
+  AFRouteSegment? _findScreenHierarchyRouteSegment(AFState state, AFRouteState route, AFScreenID screenId, {
+    required TRouteParam? launchParam,
+  }) {
+      var seg = route.findParamFor(screenId, includePrior: true);
+      if(seg == null) {
+        seg = _createDefaultRouteSegment(newParam: null, launchParam: launchParam);
+      }
+      return seg;
+  }
+
+  AFRouteSegment? _createDefaultRouteSegment({
+    required TRouteParam? newParam,
+    required TRouteParam? launchParam,
+  }) {
+    AFRouteParam? actualParam = newParam;
+    if(actualParam == null) {
+      actualParam = launchParam;
+    }
+    if(actualParam == null && (TRouteParam == AFRouteParamUnused || TRouteParam == AFRouteParam)) {
+      actualParam = AFRouteParamUnused.unused;
+    } 
+
+    if(actualParam == null) {
+      return null;
+    }
+
+    return AFRouteSegment(param: actualParam, children: null, createDefaultChildParam: null);
+  }
+
+  AFRouteSegment? _findWidgetHierarchyRouteSegment(AFState state, AFRouteState route, AFScreenID screenId, AFID wid, { 
+    required AFWidgetParamSource paramSource,
+    required TRouteParam? launchParam 
+  }) {
+      final paramParent = route.findParamFor(screenId);
       assert(paramParent != null);
       if(paramParent == null) {
         return null;
       }
-      if(useParentParam) {
+
+      if(paramSource == AFWidgetParamSource.parent) {
         assert(paramParent.param is TRouteParam);
         return paramParent;
       }
+
       var seg = paramParent.findChild(wid);
       if(seg == null) {
         var newParam;
@@ -187,16 +225,17 @@ abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extend
         if(createDefault != null) {
           newParam = createDefault(wid, state.public, paramParent);
         }
-        //if(newParam == null) {
-        //newParam = launchParam;
-        //}
-        if(newParam == null && (TRouteParam == AFRouteParamUnused || TRouteParam == AFRouteParam)) {
-          newParam = AFRouteParamUnused.unused;
-        } 
-
-        seg = AFRouteSegment(param: newParam, children: null, createDefaultChildParam: null);
+        seg = _createDefaultRouteSegment(newParam: newParam, launchParam: launchParam);
       } 
       return seg;
+
+  }
+
+  AFRouteSegment? _findHierarchyRouteSegment(AFState state, AFRouteState route, AFScreenID screenId, AFID wid, { required AFWidgetParamSource paramSource, required TRouteParam? launchParam }) {
+    if(wid == AFUIWidgetID.unused) {
+      return _findScreenHierarchyRouteSegment(state, route, screenId, launchParam: launchParam);
+    } else {
+      return _findWidgetHierarchyRouteSegment(state, route, screenId, wid, paramSource: paramSource, launchParam: launchParam);
     }
 
   }
@@ -211,7 +250,7 @@ abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extend
     return createStateModels(stateViewCtx);
   }
 
-  TSPI createSPI(BuildContext? buildContext, AFBuildContext dataContext, AFScreenID parentScreenId, AFID? wid) {
+  TSPI createSPI(BuildContext? buildContext, AFBuildContext dataContext, AFScreenID parentScreenId, AFWidgetID wid, AFWidgetParamSource paramSource) {
     final standard = AFStandardBuildContextData(
       screenId: parentScreenId,
       context: buildContext,
@@ -223,18 +262,18 @@ abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extend
     final theme = standard.themes.findById(themeId);
     _updateFundamentalThemeState(buildContext);
     final withContext = createContext(standard, dataContext.s as TStateView, dataContext.p as TRouteParam, dataContext.children);
-    final spi = spiCreator(withContext, theme as TTheme, parentScreenId, AFUIWidgetID.unused);
+    final spi = spiCreator(withContext, theme as TTheme, parentScreenId, wid, paramSource);
     return spi;
   }
 
-  void updateRouteParam(AFBuildContext context, AFScreenID screenId, AFID? wid, TRouteParam revised, { required bool useParentParam, AFID? id }) {
+  void updateRouteParam(AFBuildContext context, AFScreenID screenId, AFID? wid, TRouteParam revised, { required AFWidgetParamSource paramSource, AFID? id }) {
     if(wid != null && route == AFNavigateRoute.routeHierarchy) {
       context.dispatch(AFNavigateSetChildParamAction(
         id: id,
         screen: screenId, 
         param: revised,
         route: route,
-        useParentParam: useParentParam,
+        paramSource: paramSource,
       ));
     } else {
       context.dispatch(AFNavigateSetParamAction(param: revised, route: route));
@@ -247,7 +286,7 @@ abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extend
       screen: screenId,
       param: revised,
       route: route,
-      useParentParam: false
+      paramSource: AFWidgetParamSource.child
     ));
   }
 
@@ -282,14 +321,14 @@ abstract class AFScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TS
     AFScreenConfig({
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
-      required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
+      required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
       AFNavigateRoute? route,
       
     }): super(
       themeId: themeId,
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.screen,
-      spiCreator: spiCreator,
+      spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
       route: route ?? AFNavigateRoute.routeHierarchy,
     );
 }
@@ -298,12 +337,12 @@ abstract class AFDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TS
     AFDrawerConfig({
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
-      required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
+      required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
     }): super(
       themeId: themeId,
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.drawer,
-      spiCreator: spiCreator,
+      spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
       // has to be, because it can be dragged onto the screen dynamically.
       route: AFNavigateRoute.routeGlobalPool,
     );
@@ -313,12 +352,12 @@ abstract class AFDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TS
     AFDialogConfig({
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
-      required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
+      required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
     }): super(
       themeId: themeId,
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.dialog,
-      spiCreator: spiCreator,
+      spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
       route: AFNavigateRoute.routeGlobalPool,
     );
 }
@@ -327,12 +366,12 @@ abstract class AFBottomSheetConfig<TSPI extends AFBottomSheetStateProgrammingInt
     AFBottomSheetConfig({
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
-      required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
+      required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
     }): super(
       themeId: themeId,
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.bottomSheet,
-      spiCreator: spiCreator,
+      spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
       route: AFNavigateRoute.routeGlobalPool,
     );
 }
@@ -342,7 +381,7 @@ abstract class AFWidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TS
   AFWidgetConfig({
     required AFThemeID themeId,
     required AFCreateStateViewDelegate<TStateView> stateViewCreator,
-    required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
+    required AFCreateWidgetSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
     AFNavigateRoute? route,
   }): super(
     themeId: themeId,
@@ -352,8 +391,6 @@ abstract class AFWidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TS
     route: route ?? AFNavigateRoute.routeHierarchy,
   );
 }
-
-
 
 /// Base call for all screens, widgets, drawers, dialogs and bottom sheets
 /// that connect to the store/state.
@@ -368,7 +405,7 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
   final AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> uiConfig;
   final AFScreenID screenId;
   final AFWidgetID wid;
-  final bool useParentParam;
+  final AFWidgetParamSource paramSource;
   final TRouteParam? launchParam;
     
   //--------------------------------------------------------------------------------------
@@ -376,7 +413,7 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
     required this.uiConfig,
     required this.screenId,
     required this.wid,
-    required this.useParentParam,
+    required this.paramSource,
     required this.launchParam,
   }): super(key: AFFunctionalTheme.keyForWIDStatic(wid != AFUIWidgetID.unused ? wid : screenId));
 
@@ -385,7 +422,7 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
   material.Widget build(material.BuildContext context) {
     return StoreConnector<AFState, AFBuildContext?>(
         converter: (store) {          
-          final context = uiConfig.createContextForDiff(store as AFStore, screenId, wid, useParentParam: useParentParam);
+          final context = uiConfig.createContextForDiff(store as AFStore, screenId, wid, paramSource: paramSource, launchParam: launchParam);
           return context;
         },
         distinct: true,
@@ -401,7 +438,7 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
             AFibD.logUIAF?.d("Rebuilding widget $runtimeType");
           }
 
-          final spi = uiConfig.createSPI(buildContext, dataContext, screenId, wid);
+          final spi = uiConfig.createSPI(buildContext, dataContext, screenId, wid, paramSource);
           final widgetResult = buildWithSPI(spi);
           return widgetResult;
         }
@@ -439,7 +476,7 @@ abstract class AFConnectedScreen<TState extends AFFlexibleState, TTheme extends 
     required AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> config,
     required AFScreenID screenId,
     required TRouteParam? launchParam,
-  }): super(uiConfig: config, screenId: screenId, wid: AFUIWidgetID.unused, useParentParam: false, launchParam: launchParam);
+  }): super(uiConfig: config, screenId: screenId, wid: AFUIWidgetID.unused, paramSource: AFWidgetParamSource.child, launchParam: launchParam);
 
 
   bool get testOnlyRequireScreenIdMatchForTestContext { return true; }
@@ -467,9 +504,8 @@ abstract class AFConnectedWidget<TState extends AFFlexibleState, TTheme extends 
     required AFScreenID screenId,
     required AFWidgetID wid,
     required TRouteParam? launchParam,
-    bool useParentParam = false,
-
-  }): super(uiConfig: uiConfig, screenId: screenId, wid: wid, useParentParam: useParentParam, launchParam: launchParam);
+    AFWidgetParamSource paramSource = AFWidgetParamSource.child,
+  }): super(uiConfig: uiConfig, screenId: screenId, wid: wid, paramSource: paramSource, launchParam: launchParam);
 
   AFScreenID? get primaryScreenId {
     return null;
@@ -836,6 +872,10 @@ mixin AFContextShowMixin {
     if(ctx != null) {
       ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(text), duration: duration));
     }
+  }
+
+  bool get isUIEnabled {
+    return flutterContext != null;
   }
 
   /// Show a snackbar.
@@ -1311,8 +1351,9 @@ class AFStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme e
   final TBuildContext context;
   final AFScreenID screenId;
   final TTheme theme;
+  final AFWidgetParamSource paramSource;
 
-  AFStateProgrammingInterface(this.context, this.screenId, this.theme);
+  AFStateProgrammingInterface(this.context, this.screenId, this.theme, this.paramSource);
 
   BuildContext get flutterContext {
     return context.c;
@@ -1326,9 +1367,9 @@ class AFStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme e
     context.dispatch(action);
   }
 
-  void updateRouteParam(AFRouteParam param, { bool useParentParam = false }) {
+  void updateRouteParam(AFRouteParam param) {
     final config = context.standard.config;
-    config.updateRouteParam(context, screenId, null, param, useParentParam: useParentParam);
+    config.updateRouteParam(context, screenId, null, param, paramSource: AFWidgetParamSource.child);
   }
 
   void updateChildRouteParam(AFRouteParam revised) {
@@ -1388,7 +1429,7 @@ class AFScreenStateProgrammingInterface<TBuildContext extends AFBuildContext, TT
     TBuildContext context,
     AFScreenID screenId,
     TTheme theme,
-  ): super(context, screenId, theme);
+  ): super(context, screenId, theme, AFWidgetParamSource.notApplicable);
 
   void onTapStandardBackButton() {
     context.dispatch(AFNavigatePopAction());
@@ -1444,12 +1485,13 @@ class AFWidgetStateProgrammingInterface<TBuildContext extends AFBuildContext, TT
     TBuildContext context,
     AFScreenID screenId,
     this.wid,
+    AFWidgetParamSource paramSource,
     TTheme theme,
-  ): super(context, screenId, theme);
+  ): super(context, screenId, theme, paramSource);
 
-  void updateRouteParam(AFRouteParam param, { bool useParentParam = false }) {
+  void updateRouteParam(AFRouteParam param) {
     final config = context.standard.config;
-    config.updateRouteParam(context, screenId, wid, param, useParentParam: useParentParam);
+    config.updateRouteParam(context, screenId, wid, param, paramSource: paramSource);
   }
 
 }

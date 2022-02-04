@@ -26,7 +26,7 @@ class AFUIPrototypeThirdPartyHomeParam extends AFRouteParam {
 class AFUIPrototypeThirdPartyHomeScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeThirdPartyHomeParam> {
   AFUIPrototypeThirdPartyHomeScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeThirdPartyHomeParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
   
-  factory AFUIPrototypeThirdPartyHomeScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeThirdPartyHomeParam> context, AFUIDefaultTheme theme, AFScreenID screenId, AFWidgetID wid) {
+  factory AFUIPrototypeThirdPartyHomeScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeThirdPartyHomeParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
     return AFUIPrototypeThirdPartyHomeScreenSPI(context, screenId, theme,
     );
   }

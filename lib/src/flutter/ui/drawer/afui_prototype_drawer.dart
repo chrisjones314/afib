@@ -36,7 +36,7 @@ class AFUIPrototypeDrawerRouteParam extends AFRouteParam {
     required this.timeText,
     required this.timeAdjustText,
     required this.textControllers,
-  }): super(id: AFUIScreenID.screenTestDrawer);
+  }): super(id: AFUIScreenID.drawerPrototype);
 
   factory AFUIPrototypeDrawerRouteParam.createOncePerScreen(int view) {
     final themeExpanded = <String, bool>{};
@@ -93,7 +93,7 @@ class AFUIPrototypeDrawerSPI extends AFUIDrawerSPI<AFUIDefaultStateView, AFUIPro
 
   AFUIPrototypeDrawerSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme);
   
-  factory AFUIPrototypeDrawerSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId, AFWidgetID wid) {
+  factory AFUIPrototypeDrawerSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
     return AFUIPrototypeDrawerSPI(context, screenId, theme);
   }
 
@@ -161,7 +161,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
   //--------------------------------------------------------------------------------------
   AFUIPrototypeDrawer({
     required AFUIPrototypeDrawerRouteParam launchParam
-  }): super(screenId: AFUIScreenID.screenTestDrawer, config: config, launchParam: launchParam);
+  }): super(screenId: AFUIScreenID.drawerPrototype, config: config, launchParam: launchParam);
 
   //--------------------------------------------------------------------------------------
   AFScreenID? get primaryScreenId {

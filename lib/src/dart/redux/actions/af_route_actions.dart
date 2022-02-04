@@ -207,13 +207,13 @@ class AFNavigateRemoveChildParamAction extends AFNavigateAction {
 class AFNavigateSetChildParamAction extends AFNavigateAction {
   final AFScreenID screen;
   final AFNavigateRoute route;
-  final bool useParentParam;
+  final AFWidgetParamSource paramSource;
   AFNavigateSetChildParamAction({
     AFID? id, 
     required this.screen, 
     required this.route,
     required AFRouteParam param,
-    required this.useParentParam,
+    required this.paramSource,
   }): super(id: id, param: param, children: null); 
 }
 

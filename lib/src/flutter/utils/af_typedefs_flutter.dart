@@ -184,8 +184,9 @@ typedef AFStateTestScreenBuildContextDelegate<TSPI extends AFStateProgrammingInt
 
 typedef AFStateTestScreenBuildWithExecuteContextDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, TSPI spi);
 
-typedef AFCreateSPIDelegate<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> = TSPI Function(TBuildContext context, TTheme theme, AFScreenID screenId, AFWidgetID wid);
+typedef AFCreateScreenSPIDelegate<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> = TSPI Function(TBuildContext context, TTheme theme, AFScreenID screenId);
 
+typedef AFCreateWidgetSPIDelegate<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> = TSPI Function(TBuildContext context, TTheme theme, AFScreenID screenId, AFWidgetID wid, AFWidgetParamSource paramSource);
 
 typedef AFCreateConnectedWidgetDelegate = AFConnectedUIBase Function(AFConnectedUIBase parent, AFWidgetID wid, { required bool useParentParam });
 

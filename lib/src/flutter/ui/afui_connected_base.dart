@@ -57,7 +57,7 @@ abstract class AFUIConnectedDrawer<TSPI extends AFScreenStateProgrammingInterfac
 abstract class AFUIScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFScreenConfig<TSPI, AFUIState, AFUIDefaultTheme, TStateView, TRouteParam> {
     AFUIScreenConfig({
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
-      required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
+      required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
       AFNavigateRoute? route,
     }): super(
       themeId: AFUIThemeID.defaultTheme,
@@ -71,7 +71,7 @@ abstract class AFUIDialogConfig<TSPI extends AFDialogStateProgrammingInterface, 
 
     AFUIDialogConfig({
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
-      required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
+      required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
       AFNavigateRoute? route,
     }): super(
       themeId: AFUIThemeID.defaultTheme,
@@ -83,7 +83,7 @@ abstract class AFUIDialogConfig<TSPI extends AFDialogStateProgrammingInterface, 
 abstract class AFUIDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFDrawerConfig<TSPI, AFUIState, AFUIDefaultTheme, TStateView, TRouteParam> {
     AFUIDrawerConfig({
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
-      required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
+      required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
       AFNavigateRoute? route,
     }): super(
       themeId: AFUIThemeID.defaultTheme,

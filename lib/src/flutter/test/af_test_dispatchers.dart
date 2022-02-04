@@ -93,4 +93,16 @@ class AFWidgetScreenTestDispatcher extends AFScreenTestDispatcher {
     required this.originalParam
   }): super(main, context);
 
+  @override
+  void dispatch(dynamic action) {
+    if(action is AFNavigateSetChildParamAction) {
+      final revisedParam = originalParam.copyWith(param: action.param);
+      super.dispatch(AFNavigateSetParamAction(param: revisedParam, route: AFNavigateRoute.routeHierarchy));
+    } else { 
+      super.dispatch(action);
+    }
+
+
+  }
+
 }

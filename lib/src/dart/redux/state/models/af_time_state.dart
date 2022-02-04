@@ -42,6 +42,10 @@ class AFTimeState {
     required this.timeZone,
   });
 
+  bool get isInitialized {
+    return actualNow != null;
+  }
+
   factory AFTimeState.initialState() {
     return AFTimeState(actualNow: null, pauseTime: null, simulatedOffset: Duration(milliseconds: 0), updateFrequency: Duration(days: 1), updateSpecificity: AFTimeStateUpdateSpecificity.second, timeZone: AFTimeZone.local);
   }

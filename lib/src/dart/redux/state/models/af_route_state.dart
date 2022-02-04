@@ -690,9 +690,9 @@ class AFRouteState {
     return _reviseParamWithChildren(screen, widget, route, null, (pwc) => pwc.reviseRemoveChild(widget));
   }
 
-  AFRouteState setChildParam(AFScreenID screen, AFNavigateRoute route, AFRouteParam param, { required bool useParentParam }) {
+  AFRouteState setChildParam(AFScreenID screen, AFNavigateRoute route, AFRouteParam param, AFWidgetParamSource paramSource) {
     final widget = param.id;
-    if(useParentParam) {
+    if(paramSource == AFWidgetParamSource.parent) {
       return setParam(screen, param, AFNavigateRoute.routeHierarchy);
     }
     AFibD.logRouteAF?.d("setConnectedChild $screen/$widget with $param");

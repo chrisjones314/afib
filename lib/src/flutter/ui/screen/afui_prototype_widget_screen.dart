@@ -4,6 +4,7 @@ import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
@@ -36,7 +37,7 @@ class AFUIPrototypeWidgetRouteParam extends AFRouteParam {
 class AFUIPrototypeWidgetScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> {
   AFUIPrototypeWidgetScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
   
-  factory AFUIPrototypeWidgetScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId, AFWidgetID wid) {
+  factory AFUIPrototypeWidgetScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
     return AFUIPrototypeWidgetScreenSPI(context, screenId, theme,
     );
   }
@@ -79,7 +80,6 @@ class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetS
     final testModels = testState?.models ?? test.models;
 
     final sourceWidget = test.render(screenId, AFUIWidgetID.widgetPrototypeTest);
-    /*
     Widget resultWidget;
     if(test is AFConnectedWidgetPrototype && sourceWidget is AFConnectedWidget) {
       var paramChild = context.p.routeParam;
@@ -88,26 +88,24 @@ class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetS
       }
       if(paramChild == null) throw AFException("Missing route param in test");
       final dispatcher = AFWidgetScreenTestDispatcher(context: testContext, main: context.d, originalParam: context.p);
+      final config = sourceWidget.uiConfig;
 
-      final themeChild = sourceWidget.findPrimaryTheme(AFibF.g.storeInternalOnly!.state);
       final standard = AFStandardBuildContextData(
         screenId: this.primaryScreenId,
         context: context.c,
         dispatcher: dispatcher,
-        container: this,
         themes: context.standard.themes,
+        config: config
       );
 
-      final stateView = sourceWidget.stateViewCreator(testModels);
+      final stateView = config.createStateView(testModels);
 
-      final childContext = sourceWidget.createContext(standard, stateView, paramChild, context.children, themeChild);
-      final childSpi = sourceWidget.createSPI(childContext);
-      resultWidget = sourceWidget.buildWithContext(childSpi);
+      final childContext = config.createContext(standard, stateView, paramChild, context.children);
+      final childSpi = config.createSPI(spi.context.c, childContext, screenId,  AFUIWidgetID.widgetPrototypeTest, AFWidgetParamSource.child);
+      resultWidget = sourceWidget.buildWithSPI(childSpi);
     } else {
       resultWidget = sourceWidget;
     }
-    */
-    final resultWidget = Text("REFACTOR TODO");
     return _createScaffold(spi, resultWidget);
   }
 

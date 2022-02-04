@@ -71,7 +71,7 @@ class AFUIPrototypeTestScreenParam extends AFRouteParam {
 class AFUIPrototypeTestScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> {
   AFUIPrototypeTestScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
   
-  factory AFUIPrototypeTestScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> context, AFUIDefaultTheme theme, AFScreenID screenId, AFWidgetID wid) {
+  factory AFUIPrototypeTestScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
     return AFUIPrototypeTestScreenSPI(context, screenId, theme,
     );
   }

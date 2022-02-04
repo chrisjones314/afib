@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 class AFPrototypeLoadingScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFRouteParam> {
   AFPrototypeLoadingScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
   
-  factory AFPrototypeLoadingScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId, AFWidgetID wid) {
+  factory AFPrototypeLoadingScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
     return AFPrototypeLoadingScreenSPI(context, screenId, theme,
     );
   }

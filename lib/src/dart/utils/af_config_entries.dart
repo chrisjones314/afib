@@ -28,7 +28,7 @@ class AFConfigEntries {
 
   /// Used to start the app in dark mode, rather than having to configure the device/emulator for 
   /// dark mode.
-  static final forceDarkMode = AFConfigurationitemTrueFalse(
+  static final forceDarkMode = AFConfigurationItemTrueFalse(
     libraryId: AFUILibraryID.id,
     name: "force-dark-mode", 
     validContexts: AFConfigurationItem.validContextsAllButNew,
@@ -40,13 +40,15 @@ class AFConfigEntries {
   /// Used to specify the year from which [AFTimeState] 'absolute' values are measured.
   ///
   /// If you specify 2004 as the absolute base year, then 
-  static final absoluteBaseYear = AFConfigurationitemTrueFalse(
+  static final absoluteBaseYear = AFConfigurationItemInt(
     libraryId: AFUILibraryID.id,
     name: "absolute-base-year", 
     validContexts: AFConfigurationItem.validContextNewProjectCommand,
     ordinal: 400.0,
     help: "The earliest year which your app will have reason to reference, generally good to set it 1-2 years before you started creating the app", 
-    defaultValue: false);
+    defaultValue: 2019,
+    min: 2000,
+    max: 2200);
 
   /// Set to true only when running under a flutter WidgetTester test.
   /// 
@@ -56,7 +58,7 @@ class AFConfigEntries {
   /// by way of the utility [AFConfig.isWidgetTesterContext] to return static widgets
   /// instead of an infinite animation in the widget tester context.
   static final widgetTesterContextKey = "widgetTesterContext";
-  static final widgetTesterContext = AFConfigurationitemTrueFalse(
+  static final widgetTesterContext = AFConfigurationItemTrueFalse(
     libraryId: AFUILibraryID.id,
     name: widgetTesterContextKey, 
     validContexts: AFConfigurationItem.validContextInternalOnly,

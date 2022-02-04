@@ -59,7 +59,7 @@ AFRouteState _navSetParam(AFRouteState state, AFNavigateSetParamAction action) {
 
 //---------------------------------------------------------------------------
 AFRouteState _navSetChildParam(AFRouteState state, AFNavigateSetChildParamAction action) {
-  return state.setChildParam(action.screen, action.route, action.param, useParentParam: action.useParentParam);
+  return state.setChildParam(action.screen, action.route, action.param, action.paramSource);
 }
 
 //---------------------------------------------------------------------------

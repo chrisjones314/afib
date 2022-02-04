@@ -32,8 +32,13 @@ mixin AFUIDefaultStateViewModelsMixin<TRouteParam extends AFRouteParam> {
   Iterable<Object?> createStateModels(AFBuildStateViewContext<AFUIState, TRouteParam> context) {
     final result = <Object?>[]; 
     result.addAll(context.stateApp.allModels);
-    result.add(context.statePublic.time);
-    result.add(context.statePublic.queries.findListenerQueryById(AFUIQueryID.time.toString()));
+    final time = context.statePublic.time;
+
+    // afib protoypes need to work whether the calling app/library uses the time state or not.
+    if(time.isInitialized) {
+      result.add(context.statePublic.time);
+      result.add(context.statePublic.queries.findListenerQueryById(AFUIQueryID.time.toString()));
+    }
 
     final testState = context.private.testState;
     final activeTestId = testState.activeTestId;
@@ -55,7 +60,7 @@ mixin AFUIDefaultStateViewModelsMixin<TRouteParam extends AFRouteParam> {
 //--------------------------------------------------------------------------------------
 class AFUIDefaultScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIScreenConfig<TSPI, AFUIDefaultStateView, TRouteParam> with AFUIDefaultStateViewModelsMixin<TRouteParam> {
   AFUIDefaultScreenConfig({
-    required AFCreateSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
+    required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
     AFNavigateRoute? route
   }): super(
     stateViewCreator: AFUIDefaultStateView.create,
@@ -67,7 +72,7 @@ class AFUIDefaultScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TR
 //--------------------------------------------------------------------------------------
 class AFUIDefaultDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIDrawerConfig<TSPI, AFUIDefaultStateView, TRouteParam> with AFUIDefaultStateViewModelsMixin<TRouteParam> {
   AFUIDefaultDrawerConfig({
-    required AFCreateSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
+    required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
     AFNavigateRoute? route
   }): super(
     stateViewCreator: AFUIDefaultStateView.create,
@@ -79,7 +84,7 @@ class AFUIDefaultDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TR
 //--------------------------------------------------------------------------------------
 class AFUIDefaultDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIDialogConfig<TSPI, AFUIDefaultStateView, TRouteParam> with AFUIDefaultStateViewModelsMixin<TRouteParam> {
   AFUIDefaultDialogConfig({
-    required AFCreateSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
+    required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
     AFNavigateRoute? route
   }): super(
     stateViewCreator: AFUIDefaultStateView.create,

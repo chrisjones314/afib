@@ -94,14 +94,14 @@ class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextDispatc
 
   /// Dispatches an action that updates the route parameter for the specified screen.
   void updateChildRouteParam(AFScreenID screen, AFRouteParam param, { 
-    bool useParentParam = false,
+    AFWidgetParamSource paramSource = AFWidgetParamSource.child,
     AFNavigateRoute route = AFNavigateRoute.routeHierarchy
   }) {
     dispatch(AFNavigateSetChildParamAction(
       screen: screen,
       param: param, 
       route: route,
-      useParentParam: useParentParam
+      paramSource: paramSource
     ));
   }
 

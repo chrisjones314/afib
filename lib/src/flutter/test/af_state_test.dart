@@ -174,7 +174,7 @@ class _AFStateTestScreenStatement<TSPI extends AFStateProgrammingInterface> exte
   void execute(AFStateTestContext context, { required bool verify }) {
     final screen = AFibF.g.screenMap.createInstance(screenId, null);
     final config = screen.uiConfig;
-    final ctx = AFStateTestScreenContext<TSPI>(screenId: screenId, screenConfig: config as AFScreenConfig);
+    final ctx = AFStateTestScreenContext<TSPI>(screenId: screenId, screenConfig: config);
     screenHandler(context, ctx);
   }
 }
@@ -324,12 +324,12 @@ mixin AFExecuteWidgetMixin {
   AFStateTestScreenContext get screenContext;
 
   void executeWidgetUseChildParam<TSPIWidget extends AFStateProgrammingInterface>(AFWidgetID wid, AFWidgetConfig config, AFStateTestWidgetHandlerDelegate<TSPIWidget> delegate) {
-    final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widgetConfig: config, wid: wid, screenContext: screenContext, useParentParam: false);
+    final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widgetConfig: config, wid: wid, screenContext: screenContext, paramSource: AFWidgetParamSource.child, launchParam: null);
     return delegate(widgetContext);
   }
 
   void executeWidgetUseChildParamWithExecute<TSPIWidget extends AFStateProgrammingInterface>(AFWidgetID wid, AFWidgetConfig config, AFStateTestExecute e, AFStateTestWidgetWithExecuteHandlerDelegate<TSPIWidget> delegate) {
-    final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widgetConfig: config, wid: wid, screenContext: screenContext, useParentParam: false);
+    final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widgetConfig: config, wid: wid, screenContext: screenContext, paramSource: AFWidgetParamSource.child, launchParam: null);
     return delegate(e, widgetContext);
   }
 
@@ -349,51 +349,50 @@ mixin AFExecuteWidgetMixin {
   }
 
   AFStateTestWidgetContext<TSPIWidget> _createWidgetContextWithLaunchParam<TSPIWidget extends AFStateProgrammingInterface>(AFRouteParam launchParam, AFWidgetConfig config, AFNavigateRoute parentRoute) { 
-    final store = AFibF.g.storeInternalOnly!;
-    final screenCtx = screenContext;
-    store.dispatch(AFNavigateSetChildParamAction(screen: screenCtx.screenId, route: parentRoute, param: launchParam, useParentParam: false));
-    return AFStateTestWidgetContext<TSPIWidget>(widgetConfig: config, wid: launchParam.id as AFWidgetID, screenContext: screenContext, useParentParam: true);
+    //store.dispatch(AFNavigateSetChildParamAction(screen: screenCtx.screenId, route: parentRoute, param: launchParam, paramSource: AFWidgetParamSource.child));
+    return AFStateTestWidgetContext<TSPIWidget>(widgetConfig: config, wid: launchParam.id as AFWidgetID, screenContext: screenContext, paramSource: AFWidgetParamSource.child, launchParam: launchParam);
   }  
 
   void executeWidgetUseParentParam<TSPIWidget extends AFStateProgrammingInterface>(AFWidgetID wid, AFWidgetConfig config, AFStateTestWidgetHandlerDelegate<TSPIWidget> delegate) {
-    final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widgetConfig: config, wid: wid, screenContext: screenContext, useParentParam: true);
+    final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widgetConfig: config, wid: wid, screenContext: screenContext, paramSource: AFWidgetParamSource.parent, launchParam: null);
     return delegate(widgetContext);
   }
 
   void executeWidgetUseParentParamAndExecute<TSPIWidget extends AFStateProgrammingInterface>(AFWidgetID wid, AFWidgetConfig config, AFStateTestExecute e, AFStateTestWidgetWithExecuteHandlerDelegate<TSPIWidget> delegate) {
-    final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widgetConfig: config, wid: wid, screenContext: screenContext, useParentParam: true);
+    final widgetContext = AFStateTestWidgetContext<TSPIWidget>(widgetConfig: config, wid: wid, screenContext: screenContext, paramSource: AFWidgetParamSource.parent, launchParam: null);
     return delegate(e, widgetContext);
   }
-
-
-
 }
 
 class AFStateTestWidgetContext<TSPI extends AFStateProgrammingInterface> with AFExecuteWidgetMixin {
   final AFStateTestScreenContext screenContext; 
   final AFWidgetConfig widgetConfig;
   final AFWidgetID wid;
-  final bool useParentParam;
+  final AFWidgetParamSource paramSource;
+  final AFRouteParam? launchParam;
   AFStateTestWidgetContext({
     required this.wid,
     required this.screenContext,
     required this.widgetConfig,
-    required this.useParentParam,
+    required this.paramSource,
+    required this.launchParam,
   });
 
   void executeBuild(AFStateTestScreenBuildContextDelegate<TSPI> delegate) {
-    final spi = createWidgetSPI(useParentParam: useParentParam);
+    final spi = createWidgetSPI(paramSource: paramSource);
     return delegate(spi);
   }
 
 
   void executeBuildWithExecute(AFStateTestExecute e, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> delegate) {
-    final spi = createWidgetSPI(useParentParam: useParentParam);
+    final spi = createWidgetSPI(paramSource: paramSource);
     delegate(e, spi);
   }
 
-  TSPI createWidgetSPI({ required bool useParentParam }) {
-    return AFStateTestScreenContext.createSPI<TSPI>(widgetConfig, screenContext.screenId, wid, useParentParam: false);
+  TSPI createWidgetSPI({ required AFWidgetParamSource paramSource }) {
+    return AFStateTestScreenContext.createSPI<TSPI>(widgetConfig, screenContext.screenId, wid, 
+      paramSource: paramSource,
+      launchParam: launchParam);
   }
 
 
@@ -401,7 +400,7 @@ class AFStateTestWidgetContext<TSPI extends AFStateProgrammingInterface> with AF
 
 class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface>  with AFExecuteWidgetMixin  {
   final AFScreenID screenId;
-  final AFScreenConfig screenConfig;
+  final AFConnectedUIConfig screenConfig;
   AFStateTestScreenContext({
     required this.screenId,
     required this.screenConfig,
@@ -411,27 +410,31 @@ class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface>  with A
     return this;
   }
 
-  void executeBuild(AFStateTestScreenBuildContextDelegate<TSPI> delegate) {
-    final spi = createScreenSPI();
+  void executeBuild(AFStateTestScreenBuildContextDelegate<TSPI> delegate, {
+    AFRouteParam? launchParam
+  }) {
+    final spi = createScreenSPI(launchParam: launchParam);
     delegate(spi);
   }
 
-  void executeBuildWithExecute(AFStateTestExecute e, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> delegate) {
-    final spi = createScreenSPI();
+  void executeBuildWithExecute(AFStateTestExecute e, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> delegate, {
+    AFRouteParam? launchParam
+  }) {
+    final spi = createScreenSPI(launchParam: launchParam);
     delegate(e, spi);
   }
 
-  TSPI createScreenSPI() {
-    return createSPI<TSPI>(screenConfig, screenId, null, useParentParam: false);    
+  TSPI createScreenSPI({ required AFRouteParam? launchParam }) {
+    return createSPI<TSPI>(screenConfig, screenId, AFUIWidgetID.unused, paramSource: AFWidgetParamSource.child, launchParam: launchParam);    
   }
 
-  static TSPI createSPI<TSPI extends AFStateProgrammingInterface>(AFConnectedUIConfig config, AFScreenID screenId, AFID? wid, { required bool useParentParam }) {
+  static TSPI createSPI<TSPI extends AFStateProgrammingInterface>(AFConnectedUIConfig config, AFScreenID screenId, AFWidgetID wid, { required AFWidgetParamSource paramSource, required AFRouteParam? launchParam }) {
     final store = AFibF.g.storeInternalOnly!;
-    final context = config.createContextForDiff(store, screenId, wid, useParentParam: useParentParam);
+    final context = config.createContextForDiff(store, screenId, wid, paramSource: paramSource, launchParam: launchParam);
     if(context == null) {
       throw AFException("Failed to create context");
     }
-    return config.createSPI(null, context, screenId, wid) as TSPI;
+    return config.createSPI(null, context, screenId, wid, paramSource) as TSPI;
   }
 }
 

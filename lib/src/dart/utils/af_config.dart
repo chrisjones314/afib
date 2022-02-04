@@ -249,9 +249,9 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
 
 
 
-class AFConfigurationitemTrueFalse extends AFConfigurationItemOptionChoice {
+class AFConfigurationItemTrueFalse extends AFConfigurationItemOptionChoice {
 
-  AFConfigurationitemTrueFalse({ 
+  AFConfigurationItemTrueFalse({ 
     required AFLibraryID libraryId,
     required String name, 
     required int validContexts, 
@@ -278,6 +278,57 @@ class AFConfigurationitemTrueFalse extends AFConfigurationItemOptionChoice {
   }
    
 }
+
+class AFConfigurationItemInt extends AFConfigurationItem {
+  final int min;
+  final int max;
+
+  AFConfigurationItemInt({ 
+    required AFLibraryID libraryId,
+    required String name, 
+    required int validContexts, 
+    required double ordinal, 
+    required int defaultValue, 
+    required this.min,
+    required this.max,
+    required String help 
+  }): super(
+    libraryId: libraryId,
+    name: name, 
+    defaultValue: defaultValue, 
+    validContexts: validContexts, 
+    ordinal: ordinal, help: help
+  );
+
+  void addArguments(args.ArgParser argParser) {
+    argParser.addOption(name, help: help);
+  }
+
+  /// Return an error message if the value is invalid, otherwise return null.
+  String? validate(dynamic value) {
+    return null;
+  }
+
+
+  void setValue(AFConfig dest, dynamic value) {
+    int? val;
+    if(value is String) {
+      val = int.tryParse(value);
+    } else if(value is int){
+      val = value;
+    } 
+
+    if(val == null) {
+      throw AFException("Unsupported integer value $value for $name");
+    }
+    if(val < min || val > max) {
+      throw AFException("Value $val outside range $min-$max for $name");
+    }
+    dest.putInternal(this, val);
+  }
+   
+}
+
 
 class AFConfigurationItemOption extends AFConfigurationItem {
   static const optionLowercase = 1;

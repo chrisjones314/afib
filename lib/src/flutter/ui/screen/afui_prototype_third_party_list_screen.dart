@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 class AFUIPrototypeThirdPartyListScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFRouteParam> {
   AFUIPrototypeThirdPartyListScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
   
-  factory AFUIPrototypeThirdPartyListScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId, AFWidgetID wid) {
+  factory AFUIPrototypeThirdPartyListScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
     return AFUIPrototypeThirdPartyListScreenSPI(context, screenId, theme,
     );
   }

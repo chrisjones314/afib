@@ -2,6 +2,12 @@ import 'package:afib/id.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:meta/meta.dart';
 
+enum AFWidgetParamSource {
+  parent,
+  child,
+  notApplicable
+}
+
 /// Can be used in cases where no route param is necessary
 
 /// Base class for transient data associated with an [AFScreen], and stored

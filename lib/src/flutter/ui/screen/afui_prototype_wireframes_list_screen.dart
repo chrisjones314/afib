@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 class AFUIPrototypeWireframesListScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFRouteParam> {
   AFUIPrototypeWireframesListScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
   
-  factory AFUIPrototypeWireframesListScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId, AFWidgetID wid) {
+  factory AFUIPrototypeWireframesListScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
     return AFUIPrototypeWireframesListScreenSPI(context, screenId, theme,
     );
   }

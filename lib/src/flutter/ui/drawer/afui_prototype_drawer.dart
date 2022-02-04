@@ -28,7 +28,7 @@ class AFUIPrototypeDrawerRouteParam extends AFRouteParam {
   final Map<String, bool> themeExpanded;
   final String timeText;
   final String timeAdjustText;
-  final AFTextEditingControllersHolder textControllers;
+  final AFTextEditingControllers textControllers;
 
   AFUIPrototypeDrawerRouteParam({
     required this.view, 
@@ -40,7 +40,7 @@ class AFUIPrototypeDrawerRouteParam extends AFRouteParam {
 
   factory AFUIPrototypeDrawerRouteParam.createOncePerScreen(int view) {
     final themeExpanded = <String, bool>{};
-    final textControllers = AFTextEditingControllersHolder.createN({
+    final textControllers = AFTextEditingControllers.createN({
       AFUIWidgetID.textTime: "",
       AFUIWidgetID.textTimeAdjust: "",
     });
@@ -677,6 +677,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
 
     final rowsAdjust = t.column();
     rowsAdjust.add(t.childTextField(
+      screenId: screenId,
       wid: AFUIWidgetID.textTimeAdjust,
       controllers: context.p.textControllers,
       text: context.p.timeAdjustText,
@@ -720,6 +721,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     final rowsSet = t.column();
     rowsSet.add(t.childTextField(
       wid: AFUIWidgetID.textTime,
+      screenId: screenId,
       controllers: context.p.textControllers,
       text: context.p.timeText,
       obscureText: false,

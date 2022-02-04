@@ -27,7 +27,6 @@ class AFSharedTestExtensionContext {
     registerApplicator(AFTapChoiceChip());
     registerApplicator(AFSetChoiceChip());
     registerApplicator(AFApplyTextTextFieldAction());
-    registerApplicator(AFApplyTextAFTextFieldAction());
     registerApplicator(AFApplySliderAction());
     registerApplicator(AFRichTextGestureTapAction());
     registerApplicator(AFApplyCupertinoPicker());
@@ -42,7 +41,6 @@ class AFSharedTestExtensionContext {
     registerExtractor(AFSelectableChoiceChip());
     registerExtractor(AFExtractTextTextAction());
     registerExtractor(AFExtractTextTextFieldAction());
-    registerExtractor(AFExtractTextAFTextFieldAction());
     registerExtractor(AFExtractSliderAction());
     registerExtractor(AFExtractRichTextAction());
     registerExtractor(AFSwitchExtractor());    

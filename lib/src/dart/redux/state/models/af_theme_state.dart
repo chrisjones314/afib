@@ -2083,15 +2083,17 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   /// Create a text field with the specified text.
   /// 
-  /// See [AFTextEditingControllersHolder] for an explanation
+  /// See [AFTextEditingControllers] for an explanation
   /// of how text controllers should be handled.  The [wid] is
-  /// used as the id for the specific controller. The [AFTextEditingControllersHolder]
+  /// used as the id for the specific controller. The [AFTextEditingControllers]
   /// should be created only once, when you first visit a screen, and then
   /// should be passed through via the 'copyWith' method, and then 
   /// disposed of the route parameter is disposed.
   Widget childTextField({
+    required AFScreenID screenId,
     required AFWidgetID wid,
-    required AFTextEditingControllersHolder controllers,
+    AFTextEditingControllers? controllers,
+    AFTextEditingController? controller,
     required AFOnChangedStringDelegate onChanged,
     required String text,
     bool? enabled,
@@ -2106,8 +2108,10 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     Color? cursorColor,
     ValueChanged<String>? onSubmitted,
   }) {
-    final textController = controllers.access(wid);
+
+    final textController = controller ?? controllers?.access(wid);
     assert(textController != null, "You must register the text controller for $wid in your route parameter using AFTextEditingControllersHolder.createN or createOne");
+    assert(textController?.controller != null);
     assert(textController?.text == text, '''The text value in the text controller was different from the value you passed into 
 childTextField was different from the value in the text controller for $wid ($text != ${textController?.text}).  This will happen
 if you try to change the value of a text field during the render process (which you should not).   It will also happen if you are 
@@ -2116,11 +2120,13 @@ In the later case, AFib automatically keeps the controller in sync with the valu
 need to manually update the value in the controller.
 ''');
 
-    return TextField(
-      key: keyForWID(wid),
+    return AFUITextField(
+      screenId: screenId,
+      wid: wid,
       enabled: enabled,
       style: style,
-      controller: textController,
+      controller: controller,
+      controllers: controllers,
       onChanged: onChanged,
       keyboardType: keyboardType,
       obscureText: obscureText,

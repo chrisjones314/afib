@@ -144,7 +144,7 @@ class AFRouteSegment {
     );
   }
 
-  bool matchesScreen(AFScreenID screen) {
+  bool matchesScreen(AFID screen) {
     if(screen == this.screen) {
       return true;
     }
@@ -265,7 +265,7 @@ class AFRouteStateSegments {
 
   /// Returns the segment in the current route associated with the 
   /// specified screen.
-  AFRouteSegment? findSegmentFor(AFScreenID screen, { required bool includePrior }) {
+  AFRouteSegment? findSegmentFor(AFID screen, { required bool includePrior }) {
     for(var i = active.length - 1; i >= 0; i--) {
       final segment = active[i];
       if(segment.matchesScreen(screen)) {
@@ -373,7 +373,7 @@ class AFRouteStateSegments {
   }
   */
 
-  AFRouteStateSegments updateRouteSegment(AFScreenID screen, AFRouteSegment revisedSeg) {
+  AFRouteStateSegments updateRouteSegment(AFID screen, AFRouteSegment revisedSeg) {
     final revised = copyActive();
     for(var i = revised.length - 1; i >= 0; i--) {
       final seg = revised[i];
@@ -461,7 +461,7 @@ class AFRouteStateSegments {
 class AFRouteState {
   static const emptySegments = <AFRouteSegment>[];
   final AFRouteStateSegments screenHierarchy;
-  final Map<AFScreenID, AFRouteSegment> globalPool;
+  final Map<AFID, AFRouteSegment> globalPool;
 
   AFRouteState({
     required this.screenHierarchy, 
@@ -632,7 +632,7 @@ class AFRouteState {
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteState setParam(AFScreenID screen, AFRouteParam param, AFNavigateRoute route) {
+  AFRouteState setParam(AFID screen, AFRouteParam param, AFNavigateRoute route) {
     if(route == AFNavigateRoute.routeHierarchy) {
       if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
         screen = AFUIScreenID.screenStartupWrapper;
@@ -736,8 +736,8 @@ class AFRouteState {
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteState setGlobalPoolParam(AFScreenID screen, AFRouteSegment revisedSeg) {
-    final revised = Map<AFScreenID, AFRouteSegment>.from(globalPool);
+  AFRouteState setGlobalPoolParam(AFID screen, AFRouteSegment revisedSeg) {
+    final revised = Map<AFID, AFRouteSegment>.from(globalPool);
     revised[screen] = revisedSeg;
     return copyWith(globalPool: revised);
   }
@@ -757,7 +757,7 @@ class AFRouteState {
   AFRouteState copyWith({
     AFRouteStateSegments? screenSegs,
     AFRouteStateSegments? popupSegs,
-    Map<AFScreenID, AFRouteSegment>? globalPool,
+    Map<AFID, AFRouteSegment>? globalPool,
   }) {
     final revised = AFRouteState(
       screenHierarchy: screenSegs ?? this.screenHierarchy,

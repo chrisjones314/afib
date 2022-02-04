@@ -454,21 +454,6 @@ class AFApplyTextTextFieldAction extends AFApplySetValueWidgetAction {
   }
 }
 
-class AFApplyTextAFTextFieldAction extends AFApplySetValueWidgetAction {
-
-  AFApplyTextAFTextFieldAction(): super(AFTextField);
-
-  @override
-  bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
-    final widget = elem.widget;
-    if(widget is AFTextField && data is String) {
-      widget.onChanged?.call(data);
-      return true;
-    } 
-    return false;
-  }
-}
-
 class AFApplySliderAction extends AFApplySetValueWidgetAction {
 
   AFApplySliderAction(): super(Slider);
@@ -582,32 +567,6 @@ class AFExtractRichTextAction extends AFExtractPrimaryWidgetAction {
         }
       }
     }
-  }
-
-}
-
-
-class AFExtractTextAFTextFieldAction extends AFExtractPrimaryWidgetAction {
-
-  AFExtractTextAFTextFieldAction(): super(AFTextField);
-
-  @override
-  dynamic extractInternal(String extractType, AFWidgetSelector selector, Element element) {
-    String? text;
-    final widget = element.widget;
-    if(AFExtractWidgetAction.isPrimary(extractType) && widget is AFTextField) {
-      final children = this.findChildrenWithWidgetType<TextField>(element);
-      if(children.length != 1) {
-        throw AFException("AFTextField doesn't have one TextField child?");
-      }
-
-      final elem = children.first;
-      final childWidget = elem.widget;
-      if(childWidget is TextField) {
-        text = childWidget.controller?.value.text; 
-      }
-    } 
-    return text;
   }
 }
 

@@ -21,7 +21,7 @@ class AFRouteParam {
     required this.id
   });
 
-  bool matchesScreen(AFScreenID screen) {
+  bool matchesScreen(AFID screen) {
     return false;
   }
 

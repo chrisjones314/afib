@@ -30,6 +30,12 @@ class AFUIDrawerSPI<TStateView extends AFFlexibleStateView, TRouteParam extends 
   AFUIDrawerSPI(AFBuildContext<TStateView, TRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme);
 }
 
+// a default screen programming interface while we transition to this new model.
+class AFUIWidgetSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFWidgetStateProgrammingInterface<AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> {
+  AFUIWidgetSPI(AFBuildContext<TStateView, TRouteParam> context, AFScreenID screenId, AFID wid, AFWidgetParamSource paramSource, AFUIDefaultTheme theme): super(context, screenId, wid, paramSource, theme);
+}
+
+
 abstract class AFUIConnectedScreen<TSPI extends AFScreenStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreen<AFUIState, AFUIDefaultTheme, TStateView, TRouteParam, TSPI> {
   AFUIConnectedScreen({
     required AFConnectedUIConfig<AFUIState, AFUIDefaultTheme, TStateView, TRouteParam, TSPI>  config,
@@ -53,6 +59,23 @@ abstract class AFUIConnectedDrawer<TSPI extends AFScreenStateProgrammingInterfac
     required TRouteParam launchParam,
   }): super(config: config, screenId: screenId, launchParam: launchParam);
 }
+
+abstract class AFUIConnectedWidget<TSPI extends AFWidgetStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedWidget<AFUIState, AFUIDefaultTheme, TStateView, TRouteParam, TSPI> {
+  AFUIConnectedWidget({
+    required AFConnectedUIConfig<AFUIState, AFUIDefaultTheme, TStateView, TRouteParam, TSPI> uiConfig,
+    required AFScreenID screenId,
+    required AFWidgetID wid,
+    TRouteParam? launchParam,
+    AFWidgetParamSource paramSource = AFWidgetParamSource.child,
+  }): super(
+    uiConfig: uiConfig,
+    screenId: screenId,
+    wid: wid,
+    paramSource: paramSource,
+    launchParam: launchParam,
+  );
+}
+
 
 abstract class AFUIScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFScreenConfig<TSPI, AFUIState, AFUIDefaultTheme, TStateView, TRouteParam> {
     AFUIScreenConfig({
@@ -91,3 +114,17 @@ abstract class AFUIDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, 
       spiCreator: spiCreator,
     );
 }
+
+abstract class AFUIWidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFWidgetConfig<TSPI, AFUIState, AFUIDefaultTheme, TStateView, TRouteParam> {
+  AFUIWidgetConfig({
+    required AFCreateStateViewDelegate<TStateView> stateViewCreator,
+    required AFCreateWidgetSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
+    AFNavigateRoute? route,
+  }): super(
+    themeId: AFUIThemeID.defaultTheme,
+    stateViewCreator: stateViewCreator,
+    spiCreator: spiCreator,
+    route: route ?? AFNavigateRoute.routeHierarchy,
+  );
+}
+

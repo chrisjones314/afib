@@ -383,7 +383,6 @@ class AFStateTestWidgetContext<TSPI extends AFStateProgrammingInterface> with AF
     return delegate(spi);
   }
 
-
   void executeBuildWithExecute(AFStateTestExecute e, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> delegate) {
     final spi = createWidgetSPI(paramSource: paramSource);
     delegate(e, spi);

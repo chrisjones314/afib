@@ -92,3 +92,16 @@ class AFUIDefaultDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TR
     route: route,
   );
 }
+
+//--------------------------------------------------------------------------------------
+class AFUIDefaultWidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIWidgetConfig<TSPI, AFUIDefaultStateView, TRouteParam> with AFUIDefaultStateViewModelsMixin<TRouteParam> {
+
+    AFUIDefaultWidgetConfig({
+      required AFCreateWidgetSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
+      AFNavigateRoute? route
+    }): super(
+      stateViewCreator: AFUIDefaultStateView.create,
+      spiCreator: spiCreator,
+      route: route,
+    );
+}

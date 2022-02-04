@@ -34,7 +34,7 @@ class AFUIPrototypeHomeScreenParam extends AFRouteParam {
   static const viewFilter = 1;
   static const viewResults = 2;
   final String filter;
-  final AFTextEditingControllersHolder textControllers;
+  final AFTextEditingControllers textControllers;
   final List<AFScreenTestResultSummary> results;
   final int view;
 
@@ -52,7 +52,7 @@ class AFUIPrototypeHomeScreenParam extends AFRouteParam {
   factory AFUIPrototypeHomeScreenParam.createOncePerScreen({
     required String filter,
   }) {
-    final controllers = AFTextEditingControllersHolder.createOne(AFUIWidgetID.textTestSearch, filter);
+    final controllers = AFTextEditingControllers.createOne(AFUIWidgetID.textTestSearch, filter);
     return AFUIPrototypeHomeScreenParam(
       view: viewFilter,
       results: <AFScreenTestResultSummary>[],
@@ -199,6 +199,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFPrototypeHomeScreenSPI
 
     final searchText = Container(
       child: t.childTextField(
+        screenId: screenId,
         wid: AFUIWidgetID.textTestSearch,
         controllers: context.p.textControllers,
         obscureText: false,

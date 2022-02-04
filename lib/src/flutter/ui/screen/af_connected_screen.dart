@@ -1263,12 +1263,13 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
   /// This is intended to be called from within an AFConnectedDialog.  If you call it 
   /// and a dialog is not open, it will mess up the navigation state.
   void closeDialog(AFScreenID dialogId, dynamic returnValue) {
-    if(!AFibF.g.doMiddlewareNavigation( (navState) {
-      final ctx = contextNullCheck;
-      material.Navigator.pop(ctx, returnValue); 
-      })) {
-      AFibF.g.testOnlySimulateCloseDialogOrSheet(dialogId, returnValue);
-    };
+    final ctx = flutterContext;
+    final didNav = (ctx != null && AFibF.g.doMiddlewareNavigation( (navState) {
+        material.Navigator.pop(ctx, returnValue); 
+      }));
+    if(!didNav) {
+      AFibF.g.testOnlySimulateCloseDialogOrSheet(dialogId, returnValue); 
+    }
   }
 
   /// Closes the dialog, and returns the [returnValue] to the callback function that was

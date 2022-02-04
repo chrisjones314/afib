@@ -253,6 +253,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
 
   bool doMiddlewareNavigation( Function(NavigatorState) underHere ) {
     navDepth++;
+    AFibD.logUIAF?.d("enter navDepth: $navDepth");
     if(navDepth > 1) {
       throw AFException("Unexpected navigation depth greater than 1");
     }
@@ -261,6 +262,8 @@ class AFibGlobalState<TState extends AFFlexibleState> {
       underHere(navState);
     }
     navDepth--;
+    AFibD.logUIAF?.d("exit navDepth: $navDepth");
+
     if(navDepth < 0) {
       throw AFException("Unexpected navigation depth less than 0");
     }

@@ -1,7 +1,6 @@
 import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
-import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:redux/redux.dart';
 
 //---------------------------------------------------------------------------
@@ -53,7 +52,7 @@ AFRouteState _navPopTo(AFRouteState state, AFNavigatePopToAction action) {
 
 //---------------------------------------------------------------------------
 AFRouteState _navSetParam(AFRouteState state, AFNavigateSetParamAction action) {
-  final screen = action.param.id as AFScreenID;
+  final screen = action.param.id;
   return state.setParam(screen, action.param, action.route);
 }
 

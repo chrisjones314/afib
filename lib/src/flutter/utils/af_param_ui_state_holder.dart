@@ -3,13 +3,64 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-class AFTextEditingControllersHolder  {
-  final Map<AFWidgetID, TextEditingController> controllers;
-  AFTextEditingControllersHolder(this.controllers);
+class AFTextEditingController  {
+  final AFWidgetID wid;
+  final TextEditingController controller;
+  AFTextEditingController(this.wid, this.controller);
+
+  factory AFTextEditingController.create(AFWidgetID wid, String text) {
+    return AFTextEditingController(wid, TextEditingController(text: text)); 
+  }
+
+  void update(String text) {
+    if(controller.text != text) {
+      controller.text = text;
+      controller.selection = TextSelection.collapsed(offset: text.length);
+    }
+  }
+
+  void select(int start, int end, {
+    TextAffinity affinity = TextAffinity.downstream
+  }) {
+    final sel = TextSelection(baseOffset: start, extentOffset: end, affinity: affinity);
+    if(!controller.isSelectionWithinTextBounds(sel)) {
+      throw AFException("Text selection from $start to $end is out of range for ${controller.text}");
+    }
+    controller.selection = sel;
+  }
+
+  String get text {
+    return controller.text;
+  }
+
+  void clear() {
+    controller.clear();
+  }
+
+  void stopComposing() {
+    controller.clearComposing();
+  }
+
+  void dispose() {
+    controller.dispose();
+  }
+}
 
 
-  TextEditingController? access(AFWidgetID wid) {
+class AFTextEditingControllers  {
+  final Map<AFWidgetID, AFTextEditingController> controllers;
+  AFTextEditingControllers(this.controllers);
+
+  AFTextEditingController? access(AFWidgetID wid) {
     return controllers[wid];
+  }
+
+  void update(AFWidgetID wid, String text) {
+    final controller = controllers[wid];
+    if(controller == null) {
+      throw AFException("No controller regisered for $wid");
+    }
+    controller.update(text);
   }
 
   String textFor(AFWidgetID wid) {
@@ -21,13 +72,15 @@ class AFTextEditingControllersHolder  {
   void reviseN(Map<AFWidgetID, String> values) {
     for(final wid in values.keys) {
       final value = values[wid];
+      if(value == null) {
+        continue;
+      }
       var controller = controllers[wid];
       if(controller == null) {
-        controller = TextEditingController(text: value);
+        controller = AFTextEditingController.create(wid, value);
         controllers[wid] = controller;
-      }
-      if(controller.text != value && value != null) {
-        controller.text = value;
+      } else {
+        controller.update(value);
       }
     }
   }
@@ -35,22 +88,21 @@ class AFTextEditingControllersHolder  {
   void reviseOne(AFWidgetID wid, String value) {
     var controller = controllers[wid];
     if(controller == null) {
-      controller = TextEditingController(text: value);
+      controller = AFTextEditingController(wid, TextEditingController(text: value));
       controllers[wid] = controller;
-    }
-    if(controller.text != value) {
-      controller.text = value;
+    } else {
+      controller.update(value);
     }
   }
 
-  static AFTextEditingControllersHolder createN(Map<AFWidgetID, String> values) {
-    final initial = AFTextEditingControllersHolder(<AFWidgetID, TextEditingController>{});
+  static AFTextEditingControllers createN(Map<AFWidgetID, String> values) {
+    final initial = AFTextEditingControllers(<AFWidgetID, AFTextEditingController>{});
     initial.reviseN(values);
     return initial;
   }
 
-  static AFTextEditingControllersHolder createOne(AFWidgetID wid, String value) {
-    final initial = AFTextEditingControllersHolder(<AFWidgetID, TextEditingController>{});
+  static AFTextEditingControllers createOne(AFWidgetID wid, String value) {
+    final initial = AFTextEditingControllers(<AFWidgetID, AFTextEditingController>{});
     initial.reviseOne(wid, value);
     return initial;
   }

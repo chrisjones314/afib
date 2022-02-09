@@ -19,7 +19,7 @@ class AFTimeUpdateListenerQuery<AFUIState extends AFFlexibleState> extends AFAsy
 
   @override
   void startAsync(AFStartQueryContext<AFTimeState> context) {
-    timer = Timer.periodic(baseTime.updateFrequency, (timer) { 
+    timer = Timer.periodic(baseTime.pushUpdateFrequency, (timer) { 
       final updatedTime = baseTime.reviseForActualNow(DateTime.now());
       if(baseTime.pauseTime == null) {
         context.onSuccess(updatedTime);

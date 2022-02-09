@@ -29,15 +29,15 @@ class AFTimeState {
   final DateTime? actualNow;
   final DateTime? pauseTime;
   final Duration simulatedOffset;
-  final Duration updateFrequency;
-  final AFTimeStateUpdateSpecificity updateSpecificity;
+  final Duration pushUpdateFrequency;
+  final AFTimeStateUpdateSpecificity pushUpdateSpecificity;
   final AFTimeZone timeZone;
 
   AFTimeState({
     required this.actualNow,
     required this.simulatedOffset,
-    required this.updateFrequency,
-    required this.updateSpecificity,
+    required this.pushUpdateFrequency,
+    required this.pushUpdateSpecificity,
     required this.pauseTime,
     required this.timeZone,
   });
@@ -47,7 +47,7 @@ class AFTimeState {
   }
 
   factory AFTimeState.initialState() {
-    return AFTimeState(actualNow: null, pauseTime: null, simulatedOffset: Duration(milliseconds: 0), updateFrequency: Duration(days: 1), updateSpecificity: AFTimeStateUpdateSpecificity.second, timeZone: AFTimeZone.local);
+    return AFTimeState(actualNow: null, pauseTime: null, simulatedOffset: Duration(milliseconds: 0), pushUpdateFrequency: Duration(days: 1), pushUpdateSpecificity: AFTimeStateUpdateSpecificity.second, timeZone: AFTimeZone.local);
   }
 
   factory AFTimeState.createNow({ Duration updateFrequency = const Duration(milliseconds: 250),  AFTimeStateUpdateSpecificity updateSpecificity = AFTimeStateUpdateSpecificity.second }) {
@@ -71,8 +71,8 @@ class AFTimeState {
     return AFTimeState(
       actualNow: actualNow,
       simulatedOffset: simulatedOffset,
-      updateFrequency: updateFrequency,
-      updateSpecificity: updateSpecificity,
+      pushUpdateFrequency: updateFrequency,
+      pushUpdateSpecificity: updateSpecificity,
       pauseTime: null,
       timeZone: timeZone,
     );
@@ -178,7 +178,7 @@ class AFTimeState {
     int hour,
     int minute,
   ) {
-    final ct = currentTime;
+    final ct = currentPushTime;
     final revisedNow = DateTime(ct.year, ct.month, ct.day, hour, minute);
     return copyWith(actualNow: revisedNow);
   }
@@ -196,12 +196,12 @@ class AFTimeState {
   }
 
   int absoluteMinuteLocalToUTC(int absoluteMinuteLocal) {
-    final offset = currentTime.timeZoneOffset.inMinutes;
+    final offset = currentPushTime.timeZoneOffset.inMinutes;
     return absoluteMinuteLocal - offset;
   }
 
   int absoluteSecondLocalToUTC(int absoluteSecondLocal) {
-    final offset = currentTime.timeZoneOffset.inSeconds;
+    final offset = currentPushTime.timeZoneOffset.inSeconds;
     return absoluteSecondLocal - offset;
   }
 
@@ -267,27 +267,27 @@ class AFTimeState {
   }
 
   int get year {
-    return currentTime.year;
+    return currentPushTime.year;
   }
 
   int get month {
-    return currentTime.month;
+    return currentPushTime.month;
   }
 
   int get day {
-    return currentTime.day;
+    return currentPushTime.day;
   }
 
   int get hour {
-    return currentTime.hour;
+    return currentPushTime.hour;
   }
 
   int get minute {
-    return currentTime.minute;
+    return currentPushTime.minute;
   }
 
   int get second {
-    return currentTime.second;
+    return currentPushTime.second;
   }
 
   static Duration parseDuration(String text) {
@@ -318,7 +318,7 @@ class AFTimeState {
   }
 
   String format(DateFormat format) {
-    return format.format(currentTime);
+    return format.format(currentPushTime);
   }
 
   AFTimeState reviseForActualNow(DateTime actualNow) {
@@ -358,7 +358,7 @@ class AFTimeState {
   }
 
   AFTimeState reviseSpecificity(AFTimeStateUpdateSpecificity specificity) {
-    if(this.updateSpecificity == specificity) {
+    if(this.pushUpdateSpecificity == specificity) {
       return this;
     }
     return copyWith(updateSpecificity: specificity);
@@ -381,19 +381,19 @@ class AFTimeState {
   }
 
   int get absoluteMonth {
-    final ct = currentTime;
+    final ct = currentPushTime;
     return (absoluteYear * 12) + (ct.month - 1);
   }
 
   int get absoluteYear {
-    final ct = currentTime;
+    final ct = currentPushTime;
     final abd = absoluteBaseDate;
     return ct.year - abd.year;
   }
 
   Duration get absoluteDuration {
     final abd = absoluteBaseDate;
-    final dur = currentTime.difference(abd);
+    final dur = currentPushTime.difference(abd);
     return dur;
   }
 
@@ -415,8 +415,8 @@ class AFTimeState {
     return AFTimeState(
       actualNow: actualNow ?? this.actualNow,
       simulatedOffset: simulatedOffset ?? this.simulatedOffset,
-      updateFrequency: updateFrequency ?? this.updateFrequency,
-      updateSpecificity: updateSpecificity ?? this.updateSpecificity,
+      pushUpdateFrequency: updateFrequency ?? this.pushUpdateFrequency,
+      pushUpdateSpecificity: updateSpecificity ?? this.pushUpdateSpecificity,
       pauseTime: pt,
       timeZone: timeZone ?? this.timeZone,
     );
@@ -440,7 +440,7 @@ class AFTimeState {
       throw AFException("Do not compare two time states with different time zones");
     }
 
-    final leastSpecificity = leastSpecificityOf(updateSpecificity, other.updateSpecificity);
+    final leastSpecificity = leastSpecificityOf(pushUpdateSpecificity, other.pushUpdateSpecificity);
 
 
     if(leastSpecificity == AFTimeStateUpdateSpecificity.second) {
@@ -456,19 +456,32 @@ class AFTimeState {
   }
 
   int get hashCode {
-    return currentTime.hashCode;
+    return currentPushTime.hashCode;
   }
 
   String toString() {
     if(actualNow == null) {
       return missingNowError;
     }
-    final cur = currentTime;
+    final cur = currentPushTime;
     return cur.toString();
   }
 
+  AFTimeState get currentPullTimeState {
+    return copyWith(actualNow: DateTime.now());
+  }
 
-  DateTime get currentTime {
+  DateTime get currentPullTime {
+    final ts = currentPullTimeState;
+    return ts.currentPushTime;
+  }
+
+
+  AFTimeState get currentPushTimeState {
+    return this;
+  }
+
+  DateTime get currentPushTime {
     final an = actualNow;
     if(an == null) {
       throw AFException(missingNowError);

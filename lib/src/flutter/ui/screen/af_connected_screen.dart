@@ -1364,6 +1364,10 @@ class AFStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme e
     return theme;
   }
 
+  Logger? get log {
+    return context.log;
+  }
+
   void dispatch(dynamic action) {
     context.dispatch(action);
   }

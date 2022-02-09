@@ -486,8 +486,8 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
         timeZone: AFTimeZone.local,
         pauseTime: null,
         simulatedOffset: Duration(milliseconds: 0),
-        updateFrequency: Duration(minutes: 1000),
-        updateSpecificity: AFTimeStateUpdateSpecificity.minute
+        pushUpdateFrequency: Duration(minutes: 1000),
+        pushUpdateSpecificity: AFTimeStateUpdateSpecificity.minute
       );
     });    
   }

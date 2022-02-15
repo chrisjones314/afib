@@ -67,7 +67,6 @@ class AFNavigateReplaceAction extends AFNavigateAction {
   final AFCreateDefaultChildParamDelegate? createDefaultChildParam;
   AFNavigateReplaceAction({
     AFID? id, 
-    required AFScreenID screen, 
     required AFRouteParam param,
     List<AFRouteParam>? children,
     this.createDefaultChildParam,

@@ -64,7 +64,7 @@ class AFUIPrototypeThirdPartyListScreen extends AFUIConnectedScreen<AFUIPrototyp
 
     final rows = t.column();
     rows.add(t.childCardHeader(context, AFUIWidgetID.cardThirdParty, "Third Party", rowsCard));
-    final leading = t.childButtonStandardBack(context, screen: screenId);
+    final leading = t.childButtonStandardBack(spi, screen: screenId);
     return t.buildPrototypeScaffold("AFib Third Party", rows, leading: leading);
 
   }

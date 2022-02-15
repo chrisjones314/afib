@@ -10,6 +10,7 @@ import 'package:afib/src/flutter/ui/screen/afui_prototype_list_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_loading_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_third_party_home_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_third_party_list_screen.dart';
+import 'package:afib/src/flutter/ui/screen/afui_prototype_waiting_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_wireframes_list_screen.dart';
 
@@ -31,4 +32,5 @@ void afInitPrototypeScreenMap(AFScreenMap screens) {
   screens.registerScreen(AFUIScreenID.screenPrototypeThirdPartyList, (_) => AFUIPrototypeThirdPartyListScreen());
   screens.registerScreen(AFUIScreenID.screenPrototypeThirdPartyHome, (_) => AFUIPrototypeThirdPartyHomeScreen());
   screens.registerScreen(AFUIScreenID.screenPrototypeWireframesList, (_) => AFUIPrototypeWireframesListScreen());
+  screens.registerScreen(AFUIScreenID.screenPrototypeWaiting, (_) => AFUIPrototypeWaitingScreen());
 }

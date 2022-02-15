@@ -113,7 +113,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFPrototypeHomeScreenSPI
     final protoRows = t.column();
     final primaryTests = AFibF.g.primaryUITests;
     t.buildTestNavDownAll(
-      context: context,
+      spi: spi,
       rows: protoRows,
       tests: primaryTests,
     );

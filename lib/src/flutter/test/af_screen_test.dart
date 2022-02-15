@@ -813,7 +813,7 @@ abstract class AFSingleScreenTestExecute extends AFScreenTestExecute {
 }
 
 class AFScreenTestDescription {
-  final AFScreenTestID id;
+  final AFBaseTestID id;
   final String? description;
   final String? disabled;
   AFScreenTestDescription(this.id, this.description, this.disabled);
@@ -874,7 +874,7 @@ class AFSingleScreenPrototypeBody {
     smokeTests.add(body);
   }
 
-  void _checkDuplicateTestId(AFScreenTestID id) {
+  void _checkDuplicateTestId(AFID id) {
     if( _listContainsTestId(smokeTests, id) ||
       _listContainsTestId(reusableTests, id) ||
       _listContainsTestId(regressionTests, id) 
@@ -883,7 +883,7 @@ class AFSingleScreenPrototypeBody {
     }
   }
 
-  bool _listContainsTestId(List<AFScreenTestBody> tests, AFScreenTestID id) {
+  bool _listContainsTestId(List<AFScreenTestBody> tests, AFID id) {
     return tests.where((t) => t.id == id).isNotEmpty;
   }
 
@@ -1413,6 +1413,7 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
   List<AFScreenTestDescription> get smokeTests { return List<AFScreenTestDescription>.from(body.smokeTests); }
   List<AFScreenTestDescription> get reusableTests { return  List<AFScreenTestDescription>.from(body.reusableTests); }
   List<AFScreenTestDescription> get regressionTests { return  List<AFScreenTestDescription>.from(body.regressionTests); }
+  
   AFTestTimeHandling get timeHandling { return AFTestTimeHandling.running; }
 
   dynamic get models { return null; }
@@ -1456,7 +1457,7 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
     final mainDispatcher = AFStoreDispatcher(store!);    
     final stateDispatcher = AFStateScreenTestDispatcher(mainDispatcher);
 
-    final stateTestContext = AFStateTestContext<TState>(testImpl, store, stateDispatcher, isTrueTestContext: false);
+    final stateTestContext = AFStateTestContextForState<TState>(testImpl, store, stateDispatcher, isTrueTestContext: false);
     testImpl.execute(stateTestContext);
     stateTestContext.dispatcher = mainDispatcher;
 
@@ -1862,12 +1863,22 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
 
     // This causes the query middleware to return results specified in the state test.
     if(stateTest != null && store != null && dispatcher != null) {
-      final stateTestContext = AFStateTestContext(stateTest, store, dispatcher, isTrueTestContext: false);
+      final stateTestContext = AFStateTestContextForState(stateTest, store, dispatcher, isTrueTestContext: false);
       AFStateTestContext.currentTest = stateTestContext;    
     } else {
       assert(false);
     }
   }
+}
+
+class AFWorkflowStateTestUI extends AFScreenTestDescription {
+  final AFStateTestID uiStartsWith;
+  AFWorkflowStateTestUI(
+    AFScreenTestID id,
+    String? description,
+    String? disabled,
+    this.uiStartsWith): super(id, description, disabled);
+
 }
 
 class AFWorkflowStateTestBodyWithParam extends AFScreenTestDescription {
@@ -1885,6 +1896,7 @@ class AFWorkflowStateTestPrototype {
   final smokeTests = <AFWorkflowStateTestBodyWithParam>[];
   final reusableTests = <AFWorkflowStateTestBodyWithParam>[];
   final regressionTests = <AFWorkflowStateTestBodyWithParam>[];
+  final uiStateTests = <AFWorkflowStateTestUI>[];
 
   AFWorkflowStateTestPrototype(this.tests);
 
@@ -1899,6 +1911,15 @@ class AFWorkflowStateTestPrototype {
     String? disabled 
   }) async {
     smokeTests.add(AFWorkflowStateTestBodyWithParam(id, description, disabled, body));
+  }  
+
+  void defineRunStateTestInUI({
+    required AFScreenTestID id,
+    required String? description,
+    required String? disabled,
+    required AFStateTestID runExtensionInUI,
+  }) async {
+    uiStateTests.add(AFWorkflowStateTestUI(id, description, disabled, runExtensionInUI));
   }  
 
   void openTestDrawer(AFScreenTestID id) {
@@ -2040,9 +2061,17 @@ class AFStateTestDefinitionsContext extends AFBaseTestDefinitionContext {
   /// a series of query/response cycles across multiple tests.
   void addTest(AFStateTestID id, {
     required AFStateTestID? extendTest,
-    required AFStateTestDefinitionDelegate body
+    required AFStateTestDefinitionDelegate body,
+    String? description,
+    String? disabled,
   }) {
-    tests.addTest(id, extendTest, this, body);
+    tests.addTest(
+      id: id, 
+      extendTest: extendTest, 
+      definitions: this, 
+      body: body,
+      description: description,
+      disabled: disabled);
   }
 }
 
@@ -2180,5 +2209,6 @@ class AFWorkflowTestDefinitionContext extends AFBaseTestDefinitionContext {
     String? disabled }) {
     prototype.defineSmokeTest(body: body, id: id, description: description, disabled: disabled);
   }
+
 }
 

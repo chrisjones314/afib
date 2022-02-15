@@ -35,7 +35,7 @@ void afStateTestMain<TState extends AFFlexibleState> (AFCommandOutput output, AF
         printTestKind(output, testKind);
       }
       printPrototypeStart(output, test.id);
-      final context = AFStateTestContext<TState>(test as AFStateTest<AFFlexibleState>, store, dispatcher, isTrueTestContext: true);
+      final context = AFStateTestContextForState<TState>(test as AFStateTest<AFFlexibleState>, store, dispatcher, isTrueTestContext: true);
       
       context.store.dispatch(AFResetToInitialStateAction());
       context.store.dispatch(AFResetToInitialRouteAction());

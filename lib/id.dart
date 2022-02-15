@@ -12,6 +12,7 @@ class AFUIQueryID extends AFQueryID {
 
 class AFUIScreenID extends AFScreenID {
   const AFUIScreenID(String code) : super(code, AFUILibraryID.id);
+  static const screenPrototypeWaiting = AFUIScreenID("screen_prototype_waiting");
 
   static const unused = AFUIScreenID("unused");
   static const screenPrototypeWireframesList = AFUIScreenID("screen_prototype_wireframes_list");
@@ -158,4 +159,10 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textPackageName = AFUISourceTemplateID("package_name");
 
   static const dynConfigEntries = AFUISourceTemplateID("config_entries");
+}
+
+class AFUIPrototypeID extends AFPrototypeID {
+  const AFUIPrototypeID(String code, { List<String>? tags }): super(code, AFUILibraryID.id, tags: tags); 
+  static const visualize = AFUIPrototypeID("visualize");
+
 }

@@ -115,7 +115,7 @@ class AFUIPrototypeTestScreen extends AFUIConnectedScreen<AFUIPrototypeTestScree
       }
     }
 
-    final leading = t.childButtonStandardBack(context, screen: screenId);
+    final leading = t.childButtonStandardBack(spi, screen: screenId);
     return spi.t.buildPrototypeScaffold(context.p.title, rows, leading: leading);
   }
 

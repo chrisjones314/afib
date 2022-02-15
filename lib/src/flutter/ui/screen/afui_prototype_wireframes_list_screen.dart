@@ -74,7 +74,7 @@ class AFUIPrototypeWireframesListScreen extends AFUIConnectedScreen<AFUIPrototyp
 
     final rows = t.column();
     rows.add(t.childCardHeader(context, AFUIWidgetID.cardWireframes, "Wireframes", rowsCard));
-    final leading = t.childButtonStandardBack(context, screen: screenId);
+    final leading = t.childButtonStandardBack(spi, screen: screenId);
     return t.buildPrototypeScaffold("AFib Wireframes", rows, leading: leading);
 
   }

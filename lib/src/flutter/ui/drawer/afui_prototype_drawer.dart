@@ -125,7 +125,7 @@ class AFUIPrototypeDrawerSPI extends AFUIDrawerSPI<AFUIDefaultStateView, AFUIPro
       return;
     }
     final revisedBase = timeQuery.baseTime.reviseForDesiredNow(DateTime.now(), revised);
-    context.dispatchQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
+    executeQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
 
   }
 
@@ -147,7 +147,7 @@ class AFUIPrototypeDrawerSPI extends AFUIDrawerSPI<AFUIDefaultStateView, AFUIPro
       return;
     }
     final revisedBase = timeQuery.baseTime.reviseAdjustOffset(duration*multiple);
-    context.dispatchQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
+    executeQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
   }
 }
 
@@ -539,6 +539,8 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     });    
   }
 
+
+
   Widget _childTestList(AFUIPrototypeDrawerSPI spi,
     List<AFScreenTestDescription> tests,
     String title) {
@@ -560,7 +562,10 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
         trailing: Icon(Icons.run_circle),
         dense: true,
         onTap: () {
-          _onRun(spi, test.id);
+          final testId = test.id;
+          if(testId is AFScreenTestID) {
+            _onRun(spi, testId);
+          } 
         }
       ));     
     }
@@ -658,7 +663,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
       child: Icon(Icons.play_arrow),
       onPressed: () {
         final revisedBase = timeQuery.baseTime.reviseForPlay();
-        context.dispatchQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
+        spi.executeQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
       }
     ));
 
@@ -666,7 +671,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
       child: Icon(Icons.pause),
       onPressed: () {
         final revisedBase = timeQuery.baseTime.reviseForPause();
-        context.dispatchQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
+        spi.executeQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
       }
     ));
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:afib/id.dart';
 import 'package:afib/src/dart/redux/actions/af_always_fail_query.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
@@ -69,7 +71,7 @@ class AFStateTestStateVerificationContext {
   }
 }
 
-class AFStateTestContext<TState extends AFFlexibleState> extends AFStateTestExecute {
+abstract class AFStateTestContext<TState extends AFFlexibleState> extends AFStateTestExecute {
   AFStateTest test;
   final AFStore store;
   AFDispatcher dispatcher;
@@ -78,7 +80,7 @@ class AFStateTestContext<TState extends AFFlexibleState> extends AFStateTestExec
   
   AFStateTestContext(this.test, this.store, this.dispatcher, { required this.isTrueTestContext } );
 
-  AFStateTestID get testID { return this.test.id; }
+  AFStateTestID get testID { return this.test.id as AFStateTestID; }
   AFState get afState { return store.state; }
   TState? get state { return store.state.public.componentStateOrNull<TState>(); }
   AFRouteState get route { return store.state.public.route; }
@@ -89,25 +91,82 @@ class AFStateTestContext<TState extends AFFlexibleState> extends AFStateTestExec
     AFStateTest.processQuery(this, q);
   }
 
+  AFStateTestScreenContext<TSPI> createScreenContext<TSPI extends AFStateProgrammingInterface>({
+    required AFScreenID screenId,
+    required AFConnectedUIConfig screenConfig,
+  });
+
   void finishAndUpdateStats(AFTestStats stats) {
     stats.addPasses(errors.pass);
     stats.addErrors(errors.errorCount);
   }
 }
 
+class AFStateTestContextForState<TState extends AFFlexibleState> extends AFStateTestContext<TState> {
+
+  AFStateTestContextForState(
+    AFStateTest test,
+    AFStore store,
+    AFDispatcher dispatcher, {
+      required bool isTrueTestContext
+    }
+  ): super(test, store, dispatcher, isTrueTestContext: isTrueTestContext);
+
+
+  AFStateTestScreenContext<TSPI> createScreenContext<TSPI extends AFStateProgrammingInterface>({
+    required AFScreenID screenId,
+    required AFConnectedUIConfig screenConfig,
+  }) {
+    return AFStateTestScreenContextForState<TSPI>(screenId: screenId, screenConfig: screenConfig);
+  }
+}
+
+class AFStateTestContextForScreen<TState extends AFFlexibleState> extends AFStateTestContext<TState> {
+
+  AFStateTestContextForScreen(
+    AFStateTest test,
+    AFStore store,
+    AFDispatcher dispatcher, {
+      required bool isTrueTestContext
+    }
+  ): super(test, store, dispatcher, isTrueTestContext: isTrueTestContext);
+
+
+  AFStateTestScreenContext<TSPI> createScreenContext<TSPI extends AFStateProgrammingInterface>({
+    required AFScreenID screenId,
+    required AFConnectedUIConfig screenConfig,
+  }) {
+    return AFStateTestScreenContextForScreen<TSPI>(screenId: screenId, screenConfig: screenConfig);
+  }
+}
+
+
 class AFStateTests<TState extends AFFlexibleState> {
   final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
   final List<AFStateTest<dynamic>> tests = <AFStateTest<dynamic>>[];
   AFStateTestContext<dynamic>? context;
 
-  void addTest(AFStateTestID id, AFStateTestID? extendTest, AFStateTestDefinitionsContext definitions, AFStateTestDefinitionDelegate handler) {
-    final test = AFStateTest<TState>(id, this);
+  void addTest({
+    required AFStateTestID id, 
+    required AFStateTestID? extendTest, 
+    required AFStateTestDefinitionsContext definitions, 
+    required AFStateTestDefinitionDelegate body,
+    String? description,
+    String? disabled 
+  }) {
+    final test = AFStateTest<TState>(
+      id: id, 
+      idPredecessor: extendTest,
+      tests: this,
+      description: description,
+      disabled: disabled,
+    );
     if(extendTest != null) {
       test.extendsTest(extendTest);
     }
     tests.add(test);
     final defContext = AFStateTestDefinitionContext(definitions, test);
-    handler(defContext);
+    body(defContext);
   }
 
   AFStateTest? findById(AFStateTestID id) {
@@ -174,8 +233,12 @@ class _AFStateTestScreenStatement<TSPI extends AFStateProgrammingInterface> exte
   void execute(AFStateTestContext context, { required bool verify }) {
     final screen = AFibF.g.screenMap.createInstance(screenId, null);
     final config = screen.uiConfig;
-    final ctx = AFStateTestScreenContext<TSPI>(screenId: screenId, screenConfig: config);
-    screenHandler(context, ctx);
+    final ctx = context.createScreenContext<TSPI>(screenId: screenId, screenConfig: config);
+     screenHandler(context, ctx);
+    //final ctxFuture = ctx.future;
+    //if(ctxFuture != null) {
+      //await ctxFuture;
+    //}
   }
 }
 
@@ -189,7 +252,7 @@ class _AFStateTestQueryStatement extends _AFStateTestExecutionStatement {
     final queries = [query];
     return _AFStateTestQueryStatement(queries);
   }
-  void execute(AFStateTestContext context, { required bool verify }) {
+  Future<void> execute(AFStateTestContext context, { required bool verify }) async {
     for(final query in queries) {
       AFStateTest.processQuery(context, query);
     }
@@ -203,7 +266,7 @@ class _AFStateTestStartupStatement extends _AFStateTestQueryStatement {
 class _AFStateTestVerifyStatement extends _AFStateTestExecutionStatement {
   final AFStateTestVerifyStateDelegate verifyDelegate;
   _AFStateTestVerifyStatement(this.verifyDelegate);
-  void execute(AFStateTestContext context, { required bool verify }) {
+  Future<void> execute(AFStateTestContext context, { required bool verify }) async {
     if(!verify) {
       return;
     }
@@ -215,7 +278,7 @@ class _AFStateTestVerifyStatement extends _AFStateTestExecutionStatement {
 class _AFStateTestAdvanceTimeStatement extends _AFStateTestExecutionStatement {
  final Duration duration;
   _AFStateTestAdvanceTimeStatement(this.duration);
-  void execute(AFStateTestContext context, { required bool verify }) {
+  Future<void> execute(AFStateTestContext context, { required bool verify }) async {
     if(!verify) {
       return;
     }
@@ -231,7 +294,7 @@ class _AFStateTestAdvanceTimeStatement extends _AFStateTestExecutionStatement {
 class _AFStateTestSetAbsoluteTimeStatement extends _AFStateTestExecutionStatement {
  final DateTime time;
   _AFStateTestSetAbsoluteTimeStatement(this.time);
-  void execute(AFStateTestContext context, { required bool verify }) {
+  Future<void> execute(AFStateTestContext context, { required bool verify }) async {
     if(!verify) {
       return;
     }
@@ -389,7 +452,7 @@ class AFStateTestWidgetContext<TSPI extends AFStateProgrammingInterface> with AF
   }
 
   TSPI createWidgetSPI({ required AFWidgetParamSource paramSource }) {
-    return AFStateTestScreenContext.createSPI<TSPI>(widgetConfig, screenContext.screenId, wid, 
+    return AFStateTestScreenContextForState.createSPI<TSPI>(widgetConfig, screenContext.screenId, wid, 
       paramSource: paramSource,
       launchParam: launchParam);
   }
@@ -397,9 +460,10 @@ class AFStateTestWidgetContext<TSPI extends AFStateProgrammingInterface> with AF
 
 }
 
-class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface>  with AFExecuteWidgetMixin  {
+abstract class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface>  with AFExecuteWidgetMixin  {
   final AFScreenID screenId;
   final AFConnectedUIConfig screenConfig;
+  Future<void>? future;
   AFStateTestScreenContext({
     required this.screenId,
     required this.screenConfig,
@@ -409,20 +473,34 @@ class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface>  with A
     return this;
   }
 
-  void executeBuild(AFStateTestScreenBuildContextDelegate<TSPI> delegate, {
+  Future<void> executeBuild(AFStateTestScreenBuildContextDelegate<TSPI> delegate, {
     AFRouteParam? launchParam
   }) {
     final spi = createScreenSPI(launchParam: launchParam);
     delegate(spi);
+    return pauseForRender();
+    
   }
 
-  void executeBuildWithExecute(AFStateTestExecute e, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> delegate, {
+  Future<void> executeBuildWithExecute(AFStateTestExecute e, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> delegate, {
     AFRouteParam? launchParam
-  }) {
+  }) async {
     final spi = createScreenSPI(launchParam: launchParam);
     delegate(e, spi);
+    return pauseForRender();
   }
 
+  TSPI createScreenSPI({ required AFRouteParam? launchParam });
+  Future<void> pauseForRender();
+}
+
+class AFStateTestScreenContextForState<TSPI extends AFStateProgrammingInterface> extends AFStateTestScreenContext<TSPI>  {
+  AFStateTestScreenContextForState({
+    required AFScreenID screenId,
+    required AFConnectedUIConfig screenConfig,
+  }): super(screenId: screenId, screenConfig: screenConfig);
+
+  @override
   TSPI createScreenSPI({ required AFRouteParam? launchParam }) {
     return createSPI<TSPI>(screenConfig, screenId, AFUIWidgetID.unused, paramSource: AFWidgetParamSource.child, launchParam: launchParam);    
   }
@@ -435,7 +513,38 @@ class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface>  with A
     }
     return config.createSPI(null, context, screenId, wid, paramSource) as TSPI;
   }
+
+  @override
+  Future<void> pauseForRender() async {
+  }
 }
+
+class AFStateTestScreenContextForScreen<TSPI extends AFStateProgrammingInterface> extends AFStateTestScreenContext<TSPI>  {
+  AFStateTestScreenContextForScreen({
+    required AFScreenID screenId,
+    required AFConnectedUIConfig screenConfig,
+  }): super(screenId: screenId, screenConfig: screenConfig);
+
+  @override
+  TSPI createScreenSPI({ required AFRouteParam? launchParam }) {
+    // find the existing SPI.
+    final spi = AFibF.g.testOnlyScreenSPIMap[screenId];
+    if(spi == null) {
+      throw AFException("No spi found for screen $screenId, maybe you have a test that is not navigating to that screen, but does reference its SPI?");
+    }
+    if(spi is! TSPI) {
+      throw AFException("Found spi for $screenId but it has type ${spi.runtimeType} instead of $TSPI");
+    }
+    return spi;
+  }
+
+  @override
+  Future<void> pauseForRender() async {
+    // this gives a chance for the screen to render, and for the 
+    return Future<void>.delayed(Duration(seconds: 2), () {});
+  }
+}
+
 
 class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
   final AFStateTestDefinitionsContext definitions;
@@ -530,7 +639,7 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
     AFWidgetID wid,
     AFWidgetConfig config,
     AFStateTestScreenBuildWithExecuteContextDelegate<TSPIWidget> widgetHandler) {
-    test.executeScreen<AFScreenStateProgrammingInterface>(screenId, (e, screenContext) {
+    test.executeScreen<AFScreenStateProgrammingInterface>(screenId, (e, screenContext) async {
       screenContext.executeWidgetUseChildParam<TSPIWidget>(wid, config, (widgetContext) {
         widgetContext.executeBuildWithExecute(e, widgetHandler);
       });
@@ -543,7 +652,7 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
     AFWidgetConfig config,
     AFStateTestWidgetWithExecuteHandlerDelegate<TSPIWidget> widgetHandler) {
     
-    test.executeScreen<AFScreenStateProgrammingInterface>(screenId, (e, screenContext) {
+    test.executeScreen<AFScreenStateProgrammingInterface>(screenId, (e, screenContext) async {
       screenContext.executeWidgetUseChildParamWithExecute<TSPIWidget>(wid, config, e, widgetHandler);
     });
   }
@@ -554,7 +663,7 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
     AFWidgetConfig config,
     AFStateTestWidgetWithExecuteHandlerDelegate<TSPIWidget> widgetHandler) {
     
-    test.executeScreen<AFStateProgrammingInterface>(screenId, (e, screenContext) {
+    test.executeScreen<AFStateProgrammingInterface>(screenId, (e, screenContext) async {
       screenContext.executeWidgetUseParentParamAndExecute<TSPIWidget>(wid, config, e, widgetHandler);
     });
   }
@@ -568,14 +677,14 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
       AFNavigateRoute parentRoute = AFNavigateRoute.routeHierarchy,
     }) {
     
-    test.executeScreen<AFStateProgrammingInterface>(screenId, (e, screenContext) {
+    test.executeScreen<AFStateProgrammingInterface>(screenId, (e, screenContext) async {
       screenContext.executeWidgetUseLaunchParamAndExecute<TSPIWidget>(launchParam, config, e, widgetHandler, parentRoute: parentRoute);
     });
   }
 
 
   void executeScreenBuild<TSPI extends AFStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> buildHandler) {
-    test.executeScreen<TSPI>(screenId, (e, screenContext) {
+    test.executeScreen<TSPI>(screenId, (e, screenContext) async {
       screenContext.executeBuildWithExecute(e, buildHandler);
     });
   }
@@ -607,6 +716,7 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
 }
 
 class _AFStateExecutionConfiguration {
+  AFStateTestID? owner;
   final List<_AFStateTestDefinitionStatement> definitionStatements = <_AFStateTestDefinitionStatement>[];
   final List<_AFStateTestExecutionStatement> executionStatements = <_AFStateTestExecutionStatement>[];
 
@@ -634,15 +744,77 @@ class _AFStateExecutionConfiguration {
   }
 }
 
-class AFStateTest<TState extends AFFlexibleState> {
-  final AFStateTests<TState> tests;
-  final AFStateTestID id;
-  AFStateTestID? idPredecessor;
-  final Map<String, _AFStateResultEntry> results = <String, _AFStateResultEntry>{};
-  final _AFStateExecutionConfiguration extendedStatements = _AFStateExecutionConfiguration();
-  final _AFStateExecutionConfiguration currentStatements = _AFStateExecutionConfiguration();
+class _AFStateExtendedExecutionConfiguration {
+  final configurations = <_AFStateExecutionConfiguration>[];
 
-  AFStateTest(this.id, this.tests) {
+  bool get hasExecutionStatements {
+    for(final config in configurations) {
+      if(config.hasExecutionStatements) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  List<_AFStateTestDefinitionStatement> definitionStatements() {
+    final result = <_AFStateTestDefinitionStatement>[];
+    for(final config in configurations) {
+      result.addAll(config.definitionStatements);
+    }
+    return result;
+  }
+
+  List<_AFStateTestExecutionStatement> executionStatements({ required AFStateTestID? upTo, required AFStateTestID? continueFrom }) {
+    final result = <_AFStateTestExecutionStatement>[];
+    for(final config in configurations) {
+      if(continueFrom != null && config.owner != continueFrom) {
+        continue;
+      } else {
+        continueFrom = null;
+      }
+      result.addAll(config.executionStatements);
+      if(upTo != null && config.owner == upTo) {
+        break;
+      }
+    }
+    return result;
+  }
+
+  _AFStateTestStartupStatement? get startupStatement {
+    for(final config in configurations) {
+      final startup = config.executionStatements.firstWhereOrNull((e) => e is _AFStateTestStartupStatement);
+      if(startup != null) {
+        return startup as _AFStateTestStartupStatement;
+      }
+    }
+    return null;
+  }
+
+  void addAll(_AFStateExtendedExecutionConfiguration other) {
+    configurations.addAll(other.configurations);
+  }
+
+  void add(_AFStateExecutionConfiguration other) {
+    configurations.add(other);
+  }
+  
+}
+
+class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescription {
+  final AFStateTests<TState> tests;
+  final AFStateTestID? idPredecessor;
+  final Map<String, _AFStateResultEntry> results = <String, _AFStateResultEntry>{};
+  final extendedStatements = _AFStateExtendedExecutionConfiguration();
+  _AFStateExecutionConfiguration currentStatements = _AFStateExecutionConfiguration();
+
+  AFStateTest({
+    required AFStateTestID id,
+    String? description,
+    String? disabled,
+    required this.idPredecessor,
+    required this.tests,
+  }): super(id, description, disabled) {
+    currentStatements.owner = id;
     registerResult(AFAlwaysFailQuery, (context, query) {
       query.testFinishAsyncWithError(context, AFQueryError(message: "Always fail in state test"));
     });
@@ -651,13 +823,29 @@ class AFStateTest<TState extends AFFlexibleState> {
     }
   }
 
+
   void extendsTest(AFStateTestID idTest) {
-    idPredecessor = idTest;
     final test = tests.findById(idTest);
     if(test != null) {
       this.extendedStatements.addAll(test.extendedStatements);
-      this.extendedStatements.addAll(test.currentStatements);
+      final cs = test.currentStatements;
+      this.extendedStatements.add(cs);
     }
+  }
+
+  bool hasPredecessor(AFStateTestID desiredId) {
+    final idPred = idPredecessor;
+    if(idPred  == null) {
+      return false;
+    }
+    if(idPred == desiredId) {
+      return true;
+    }
+    final testPred = tests.findById(idPred);
+    if(testPred == null) {
+      throw AFException("Unknown predecessor test $idPred in $id");
+    }
+    return testPred.hasPredecessor(desiredId);
   }
     
   void registerResult(dynamic querySpecifier, AFProcessQueryDelegate? handler) {
@@ -803,7 +991,7 @@ class AFStateTest<TState extends AFFlexibleState> {
   }
 
   void executeStartup() {
-    final prevStartup = extendedStatements.executionStatements.firstWhereOrNull((e) => e is _AFStateTestStartupStatement);
+    final prevStartup = extendedStatements.startupStatement;
     if(prevStartup != null) {
       throw AFException("Do not call executeStartup in a test, if it extends a test that has already called executeStartup");
     }
@@ -821,11 +1009,14 @@ class AFStateTest<TState extends AFFlexibleState> {
 
 
   /// Execute the test by kicking of its queries, then 
-  void execute(AFStateTestContext context, { bool shouldVerify = true }) {    
+  void execute(AFStateTestContext context, { bool shouldVerify = true,
+    AFStateTestID? upTo,
+    AFStateTestID? continueFrom }) {    
     AFStateTestContext.currentTest = context;
   
     // first, execute all the predecessor definitons.
-    for(final exec in extendedStatements.definitionStatements) {
+    final defs = extendedStatements.definitionStatements();
+    for(final exec in defs) {
       exec.execute(context);
     }
 
@@ -838,13 +1029,16 @@ class AFStateTest<TState extends AFFlexibleState> {
     // then, execute all the predecessor executions, but don't do any verification,
     // not just because it would be redundant, but because it may be inaccurate due
     // to overriden definitions that impact the results of queries.
-    for(final exec in extendedStatements.executionStatements) {
+    final execs = extendedStatements.executionStatements(upTo: upTo, continueFrom: continueFrom);
+    for(final exec in execs) {
       exec.execute(context, verify: false);
     }
 
-    // basically, we need to go through an execute each query that they specified.
-    for(final exec in currentStatements.executionStatements) {
-      exec.execute(context, verify: true);
+    if(upTo == null) {
+      // basically, we need to go through an execute each query that they specified.
+      for(final exec in currentStatements.executionStatements) {
+        exec.execute(context, verify: true);
+      }
     }
   }
 }

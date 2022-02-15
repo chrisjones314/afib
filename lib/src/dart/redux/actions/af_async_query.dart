@@ -7,7 +7,6 @@ import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
-import 'package:afib/src/dart/utils/af_context_dispatcher_mixin.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
@@ -43,7 +42,7 @@ class AFStartQueryContext<TResponse> {
   }
 }
 
-class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextDispatcherMixin, AFContextShowMixin, AFUpdateAppStateMixin<TState> {
+class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextShowMixin, AFUpdateAppStateMixin<TState>, AFNavigateMixin {
   final AFDispatcher dispatcher;
   AFState state;
 

@@ -1978,7 +1978,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   /// duplicating them on every screen.
   Widget childScaffold<TBuildContext extends AFBuildContext>({
     Key? key,
-    required AFBuildContext context,
+    required AFStateProgrammingInterface spi,
     AFConnectedUIBase? contextSource,
     PreferredSizeWidget? appBar,
     Widget? drawer,
@@ -2645,7 +2645,7 @@ need to manually update the value in the controller.
   /// 
   /// The back button can optionally display a dialog which checks whether the user
   /// should continue, see [standardShouldContinueAlertCheck] for more.
-  Widget childButtonStandardBack(AFBuildContext context, {
+  Widget childButtonStandardBack(AFStateProgrammingInterface spi, {
     required AFScreenID screen,
     AFWidgetID wid = AFUIWidgetID.buttonBack,
     dynamic iconIdOrWidget = AFUIThemeID.iconBack,
@@ -2663,8 +2663,8 @@ need to manually update the value in the controller.
         tooltip: translate(tooltip),
         onPressed: () async {
           if(shouldContinueCheck == null || await shouldContinueCheck() == AFShouldContinue.yesContinue) {
-            context.dispatchNavigate(AFNavigatePopAction(id: wid, worksInSingleScreenTest: worksInSingleScreenTest));
-            context.dispatchWireframeEvent(screen, wid, null);
+            spi.navigatePop();
+            spi.executeWireframeEvent(screen, wid, null);
           } 
         }
     );

@@ -105,6 +105,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   final testMissingTranslations = AFTestMissingTranslations();
   final wireframes = AFWireframes();
   final testOnlyDialogCompleters = <AFScreenID, void Function(dynamic)>{}; 
+  final testOnlyScreenSPIMap = <AFScreenID, AFStateProgrammingInterface>{};
 
   AFScreenMap? _afPrototypeScreenMap;
   AFScreenID? forcedStartupScreen;

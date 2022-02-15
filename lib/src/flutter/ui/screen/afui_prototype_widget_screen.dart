@@ -120,13 +120,13 @@ class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetS
 
     final widgets = [resultWidget];
     return t.childScaffold(
-      context: context,
+      spi: spi,
       //key: _mainScaffoldKey,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             automaticallyImplyLeading: false,
-            leading: t.childButtonStandardBack(context, screen: screenId),
+            leading: t.childButtonStandardBack(spi, screen: screenId),
             title: t.childText('Widget Test Screen',
               style: t.styleOnPrimary.headline6,
             ),

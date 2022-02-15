@@ -2,7 +2,6 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
-import 'package:afib/src/dart/utils/af_context_dispatcher_mixin.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/ui/dialog/afui_standard_notification.dart';
 import 'package:flutter/material.dart';
@@ -439,6 +438,9 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
           }
 
           final spi = uiConfig.createSPI(buildContext, dataContext, screenId, wid, paramSource);
+          if(AFibD.config.isTestContext && wid == AFUIWidgetID.unused) {
+            AFibF.g.testOnlyScreenSPIMap[screenId] = spi;
+          }
           final widgetResult = buildWithSPI(spi);
           return widgetResult;
         }
@@ -567,6 +569,51 @@ abstract class AFConnectedBottomSheet<TState extends AFFlexibleState, TTheme ext
 
 }
 
+mixin AFNavigateMixin {
+  void dispatch(dynamic action);
+
+  void navigatePop() {
+    dispatch(AFNavigatePopAction());
+  }
+
+  void navigatePush(
+    AFNavigatePushAction action
+  ) {
+    dispatch(action);
+  }
+
+  void navigateReplaceCurrent(
+    AFNavigateReplaceAction action,
+  ) {
+    dispatch(action);
+  }
+
+  void navigateReplaceAll(
+    AFNavigateReplaceAllAction action
+  ) {
+    dispatch(action);
+  }
+
+  void navigatePopN({ 
+    required int popCount,
+  }) {
+    dispatch(AFNavigatePopNAction(popCount: popCount));
+  }
+
+  void navigatePopTo(
+    AFNavigatePopToAction popTo
+  )  {
+    dispatch((popTo));
+  }
+
+  void navigatePopToAndPush({
+    required AFScreenID popTo,
+    required AFNavigatePushAction push
+  }) {
+    dispatch(AFNavigatePopToAction(popTo: popTo, push: push));
+  }
+}
+
 mixin AFUpdateAppStateMixin<TState extends AFFlexibleState> {
   void dispatch(dynamic action);
 
@@ -580,6 +627,45 @@ mixin AFUpdateAppStateMixin<TState extends AFFlexibleState> {
   /// with the [TState] type parameter.
   void updateAppStateMany(List<Object> toIntegrate) {
     dispatch(AFUpdateAppStateAction(area: TState, toIntegrate: toIntegrate));
+  }
+
+  /// A utility which dispatches an asynchronous query.
+  void executeQuery(AFAsyncQuery query) {
+    dispatch(query);
+  }
+
+  /// A utility which delays for the specified time, then updates the resulting code.   
+  /// 
+  /// This deferral is active in UIs, but is disabled during automated tests to speed results and reduce 
+  /// complexity.
+  void executeDeferredQuery(AFDeferredSuccessQuery query) {
+    dispatch(query);
+  }
+
+
+  void executeConsolidatedQuery(AFConsolidatedQuery query) {
+    dispatch(query);
+  }
+
+  /// Dispatch an [AFAsyncListenerQuery], which establishes a channel that
+  /// recieves results on an ongoing basis (e.g. via a websocket).
+  /// 
+  /// This is just here for discoverability, it is no different from
+  /// dispatch(query).
+  void executeListenerQuery(AFAsyncListenerQuery query) {
+    dispatch(query);
+  }
+
+
+  void executeWireframeEvent(AFScreenID screen, AFID widget, Object? eventData) {
+    if(!AFibD.config.isPrototypeMode || AFibF.g.storeInternalOnly?.state.private.testState.activeWireframe == null) {
+      return;
+    }
+    dispatch(AFWireframeEventAction(
+      screen: screen,
+      widget: widget,
+      eventParam: eventData
+    ));
   }
 
 }
@@ -1107,7 +1193,7 @@ class AFBuildStateViewContext<TState extends AFFlexibleState?, TRouteParam exten
 /// screen data and param to many functions, to make things more concise.  
 /// 
 /// The framework cannot pass you this itself because 
-class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> with AFContextDispatcherMixin, AFContextShowMixin {
+class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> with AFContextShowMixin {
   AFStandardBuildContextData standard;
   TStateView stateView;
   TRouteParam routeParam;
@@ -1195,44 +1281,6 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
       }
     }
     return result;
-  }
-
-  /// Update one object at the root of the application state.
-  /// 
-  /// Note that you must specify your root application state type as a type parameter:
-  /// ```dart
-  /// context.updateAppStateOne<YourRootState>(oneObjectWithinYourRootState);
-  /// ```
-  void updateAppStateOne<TState extends AFFlexibleState>(Object toUpdate) {
-    assert(TState != AFFlexibleState);
-    dispatch(AFUpdateAppStateAction.updateOne(TState, toUpdate));
-  }
-
-  /// Update several objects at the root of the application state.
-  /// 
-  /// Note that you must specify your root application state type as a type parameter:
-  /// ```dart
-  /// context.updateAppStateMany<YourRootState>([oneObjectWithinYourRootState, anotherObjectWithinYourRootState]);
-  /// ```
-  void updateAppStateN<TState extends AFFlexibleState>(List<Object> toUpdate) {
-    assert(TState != AFFlexibleState);
-    dispatch(AFUpdateAppStateAction.updateMany(TState, toUpdate));
-  } 
-
-  /// A utility which dispatches an asynchronous query.
-  void dispatchQuery(AFAsyncQuery query) {
-    dispatch(query);
-  }
-
-  /// A utility which delays for the specified time, then updates the resulting code.   
-  /// 
-  /// This deferral is active in UIs, but is disabled during automated tests to speed results and avoid 
-  /// complexity.
-  void deferUpdate<TState extends AFFlexibleState>({ 
-    required AFOnResponseDelegate<TState, AFUnused> onExecute, Duration duration = const Duration(milliseconds: 200)}) {
-    dispatch(AFDeferredSuccessQuery(
-      duration, onExecute,
-    ));
   }
 
   bool get _isInWireframe {
@@ -1348,7 +1396,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
 }
 
 @immutable
-class AFStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> with AFContextShowMixin {
+class AFStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> with AFContextShowMixin, AFUpdateAppStateMixin, AFNavigateMixin {
   final TBuildContext context;
   final AFScreenID screenId;
   final TTheme theme;
@@ -1391,7 +1439,6 @@ class AFStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme e
     final config = context.standard.config;
     config.updateRemoveChildParam(context, screenId, wid);
   }
-
 
   void closeBottomSheetFromScreen(AFScreenID sheetId, dynamic result) {
     context.closeBottomSheet(sheetId, result);

@@ -235,39 +235,39 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
   }
 
   void buildTestNavDownAll({
-    required AFBuildContext? context,
+    required AFStateProgrammingInterface spi,
     required List<Widget> rows,
     required AFLibraryTestHolder tests,
   }) {
     rows.add(childTestNavDown(
-      context: context,
+      spi: spi,
       title: AFUITranslationID.widgetPrototypes,
       tests: tests.afWidgetTests.all,
     ));
     
     rows.add(childTestNavDown(
-      context: context,
+      spi: spi,
       title: AFUITranslationID.screenPrototypes,
       tests: tests.afScreenTests.all,
     ));
     
     rows.add(childTestNavDown(
-      context: context,
+      spi: spi,
       title: AFUITranslationID.workflowPrototypes,
       tests: tests.afWorkflowStateTests.all
     ));
   }
 
   Widget childTestNavDown({
-    AFBuildContext? context,
+    AFStateProgrammingInterface? spi,
     dynamic title, 
     List<AFScreenPrototype>? tests
   }) {
-    if(context == null || tests == null) throw AFException("Context or tests are null");
+    if(spi == null || tests == null) throw AFException("Context or tests are null");
     return childListNav(
       title: title,
       onPressed: () {
-      context.dispatchNavigatePush(AFUIPrototypeTestScreen.navigatePush(tests, title));
+      spi.navigatePush(AFUIPrototypeTestScreen.navigatePush(tests, title));
     });    
   }
 

@@ -33,7 +33,7 @@ class AFUIPrototypeWireframesListScreen extends AFUIConnectedScreen<AFUIPrototyp
 
   AFUIPrototypeWireframesListScreen(): super(screenId: AFUIScreenID.screenPrototypeWireframesList, config: config);
 
-  static AFNavigatePushAction navigateTo() {
+  static AFNavigatePushAction navigatePush() {
     return AFNavigatePushAction(
       routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeWireframesList)
     );
@@ -62,11 +62,11 @@ class AFUIPrototypeWireframesListScreen extends AFUIConnectedScreen<AFUIPrototyp
       );
 
       rowsCard.add(
-        t.createTestListTile(context.d, test,
+        t.createTestListTile(spi, test,
           title: wireframe.id.toString(),
           onTap: () {               
             context.dispatch(AFStartWireframeAction(wireframe: wireframe));
-            test.startScreen(context.d, wireframe.testData);
+            test.startScreen(spi.d, spi.flutterContext, wireframe.testData);
           }
         )
       );

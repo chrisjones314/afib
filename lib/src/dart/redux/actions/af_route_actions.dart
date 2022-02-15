@@ -3,6 +3,7 @@ import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
@@ -217,11 +218,13 @@ class AFNavigateSetChildParamAction extends AFNavigateAction {
 }
 
 class AFWireframeEventAction {
+  final AFStateProgrammingInterface spi;
   final AFScreenID screen;
   final AFID widget;
   final dynamic eventParam;
 
   AFWireframeEventAction({
+    required this.spi,
     required this.screen,
     required this.widget,
     this.eventParam,

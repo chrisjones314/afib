@@ -13,7 +13,7 @@ import 'package:flutter/widgets.dart';
 /// Parameter uses to filter the tests/protoypes shown on the screen.
 @immutable
 class AFUIPrototypeTestScreenParam extends AFRouteParam {
-  static const ungroupedGroup = "ungrouped";
+  static const untaggedGroup = "untagged";
   final String? filter;
   final dynamic title;
 
@@ -34,7 +34,7 @@ class AFUIPrototypeTestScreenParam extends AFRouteParam {
     for(final test in tests) {
       var group = test.id.effectiveGroup;
       if(group == null) {
-       group = ungroupedGroup; 
+       group = untaggedGroup; 
       }
       var tests = groups[group];      
       if(tests == null) {
@@ -99,6 +99,13 @@ class AFUIPrototypeTestScreen extends AFUIConnectedScreen<AFUIPrototypeTestScree
   List<String> _sortIterable(Iterable<String> items) {
     final result = List<String>.of(items);
     result.sort();
+
+    final idxUngrouped = result.indexOf(AFUIPrototypeTestScreenParam.untaggedGroup);
+    if(idxUngrouped > 0) {
+      result.removeAt(idxUngrouped);
+      result.insert(0, AFUIPrototypeTestScreenParam.untaggedGroup);
+    }   
+
     return result;
   }
 
@@ -124,7 +131,7 @@ class AFUIPrototypeTestScreen extends AFUIConnectedScreen<AFUIPrototypeTestScree
     final context = spi.context;
     final rows = t.column();
     for(final test in tests) {
-      rows.add(t.createTestListTile(context.d, test));
+      rows.add(t.createTestListTile(spi, test));
     }
 
     return t.childCardHeader(context, widGroup, group, rows);

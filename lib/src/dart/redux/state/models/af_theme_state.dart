@@ -2664,7 +2664,7 @@ need to manually update the value in the controller.
         onPressed: () async {
           if(shouldContinueCheck == null || await shouldContinueCheck() == AFShouldContinue.yesContinue) {
             spi.navigatePop();
-            spi.executeWireframeEvent(screen, wid, null);
+            spi.executeWireframeEvent(wid, null);
           } 
         }
     );

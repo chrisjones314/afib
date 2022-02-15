@@ -10,6 +10,9 @@ import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
+import 'package:afib/src/flutter/ui/screen/afui_prototype_bottomsheet_screen.dart';
+import 'package:afib/src/flutter/ui/screen/afui_prototype_dialog_screen.dart';
+import 'package:afib/src/flutter/ui/screen/afui_prototype_drawer_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_widget_screen.dart';
 import 'package:collection/collection.dart';
 import 'package:colorize/colorize.dart';
@@ -563,7 +566,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
       await onDialog(this);
     });
 
-    final result = AFibF.g.testOnlyDialogReturn[dialogScreenId];
+    final result = AFibF.g.testOnlyShowUIReturn[dialogScreenId];
     if(verifyReturn != null) {
       verifyReturn(result);
     }
@@ -583,7 +586,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
       await onSheet(this);
     });
 
-    final result = AFibF.g.testOnlyBottomSheetReturn[dialogScreenId];
+    final result = AFibF.g.testOnlyShowUIReturn[dialogScreenId];
     if(verifyReturn != null) {
       verifyReturn(result);
     }
@@ -631,6 +634,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
     AFActionListenerDelegate? verifyActions, 
     AFParamListenerDelegate? verifyParamUpdate,
     AFAsyncQueryListenerDelegate? verifyQuery,
+    AFVerifyResultDelegate? verifyResult,
     int maxWidgets = 1, 
     int extraFrames = 0,
     bool ignoreUnderWidget = false, 
@@ -642,9 +646,10 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
     AFActionListenerDelegate? verifyActions, 
     AFParamListenerDelegate? verifyParamUpdate,
     AFAsyncQueryListenerDelegate? verifyQuery, 
+    AFVerifyResultDelegate? verifyResult,
     bool ignoreUnderWidget = false,
   }) {
-    return applyWidgetValue(selector, tapData, AFApplyWidgetAction.applyTap, ignoreUnderWidget: ignoreUnderWidget, extraFrames: extraFrames+1, verifyActions: verifyActions, verifyParamUpdate: verifyParamUpdate, verifyQuery: verifyQuery);
+    return applyWidgetValue(selector, tapData, AFApplyWidgetAction.applyTap, ignoreUnderWidget: ignoreUnderWidget, extraFrames: extraFrames+1, verifyActions: verifyActions, verifyParamUpdate: verifyParamUpdate, verifyQuery: verifyQuery, verifyResult: verifyResult);
   }
 
   Future<void> applySwipeDismiss(dynamic selector, { 
@@ -892,7 +897,7 @@ class AFSingleScreenPrototypeBody {
     reusableTests.add(body);
   }
 
-  void defineSmokeTest(AFScreenTestID id, { required AFScreenTestBodyExecuteDelegate body, String? description, String? disabled }) async {
+  void defineSmokeTest({ AFScreenTestID id = AFUIScreenTestID.smoke, required AFScreenTestBodyExecuteDelegate body, String? description, String? disabled }) async {
     // in the first section, always add a scaffold widget collector.
 
     addSmokeTest(AFScreenTestBody(id: id, description: description, disabled: disabled, params: [], bodyReusable: null, body: (sse, params) async {
@@ -1012,6 +1017,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
       AFActionListenerDelegate? verifyActions, 
       AFParamListenerDelegate? verifyParamUpdate,
       AFAsyncQueryListenerDelegate? verifyQuery,
+      AFVerifyResultDelegate? verifyResult,
       int maxWidgets = 1, 
       int extraFrames = 0,
       bool ignoreUnderWidget = false, 
@@ -1059,6 +1065,10 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
         throw AFException("Passed in verifyQuery, but there was not an AFAsyncQuery dispatched by action");
       }
       verifyQuery(query);
+    }
+    if(verifyResult != null) {
+      final result = AFibF.g.testOnlyShowUIReturn[activeScreenId];
+      verifyResult(result);
     }
 
     await pauseForRender();
@@ -1194,6 +1204,7 @@ abstract class AFScreenPrototype {
   List<AFScreenTestDescription> get reusableTests;
   List<AFScreenTestDescription> get regressionTests;
   AFTestTimeHandling get timeHandling;
+  AFSingleScreenPrototypeBody get singleScreenBody;
 
   bool get hasTests { 
     return (smokeTests.isNotEmpty ||
@@ -1208,10 +1219,10 @@ abstract class AFScreenPrototype {
   AFNavigatePushAction get navigate;
   List<String> paramDescriptions(AFScreenTestID id) { return <String>[]; }
   List<AFScreenTestID> get sectionIds { return <AFScreenTestID>[]; }
-  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models });
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models });
   Future<void> run(AFScreenTestContext context, { Function onEnd});
   void onDrawerReset(AFDispatcher dispatcher);
-  Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator? prevContext, AFSingleScreenTestState state, AFScreenTestID testId, Function onEnd);
+  Future<void> onDrawerRun(AFBuildContext context, AFScreenTestContextSimulator? prevContext, AFSingleScreenTestState state, AFScreenTestID testId, Function onEnd);
   void openTestDrawer(AFScreenTestID id);
   dynamic get models;
   bool get isTestDrawerEnd { return testDrawerSide == testDrawerSideEnd; }
@@ -1230,19 +1241,16 @@ abstract class AFScreenPrototype {
     dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(testContext, navigate: navigate, models: this.models, timeHandling: this.timeHandling));
     return testContext;
   }
-
 }
 
-/// All the information necessary to render a single screen for
-/// prototyping and testing.
-class AFSingleScreenPrototype extends AFScreenPrototype {
+abstract class AFScreenLikePrototype extends AFScreenPrototype {
   dynamic models;
   final AFSingleScreenPrototypeBody body;
   //final AFConnectedScreenWithoutRoute screen;
   final AFNavigatePushAction navigate;
   final AFTestTimeHandling timeHandling;
 
-  AFSingleScreenPrototype({
+  AFScreenLikePrototype({
     required AFPrototypeID id,
     required this.models,
     required this.navigate,
@@ -1250,12 +1258,50 @@ class AFSingleScreenPrototype extends AFScreenPrototype {
     required this.timeHandling,
   }): super(id: id);
 
+  void openTestDrawer(AFScreenTestID id) {
+    body.openTestDrawer(id);
+  }
+
+  AFSingleScreenPrototypeBody get singleScreenBody {
+    return body;
+  }
+
   List<AFScreenTestDescription> get smokeTests { return List<AFScreenTestDescription>.from(body.smokeTests); }
   List<AFScreenTestDescription> get reusableTests { return  List<AFScreenTestDescription>.from(body.reusableTests); }
   List<AFScreenTestDescription> get regressionTests { return  List<AFScreenTestDescription>.from(body.regressionTests); }
   
+  Future<void> run(AFScreenTestExecute context, { List<Object?>? params, Function? onEnd}) {
+    return body.run(context, onEnd: onEnd, params: params);
+  }
+
   @override
-  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
+  Future<void> onDrawerRun(AFBuildContext context, AFScreenTestContextSimulator? prevContext, AFSingleScreenTestState state, AFScreenTestID id, Function onEnd) async {
+    final dispatcher = context.d;
+    final testContext = prepareRun(dispatcher, prevContext, id);
+    return run(testContext, onEnd: onEnd);
+  }
+
+}
+
+/// All the information necessary to render a single screen for
+/// prototyping and testing.
+class AFSingleScreenPrototype extends AFScreenLikePrototype {
+
+  AFSingleScreenPrototype({
+    required AFPrototypeID id,
+    required dynamic models,
+    required AFNavigatePushAction navigate,
+    required AFSingleScreenPrototypeBody body,
+    required AFTestTimeHandling timeHandling,
+  }): super(
+    id: id,
+    models: models,
+    navigate: navigate,
+    body: body,
+    timeHandling: timeHandling);
+
+  @override
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
     final ms = models ?? this.models;
     final rvp = routeParam ?? this.navigate.param;
     final actualModels = registry.resolveStateViewModels(ms);
@@ -1282,9 +1328,6 @@ class AFSingleScreenPrototype extends AFScreenPrototype {
 
   }
 
-  Future<void> run(AFScreenTestExecute context, { List<Object?>? params, Function? onEnd}) {
-    return body.run(context, onEnd: onEnd, params: params);
-  }
 
   static void resetTestParam(AFDispatcher dispatcher, AFBaseTestID testId, AFNavigatePushAction navigate) {
     final d = AFSingleScreenTestDispatcher(testId, dispatcher, null);
@@ -1301,15 +1344,6 @@ class AFSingleScreenPrototype extends AFScreenPrototype {
     dispatcher.dispatch(AFUpdatePrototypeScreenTestModelsAction(this.id, sv));
   }
 
-  @override
-  Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator? prevContext, AFSingleScreenTestState state, AFScreenTestID id, Function onEnd) async {
-    final testContext = prepareRun(dispatcher, prevContext, id);
-    return run(testContext, onEnd: onEnd);
-  }
-
-  void openTestDrawer(AFScreenTestID id) {
-    body.openTestDrawer(id);
-  }
 }
 
 
@@ -1336,7 +1370,11 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
     body.openTestDrawer(id);
   }
 
-  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
+  AFSingleScreenPrototypeBody get singleScreenBody {
+    return body;
+  }
+
+  void startScreen(AFDispatcher dispatcher,  BuildContext? flutterContext, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
     final ms = models ?? this.models;
     final rpp = routeParam ?? this.navigate.param;
 
@@ -1354,9 +1392,9 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
   }
 
   @override
-  Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator? prevContext, AFSingleScreenTestState state, AFScreenTestID selectedTestId, Function onEnd) async {
+  Future<void> onDrawerRun(AFBuildContext context, AFScreenTestContextSimulator? prevContext, AFSingleScreenTestState state, AFScreenTestID selectedTestId, Function onEnd) async {
     //final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
-    final testContext = prepareRun(dispatcher, prevContext, selectedTestId);
+    final testContext = prepareRun(context.dispatcher, prevContext, selectedTestId);
     //await testContext.pauseForRender(screenUpdateCount, true);
     run(testContext, onEnd: onEnd);
     return null;
@@ -1398,6 +1436,184 @@ class AFConnectedWidgetPrototype extends AFWidgetPrototype {
 }
 
 
+class AFDialogPrototype extends AFScreenLikePrototype {
+
+  AFDialogPrototype({
+    required AFPrototypeID id,
+    required dynamic models,
+    required AFNavigatePushAction navigate,
+    required AFSingleScreenPrototypeBody body,
+    required AFTestTimeHandling timeHandling,
+  }): super(
+    id: id,
+    models: models,
+    navigate: navigate,
+    body: body,
+    timeHandling: timeHandling);
+
+  AFScreenID get screenId {
+    return AFUIScreenID.screenPrototypeDialog;
+  }
+
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
+    final ms = models ?? this.models;
+    final rpp = routeParam ?? this.navigate.param;
+
+    final actualModels = registry.f(ms);
+    final rp = registry.f(rpp);
+    dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, 
+      models: actualModels, 
+      navigate: AFNavigatePushAction(routeParam: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
+    ));
+    dispatcher.dispatch(AFUIPrototypeDialogScreen.navigatePush(this, id: this.id));    
+  }
+
+  void onDrawerReset(AFDispatcher dispatcher) {
+  }
+
+  
+  @override
+  Future<void> onDrawerRun(AFBuildContext context, AFScreenTestContextSimulator? prevContext, AFSingleScreenTestState state, AFScreenTestID selectedTestId, Function onEnd) async {
+    final dispatcher = context.d;
+    //final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
+    final testContext = prepareRun(dispatcher, prevContext, selectedTestId);
+
+    final buildContext = AFibF.g.testOnlyShowBuildContext;
+    assert(buildContext != null);
+
+    // show the dialog, but don't wait it, because it won't return until the dialog is closed.
+    AFContextShowMixin.showDialogStatic(
+        dispatch: dispatcher.dispatch,
+        navigate: navigate,
+        flutterContext: buildContext,
+    );
+   
+    // instead, wait for the dialog to be displayed, then run the test.
+    Future.delayed(Duration(milliseconds: 500), () {
+      run(testContext, onEnd: onEnd);
+    });
+    return null;
+  }
+}
+
+class AFBottomSheetPrototype extends AFScreenLikePrototype {
+
+  AFBottomSheetPrototype({
+    required AFPrototypeID id,
+    required dynamic models,
+    required AFNavigatePushAction navigate,
+    required AFSingleScreenPrototypeBody body,
+    required AFTestTimeHandling timeHandling,
+  }): super(
+    id: id,
+    models: models,
+    navigate: navigate,
+    body: body,
+    timeHandling: timeHandling);
+
+  AFScreenID get screenId {
+    return AFUIScreenID.screenPrototypeBottomSheet;
+  }
+
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
+    final ms = models ?? this.models;
+    final rpp = routeParam ?? this.navigate.param;
+
+    final actualModels = registry.f(ms);
+    final rp = registry.f(rpp);
+    dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, 
+      models: actualModels, 
+      navigate: AFNavigatePushAction(routeParam: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
+    ));
+    dispatcher.dispatch(AFUIPrototypeBottomSheetScreen.navigatePush(this, id: this.id));    
+  }
+
+  void onDrawerReset(AFDispatcher dispatcher) {
+  }
+
+  @override
+  Future<void> onDrawerRun(AFBuildContext context, AFScreenTestContextSimulator? prevContext, AFSingleScreenTestState state, AFScreenTestID selectedTestId, Function onEnd) async {
+    final dispatcher = context.d;
+    //final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
+    final testContext = prepareRun(dispatcher, prevContext, selectedTestId);
+
+    final buildContext = AFibF.g.testOnlyShowBuildContext;
+    assert(buildContext != null);
+
+    // show the dialog, but don't wait it, because it won't return until the dialog is closed.
+    AFContextShowMixin.showModalBottomSheetStatic(
+        dispatch: dispatcher.dispatch,
+        navigate: navigate,
+        flutterContext: buildContext,
+    );
+   
+    // instead, wait for the dialog to be displayed, then run the test.
+    Future.delayed(Duration(milliseconds: 500), () {
+      run(testContext, onEnd: onEnd);
+    });
+    return null;
+  }
+}
+
+class AFDrawerPrototype extends AFScreenLikePrototype {
+
+  AFDrawerPrototype({
+    required AFPrototypeID id,
+    required dynamic models,
+    required AFNavigatePushAction navigate,
+    required AFSingleScreenPrototypeBody body,
+    required AFTestTimeHandling timeHandling,
+  }): super(
+    id: id,
+    models: models,
+    navigate: navigate,
+    body: body,
+    timeHandling: timeHandling);
+
+  AFScreenID get screenId {
+    return AFUIScreenID.screenPrototypeDrawer;
+  }
+
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
+    final ms = models ?? this.models;
+    final rpp = routeParam ?? this.navigate.param;
+
+    final actualModels = registry.f(ms);
+    final rp = registry.f(rpp);
+    dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, 
+      models: actualModels, 
+      navigate: AFNavigatePushAction(routeParam: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
+    ));
+    dispatcher.dispatch(AFUIPrototypeDrawerScreen.navigatePush(this, id: this.id));    
+  }
+
+  void onDrawerReset(AFDispatcher dispatcher) {
+  }
+
+  @override
+  Future<void> onDrawerRun(AFBuildContext context, AFScreenTestContextSimulator? prevContext, AFSingleScreenTestState state, AFScreenTestID selectedTestId, Function onEnd) async {
+    final dispatcher = context.d;
+    //final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
+    final testContext = prepareRun(dispatcher, prevContext, selectedTestId);
+
+    final buildContext = AFibF.g.testOnlyShowBuildContext;
+    assert(buildContext != null);
+
+    // show the dialog, but don't wait it, because it won't return until the dialog is closed.
+    AFContextShowMixin.showDrawerStatic(
+        dispatch: dispatcher.dispatch,
+        navigate: navigate,
+        flutterContext: buildContext,
+    );
+   
+    // instead, wait for the dialog to be displayed, then run the test.
+    Future.delayed(Duration(milliseconds: 500), () {
+      run(testContext, onEnd: onEnd);
+    });
+    return null;
+  }
+}
+
 /// The information necessary to start a test with a baseline state
 /// (determined by a state test) and an initial screen/route.
 class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenPrototype {
@@ -1415,6 +1631,10 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
   List<AFScreenTestDescription> get regressionTests { return  List<AFScreenTestDescription>.from(body.regressionTests); }
   
   AFTestTimeHandling get timeHandling { return AFTestTimeHandling.running; }
+
+  AFSingleScreenPrototypeBody get singleScreenBody {
+    throw UnimplementedError();
+  }
 
   dynamic get models { return null; }
   dynamic get routeParam { return null; }
@@ -1434,7 +1654,7 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
     return AFibF.g.screenTests;
   }
 
-  void startScreen(AFDispatcher dispatcher, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
     initializeMultiscreenPrototype<TState>(dispatcher, this);
   }
 
@@ -1482,11 +1702,48 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
   }
 
   @override
-  Future<void> onDrawerRun(AFDispatcher dispatcher, AFScreenTestContextSimulator? prevContext, AFSingleScreenTestState state, AFScreenTestID selectedTestId, Function onEnd) async {
-    final testContext = prepareRun(dispatcher, prevContext, selectedTestId);
+  Future<void> onDrawerRun(AFBuildContext context, AFScreenTestContextSimulator? prevContext, AFSingleScreenTestState state, AFScreenTestID selectedTestId, Function onEnd) async {
+    final testContext = prepareRun(context.d, prevContext, selectedTestId);
     return run(testContext, onEnd: onEnd);
   }
+}
 
+abstract class AFScreenKindTests<TState, TPrototype extends AFScreenPrototype> {
+  final _connectedTests = <TPrototype>[];
+  
+  AFSingleScreenPrototypeBody addConnectedPrototype({
+    required AFPrototypeID   id,
+    Object? models,
+    required AFNavigatePushAction navigate,
+    AFTestTimeHandling timeHandling = AFTestTimeHandling.paused,
+  }) {
+    final sv = AFibF.g.testData.resolveStateViewModels(models);    
+    final instance = createPrototype(
+      id: id,
+      models: sv,
+      navigate: navigate,
+      body: AFSingleScreenPrototypeBody(id),
+      timeHandling: timeHandling,
+    );
+    _connectedTests.add(instance);
+    return instance.singleScreenBody;
+  }
+
+  TPrototype createPrototype({
+    required AFPrototypeID   id,
+    required Object? models,
+    required AFNavigatePushAction navigate,
+    required AFTestTimeHandling timeHandling,
+    required AFSingleScreenPrototypeBody body,
+  });
+
+  TPrototype? findById(AFBaseTestID id) {
+    return _connectedTests.firstWhereOrNull( (test) => test.id == id);
+  }
+
+  List<TPrototype> get all {
+    return _connectedTests;
+  }
 }
 
 
@@ -1523,6 +1780,70 @@ class AFWidgetTests<TState> {
     return _connectedTests;
   }
 }
+
+/// Used to register connected or unconnected widget tests.
+class AFDialogTests<TState> extends AFScreenKindTests<TState, AFDialogPrototype> {
+  
+  @override
+  AFDialogPrototype createPrototype({
+    required AFPrototypeID   id,
+    Object? models,
+    required AFNavigatePushAction navigate,
+    required AFTestTimeHandling timeHandling,
+    required AFSingleScreenPrototypeBody body,
+  }) {
+    return AFDialogPrototype(
+      id: id,
+      models: models,
+      navigate: navigate,
+      timeHandling: timeHandling,
+      body: body
+    );
+  }
+
+}
+
+/// Used to register connected or unconnected widget tests.
+class AFBottomSheetTests<TState> extends AFScreenKindTests<TState, AFBottomSheetPrototype> {
+
+  @override
+  AFBottomSheetPrototype createPrototype({
+    required AFPrototypeID   id,
+    Object? models,
+    required AFNavigatePushAction navigate,
+    required AFTestTimeHandling timeHandling,
+    required AFSingleScreenPrototypeBody body,
+  }) {
+    return AFBottomSheetPrototype(
+      id: id,
+      models: models,
+      navigate: navigate,
+      timeHandling: timeHandling,
+      body: body
+    );
+  }
+}
+
+/// Used to register connected or unconnected widget tests.
+class AFDrawerTests<TState> extends AFScreenKindTests<TState, AFDrawerPrototype> {
+  @override
+  AFDrawerPrototype createPrototype({
+    required AFPrototypeID   id,
+    Object? models,
+    required AFNavigatePushAction navigate,
+    required AFTestTimeHandling timeHandling,
+    required AFSingleScreenPrototypeBody body,
+  }) {
+    return AFDrawerPrototype(
+      id: id,
+      models: models,
+      navigate: navigate,
+      timeHandling: timeHandling,
+      body: body
+    );
+  }
+}
+
 
 @immutable
 class AFSingleScreenReusableBody {
@@ -2075,57 +2396,31 @@ class AFStateTestDefinitionsContext extends AFBaseTestDefinitionContext {
   }
 }
 
-/// A context wrapper for definining a widget test
-/// 
-/// This class is intended to provide a quick start for the most common
-/// methods in defining widget tests, and to enable extensions
-/// later without changing the test definition function profile.
-class AFWidgetTestDefinitionContext extends AFBaseTestDefinitionContext {
-
-  final AFWidgetTests tests;
-  AFWidgetTestDefinitionContext({
-    required this.tests,
-    required AFCompositeTestDataRegistry testData
-  }): super(testData);
-
-  AFSingleScreenPrototypeBody definePrototype({
-    required AFPrototypeID id,
-    required AFRenderConnectedChildDelegate render,
-    dynamic models,
-    required AFRouteParam routeParam,
-  }) {
-    return tests.addConnectedPrototype(
-      id: id,
-      render: render,
-      models: models,
-      routeParam: routeParam,
-    );
-  }
-
-  void defineSmokeTest(AFSingleScreenPrototypeBody prototype, { required AFScreenTestBodyExecuteDelegate body, String? disabled, AFScreenTestID id = AFUIScreenTestID.smoke }) {
-    prototype.defineSmokeTest(id, body: body, disabled: disabled);
-  }
-}
-
 /// A context wrapper for defining single screen test. 
 /// 
 /// This class is intended to provide a quick start for the most common
 /// methods in defining single screen tests, and to enable extensions
 /// later without changing the test definition function profile.
-class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
-  final AFSingleScreenTests tests; 
-
-  AFSingleScreenTestDefinitionContext({
-    required this.tests,
+class AFScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
+  final AFSingleScreenTests screenTests; 
+  final AFWidgetTests widgetTests;
+  final AFDialogTests dialogTests;
+  final AFBottomSheetTests bottomSheetTests;
+  final AFDrawerTests drawerTests;
+  
+  AFScreenTestDefinitionContext({
+    required this.screenTests,
+    required this.widgetTests,
+    required this.dialogTests,
+    required this.drawerTests,
+    required this.bottomSheetTests,
     required AFCompositeTestDataRegistry testData
   }): super(testData);
 
 
   /// Define a prototype which shows a  single screen in a particular 
   /// screen view state/route param state.
-  /// 
-  /// 
-  AFSingleScreenPrototypeBody definePrototype({
+  AFSingleScreenPrototypeBody defineScreenPrototype({
     required AFPrototypeID   id,
     required Object? models,
     required AFNavigatePushAction navigate,
@@ -2133,7 +2428,7 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
     String? title,
   }) {
     final modelsActual = models ?? <Object>[];
-    return tests.addPrototype(
+    return screenTests.addPrototype(
       id: id,
       models: modelsActual,
       navigate: navigate,
@@ -2141,16 +2436,69 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
     );
   }
 
-  /// Create a smoke test for the [prototype]
-  /// 
-  /// A smoke test manipulates the screen thoroughly and validates 
-  /// it in various states, it is not intended to be reused.
-  void defineSmokeTest(AFSingleScreenPrototypeBody prototype, {
-    required AFScreenTestBodyExecuteDelegate body,
-    AFScreenTestID id = AFUIScreenTestID.smoke,
-    String? disabled
+  /// Define a prototype which shows a  single screen in a particular 
+  /// screen view state/route param state.
+  AFSingleScreenPrototypeBody defineDialogPrototype({
+    required AFPrototypeID   id,
+    required Object? models,
+    required AFNavigatePushAction navigate,
+    AFTestTimeHandling timeHandling = AFTestTimeHandling.paused,
+    String? title,
   }) {
-    prototype.defineSmokeTest(id, body: body, disabled: disabled);
+    final modelsActual = models ?? <Object>[];
+    return dialogTests.addConnectedPrototype(
+      id: id,
+      models: modelsActual,
+      navigate: navigate,
+      timeHandling: timeHandling,
+    );
+  }
+
+  AFSingleScreenPrototypeBody defineBottomSheetPrototype({
+    required AFPrototypeID   id,
+    required Object? models,
+    required AFNavigatePushAction navigate,
+    AFTestTimeHandling timeHandling = AFTestTimeHandling.paused,
+    String? title,
+  }) {
+    final modelsActual = models ?? <Object>[];
+    return bottomSheetTests.addConnectedPrototype(
+      id: id,
+      models: modelsActual,
+      navigate: navigate,
+      timeHandling: timeHandling,
+    );
+  }
+
+  AFSingleScreenPrototypeBody defineDrawerPrototype({
+    required AFPrototypeID   id,
+    required Object? models,
+    required AFNavigatePushAction navigate,
+    AFTestTimeHandling timeHandling = AFTestTimeHandling.paused,
+    String? title,
+  }) {
+    final modelsActual = models ?? <Object>[];
+    return drawerTests.addConnectedPrototype(
+      id: id,
+      models: modelsActual,
+      navigate: navigate,
+      timeHandling: timeHandling,
+    );
+  }
+
+
+  AFSingleScreenPrototypeBody defineWidgetPrototype({
+    required AFPrototypeID id,
+    required AFRenderConnectedChildDelegate render,
+    dynamic models,
+    required AFRouteParam routeParam,
+  }) {
+    return widgetTests.addConnectedPrototype(
+      id: id,
+      render: render,
+      models: models,
+      routeParam: routeParam,
+    );
   }
 
   /// Used to define a reusable test which takes three parameters.
@@ -2163,7 +2511,7 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
     required List<Object> params,
     String? disabled,
   }) {
-    tests.defineReusableTest(
+    screenTests.defineReusableTest(
       id: id, 
       prototype: prototype,
       body: body,
@@ -2180,7 +2528,7 @@ class AFSingleScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
     String? disabled,
   }) {
     final paramsFull = params.map<Object>((e) => td(e)).toList();
-    body.executeReusable(tests, bodyId, params: paramsFull, disabled: disabled);
+    body.executeReusable(screenTests, bodyId, params: paramsFull, disabled: disabled);
   }
 }
 

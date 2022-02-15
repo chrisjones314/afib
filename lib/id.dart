@@ -12,6 +12,9 @@ class AFUIQueryID extends AFQueryID {
 
 class AFUIScreenID extends AFScreenID {
   const AFUIScreenID(String code) : super(code, AFUILibraryID.id);
+  static const screenPrototypeDrawer = AFUIScreenID("screen_prototype_drawer");
+  static const screenPrototypeBottomSheet = AFUIScreenID("screen_prototype_bottom_sheet");
+  static const screenPrototypeDialog = AFUIScreenID("screen_prototype_dialog");
   static const screenPrototypeWaiting = AFUIScreenID("screen_prototype_waiting");
 
   static const unused = AFUIScreenID("unused");
@@ -33,6 +36,7 @@ class AFUIScreenID extends AFScreenID {
 
 class AFUIWidgetID extends AFWidgetID {
   const AFUIWidgetID(String code) : super(code, AFUILibraryID.id);
+  static const cardRelease = AFUIWidgetID("card_release");
 
   static const cardWireframes = AFUIWidgetID("card_wireframes");
 
@@ -40,7 +44,7 @@ class AFUIWidgetID extends AFWidgetID {
   //static const screenStartup = AFUIScreenID("${afibScreenPrefix}startup");
   static const buttonBack = AFUIWidgetID("button_back");  
   static const textTestSearch = AFUIWidgetID("test_search");
-  static const cardTestHomeHeader = AFUIWidgetID("card_test_home_header");
+  static const cardPrototype = AFUIWidgetID("card_prototype");
   static const contTestSearchControls = AFUIWidgetID("cont_test_search_controls");
   static const cardTestHomeSearchAndRun = AFUIWidgetID("card_test_home_search_and_run");
   static const cardTestGroup = AFUIWidgetID("card_test_group");
@@ -69,16 +73,18 @@ class AFUIScreenTestID extends AFScreenTestID {
 
 class AFUITranslationID extends AFTranslationID{
   const AFUITranslationID(String code) : super(code, AFUILibraryID.id);
+  static const stateTests = AFUITranslationID("state_tests");
+  static const release = AFUITranslationID("release");
   
   static const wireframes = AFUITranslationID("wireframes");
   static const afibPrototypeMode = AFUITranslationID("afib_prototype_mode");
   static const searchAndRun = AFUITranslationID("search_and_run");
-  static const prototypesAndTests = AFUITranslationID("prototypes_and_tests");
+  static const prototype = AFUITranslationID("prototypes");
   static const run = AFUITranslationID("run");
   static const testResults = AFUITranslationID("test_results");
   static const searchResults = AFUITranslationID("search_results");
   static const thirdParty = AFUITranslationID("third_party");
-  static const workflowPrototypes = AFUITranslationID("workflow_prototypes");
+  static const workflowTests = AFUITranslationID("workflow_prototypes");
   static const screenPrototypes = AFUITranslationID("screen_prototypes");
   static const widgetPrototypes = AFUITranslationID("widget_prototypes");
   static const appTitle = AFUITranslationID("app_title");

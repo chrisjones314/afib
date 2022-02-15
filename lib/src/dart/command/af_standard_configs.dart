@@ -19,7 +19,7 @@ class AFConfigEntryEnvironment extends AFConfigurationItemOptionChoice {
     addChoice(textValue: "production", help: "For production", runtimeValue: AFEnvironment.production);
     addChoice(textValue: "prototype", help: "Interact with prototype screens, and run tests against them on the simulator", runtimeValue: AFEnvironment.prototype);
     addChoice(textValue: "wireframe", help: "Startup in a wireframe specified by AFConfig.setStartupWireframe $specificItemConfigLocation", runtimeValue: AFEnvironment.wireframe);
-      addChoice(textValue: "workflowPrototype", help: "Startup in a specific workflow prototype specified by AFConfig.setStartupWorkflowPrototype $specificItemConfigLocation", runtimeValue: AFEnvironment.workflowPrototype);
+    addChoice(textValue: "workflowPrototype", help: "Startup in a specific workflow prototype specified by AFConfig.setStartupWorkflowPrototype $specificItemConfigLocation", runtimeValue: AFEnvironment.workflowPrototype);
     addChoice(textValue: "screenPrototype", help: "Startup in a specific screen prototype specified by AFConfig.setStartupScreenPrototype $specificItemConfigLocation", runtimeValue: AFEnvironment.screenPrototype);
     addChoice(textValue: "test", help: "Used internally when command-line tests are executing, not usually explicitly used by developers", runtimeValue: AFEnvironment.test);
 
@@ -93,9 +93,12 @@ class AFConfigEntryEnabledTests extends AFConfigurationItemOptionChoice {
   static const unitTests = "unit";
   static const screenTests = "screen";
   static const workflowTests = "workflow";
+  static const dialogTests = "dialog";
+  static const drawerTests = "drawer";
+  static const bottomSheetTests = "bottomsheet";
   static const widgetTests = "widget";
   static const i18n = "i18n";
-  static const allAreas = [allTests, unitTests, stateTests, widgetTests, screenTests, workflowTests, i18n];
+  static const allAreas = [allTests, unitTests, stateTests, widgetTests, dialogTests, bottomSheetTests, drawerTests, screenTests, workflowTests, i18n];
 
   AFConfigEntryEnabledTests(): super(
     libraryId: AFUILibraryID.id,
@@ -109,7 +112,10 @@ class AFConfigEntryEnabledTests extends AFConfigurationItemOptionChoice {
     addChoice(textValue: stateTests, help: "State tests");
     addChoice(textValue: unitTests, help: "");    
     addChoice(textValue: widgetTests, help: "");    
+    addChoice(textValue: dialogTests, help: "");    
+    addChoice(textValue: bottomSheetTests, help: "");
     addChoice(textValue: screenTests, help: "");    
+    addChoice(textValue: drawerTests, help: "");
     addChoice(textValue: workflowTests, help: "");    
     addChoice(textValue: i18n, help: "");    
     addWildcard("Or, the full identifier of any prototype, test name, or tag");

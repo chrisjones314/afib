@@ -61,6 +61,9 @@ class AFLibraryTestHolder<TState extends AFFlexibleState> {
   final AFUnitTests afUnitTests = AFUnitTests();
   final AFSingleScreenTests afScreenTests = AFSingleScreenTests();
   final AFWidgetTests afWidgetTests = AFWidgetTests();
+  final AFDialogTests afDialogTests = AFDialogTests();
+  final AFBottomSheetTests afBottomSheetTests = AFBottomSheetTests();
+  final AFDrawerTests afDrawerTests = AFDrawerTests();
   final AFWorkflowStateTests afWorkflowStateTests = AFWorkflowStateTests<TState>();
 }
 
@@ -99,13 +102,13 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   final sharedTestContext = AFSharedTestExtensionContext();
   final widgetsBindingObserver = AFWidgetsBindingObserver();
-  final testOnlyDialogReturn = <AFScreenID, dynamic>{};
-  final testOnlyBottomSheetReturn = <AFScreenID, dynamic>{};
+  final testOnlyShowUIReturn = <AFScreenID, dynamic>{};
   final themeFactories = AFFunctionalThemeDefinitionContext();
   final testMissingTranslations = AFTestMissingTranslations();
   final wireframes = AFWireframes();
   final testOnlyDialogCompleters = <AFScreenID, void Function(dynamic)>{}; 
   final testOnlyScreenSPIMap = <AFScreenID, AFStateProgrammingInterface>{};
+  BuildContext? testOnlyShowBuildContext;
 
   AFScreenMap? _afPrototypeScreenMap;
   AFScreenID? forcedStartupScreen;
@@ -148,6 +151,9 @@ class AFibGlobalState<TState extends AFFlexibleState> {
         unitTests: unitTests,
         stateTests: stateTests,
         widgetTests: widgetTests,
+        dialogTests: dialogTests,
+        bottomSheetTests: bottomSheetTests,
+        drawerTests: drawerTests,
         screenTests: screenTests,
         workflowTests: workflowTests,
         wireframes: wireframes,
@@ -161,6 +167,9 @@ class AFibGlobalState<TState extends AFFlexibleState> {
           unitTests: holder.afUnitTests,
           stateTests: holder.afStateTests,
           widgetTests: holder.afWidgetTests,
+          dialogTests: holder.afDialogTests,
+          drawerTests: holder.afDrawerTests,
+          bottomSheetTests: holder.afBottomSheetTests,
           screenTests: holder.afScreenTests,
           workflowTests: holder.afWorkflowStateTests,
           wireframes: wireframes
@@ -275,15 +284,9 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     return navDepth > 0;
   }
 
-  void testOnlyDialogRegisterReturn(AFScreenID screen, dynamic result) {
+  void testOnlyShowUIRegisterReturn(AFScreenID screen, dynamic result) {
     if(AFibD.config.isTestContext) {
-      this.testOnlyDialogReturn[screen] = result;
-    }
-  }
-
-  void testOnlyBottomSheetRegisterReturn(AFScreenID screen, dynamic result) {
-    if(AFibD.config.isTestContext) {
-      this.testOnlyBottomSheetReturn[screen] = result;
+      this.testOnlyShowUIReturn[screen] = result;
     }
   }
 
@@ -329,6 +332,22 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     if(single != null) {
       return single;
     }
+
+    final dialog = tests.afDialogTests.findById(testId);
+    if(dialog != null) {
+      return dialog;
+    }
+
+    final bottomSheet = tests.afBottomSheetTests.findById(testId);
+    if(bottomSheet != null) {
+      return bottomSheet;
+    }
+
+    final drawer = tests.afDrawerTests.findById(testId);
+    if(drawer != null) {
+      return drawer;
+    }
+  
 
     final multi = tests.afWorkflowStateTests.findById(testId);
     if(multi != null) {
@@ -489,6 +508,18 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     return primaryUITests.afScreenTests;
   }
 
+  AFDialogTests get dialogTests {
+    return primaryUITests.afDialogTests;
+  }
+
+  AFBottomSheetTests get bottomSheetTests {
+    return primaryUITests.afBottomSheetTests;
+  }
+
+  AFDrawerTests get drawerTests {
+    return primaryUITests.afDrawerTests;
+  }
+
   List<AFScreenPrototype> findTestsForAreas(List<String> areas) {
     final results = <AFScreenPrototype>[];
     _addTestsForTestSet(AFibF.g.primaryUITests, areas, results);
@@ -502,6 +533,9 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   List<AFScreenPrototype> get allScreenTests {
     final result = <AFScreenPrototype>[];
     result.addAll(widgetTests.all);
+    result.addAll(dialogTests.all);
+    result.addAll(bottomSheetTests.all);
+    result.addAll(drawerTests.all);
     result.addAll(screenTests.all);
     result.addAll(workflowTests.all);
     return result;

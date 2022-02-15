@@ -18,6 +18,9 @@ import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/ui/screen/afui_prototype_dialog_screen.dart';
+import 'package:afib/src/flutter/ui/screen/afui_prototype_drawer_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
@@ -28,7 +31,10 @@ Future<void> afScreenTestMain<TState extends AFFlexibleState>(AFCommandOutput ou
   final isWidget = AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.widgetTests);
   final isSingle = AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.screenTests);
   final isMulti  = AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.workflowTests);
-  if(!isSingle && !isMulti && !isWidget) {
+  final isDialog = AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.dialogTests);
+  final isDrawer = AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.drawerTests);
+  final isBottomSheet = AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.bottomSheetTests);
+  if(!isSingle && !isMulti && !isWidget && !isDialog && !isBottomSheet && !isDrawer) {
     return;
   }
 
@@ -55,6 +61,18 @@ Future<void> afScreenTestMain<TState extends AFFlexibleState>(AFCommandOutput ou
       await _afWidgetTestMain<TState>(output, stats, tester, app);
     }
 
+    if(isDialog) {
+      await _afDialogTestMain<TState>(output, stats, tester, app);
+    }
+
+    if(isBottomSheet) {
+      await _afBottomSheetTestMain<TState>(output, stats, tester, app);
+    }
+
+    if(isDrawer) {
+      await _afDrawerTestMain<TState>(output, stats, tester, app);
+    }
+
     if(isSingle) {
       await _afSingleScreenTestMain<TState>(output, stats, tester, app);
     }
@@ -75,8 +93,10 @@ Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
   WidgetTester tester, 
   AFApp app,  
   List<AFScreenPrototype> allPrototypes, 
-  String sectionTitle,
-  AFTestCreatePushActionDelegate createPush) async {
+  String sectionTitle, {
+    required AFTestCreatePushActionDelegate createPush,
+    Future<void> Function(AFDispatcher dispatcher, AFScreenPrototype prototype)? showItem
+  }) async {
   final simpleContexts = <AFScreenTestContextWidgetTester>[];
   final testKind = sectionTitle;
   final localStats = AFTestStats();
@@ -115,6 +135,12 @@ Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
       // tell the store to go to the correct screen.
       await tester.pumpAndSettle(Duration(seconds: 1));
 
+      if(showItem != null) {
+        await showItem(dispatcher, prototype);
+        await tester.pumpAndSettle(Duration(seconds: 1));
+
+      }
+
       output.indent();
       AFibD.logTestAF?.d("Finished pumpWidget for ${prototype.id}");
       await prototype.run(context);
@@ -138,7 +164,7 @@ Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
 }
 
 Future<void> _afWidgetTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
-  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.widgetTests.all, "Widget", (test) {
+  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.widgetTests.all, "Widget", createPush: (test) {
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
       AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models),
@@ -147,8 +173,68 @@ Future<void> _afWidgetTestMain<TState extends AFFlexibleState>(AFCommandOutput o
   });
 }
 
+Future<void> _afDialogTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.dialogTests.all, "Dialog", createPush: (test) {
+    return [
+      AFUpdateActivePrototypeAction(prototypeId: test.id),
+      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models),
+      AFUIPrototypeDialogScreen.navigatePush(test as AFDialogPrototype)
+    ];
+  }, showItem: (dispatcher, test) async {
+    final buildContext = AFibF.g.testOnlyShowBuildContext;
+    assert(buildContext != null);
+
+    // show the dialog, but don't wait it, because it won't return until the dialog is closed.
+    AFContextShowMixin.showDialogStatic(
+        dispatch: dispatcher.dispatch,
+        navigate: test.navigate,
+        flutterContext: buildContext,
+    );
+  });
+}
+
+Future<void> _afBottomSheetTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.dialogTests.all, "Dialog", createPush: (test) {
+    return [
+      AFUpdateActivePrototypeAction(prototypeId: test.id),
+      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models),
+      AFUIPrototypeDialogScreen.navigatePush(test as AFDialogPrototype)
+    ];
+  }, showItem: (dispatcher, test) async {
+    final buildContext = AFibF.g.testOnlyShowBuildContext;
+    assert(buildContext != null);
+
+    // show the dialog, but don't wait it, because it won't return until the dialog is closed.
+    AFContextShowMixin.showModalBottomSheetStatic(
+        dispatch: dispatcher.dispatch,
+        navigate: test.navigate,
+        flutterContext: buildContext,
+    );
+  });
+}
+
+Future<void> _afDrawerTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.drawerTests.all, "Drawer", createPush: (test) {
+    return [
+      AFUpdateActivePrototypeAction(prototypeId: test.id),
+      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models),
+      AFUIPrototypeDrawerScreen.navigatePush(test as AFDrawerPrototype)
+    ];
+  }, showItem: (dispatcher, test) async {
+    final buildContext = AFibF.g.testOnlyShowBuildContext;
+    assert(buildContext != null);
+
+    // show the dialog, but don't wait it, because it won't return until the dialog is closed.
+    AFContextShowMixin.showDrawerStatic(
+        dispatch: dispatcher.dispatch,
+        navigate: test.navigate,
+        flutterContext: buildContext,
+    );
+  });
+}
+
 Future<void> _afSingleScreenTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
-  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.screenTests.all, "Single-Screen", (test) {
+  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.screenTests.all, "Single-Screen", createPush: (test) {
     final stateViews = AFibF.g.testData.resolveStateViewModels(test.models);
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),

@@ -655,19 +655,6 @@ mixin AFUpdateAppStateMixin<TState extends AFFlexibleState> {
   void executeListenerQuery(AFAsyncListenerQuery query) {
     dispatch(query);
   }
-
-
-  void executeWireframeEvent(AFScreenID screen, AFID widget, Object? eventData) {
-    if(!AFibD.config.isPrototypeMode || AFibF.g.storeInternalOnly?.state.private.testState.activeWireframe == null) {
-      return;
-    }
-    dispatch(AFWireframeEventAction(
-      screen: screen,
-      widget: widget,
-      eventParam: eventData
-    ));
-  }
-
 }
 
 mixin AFContextShowMixin {
@@ -697,11 +684,33 @@ mixin AFContextShowMixin {
     bool useRootNavigator = true,
     material.RouteSettings? routeSettings
   }) async {
-    final screenId = navigate.param.id as AFScreenID;
-    final param = navigate.param;
+    showDialogStatic(
+      flutterContext: flutterContext,
+      dispatch: this.dispatch,
+      navigate: navigate,
+      onReturn: onReturn,
+      barrierDismissible: barrierDismissible,
+      barrierColor: barrierColor,
+      useSafeArea: useSafeArea,
+      useRootNavigator: useRootNavigator,
+      routeSettings: routeSettings,
+    );
+  }
 
+  static Future<void> showDialogStatic<TReturn>({
+    required dynamic dispatch(dynamic action),
+    required BuildContext? flutterContext,
+    required AFNavigatePushAction navigate,
+    void Function(TReturn?)? onReturn,
+    bool barrierDismissible = true,
+    material.Color? barrierColor,
+    bool useSafeArea = true,
+    bool useRootNavigator = true,
+    material.RouteSettings? routeSettings
+  }) async {
+    final screenId = navigate.param.id as AFScreenID;
     final verifiedScreenId = _nullCheckScreenId(screenId);
-    _updateOptionalGlobalParam(verifiedScreenId, param);
+    updateOptionalGlobalParam(dispatch, navigate);
 
     final builder = AFibF.g.screenMap.findBy(verifiedScreenId);
     if(builder == null) {
@@ -722,7 +731,7 @@ mixin AFContextShowMixin {
         routeSettings: routeSettings
       );
 
-      AFibF.g.testOnlyDialogRegisterReturn(verifiedScreenId, result);
+      AFibF.g.testOnlyShowUIRegisterReturn(verifiedScreenId, result);
       if(onReturn != null) {
         onReturn(result);
       }
@@ -943,7 +952,7 @@ mixin AFContextShowMixin {
     );
   }
 
-  AFScreenID _nullCheckScreenId(AFScreenID? screenId) {
+  static AFScreenID _nullCheckScreenId(AFScreenID? screenId) {
     if(screenId == null) throw AFException("You must either specify a screenId, or the navigate param with a screen id");
     return screenId;
   }
@@ -990,9 +999,7 @@ mixin AFContextShowMixin {
   /// ```
   /// inside the bottom sheet screen.
   void showModalBottomSheet({
-    AFScreenID? screenId,
-    AFRouteParam? param,
-    AFNavigatePushAction? navigate,
+    required AFNavigatePushAction navigate,
     AFReturnValueDelegate? onReturn,
     material.Color? backgroundColor,
     double? elevation,
@@ -1005,15 +1012,11 @@ mixin AFContextShowMixin {
     bool enableDrag = true,
     material.RouteSettings? routeSettings,  
   }) async {
-    if(navigate != null) {
-      assert(screenId == null);
-      assert(param == null);
-      screenId = navigate.param.id as AFScreenID;
-      param = navigate.param;
-    }
+    final screenId = navigate.param.id as AFScreenID;
+    final param = navigate.param;
 
     final verifiedScreenId = _nullCheckScreenId(screenId);
-    _updateOptionalGlobalParam(verifiedScreenId, param);
+    _updateOptionalGlobalParam(navigate);
 
     final builder = AFibF.g.screenMap.findBy(verifiedScreenId);
     if(builder == null) {
@@ -1037,7 +1040,7 @@ mixin AFContextShowMixin {
         routeSettings: routeSettings,
       );
 
-      AFibF.g.testOnlyBottomSheetRegisterReturn(verifiedScreenId, result);
+      AFibF.g.testOnlyShowUIRegisterReturn(verifiedScreenId, result);
 
       if(onReturn != null) {
         onReturn(result);
@@ -1058,23 +1061,14 @@ mixin AFContextShowMixin {
   /// 
   /// See also [showModalBottomSheet].
   void showBottomSheet({
-    AFScreenID? screenId,
-    AFRouteParam? param,
-    AFNavigatePushAction? navigate,
+    required AFNavigatePushAction navigate,
     material.Color? backgroundColor,
     double? elevation,
     material.ShapeBorder? shape,
     material.Clip? clipBehavior,
   }) async {
-    if(navigate != null) {
-      assert(screenId == null);
-      assert(param == null);
-      screenId = navigate.param.id as AFScreenID;
-      param = navigate.param;
-    }
-
-    if(screenId == null) throw AFException("You must either specify a screenId or a navigate containing one");
-    _updateOptionalGlobalParam(screenId, param);
+    final screenId = navigate.id as AFScreenID;
+    _updateOptionalGlobalParam(navigate);
 
     final builder = AFibF.g.screenMap.findBy(screenId);
     if(builder == null) {
@@ -1093,6 +1087,64 @@ mixin AFContextShowMixin {
     } 
   }
 
+  static void showModalBottomSheetStatic({
+    required dynamic dispatch(dynamic action),
+    BuildContext? flutterContext,    
+    required AFNavigatePushAction navigate,
+    AFReturnValueDelegate? onReturn,
+    material.Color? backgroundColor,
+    double? elevation,
+    material.ShapeBorder? shape,
+    material.Clip? clipBehavior,
+    material.Color? barrierColor,
+    bool isScrollControlled = false,
+    bool useRootNavigator = false,
+    bool isDismissible = true,
+    bool enableDrag = true,
+    material.RouteSettings? routeSettings,  
+  }) async {
+    final screenId = navigate.param.id as AFScreenID;
+    final verifiedScreenId = _nullCheckScreenId(screenId);
+    updateOptionalGlobalParam(dispatch, navigate);
+
+    final builder = AFibF.g.screenMap.findBy(verifiedScreenId);
+    if(builder == null) {
+      throw AFException("The screen $screenId is not registered in the screen map");
+    }
+
+    final ctx = flutterContext;
+    if(ctx != null) {
+      final result = await material.showModalBottomSheet<dynamic>(
+        context: ctx,
+        builder: builder,
+        backgroundColor: backgroundColor,
+        elevation: elevation,
+        shape: shape,
+        clipBehavior: clipBehavior,
+        barrierColor: barrierColor,
+        isScrollControlled: isScrollControlled,
+        useRootNavigator: useRootNavigator,
+        isDismissible: isDismissible,
+        enableDrag: enableDrag,
+        routeSettings: routeSettings,
+      );
+
+      AFibF.g.testOnlyShowUIRegisterReturn(verifiedScreenId, result);
+
+      if(onReturn != null) {
+        onReturn(result);
+      }
+    } else {
+      // this happens in state testing, where there is no BuildContext.  We still
+      // need to handle calling onReturn when someone calls closeDialog.
+      final result = AFibF.g.testOnlySimulateShowDialogOrSheet(verifiedScreenId, (val) {
+        if(onReturn != null) {
+          onReturn(val);
+        }
+      });
+    }
+  }
+
   /// Open the drawer that you specified for your [Scaffold].
   /// 
   /// You may optionally specify the optional screenId (which must match the screen id of the drawer
@@ -1102,10 +1154,21 @@ mixin AFContextShowMixin {
   /// method will be called to create it the very first time the drawer is shown.  Subsequently, it will
   /// use the param you pass to this function, or if you omit it, the value that is already in the global route pool.
   void showDrawer({
-    required AFScreenID screenId,
-    required AFRouteParam param,
+    required AFNavigatePushAction navigate
   }) {
-    _updateOptionalGlobalParam(screenId, param);
+    showDrawerStatic(
+      dispatch: this.dispatch,
+      flutterContext: flutterContext,
+      navigate: navigate
+    );
+  }
+
+  static void showDrawerStatic({
+    required dynamic dispatch(dynamic action),
+    BuildContext? flutterContext,    
+    required AFNavigatePushAction navigate
+  }) {
+    updateOptionalGlobalParam(dispatch, navigate);
     final ctx = flutterContext;
     // this happens in state testing, where there is no BuildContext.
     if(ctx != null) {
@@ -1116,10 +1179,9 @@ mixin AFContextShowMixin {
 
   /// Open the end drawer that you specified for your [Scaffold].
   void showEndDrawer({
-    required AFScreenID screenId,
-    required AFRouteParam param,
+    required AFNavigatePushAction navigate
   }) {
-    _updateOptionalGlobalParam(screenId, param);
+    _updateOptionalGlobalParam(navigate);
     // this happens in state testing, where there is no BuildContext.
     final ctx = flutterContext;
     if(ctx != null) {
@@ -1134,13 +1196,14 @@ mixin AFContextShowMixin {
     return ctx;
   }
 
-  void _updateOptionalGlobalParam(AFScreenID screenId, AFRouteParam? param) {
-    if(param == null)  {
-      return;
-    }
+  void _updateOptionalGlobalParam(AFNavigatePushAction navigate) {
+    updateOptionalGlobalParam(this.dispatch, navigate);
+  }
+
+  static updateOptionalGlobalParam(dynamic dispatch(dynamic action), AFNavigatePushAction navigate) {
     dispatch(AFNavigateSetParamAction(
-      param: param, route: AFNavigateRoute.routeGlobalPool
-    ));
+      param: navigate.param, route: AFNavigateRoute.routeGlobalPool
+    ));    
   }
 
   BuildContext? get flutterContext;
@@ -1317,6 +1380,8 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
       }));
     if(!didNav) {
       AFibF.g.testOnlySimulateCloseDialogOrSheet(dialogId, returnValue); 
+    } else {
+      AFibF.g.testOnlyShowUIReturn[dialogId] = returnValue;
     }
   }
 
@@ -1331,6 +1396,8 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
       material.Navigator.pop(ctx, returnValue); 
     })) {
       AFibF.g.testOnlySimulateCloseDialogOrSheet(sheetId, returnValue);      
+    } else {
+      AFibF.g.testOnlyShowUIReturn[sheetId] = returnValue;
     }
   }
 
@@ -1412,6 +1479,14 @@ class AFStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme e
     return theme;
   }
 
+  AFDispatcher get d {
+    return context.d;
+  }
+
+  AFDispatcher get dispatcher {
+    return context.d;
+  }
+
   Logger? get log {
     return context.log;
   }
@@ -1450,6 +1525,19 @@ class AFStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme e
   void closeDrawer() {
     context.closeDrawer();
   }
+
+  void executeWireframeEvent(AFID widget, Object? eventData) {
+    if(!AFibD.config.isPrototypeMode || AFibF.g.storeInternalOnly?.state.private.testState.activeWireframe == null) {
+      return;
+    }
+    dispatch(AFWireframeEventAction(
+      spi: this,
+      screen: screenId,
+      widget: widget,
+      eventParam: eventData
+    ));
+  }
+
 
   TChildRouteParam? findChild<TChildRouteParam extends AFRouteParam>(AFWidgetID wid) {
     return context.findChild<TChildRouteParam>(wid);
@@ -1548,5 +1636,23 @@ class AFWidgetStateProgrammingInterface<TBuildContext extends AFBuildContext, TT
 
 }
 
+class AFBuilder<TSPI extends AFStateProgrammingInterface> extends StatelessWidget {
+  final AFConnectedUIConfig config;
+  final TSPI spiParent;
+  final AFBuildWithSPIDelegate<TSPI> builder;
 
+  AFBuilder({
+    required this.config,
+    required this.spiParent,
+    required this.builder,
+  });
 
+  Widget build(BuildContext ctx) {
+    return Builder(
+        builder: (revisedCtx) {
+          final spi = config.createSPI(revisedCtx, spiParent.context, spiParent.screenId, AFUIWidgetID.unused, spiParent.paramSource);
+          return builder(spi as TSPI);
+        }
+    );
+  }
+}

@@ -53,7 +53,7 @@ class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetS
 
   AFUIPrototypeWidgetScreen(): super(screenId: AFUIScreenID.screenPrototypeWidget, config: config);
 
-  static AFNavigateAction navigatePush(AFWidgetPrototype test, {AFID? id}) {
+  static AFNavigatePushAction navigatePush(AFWidgetPrototype test, {AFID? id}) {
     return AFNavigatePushAction(
       id: id,
       routeParam: AFUIPrototypeWidgetRouteParam(test: test, routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeWidget)),

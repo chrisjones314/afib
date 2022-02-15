@@ -240,9 +240,13 @@ class AFRouteStateSegments {
       final segment = active[i];
       // the simple prototype screen is really a test of an app screen, so we do
       // want to pop it off.
+      final screen = segment.screen;
       if(segment.isAFibScreen && 
-        segment.screen != AFUIScreenID.screenPrototypeSingleScreen &&
-        segment.screen != AFUIScreenID.screenPrototypeWidget) {
+        screen != AFUIScreenID.screenPrototypeSingleScreen &&
+        screen != AFUIScreenID.screenPrototypeWidget &&
+        screen != AFUIScreenID.screenPrototypeDialog &&
+        screen != AFUIScreenID.screenPrototypeBottomSheet &&
+        screen != AFUIScreenID.screenPrototypeDrawer) {
         return nPop;
       }
       nPop++;

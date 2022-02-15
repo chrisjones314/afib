@@ -19,6 +19,7 @@ class AFWireframes {
 }
 
 class AFWireframeExecutionContext<TStateView extends AFFlexibleStateView> {
+  final AFStateProgrammingInterface spi;
   final AFScreenID screen;
   final AFID widget;
   final dynamic eventParam;
@@ -29,6 +30,7 @@ class AFWireframeExecutionContext<TStateView extends AFFlexibleStateView> {
 
 
   AFWireframeExecutionContext({
+    required this.spi,
     required this.screen,
     required this.widget,
     required this.eventParam,
@@ -70,7 +72,7 @@ class AFWireframeExecutionContext<TStateView extends AFFlexibleStateView> {
     final dispatcher = AFibF.g.storeDispatcherInternalOnly;
     assert(dispatcher != null && test != null);
     if(dispatcher != null && test != null) {
-      test.startScreen(dispatcher, wireframe.testData, routeParam: routeParam, models: models);
+      test.startScreen(dispatcher, spi.context.flutterContext, wireframe.testData, routeParam: routeParam, models: models);
     }
   }
 
@@ -113,10 +115,11 @@ class AFWireframe<TStateView extends AFFlexibleStateView> {
   }
 
 
-  void onEvent(AFScreenID screen, AFID widget, dynamic param, Map<String, Object> models) {
+  void onEvent(AFStateProgrammingInterface spi, AFScreenID screen, AFID widget, dynamic param, Map<String, Object> models) {
     final modelsCopy = Map<String, Object>.from(models);
     final stateViewOrig = stateViewCreator(modelsCopy);
     final context = AFWireframeExecutionContext(
+      spi: spi,
       screen: screen,
       widget: widget,
       eventParam: param,

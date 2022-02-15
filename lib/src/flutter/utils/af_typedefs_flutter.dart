@@ -33,11 +33,8 @@ typedef AFOnLifecycleEventDelegate = void Function(AppLifecycleState newState);
 /// Delegate used to create an application specific [AFApp] subclass.
 typedef AFCreateAFAppDelegate = AFApp Function();
 
-/// Delegate used to populate widget tests.
-typedef AFInitWidgetTestsDelegate = void Function(AFWidgetTestDefinitionContext context);
-
 /// Delegate used to populate single-screen tests.
-typedef AFInitScreenTestsDelegate = void Function(AFSingleScreenTestDefinitionContext context);
+typedef AFInitScreenTestsDelegate = void Function(AFScreenTestDefinitionContext context);
 
 /// Delegate used to populate multi-screen tests.
 typedef AFInitWorkflowStateTestsDelegate = void Function(AFWorkflowTestDefinitionContext context);
@@ -121,6 +118,8 @@ typedef AFOnErrorDelegate<TState extends AFFlexibleState> = void Function(AFFini
 /// Delegate used to process an [AFAsyncQuery]
 typedef AFAsyncQueryListenerDelegate = void Function(AFAsyncQuery query);
 
+typedef AFVerifyResultDelegate = void Function(Object? result);
+
 /// Delegate used to fill a list of widgets.
 typedef AFFillWidgetListDelegate = void Function(List<Widget> widgets);
 
@@ -192,4 +191,4 @@ typedef AFCreateConnectedWidgetDelegate = AFConnectedUIBase Function(AFConnected
 
 typedef AFCreateConnectedWidgetWithLaunchParamDelegate = AFConnectedUIBase Function(AFConnectedUIBase parent, AFRouteParam param);
 
-
+typedef AFBuildWithSPIDelegate<TSPI extends AFStateProgrammingInterface> = Widget Function(TSPI spi);

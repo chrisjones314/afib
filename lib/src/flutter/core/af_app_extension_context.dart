@@ -103,7 +103,6 @@ class AFTestExtensionContext {
   final initTestDatas = <AFInitTestDataDelegate>[];
   final initUnitTests = <AFInitUnitTestsDelegate>[];
   final initStateTests = <AFInitStateTestsDelegate>[];
-  final initWidgetTests = <AFInitWidgetTestsDelegate>[];
   final initScreenTests = <AFInitScreenTestsDelegate>[];
   final initWorkflowStateTests = <AFInitWorkflowStateTestsDelegate>[];
   final initWireframes = <AFInitWireframesDelegate>[];
@@ -113,7 +112,6 @@ class AFTestExtensionContext {
     required AFInitTestDataDelegate initTestData,
     required AFInitUnitTestsDelegate initUnitTests,
     required AFInitStateTestsDelegate initStateTests,
-    required AFInitWidgetTestsDelegate initWidgetTests,
     required AFInitScreenTestsDelegate initScreenTests,
     required AFInitWorkflowStateTestsDelegate initWorkflowStateTests,
     AFInitWireframesDelegate? initWireframes,
@@ -121,7 +119,6 @@ class AFTestExtensionContext {
     addInitTestData(initTestData);
     addInitUnitTest(initUnitTests);
     addInitStateTest(initStateTests);
-    addInitWidgetTest(initWidgetTests);
     addInitScreenTest(initScreenTests);
     addInitWorkflowStateTest(initWorkflowStateTests);
     addInitWireframe(initWireframes);
@@ -141,10 +138,6 @@ class AFTestExtensionContext {
 
   void addInitStateTest(AFInitStateTestsDelegate init) {
     initStateTests.add(init);
-  }
-
-  void addInitWidgetTest(AFInitWidgetTestsDelegate init) {
-    initWidgetTests.add(init);
   }
 
   void addInitScreenTest(AFInitScreenTestsDelegate init) {
@@ -192,13 +185,7 @@ class AFTestExtensionContext {
     }
   }
 
-  void _initWidgetTests(AFWidgetTestDefinitionContext context) {
-    for(final init in initWidgetTests) {
-      init(context);
-    }
-  }
-
-  void _initScreenTests(AFSingleScreenTestDefinitionContext context) {
+  void _initScreenTests(AFScreenTestDefinitionContext context) {
     for(final init in initScreenTests) {
       init(context);
     }
@@ -221,7 +208,10 @@ class AFTestExtensionContext {
     required AFUnitTests unitTests,
     required AFStateTests stateTests,
     required AFWidgetTests widgetTests,
+    required AFBottomSheetTests bottomSheetTests,
+    required AFDrawerTests drawerTests,
     required AFSingleScreenTests screenTests,
+    required AFDialogTests dialogTests,
     required AFWorkflowStateTests workflowTests,
     required AFWireframes wireframes,
   }) {
@@ -238,15 +228,13 @@ class AFTestExtensionContext {
         testData: testData
       );
       _initStateTests(stateTestDefineContext);
-
-      final widgetTestDefineContext = AFWidgetTestDefinitionContext(
-        tests: widgetTests,
-        testData: testData
-      );
-      _initWidgetTests(widgetTestDefineContext);
       
-      final singleTestDefineContext = AFSingleScreenTestDefinitionContext(
-        tests: screenTests,
+      final singleTestDefineContext = AFScreenTestDefinitionContext(
+        screenTests: screenTests,
+        widgetTests: widgetTests,
+        dialogTests: dialogTests,
+        bottomSheetTests: bottomSheetTests,
+        drawerTests: drawerTests,
         testData: testData
       );
       _initScreenTests(singleTestDefineContext);
@@ -535,12 +523,14 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
       AFUITranslationID.notTranslated: "{0}",
       AFUITranslationID.widgetPrototypes: "Widget Prototypes",
       AFUITranslationID.screenPrototypes: "Screen Prototypes",
-      AFUITranslationID.workflowPrototypes: "Workflow Prototypes",
+      AFUITranslationID.workflowTests: "Workflow Tests",
+      AFUITranslationID.stateTests: "State Tests",
       AFUITranslationID.thirdParty: "Third Party",
       AFUITranslationID.searchResults: "Search Results",
       AFUITranslationID.testResults: "Test Results",
       AFUITranslationID.run: "Run {0}",
-      AFUITranslationID.prototypesAndTests: "Prototypes and Tests",
+      AFUITranslationID.prototype: "Prototype",
+      AFUITranslationID.release: "Release",
       AFUITranslationID.searchAndRun: "Search and Run",
       AFUITranslationID.afibPrototypeMode: "AFib Prototype Mode",
       AFUITranslationID.afibPrototypeLoading: "",

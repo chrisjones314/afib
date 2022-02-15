@@ -63,7 +63,7 @@ class AFUIPrototypeThirdPartyHomeScreen extends AFUIConnectedScreen<AFUIPrototyp
     
     final cardRows = t.column();
     if(libraryTests != null) {
-      t.buildTestNavDownAll(
+      t.buildThirdPartyPrototypeNav(
         spi: spi,
         tests: libraryTests,
         rows: cardRows,
@@ -71,7 +71,7 @@ class AFUIPrototypeThirdPartyHomeScreen extends AFUIConnectedScreen<AFUIPrototyp
     }
     
     final rows = t.column();
-    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeHeader, "Prototypes and Tests", cardRows, margin: t.margin.b.s3));
+    rows.add(t.childCardHeader(context, AFUIWidgetID.cardPrototype, "Prototypes and Tests", cardRows, margin: t.margin.b.s3));
     final leading = t.childButtonStandardBack(spi, screen: screenId);
     return t.buildPrototypeScaffold(libraryName, rows, leading: leading);
   }

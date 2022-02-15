@@ -1,6 +1,7 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_list_screen.dart';
+import 'package:afib/src/flutter/ui/screen/afui_prototype_wireframes_list_screen.dart';
 import 'package:flutter/material.dart';
 
 class AFUIDefaultTheme extends AFFunctionalTheme {
@@ -84,7 +85,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     );
   }    
 
-  Widget createTestListTile(AFDispatcher dispatcher, AFScreenPrototype prototype, {
+  Widget createTestListTile(AFStateProgrammingInterface spi, AFScreenPrototype prototype, {
     String? title,
     String? subtitle,
     AFPressedDelegate? onTap,
@@ -108,13 +109,14 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
       tagsText.write(prototype.id.tagsText);
     }
     final onPressed = onTap ?? () {
-      dispatcher.dispatch(AFNavigateSetParamAction(
+      spi.dispatch(AFNavigateSetParamAction(
         param: AFUIPrototypeDrawerRouteParam.createOncePerScreen(AFUIPrototypeDrawerRouteParam.viewTest),
         children: null,
         route: AFNavigateRoute.routeGlobalPool
       ));
-      dispatcher.dispatch(AFUpdateActivePrototypeAction(prototypeId: prototype.id));
-      prototype.startScreen(dispatcher, AFibF.g.testData);
+      spi.dispatch(AFUpdateActivePrototypeAction(prototypeId: prototype.id));
+      prototype.startScreen(spi.d, spi.flutterContext, AFibF.g.testData);
+      
     };
     return childListTileNavDown(
       wid: prototype.id,
@@ -234,28 +236,28 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     return err.substring(idx+1);
   }
 
-  void buildTestNavDownAll({
+  void buildThirdPartyPrototypeNav({
     required AFStateProgrammingInterface spi,
     required List<Widget> rows,
     required AFLibraryTestHolder tests,
   }) {
-    rows.add(childTestNavDown(
-      spi: spi,
-      title: AFUITranslationID.widgetPrototypes,
-      tests: tests.afWidgetTests.all,
-    ));
+    final prototypes = <AFScreenPrototype>[];
+    prototypes.addAll(tests.afWidgetTests.all);
+    prototypes.addAll(tests.afDialogTests.all);
+    prototypes.addAll(tests.afBottomSheetTests.all);
+    prototypes.addAll(tests.afDrawerTests.all);
+    prototypes.addAll(tests.afScreenTests.all);
     
     rows.add(childTestNavDown(
       spi: spi,
       title: AFUITranslationID.screenPrototypes,
-      tests: tests.afScreenTests.all,
+      tests: prototypes,
     ));
-    
-    rows.add(childTestNavDown(
-      spi: spi,
-      title: AFUITranslationID.workflowPrototypes,
-      tests: tests.afWorkflowStateTests.all
-    ));
+
+    rows.add(childListNav(title: AFUITranslationID.wireframes, onPressed: () {
+      spi.navigatePush(AFUIPrototypeWireframesListScreen.navigatePush());
+    }));
+
   }
 
   Widget childTestNavDown({

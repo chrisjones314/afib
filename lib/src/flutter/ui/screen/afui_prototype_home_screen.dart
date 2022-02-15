@@ -9,7 +9,6 @@ import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_third_party_list_screen.dart';
-import 'package:afib/src/flutter/ui/screen/afui_prototype_wireframes_list_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
 import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:afib/src/flutter/utils/af_param_ui_state_holder.dart';
@@ -110,21 +109,39 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFPrototypeHomeScreenSPI
   Widget _buildHome(AFPrototypeHomeScreenSPI spi) {
     final t = spi.t;
     final context = spi.context;
-    final protoRows = t.column();
     final primaryTests = AFibF.g.primaryUITests;
-    t.buildTestNavDownAll(
+    final rows = t.column();
+
+    final protoRows = t.column();
+
+    t.buildThirdPartyPrototypeNav(
       spi: spi,
       rows: protoRows,
       tests: primaryTests,
     );
+
+
+    rows.add(t.childCardHeader(context, AFUIWidgetID.cardPrototype, AFUITranslationID.prototype, protoRows, margin: t.margin.b.s3));    
     
-    protoRows.add(t.childListNav(title: AFUITranslationID.thirdParty, onPressed: () {
-      context.dispatch(AFUIPrototypeThirdPartyListScreen.navigatePush());
+    final releaseRows = t.column();
+
+    releaseRows.add(t.childListNav(title: AFUITranslationID.stateTests, onPressed: () {
+      spi.navigatePush(AFUIPrototypeThirdPartyListScreen.navigatePush());
     }));
 
-    protoRows.add(t.childListNav(title: AFUITranslationID.wireframes, onPressed: () {
-      ;;context.dispatch(AFUIPrototypeWireframesListScreen.navigateTo());
+    releaseRows.add(t.childTestNavDown(
+      spi: spi,
+      title: AFUITranslationID.workflowTests,
+      tests: primaryTests.afWorkflowStateTests.all
+    ));
+
+    releaseRows.add(t.childListNav(title: AFUITranslationID.thirdParty, onPressed: () {
+      spi.navigatePush(AFUIPrototypeThirdPartyListScreen.navigatePush());
     }));
+
+
+    rows.add(t.childCardHeader(context, AFUIWidgetID.cardRelease, AFUITranslationID.release, releaseRows, margin: t.margin.b.s3));    
+
 
     final areas = context.p.filter.split(" ");
     final tests = AFibF.g.findTestsForAreas(areas);
@@ -138,8 +155,6 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFPrototypeHomeScreenSPI
       _buildResultsSection(spi, tests, filterRows);
     }
 
-    final rows = t.column();
-    rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeHeader, AFUITranslationID.prototypesAndTests, protoRows, margin: t.margin.b.s3));    
     rows.add(t.childCardHeader(context, AFUIWidgetID.cardTestHomeSearchAndRun, AFUITranslationID.searchAndRun, filterRows, margin: t.margin.b.s3));
     
     return spi.t.buildPrototypeScaffold(AFUITranslationID.afibPrototypeMode, rows);
@@ -151,7 +166,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFPrototypeHomeScreenSPI
     for(final test in tests) {
       // first, we navigate into the screen.
       context.dispatch(AFUpdateActivePrototypeAction(prototypeId: test.id));
-      test.startScreen(context.d, AFibF.g.testData);
+      test.startScreen(context.d, spi.flutterContext, AFibF.g.testData);
 
       final state = AFibF.g.storeInternalOnly!.state;
       final testState = state.private.testState;
@@ -162,7 +177,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFPrototypeHomeScreenSPI
       
       // note: not sure if this is true.
       if(testContext == null) throw AFException("Text context should not be null");
-      await test.onDrawerRun(context.d, testContext as AFScreenTestContextSimulator, testSpecificState!, AFUIScreenTestID.all, () {
+      await test.onDrawerRun(context, testContext as AFScreenTestContextSimulator, testSpecificState!, AFUIScreenTestID.all, () {
         context.dispatch(AFNavigateExitTestAction());
       });
 
@@ -321,7 +336,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFPrototypeHomeScreenSPI
     final context = spi.context;
 
     for(final test in tests) {
-      rows.add(spi.t.createTestListTile(context.d, test));
+      rows.add(spi.t.createTestListTile(spi, test));
     }
   }
 

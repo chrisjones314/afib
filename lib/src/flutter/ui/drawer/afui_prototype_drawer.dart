@@ -531,7 +531,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     Timer(Duration(seconds: 1), () async {         
       final prevContext = context.s.testContext as AFScreenTestContextSimulator?;
       final testState = context.s.singleScreenTestState;
-      await test?.onDrawerRun(context.d, prevContext, testState, id, () {
+      await test?.onDrawerRun(context, prevContext, testState, id, () {
         final revised = context.p.reviseView(AFUIPrototypeDrawerRouteParam.viewResults);
         spi.updateRouteParam(revised);
         test.openTestDrawer(id);

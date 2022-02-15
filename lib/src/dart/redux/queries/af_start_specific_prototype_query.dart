@@ -4,7 +4,6 @@ import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 
 class AFStartSpecificPrototypeQuery extends AFDeferredQuery<AFFlexibleState> {
-
   AFStartSpecificPrototypeQuery():
     super(const Duration(milliseconds: 500));
 
@@ -37,7 +36,7 @@ class AFStartSpecificPrototypeQuery extends AFDeferredQuery<AFFlexibleState> {
       timeHandling: AFTestTimeHandling.running
     );
     context.dispatch(AFStartWireframeAction(wireframe: wireframe));
-    test.startScreen(context.d, wireframe.testData);
+    test.startScreen(context.d, null, wireframe.testData);
   }
 
   void _startScreenPrototype(AFFinishQuerySuccessContext<AFFlexibleState, AFUnused> context, AFPrototypeID protoId) {
@@ -51,7 +50,7 @@ class AFStartSpecificPrototypeQuery extends AFDeferredQuery<AFFlexibleState> {
       route: AFNavigateRoute.routeGlobalPool
     ));
     context.dispatch(AFUpdateActivePrototypeAction(prototypeId: prototype.id));
-    prototype.startScreen(context.d, AFibF.g.testData);
+    prototype.startScreen(context.d, null, AFibF.g.testData);
 
   }
 

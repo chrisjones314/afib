@@ -110,4 +110,6 @@ class AFConfigEntries {
 
   // The orientation of the screen for command line tests.
   static final testOrientation = AFConfigEntryTestOrientation();
+
+  static final testsRecent = AFConfigEntryRecentTests();
 }

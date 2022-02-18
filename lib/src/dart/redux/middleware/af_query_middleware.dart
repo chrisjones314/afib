@@ -13,12 +13,12 @@ class AFQueryMiddleware implements MiddlewareClass<AFState>
   dynamic call(Store<AFState> store, dynamic query, NextDispatcher next) {
     if (query is AFAsyncQuery) {
       // keep track of listener queries so we can shut them down at the end.
-      if(query is AFAsyncListenerQuery) {
-        next(AFRegisterListenerQueryAction(query));
-      }
+      _registerQuery(query, next);
 
-      if(query is AFDeferredQuery) {
-        next(AFRegisterDeferredQueryAction(query));
+      if(query is AFConsolidatedQuery) {
+        for(final subQuery in query.allQueries) {
+          _registerQuery(subQuery, next);
+        }
       }
 
       final testContext = AFStateTestContext.currentTest;
@@ -33,5 +33,15 @@ class AFQueryMiddleware implements MiddlewareClass<AFState>
       }
     }
     next(query);
+  }
+
+  void _registerQuery(AFAsyncQuery query, NextDispatcher next) {
+    if(query is AFAsyncListenerQuery) {
+      next(AFRegisterListenerQueryAction(query));
+    }
+
+    if(query is AFDeferredQuery) {
+      next(AFRegisterDeferredQueryAction(query));
+    }
   }
 }

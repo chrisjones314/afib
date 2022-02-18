@@ -51,6 +51,7 @@ class AFibD<AppState> {
       registerConfigEntry(AFConfigEntries.absoluteBaseYear);
       registerConfigEntry(AFConfigEntries.environment);
       registerConfigEntry(AFConfigEntries.testsEnabled);
+      registerConfigEntry(AFConfigEntries.testsRecent);
       registerConfigEntry(AFConfigEntries.logsEnabled);
       registerConfigEntry(AFConfigEntries.testSize);
       registerConfigEntry(AFConfigEntries.testOrientation);

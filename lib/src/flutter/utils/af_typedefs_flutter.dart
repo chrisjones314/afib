@@ -173,11 +173,11 @@ typedef AFConvertSizeToFormFactorDelegate = AFFormFactor Function(Size);
 
 typedef AFConnectedUIBuilderDelegate = AFConnectedUIBase Function(BuildContext? context);
 
-typedef AFStateTestScreenHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, AFStateTestScreenContext<TSPI> spi);
+typedef AFStateTestScreenHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, AFStateTestScreenContext<TSPI> screenContext);
 
-typedef AFStateTestWidgetHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestWidgetContext<TSPI> context);
+typedef AFStateTestWidgetHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestWidgetContext<TSPI> widgetContext);
 
-typedef AFStateTestWidgetWithExecuteHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, AFStateTestWidgetContext<TSPI> spi);
+typedef AFStateTestWidgetWithExecuteHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, AFStateTestWidgetContext<TSPI> widgetContext);
 
 typedef AFStateTestScreenBuildContextDelegate<TSPI extends AFStateProgrammingInterface> = void Function(TSPI spi);
 

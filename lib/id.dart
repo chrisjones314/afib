@@ -78,7 +78,7 @@ class AFUITranslationID extends AFTranslationID{
   
   static const wireframes = AFUITranslationID("wireframes");
   static const afibPrototypeMode = AFUITranslationID("afib_prototype_mode");
-  static const searchAndRun = AFUITranslationID("search_and_run");
+  static const recent = AFUITranslationID("recent");
   static const prototype = AFUITranslationID("prototypes");
   static const run = AFUITranslationID("run");
   static const testResults = AFUITranslationID("test_results");
@@ -170,5 +170,6 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
 class AFUIPrototypeID extends AFPrototypeID {
   const AFUIPrototypeID(String code, { List<String>? tags }): super(code, AFUILibraryID.id, tags: tags); 
   static const visualize = AFUIPrototypeID("visualize");
+  static const workflowStateTest = AFUIPrototypeID("workflow_state_test");
 
 }

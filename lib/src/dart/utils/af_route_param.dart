@@ -1,4 +1,5 @@
 import 'package:afib/id.dart';
+import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:meta/meta.dart';
 
@@ -16,9 +17,11 @@ enum AFWidgetParamSource {
 class AFRouteParam {
   // a screen or widget id this route parameter is associated with.
   final AFID id;
+  final AFTimeStateUpdateSpecificity? timeSpecificity;
 
   const AFRouteParam({
-    required this.id
+    required this.id,
+    this.timeSpecificity,
   });
 
   bool matchesScreen(AFID screen) {
@@ -40,6 +43,10 @@ class AFRouteParam {
   /// it up when the screen goes away.
   void dispose() {
 
+  }
+
+  AFRouteParam? reviseForTime(AFTimeState timeState) {
+    return null;
   }
 
   String toString() {

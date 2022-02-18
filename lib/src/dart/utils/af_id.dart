@@ -1,3 +1,4 @@
+import 'package:afib/id.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:quiver/core.dart';
 
@@ -37,7 +38,8 @@ class AFID {
   }
 
   bool operator==(Object other) {
-    return (other is AFID && other.code == code);
+    return toString() == other.toString();
+    //return (other is AFID && other.code == code);
   }
 
   int get hashCode {
@@ -46,23 +48,6 @@ class AFID {
 
   Never throwLibNotNull() {
     throw AFException("Library cannot be null");
-  }
-
-  AFWidgetID with1(dynamic item) {
-    final lib = library;
-    if(lib == null) throwLibNotNull();
-    return AFWidgetID("${code}_${item.toString()}", lib);
-  }
-
-  AFWidgetID with2(dynamic first, dynamic second) {
-    final key = StringBuffer(code);
-    key.write("_${first.toString()}");
-    if(second != null) {
-      key.write("_${second.toString()}");
-    }
-    final lib = library;
-    if(lib == null) throwLibNotNull();
-    return AFWidgetID(key.toString(), lib);
   }
 
   bool endsWith(String ends) {
@@ -182,22 +167,60 @@ class AFLibraryID extends AFID {
 
 class AFWidgetID extends AFID {
   const AFWidgetID(String code, AFLibraryID library) : super("wid", code, library);
+
+  AFWidgetID with1(dynamic item) {
+    final lib = library;
+    if(lib == null) throwLibNotNull();
+    return AFWidgetID("${code}_${item.toString()}", lib);
+  }
+
+  AFWidgetID with2(dynamic first, dynamic second) {
+    final key = StringBuffer(code);
+    key.write("_${first.toString()}");
+    if(second != null) {
+      key.write("_${second.toString()}");
+    }
+    final lib = library;
+    if(lib == null) throwLibNotNull();
+    return AFWidgetID(key.toString(), lib);
+  }
 }
 
 class AFBaseTestID extends AFIDWithTags {
   const AFBaseTestID(String prefix, String code, AFLibraryID library, {String? group, List<String>? tags}) : super(prefix, code, library, tags: tags, group: group);
 }
 
+class AFFromStringTestID extends AFBaseTestID {
+  final String fullId;
+  AFFromStringTestID(this.fullId): super("", "", AFUILibraryID.id);
+
+  String toString() {
+    return fullId;
+  }
+
+
+}
+
 class AFStateTestID extends AFBaseTestID {
-  const AFStateTestID(String code, AFLibraryID library, {String? group, List<String>? tags, }) : super("statetest", code, library, tags: tags, group: group);
+  static const stateTestPrefix = "statetest";
+  const AFStateTestID(String code, AFLibraryID library, {String? group, List<String>? tags, }) : super(stateTestPrefix, code, library, tags: tags, group: group);
 }
 
 class AFScreenTestID extends AFBaseTestID {
-  const AFScreenTestID(String code, AFLibraryID library, {String? group, List<String>? tags }) : super("screentest", code, library, tags: tags, group: group);
+  static const screenTestPrefix = "screentest";
+  const AFScreenTestID(String code, AFLibraryID library, {String? group, List<String>? tags }) : super(screenTestPrefix, code, library, tags: tags, group: group);
 }
 
 class AFPrototypeID extends AFBaseTestID {
-  const AFPrototypeID(String code, AFLibraryID library, {String? group, List<String>? tags, }) : super("pr", code, library, tags: tags, group: group);
+  static const prototypePrefix = "pr";
+  const AFPrototypeID(String code, AFLibraryID library, {String? group, List<String>? tags, }) : super(prototypePrefix, code, library, tags: tags, group: group);
+
+  AFPrototypeID with1(dynamic item, List<String>? tags) {
+    final lib = library;
+    if(lib == null) throwLibNotNull();
+    return AFPrototypeID("${code}_${item.toString()}", lib, tags: tags);
+  }
+
 }
 
 class AFQueryTestID extends AFID {

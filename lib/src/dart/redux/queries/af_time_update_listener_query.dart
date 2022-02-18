@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:afib/id.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
+import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_time_actions.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
+import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 
 class AFTimeUpdateListenerQuery<AFUIState extends AFFlexibleState> extends AFAsyncListenerQuery<AFUIState, AFTimeState> {
@@ -33,9 +35,14 @@ class AFTimeUpdateListenerQuery<AFUIState extends AFFlexibleState> extends AFAsy
     timer?.cancel();
   }
 
+  static void processUpdatedTime(AFDispatcher dispatcher, AFTimeState time) {
+    dispatcher.dispatch(AFUpdateTimeStateAction(time));
+    dispatcher.dispatch(AFUpdateTimeRouteParametersAction(time));
+  }
+
   @override
   void finishAsyncWithResponse(AFFinishQuerySuccessContext<AFUIState, AFTimeState> context) {  
-    context.dispatch(AFUpdateTimeStateAction(context.r));
+    processUpdatedTime(context.d, context.r);
 
   }
 }

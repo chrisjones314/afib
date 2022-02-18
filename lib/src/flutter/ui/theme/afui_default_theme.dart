@@ -90,7 +90,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     String? subtitle,
     AFPressedDelegate? onTap,
   }) {
-    final titleText = title ?? prototype.id.code;
+    final titleText = title ?? prototype.displayId.code;
     final cols = row();
     cols.add(Expanded(child: childText(titleText, overflow: TextOverflow.fade)));
     if(prototype.hasReusable) {
@@ -269,7 +269,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     return childListNav(
       title: title,
       onPressed: () {
-      spi.navigatePush(AFUIPrototypeTestScreen.navigatePush(tests, title));
+        spi.navigatePush(AFUIPrototypeTestScreen.navigatePush(tests, title));
     });    
   }
 

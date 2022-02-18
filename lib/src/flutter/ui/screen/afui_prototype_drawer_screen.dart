@@ -13,30 +13,30 @@ import 'package:flutter/material.dart';
 
 /// Parameter uses to filter the tests shown on the screen.
 @immutable
-class AFUIPrototypeDrawerRouteParam extends AFRouteParam {
+class AFUIPrototypeDrawerScreenRouteParam extends AFRouteParam {
   final AFDrawerPrototype test;
   final AFRouteParam? routeParam;
 
-  AFUIPrototypeDrawerRouteParam({
+  AFUIPrototypeDrawerScreenRouteParam({
     required this.test, 
     required this.routeParam
   }): super(id: AFUIScreenID.screenPrototypeDrawer);
 
-  AFUIPrototypeDrawerRouteParam copyWith({
+  AFUIPrototypeDrawerScreenRouteParam copyWith({
     AFDrawerPrototype? test,
     AFRouteParam? param
   }) {
-    return AFUIPrototypeDrawerRouteParam(
+    return AFUIPrototypeDrawerScreenRouteParam(
       test: test ?? this.test,
       routeParam: param ?? this.routeParam
     );
   }
 }
 
-class AFUIPrototypeDrawerScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> {
-  AFUIPrototypeDrawerScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
+class AFUIPrototypeDrawerScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeDrawerScreenRouteParam> {
+  AFUIPrototypeDrawerScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerScreenRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
   
-  factory AFUIPrototypeDrawerScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
+  factory AFUIPrototypeDrawerScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerScreenRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
     return AFUIPrototypeDrawerScreenSPI(context, screenId, theme,
     );
   }
@@ -44,9 +44,9 @@ class AFUIPrototypeDrawerScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, A
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFUIPrototypeDrawerScreen extends AFUIConnectedScreen<AFUIPrototypeDrawerScreenSPI, AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam>{
+class AFUIPrototypeDrawerScreen extends AFUIConnectedScreen<AFUIPrototypeDrawerScreenSPI, AFUIDefaultStateView, AFUIPrototypeDrawerScreenRouteParam>{
 
-  static final config = AFUIDefaultScreenConfig<AFUIPrototypeDrawerScreenSPI, AFUIPrototypeDrawerRouteParam> (
+  static final config = AFUIDefaultScreenConfig<AFUIPrototypeDrawerScreenSPI, AFUIPrototypeDrawerScreenRouteParam> (
     spiCreator: AFUIPrototypeDrawerScreenSPI.create,
   );
 
@@ -55,7 +55,7 @@ class AFUIPrototypeDrawerScreen extends AFUIConnectedScreen<AFUIPrototypeDrawerS
   static AFNavigateAction navigatePush(AFDrawerPrototype test, {AFID? id}) {
     return AFNavigatePushAction(
       id: id,
-      routeParam: AFUIPrototypeDrawerRouteParam(test: test, routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeDrawer)),
+      routeParam: AFUIPrototypeDrawerScreenRouteParam(test: test, routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeDrawer)),
     );
   }
 
@@ -66,8 +66,6 @@ class AFUIPrototypeDrawerScreen extends AFUIConnectedScreen<AFUIPrototypeDrawerS
   }
 
   Widget _buildScreen(AFUIPrototypeDrawerScreenSPI spi) {
-    final context = spi.context;
-    final t = spi.t;
     final testStateSource = AFibF.g.storeInternalOnly?.state.private.testState;    
 
     if(testStateSource == null) {

@@ -1199,7 +1199,7 @@ abstract class AFScreenPrototype {
     this.testDrawerSide = testDrawerSideEnd
   });
 
-
+  AFID get displayId;
   List<AFScreenTestDescription> get smokeTests;
   List<AFScreenTestDescription> get reusableTests;
   List<AFScreenTestDescription> get regressionTests;
@@ -1258,6 +1258,10 @@ abstract class AFScreenLikePrototype extends AFScreenPrototype {
     required this.timeHandling,
   }): super(id: id);
 
+  AFID get displayId {
+    return id;
+  }
+
   void openTestDrawer(AFScreenTestID id) {
     body.openTestDrawer(id);
   }
@@ -1299,6 +1303,7 @@ class AFSingleScreenPrototype extends AFScreenLikePrototype {
     navigate: navigate,
     body: body,
     timeHandling: timeHandling);
+
 
   @override
   void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
@@ -1362,6 +1367,10 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
     String? title
   }): super(id: id);
 
+  AFID get displayId {
+    return id;
+  }
+  
   AFScreenID get screenId {
     return AFUIScreenID.screenPrototypeWidget;
   }
@@ -1619,11 +1628,13 @@ class AFDrawerPrototype extends AFScreenLikePrototype {
 class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenPrototype {
   final AFStateTestID stateTestId;
   final AFWorkflowStateTestPrototype body;
+  final AFID? actualDisplayId;
 
   AFWorkflowStatePrototype({
     required AFPrototypeID id,
     required this.stateTestId,
     required this.body,
+    this.actualDisplayId,
   }): super(id: id);
 
   List<AFScreenTestDescription> get smokeTests { return List<AFScreenTestDescription>.from(body.smokeTests); }
@@ -1634,6 +1645,10 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
 
   AFSingleScreenPrototypeBody get singleScreenBody {
     throw UnimplementedError();
+  }
+
+  AFID get displayId {
+    return actualDisplayId ?? id;
   }
 
   dynamic get models { return null; }
@@ -2285,14 +2300,26 @@ class AFWorkflowStateTests<TState extends AFFlexibleState> {
   AFWorkflowStateTestPrototype addPrototype({
     required AFPrototypeID id,
     required AFBaseTestID stateTestId,
+    AFID? actualDisplayId
   }) {
-    final instance = AFWorkflowStatePrototype<TState>(
-      id: id,
-      stateTestId: stateTestId as AFStateTestID,
-      body: AFWorkflowStateTestPrototype.create(this, id)
-    );
+    final instance = createPrototype(tests: this, id: id, stateTestId: stateTestId, actualDisplayId: actualDisplayId);
     stateTests.add(instance);
     return instance.body;
+  }
+
+  static AFWorkflowStatePrototype createPrototype<TState extends AFFlexibleState>({
+    required AFWorkflowStateTests tests,
+    required AFPrototypeID id,
+    required AFBaseTestID stateTestId,
+    required AFID? actualDisplayId,
+  }) {
+    final instance = AFWorkflowStatePrototype(
+      id: id,
+      actualDisplayId: actualDisplayId,
+      stateTestId: stateTestId as AFStateTestID,
+      body: AFWorkflowStateTestPrototype.create(tests, id)
+    );
+    return instance;
   }
 
   List<AFWorkflowStatePrototype> get all {
@@ -2301,7 +2328,7 @@ class AFWorkflowStateTests<TState extends AFFlexibleState> {
 
   AFWorkflowStatePrototype? findById(AFBaseTestID id) {
     for(final test in stateTests) {
-      if(test.id == id) {
+      if(test.id == id || test.stateTestId == id) {
         return test;
       }
     }
@@ -2321,8 +2348,8 @@ class AFBaseTestDefinitionContext {
 
   /// Looks up the test data defined in your test_data.dart file for a particular
   /// test data id.
-  dynamic td(dynamic testDataId) {
-    return registry.f(testDataId);
+  TData td<TData>(dynamic testDataId) {
+    return registry.f(testDataId) as TData;
   }
 
   TResult td2<TResult extends Object>(dynamic testDataId) {

@@ -442,6 +442,10 @@ class AFConfig {
     return stringFor(AFConfigEntries.packageName);
   }
 
+  List<String> get recentTests {
+    return stringListFor(AFConfigEntries.testsRecent);
+  }
+
   void establishDefaults() {
     // establish the defaults.
     final all = AFibD.configEntries;

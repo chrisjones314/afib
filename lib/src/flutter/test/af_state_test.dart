@@ -5,7 +5,6 @@ import 'package:afib/src/dart/redux/actions/af_always_fail_query.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
-import 'package:afib/src/dart/redux/actions/af_time_actions.dart';
 import 'package:afib/src/dart/redux/queries/af_time_update_listener_query.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
@@ -169,6 +168,10 @@ class AFStateTests<TState extends AFFlexibleState> {
     body(defContext);
   }
 
+  List<AFStateTest<dynamic>> get all {
+    return tests;
+  }
+
   AFStateTest? findById(AFStateTestID id) {
     for(var test in tests) {
       if(test.id == id) {
@@ -218,6 +221,24 @@ abstract class _AFStateTestDefinitionStatement {
   _AFStateTestDefinitionStatement();
 
   void execute(AFStateTestContext context);
+}
+
+class _AFStateTestInjectListenerQueryResponseStatement extends _AFStateTestExecutionStatement {
+  final dynamic querySpecfier;
+  final Object result;
+  _AFStateTestInjectListenerQueryResponseStatement(this.querySpecfier, this.result);
+
+  @override
+  void execute(AFStateTestContext<AFFlexibleState> context, {required bool verify}) {
+    // need to lookup the query
+    final listenerId = AFStateTest.specifierToId(querySpecfier);
+    final listenerQuery = AFibF.g.storeInternalOnly?.state.public.queries.findListenerQueryById(listenerId);
+    if(listenerQuery == null) {
+      throw AFException("No listener query found with id $querySpecfier");
+    }
+    listenerQuery.testFinishAsyncWithResponse(context, result);
+  }
+
 }
 
 
@@ -285,7 +306,16 @@ class _AFStateTestAdvanceTimeStatement extends _AFStateTestExecutionStatement {
     final state = AFibF.g.storeInternalOnly!.state;
     final currentTime = state.public.time;
     final revised = currentTime.reviseAdjustOffset(duration);
-    context.dispatcher.dispatch(AFUpdateTimeStateAction(revised));
+    final dispatcher = context.dispatcher;
+
+    final query = state.public.queries.findListenerQueryById(AFUIQueryID.time.toString());
+    if(query != null) {
+      final revisedQuery = AFTimeUpdateListenerQuery(baseTime: revised); 
+      dispatcher.dispatch(revisedQuery);
+    }
+
+    // need to revise the listener query itself.
+    AFTimeUpdateListenerQuery.processUpdatedTime(dispatcher, revised);
   }
 
 
@@ -301,7 +331,7 @@ class _AFStateTestSetAbsoluteTimeStatement extends _AFStateTestExecutionStatemen
     final state = AFibF.g.storeInternalOnly!.state;
     final currentTime = state.public.time;
     final revised = currentTime.reviseToAbsoluteTime(this.time);
-    context.dispatcher.dispatch(AFUpdateTimeStateAction(revised));
+    AFTimeUpdateListenerQuery.processUpdatedTime(context.dispatcher, revised);
   }
 
 
@@ -473,25 +503,22 @@ abstract class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface
     return this;
   }
 
-  Future<void> executeBuild(AFStateTestScreenBuildContextDelegate<TSPI> delegate, {
+  void executeBuild(AFStateTestScreenBuildContextDelegate<TSPI> delegate, {
     AFRouteParam? launchParam
   }) {
     final spi = createScreenSPI(launchParam: launchParam);
     delegate(spi);
-    return pauseForRender();
-    
   }
 
-  Future<void> executeBuildWithExecute(AFStateTestExecute e, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> delegate, {
+
+  void executeBuildWithExecute(AFStateTestExecute e, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> delegate, {
     AFRouteParam? launchParam
   }) async {
     final spi = createScreenSPI(launchParam: launchParam);
     delegate(e, spi);
-    return pauseForRender();
   }
 
   TSPI createScreenSPI({ required AFRouteParam? launchParam });
-  Future<void> pauseForRender();
 }
 
 class AFStateTestScreenContextForState<TSPI extends AFStateProgrammingInterface> extends AFStateTestScreenContext<TSPI>  {
@@ -513,10 +540,6 @@ class AFStateTestScreenContextForState<TSPI extends AFStateProgrammingInterface>
     }
     return config.createSPI(null, context, screenId, wid, paramSource) as TSPI;
   }
-
-  @override
-  Future<void> pauseForRender() async {
-  }
 }
 
 class AFStateTestScreenContextForScreen<TSPI extends AFStateProgrammingInterface> extends AFStateTestScreenContext<TSPI>  {
@@ -537,19 +560,66 @@ class AFStateTestScreenContextForScreen<TSPI extends AFStateProgrammingInterface
     }
     return spi;
   }
-
-  @override
-  Future<void> pauseForRender() async {
-    // this gives a chance for the screen to render, and for the 
-    return Future<void>.delayed(Duration(seconds: 2), () {});
-  }
 }
+
+class AFStateTestScreenShortcut<TSPI extends AFScreenStateProgrammingInterface> {
+  final AFScreenID screenId;
+  final AFStateTestDefinitionContext testContext;
+
+  AFStateTestScreenShortcut(this.testContext, this.screenId);
+
+  void executeScreen(AFStateTestScreenHandlerDelegate<TSPI> handler) {
+    testContext.executeScreen<TSPI>(screenId, handler);
+  }
+
+  AFStateTestWidgetShortcut<TSPIWidget> createWidgetShortcut<TSPIWidget extends AFWidgetStateProgrammingInterface>(
+    AFWidgetID? wid,
+    AFWidgetConfig config,
+  ) {
+    return AFStateTestWidgetShortcut<TSPIWidget>(wid, config);
+  }
+
+}
+
+class AFStateTestWidgetShortcut<TSPI extends AFWidgetStateProgrammingInterface> {
+  static const noWidException = "You must specify a wid either in the widget shortcut, or using the option parameter to executeWidget...";
+  final AFWidgetID? wid;
+  final AFWidgetConfig config;
+
+  AFStateTestWidgetShortcut(this.wid, this.config);
+
+  void executeWidgetUseParentParam(AFStateTestScreenContext screenContext, { AFWidgetID? wid, required AFStateTestWidgetHandlerDelegate<TSPI> body}) {
+    final widActual = wid ?? this.wid;
+    if(widActual == null) {
+      throw AFException(noWidException);
+    }
+    screenContext.executeWidgetUseParentParam(widActual, config, body);
+  }
+
+  void executeWidgetUseLaunchParam(AFStateTestScreenContext screenContext, AFRouteParam launchParam,{ required AFStateTestWidgetHandlerDelegate<TSPI> body}) {
+    screenContext.executeWidgetUseLaunchParam(launchParam, config, body);
+  }
+
+  void executeWidgetUseChildParam(AFStateTestScreenContext screenContext,{ AFWidgetID? wid, required AFStateTestWidgetHandlerDelegate<TSPI> body}) {
+    final widActual = wid ?? this.wid;
+    if(widActual == null) {
+      throw AFException(noWidException);
+    }
+    screenContext.executeWidgetUseChildParam(widActual, config, body);
+  }
+
+}
+
 
 
 class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
   final AFStateTestDefinitionsContext definitions;
   final AFStateTest<TState> test;
   AFStateTestDefinitionContext(this.definitions, this.test);
+
+  AFStateTestScreenShortcut<TSPI> createScreenShortcut<TSPI extends AFScreenStateProgrammingInterface>(AFScreenID screenId) {
+    return AFStateTestScreenShortcut<TSPI>(this, screenId);
+  }
 
   /// Specify a response for a particular query.
   /// 
@@ -634,85 +704,21 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
     test.executeScreen<TSPI>(screenId, screenHandler);
   }
 
-  void executeScreenWidgetUseChildParamBuild<TSPIWidget extends AFStateProgrammingInterface>(
-    AFScreenID screenId, 
-    AFWidgetID wid,
-    AFWidgetConfig config,
-    AFStateTestScreenBuildWithExecuteContextDelegate<TSPIWidget> widgetHandler) {
-    test.executeScreen<AFScreenStateProgrammingInterface>(screenId, (e, screenContext) async {
-      screenContext.executeWidgetUseChildParam<TSPIWidget>(wid, config, (widgetContext) {
-        widgetContext.executeBuildWithExecute(e, widgetHandler);
-      });
-    });
-  }
-
-  void executeScreenWidgetUseChildParam<TSPIWidget extends AFStateProgrammingInterface>(
-    AFScreenID screenId, 
-    AFWidgetID wid,
-    AFWidgetConfig config,
-    AFStateTestWidgetWithExecuteHandlerDelegate<TSPIWidget> widgetHandler) {
-    
-    test.executeScreen<AFScreenStateProgrammingInterface>(screenId, (e, screenContext) async {
-      screenContext.executeWidgetUseChildParamWithExecute<TSPIWidget>(wid, config, e, widgetHandler);
-    });
-  }
-
-  void executeScreenWidgetUseParentParam<TSPIWidget extends AFStateProgrammingInterface>(
-    AFScreenID screenId, 
-    AFWidgetID wid,
-    AFWidgetConfig config,
-    AFStateTestWidgetWithExecuteHandlerDelegate<TSPIWidget> widgetHandler) {
-    
-    test.executeScreen<AFStateProgrammingInterface>(screenId, (e, screenContext) async {
-      screenContext.executeWidgetUseParentParamAndExecute<TSPIWidget>(wid, config, e, widgetHandler);
-    });
-  }
-
-
-  void executeScreenWidgetUseParentParamAndExecute<TSPIWidget extends AFStateProgrammingInterface>(
-    AFScreenID screenId, 
-    AFRouteParam launchParam,
-    AFWidgetConfig config,
-    AFStateTestWidgetWithExecuteHandlerDelegate<TSPIWidget> widgetHandler, {
-      AFNavigateRoute parentRoute = AFNavigateRoute.routeHierarchy,
-    }) {
-    
-    test.executeScreen<AFStateProgrammingInterface>(screenId, (e, screenContext) async {
-      screenContext.executeWidgetUseLaunchParamAndExecute<TSPIWidget>(launchParam, config, e, widgetHandler, parentRoute: parentRoute);
-    });
-  }
-
-
-  void executeScreenBuild<TSPI extends AFStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> buildHandler) {
-    test.executeScreen<TSPI>(screenId, (e, screenContext) async {
-      screenContext.executeBuildWithExecute(e, buildHandler);
-    });
+  void executeInjectListenerQueryResponse(dynamic querySpecifier, Object result) {
+    test.executeInjectListenerQueryResponse(querySpecifier, result);
   }
 
   void executeDrawer<TSPI extends AFDrawerStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> screenHandler) {
     test.executeScreen<TSPI>(screenId, screenHandler);
   }
 
-  void executeDrawerBuild<TSPI extends AFDrawerStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> buildHandler) {
-    executeScreenBuild<TSPI>(screenId, buildHandler);
-  }
-
   void executeDialog<TSPI extends AFDialogStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> buildHandler) {
     executeScreen<TSPI>(screenId, buildHandler);
-  }
-
-  void executeDialogBuild<TSPI extends AFDrawerStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> buildHandler) {
-    executeScreenBuild<TSPI>(screenId, buildHandler);
   }
 
   void executeBottomSheet<TSPI extends AFBottomSheetStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> buildHandler) {
     executeScreen<TSPI>(screenId, buildHandler);
   }
-
-  void executeBottomSheetBuild<TSPI extends AFDrawerStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> buildHandler) {
-    executeScreenBuild<TSPI>(screenId, buildHandler);
-  }
-
 }
 
 class _AFStateExecutionConfiguration {
@@ -1005,6 +1011,10 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
 
   void executeScreen<TSPI extends AFStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> screenHandler) {
     currentStatements.addExecutionStatement(_AFStateTestScreenStatement<TSPI>(screenId, screenHandler), hasPreviousStatements: extendedStatements.hasExecutionStatements);
+  }
+
+  void executeInjectListenerQueryResponse(dynamic querySpecifier, Object result) {
+    currentStatements.addExecutionStatement(_AFStateTestInjectListenerQueryResponseStatement(querySpecifier, result), hasPreviousStatements: extendedStatements.hasExecutionStatements);
   }
 
 

@@ -30,6 +30,7 @@ export "src/dart/utils/af_id.dart";
 export "src/dart/utils/af_object_with_key.dart";
 export "src/dart/utils/af_query_error.dart";
 export "src/dart/utils/af_route_param.dart";
+export "src/dart/utils/af_route_param_with_flutter_state.dart";
 export "src/dart/utils/af_should_continue_route_param.dart";
 export "src/dart/utils/af_typedefs_dart.dart";
 export "src/dart/utils/af_unused.dart";

@@ -68,7 +68,6 @@ class AFUIPrototypeBottomSheetScreen extends AFUIConnectedScreen<AFUIPrototypeBo
   Widget _buildScreen(AFUIPrototypeBottomSheetScreenSPI spi) {
     final context = spi.context;
     AFibF.g.testOnlyShowBuildContext = context.c;
-    final t = spi.t;
     final testStateSource = AFibF.g.storeInternalOnly?.state.private.testState;    
 
     if(testStateSource == null) {

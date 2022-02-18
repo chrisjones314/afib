@@ -531,7 +531,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
       AFUITranslationID.run: "Run {0}",
       AFUITranslationID.prototype: "Prototype",
       AFUITranslationID.release: "Release",
-      AFUITranslationID.searchAndRun: "Search and Run",
+      AFUITranslationID.recent: "Recent",
       AFUITranslationID.afibPrototypeMode: "AFib Prototype Mode",
       AFUITranslationID.afibPrototypeLoading: "",
       AFUITranslationID.wireframes: "Wireframes",

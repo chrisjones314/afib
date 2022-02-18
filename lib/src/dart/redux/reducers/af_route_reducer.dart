@@ -17,6 +17,7 @@ final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigateAddChildParamAction>(_navAddChildParam),
   TypedReducer<AFRouteState, AFNavigateRemoveChildParamAction>(_navRemoveChildParam),
   TypedReducer<AFRouteState, AFResetToInitialRouteAction>(_resetToInitialRoute),
+  TypedReducer<AFRouteState, AFUpdateTimeRouteParametersAction>(_updateTimeRouteParameters),
 ]);
 
 //---------------------------------------------------------------------------
@@ -81,3 +82,7 @@ AFRouteState _resetToInitialRoute(AFRouteState state, AFResetToInitialRouteActio
   return state.resetToInitialRoute();
 }
 
+//---------------------------------------------------------------------------
+AFRouteState _updateTimeRouteParameters(AFRouteState state, AFUpdateTimeRouteParametersAction action) {
+  return state.updateTimeRouteParameters(action.now);
+}

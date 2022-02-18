@@ -1,8 +1,25 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:afib/afib_flutter.dart';
+import 'package:afib/id.dart';
+import 'package:afib/locale_id.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
+import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
+import 'package:afib/src/dart/redux/state/af_state.dart';
+import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:afib/src/dart/utils/af_route_param_with_flutter_state.dart';
+import 'package:afib/src/dart/utils/af_should_continue_route_param.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:afib/src/flutter/test/af_screen_test.dart';
+import 'package:afib/src/flutter/ui/dialog/afui_standard_choice_dialog.dart';
+import 'package:afib/src/flutter/ui/drawer/afui_prototype_drawer.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/ui/theme/af_text_builders.dart';
+import 'package:afib/src/flutter/ui/widgets/afui_text_field.dart';
+import 'package:afib/src/flutter/utils/af_param_ui_state_holder.dart';
+import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -2094,8 +2111,9 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     required AFWidgetID wid,
     AFTextEditingControllers? controllers,
     AFTextEditingController? controller,
+    AFRouteParamWithFlutterState? parentParam,
     required AFOnChangedStringDelegate onChanged,
-    required String text,
+    String? expectedText,
     bool? enabled,
     bool obscureText = false,
     bool autofocus = false,
@@ -2108,18 +2126,6 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     Color? cursorColor,
     ValueChanged<String>? onSubmitted,
   }) {
-
-    final textController = controller ?? controllers?.access(wid);
-    assert(textController != null, "You must register the text controller for $wid in your route parameter using AFTextEditingControllersHolder.createN or createOne");
-    assert(textController?.controller != null);
-    assert(textController?.text == text, '''The text value in the text controller was different from the value you passed into 
-childTextField was different from the value in the text controller for $wid ($text != ${textController?.text}).  This will happen
-if you try to change the value of a text field during the render process (which you should not).   It will also happen if you are 
-modifying the value returned to you in the onChanged callback, but are not subsequently calling AFTextEditingControllersOwner.reviseOne.
-In the later case, AFib automatically keeps the controller in sync with the value the user typed, but if you post-process that value, you
-need to manually update the value in the controller.
-''');
-
     return AFUITextField(
       screenId: screenId,
       wid: wid,
@@ -2127,6 +2133,8 @@ need to manually update the value in the controller.
       style: style,
       controller: controller,
       controllers: controllers,
+      parentParam: parentParam,
+      expectedText: expectedText,
       onChanged: onChanged,
       keyboardType: keyboardType,
       obscureText: obscureText,

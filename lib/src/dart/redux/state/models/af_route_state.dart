@@ -1,5 +1,6 @@
 import 'package:afib/id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
+import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
@@ -465,11 +466,13 @@ class AFRouteStateSegments {
 class AFRouteState {
   static const emptySegments = <AFRouteSegment>[];
   final AFRouteStateSegments screenHierarchy;
+  final AFTimeState timeLastUpdate;
   final Map<AFID, AFRouteSegment> globalPool;
 
   AFRouteState({
     required this.screenHierarchy, 
     required this.globalPool,
+    required this.timeLastUpdate,
   });  
 
   /// Creates the default initial state.
@@ -480,7 +483,7 @@ class AFRouteState {
     screen.add(AFRouteSegment.withParam(routeParamFactory(), null, null));
     final screenSegs = AFRouteStateSegments(active: screen, prior: emptySegments);
     final globalPool = <AFScreenID, AFRouteSegment>{};
-    return AFRouteState(screenHierarchy: screenSegs, globalPool: globalPool);
+    return AFRouteState(screenHierarchy: screenSegs, globalPool: globalPool, timeLastUpdate: AFTimeState.createNow());
   }
 
   bool isActiveScreen(AFScreenID screen
@@ -660,6 +663,35 @@ class AFRouteState {
     }
   }
 
+  AFRouteState updateTimeRouteParameters(AFTimeState now) {
+    final revisedSegs = <AFRouteSegment>[];
+    for(final segment in screenHierarchy.active) {
+      revisedSegs.add(_updateTimeRouteSegment(segment, now));
+    }
+    final revisedHier = screenHierarchy.copyWith(active: revisedSegs);
+    
+    return copyWith(timeLastUpdate: now, screenSegs: revisedHier);  
+  }
+
+  AFRouteSegment _updateTimeRouteSegment(AFRouteSegment segment, AFTimeState now) {
+    final param = segment.param;
+    final specificity = param.timeSpecificity;
+    if(specificity == null) {
+      return segment;
+    }
+    final nowSpecific = now.reviseSpecificity(specificity);
+    if(timeLastUpdate == nowSpecific) {
+      return segment;
+    }
+
+    final revisedParam = param.reviseForTime(nowSpecific);
+    if(revisedParam == null) {
+      return segment;
+    }
+
+    return segment.copyWith(param: revisedParam);    
+  }
+
   AFRouteState resetToInitialRoute() {
     AFibD.logRouteAF?.d("resetToInitialRoute");
 
@@ -762,10 +794,12 @@ class AFRouteState {
     AFRouteStateSegments? screenSegs,
     AFRouteStateSegments? popupSegs,
     Map<AFID, AFRouteSegment>? globalPool,
+    AFTimeState? timeLastUpdate
   }) {
     final revised = AFRouteState(
       screenHierarchy: screenSegs ?? this.screenHierarchy,
       globalPool: globalPool ?? this.globalPool,
+      timeLastUpdate: timeLastUpdate ?? this.timeLastUpdate,
     );
 
     if(screenSegs != null) {

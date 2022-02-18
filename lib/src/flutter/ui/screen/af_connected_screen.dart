@@ -1013,7 +1013,6 @@ mixin AFContextShowMixin {
     material.RouteSettings? routeSettings,  
   }) async {
     final screenId = navigate.param.id as AFScreenID;
-    final param = navigate.param;
 
     final verifiedScreenId = _nullCheckScreenId(screenId);
     _updateOptionalGlobalParam(navigate);
@@ -1048,7 +1047,7 @@ mixin AFContextShowMixin {
     } else {
       // this happens in state testing, where there is no BuildContext.  We still
       // need to handle calling onReturn when someone calls closeDialog.
-      final result = AFibF.g.testOnlySimulateShowDialogOrSheet(verifiedScreenId, (val) {
+      AFibF.g.testOnlySimulateShowDialogOrSheet(verifiedScreenId, (val) {
         if(onReturn != null) {
           onReturn(val);
         }
@@ -1137,7 +1136,7 @@ mixin AFContextShowMixin {
     } else {
       // this happens in state testing, where there is no BuildContext.  We still
       // need to handle calling onReturn when someone calls closeDialog.
-      final result = AFibF.g.testOnlySimulateShowDialogOrSheet(verifiedScreenId, (val) {
+      AFibF.g.testOnlySimulateShowDialogOrSheet(verifiedScreenId, (val) {
         if(onReturn != null) {
           onReturn(val);
         }
@@ -1200,7 +1199,7 @@ mixin AFContextShowMixin {
     updateOptionalGlobalParam(this.dispatch, navigate);
   }
 
-  static updateOptionalGlobalParam(dynamic dispatch(dynamic action), AFNavigatePushAction navigate) {
+  static updateOptionalGlobalParam(dynamic Function(dynamic action) dispatch, AFNavigatePushAction navigate) {
     dispatch(AFNavigateSetParamAction(
       param: navigate.param, route: AFNavigateRoute.routeGlobalPool
     ));    
@@ -1464,6 +1463,8 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
 
 @immutable
 class AFStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> with AFContextShowMixin, AFUpdateAppStateMixin, AFNavigateMixin {
+  static const errFlutterStateRequired = "You can only call this method if your route param is derived from AFRouteParamWithFlutterState";
+  static const errNeedTextControllers = "When constructing the AFFlutterRouteParamState for your route parameter, you must make textControllers non-null";
   final TBuildContext context;
   final AFScreenID screenId;
   final TTheme theme;
@@ -1525,6 +1526,19 @@ class AFStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme e
   void closeDrawer() {
     context.closeDrawer();
   }
+
+  void updateTextField(AFWidgetID wid, String text) {
+    final param = context.p;
+    if(param is! AFRouteParamWithFlutterState) {
+      throw AFException(errFlutterStateRequired);
+    }
+    final controllers = param.flutterState.textControllers;
+    if(controllers == null) {
+      throw AFException(errNeedTextControllers);
+    }
+    controllers.update(wid, text);
+  }
+
 
   void executeWireframeEvent(AFID widget, Object? eventData) {
     if(!AFibD.config.isPrototypeMode || AFibF.g.storeInternalOnly?.state.private.testState.activeWireframe == null) {

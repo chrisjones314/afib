@@ -65,6 +65,7 @@ class AFLibraryTestHolder<TState extends AFFlexibleState> {
   final AFBottomSheetTests afBottomSheetTests = AFBottomSheetTests();
   final AFDrawerTests afDrawerTests = AFDrawerTests();
   final AFWorkflowStateTests afWorkflowStateTests = AFWorkflowStateTests<TState>();
+  final AFWorkflowStateTests afWorkflowTestsForStateTests = AFWorkflowStateTests<TState>();
 }
 
 class AFTestMissingTranslations {
@@ -176,6 +177,13 @@ class AFibGlobalState<TState extends AFFlexibleState> {
         );
       }
       sharedTestContext.mergeWith(appContext.test.sharedTestContext);
+
+      final workflowBuild = workflowTestsForStateTests;
+      for(final stateTest in stateTests.all) {
+        final stateTestId = stateTest.id;
+        final protoId = AFUIPrototypeID.workflowStateTest.with1(stateTestId, stateTestId.tags);
+        workflowBuild.addPrototype(id: protoId, stateTestId: stateTestId, actualDisplayId: stateTestId);
+      }
     }
     if(AFibD.config.requiresPrototypeData) {
       afInitPrototypeScreenMap(screenMap);
@@ -352,6 +360,11 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     final multi = tests.afWorkflowStateTests.findById(testId);
     if(multi != null) {
       return multi;
+    }
+
+    final multiState = tests.afWorkflowTestsForStateTests.findById(testId);
+    if(multiState != null) {
+      return multiState;
     }
 
     final widget = tests.afWidgetTests.findById(testId);
@@ -573,6 +586,10 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   /// to produce a higher-level multi-screen test.
   AFWorkflowStateTests get workflowTests {
     return primaryUITests.afWorkflowStateTests;
+  }
+
+  AFWorkflowStateTests get workflowTestsForStateTests {
+    return primaryUITests.afWorkflowTestsForStateTests;
   }
 
   /// Retrieves unit/calculation tests

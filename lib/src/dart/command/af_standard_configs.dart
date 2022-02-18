@@ -1,6 +1,7 @@
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:args/src/arg_parser.dart';
 
 class AFConfigEntryEnvironment extends AFConfigurationItemOptionChoice {
   static const specificItemConfigLocation = "(specified in initialization/environments/prototype.dart)";
@@ -85,6 +86,27 @@ class AFConfigEntryLogArea extends AFConfigurationItemOptionChoice {
   List<String> areasFor(AFConfig config) {
     return config.stringListFor(this);
   }
+}
+
+class AFConfigEntryRecentTests extends AFConfigurationItem {
+  AFConfigEntryRecentTests(): super(
+    libraryId: AFUILibraryID.id,
+    name: "tests-recent", 
+    defaultValue: [], 
+    validContexts: AFConfigurationItem.validContextsAllButNew, 
+    ordinal: 200.0, 
+    help: "list of recently run tests, maintained internally to support the recent feature on the prototype home screen"
+  );
+
+  @override
+  void addArguments(ArgParser argParser) {
+  }
+
+  @override
+  String? validate(dynamic value) {
+    throw UnimplementedError();
+  }
+
 }
 
 class AFConfigEntryEnabledTests extends AFConfigurationItemOptionChoice {

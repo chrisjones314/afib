@@ -84,6 +84,7 @@ abstract class AFStateTestContext<TState extends AFFlexibleState> extends AFStat
   TState? get state { return store.state.public.componentStateOrNull<TState>(); }
   AFRouteState get route { return store.state.public.route; }
   AFPublicState get public { return store.state.public; }
+  AFTimeState get currentTime { return public.time; }
 
   void processQuery(AFAsyncQuery q) {
     AFibD.logQueryAF?.d("Processing ${q.runtimeType} for test $testID");
@@ -399,17 +400,37 @@ class _AFStateRegisterDynamicCrossQueryResultStatement extends _AFStateTestDefin
   }
 }
 
+enum _AFStateRegisterSpecialResultKind {
+  resultNone,
+  resultNull,
+}
 
-
-
-class _AFStateRegisterNoResultStatement extends _AFStateTestDefinitionStatement {
+class _AFStateRegisterSpecialResultStatement extends _AFStateTestDefinitionStatement {
   final Object querySpecifier;
+  final _AFStateRegisterSpecialResultKind specialResult;
 
-  _AFStateRegisterNoResultStatement(this.querySpecifier);
+  _AFStateRegisterSpecialResultStatement(this.querySpecifier, this.specialResult);
+
+  factory _AFStateRegisterSpecialResultStatement.resultNull(Object querySpecifier) {
+    return _AFStateRegisterSpecialResultStatement(querySpecifier,_AFStateRegisterSpecialResultKind.resultNull);
+  }
+
+  factory _AFStateRegisterSpecialResultStatement.resultNone(Object querySpecifier) {
+    return _AFStateRegisterSpecialResultStatement(querySpecifier,_AFStateRegisterSpecialResultKind.resultNone);
+  }
 
   void execute(AFStateTestContext context) {
     final test = context.test;
-    test.registerResult(querySpecifier, null);
+    test.registerResult(querySpecifier,  (context, query) {
+      if(specialResult == _AFStateRegisterSpecialResultKind.resultNone) {
+        // don't do a response.
+      } else if(specialResult == _AFStateRegisterSpecialResultKind.resultNull) {
+        query.testFinishAsyncWithResponse(context, null);
+      } else {
+        assert(false);
+      }
+      return null;
+    });
   }
 }
 
@@ -632,6 +653,10 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
 
   void defineQueryResponseNone(dynamic querySpecifier) {
     test.defineQueryResponseNone(querySpecifier, definitions);
+  }
+
+  void defineQueryResponseNull(dynamic querySpecifier) {
+    test.defineQueryResponseNull(querySpecifier, definitions);
   }
 
   /// Create a response dynamically for a particular query.
@@ -966,7 +991,11 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
   }
 
   void defineQueryResponseNone(dynamic querySpecifier, AFStateTestDefinitionsContext definitions) {
-    currentStatements.addDefinitionStatement(_AFStateRegisterNoResultStatement(querySpecifier), hasExecutionStatements: currentStatements.hasExecutionStatements);
+    currentStatements.addDefinitionStatement(_AFStateRegisterSpecialResultStatement.resultNone(querySpecifier), hasExecutionStatements: currentStatements.hasExecutionStatements);
+  }
+
+  void defineQueryResponseNull(dynamic querySpecifier, AFStateTestDefinitionsContext definitions) {
+    currentStatements.addDefinitionStatement(_AFStateRegisterSpecialResultStatement.resultNull(querySpecifier), hasExecutionStatements: currentStatements.hasExecutionStatements);
   }
 
   void defineQueryResponseDynamic(dynamic querySpecifier, AFCreateQueryResultDelegate delegate) {

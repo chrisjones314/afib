@@ -170,7 +170,6 @@ abstract class AFBaseTestExecute extends AFModelWithCustomID {
         color: Styles.GREEN, 
         fill: ".",
         tags: testID.tagsText);
-      stats.addPasses(pass);
     }
   }
 

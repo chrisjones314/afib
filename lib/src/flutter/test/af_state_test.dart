@@ -212,10 +212,15 @@ class _AFStateResultEntry<TQuery extends AFAsyncQuery> {
   }
 }
 
+enum _AFStateTestExecutionNext {
+  stop,
+  keepGoing,
+}
+
 abstract class _AFStateTestExecutionStatement {
   _AFStateTestExecutionStatement();
 
-  void execute(AFStateTestContext context, { required bool verify });
+  _AFStateTestExecutionNext execute(AFStateTestContext context, { required bool verify });
 }
 
 abstract class _AFStateTestDefinitionStatement {
@@ -230,7 +235,7 @@ class _AFStateTestInjectListenerQueryResponseStatement extends _AFStateTestExecu
   _AFStateTestInjectListenerQueryResponseStatement(this.querySpecfier, this.result);
 
   @override
-  void execute(AFStateTestContext<AFFlexibleState> context, {required bool verify}) {
+  _AFStateTestExecutionNext execute(AFStateTestContext<AFFlexibleState> context, {required bool verify}) {
     // need to lookup the query
     final listenerId = AFStateTest.specifierToId(querySpecfier);
     final listenerQuery = AFibF.g.storeInternalOnly?.state.public.queries.findListenerQueryById(listenerId);
@@ -238,10 +243,20 @@ class _AFStateTestInjectListenerQueryResponseStatement extends _AFStateTestExecu
       throw AFException("No listener query found with id $querySpecfier");
     }
     listenerQuery.testFinishAsyncWithResponse(context, result);
+    return _AFStateTestExecutionNext.keepGoing;
   }
 
 }
 
+class _AFStateTestDebugStopHereStatement extends _AFStateTestExecutionStatement {
+  
+  
+  @override
+  _AFStateTestExecutionNext execute(AFStateTestContext<AFFlexibleState> context, {required bool verify}) {
+    return _AFStateTestExecutionNext.stop;
+  }
+
+}
 
 class _AFStateTestScreenStatement<TSPI extends AFStateProgrammingInterface> extends _AFStateTestExecutionStatement {
   final AFScreenID screenId;
@@ -252,7 +267,8 @@ class _AFStateTestScreenStatement<TSPI extends AFStateProgrammingInterface> exte
     this.screenHandler,
   );
 
-  void execute(AFStateTestContext context, { required bool verify }) {
+  @override
+  _AFStateTestExecutionNext execute(AFStateTestContext context, { required bool verify }) {
     final screen = AFibF.g.screenMap.createInstance(screenId, null);
     final config = screen.uiConfig;
     final ctx = context.createScreenContext<TSPI>(screenId: screenId, screenConfig: config);
@@ -261,6 +277,7 @@ class _AFStateTestScreenStatement<TSPI extends AFStateProgrammingInterface> exte
     //if(ctxFuture != null) {
       //await ctxFuture;
     //}
+    return _AFStateTestExecutionNext.keepGoing;
   }
 }
 
@@ -274,10 +291,13 @@ class _AFStateTestQueryStatement extends _AFStateTestExecutionStatement {
     final queries = [query];
     return _AFStateTestQueryStatement(queries);
   }
-  Future<void> execute(AFStateTestContext context, { required bool verify }) async {
+
+  @override
+  _AFStateTestExecutionNext execute(AFStateTestContext context, { required bool verify }) {
     for(final query in queries) {
       AFStateTest.processQuery(context, query);
     }
+    return _AFStateTestExecutionNext.keepGoing;
   }
 }
 
@@ -288,35 +308,35 @@ class _AFStateTestStartupStatement extends _AFStateTestQueryStatement {
 class _AFStateTestVerifyStatement extends _AFStateTestExecutionStatement {
   final AFStateTestVerifyStateDelegate verifyDelegate;
   _AFStateTestVerifyStatement(this.verifyDelegate);
-  Future<void> execute(AFStateTestContext context, { required bool verify }) async {
-    if(!verify) {
-      return;
+  _AFStateTestExecutionNext execute(AFStateTestContext context, { required bool verify }) {
+    if(verify) {
+      final verifyContext = AFStateTestStateVerificationContext(afState: AFibF.g.storeInternalOnly!.state);
+      verifyDelegate(context, verifyContext);
     }
-    final verifyContext = AFStateTestStateVerificationContext(afState: AFibF.g.storeInternalOnly!.state);
-    verifyDelegate(context, verifyContext);
+    return _AFStateTestExecutionNext.keepGoing;
   }
 }
 
 class _AFStateTestAdvanceTimeStatement extends _AFStateTestExecutionStatement {
  final Duration duration;
   _AFStateTestAdvanceTimeStatement(this.duration);
-  Future<void> execute(AFStateTestContext context, { required bool verify }) async {
-    if(!verify) {
-      return;
-    }
-    final state = AFibF.g.storeInternalOnly!.state;
-    final currentTime = state.public.time;
-    final revised = currentTime.reviseAdjustOffset(duration);
-    final dispatcher = context.dispatcher;
+  _AFStateTestExecutionNext execute(AFStateTestContext context, { required bool verify }) {
+    if(verify) {
+      final state = AFibF.g.storeInternalOnly!.state;
+      final currentTime = state.public.time;
+      final revised = currentTime.reviseAdjustOffset(duration);
+      final dispatcher = context.dispatcher;
 
-    final query = state.public.queries.findListenerQueryById(AFUIQueryID.time.toString());
-    if(query != null) {
-      final revisedQuery = AFTimeUpdateListenerQuery(baseTime: revised); 
-      dispatcher.dispatch(revisedQuery);
-    }
+      final query = state.public.queries.findListenerQueryById(AFUIQueryID.time.toString());
+      if(query != null) {
+        final revisedQuery = AFTimeUpdateListenerQuery(baseTime: revised); 
+        dispatcher.dispatch(revisedQuery);
+      }
 
-    // need to revise the listener query itself.
-    AFTimeUpdateListenerQuery.processUpdatedTime(dispatcher, revised);
+      // need to revise the listener query itself.
+      AFTimeUpdateListenerQuery.processUpdatedTime(dispatcher, revised);
+    }
+    return _AFStateTestExecutionNext.keepGoing;
   }
 
 
@@ -325,17 +345,15 @@ class _AFStateTestAdvanceTimeStatement extends _AFStateTestExecutionStatement {
 class _AFStateTestSetAbsoluteTimeStatement extends _AFStateTestExecutionStatement {
  final DateTime time;
   _AFStateTestSetAbsoluteTimeStatement(this.time);
-  Future<void> execute(AFStateTestContext context, { required bool verify }) async {
-    if(!verify) {
-      return;
+  _AFStateTestExecutionNext execute(AFStateTestContext context, { required bool verify }) {
+    if(verify) {
+      final state = AFibF.g.storeInternalOnly!.state;
+      final currentTime = state.public.time;
+      final revised = currentTime.reviseToAbsoluteTime(this.time);
+      AFTimeUpdateListenerQuery.processUpdatedTime(context.dispatcher, revised);
     }
-    final state = AFibF.g.storeInternalOnly!.state;
-    final currentTime = state.public.time;
-    final revised = currentTime.reviseToAbsoluteTime(this.time);
-    AFTimeUpdateListenerQuery.processUpdatedTime(context.dispatcher, revised);
+    return _AFStateTestExecutionNext.keepGoing;
   }
-
-
 }
 
 
@@ -736,6 +754,10 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
     test.executeScreen<TSPI>(screenId, screenHandler);
   }
 
+  void executeDebugStopHere() {
+    test.executeDebugStopHere();
+  }
+
   void executeInjectListenerQueryResponse(dynamic querySpecifier, Object result) {
     test.executeInjectListenerQueryResponse(querySpecifier, result);
   }
@@ -1056,6 +1078,10 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
     currentStatements.addExecutionStatement(_AFStateTestScreenStatement<TSPI>(screenId, screenHandler), hasPreviousStatements: extendedStatements.hasExecutionStatements);
   }
 
+  void executeDebugStopHere() {
+    currentStatements.addExecutionStatement(_AFStateTestDebugStopHereStatement(), hasPreviousStatements: extendedStatements.hasExecutionStatements);
+  }
+
   void executeInjectListenerQueryResponse(dynamic querySpecifier, Object result) {
     currentStatements.addExecutionStatement(_AFStateTestInjectListenerQueryResponseStatement(querySpecifier, result), hasPreviousStatements: extendedStatements.hasExecutionStatements);
   }
@@ -1084,13 +1110,19 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
     // to overriden definitions that impact the results of queries.
     final execs = extendedStatements.executionStatements(upTo: upTo, continueFrom: continueFrom);
     for(final exec in execs) {
-      exec.execute(context, verify: false);
+      final result = exec.execute(context, verify: false);
+      if(result == _AFStateTestExecutionNext.stop) {
+        return;
+      }
     }
 
     if(upTo == null) {
       // basically, we need to go through an execute each query that they specified.
       for(final exec in currentStatements.executionStatements) {
-        exec.execute(context, verify: true);
+        final result = exec.execute(context, verify: true);
+        if(result == _AFStateTestExecutionNext.stop) {
+          return;
+        }
       }
     }
   }

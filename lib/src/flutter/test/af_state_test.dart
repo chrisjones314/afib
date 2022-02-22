@@ -183,10 +183,10 @@ class AFStateTests<TState extends AFFlexibleState> {
   }
 }
 
-class _AFStateResultEntry {
+class _AFStateResultEntry<TQuery extends AFAsyncQuery> {
   final dynamic querySpecifier;
-  final AFProcessQueryDelegate? handler;
-  final Map<String, AFProcessQueryDelegate?>? crossHandlers;
+  final AFProcessQueryDelegate<TQuery>? handler;
+  final Map<String, AFProcessQueryDelegate<TQuery>?>? crossHandlers;
   _AFStateResultEntry(
     this.querySpecifier,
     this.handler,
@@ -201,10 +201,10 @@ class _AFStateResultEntry {
   }
 
   _AFStateResultEntry copyWith({
-    AFProcessQueryDelegate? handler,
-    Map<String, AFProcessQueryDelegate?>? crossHandlers
+    AFProcessQueryDelegate<TQuery>? handler,
+    Map<String, AFProcessQueryDelegate<TQuery>?>? crossHandlers
   }) {
-    return _AFStateResultEntry(
+    return _AFStateResultEntry<TQuery>(
       querySpecifier,
       handler ?? this.handler,
       crossHandlers ?? this.crossHandlers,
@@ -339,7 +339,7 @@ class _AFStateTestSetAbsoluteTimeStatement extends _AFStateTestExecutionStatemen
 }
 
 
-class _AFStateRegisterFixedResultStatement extends _AFStateTestDefinitionStatement {
+class _AFStateRegisterFixedResultStatement<TQuery extends AFAsyncQuery> extends _AFStateTestDefinitionStatement {
   final Object querySpecifier;
   final AFStateTestDefinitionsContext definitions;
   final Object idData;
@@ -348,7 +348,7 @@ class _AFStateRegisterFixedResultStatement extends _AFStateTestDefinitionStateme
 
   void execute(AFStateTestContext context) {
     final test = context.test;
-    test.registerResult(querySpecifier, (context, query) {
+    test.registerResult<TQuery>(querySpecifier, (context, query) {
       final data = definitions.td(idData);
       query.testFinishAsyncWithResponse(context, data);
       return data;
@@ -357,14 +357,14 @@ class _AFStateRegisterFixedResultStatement extends _AFStateTestDefinitionStateme
   }
 }
 
-class _AFStateRegisterDynamicResultStatement extends _AFStateTestDefinitionStatement {
+class _AFStateRegisterDynamicResultStatement<TQuery extends AFAsyncQuery> extends _AFStateTestDefinitionStatement {
   final Object querySpecifier;
-  final AFCreateQueryResultDelegate delegate;
+  final AFCreateQueryResultDelegate<TQuery> delegate;
   _AFStateRegisterDynamicResultStatement(this.querySpecifier, this.delegate);
 
   void execute(AFStateTestContext context) {
     final test = context.test;
-    test.registerResult(querySpecifier, (context, query) {
+    test.registerResult<TQuery>(querySpecifier, (context, query) {
       final result = delegate(context, query);
       query.testFinishAsyncWithResponse(context, result);
       return result;
@@ -372,15 +372,15 @@ class _AFStateRegisterDynamicResultStatement extends _AFStateTestDefinitionState
   }
 }
 
-class _AFStateRegisterDynamicCrossQueryResultStatement extends _AFStateTestDefinitionStatement {
+class _AFStateRegisterDynamicCrossQueryResultStatement<TQuerySource extends AFAsyncQuery> extends _AFStateTestDefinitionStatement {
   final dynamic querySpecifier; 
   final dynamic listenerSpecifier; 
-  final List<AFCreateQueryResultDelegate> delegates;
+  final List<AFCreateQueryResultDelegate<TQuerySource>> delegates;
    _AFStateRegisterDynamicCrossQueryResultStatement(this.querySpecifier, this.listenerSpecifier, this.delegates);
 
   void execute(AFStateTestContext context) {
     final test = context.test;
-    test.registerResult(querySpecifier, (context, query) {
+    test.registerResult<TQuerySource>(querySpecifier, (context, query) {
       final listenerId = AFStateTest.specifierToId(listenerSpecifier);
       final listenerQuery = AFibF.g.storeInternalOnly?.state.public.queries.findListenerQueryById(listenerId);
 
@@ -405,7 +405,7 @@ enum _AFStateRegisterSpecialResultKind {
   resultNull,
 }
 
-class _AFStateRegisterSpecialResultStatement extends _AFStateTestDefinitionStatement {
+class _AFStateRegisterSpecialResultStatement<TQuery extends AFAsyncQuery> extends _AFStateTestDefinitionStatement {
   final Object querySpecifier;
   final _AFStateRegisterSpecialResultKind specialResult;
 
@@ -421,7 +421,8 @@ class _AFStateRegisterSpecialResultStatement extends _AFStateTestDefinitionState
 
   void execute(AFStateTestContext context) {
     final test = context.test;
-    test.registerResult(querySpecifier,  (context, query) {
+    test.registerResult(querySpecifier,  (context, q) {
+      final query = q as TQuery;
       if(specialResult == _AFStateRegisterSpecialResultKind.resultNone) {
         // don't do a response.
       } else if(specialResult == _AFStateRegisterSpecialResultKind.resultNull) {
@@ -634,6 +635,7 @@ class AFStateTestWidgetShortcut<TSPI extends AFWidgetStateProgrammingInterface> 
 
 
 class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
+  static const errSpecifyTypeParameter = "You must specify a type parameter to this function call";
   final AFStateTestDefinitionsContext definitions;
   final AFStateTest<TState> test;
   AFStateTestDefinitionContext(this.definitions, this.test);
@@ -647,16 +649,20 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
   /// When the query 'executes', its [AFAsyncQuery.startAsync] method will be skipped
   /// and its [AFAsyncQuery.finishAsyncWithResponse] method will be called with the 
   /// test data with the specified [idData] in the test data registry.
-  void defineQueryResponseFixed(dynamic querySpecifier, dynamic idData) {
-    test.defineQueryResponse(querySpecifier, definitions, idData);
+  void defineQueryResponseFixed<TQuery extends AFAsyncQuery>(dynamic idData, { Object? querySpecifier }) {
+    assert(TQuery != AFAsyncQuery, errSpecifyTypeParameter);
+
+    test.defineQueryResponse<TQuery>(querySpecifier ?? TQuery, definitions, idData);
   }
 
-  void defineQueryResponseNone(dynamic querySpecifier) {
-    test.defineQueryResponseNone(querySpecifier, definitions);
+  void defineQueryResponseNone<TQuery extends AFAsyncQuery>({ Object? querySpecifier }) {
+    assert(TQuery != AFAsyncQuery, errSpecifyTypeParameter);
+    test.defineQueryResponseNone<TQuery>(querySpecifier ?? TQuery, definitions);
   }
 
-  void defineQueryResponseNull(dynamic querySpecifier) {
-    test.defineQueryResponseNull(querySpecifier, definitions);
+  void defineQueryResponseNull<TQuery extends AFAsyncQuery>({ Object? querySpecifier }) {
+    assert(TQuery != AFAsyncQuery, errSpecifyTypeParameter);
+    test.defineQueryResponseNull<TQuery>(querySpecifier ?? TQuery, definitions);
   }
 
   /// Create a response dynamically for a particular query.
@@ -670,12 +676,13 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
   /// When the query 'executes', its [AFAsyncQuery.startAsync] method will be skipped
   /// and its [AFAsyncQuery.finishAsyncWithResponse] method will be called with the 
   /// test data that is created by [delegate].
-  void defineQueryResponseDynamic(dynamic querySpecifier, AFCreateQueryResultDelegate delegate) {
-    test.defineQueryResponseDynamic(querySpecifier, delegate);
+  void defineQueryResponseDynamic<TQuery extends AFAsyncQuery>({ Object? querySpecifier, required AFCreateQueryResultDelegate<TQuery> body}) {
+    assert(TQuery != AFAsyncQuery);
+    test.defineQueryResponseDynamic<TQuery>(querySpecifier ?? TQuery, body);
   }
 
-  void defineDynamicCrossQueryResponse(Object querySpecifier, Object listenerSpecifier, List<AFCreateQueryResultDelegate> delegates) {
-    test.defineDynamicCrossQueryResponse(querySpecifier, listenerSpecifier, delegates);
+  void defineDynamicCrossQueryResponse<TQuerySource extends AFAsyncQuery, TQueryListener extends AFAsyncQuery>(List<AFCreateQueryResultDelegate> delegates, { Object? querySpecifier, Object? listenerSpecifier }) {
+    test.defineDynamicCrossQueryResponse<TQuerySource>(delegates, querySpecifier: querySpecifier ?? TQuerySource, listenerSpecifier: listenerSpecifier ?? TQueryListener);
   }
 
   void defineInitialTime(Object timeOrId) {
@@ -846,7 +853,7 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
     required this.tests,
   }): super(id, description, disabled) {
     currentStatements.owner = id;
-    registerResult(AFAlwaysFailQuery, (context, query) {
+    registerResult<AFAlwaysFailQuery>(AFAlwaysFailQuery, (context, query) {
       query.testFinishAsyncWithError(context, AFQueryError(message: "Always fail in state test"));
     });
     if(TState.runtimeType == AFFlexibleState) {
@@ -879,8 +886,8 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
     return testPred.hasPredecessor(desiredId);
   }
     
-  void registerResult(dynamic querySpecifier, AFProcessQueryDelegate? handler) {
-    _registerHandler(querySpecifier, handler);
+  void registerResult<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFProcessQueryDelegate<TQuery> handler) {
+    _registerHandler<TQuery>(querySpecifier, handler);
   }
 
   void registerCrossResult(dynamic querySpecifier, dynamic listenerSpecifier, AFProcessQueryDelegate? handler) {
@@ -894,14 +901,21 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
     results[key] = result.reviseAddCross(listenerId, handler);
   }
 
-  void _registerHandler(dynamic querySpecifier, AFProcessQueryDelegate? handler) {
+  void _registerHandler<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFProcessQueryDelegate<TQuery> handler) {
     final key = specifierToId(querySpecifier);
     var result = results[key];
     if(result == null) {
-      result = _AFStateResultEntry(querySpecifier, handler, null);
+      result = _AFStateResultEntry(querySpecifier, (context, q) { 
+        final query = q as TQuery;
+        return handler(context, query);
+      }, null);
       results[key] = result;
-    } 
-    results[key] = result.copyWith(handler: handler);
+    }  else {
+      results[key] = result.copyWith(handler: (context, q) {
+        final query = q as TQuery;
+        return handler(context, query);
+      });
+    }
   }
 
   static String specifierToId(dynamic querySpecifier) {
@@ -986,28 +1000,28 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
   }  
 
   /// 
-  void defineQueryResponse(dynamic querySpecifier, AFStateTestDefinitionsContext definitions, dynamic idData) {
-    currentStatements.addDefinitionStatement(_AFStateRegisterFixedResultStatement(querySpecifier, definitions, idData), hasExecutionStatements: currentStatements.hasExecutionStatements);
+  void defineQueryResponse<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFStateTestDefinitionsContext definitions, dynamic idData) {
+    currentStatements.addDefinitionStatement(_AFStateRegisterFixedResultStatement<TQuery>(querySpecifier, definitions, idData), hasExecutionStatements: currentStatements.hasExecutionStatements);
   }
 
-  void defineQueryResponseNone(dynamic querySpecifier, AFStateTestDefinitionsContext definitions) {
-    currentStatements.addDefinitionStatement(_AFStateRegisterSpecialResultStatement.resultNone(querySpecifier), hasExecutionStatements: currentStatements.hasExecutionStatements);
+  void defineQueryResponseNone<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFStateTestDefinitionsContext definitions) {
+    currentStatements.addDefinitionStatement(_AFStateRegisterSpecialResultStatement<TQuery>.resultNone(querySpecifier), hasExecutionStatements: currentStatements.hasExecutionStatements);
   }
 
-  void defineQueryResponseNull(dynamic querySpecifier, AFStateTestDefinitionsContext definitions) {
-    currentStatements.addDefinitionStatement(_AFStateRegisterSpecialResultStatement.resultNull(querySpecifier), hasExecutionStatements: currentStatements.hasExecutionStatements);
+  void defineQueryResponseNull<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFStateTestDefinitionsContext definitions) {
+    currentStatements.addDefinitionStatement(_AFStateRegisterSpecialResultStatement<TQuery>.resultNull(querySpecifier), hasExecutionStatements: currentStatements.hasExecutionStatements);
   }
 
-  void defineQueryResponseDynamic(dynamic querySpecifier, AFCreateQueryResultDelegate delegate) {
-    currentStatements.addDefinitionStatement(_AFStateRegisterDynamicResultStatement(querySpecifier, delegate), hasExecutionStatements: currentStatements.hasExecutionStatements);
+  void defineQueryResponseDynamic<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFCreateQueryResultDelegate<TQuery> delegate) {
+    currentStatements.addDefinitionStatement(_AFStateRegisterDynamicResultStatement<TQuery>(querySpecifier, delegate), hasExecutionStatements: currentStatements.hasExecutionStatements);
   }
 
-  void defineDynamicCrossQueryResponse(dynamic querySpecifier, dynamic listenerSpecifier, List<AFCreateQueryResultDelegate> delegates) {
-    currentStatements.addDefinitionStatement(_AFStateRegisterDynamicCrossQueryResultStatement(querySpecifier, listenerSpecifier, delegates), hasExecutionStatements: currentStatements.hasExecutionStatements);
+  void defineDynamicCrossQueryResponse<TQuerySource extends AFAsyncQuery>(List<AFCreateQueryResultDelegate> delegates, { Object? querySpecifier, Object? listenerSpecifier }) {
+    currentStatements.addDefinitionStatement(_AFStateRegisterDynamicCrossQueryResultStatement<TQuerySource>(querySpecifier, listenerSpecifier, delegates), hasExecutionStatements: currentStatements.hasExecutionStatements);
   }
 
-  void specifySecondaryError(dynamic querySpecifier, dynamic error) {
-    registerResult(querySpecifier, (context, query) {
+  void specifySecondaryError<TQuery extends AFAsyncQuery>(dynamic querySpecifier, dynamic error) {
+    registerResult<TQuery>(querySpecifier, (context, query) {
       query.testFinishAsyncWithError(context, error);
       return null;
     });

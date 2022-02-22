@@ -91,10 +91,10 @@ typedef AFInitUnitTestsDelegate = void Function(AFUnitTestDefinitionContext cont
 typedef AFInitStateTestsDelegate = void Function(AFStateTestDefinitionsContext context);
 
 /// Delegate 
-typedef AFProcessQueryDelegate = dynamic Function(AFStateTestContext context, AFAsyncQuery query);
+typedef AFProcessQueryDelegate<TQuery extends AFAsyncQuery> = dynamic Function(AFStateTestContext context, TQuery query);
 
 /// Delegate used in state tests to create a mock result from a query.
-typedef AFCreateQueryResultDelegate = dynamic Function(AFStateTestContext context, AFAsyncQuery query);
+typedef AFCreateQueryResultDelegate<TQuery extends AFAsyncQuery> = dynamic Function(AFStateTestContext context, TQuery query);
 
 /// Delegate used to process a state test.
 typedef AFStateTestDefinitionDelegate = void Function(AFStateTestDefinitionContext test);

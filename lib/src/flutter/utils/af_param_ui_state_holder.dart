@@ -46,6 +46,45 @@ class AFTextEditingController  {
   }
 }
 
+class AFScrollControllersHolder {
+  final controllers = <AFWidgetID, ScrollController>{};
+
+  ScrollController access(AFWidgetID wid) {
+    var controller = controllers[wid];
+    if(controller == null) {
+      controller = ScrollController();
+      controllers[wid] = controller;
+    }
+    return controller;
+  }
+
+  void dispose() {
+    for(final controller in controllers.values) {
+      controller.dispose();
+    }
+  }
+
+}
+
+class AFFocusNodesHolder {
+  final nodes = <AFWidgetID, FocusNode>{};
+
+  FocusNode access(AFWidgetID wid) {
+    var node = nodes[wid];
+    if(node == null) {
+      node = FocusNode();
+      nodes[wid] = node;
+    }
+    return node;
+  }
+
+  void dispose() {
+    for(final node in nodes.values) {
+      node.dispose();
+    }
+  }
+}
+
 
 class AFTextEditingControllers  {
   final Map<AFWidgetID, AFTextEditingController> controllers;
@@ -62,6 +101,15 @@ class AFTextEditingControllers  {
     }
     controller.update(text);
   }
+
+  AFTextEditingController? accessTextController(AFWidgetID wid) {
+    final controller = controllers[wid];
+    if(controller == null) {
+      throw AFException("No controller regisered for $wid");
+    }
+    return controller;
+  }
+
 
   String textFor(AFWidgetID wid) {
     final controller = controllers[wid];

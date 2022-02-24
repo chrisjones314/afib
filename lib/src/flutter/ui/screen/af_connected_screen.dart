@@ -1446,6 +1446,8 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
 class AFStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> with AFContextShowMixin, AFUpdateAppStateMixin, AFNavigateMixin {
   static const errFlutterStateRequired = "You can only call this method if your route param is derived from AFRouteParamWithFlutterState";
   static const errNeedTextControllers = "When constructing the AFFlutterRouteParamState for your route parameter, you must make textControllers non-null";
+  static const errNeedScrollControllers = "When constructing the AFFlutterRouteParamState for your route parameter, you must make scrollControllers non-null";
+  static const errNeedTapRecognizers = "When constructing the AFFlutterRouteParamState for your route parameter, you must make tapRecognizers non-null";
   final TBuildContext context;
   final AFScreenID screenId;
   final TTheme theme;

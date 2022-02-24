@@ -2121,7 +2121,6 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     bool autocorrect = true,
     TextAlign textAlign = TextAlign.start,
     TextInputType? keyboardType,
-    FocusNode? focusNode,
     TextStyle? style,
     Color? cursorColor,
     ValueChanged<String>? onSubmitted,
@@ -2142,7 +2141,6 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
       autofocus: autofocus,
       textAlign: textAlign,
       decoration: decoration,
-      focusNode: focusNode,
       onSubmitted: onSubmitted,
       cursorColor: cursorColor,
     );
@@ -2150,9 +2148,20 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   TapGestureRecognizer tapRecognizerFor({
     required AFWidgetID wid,
-    required AFTapGestureRecognizersHolder recognizers,
+    AFTapGestureRecognizersHolder? recognizers,
+    AFRouteParamWithFlutterState? parentParam,
     required AFPressedDelegate onTap,
   }) {
+    assert(recognizers != null || parentParam != null, "You must specify either recognizers or parentParam");
+    assert(recognizers == null || parentParam == null, "You cannot specify both recognizers and parentParam");
+    if(recognizers == null) {
+      recognizers = parentParam?.flutterState.tapRecognizers;
+    }
+
+    if(recognizers == null) {
+      throw AFException("Need to specify recognizers or parentParam");
+    }
+
     final recognizer = recognizers.access(wid);
     recognizer.onTap = onTap;
     return recognizer;

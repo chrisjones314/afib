@@ -13,3 +13,6 @@ class AFException implements Exception {
   }
 }
 
+class AFExceptionStopHere extends AFException {
+  AFExceptionStopHere(): super("debug stop here");
+}

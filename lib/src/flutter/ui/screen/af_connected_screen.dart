@@ -11,14 +11,6 @@ import 'package:logger/logger.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:quiver/core.dart';
 
-enum AFUIType {
-  screen,
-  drawer,
-  dialog,
-  bottomSheet,
-  widget,
-}
-
 abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> {
   final AFThemeID themeId;
   final AFCreateStateViewDelegate<TStateView> stateViewCreator;
@@ -440,6 +432,7 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
           final spi = uiConfig.createSPI(buildContext, dataContext, screenId, wid, paramSource);
           if(AFibD.config.isTestContext && wid == AFUIWidgetID.unused) {
             AFibF.g.testOnlyScreenSPIMap[screenId] = spi;
+            AFibF.g.testOnlyScreenBuildContextMap[screenId] = buildContext;
           }
           final widgetResult = buildWithSPI(spi);
           return widgetResult;
@@ -675,16 +668,16 @@ mixin AFContextShowMixin {
   /// context.closeDialog(context.p);
   /// ```
   /// inside the dialog screen.
-  void showDialog<TReturn>({
+  void showDialog<TReturn extends Object?>({
     required AFNavigatePushAction navigate,
-    void Function(TReturn?)? onReturn,
+    AFReturnValueDelegate<TReturn>? onReturn,
     bool barrierDismissible = true,
     material.Color? barrierColor,
     bool useSafeArea = true,
     bool useRootNavigator = true,
     material.RouteSettings? routeSettings
   }) async {
-    showDialogStatic(
+    showDialogStatic<TReturn>(
       flutterContext: flutterContext,
       dispatch: this.dispatch,
       navigate: navigate,
@@ -701,7 +694,7 @@ mixin AFContextShowMixin {
     required dynamic dispatch(dynamic action),
     required BuildContext? flutterContext,
     required AFNavigatePushAction navigate,
-    void Function(TReturn?)? onReturn,
+    AFReturnValueDelegate<TReturn>? onReturn,
     bool barrierDismissible = true,
     material.Color? barrierColor,
     bool useSafeArea = true,
@@ -716,6 +709,8 @@ mixin AFContextShowMixin {
     if(builder == null) {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
+
+    dispatch(AFNavigateShowScreenBeginAction(verifiedScreenId, AFUIType.dialog));
 
     final ctx = flutterContext;
     if(ctx != null) {
@@ -735,6 +730,8 @@ mixin AFContextShowMixin {
       if(onReturn != null) {
         onReturn(result);
       }
+      dispatch(AFNavigateShowScreenEndAction(verifiedScreenId));
+
     } else {
       // this happens in state testing, where there is no BuildContext.  We still
       // need to handle calling onReturn when someone calls closeDialog.
@@ -742,6 +739,7 @@ mixin AFContextShowMixin {
         if(onReturn != null) {
           onReturn(val);
         }
+        dispatch(AFNavigateShowScreenEndAction(verifiedScreenId));
        });
     }
   }
@@ -998,9 +996,9 @@ mixin AFContextShowMixin {
   /// context.closeBottomSheet(context.p);
   /// ```
   /// inside the bottom sheet screen.
-  void showModalBottomSheet({
+  void showModalBottomSheet<TReturn extends Object?>({
     required AFNavigatePushAction navigate,
-    AFReturnValueDelegate? onReturn,
+    AFReturnValueDelegate<TReturn>? onReturn,
     material.Color? backgroundColor,
     double? elevation,
     material.ShapeBorder? shape,
@@ -1012,48 +1010,23 @@ mixin AFContextShowMixin {
     bool enableDrag = true,
     material.RouteSettings? routeSettings,  
   }) async {
-    final screenId = navigate.param.id as AFScreenID;
 
-    final verifiedScreenId = _nullCheckScreenId(screenId);
-    _updateOptionalGlobalParam(navigate);
-
-    final builder = AFibF.g.screenMap.findBy(verifiedScreenId);
-    if(builder == null) {
-      throw AFException("The screen $screenId is not registered in the screen map");
-    }
-
-    final ctx = flutterContext;
-    if(ctx != null) {
-      final result = await material.showModalBottomSheet<dynamic>(
-        context: ctx,
-        builder: builder,
-        backgroundColor: backgroundColor,
-        elevation: elevation,
-        shape: shape,
-        clipBehavior: clipBehavior,
-        barrierColor: barrierColor,
-        isScrollControlled: isScrollControlled,
-        useRootNavigator: useRootNavigator,
-        isDismissible: isDismissible,
-        enableDrag: enableDrag,
-        routeSettings: routeSettings,
-      );
-
-      AFibF.g.testOnlyShowUIRegisterReturn(verifiedScreenId, result);
-
-      if(onReturn != null) {
-        onReturn(result);
-      }
-    } else {
-      // this happens in state testing, where there is no BuildContext.  We still
-      // need to handle calling onReturn when someone calls closeDialog.
-      AFibF.g.testOnlySimulateShowDialogOrSheet(verifiedScreenId, (val) {
-        if(onReturn != null) {
-          onReturn(val);
-        }
-      });
-    }
-
+    showModalBottomSheetStatic<TReturn>(
+      dispatch: dispatch, 
+      navigate: navigate,
+      onReturn: onReturn,
+      flutterContext: flutterContext,
+      backgroundColor: backgroundColor,
+      elevation: elevation,
+      shape: shape,
+      clipBehavior: clipBehavior,
+      barrierColor: barrierColor,
+      isScrollControlled: isScrollControlled,
+      useRootNavigator: useRootNavigator,
+      isDismissible: isDismissible,
+      enableDrag: enableDrag,
+      routeSettings: routeSettings,
+    );
   }
 
   /// Shows a bottom sheet
@@ -1086,11 +1059,11 @@ mixin AFContextShowMixin {
     } 
   }
 
-  static void showModalBottomSheetStatic({
+  static void showModalBottomSheetStatic<TReturn extends Object?>({
     required dynamic dispatch(dynamic action),
     BuildContext? flutterContext,    
     required AFNavigatePushAction navigate,
-    AFReturnValueDelegate? onReturn,
+    AFReturnValueDelegate<TReturn>? onReturn,
     material.Color? backgroundColor,
     double? elevation,
     material.ShapeBorder? shape,
@@ -1110,6 +1083,8 @@ mixin AFContextShowMixin {
     if(builder == null) {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
+
+    dispatch(AFNavigateShowScreenBeginAction(verifiedScreenId, AFUIType.bottomSheet));
 
     final ctx = flutterContext;
     if(ctx != null) {
@@ -1133,6 +1108,8 @@ mixin AFContextShowMixin {
       if(onReturn != null) {
         onReturn(result);
       }
+      dispatch(AFNavigateShowScreenEndAction(verifiedScreenId));
+
     } else {
       // this happens in state testing, where there is no BuildContext.  We still
       // need to handle calling onReturn when someone calls closeDialog.
@@ -1140,7 +1117,9 @@ mixin AFContextShowMixin {
         if(onReturn != null) {
           onReturn(val);
         }
+        dispatch(AFNavigateShowScreenEndAction(verifiedScreenId));
       });
+
     }
   }
 
@@ -1390,10 +1369,12 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
   /// This is intended to be called from within an AFConnectedDialog.  If you call it 
   /// and a dialog is not open, it will mess up the navigation state.
   void closeBottomSheet(AFScreenID sheetId, dynamic returnValue) {
-    if(!AFibF.g.doMiddlewareNavigation( (navState) {
-      final ctx = contextNullCheck;
+    final ctx = flutterContext;
+    final didNav = (ctx != null && AFibF.g.doMiddlewareNavigation( (navState) {
       material.Navigator.pop(ctx, returnValue); 
-    })) {
+    }));
+
+    if(!didNav) {
       AFibF.g.testOnlySimulateCloseDialogOrSheet(sheetId, returnValue);      
     } else {
       AFibF.g.testOnlyShowUIReturn[sheetId] = returnValue;
@@ -1472,8 +1453,12 @@ class AFStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme e
 
   AFStateProgrammingInterface(this.context, this.screenId, this.theme, this.paramSource);
 
-  BuildContext get flutterContext {
-    return context.c;
+  bool get hasFlutterContext {
+    return context.flutterContext != null;
+  }
+
+  BuildContext? get flutterContext {
+    return context.flutterContext;
   }
 
   TTheme get t {

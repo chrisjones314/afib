@@ -153,7 +153,7 @@ typedef AFOverrideCreateThemeDataDelegate = ThemeData Function(AFFundamentalDevi
 
 typedef AFCreateDynamicDelegate = dynamic Function();
 
-typedef AFReturnValueDelegate = void Function(Object? param);
+typedef AFReturnValueDelegate<TReturn extends Object?> = void Function(TReturn? param);
 
 typedef AFRenderConnectedChildDelegate = Widget Function(AFScreenID screenId, AFWidgetID wid);
 
@@ -175,7 +175,11 @@ typedef AFConnectedUIBuilderDelegate = AFConnectedUIBase Function(BuildContext? 
 
 typedef AFStateTestScreenHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, AFStateTestScreenContext<TSPI> screenContext);
 
+typedef AFStateTestScreenBuildHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, TSPI spi);
+
 typedef AFStateTestWidgetHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestWidgetContext<TSPI> widgetContext);
+
+typedef AFStateTestWidgetBuildHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(TSPI spi);
 
 typedef AFStateTestWidgetWithExecuteHandlerDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, AFStateTestWidgetContext<TSPI> widgetContext);
 

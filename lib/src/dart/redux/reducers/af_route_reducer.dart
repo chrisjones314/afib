@@ -18,6 +18,8 @@ final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigateRemoveChildParamAction>(_navRemoveChildParam),
   TypedReducer<AFRouteState, AFResetToInitialRouteAction>(_resetToInitialRoute),
   TypedReducer<AFRouteState, AFUpdateTimeRouteParametersAction>(_updateTimeRouteParameters),
+  TypedReducer<AFRouteState, AFNavigateShowScreenBeginAction>(_navShowScreenBegin),
+  TypedReducer<AFRouteState, AFNavigateShowScreenEndAction>(_navShowScreenEnd),
 ]);
 
 //---------------------------------------------------------------------------
@@ -85,4 +87,14 @@ AFRouteState _resetToInitialRoute(AFRouteState state, AFResetToInitialRouteActio
 //---------------------------------------------------------------------------
 AFRouteState _updateTimeRouteParameters(AFRouteState state, AFUpdateTimeRouteParametersAction action) {
   return state.updateTimeRouteParameters(action.now);
+}
+
+//---------------------------------------------------------------------------
+AFRouteState _navShowScreenBegin(AFRouteState state, AFNavigateShowScreenBeginAction action) {
+  return state.showScreenBegin(action.screen, action.uiType);
+}
+
+//---------------------------------------------------------------------------
+AFRouteState _navShowScreenEnd(AFRouteState state, AFNavigateShowScreenEndAction action) {
+  return state.showScreenEnd(action.screen);
 }

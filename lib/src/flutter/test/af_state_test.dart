@@ -261,14 +261,22 @@ class _AFStateTestDebugStopHereStatement extends _AFStateTestExecutionStatement 
 class _AFStateTestScreenStatement<TSPI extends AFStateProgrammingInterface> extends _AFStateTestExecutionStatement {
   final AFScreenID screenId;
   final AFStateTestScreenHandlerDelegate<TSPI> screenHandler;
+  final bool verifyIsActiveScreen;
 
   _AFStateTestScreenStatement(
     this.screenId,
-    this.screenHandler,
+    this.screenHandler, {
+      required this.verifyIsActiveScreen
+    }
   );
 
   @override
   _AFStateTestExecutionNext execute(AFStateTestContext context, { required bool verify }) {
+    if(verify && verifyIsActiveScreen) {
+        final state = AFibF.g.storeInternalOnly!.state;
+        final route = state.public.route;
+        context.expect(route.activeScreenId, ft.equals(screenId));      
+    }
     final screen = AFibF.g.screenMap.createInstance(screenId, null);
     final config = screen.uiConfig;
     final ctx = context.createScreenContext<TSPI>(screenId: screenId, screenConfig: config);
@@ -550,6 +558,9 @@ abstract class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface
     delegate(spi);
   }
 
+  void executeDebugStopHere() {
+    throw AFExceptionStopHere();
+  }
 
   void executeBuildWithExecute(AFStateTestExecute e, AFStateTestScreenBuildWithExecuteContextDelegate<TSPI> delegate, {
     AFRouteParam? launchParam
@@ -602,21 +613,79 @@ class AFStateTestScreenContextForScreen<TSPI extends AFStateProgrammingInterface
   }
 }
 
-class AFStateTestScreenShortcut<TSPI extends AFScreenStateProgrammingInterface> {
+class AFStateTestScreenLikeShortcut<TSPI extends AFScreenStateProgrammingInterface> {
   final AFScreenID screenId;
   final AFStateTestDefinitionContext testContext;
 
-  AFStateTestScreenShortcut(this.testContext, this.screenId);
-
-  void executeScreen(AFStateTestScreenHandlerDelegate<TSPI> handler) {
-    testContext.executeScreen<TSPI>(screenId, handler);
-  }
+  AFStateTestScreenLikeShortcut(this.testContext, this.screenId);
 
   AFStateTestWidgetShortcut<TSPIWidget> createWidgetShortcut<TSPIWidget extends AFWidgetStateProgrammingInterface>(
     AFWidgetID? wid,
     AFWidgetConfig config,
   ) {
     return AFStateTestWidgetShortcut<TSPIWidget>(wid, config);
+  }
+}
+
+class AFStateTestScreenShortcut<TSPI extends AFScreenStateProgrammingInterface> extends AFStateTestScreenLikeShortcut<TSPI> {
+
+  AFStateTestScreenShortcut(AFStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
+
+  void executeScreen(AFStateTestScreenHandlerDelegate<TSPI> handler, { bool verifyIsActiveScreen = true }) {
+    testContext.executeScreen<TSPI>(screenId, handler, verifyIsActiveScreen: verifyIsActiveScreen);
+  }
+
+  void executeScreenBuild(AFStateTestScreenBuildHandlerDelegate<TSPI> handler, { bool verifyIsActiveScreen = true }) {
+    testContext.executeScreen<TSPI>(screenId, (e, screenContext) {
+      screenContext.executeBuildWithExecute(e, handler);
+    }, verifyIsActiveScreen: verifyIsActiveScreen);
+  }
+}
+
+class AFStateTestDrawerShortcut<TSPI extends AFDrawerStateProgrammingInterface> extends AFStateTestScreenLikeShortcut<TSPI> {
+
+  AFStateTestDrawerShortcut(AFStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
+
+  void executeDrawer(AFStateTestScreenHandlerDelegate<TSPI> handler) {
+    testContext.executeDrawer<TSPI>(screenId, handler);
+  }
+
+  void executeDrawerBuild(AFStateTestScreenBuildHandlerDelegate<TSPI> handler) {
+    testContext.executeDrawer<TSPI>(screenId, (e, screenContext) {
+      screenContext.executeBuildWithExecute(e, handler);
+    });
+  }
+
+}
+
+class AFStateTestDialogShortcut<TSPI extends AFDialogStateProgrammingInterface> extends AFStateTestScreenLikeShortcut<TSPI> {
+
+  AFStateTestDialogShortcut(AFStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
+
+  void executeDialog(AFStateTestScreenHandlerDelegate<TSPI> handler) {
+    testContext.executeDialog<TSPI>(screenId, handler);
+  }
+
+  void executeDialogBuild(AFStateTestScreenBuildHandlerDelegate<TSPI> handler) {
+    testContext.executeDialog<TSPI>(screenId, (e, screenContext) {
+      screenContext.executeBuildWithExecute(e, handler);
+    });
+  }
+
+}
+
+class AFStateTestBottomSheetShortcut<TSPI extends AFBottomSheetStateProgrammingInterface> extends AFStateTestScreenLikeShortcut<TSPI> {
+
+  AFStateTestBottomSheetShortcut(AFStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
+
+  void executeBottomSheet(AFStateTestScreenHandlerDelegate<TSPI> handler) {
+    testContext.executeBottomSheet<TSPI>(screenId, handler);
+  }
+
+  void executeBottomSheetBuild(AFStateTestScreenBuildHandlerDelegate<TSPI> handler) {
+    testContext.executeBottomSheet<TSPI>(screenId, (e, screenContext) {
+      screenContext.executeBuildWithExecute(e, handler);
+    });
   }
 
 }
@@ -633,11 +702,27 @@ class AFStateTestWidgetShortcut<TSPI extends AFWidgetStateProgrammingInterface> 
     if(widActual == null) {
       throw AFException(noWidException);
     }
-    screenContext.executeWidgetUseParentParam(widActual, config, body);
+    screenContext.executeWidgetUseParentParam<TSPI>(widActual, config, body);
+  }
+
+  void executeWidgetUseParentParamBuild(AFStateTestScreenContext screenContext, { AFWidgetID? wid, required AFStateTestWidgetBuildHandlerDelegate<TSPI> body}) {
+    final widActual = wid ?? this.wid;
+    if(widActual == null) {
+      throw AFException(noWidException);
+    }
+    screenContext.executeWidgetUseParentParam<TSPI>(widActual, config, (widgetContext) {
+      widgetContext.executeBuild(body);
+    });
   }
 
   void executeWidgetUseLaunchParam(AFStateTestScreenContext screenContext, AFRouteParam launchParam,{ required AFStateTestWidgetHandlerDelegate<TSPI> body}) {
-    screenContext.executeWidgetUseLaunchParam(launchParam, config, body);
+    screenContext.executeWidgetUseLaunchParam<TSPI>(launchParam, config, body);
+  }
+
+  void executeWidgetUseLaunchParamBuild(AFStateTestScreenContext screenContext, AFRouteParam launchParam,{ required AFStateTestWidgetBuildHandlerDelegate<TSPI> body}) {
+    screenContext.executeWidgetUseLaunchParam<TSPI>(launchParam, config, (widgetContext) {
+      widgetContext.executeBuild(body);
+    });
   }
 
   void executeWidgetUseChildParam(AFStateTestScreenContext screenContext,{ AFWidgetID? wid, required AFStateTestWidgetHandlerDelegate<TSPI> body}) {
@@ -645,12 +730,21 @@ class AFStateTestWidgetShortcut<TSPI extends AFWidgetStateProgrammingInterface> 
     if(widActual == null) {
       throw AFException(noWidException);
     }
-    screenContext.executeWidgetUseChildParam(widActual, config, body);
+    screenContext.executeWidgetUseChildParam<TSPI>(widActual, config, body);
   }
 
+  void executeWidgetUseChildParamBuild(AFStateTestScreenContext screenContext,{ AFWidgetID? wid, required AFStateTestWidgetBuildHandlerDelegate<TSPI> body}) {
+    final widActual = wid ?? this.wid;
+    if(widActual == null) {
+      throw AFException(noWidException);
+    }
+    screenContext.executeWidgetUseChildParam<TSPI>(widActual, config, (widgetContext) { 
+      widgetContext.executeBuild(body);
+    });
+  }
+
+
 }
-
-
 
 class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
   static const errSpecifyTypeParameter = "You must specify a type parameter to this function call";
@@ -660,6 +754,18 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
 
   AFStateTestScreenShortcut<TSPI> createScreenShortcut<TSPI extends AFScreenStateProgrammingInterface>(AFScreenID screenId) {
     return AFStateTestScreenShortcut<TSPI>(this, screenId);
+  }
+
+  AFStateTestDialogShortcut<TSPI> createDialogShortcut<TSPI extends AFDialogStateProgrammingInterface>(AFScreenID screenId) {
+    return AFStateTestDialogShortcut<TSPI>(this, screenId);
+  }
+
+  AFStateTestDrawerShortcut<TSPI> createDrawerShortcut<TSPI extends AFDrawerStateProgrammingInterface>(AFScreenID screenId) {
+    return AFStateTestDrawerShortcut<TSPI>(this, screenId);
+  }
+
+  AFStateTestBottomSheetShortcut<TSPI> createBottomSheetShortcut<TSPI extends AFBottomSheetStateProgrammingInterface>(AFScreenID screenId) {
+    return AFStateTestBottomSheetShortcut<TSPI>(this, screenId);
   }
 
   /// Specify a response for a particular query.
@@ -750,8 +856,8 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
     test.executeQuery(query);
   }
 
-  void executeScreen<TSPI extends AFScreenStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> screenHandler) {
-    test.executeScreen<TSPI>(screenId, screenHandler);
+  void executeScreen<TSPI extends AFScreenStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> screenHandler, { bool verifyIsActiveScreen = true }) {
+    test.executeScreen<TSPI>(screenId, screenHandler, verifyIsActiveScreen: verifyIsActiveScreen);
   }
 
   void executeDebugStopHere() {
@@ -763,15 +869,15 @@ class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
   }
 
   void executeDrawer<TSPI extends AFDrawerStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> screenHandler) {
-    test.executeScreen<TSPI>(screenId, screenHandler);
+    test.executeScreen<TSPI>(screenId, screenHandler, verifyIsActiveScreen: false);
   }
 
   void executeDialog<TSPI extends AFDialogStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> buildHandler) {
-    executeScreen<TSPI>(screenId, buildHandler);
+    executeScreen<TSPI>(screenId, buildHandler, verifyIsActiveScreen: false);
   }
 
   void executeBottomSheet<TSPI extends AFBottomSheetStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> buildHandler) {
-    executeScreen<TSPI>(screenId, buildHandler);
+    executeScreen<TSPI>(screenId, buildHandler, verifyIsActiveScreen: false);
   }
 }
 
@@ -1074,8 +1180,12 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
     currentStatements.addExecutionStatement(_AFStateTestQueryStatement.fromOne(query), hasPreviousStatements: extendedStatements.hasExecutionStatements);
   }
 
-  void executeScreen<TSPI extends AFStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> screenHandler) {
-    currentStatements.addExecutionStatement(_AFStateTestScreenStatement<TSPI>(screenId, screenHandler), hasPreviousStatements: extendedStatements.hasExecutionStatements);
+  void executeScreen<TSPI extends AFStateProgrammingInterface>(AFScreenID screenId, AFStateTestScreenHandlerDelegate<TSPI> screenHandler, { 
+    required bool verifyIsActiveScreen,
+  }) {
+    currentStatements.addExecutionStatement(_AFStateTestScreenStatement<TSPI>(screenId, screenHandler, 
+      verifyIsActiveScreen: verifyIsActiveScreen
+    ), hasPreviousStatements: extendedStatements.hasExecutionStatements);
   }
 
   void executeDebugStopHere() {
@@ -1108,22 +1218,26 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
     // then, execute all the predecessor executions, but don't do any verification,
     // not just because it would be redundant, but because it may be inaccurate due
     // to overriden definitions that impact the results of queries.
-    final execs = extendedStatements.executionStatements(upTo: upTo, continueFrom: continueFrom);
-    for(final exec in execs) {
-      final result = exec.execute(context, verify: false);
-      if(result == _AFStateTestExecutionNext.stop) {
-        return;
-      }
-    }
-
-    if(upTo == null) {
-      // basically, we need to go through an execute each query that they specified.
-      for(final exec in currentStatements.executionStatements) {
-        final result = exec.execute(context, verify: true);
+    try {
+      final execs = extendedStatements.executionStatements(upTo: upTo, continueFrom: continueFrom);
+      for(final exec in execs) {
+        final result = exec.execute(context, verify: false);
         if(result == _AFStateTestExecutionNext.stop) {
           return;
         }
       }
+
+      if(upTo == null) {
+        // basically, we need to go through an execute each query that they specified.
+        for(final exec in currentStatements.executionStatements) {
+          final result = exec.execute(context, verify: true);
+          if(result == _AFStateTestExecutionNext.stop) {
+            return;
+          }
+        }
+      }
+    } on AFExceptionStopHere {
+      // nothing to do, just stop.
     }
   }
 }

@@ -461,18 +461,38 @@ class AFRouteStateSegments {
 
 }
 
+enum AFUIType {
+  screen,
+  drawer,
+  dialog,
+  bottomSheet,
+  widget,
+}
+
+class _AFRouteStateShowScreen {
+  final AFScreenID screenId;
+  final AFUIType kind;
+  const _AFRouteStateShowScreen({
+    required this.screenId,
+    required this.kind,
+  });
+}
+
 /// The current route, a list of nested screens and the data associated with them.
 @immutable
 class AFRouteState {
+  static const showScreenUnused = _AFRouteStateShowScreen(screenId: AFUIScreenID.unused, kind: AFUIType.dialog);
   static const emptySegments = <AFRouteSegment>[];
   final AFRouteStateSegments screenHierarchy;
   final AFTimeState timeLastUpdate;
   final Map<AFID, AFRouteSegment> globalPool;
+  final _AFRouteStateShowScreen showScreen;
 
   AFRouteState({
     required this.screenHierarchy, 
     required this.globalPool,
     required this.timeLastUpdate,
+    required this.showScreen,
   });  
 
   /// Creates the default initial state.
@@ -483,7 +503,7 @@ class AFRouteState {
     screen.add(AFRouteSegment.withParam(routeParamFactory(), null, null));
     final screenSegs = AFRouteStateSegments(active: screen, prior: emptySegments);
     final globalPool = <AFScreenID, AFRouteSegment>{};
-    return AFRouteState(screenHierarchy: screenSegs, globalPool: globalPool, timeLastUpdate: AFTimeState.createNow());
+    return AFRouteState(screenHierarchy: screenSegs, globalPool: globalPool, timeLastUpdate: AFTimeState.createNow(), showScreen: showScreenUnused);
   }
 
   bool isActiveScreen(AFScreenID screen
@@ -726,6 +746,15 @@ class AFRouteState {
     return _reviseParamWithChildren(screen, widget, route, null, (pwc) => pwc.reviseRemoveChild(widget));
   }
 
+  AFRouteState showScreenBegin(AFScreenID screenId, AFUIType kind) {
+    return copyWith(showScreen: _AFRouteStateShowScreen(screenId: screenId, kind: kind));
+  }
+
+  AFRouteState showScreenEnd(AFScreenID screenId) {
+    assert(showScreen.screenId == screenId);
+    return copyWith(showScreen: AFRouteState.showScreenUnused);
+  }
+
   AFRouteState setChildParam(AFScreenID screen, AFNavigateRoute route, AFRouteParam param, AFWidgetParamSource paramSource) {
     final widget = param.id;
     if(paramSource == AFWidgetParamSource.parent) {
@@ -794,12 +823,14 @@ class AFRouteState {
     AFRouteStateSegments? screenSegs,
     AFRouteStateSegments? popupSegs,
     Map<AFID, AFRouteSegment>? globalPool,
-    AFTimeState? timeLastUpdate
+    AFTimeState? timeLastUpdate,
+    _AFRouteStateShowScreen? showScreen,
   }) {
     final revised = AFRouteState(
       screenHierarchy: screenSegs ?? this.screenHierarchy,
       globalPool: globalPool ?? this.globalPool,
       timeLastUpdate: timeLastUpdate ?? this.timeLastUpdate,
+      showScreen: showScreen ?? this.showScreen,
     );
 
     if(screenSegs != null) {

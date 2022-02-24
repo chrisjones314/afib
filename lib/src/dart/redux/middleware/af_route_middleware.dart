@@ -176,7 +176,7 @@ void _navigateWireframe(Store<AFState> store, AFWireframeEventAction action, Nex
 void _navigateSyncNavigatorState(Store<AFState> store, AFNavigateSyncNavigatorStateWithRoute action, NextDispatcher next) {
   final route = action.route;
   final hierarchy = route.screenHierarchy.active;
-
+  
   AFibF.g.doMiddlewareNavigation( (navState) {
     // first, pop off all but one screen.
     while(navState.canPop()) {

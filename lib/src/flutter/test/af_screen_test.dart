@@ -17,6 +17,7 @@ import 'package:afib/src/flutter/ui/screen/afui_prototype_widget_screen.dart';
 import 'package:collection/collection.dart';
 import 'package:colorize/colorize.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as material;
 import 'package:flutter_test/flutter_test.dart' as ft;
 import 'package:logger/logger.dart';
 import 'package:quiver/core.dart';
@@ -1704,6 +1705,46 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
     // now, perform an action that navigates to the specified path, only in flutter.
     final route = store.state.public.route;
     dispatcher.dispatch(AFNavigateSyncNavigatorStateWithRoute(route));
+    final showScreenId = route.showScreen.screenId;
+    if(showScreenId != AFUIScreenID.unused) {
+      
+      // this occurs when a dialog, bottomsheet, or drawer is actively displayed 
+      // in the current route.   In this scenario, we have already executed the 
+      // state part of opening the dialog, etc, but we haven't actually done the open
+      // because we didn't have a BuildContext at the time.   So, below, we do the 
+      // actual open, then make sure to route the result through the expected code-path
+      // as though it had been opened the normal way.
+      Future.delayed(Duration(seconds: 1), () async {
+        final uiType = route.showScreen.kind;
+
+        final builder = AFibF.g.screenMap.findBy(showScreenId);
+        final ctx = AFibF.g.testOnlyScreenBuildContextMap[route.activeScreenId];
+        assert(builder != null && ctx != null);
+        if(builder != null && ctx != null) {
+          var result;
+          if(uiType == AFUIType.dialog) {          
+            result = await material.showDialog(
+              context: ctx,
+              builder: builder
+            );
+          } else if(uiType == AFUIType.bottomSheet) {
+            result = await material.showModalBottomSheet(
+              context: ctx, 
+              builder: builder
+            );
+          } else if(uiType == AFUIType.drawer) {
+            final scaffold = material.Scaffold.of(ctx);
+            scaffold.openDrawer();
+          } else {
+            assert(false, "Unsupposed UI type");
+          }
+
+          if(uiType == AFUIType.dialog || uiType == AFUIType.bottomSheet) {
+            AFibF.g.testOnlySimulateCloseDialogOrSheet(showScreenId, result);
+          }
+        }
+      });   
+    }
   }
 
 

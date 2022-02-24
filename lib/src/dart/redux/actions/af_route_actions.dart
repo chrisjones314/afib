@@ -205,6 +205,19 @@ class AFNavigateRemoveChildParamAction extends AFNavigateAction {
   }): super(id: id, param: AFRouteParamUnused.unused, children: null); 
 }
 
+class AFNavigateShowScreenBeginAction extends AFNavigateAction {
+    final AFScreenID screen;
+    final AFUIType uiType; 
+    AFNavigateShowScreenBeginAction(this.screen, this.uiType): super(
+      children: null, param: AFRouteParamUnused.unused);
+}
+
+class AFNavigateShowScreenEndAction extends AFNavigateAction {
+    final AFScreenID screen;
+    AFNavigateShowScreenEndAction(this.screen): super(
+      children: null, param: AFRouteParamUnused.unused);
+}
+
 class AFNavigateSetChildParamAction extends AFNavigateAction {
   final AFScreenID screen;
   final AFNavigateRoute route;

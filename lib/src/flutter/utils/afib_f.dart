@@ -109,6 +109,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   final wireframes = AFWireframes();
   final testOnlyDialogCompleters = <AFScreenID, void Function(dynamic)>{}; 
   final testOnlyScreenSPIMap = <AFScreenID, AFStateProgrammingInterface>{};
+  final testOnlyScreenBuildContextMap = <AFScreenID, BuildContext>{};
   BuildContext? testOnlyShowBuildContext;
 
   AFScreenMap? _afPrototypeScreenMap;

@@ -39,7 +39,7 @@ abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extend
     //  param = AFRouteParamUnused.unused;
     //}
     if(paramSeg == null) {
-      assert(false);
+      assert(false, "If you reached this in testing, you may not be on the screen you think you are on in your test scenario.");
       return null;
     }
     final param = paramSeg.param as TRouteParam;

@@ -1219,6 +1219,9 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
     // not just because it would be redundant, but because it may be inaccurate due
     // to overriden definitions that impact the results of queries.
     try {
+
+      // don't validate the extended execution.
+      context.disableValidation();
       final execs = extendedStatements.executionStatements(upTo: upTo, continueFrom: continueFrom);
       for(final exec in execs) {
         final result = exec.execute(context, verify: false);
@@ -1227,6 +1230,8 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
         }
       }
 
+      // don't validate the extended execution.
+      context.enableValidation();
       if(upTo == null) {
         // basically, we need to go through an execute each query that they specified.
         for(final exec in currentStatements.executionStatements) {

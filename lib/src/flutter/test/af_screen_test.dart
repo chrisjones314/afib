@@ -462,6 +462,11 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
     return timeState;
   }
 
+   void expectWidgetIds(List<Widget> widgets, List<AFWidgetID?> ids, { AFWidgetMapperDelegate? mapper } ) {
+    return expect(widgets, hasWidgetIdsWith(ids, mapper: mapper));
+  }
+ 
+
   @override
   AFBaseTestID get testID => testId;
   AFSparsePathWidgetSelector? get activeSelectorPath {

@@ -4,11 +4,9 @@ import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:afib/src/flutter/test/af_matchers.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
 import 'package:colorize/colorize.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart' as flutter_test;
 import 'package:logger/logger.dart';
 import 'package:stack_trace/stack_trace.dart';
@@ -56,6 +54,7 @@ abstract class AFBaseTestExecute extends AFModelWithCustomID {
   static const titleColWidth = 60;
   static const resultColWidth = 5;
   static const resultSuffixColWidth = 8;
+  bool validate = true;
 
   AFBaseTestExecute(): super(customStateId: testExecuteId);
 
@@ -64,6 +63,9 @@ abstract class AFBaseTestExecute extends AFModelWithCustomID {
   AFTestErrors defaultErrors = AFTestErrors(null);
 
   void expect(dynamic value, flutter_test.Matcher matcher, {int extraFrames = 0}) {
+    if(!validate) {
+      return;
+    }
     final matchState = <dynamic, dynamic>{};
     if(!addPassIf(test: matcher.matches(value, matchState))) {
       final matchDesc = matcher.describe(flutter_test.StringDescription());
@@ -73,8 +75,12 @@ abstract class AFBaseTestExecute extends AFModelWithCustomID {
     }
   }
 
-  void expectWidgetIds(List<Widget> widgets, List<AFWidgetID?> ids, { AFWidgetMapperDelegate? mapper } ) {
-    return expect(widgets, hasWidgetIdsWith(ids, mapper: mapper));
+  void enableValidation() {
+    validate = true;
+  }
+
+  void disableValidation() {
+    validate = false;
   }
   
   void startSection(AFID id, { bool resetSection = false }) {

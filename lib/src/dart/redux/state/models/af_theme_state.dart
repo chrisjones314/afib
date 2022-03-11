@@ -943,13 +943,17 @@ class AFSpacingSet {
     required this.s5,
   });
 
-  EdgeInsets get sizeNone { return s0; }
   EdgeInsets get size1 { return s1; }
   EdgeInsets get size2 { return s2; }
   EdgeInsets get size3 { return s3; }
   EdgeInsets get size4 { return s4; }
   EdgeInsets get size5 { return s5; }
+  EdgeInsets get none { return s0; }
+  EdgeInsets get smallest { return s1; }
+  EdgeInsets get smaller { return s2; }
   EdgeInsets get standard { return s3; }
+  EdgeInsets get bigger { return s4; }
+  EdgeInsets get biggest { return s5; }
 
   factory AFSpacingSet.createLTRB(
     List<double> basicSizes,
@@ -995,6 +999,13 @@ class AFSpacing {
   AFSpacingSet get horz { return h; }
   AFSpacingSet get y { return v; }
   AFSpacingSet get x { return h; }
+
+  EdgeInsets get smallest { return a.smallest; }
+  EdgeInsets get smaller { return a.smaller; }
+  EdgeInsets get standard { return a.standard; }
+  EdgeInsets get bigger { return a.bigger; }
+  EdgeInsets get biggest { return a.biggest; }
+  EdgeInsets get none { return a.none; }
 
 
   AFSpacing({
@@ -1603,6 +1614,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
       primary: textColor
     );
   }
+
 
   ButtonStyle styleTextButtonPrimary() {
     return styleTextButton(
@@ -2463,18 +2475,6 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return fundamentals.padding.a.standard;
   }
 
-  EdgeInsets get marginStandard {
-    return fundamentals.margin.a.standard;
-  }
-
-  EdgeInsets get marginNone {
-    return fundamentals.margin.a.s0;
-  }
-
-  EdgeInsets get paddingNone {
-    return fundamentals.padding.a.s0;
-  }
-
   AFSpacing get margin {
     return fundamentals.margin;
   }
@@ -2632,6 +2632,12 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }) {
     final stackChildren = column();
 
+
+    stackChildren.add(Positioned(
+      key: keyForWID(AFUIWidgetID.positionedCenterHosted),
+      top: 0, left: 0, bottom: 0, right: 0,
+      child: main));
+
     if(topControls != null) {
       stackChildren.add(Positioned(
         key: keyForWID(AFUIWidgetID.positionedTopHosted),
@@ -2639,11 +2645,6 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
         child: topControls
       ));
     }
-
-    stackChildren.add(Positioned(
-      key: keyForWID(AFUIWidgetID.positionedCenterHosted),
-      top: topHeight, left: 0, bottom: 0, right: 0,
-      child: main));
 
     if(bottomControls != null) {
       stackChildren.add(Positioned(
@@ -2654,7 +2655,6 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     }
     return Container(
       key: keyForWID(AFUIWidgetID.contHostedControls),
-      margin: EdgeInsets.all(4.0),
       child: Stack(children: stackChildren));
   }
 

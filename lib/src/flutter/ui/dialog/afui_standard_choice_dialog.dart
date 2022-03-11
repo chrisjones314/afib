@@ -126,6 +126,7 @@ class AFUIStandardChoiceDialog extends AFUIConnectedDialog<AFUIStandardChoiceDia
     )));
 
     return Dialog(
+      backgroundColor: t.colorSurface,
       child: Container(
         margin: t.margin.a.s5,
         child: Column(

@@ -86,6 +86,7 @@ class AFRichTextBuilder {
   /// Creates a rich text widget with the specified content.
   Widget toRichText({
     TextAlign textAlign = TextAlign.start,
+    TextOverflow overflow = TextOverflow.clip,
   }) {
     return RichText(
         key: AFFunctionalTheme.keyForWIDStatic(wid),

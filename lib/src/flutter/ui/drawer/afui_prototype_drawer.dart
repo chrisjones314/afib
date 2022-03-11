@@ -268,7 +268,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     final color = isActive ? t.colorSecondary : Colors.grey[400] ?? Colors.grey;
       
     final button = IconButton(
-      padding: t.paddingNone,
+      padding: t.padding.none,
       visualDensity: VisualDensity.compact,
       icon: Icon(icon),
       onPressed: () {
@@ -277,7 +277,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     );
 
     return Container(
-      padding: t.paddingNone,
+      padding: t.padding.none,
       margin: t.margin.b.s3,
       child: button,
       decoration: BoxDecoration(
@@ -519,7 +519,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     );
 
     return Container(
-      margin: t.marginStandard,
+      margin: t.margin.standard,
       child: content
     );
   }
@@ -653,7 +653,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     final timeQuery = context.s.timeQuery;
     if(timeQuery == null) {
       return t.childMargin(
-        margin: t.marginStandard,
+        margin: t.margin.standard,
         child: Text("A AFTimeUpdateListenerQuery is not running.  Either start one in a workflow test, or pass in runTime: true in a screen or widget test.")
       );
     }
@@ -700,7 +700,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
 
 
     rowsAdjust.add(Container(
-      margin: t.marginStandard,
+      margin: t.margin.standard,
       child: Text("space separated with suffix, eg 1d 2h 3m 4s 5ms", style: t.styleHint())
     ));
 
@@ -777,14 +777,14 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
 
     rowsOverall.add(t.childCardHeader(context, null, "Adjust Time", [
       t.childMargin(
-        margin: t.marginStandard,
+        margin: t.margin.standard,
         child: Column(children: rowsAdjust)
       )
     ]));
 
     rowsOverall.add(t.childCardHeader(context, null, "Set Local Time", [
       t.childMargin(
-        margin: t.marginStandard,
+        margin: t.margin.standard,
         child: Column(children: rowsSet)
       )
     ]));
@@ -808,7 +808,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     childrenAbsolute.add(_buildAbsoluteRow(spi, "Month", time.absoluteMonth));
     childrenAbsolute.add(_buildAbsoluteRow(spi, "Year", time.absoluteYear));
     rowsAbsolute.add(t.childMargin(
-      margin: t.marginStandard,
+      margin: t.margin.standard,
       child: Table(children: childrenAbsolute)
     ));
 

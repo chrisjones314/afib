@@ -9,7 +9,6 @@ class AFStartSpecificPrototypeQuery extends AFDeferredQuery<AFFlexibleState> {
 
   @override
   Duration? finishAsyncExecute(AFFinishQuerySuccessContext<AFFlexibleState, AFUnused> context) {
-    // TODO:
     // Basically, for each different type of test, look it up, then update the state to properly, 
     // then redirect to the test.
     final config = AFibD.config;

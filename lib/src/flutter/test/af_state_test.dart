@@ -1091,7 +1091,12 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
           state: context.afState
         );
 
-        query.finishAsyncExecute(successContext);
+        var duration = query.finishAsyncExecute(successContext);
+        if(duration != null) {
+          Timer(duration, () {
+            successContext.executeDeferredQuery(query);
+          });
+        }
         return;
       }
 

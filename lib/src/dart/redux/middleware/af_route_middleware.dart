@@ -24,8 +24,6 @@ List<Middleware<AFState>> createRouteMiddleware() {
   ];
 }
 
-
-
 //---------------------------------------------------------------------------
 AFRouteState _getRouteState(Store<AFState> store) {
   final state = store.state;

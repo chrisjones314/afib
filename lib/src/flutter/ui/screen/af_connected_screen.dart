@@ -631,7 +631,7 @@ mixin AFUpdateAppStateMixin<TState extends AFFlexibleState> {
   /// 
   /// This deferral is active in UIs, but is disabled during automated tests to speed results and reduce 
   /// complexity.
-  void executeDeferredQuery(AFDeferredSuccessQuery query) {
+  void executeDeferredQuery(AFDeferredQuery query) {
     dispatch(query);
   }
 
@@ -1443,7 +1443,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
 }
 
 @immutable
-class AFStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> with AFContextShowMixin, AFUpdateAppStateMixin, AFNavigateMixin {
+class AFStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> with AFContextShowMixin, AFUpdateAppStateMixin<TState>, AFNavigateMixin {
   static const errFlutterStateRequired = "You can only call this method if your route param is derived from AFRouteParamWithFlutterState";
   static const errNeedTextControllers = "When constructing the AFFlutterRouteParamState for your route parameter, you must make textControllers non-null";
   static const errNeedScrollControllers = "When constructing the AFFlutterRouteParamState for your route parameter, you must make scrollControllers non-null";
@@ -1565,7 +1565,7 @@ class AFStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme e
 }
 
 @immutable
-class AFScreenStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFStateProgrammingInterface<TBuildContext, TTheme> {
+class AFScreenStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFStateProgrammingInterface<TState, TBuildContext, TTheme> {
   AFScreenStateProgrammingInterface(
     TBuildContext context,
     AFScreenID screenId,
@@ -1578,7 +1578,7 @@ class AFScreenStateProgrammingInterface<TBuildContext extends AFBuildContext, TT
 }
 
 @immutable
-class AFDialogStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFScreenStateProgrammingInterface<TBuildContext, TTheme> {
+class AFDialogStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFScreenStateProgrammingInterface<TState, TBuildContext, TTheme> {
   AFDialogStateProgrammingInterface(
     TBuildContext context,
     AFScreenID screenId,
@@ -1596,7 +1596,7 @@ class AFDialogStateProgrammingInterface<TBuildContext extends AFBuildContext, TT
 
 
 @immutable
-class AFBottomSheetStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFScreenStateProgrammingInterface<TBuildContext, TTheme> {
+class AFBottomSheetStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFScreenStateProgrammingInterface<TState, TBuildContext, TTheme> {
   AFBottomSheetStateProgrammingInterface(
     TBuildContext context,
     AFScreenID screenId,
@@ -1610,7 +1610,7 @@ class AFBottomSheetStateProgrammingInterface<TBuildContext extends AFBuildContex
 }
 
 @immutable
-class AFDrawerStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFScreenStateProgrammingInterface<TBuildContext, TTheme> {
+class AFDrawerStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFScreenStateProgrammingInterface<TState, TBuildContext, TTheme> {
   AFDrawerStateProgrammingInterface(
     TBuildContext context,
     AFScreenID screenId,
@@ -1620,7 +1620,7 @@ class AFDrawerStateProgrammingInterface<TBuildContext extends AFBuildContext, TT
 
 
 @immutable
-class AFWidgetStateProgrammingInterface<TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFStateProgrammingInterface<TBuildContext, TTheme> {
+class AFWidgetStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFStateProgrammingInterface<TState, TBuildContext, TTheme> {
   final AFID wid;
   AFWidgetStateProgrammingInterface(
     TBuildContext context,

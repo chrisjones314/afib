@@ -1316,7 +1316,7 @@ class AFSingleScreenPrototype extends AFScreenLikePrototype {
     final ms = models ?? this.models;
     final rvp = routeParam ?? this.navigate.param;
     final actualModels = registry.resolveStateViewModels(ms);
-    final rp = registry.f(rvp);
+    final rp = registry.find(rvp);
 
     if(timeHandling == AFTestTimeHandling.running) {
       final baseTime = actualModels["AFTimeState"] as AFTimeState?;
@@ -1393,8 +1393,8 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
     final ms = models ?? this.models;
     final rpp = routeParam ?? this.navigate.param;
 
-    final actualModels = registry.f(ms);
-    final rp = registry.f(rpp);
+    final actualModels = registry.find(ms);
+    final rp = registry.find(rpp);
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, 
       models: actualModels, 
       navigate: AFNavigatePushAction(routeParam: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
@@ -1474,8 +1474,8 @@ class AFDialogPrototype extends AFScreenLikePrototype {
     final ms = models ?? this.models;
     final rpp = routeParam ?? this.navigate.param;
 
-    final actualModels = registry.f(ms);
-    final rp = registry.f(rpp);
+    final actualModels = registry.find(ms);
+    final rp = registry.find(rpp);
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, 
       models: actualModels, 
       navigate: AFNavigatePushAction(routeParam: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
@@ -1534,8 +1534,8 @@ class AFBottomSheetPrototype extends AFScreenLikePrototype {
     final ms = models ?? this.models;
     final rpp = routeParam ?? this.navigate.param;
 
-    final actualModels = registry.f(ms);
-    final rp = registry.f(rpp);
+    final actualModels = registry.find(ms);
+    final rp = registry.find(rpp);
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, 
       models: actualModels, 
       navigate: AFNavigatePushAction(routeParam: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
@@ -1593,8 +1593,8 @@ class AFDrawerPrototype extends AFScreenLikePrototype {
     final ms = models ?? this.models;
     final rpp = routeParam ?? this.navigate.param;
 
-    final actualModels = registry.f(ms);
-    final rp = registry.f(rpp);
+    final actualModels = registry.find(ms);
+    final rp = registry.find(rpp);
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, 
       models: actualModels, 
       navigate: AFNavigatePushAction(routeParam: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
@@ -2019,7 +2019,7 @@ class AFSingleScreenTests<TState> {
   }
 
   dynamic findData(dynamic id) {
-    return AFibF.g.testData.f(id);
+    return AFibF.g.testData.find(id);
   }
 
   bool addPassIf({required bool test}) {
@@ -2395,17 +2395,17 @@ class AFBaseTestDefinitionContext {
   /// Looks up the test data defined in your test_data.dart file for a particular
   /// test data id.
   TData td<TData>(dynamic testDataId) {
-    return registry.f(testDataId) as TData;
+    return registry.find(testDataId) as TData;
   }
 
   TResult td2<TResult extends Object>(dynamic testDataId) {
-    return registry.f(testDataId) as TResult;
+    return registry.find(testDataId) as TResult;
   }
 
   /// Looks up the test data defined in your test_data.dart file for a particular
   /// test data id.
   T testData<T extends Object>(dynamic testDataId) {
-    final value = registry.f(testDataId);
+    final value = registry.find(testDataId);
     if(value == null) {
       throw AFException("Missing test value for id $testDataId");
     }

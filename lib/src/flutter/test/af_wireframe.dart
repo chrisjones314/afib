@@ -77,7 +77,7 @@ class AFWireframeExecutionContext<TStateView extends AFFlexibleStateView> {
   }
 
   dynamic td(dynamic id) {
-    return wireframe.testData.f(id);
+    return wireframe.testData.find(id);
   }
 
   void _dispatch(dynamic action) {

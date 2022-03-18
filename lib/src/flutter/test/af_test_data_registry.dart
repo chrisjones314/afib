@@ -42,12 +42,20 @@ class AFCompositeTestDataRegistry {
   /// implement parameterized tests where you can pass in either an
   /// instance of the object you want, or an id for an intestance of that object
   /// in the test data registry.
-  dynamic f(dynamic id) {
+  T find<T>(dynamic id) {
     if(id is String) {
       final result = testData[id];
       return result ?? id;
     } 
     return id;
+  }
+
+  List<T> findAll<T>(List<String> ids) {
+    final result = <T>[];
+    for(final id in ids) {
+      result.add(find<T>(id));
+    }
+    return result;
   }
 
   Map<String, Object> resolveStateViewModels(dynamic sources) {
@@ -67,7 +75,7 @@ class AFCompositeTestDataRegistry {
         _internalResolveStateViewModels(items, models);
       }
     } else if(sources is String) {
-      final item = f(sources);
+      final item = find(sources);
       _internalResolveStateViewModels(item, models);
     } else if(sources is AFFlexibleState) {
       _internalApplyModels(sources.models, models);
@@ -88,15 +96,9 @@ class AFCompositeTestDataRegistry {
       }
   }
 
-
-  /// See the shortened version [f].
-  dynamic find(dynamic id) {
-    return f(id);
-  }
-
   dynamic findModels(dynamic id) {
     if(id is String || id is int) {
-      return f(id);
+      return find(id);
     } else if(id is List) {
       return findList(id);
     } else {
@@ -107,7 +109,7 @@ class AFCompositeTestDataRegistry {
   List<TData> findList<TData>(List<dynamic> ids) {
     final list = <TData>[];
     for(final id in ids) {
-      TData data = f(id);
+      TData data = find(id);
       list.add(data);
     }
     return list;

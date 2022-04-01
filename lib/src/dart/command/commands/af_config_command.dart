@@ -66,7 +66,7 @@ class AFConfigCommand extends AFCommand {
 
     final unnamed = ctx.unnamedArguments;
     if(unnamed != null && unnamed.isNotEmpty) {
-      throw AFCommandError("The command has extra unrecognized arguments, did you forgot -- before an argument?");
+      throw AFCommandError(error: "The command has extra unrecognized arguments, did you forgot -- before an argument?");
     }
 
     updateConfig(ctx, AFibD.config, AFibD.configEntries, ctx.arguments);

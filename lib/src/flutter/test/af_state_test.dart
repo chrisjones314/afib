@@ -358,6 +358,13 @@ class _AFStateTestSetAbsoluteTimeStatement extends _AFStateTestExecutionStatemen
       final state = AFibF.g.storeInternalOnly!.state;
       final currentTime = state.public.time;
       final revised = currentTime.reviseToAbsoluteTime(this.time);
+
+      final query = state.public.queries.findListenerQueryById(AFUIQueryID.time.toString());
+      if(query != null) {
+        final revisedQuery = AFTimeUpdateListenerQuery(baseTime: revised); 
+        context.dispatcher.dispatch(revisedQuery);
+      }
+
       AFTimeUpdateListenerQuery.processUpdatedTime(context.dispatcher, revised);
     }
     return _AFStateTestExecutionNext.keepGoing;

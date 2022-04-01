@@ -902,6 +902,8 @@ class AFBorderRadius {
   AFBorderRadiusSet get right { return r; }
   AFBorderRadiusSet get top { return t; }
   AFBorderRadiusSet get bottom { return b; }
+  BorderRadius get standard { return a.standard; }
+  BorderRadius get none { return BorderRadius.zero; }
 
 
   factory AFBorderRadius.create(List<double> sizes) {
@@ -989,6 +991,10 @@ class AFSpacing {
   final AFSpacingSet l;
   final AFSpacingSet v;
   final AFSpacingSet h;
+  final AFSpacingSet th;
+  final AFSpacingSet bh;
+  final AFSpacingSet lv;
+  final AFSpacingSet rv;
 
   AFSpacingSet get all { return a; }
   AFSpacingSet get top { return t; }
@@ -999,6 +1005,10 @@ class AFSpacing {
   AFSpacingSet get horz { return h; }
   AFSpacingSet get y { return v; }
   AFSpacingSet get x { return h; }
+  AFSpacingSet get topHorz { return th; }
+  AFSpacingSet get bottomHorz { return bh; }
+  AFSpacingSet get leftVert { return lv; }
+  AFSpacingSet get rightVert { return rv; }
 
   EdgeInsets get smallest { return a.smallest; }
   EdgeInsets get smaller { return a.smaller; }
@@ -1016,7 +1026,11 @@ class AFSpacing {
     required this.b,
     required this.l,
     required this.v,
-    required this.h
+    required this.h,
+    required this.th,
+    required this.bh,
+    required this.lv,
+    required this.rv,
   });
 
   factory AFSpacing.create(List<double> sizes) {
@@ -1027,6 +1041,10 @@ class AFSpacing {
     final ml = AFSpacingSet.createLTRB(sizes, 1, 0, 0, 0);
     final mv = AFSpacingSet.createLTRB(sizes, 0, 1, 0, 1);
     final mh = AFSpacingSet.createLTRB(sizes, 1, 0, 1, 0);
+    final th = AFSpacingSet.createLTRB(sizes, 1, 1, 1, 0);
+    final bh = AFSpacingSet.createLTRB(sizes, 1, 0, 1, 1);
+    final lv = AFSpacingSet.createLTRB(sizes, 1, 1, 0, 1);
+    final rv = AFSpacingSet.createLTRB(sizes, 0, 1, 1, 1);
     return AFSpacing(
       sizes: sizes,
       a: m,
@@ -1035,7 +1053,11 @@ class AFSpacing {
       r: mr,
       b: mb,
       v: mv,
-      h: mh
+      h: mh,
+      th: th,
+      bh: bh,
+      lv: lv,
+      rv: rv,
     );
   }
 
@@ -2471,10 +2493,6 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     );
   }
 
-  EdgeInsets get paddingStandard {
-    return fundamentals.padding.a.standard;
-  }
-
   AFSpacing get margin {
     return fundamentals.margin;
   }
@@ -2485,10 +2503,6 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   AFBorderRadius get borderRadius {
     return fundamentals.borderRadius;
-  }
-
-  BorderRadius get borderRadiusStandard {
-    return fundamentals.borderRadius.a.standard;
   }
 
   /// Create a custom margin based on the standard sizes you setup in your fundamental theme.

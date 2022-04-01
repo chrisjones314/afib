@@ -571,7 +571,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     }
     if(tests.isEmpty) {
       rows.add(t.childPadding(
-        padding: t.paddingStandard,
+        padding: t.padding.standard,
         child: t.childText("No tests defined.")
       ));
     }
@@ -603,7 +603,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     _buildTestReport(spi, rows);
     return t.childCard(
       child: t.childPadding(
-        padding: t.paddingStandard,
+        padding: t.padding.standard,
         child: Column(children: rows, crossAxisAlignment: CrossAxisAlignment.stretch)
       )
     );

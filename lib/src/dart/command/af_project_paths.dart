@@ -1,5 +1,7 @@
 
 import 'dart:io';
+import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:path/path.dart';
 
 class AFStatementID {
@@ -46,9 +48,13 @@ class AFProjectPaths {
     final projectRoot = split(current.path);
     final projectRootFolders = List<String>.from(projectRoot);
     final relativeSrcFolder = List<String>.from(relativeFolder);        
+    /*
     if(relativeSrcFolder.first == libFolder && hasLibSrcFolder(projectRootFolders)) {
-      relativeSrcFolder.insert(1, srcFolder);
+      if(relativeSrcFolder[1] != srcFolder) {      
+        relativeSrcFolder.insert(1, srcFolder);
+      }
     }
+    */
 
     projectRootFolders.addAll(relativeSrcFolder);
     return joinAll(projectRootFolders);
@@ -77,6 +83,25 @@ class AFProjectPaths {
     Directory(path).createSync(recursive: true);
   }
 
+  static List<String> createPath(List<String> folders) {
+    final path = List<String>.from(folders);
+    if(AFibD.config.isLibraryCommand) {
+      if(path[0] != libFolder) {
+        throw AFException("Expected lib folder at root");
+      }
+      path.insert(1, srcFolder);
+    }
+    return path;
+  }
+
+  static List<String> createFile(List<String> folders, String filename) {
+    final path = createPath(folders);
+    path.add(filename);
+    return path;
+  }
+
+
+
   static String relativePathFor(List<String> projectPath, { bool allowExtra = true}) {
     final temp = <String>[];
 
@@ -95,7 +120,7 @@ class AFProjectPaths {
     if(!AFProjectPaths.projectFileExists(AFProjectPaths.pubspecPath)) {
       return false;
     }
-    if(!AFProjectPaths.projectFileExists(AFProjectPaths.afibConfigPath)) {
+    if(!AFProjectPaths.projectFileExists(createPath(AFProjectPaths.afibConfigPath))) {
       return false;
     }
 

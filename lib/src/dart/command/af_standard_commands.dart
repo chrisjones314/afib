@@ -39,6 +39,7 @@ Future<void> afAppCommandMain(AFDartParams paramsD, List<String> args, AFExtendB
 }
 
 Future<void> afUILibraryCommandMain(AFDartParams paramsD, List<String> args, AFExtendBaseDelegate initBase, AFExtendBaseDelegate initBaseThirdParty, AFExtendCommandsDelegate initApp, AFExtendCommandsThirdPartyDelegate initExtend) async {
+  AFibD.config.setIsLibraryCommand(isLib: true);
   await _afCommandMain(paramsD, args, "afib", "App-specific afib command", initBase, initBaseThirdParty, [
     afRegisterAppCommands,
     initApp

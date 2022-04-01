@@ -5,57 +5,42 @@ import 'package:afib/src/dart/command/af_source_template.dart';
 class AFScreenT extends AFSourceTemplate {
 
   final String template = '''
-import 'package:flutter/material.dart';
 import 'package:afib/afib_flutter.dart';
+import 'package:flutter/material.dart';
 import 'package:[!af_package_name]/id.dart';
-import 'package:[!af_package_name]/state/[!af_app_namespace]_state.dart';
-import 'package:[!af_package_name]/ui/[!af_app_namespace]_connected_base.dart';
+[!af_import_statements]
 
 [!af_declare_route_param]
 
-[!af_declare_state_view]
+[!af_declare_spi]
 
-class [!af_screen_name]Screen extends [!af_app_namespace(upper)]ConnectedScreen<[!af_screen_name]StateView, [!af_screen_name]RouteParam> {
 
-  //--------------------------------------------------------------------------------------
-  [!af_screen_name]Screen(): super([!af_app_namespace(upper)]ScreenID.[!af_screen_name(lower)]);
+class [!af_screen_name]Screen extends [!af_app_namespace(upper)]ConnectedScreen<[!af_screen_name]SPI, [!af_state_view_type], [!af_screen_name]RouteParam> {
+  static final config = [!af_state_view_prefix]ScreenConfig<[!af_screen_name]SPI, [!af_screen_name]RouteParam> (
+    spiCreator: [!af_screen_name]SPI.create,
+  );
 
-  //--------------------------------------------------------------------------------------
-  static AFNavigatePushAction navigatePush(String exampleParam) {      
+  [!af_screen_name]Screen(): super(screenId: [!af_screen_id_type].[!af_screen_id], config: config);
+
+  static AFNavigatePushAction navigatePush() {
     return AFNavigatePushAction(
-      screen: [!af_app_namespace(upper)]ScreenID.[!af_screen_name(lower)],
-      routeParam: [!af_screen_name]RouteParam(exampleParam: exampleParam)
+      routeParam: [!af_screen_name]RouteParam.create()
     );
   }
 
-  //--------------------------------------------------------------------------------------
   @override
-  [!af_screen_name]StateView createStateView([!af_app_namespace(upper)]State state, [!af_screen_name]RouteParam param) {
-    return [!af_screen_name]StateView("Pass a value from your state");
-  }
-
-  //--------------------------------------------------------------------------------------
-  @override
-  Widget buildWithContext([!af_app_namespace(upper)]BuildContext<[!af_screen_name]StateView, [!af_screen_name]RouteParam> context) {
-    return context.t.childScaffoldStandard<DFBuildContext<[!af_screen_name]StateView, [!af_screen_name]RouteParam>>(
-      context: context, 
-      screenId: screenId,
-      bodyUnderScaffold: _buildBody, 
-      contextSource: this,
-      title: "[!af_screen_name]"
+  Widget buildWithSPI([!af_screen_name]SPI spi) {
+    final t = spi.t;
+    final body = _buildBody(spi);
+    return t.childScaffold(
+      spi: spi,
+      body: body,
     );
   }
 
-  //--------------------------------------------------------------------------------------
-  Widget _buildBody([!af_app_namespace(upper)]BuildContext<[!af_screen_name]StateView, [!af_screen_name]RouteParam> context) {
-    final t = context.t;
-    final rows = t.column();
-    rows.add(t.childText("Screen [!af_screen_name]"));
-    rows.add(t.childText("Example route param: \$\{context.p.exampleParam\}"));
-    rows.add(t.childText("Example state view: \$\{context.s.exampleState\}"));
-    return Center(
-      child: t.childColumn(rows)
-    );
+  Widget _buildBody([!af_screen_name]SPI spi) {
+    final t = spi.t;
+    return Center(child: t.childText("[!af_screen_name]"));
   }
 }
 ''';

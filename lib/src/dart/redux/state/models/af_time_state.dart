@@ -190,9 +190,11 @@ class AFTimeState {
   }
 
   AFTimeState reviseToAbsoluteTime(DateTime revisedNow) {
+    final actualNow = DateTime.now();
+    final offset = revisedNow.difference(actualNow);
     return copyWith(
-      actualNow: revisedNow,
-      simulatedOffset: Duration(milliseconds: 0)
+      actualNow: actualNow,
+      simulatedOffset: offset,
     );
   }
 

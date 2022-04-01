@@ -1,8 +1,12 @@
 class AFCommandError implements Exception {
-  String cause;
-  AFCommandError(this.cause);
+  String error;
+  String? usage;
+  AFCommandError({
+    required this.error,
+    this.usage,
+  });
 
   String toString() {
-    return this.cause;
+    return this.error;
   }
 }

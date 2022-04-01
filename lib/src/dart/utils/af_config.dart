@@ -397,6 +397,7 @@ class AFConfig {
   AFPrototypeID? startupWireframe;
   AFPrototypeID? startupScreenPrototype;
   AFPrototypeID? startupWorkflowPrototype;
+  bool isLibraryCommand = false;
   final Map<AFConfigurationItem, dynamic> values = <AFConfigurationItem, dynamic>{};
 
   void setStartupWireframe(AFPrototypeID id) {
@@ -409,6 +410,10 @@ class AFConfig {
 
   void setStartupWorkflowPrototype(AFPrototypeID id) {
     startupWorkflowPrototype = id;
+  }
+
+  void setIsLibraryCommand({required bool isLib}) {
+    isLibraryCommand = isLib;
   }
 
   AFPrototypeID get startupPrototypeId {

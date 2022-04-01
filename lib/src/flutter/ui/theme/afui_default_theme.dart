@@ -51,7 +51,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     final content = column();
     content.add(Container(
       margin: margin,
-        padding: paddingStandard,
+        padding: padding.standard,
         child: Row(
           children: [childText(title, style: styleOnPrimary.subtitle1)],
         ),
@@ -184,7 +184,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
           color: Colors.green,
           borderRadius: borderRadiusScaled(),
         ),
-        padding: paddingStandard,
+        padding: padding.standard,
         child: childText("All Tests Passed", textColor: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold, textAlign: TextAlign.center)
       );
     }
@@ -197,7 +197,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
 
   Widget testResultTableHeader(String text, TextAlign textAlign) {
     return Container(
-      padding: paddingStandard,
+      padding: padding.standard,
       color: colorPrimary,
       child: childText(text, textColor: colorOnPrimary, textAlign: textAlign)
     );
@@ -223,7 +223,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     }
     return Container(
       color: color,
-      padding: paddingStandard,
+      padding: padding.standard,
       child: childText(text, textColor: colorText, textAlign: textAlign)
     );
   }

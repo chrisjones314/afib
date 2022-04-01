@@ -3,6 +3,8 @@ import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_model_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_screen_command.dart';
 import 'package:afib/src/dart/command/commands/af_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
@@ -47,6 +49,7 @@ class AFItemWithNamespace {
 /// Parent for commands executed through the afib command line app.
 abstract class AFCommand extends cmd.Command { 
   AFCommandContext? ctx;
+  static const optionPrefix = "--";
 
   /// Override this to implement the command.   The first item in the list is the command name.
   /// 
@@ -76,6 +79,89 @@ abstract class AFCommand extends cmd.Command {
     }
     return true;
   }  
+
+  Never throwUsageError(String error) {
+    throw AFCommandError(error: error, usage: usage);
+  }
+
+  String verifyEndsWith(String value, String endsWith) {
+    if(!value.endsWith(endsWith)) {
+      throwUsageError("$value must end with $endsWith");
+    }
+    return value;
+  }
+
+  String convertToPrefix(String value, String suffix) {
+    final lower = suffix.toLowerCase();
+    final prefix = value.substring(0, value.length-suffix.length);
+    return "$lower$prefix";
+  }
+
+  String removeSuffixAndCamel(String value, String suffix) {
+    final prefix = value.substring(0, value.length-suffix.length);
+    return toCamelCase(prefix);
+  }
+
+  String toCamelCase(String value) {
+    return "${value[0].toLowerCase()}${value.substring(1)}";
+  }
+
+  void verifyMixedCase(String value, String valueKindInError) {
+    if(value[0].toUpperCase() != value[0]) {
+      throwUsageError("The $valueKindInError should be mixed case");
+    }
+  }
+
+  void verifyNotOption(String value) {
+    if(value.startsWith(optionPrefix)) {
+      throwUsageError("Options must come after other values in the command");
+    }
+  }
+
+  Map<String, dynamic> parseArguments(List<String> source, {
+    required int startWith,
+    required Map<String, dynamic> defaults
+  }) {
+    final result = Map<String, dynamic>.from(defaults);
+    var i = startWith;
+    while(i < source.length) {
+      final value = source[i];
+      final valueNext = source.length > i ? source[i+1] : null; 
+      i++;
+      if(value.startsWith(optionPrefix)) {
+        final key = value.substring(2);
+        if(valueNext == null || valueNext.startsWith(optionPrefix)) {
+          result[key] = true;
+        } else {
+          result[key] = valueNext;
+          i++;
+        }        
+      }
+    }
+    return result;
+  }
+
+  void verifyDoesNotEndWith(String value, String excluded) {
+    if(value.endsWith(excluded)) {
+      throwUsageError("Please do not add '$excluded' to the end of $value, AFib will add it for you");
+    }
+  }
+
+  void verifyUsageOption(String value, List<String> options) {
+    if(options.contains(value)) {
+      return;
+    }
+
+    final msg = StringBuffer("$value must be one of (");
+    for(final key in options) {
+      msg.write(key);
+      msg.write(", ");
+    }    
+    msg.write(")");
+    throwUsageError(msg.toString());
+  }
+
+
 }
 
 class AFCommandContext {
@@ -169,7 +255,11 @@ class AFCommandExtensionContext extends AFCommandThirdPartyExtensionContext {
       try {
         await commands.run(args);
       } on AFCommandError catch(e) {
-        output.writeErrorLine("Aborted because: $e");
+        final usage = e.usage;
+        if(usage != null && usage.isNotEmpty) {
+          output.writeLine(usage);
+        }
+        output.writeErrorLine(e.error);
       }
     }
 
@@ -179,6 +269,9 @@ class AFCommandExtensionContext extends AFCommandThirdPartyExtensionContext {
       register(AFGenerateParentCommand());
       register(AFTestCommand());
 
+
       registerGenerateSubcommand(AFGenerateScreenSubcommand());
+      registerGenerateSubcommand(AFGenerateModelSubcommand());
+      registerGenerateSubcommand(AFGenerateQuerySubcommand());
     }
 }

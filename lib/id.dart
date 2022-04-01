@@ -155,14 +155,32 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const fileIds = AFUISourceTemplateID("ids");
   static const fileTestConfig = AFUISourceTemplateID("test_config");
   static const fileScreen = AFUISourceTemplateID("file_screen");
+  static const fileModel = AFUISourceTemplateID("file_model");
+  static const fileSimpleQuery = AFUISourceTemplateID("file_simple_query");
+  static const fileDeferredQuery = AFUISourceTemplateID("file_deferred_query");
 
   static const stmtDeclareID = AFUISourceTemplateID("declare_id");
   static const stmtDeclareRouteParam = AFUISourceTemplateID("declare_route_param");
   static const stmtDeclareStateView = AFUISourceTemplateID("declare_state_view");
+  static const stmtDeclareSPI = AFUISourceTemplateID("declare_spi");
 
   static const textScreenName = AFUISourceTemplateID("screen_name");
+  static const textScreenID = AFUISourceTemplateID("screen_id");
+  static const textScreenIDType = AFUISourceTemplateID("screen_id_type");
+  static const textSPIParentType = AFUISourceTemplateID("spi_parent_type");
+  static const textThemeType = AFUISourceTemplateID("theme_type");
+  static const textStateViewPrefix = AFUISourceTemplateID("state_view_prefix");
+  static const textStateViewType = AFUISourceTemplateID("state_view_type");
   static const textAppNamespace = AFUISourceTemplateID("app_namespace");
   static const textPackageName = AFUISourceTemplateID("package_name");
+  static const textPackagePath = AFUISourceTemplateID("package_path");
+  static const textModelName = AFUISourceTemplateID("model_name");
+  static const textQueryName = AFUISourceTemplateID("query_name");
+  static const textStateType = AFUISourceTemplateID("state_type");
+  static const textQueryType = AFUISourceTemplateID("query_type");
+  static const textResultType = AFUISourceTemplateID("result_type");
+  static const textImportStatements = AFUISourceTemplateID("import_statements");
+  static const textAdditionalMethods = AFUISourceTemplateID("additional_methods");
 
   static const dynConfigEntries = AFUISourceTemplateID("config_entries");
 }

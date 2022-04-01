@@ -5,6 +5,7 @@ import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_buffer.dart';
+import 'package:afib/src/dart/command/code_generation/af_code_generator.dart';
 import 'package:colorize/colorize.dart';
 
 enum AFGeneratedFileAction {
@@ -49,10 +50,17 @@ class AFGeneratedFile {
     );
   }
 
+  String get importPathStatement {
+    return AFCodeGenerator.importPathStatementStatic(projectPath);
+  }
+
   void executeStandardReplacements(AFCommandContext context) {
     buffer.executeStandardReplacements(context);
   }
 
+  void addLinesBefore(AFCommandContext context, RegExp match, List<String> lines) {
+    buffer.addLinesBefore(context, match, lines);
+  }
 
   void addLinesAfter(AFCommandContext context, RegExp match, List<String> lines) {
     buffer.addLinesAfter(context, match, lines);
@@ -78,6 +86,23 @@ class AFGeneratedFile {
   /// Handles the standard parameters upper and lower.
   void replaceText(AFCommandContext context, dynamic id, String value) {
     return buffer.replaceText(context, id, value);
+  }
+
+  void replaceTextLines(AFCommandContext context, dynamic id, List<String> lines) {
+    final value = StringBuffer();
+    for(final line in lines) {
+      value.write(line);
+      value.write("\n");
+    }
+    return buffer.replaceText(context, id, value.toString());
+  }
+
+  void replaceTextTemplate(AFCommandContext context, dynamic id, AFSourceTemplate? template) {
+    if(template == null) {
+      buffer.replaceText(context, id, "");
+    } else {
+      replaceTextLines(context, id, template.toBuffer().lines);
+    }
   }
 
   /// Replaces all instances of the specified id with the value

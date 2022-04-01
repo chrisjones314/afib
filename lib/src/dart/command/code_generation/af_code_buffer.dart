@@ -13,21 +13,23 @@ class AFCodeBuffer {
   static const startCode = "[!";
   static const endCode = "]";
 
+  final List<String>? projectPath;
   final List<String> lines;
   bool modified;
 
   AFCodeBuffer({
+    required this.projectPath,
     required this.lines,
     required this.modified
   });
 
   factory AFCodeBuffer.empty() {
-    return AFCodeBuffer(lines: <String>[], modified: true);
+    return AFCodeBuffer(projectPath: null, lines: <String>[], modified: true);
   }
 
   factory AFCodeBuffer.fromPath(List<String> projectPath) {
     if(!AFProjectPaths.projectFileExists(projectPath)) {
-      throw AFCommandError("Expected to find file at $projectPath but did not, failed.");
+       throw AFCommandError(error: "Expected to find file at $projectPath but did not.", usage: "");
     }
 
     final fullPath = AFProjectPaths.fullPathFor(projectPath);
@@ -35,13 +37,13 @@ class AFCodeBuffer {
 
     final ls = LineSplitter();
     final lines = ls.convert(file.readAsStringSync());    
-    return AFCodeBuffer(lines: lines, modified: true);    
+    return AFCodeBuffer(projectPath: projectPath, lines: lines, modified: true);    
   }
 
   factory AFCodeBuffer.fromTemplate(AFSourceTemplate template) {
     final ls = LineSplitter();
     final lines = ls.convert(template.template);    
-    return AFCodeBuffer(lines: lines, modified: true);
+    return AFCodeBuffer(projectPath: null, lines: lines, modified: true);
   }
 
   /// Replaces the specified id with the content of the specified source
@@ -75,8 +77,26 @@ class AFCodeBuffer {
         return;
       }
     }
-    throw AFCommandError("Could not find regular expression $match in existing file");
+    _throwMissingMatchRegex(match);    
   }
+
+
+  void addLinesBefore(AFCommandContext context, RegExp match, List<String> toInsert) {
+    for(var i = 0; i < lines.length; i++) {
+      final line = lines[i];
+      if(line.contains(match)) {
+        lines.insertAll(i-1, toInsert);
+        return;
+      }
+    }
+    _throwMissingMatchRegex(match);
+  }
+
+  void _throwMissingMatchRegex(RegExp match) {
+    final location = projectPath == null ? "template" : projectPath?.join('/');
+    throw AFCommandError(error: "Could not find regular expression $match in $location");
+  }
+
 
   /// Replaces the specified id with the specified text value anywhere in the file.
   /// 
@@ -100,7 +120,10 @@ class AFCodeBuffer {
         if(options.indexOf("snake") >= 0) {
           return [AFCodeGenerator.convertMixedToSnake(value)];
         }
-        throw AFCommandError("Unknown option in tag $idCode");
+        if(options.indexOf("camel") >= 0) {
+          return [AFCodeGenerator.convertToCamelCase(value)];
+        }
+        throw AFCommandError(error: "Unknown option '$options' in tag $idCode");
       });
     }
   }
@@ -126,12 +149,12 @@ class AFCodeBuffer {
       final lineCur = lines[lineIdx];
       var curEnd = lineCur.indexOf(endCode, curStart);
       if(curEnd < 0) {
-        throw AFCommandError("Found $codeStart but failed to find matching $endCode");
+        throw AFCommandError(error: "Found $codeStart but failed to find matching $endCode");
       }
       final idxOpenOptions = lineCur.lastIndexOf("(", curEnd);
       final idxCloseOptions = lineCur.lastIndexOf(")", curEnd);
       if(idxOpenOptions > curStart && idxCloseOptions < idxOpenOptions) {
-        throw AFCommandError("Found open paren after $codeStart, but did not find close paren.");
+        throw AFCommandError(error: "Found open paren after $codeStart, but did not find close paren.");
       }
       final options = <String>[];
       if(idxOpenOptions > curStart) {

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:afib/id.dart';
+import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_error.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
@@ -80,6 +80,9 @@ class AFCodeBuffer {
     _throwMissingMatchRegex(match);    
   }
 
+  void addLinesAtEnd(AFCommandContext context, List<String> toInsert) {
+    lines.addAll(toInsert);
+  }
 
   void addLinesBefore(AFCommandContext context, RegExp match, List<String> toInsert) {
     for(var i = 0; i < lines.length; i++) {
@@ -123,6 +126,10 @@ class AFCodeBuffer {
         if(options.indexOf("camel") >= 0) {
           return [AFCodeGenerator.convertToCamelCase(value)];
         }
+        if(options.indexOf("spaces") >= 0) {
+          return [AFCodeGenerator.convertMixedToSpaces(value)];
+        }
+
         throw AFCommandError(error: "Unknown option '$options' in tag $idCode");
       });
     }

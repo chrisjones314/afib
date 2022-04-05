@@ -1,5 +1,5 @@
 
-import 'package:afib/id.dart';
+import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/models/afui_proto_state.dart';

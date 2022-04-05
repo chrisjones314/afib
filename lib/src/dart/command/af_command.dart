@@ -11,7 +11,6 @@ import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/command/templates/af_template_registry.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:args/args.dart' as args;
-import 'package:args/command_runner.dart' as cmd;
 import 'package:collection/collection.dart';
 
 class AFItemWithNamespace {
@@ -47,30 +46,38 @@ class AFItemWithNamespace {
 }
 
 /// Parent for commands executed through the afib command line app.
-abstract class AFCommand extends cmd.Command { 
-  AFCommandContext? ctx;
+abstract class AFCommand { 
   static const optionPrefix = "--";
+  static const argPrivate = "private";
+  static const argPrivateOptionHelp = "--${AFCommand.argPrivate} - if specified for a library, does not export the generated class via [YourAppNamespace]_flutter.dart";
+  
+  final subcommands = <String, AFCommand>{};
+
+  String get name;
+  String get description;
+  String get usage {
+    return "";
+  }
 
   /// Override this to implement the command.   The first item in the list is the command name.
   /// 
   /// [afibConfig] contains only the values from initialization/afib.g.dart, which can be 
   /// manipulated from the command line.
-  void run() {
-    final ctxLocal = ctx;
-    if(ctxLocal == null) return;
-
+  void run(AFCommandContext ctx) {
     // make sure we are in the project root.
-    if(!errorIfNotProjectRoot(ctxLocal.out)) {
+    if(!errorIfNotProjectRoot(ctx.out)) {
       return;
     }
 
-    ctxLocal.arguments = argResults;
-    execute(ctxLocal);
+    execute(ctx);
+  }
+
+  void addSubcommand(AFCommand cmd) {
+    subcommands[cmd.name] = cmd;
   }
 
   void finalize() {}
   void execute(AFCommandContext ctx);
-  void registerArguments(args.ArgParser parser);
 
   bool errorIfNotProjectRoot(AFCommandOutput output) {
     if(!AFProjectPaths.inRootOfAfibProject) {
@@ -97,15 +104,6 @@ abstract class AFCommand extends cmd.Command {
     return "$lower$prefix";
   }
 
-  String removeSuffixAndCamel(String value, String suffix) {
-    final prefix = value.substring(0, value.length-suffix.length);
-    return toCamelCase(prefix);
-  }
-
-  String toCamelCase(String value) {
-    return "${value[0].toLowerCase()}${value.substring(1)}";
-  }
-
   void verifyMixedCase(String value, String valueKindInError) {
     if(value[0].toUpperCase() != value[0]) {
       throwUsageError("The $valueKindInError should be mixed case");
@@ -119,14 +117,24 @@ abstract class AFCommand extends cmd.Command {
   }
 
   Map<String, dynamic> parseArguments(List<String> source, {
-    required int startWith,
     required Map<String, dynamic> defaults
   }) {
+
     final result = Map<String, dynamic>.from(defaults);
+    result[argPrivate] = false;
+    var startWith = 0;
+    while(startWith < source.length) {
+      final arg = source[startWith];
+      if(arg.startsWith(optionPrefix)) {
+        break;
+      }
+      startWith++;
+    }
+
     var i = startWith;
     while(i < source.length) {
       final value = source[i];
-      final valueNext = source.length > i ? source[i+1] : null; 
+      final valueNext = source.length > (i+1) ? source[i+1] : null; 
       i++;
       if(value.startsWith(optionPrefix)) {
         final key = value.substring(2);
@@ -160,7 +168,27 @@ abstract class AFCommand extends cmd.Command {
     msg.write(")");
     throwUsageError(msg.toString());
   }
+}
 
+abstract class AFCommandGroup extends AFCommand {
+
+  @override 
+  String get usage {
+    final result = StringBuffer();
+    result.write('''
+Usage 
+  afib $name <subcommand>...
+
+Available subcommands
+''');
+
+
+    for(final sub in subcommands.values) {
+      result.write("  ${sub.name} - ${sub.description}\n");
+    }
+    
+    return result.toString();
+  }
 
 }
 
@@ -168,16 +196,36 @@ class AFCommandContext {
   final AFCommandExtensionContext definitions;
   final AFCommandOutput output;
   final AFCodeGenerator generator;
-  args.ArgResults? arguments;
+  final args.ArgResults arguments;
+  int commandArgCount = 1;
 
   AFCommandContext({
     required this.output, 
     required this.definitions,
-    required this.generator
+    required this.generator,
+    required this.arguments,
   });
 
+  Object? findArgument(String key) {
+    final args = arguments.rest;
+    for(var i = 0; i < args.length; i++) {
+      final arg = args[i];
+      if(arg.startsWith(AFCommand.optionPrefix) && arg.endsWith(key)) {
+        final next = args.length > (i+1) ? args[i+1] : null;
+        if(next == null || next.startsWith(AFCommand.optionPrefix)) {
+          return true;
+        } 
+        return next;
+      }
+    }
+    return null;
+  }
+
+  void setCommandArgCount(int count) {
+    commandArgCount = count;
+  }
   List<String>? get unnamedArguments {
-    return arguments?.rest;
+    return arguments.arguments.slice(commandArgCount);
   }
 
   AFCommandOutput get out { return output; }
@@ -192,7 +240,7 @@ class AFBaseExtensionContext {
 
 class AFCommandThirdPartyExtensionContext extends AFBaseExtensionContext {
   final AFDartParams paramsD;
-  final cmd.CommandRunner commands;
+  final AFCommandRunner commands;
   final AFTemplateRegistry templates;
 
   AFCommandThirdPartyExtensionContext({
@@ -217,43 +265,161 @@ class AFCommandThirdPartyExtensionContext extends AFBaseExtensionContext {
   }
 
   AFCommand? findCommandByType<T extends AFCommand>() {
-    final result = commands.commands.values.firstWhereOrNull((c) => c is T);
-    return result as AFCommand?;
+    final result = commands.all.firstWhereOrNull((c) => c is T);
+    return result;
   }
 
+  /*
   void finalize(AFCommandContext context) {
-    for(final command in commands.commands.values) {
-      if(command is AFCommand) {
-        command.ctx = context;
-        command.registerArguments(command.argParser);
-        command.finalize();
+  for(final command in commands.all) {
+      command.ctx = context;
+      command.registerArguments(command.argParser);
+      command.finalize();
 
-        for(final sub in command.subcommands.values) {
-          if(sub is AFCommand) {
-            sub.ctx = context;
-            sub.registerArguments(sub.argParser);
-            sub.finalize();
-          }
+      for(final sub in command.subcommands.values) {
+        if(sub is AFCommand) {
+          sub.ctx = context;
+          sub.registerArguments(sub.argParser);
+          sub.finalize();
         }
       }
     }
+    
   }
+  */
 
 }
+
+class AFCommandRunner {
+  List<AFCommand> commands = <AFCommand>[];
+  final String name;
+  final String description;
+  AFCommandRunner(this.name, this.description);
+
+  List<AFCommand> get all {
+    return commands;
+  }
+
+  void run(AFCommandContext ctx) {
+    final args = ctx.arguments.arguments;
+    if(args.isEmpty) {
+      printUsage();
+      return;
+    }
+
+    final commandName = args.first;
+    final command = findByName(commandName);
+    if(command == null) {
+      printUsage(error: "Unknown command $commandName");
+      return;
+    }
+
+    if(command.subcommands.isNotEmpty) {
+      if(args.length < 2) {
+        printUsage(error: "Command $commandName expects a subcommand", command: command);
+        return;
+      }
+      final subcommandName = args[1];
+      final subcommand = command.subcommands[subcommandName];
+      if(subcommand == null) {
+        printUsage(error: "Command $commandName does not have a subcommand named $subcommandName, command: command");
+        return;
+      }
+      ctx.setCommandArgCount(2);
+      subcommand.run(ctx);
+    } else {
+      ctx.setCommandArgCount(1);
+      command.run(ctx);
+    }
+  }
+
+  void printUsage({
+    String? error,
+    AFCommand? command,
+  }) {
+    final result = StringBuffer();
+    
+    if(command != null) {
+      result.write(command.usage);
+    } else {
+      result.write('''
+$description
+
+Usage: $name <command> [arguments]
+
+Available Commands
+''');
+      for(final command in commands) {
+        result.write("  ${command.name} - ${command.description}\n");
+      }
+    }
+
+    if(error != null) {
+      result.write("$error\n");
+    }
+    print(result.toString());
+  }
+
+  AFCommand? findByName(String name) {
+    return commands.firstWhereOrNull((c) => c.name == name);
+  }
+
+  void addCommand(AFCommand command) {
+    commands.add(command);
+  }
+}
+
+class AFCommandHelp extends AFCommand {
+  final name = "help";
+  final description = "Show help for other commands";
+  final usage = '''
+Usage:  afib help <command> [<subcommand>]
+''';
+
+  void execute(AFCommandContext ctx) {
+    final args = ctx.arguments.arguments;
+    if(args.length < 2) {
+      print(usage);
+      return;
+    }
+
+    final cmdName = args[1];
+    final command = ctx.definitions.commands.findByName(cmdName);
+    if(command == null) {
+      print("Error: Unknown command $cmdName");
+      return;
+    } else {
+      if(args.length > 2) {
+        final subcommandName = args[2];
+        final subcommand = command.subcommands[subcommandName];
+        if(subcommand == null) {
+          print("Error: Unknown subcommand $subcommandName");
+          return;
+        } else {
+          print(subcommand.usage);
+        }
+      } else {
+        print(command.usage);
+      }
+    }
+  }
+}
+
 
 class AFCommandExtensionContext extends AFCommandThirdPartyExtensionContext {
   AFCommandExtensionContext({
     required AFDartParams paramsD, 
-    required cmd.CommandRunner commands
+    required AFCommandRunner commands
   }): super(
       paramsD: paramsD, 
       commands: commands,
       templates: AFTemplateRegistry()
     );
 
-    Future<void> execute(AFCommandOutput output, List<String> args) async {
+    Future<void> execute(AFCommandContext context) async {
+      final output = context.output;
       try {
-        await commands.run(args);
+        commands.run(context);
       } on AFCommandError catch(e) {
         final usage = e.usage;
         if(usage != null && usage.isNotEmpty) {
@@ -268,6 +434,7 @@ class AFCommandExtensionContext extends AFCommandThirdPartyExtensionContext {
       register(AFConfigCommand());
       register(AFGenerateParentCommand());
       register(AFTestCommand());
+      register(AFCommandHelp());
 
 
       registerGenerateSubcommand(AFGenerateScreenSubcommand());

@@ -42,7 +42,7 @@ Future<void> afTestMainUILibrary<TState extends AFFlexibleState>(AFLibraryID id,
   final extendAppFull = (context) {
     context.fromUILibrary(contextLibrary,
       createApp: () => AFAppUILibrary(),
-      initFundamentalThemeArea: initAFDefaultFundamentalThemeArea,
+      defineFundamentalThemeArea: defineAFDefaultFundamentalThemeArea,
     );
   };
 

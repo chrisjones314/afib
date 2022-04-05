@@ -1,15 +1,18 @@
-import 'package:afib/id.dart';
+import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_error.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/code_generation/af_generated_file.dart';
+import 'package:afib/src/dart/command/commands/af_generate_screen_command.dart';
+import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_export_statement.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_id_statement.t.dart';
 import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 class AFCodeGenerator { 
-  static const idFile = "id.dart";
   static const afibConfigFile = "afib.g.dart";
   static const libFolder = "lib";
   static const uiFolder = "ui";
@@ -20,8 +23,18 @@ class AFCodeGenerator {
   static const srcFolder = "src";
   static const queryFolder = "query";
   static const themesFolder = "themes";
-  static const stateViewsFolder = "stateViews";
+  static const stateViewsFolder = "stateviews";
+  static const testFolder = "test";
+  static const uiPrototypesFolder = "ui_prototypes";
+  static const bottomSheetsFolder = "bottomsheets";
+  static const dialogsFolder = "dialogs";
+  static const drawersFolder = "drawers";
+  static const widgetsFolder = "widgets";
   static const screensPath = [libFolder, uiFolder, screensFolder];
+  static const bottomSheetsPath = [libFolder, uiFolder, bottomSheetsFolder];
+  static const drawersPath = [libFolder, uiFolder, drawersFolder];
+  static const dialogsPath = [libFolder, uiFolder, dialogsFolder];
+  static const widgetsPath = [libFolder, uiFolder, widgetsFolder];
   static const modelsPath = [libFolder, stateFolder, modelsFolder];
   static const statePath = [libFolder, stateFolder];
   static const queryPath = [libFolder, queryFolder];
@@ -30,6 +43,10 @@ class AFCodeGenerator {
   static const afibConfig = [libFolder, initializationFolder, afibConfigFile];
   static const stateViewsPath = [libFolder, uiFolder, stateViewsFolder];
   static const themesPath = [libFolder, uiFolder, themesFolder];
+  static const testPath = [libFolder, testFolder];
+  static const prototypesPath = [libFolder, testFolder, uiPrototypesFolder];
+  static const uiPrototypesFilename = "ui_prototypes.dart";
+  static const screenMapFilename = "screen_map.dart";
 
   final AFCommandExtensionContext definitions;
   final created = <String, AFGeneratedFile>{};
@@ -39,17 +56,34 @@ class AFCodeGenerator {
     required this.definitions
   });
 
-  List<String> get idFilePath { 
+  List<String> get pathIdFile { 
+    final idFile = "${appNamespace}_id.dart";
     return [libFolder, idFile];
   }
 
-  List<String> get afibConfigPath {
+  List<String> get pathAfibConfig {
     return afibConfig;
   }
 
-  List<String> pathScreen(String screenName) {
-    final filename = "${convertMixedToSnake(screenName)}.dart";
-    return _createPath(screensPath, filename);
+  String get appNamespace {
+    return AFibD.config.appNamespace;
+  }
+
+  String get appNamespaceUpper {
+    return AFibD.config.appNamespace.toUpperCase();
+  }
+
+  List<String> get pathScreenMap { 
+    return _createPath(uiPath, screenMapFilename);
+  }
+
+  List<String> get pathStateTestShortcutsFile {
+    return _createPath(testPath, "${appNamespace}_state_test_shortcuts.dart");
+  }
+
+  List<String> pathUI(String uiName, AFUIControlSettings control) {
+    final filename = "${convertMixedToSnake(uiName)}.dart";
+    return _createPath(control.path, filename);
   }
 
   List<String> pathModel(String modelName) {
@@ -58,7 +92,7 @@ class AFCodeGenerator {
   }
 
   List<String> pathQuery(String modelName) {
-    final filename = "${convertMixedToSnake(modelName)}_query.dart";
+    final filename = "${convertMixedToSnake(modelName)}.dart";
     return _createPath(queryPath, filename);
   }
 
@@ -79,6 +113,19 @@ class AFCodeGenerator {
     
   }
 
+  List<String> pathScreenTest(String screenName, AFUIControlSettings control) {
+    final filename = "${convertMixedToSnake(screenName)}_tests.dart";
+    return _createPath(control.prototypesPath, filename);
+  }
+
+  List<String> get pathScreenTests {
+    return _createPath(testPath, uiPrototypesFilename);
+  }
+
+  String get stateViewFullLoginID {
+    return "stateViewFullLogin";
+  }
+
   String? _namedObjectToFilename(String stateViewName, String suffix) {
     final ns = AFibD.config.appNamespace;
     final prefixUpper = ns.toUpperCase();
@@ -96,6 +143,11 @@ class AFCodeGenerator {
   List<String> get pathConnectedBaseFile {
     final filename = "${AFibD.config.appNamespace}_connected_base.dart";
     return _createPath(uiPath, filename);
+  }
+
+  List<String> get pathFlutterExportsFile {
+    final filename = "${AFibD.config.appNamespace}_flutter.dart";
+    return [libFolder, filename];
   }
 
  List<String> pathRootState(String stateName) {
@@ -126,6 +178,39 @@ class AFCodeGenerator {
     } 
     return false;
   }
+  // void defineTestScreenTests(AFScreenTestDefinitionContext definitions) {
+  // void\s+defineTestScreenTests(AFScreenTestDefinitionContext\s+definitions)\s+{
+
+  void addImport(AFCommandContext ctx, {
+    required String importPath,
+    required AFGeneratedFile to,
+    required RegExp before,
+  }) {
+    final declareImport = ImportFromPackage().toBuffer();
+    declareImport.replaceText(ctx, AFUISourceTemplateID.textPackageName, AFibD.config.packageName);
+    declareImport.replaceText(ctx, AFUISourceTemplateID.textPackagePath, importPath);
+    to.addLinesBefore(ctx, before, declareImport.lines);
+
+  }
+
+
+  void addExportsForFiles(AFCommandContext context, Map<String, dynamic> args, List<AFGeneratedFile> files) {
+    if(args[AFCommand.argPrivate]) {
+      return;
+    }
+    if(!AFibD.config.isLibraryCommand) {
+      return;
+    }
+    
+    final pathExports = pathFlutterExportsFile;
+    final fileExports = modifyFile(context, pathExports);
+    for(final exportFile in files) {
+      final decl = DeclareExportStatementT().toBuffer();
+      decl.replaceText(context, AFUISourceTemplateID.textFileRelativePath, importPathStatementStatic(exportFile.projectPath));
+      fileExports.addLinesAtEnd(context, decl.lines);
+    }
+  }
+
 
   String removeSuffix(String value, String suffix) {
     return value.substring(0, value.length - suffix.length);
@@ -210,9 +295,61 @@ class AFCodeGenerator {
     return result;
   }
 
+  String removeSuffixAndCamel(String value, String suffix) {
+    if(!value.endsWith(suffix)) {
+      throw AFException("Expected $value to end with $suffix");
+    }
+    final prefix = value.substring(0, value.length-suffix.length);
+    return toCamelCase(prefix);
+  }
+
+  String toCamelCase(String value) {
+    return "${value[0].toLowerCase()}${value.substring(1)}";
+  }
+
+  String declareUIID(AFCommandContext ctx, String screenName, AFUIControlSettings control) {  
+    return _declareID(ctx,
+      name: screenName,
+      suffix: control.suffix,
+      after: AFCodeRegExp.startUIID(control.suffix),
+    );    
+  }
+
+  String declarePrototypeID(AFCommandContext ctx, String screenName) {  
+    return _declareID(ctx,
+      name: screenName,
+      suffix: "Prototype",
+      after: AFCodeRegExp.startPrototypeID,
+    );    
+  }
+
+  String _declareID(AFCommandContext ctx, {
+    required String name,
+    required String suffix,
+    required RegExp after,
+  }) {
+    final idPath = pathIdFile;
+    final idFile = loadFile(ctx, idPath);
+    final root = removeSuffix(name, suffix);
+    final screenId = toCamelCase(root);
+    
+    final declareId = DeclareIDStatementT().toBuffer();
+    declareId.replaceText(ctx, AFUISourceTemplateID.textScreenName, name);
+    declareId.replaceText(ctx, AFUISourceTemplateID.textScreenID, screenId);
+    declareId.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, suffix);
+    declareId.executeStandardReplacements(ctx);
+    idFile.addLinesAfter(ctx, after, declareId.lines);
+    return screenId;    
+  }
+
   AFGeneratedFile loadFile(AFCommandContext context, List<String> path) {
+    final key = path.join('/');
+    final current = modified[key];
+    if(current != null) {
+      return current;
+    }
     final result = AFGeneratedFile.fromPath(projectPath: path);
-    modified[path.join('/')] = result;
+    modified[key] = result;
     return result;
   }
 
@@ -230,6 +367,20 @@ class AFCodeGenerator {
       }
     }
     return sb.toString().toLowerCase();
+  }  
+
+  static String convertMixedToSpaces(String convert) {
+    final sb = StringBuffer();
+    for(var i = 0; i < convert.length; i++) {
+      final c = convert[i];
+      if(c == c.toUpperCase()) {
+        if(i > 0) {
+          sb.write(" ");
+        }
+      }
+      sb.write(c);
+    }
+    return sb.toString();
   }  
 
   static String convertToCamelCase(String convert) {

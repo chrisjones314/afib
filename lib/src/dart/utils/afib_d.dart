@@ -56,6 +56,8 @@ class AFibD<AppState> {
       registerConfigEntry(AFConfigEntries.testSize);
       registerConfigEntry(AFConfigEntries.testOrientation);
       registerConfigEntry(AFConfigEntries.widgetTesterContext);
+      registerConfigEntry(AFConfigEntries.generateBeginnerComments);
+      registerConfigEntry(AFConfigEntries.generateUIPrototypes);
 
     }
 

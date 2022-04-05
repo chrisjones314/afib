@@ -1,4 +1,4 @@
-import 'package:afib/id.dart';
+import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';

@@ -3,7 +3,7 @@
 /// Be careful not to reference this library from integration tests.
 library afib_flutter;
 
-export 'id.dart';
+export 'afui_id.dart';
 export 'locale_id.dart';
 export "src/dart/command/af_command.dart";
 export "src/dart/command/af_standard_commands.dart";

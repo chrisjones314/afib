@@ -1,4 +1,4 @@
-import 'package:afib/id.dart';
+import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
@@ -92,7 +92,10 @@ class AFUIPrototypeDialogScreen extends AFUIConnectedScreen<AFUIPrototypeDialogS
     final t = spi.t;
     return t.childScaffold(
       spi: spi,
-      appBar: AppBar(title: t.childText('Dialog Test Screen')),
+      appBar: AppBar(
+        leading: t.childButtonStandardBack(spi, screen: screenId),
+        title: t.childText('Dialog Test Screen'), 
+      ),
       body: resultWidget,
     );
 

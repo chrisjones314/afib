@@ -565,8 +565,10 @@ abstract class AFConnectedBottomSheet<TState extends AFFlexibleState, TTheme ext
 mixin AFNavigateMixin {
   void dispatch(dynamic action);
 
-  void navigatePop() {
-    dispatch(AFNavigatePopAction());
+  void navigatePop({
+    bool worksInSingleScreenTest = false,
+  }) {
+    dispatch(AFNavigatePopAction(worksInSingleScreenTest: worksInSingleScreenTest));
   }
 
   void navigatePush(
@@ -1039,7 +1041,7 @@ mixin AFContextShowMixin {
     material.ShapeBorder? shape,
     material.Clip? clipBehavior,
   }) async {
-    final screenId = navigate.id as AFScreenID;
+    final screenId = navigate.screenId;
     _updateOptionalGlobalParam(navigate);
 
     final builder = AFibF.g.screenMap.findBy(screenId);

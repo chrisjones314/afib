@@ -154,6 +154,7 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const fileConfig = AFUISourceTemplateID("config");
   static const fileIds = AFUISourceTemplateID("ids");
   static const fileTestConfig = AFUISourceTemplateID("test_config");
+  static const fileScreenTest = AFUISourceTemplateID("screen_test");
   static const fileScreen = AFUISourceTemplateID("file_screen");
   static const fileModel = AFUISourceTemplateID("file_model");
   static const fileSimpleQuery = AFUISourceTemplateID("file_simple_query");
@@ -170,6 +171,9 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textSPIParentType = AFUISourceTemplateID("spi_parent_type");
   static const textThemeType = AFUISourceTemplateID("theme_type");
   static const textStateViewPrefix = AFUISourceTemplateID("state_view_prefix");
+  static const textControlTypeSuffix = AFUISourceTemplateID("control_type_suffix");
+  static const textSPIImpls = AFUISourceTemplateID("spi_impls");
+  static const textSuperImpls = AFUISourceTemplateID("super_impls");
   static const textStateViewType = AFUISourceTemplateID("state_view_type");
   static const textAppNamespace = AFUISourceTemplateID("app_namespace");
   static const textPackageName = AFUISourceTemplateID("package_name");
@@ -180,7 +184,21 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textQueryType = AFUISourceTemplateID("query_type");
   static const textResultType = AFUISourceTemplateID("result_type");
   static const textImportStatements = AFUISourceTemplateID("import_statements");
+  static const textBuildWithSPIImpl = AFUISourceTemplateID("build_with_spi_impl");
+  static const textBuildBodyImpl = AFUISourceTemplateID("build_body_impl");
+  
   static const textAdditionalMethods = AFUISourceTemplateID("additional_methods");
+  static const textFileRelativePath = AFUISourceTemplateID("file_relative_path");
+  static const textFullTestDataID = AFUISourceTemplateID("full_test_data_id");
+  static const textScreenTestID = AFUISourceTemplateID("screen_test_id");
+  static const textIDTypeSuffix = AFUISourceTemplateID("id_type_suffix");
+
+  static const commentSPIIntro = AFUISourceTemplateID("comment_spi_intro");
+  static const commentRouteParamIntro = AFUISourceTemplateID("comment_route_param_intro");
+  static const commentConfigDecl = AFUISourceTemplateID("comment_config_decl");
+  static const commentNavigatePush = AFUISourceTemplateID("comment_navigate_push");
+  static const commentBuildWithSPI = AFUISourceTemplateID("comment_build_with_spi");
+  static const commentBuildBody = AFUISourceTemplateID("comment_build_body");
 
   static const dynConfigEntries = AFUISourceTemplateID("config_entries");
 }

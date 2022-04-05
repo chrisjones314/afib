@@ -6,9 +6,9 @@ class SimpleQueryT extends AFSourceTemplate {
 import 'package:afib/afib_flutter.dart';
 [!af_import_statements]
 
-class [!af_query_name]Query extends [!af_query_type]<[!af_state_type], [!af_result_type]> {
+class [!af_query_name] extends [!af_query_type]<[!af_state_type], [!af_result_type]> {
   
-  [!af_query_name]Query({
+  [!af_query_name]({
     AFID? id,
     AFOnResponseDelegate<[!af_state_type], [!af_result_type]>? onSuccessDelegate,
     AFOnErrorDelegate<[!af_state_type]>? onErrorDelegate,

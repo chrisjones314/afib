@@ -1,7 +1,7 @@
 
 
 //import 'package:afib/id.dart';
-import 'package:afib/id.dart';
+import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 
@@ -35,6 +35,26 @@ class AFConfigEntries {
     ordinal: 300.0,
     help: "Set to true if you'd like to run the app in dark mode, regardless of the device setting", 
     defaultValue: false);
+
+  /// Determines whehter afib.dart generate ... will include helpful comments for beginners
+  /// in generated files.
+  static final generateBeginnerComments = AFConfigurationItemTrueFalse(
+    libraryId: AFUILibraryID.id,
+    name: "generate-beginner-comments", 
+    validContexts: AFConfigurationItem.validContextsAllButNew,
+    ordinal: 310.0,
+    help: "Set to false if you do not want generated files to contain comments intended to help beginners", 
+    defaultValue: true);
+
+  /// Determines whehter afib.dart generate ... will include helpful comments for beginners
+  /// in generated files.
+  static final generateUIPrototypes = AFConfigurationItemTrueFalse(
+    libraryId: AFUILibraryID.id,
+    name: "generate-ui-prototypes", 
+    validContexts: AFConfigurationItem.validContextsAllButNew,
+    ordinal: 320.0,
+    help: "Set to false if you do not want a ui prototype to be automatically added when you create a new ui element", 
+    defaultValue: true);
 
 
   /// Used to specify the year from which [AFTimeState] 'absolute' values are measured.

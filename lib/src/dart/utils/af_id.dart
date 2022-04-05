@@ -1,4 +1,4 @@
-import 'package:afib/id.dart';
+import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:quiver/core.dart';
 

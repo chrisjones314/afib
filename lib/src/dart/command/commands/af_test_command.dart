@@ -14,7 +14,7 @@ class AFTestCommand extends AFCommand {
   final description = "Run tests, you can specify any prototype name, test name, or any of the values for afib.dart help config's --tests-enabled option";
 
   @override 
-  void registerArguments(args.ArgParser argsParser) {
+  void registerArguments(args.ArgParser argParser) {
     AFConfigEntries.testSize.addArguments(argParser);
     AFConfigEntries.testOrientation.addArguments(argParser);
   }
@@ -26,7 +26,7 @@ class AFTestCommand extends AFCommand {
     _updateRecentTests(config, ctx.unnamedArguments);
 
 
-    AFConfigCommand.updateConfig(ctx, config, [AFConfigEntries.testSize, AFConfigEntries.testOrientation], argResults);
+    AFConfigCommand.updateConfig(ctx, config, [AFConfigEntries.testSize, AFConfigEntries.testOrientation], ctx.arguments);
     AFConfigCommand.writeUpdatedConfig(ctx);
       
     Process.start('flutter', ['test', AFProjectPaths.relativePathFor(AFProjectPaths.afTestPath)]).then((process) {

@@ -6,7 +6,6 @@ import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_model_access_statement.t.dart';
 import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:args/args.dart' as args;
 
 class AFGenerateModelSubcommand extends AFGenerateSubcommand {
   static const kindRoot = "root";
@@ -24,7 +23,7 @@ class AFGenerateModelSubcommand extends AFGenerateSubcommand {
   String get usage {
     return '''
 Usage 
-  afib.dart generate model [$kindRoot|$kindLeaf] YourModelName
+  afib generate model [$kindRoot|$kindLeaf] YourModelName [any --options]
 
 Description
   Creates a new model template in your state/models folder.  If you choose root, adds the model at the root
@@ -33,11 +32,10 @@ Description
 Options
   $kindRoot: Use for a model that is referenced by the root of your state and by your default state view
   $kindLeaf: Use for a model that is not at the root of your state, and is referenced somewhere below your state
-''';
-  }
 
-  @override
-  void registerArguments(args.ArgParser parser) {
+  ${AFCommand.argPrivateOptionHelp}
+
+''';
   }
 
   
@@ -45,8 +43,8 @@ Options
   @override
   void execute(AFCommandContext ctx) {
     final unnamed = ctx.unnamedArguments;
-    if(unnamed == null || unnamed.length != 2) {
-      throwUsageError("Expected two arguments");
+    if(unnamed == null || unnamed.length < 2) {
+      throwUsageError("Expected at least two arguments");
     }
 
     final modelKind = unnamed[0];
@@ -57,6 +55,10 @@ Options
       kindRoot,
       kindLeaf
     ]);
+
+    final args = parseArguments(unnamed, defaults: {
+    });
+
 
     // create a screen name
     final generator = ctx.generator;
@@ -87,8 +89,11 @@ Options
       declareId.executeStandardReplacements(ctx);
       idFile.addLinesAfter(ctx, RegExp("class\\s+.*ScreenID"), declareId.lines);
       */
-      
     }
+
+    generator.addExportsForFiles(ctx, args, [
+      modelFile
+    ]);
 
 
     // replace any default 

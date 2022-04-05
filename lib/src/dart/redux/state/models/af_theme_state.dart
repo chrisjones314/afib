@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:afib/id.dart';
+import 'package:afib/afui_id.dart';
 import 'package:afib/locale_id.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
@@ -2629,11 +2629,16 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   Column childColumn(List<Widget> children, {
    AFWidgetID? wid,
-   MainAxisAlignment mainAxisAlignment =  MainAxisAlignment.start
+   MainAxisAlignment mainAxisAlignment =  MainAxisAlignment.start,
+   CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.start,
+   MainAxisSize mainAxisSize = MainAxisSize.max,
   }) {
     return Column(children: children,
       key: keyForWID(wid),
-      mainAxisAlignment: mainAxisAlignment);
+      mainAxisAlignment: mainAxisAlignment,
+      crossAxisAlignment: crossAxisAlignment,
+      mainAxisSize: mainAxisSize,
+    );
   }
 
 
@@ -2694,7 +2699,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
         tooltip: translate(tooltip),
         onPressed: () async {
           if(shouldContinueCheck == null || await shouldContinueCheck() == AFShouldContinue.yesContinue) {
-            spi.navigatePop();
+            spi.navigatePop(worksInSingleScreenTest: worksInSingleScreenTest);
             spi.executeWireframeEvent(wid, null);
           } 
         }

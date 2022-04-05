@@ -3,7 +3,7 @@
 /// This code cannot pull in flutter/UI source.
 library afib_command;
 
-export 'id.dart'; // ok
+export 'afui_id.dart'; // ok
 export 'src/dart/command/af_args.dart'; // ok
 export "src/dart/command/af_command.dart";
 export "src/dart/command/af_command_enums.dart";

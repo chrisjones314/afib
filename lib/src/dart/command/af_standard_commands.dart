@@ -4,7 +4,7 @@ import 'package:afib/src/dart/command/commands/af_typedefs_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:args/command_runner.dart' as cmd;
+import 'package:args/args.dart' as args;
 
 /// Initialize commands that are used only from the afib command
 /// line app itself (e.g. new).
@@ -46,8 +46,8 @@ Future<void> afUILibraryCommandMain(AFDartParams paramsD, List<String> args, AFE
   ], initExtend);
 }
 
-Future<void> _afCommandMain(AFDartParams paramsD, List<String> args, String cmdName, String cmdDescription, AFExtendBaseDelegate? initBase, AFExtendBaseDelegate? initBaseThirdParty, List<AFExtendCommandsDelegate> inits, AFExtendCommandsThirdPartyDelegate? initExtend) async {
-  final definitions = AFCommandExtensionContext(paramsD: paramsD, commands: cmd.CommandRunner(cmdName, cmdDescription));
+Future<void> _afCommandMain(AFDartParams paramsD, List<String> argsIn, String cmdName, String cmdDescription, AFExtendBaseDelegate? initBase, AFExtendBaseDelegate? initBaseThirdParty, List<AFExtendCommandsDelegate> inits, AFExtendCommandsThirdPartyDelegate? initExtend) async {
+  final definitions = AFCommandExtensionContext(paramsD: paramsD, commands: AFCommandRunner(cmdName, cmdDescription));
   final baseContext = AFBaseExtensionContext();
 
   if(initBase != null) {
@@ -67,14 +67,15 @@ Future<void> _afCommandMain(AFDartParams paramsD, List<String> args, String cmdN
     initExtend(definitions);
   }
 
+  final parsed = args.ArgParser.allowAnything();
+  final arguments = parsed.parse(argsIn);
+
   final ctx = AFCommandContext(
     output: AFCommandOutput(),
     definitions: definitions,
-    generator: AFCodeGenerator(definitions: definitions)
+    generator: AFCodeGenerator(definitions: definitions),
+    arguments: arguments,
   );
-
-  definitions.finalize(ctx);
-
   
   /*
   final afibConfig = AFConfig();
@@ -85,5 +86,5 @@ Future<void> _afCommandMain(AFDartParams paramsD, List<String> args, String cmdN
   }
   */
 
-  await definitions.execute(ctx.output, args);
+  await definitions.execute(ctx);
 }

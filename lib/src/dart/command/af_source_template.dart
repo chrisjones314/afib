@@ -13,12 +13,23 @@ enum AFFileTemplateCreationRule {
   updateInPlace
 }
 
+enum AFSourceTemplateRole {
+  code,
+  comment,
+}
+
 /// A source of template source code. 
 /// 
 /// It would seem more natural to store the templates as text file resources,
 /// but because dart programs are sometimes compiled, you cannot depend on
 /// resource files to be present (see https://github.com/dart-archive/resource)
-abstract class AFSourceTemplate{
+abstract class AFSourceTemplate {
+  final AFSourceTemplateRole role;
+  
+  AFSourceTemplate({ this.role = AFSourceTemplateRole.code });
+
+  bool get isComment { return role == AFSourceTemplateRole.comment; }
+  bool get isCode { return role == AFSourceTemplateRole.code; }
 
   String get template;
 
@@ -30,6 +41,10 @@ abstract class AFSourceTemplate{
     final buffer = toBuffer();
     return buffer.lines;
   }
+}
+
+abstract class AFSourceTemplateComment extends AFSourceTemplate {
+  AFSourceTemplateComment(): super(role: AFSourceTemplateRole.comment);
 }
 
 abstract class AFDynamicSourceTemplate extends AFSourceTemplate {

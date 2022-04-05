@@ -19,7 +19,7 @@ void afMainUILibrary<TState extends AFFlexibleState>(AFLibraryID id, AFDartParam
   final extendAppFull = (context) {
     context.fromUILibrary(contextLibrary,
       createApp: () => AFAppUILibrary(),
-      initFundamentalThemeArea: initAFDefaultFundamentalThemeArea,
+      defineFundamentalThemeArea: defineAFDefaultFundamentalThemeArea,
     );
   };
 

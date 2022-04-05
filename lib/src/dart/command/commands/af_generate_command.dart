@@ -1,5 +1,4 @@
 import 'package:afib/src/dart/command/af_command.dart';
-import 'package:args/args.dart' as args;
 
 /*
 class AFInsertionPoint {
@@ -60,13 +59,10 @@ class AFInsertionPoint {
 */
 
 
-class AFGenerateParentCommand extends AFCommand {
+class AFGenerateParentCommand extends AFCommandGroup {
   final name = "generate";
   final description = "Generate AFib source code for screens, queries, models, and more";
-
-  @override
-  void registerArguments(args.ArgParser args) {
-  }
+  
 
   @override
   void execute(AFCommandContext ctx) {

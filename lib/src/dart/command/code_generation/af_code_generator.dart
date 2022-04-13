@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_error.dart';
+import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/code_generation/af_generated_file.dart';
@@ -11,6 +14,8 @@ import 'package:afib/src/dart/command/templates/statements/declare_id_statement.
 import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:colorize/colorize.dart';
+import 'package:collection/collection.dart';
 
 class AFCodeGenerator { 
   static const afibConfigFile = "afib.g.dart";
@@ -30,18 +35,28 @@ class AFCodeGenerator {
   static const dialogsFolder = "dialogs";
   static const drawersFolder = "drawers";
   static const widgetsFolder = "widgets";
+  static const binFolder = "bin";
+  static const extendFolder = "extend";
+  static const environmentsFolder = "environments";
+  static const afibFolder = "afib";
+
+  static const testAFibPath = [testFolder, afibFolder];
   static const screensPath = [libFolder, uiFolder, screensFolder];
   static const bottomSheetsPath = [libFolder, uiFolder, bottomSheetsFolder];
+  static const binPath = [binFolder];
+  static const testsPath = [libFolder, testFolder];
+  static const environmentsPath = [libFolder, initializationFolder, environmentsFolder];
+  static const extendPath = [libFolder, initializationFolder, extendFolder];
   static const drawersPath = [libFolder, uiFolder, drawersFolder];
   static const dialogsPath = [libFolder, uiFolder, dialogsFolder];
   static const widgetsPath = [libFolder, uiFolder, widgetsFolder];
   static const modelsPath = [libFolder, stateFolder, modelsFolder];
   static const statePath = [libFolder, stateFolder];
   static const queryPath = [libFolder, queryFolder];
+  static const initializationPath = [libFolder, initializationFolder];
   static const libPath = [libFolder];
   static const uiPath = [libFolder, uiFolder];
-  static const afibConfig = [libFolder, initializationFolder, afibConfigFile];
-  static const stateViewsPath = [libFolder, uiFolder, stateViewsFolder];
+  static const stateViewsPath = [libFolder, stateFolder, stateViewsFolder];
   static const themesPath = [libFolder, uiFolder, themesFolder];
   static const testPath = [libFolder, testFolder];
   static const prototypesPath = [libFolder, testFolder, uiPrototypesFolder];
@@ -51,6 +66,7 @@ class AFCodeGenerator {
   final AFCommandExtensionContext definitions;
   final created = <String, AFGeneratedFile>{};
   final modified = <String, AFGeneratedFile>{};
+  final renamed = <List<String>, List<String>>{};
 
   AFCodeGenerator({
     required this.definitions
@@ -62,7 +78,8 @@ class AFCodeGenerator {
   }
 
   List<String> get pathAfibConfig {
-    return afibConfig;
+    final filename = "${appNamespace}_afib_config.g.dart";
+    return _createPath(initializationPath, filename);
   }
 
   String get appNamespace {
@@ -132,6 +149,7 @@ class AFCodeGenerator {
     if(!stateViewName.startsWith(prefixUpper)) {
       return null;
     }
+
     if(!stateViewName.endsWith(suffix)) {
       return null;
     }
@@ -144,6 +162,140 @@ class AFCodeGenerator {
     final filename = "${AFibD.config.appNamespace}_connected_base.dart";
     return _createPath(uiPath, filename);
   }
+
+  List<String> get pathDefaultTheme {
+    final filename = "${AFibD.config.appNamespace}_default_theme.dart";
+    return _createPath(themesPath, filename);    
+  }
+
+  List<String> get pathFundamentalTheme {
+    final filename = "${AFibD.config.appNamespace}_fundamental_theme.dart";
+    return _createPath(themesPath, filename);    
+  }
+
+  List<String> get pathCreateDartParams {
+    final filename = "create_dart_params.dart";
+    return _createPath(initializationPath, filename);
+  }
+
+  List<String> get pathPubspecYaml {
+    return ["pubspec.yaml"];
+  }
+
+
+  List<String> get pathExtendApplication {
+    final filename = "application.dart";
+    return _createPath(initializationPath, filename);
+  }
+
+  List<String> get pathExtendApp {
+    final filename = "extend_app.dart";
+    return _createPath(extendPath, filename);
+  }
+
+  List<String> get pathExtendTest {
+    final filename = "extend_test.dart";
+    return _createPath(extendPath, filename);
+  }
+
+  List<String> get pathMain {
+    final filename = "main.dart";
+    return _createPath(libPath, filename);
+  }
+
+  List<String> get pathMainAFibTest {
+    final filename = "main_afib_test.dart";
+    return _createPath(testAFibPath, filename);
+  }
+
+  List<String> get pathTestData {
+    final filename = "test_data.dart";
+    return _createPath(testPath, filename);
+  }
+
+  List<String> pathTestDefinitions(String kind) {
+    
+    final filename = "${kind}s.dart";
+    return _createPath(testsPath, filename);
+  }
+
+  List<String> get pathOriginalWidgetTest {
+    return [testFolder, "widget_test.dart"];
+  }
+
+  List<String> get pathApp {
+    final filename = "app.dart";
+    return _createPath(libPath, filename);
+  }
+
+  List<String> get pathAppId {
+    final filename = "${appNamespace}_id.dart";
+    return _createPath(libPath, filename);
+  }
+
+  String get nameStartupQuery {
+    return "StartupQuery";
+  }
+
+  String get nameDefaultStateView {
+    return "${appNamespaceUpper}DefaultStateView";
+  }
+
+  String get nameDefaultTheme {
+    return "${appNamespaceUpper}DefaultTheme";
+  }
+    
+  String get nameRootState {
+    final defaultRootStateType = "${appNamespaceUpper}State";
+    return defaultRootStateType;
+  }
+
+  List<String> get pathExtendBase {
+    final filename = "extend_base.dart";
+    return _createPath(extendPath, filename);
+  }
+
+  List<String> get pathStateModelAccess {
+    final filename = "${appNamespace}_state_model_access.dart";
+    return _createPath(statePath, filename);
+  }
+
+  List<String> get pathAppState {
+    final filename = "${appNamespace}_state.dart";
+    return _createPath(statePath, filename);
+  }
+
+  List<String> get pathExtendBaseThirdParty {
+    final filename = "extend_base_third_party.g.dart";
+    return _createPath(extendPath, filename);
+  }
+
+  List<String> get pathExtendCommand {
+    final filename = "extend_command.dart";
+    return _createPath(extendPath, filename);
+  }
+
+  List<String> get pathExtendCommandThirdParty {
+    final filename = "extend_command_third_party.g.dart";
+    return _createPath(extendPath, filename);
+  }
+
+  List<String> get pathExtendThirdParty {
+    final filename = "extend_third_party.g.dart";
+    return _createPath(extendPath, filename);
+  }
+
+
+  List<String> get pathAppCommand {
+    final filename = "${appNamespace}_afib.dart";
+    return _createPath(binPath, filename);
+  }
+
+  List<String> pathEnvironment(String suffix) {
+    final filename = "${suffix.toLowerCase()}.dart";
+    return _createPath(environmentsPath, filename);
+  }
+
 
   List<String> get pathFlutterExportsFile {
     final filename = "${AFibD.config.appNamespace}_flutter.dart";
@@ -161,15 +313,24 @@ class AFCodeGenerator {
   }
 
   bool fileExists(List<String> projectPath) {
-    return AFProjectPaths.projectFileExists(projectPath);
-  }
+    final key = _keyForPath(projectPath);
+    final inMem = _findInMemory(key);
+    if(inMem != null) {
+      return true;
+    }
 
+    if(AFProjectPaths.projectFileExists(projectPath)) {
+      return true;
+    }
+
+    return false;
+  }
   String importStatementPath(List<String> projectPath) {
     return importPathStatementStatic(projectPath);
   }
 
-   bool addImportsForPath(AFCommandContext ctx, List<String> projectPath, { required List<String> imports }) {
-    if(fileExists(projectPath)) {
+   bool addImportsForPath(AFCommandContext ctx, List<String> projectPath, { required List<String> imports, bool requireExists = true }) {
+    if(!requireExists || fileExists(projectPath)) {
       final template = ImportFromPackage().toBuffer();
       template.replaceText(ctx, AFUISourceTemplateID.textPackageName, AFibD.config.packageName);
       template.replaceText(ctx, AFUISourceTemplateID.textPackagePath, importStatementPath(projectPath));
@@ -235,6 +396,14 @@ class AFCodeGenerator {
     return AFProjectPaths.createFile(folders, filename);
   }
 
+  String packagePath(String packageName) {
+    final result = StringBuffer(packageName);
+    if(AFibD.config.isLibraryCommand) {
+      result.write("/$srcFolder");
+    }
+    return result.toString();
+  }
+
   List<String> pathState(String stateName) {
     final path = List<String>.from(statePath);
     path.add(stateName);
@@ -242,6 +411,35 @@ class AFCodeGenerator {
   }
 
   void finalizeAndWriteFiles(AFCommandContext context) {
+    for(final original in renamed.keys) {
+      final revised = renamed[original];
+      if(revised == null) {
+        continue;
+      }
+      final output = context.output;
+      output.startColumn(
+        alignment: AFOutputAlignment.alignRight,
+        width: 15,
+        color: Styles.GREEN);
+      output.write("rename ");
+      output.startColumn(
+        alignment: AFOutputAlignment.alignLeft
+      );
+      output.write(AFProjectPaths.relativePathFor(original));
+
+      output.startColumn(
+        alignment: AFOutputAlignment.alignLeft,
+        width: 40,
+      );
+      output.write("-> ${AFProjectPaths.relativePathFor(revised)}");
+      output.endLine();
+
+      final pathOrig = AFProjectPaths.fullPathFor(original);
+      final fileOrig = File(pathOrig);
+      final pathRevised = AFProjectPaths.fullPathFor(revised);
+      fileOrig.renameSync(pathRevised);
+    }
+
     for(final generatedFile in created.values) {
       generatedFile.executeStandardReplacements(context);
       generatedFile.writeIfModified(context);
@@ -250,6 +448,29 @@ class AFCodeGenerator {
     for(final modifiedFile in modified.values) {
       modifiedFile.writeIfModified(context);
     }
+  }
+
+  void renameExistingFileToOld(AFCommandContext context, List<String> projectPath) {
+    if(!AFProjectPaths.projectFileExists(projectPath)) {
+       throw AFCommandError(error: "Expected to find file at $projectPath but did not.");
+    }
+
+    final filename = projectPath.last;
+    final idxSuffix = filename.lastIndexOf('.');
+    if(idxSuffix < 0) {
+      throw AFException("Expected $filename to have a . extension");
+    }
+
+    final renamedFilename = StringBuffer(filename.substring(0, idxSuffix));
+    renamedFilename.write(".old");
+    final revisedPath = List<String>.from(projectPath);
+    revisedPath.removeLast();
+    revisedPath.add(renamedFilename.toString());
+    if(AFProjectPaths.projectFileExists(revisedPath)) {
+      throw AFCommandError(error: "Need to rename $projectPath to $revisedPath, but the destination already exists");
+    }
+
+    renamed[projectPath] = revisedPath;        
   }
 
   // used for existing files which are loaded, modified and written back, the file must already exist
@@ -270,6 +491,16 @@ class AFCodeGenerator {
     return loadFile(context, projectPath);
   }
 
+  bool isRenamed(List<String> projectPath) {
+    Function eq = const ListEquality().equals;
+    for(final candidate in renamed.keys) {
+      if(eq(candidate, projectPath)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 
   AFGeneratedFile _createFile(AFCommandContext context, List<String> projectPath, dynamic templateOrId, AFGeneratedFileAction action) {
     // if not, return the contents of the template
@@ -285,7 +516,7 @@ class AFCodeGenerator {
       throw AFException("Could not find template with id $templateOrId");
     }
 
-    if(action == AFGeneratedFileAction.create && AFProjectPaths.projectFileExists(projectPath)) {
+    if(action == AFGeneratedFileAction.create && AFProjectPaths.projectFileExists(projectPath) && !isRenamed(projectPath)) {
       throw AFCommandError(error: "File at $projectPath needs to be created, but already exists, delete or move it if you'd like to re-create it.");
     }
 
@@ -342,11 +573,28 @@ class AFCodeGenerator {
     return screenId;    
   }
 
-  AFGeneratedFile loadFile(AFCommandContext context, List<String> path) {
+  String _keyForPath(List<String> path) {
     final key = path.join('/');
+    return key;
+  }
+
+  AFGeneratedFile? _findInMemory(String key) {
     final current = modified[key];
     if(current != null) {
       return current;
+    }
+    final createdFile = created[key];
+    if(createdFile != null) {
+      return createdFile;
+    }
+    return null;
+  }
+
+  AFGeneratedFile loadFile(AFCommandContext context, List<String> path) {
+    final key = _keyForPath(path);
+    final inMem = _findInMemory(key);
+    if(inMem != null) {
+      return inMem;
     }
     final result = AFGeneratedFile.fromPath(projectPath: path);
     modified[key] = result;

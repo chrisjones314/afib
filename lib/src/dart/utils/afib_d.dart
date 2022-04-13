@@ -71,20 +71,20 @@ class AFibD<AppState> {
       if(p != null) {
         // first do the separate initialization that just says what environment it is, since this
         config.establishDefaults();
-        p.initAfib(AFibD.config);
+        p.configureAfib(AFibD.config);
         if(p.forceEnv != null) {
           AFibD.config.setValue(AFConfigEntryEnvironment.optionName, p.forceEnv);
         }
-        p.initAppConfig(AFibD.config);
+        p.configureAppConfig(AFibD.config);
         final env = AFibD.config.environment;
         if(env == AFEnvironment.debug) {
-          p.initDebugConfig(AFibD.config);
+          p.configureDebugConfig(AFibD.config);
         } else if(env == AFEnvironment.production) {
-          p.initProductionConfig(AFibD.config);
+          p.configureProductionConfig(AFibD.config);
         } else if(AFibD.config.isPrototypeEnvironment) {
-          p.initPrototypeConfig(AFibD.config);
+          p.condfigurePrototypeConfig(AFibD.config);
         } else if(env == AFEnvironment.test) {
-          p.initTestConfig(AFibD.config);
+          p.configureTestConfig(AFibD.config);
         }
       }
 

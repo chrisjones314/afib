@@ -288,8 +288,8 @@ class AFConfigEntryTestSize extends AFConfigurationItemOptionChoice {
   @override
   String codeValue(AFConfig config) {
     dynamic val = config.valueFor(this);
-    if(!val.identifier.contains("custom")) {
-      return '"${val.identifier}"';
+    if(!val.contains("custom")) {
+      return '"$val"';
     } 
     return '"${val.width}x${val.height}"';
   }
@@ -303,7 +303,7 @@ class AFConfigEntryTestOrientation extends AFConfigurationItemOptionChoice {
     libraryId: AFUILibraryID.id,
     name: "test-orientation", 
     help: "The orientation used in command line tests",
-    defaultValue: AFFormFactorSize.idPhoneStandard, 
+    defaultValue: AFFormFactorSize.idOrientationPortrait, 
     validContexts: AFConfigurationItem.validContextsAll, 
     ordinal: 470.0, 
     allowMultiple: false

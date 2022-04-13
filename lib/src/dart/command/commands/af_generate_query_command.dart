@@ -21,10 +21,6 @@ class AFGenerateQuerySubcommand extends AFGenerateSubcommand {
   @override
   String get name => "query";
 
-  @override
-  void registerArguments(args.ArgParser parser) {
-  }
-
   String get usage {
     return '''
 Usage 
@@ -56,6 +52,12 @@ Options
 
     final queryKind = unnamed[0];
     final queryName = unnamed[1];
+    final generator = ctx.generator;
+
+    final args = parseArguments(unnamed, defaults: {
+      argResultModelType: "",
+      argRootStateType: generator.nameRootState,
+    });
 
     verifyMixedCase(queryName, "query name");
     verifyUsageOption(queryKind, [
@@ -65,13 +67,26 @@ Options
     ]);
     verifyEndsWith(queryName, "Query");
 
-    final defaultRootStateType = "${AFibD.config.appNamespace.toUpperCase()}State";
+    createQuery(
+      ctx: ctx,
+      queryKind: queryKind,
+      queryName: queryName,
+      args: args,
+      usage: usage,
+    );
+        
+    // replace any default 
+    ctx.generator.finalizeAndWriteFiles(ctx);
 
-    final args = parseArguments(unnamed, defaults: {
-      argResultModelType: "",
-      argRootStateType: defaultRootStateType,
-    });
+  }
 
+  static void createQuery({
+    required AFCommandContext ctx,
+    required String queryKind,
+    required String queryName,
+    required Map<String, dynamic> args,
+    required String usage,
+  }) {
     final rootStateType = args[argRootStateType];
     final resultModelType = args[argResultModelType];
 
@@ -80,7 +95,7 @@ Options
     final isListener = queryKind == kindListener;
     final isDeferred = queryKind == kindDeferred;
     if(!isDeferred && resultModelType.isEmpty) {
-      throwUsageError("Please specify a result model type using --$argResultModelType");
+      AFCommand.throwUsageErrorStatic("Please specify a result model type using --$argResultModelType", usage);
     }
     if(isListener) {
       queryType = "AFAsyncListenerQuery";
@@ -101,7 +116,7 @@ Options
     final imports = <String>[];
     // see if the state file exists
     final stateFilePath = generator.pathRootState(rootStateType);
-    generator.addImportsForPath(ctx, stateFilePath, imports: imports);
+    generator.addImportsForPath(ctx, stateFilePath, imports: imports, requireExists: false);
     
     // if the result exists in the models area
     final modelFilePath = generator.pathModel(rootStateType);
@@ -111,10 +126,6 @@ Options
 
     final replaceCode = isListener || isDeferred ? DeclareQueryShutdownMethodT() : null;
     queryFile.replaceTextTemplate(ctx, AFUISourceTemplateID.textAdditionalMethods, replaceCode);
-        
-    // replace any default 
-    generator.finalizeAndWriteFiles(ctx);
-
   }
 
 }

@@ -6,11 +6,11 @@ class AFScreenTestT extends AFSourceTemplate {
 import 'package:afib/afib_flutter.dart';
 import 'package:[!af_package_name]/[!af_app_namespace]_id.dart';
 
-void define[!af_screen_name]Prototypes(AFScreenTestDefinitionContext definitions) {
+void define[!af_screen_name]Prototypes(AFUIPrototypeDefinitionContext definitions) {
   _define[!af_screen_name]PrototypeInitial(definitions);
 }
 
-void _define[!af_screen_name]PrototypeInitial(AFScreenTestDefinitionContext definitions) {  
+void _define[!af_screen_name]PrototypeInitial(AFUIPrototypeDefinitionContext definitions) {  
   var prototype = definitions.define[!af_control_type_suffix]Prototype(
     id: [!af_app_namespace(upper)]PrototypeID.[!af_screen_test_id],
     navigate: [!af_screen_name].navigatePush(),

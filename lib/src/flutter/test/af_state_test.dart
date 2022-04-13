@@ -149,7 +149,7 @@ class AFStateTests<TState extends AFFlexibleState> {
   void addTest({
     required AFStateTestID id, 
     required AFStateTestID? extendTest, 
-    required AFStateTestDefinitionsContext definitions, 
+    required AFStateTestDefinitionContext definitions, 
     required AFStateTestDefinitionDelegate body,
     String? description,
     String? disabled 
@@ -165,7 +165,7 @@ class AFStateTests<TState extends AFFlexibleState> {
       test.extendsTest(extendTest);
     }
     tests.add(test);
-    final defContext = AFStateTestDefinitionContext(definitions, test);
+    final defContext = AFSpecificStateTestDefinitionContext(definitions, test);
     body(defContext);
   }
 
@@ -374,7 +374,7 @@ class _AFStateTestSetAbsoluteTimeStatement extends _AFStateTestExecutionStatemen
 
 class _AFStateRegisterFixedResultStatement<TQuery extends AFAsyncQuery> extends _AFStateTestDefinitionStatement {
   final Object querySpecifier;
-  final AFStateTestDefinitionsContext definitions;
+  final AFStateTestDefinitionContext definitions;
   final Object idData;
 
   _AFStateRegisterFixedResultStatement(this.querySpecifier, this.definitions, this.idData);
@@ -622,7 +622,7 @@ class AFStateTestScreenContextForScreen<TSPI extends AFStateProgrammingInterface
 
 class AFStateTestScreenLikeShortcut<TSPI extends AFScreenStateProgrammingInterface> {
   final AFScreenID screenId;
-  final AFStateTestDefinitionContext testContext;
+  final AFSpecificStateTestDefinitionContext testContext;
 
   AFStateTestScreenLikeShortcut(this.testContext, this.screenId);
 
@@ -636,7 +636,7 @@ class AFStateTestScreenLikeShortcut<TSPI extends AFScreenStateProgrammingInterfa
 
 class AFStateTestScreenShortcut<TSPI extends AFScreenStateProgrammingInterface> extends AFStateTestScreenLikeShortcut<TSPI> {
 
-  AFStateTestScreenShortcut(AFStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
+  AFStateTestScreenShortcut(AFSpecificStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
 
   void executeScreen(AFStateTestScreenHandlerDelegate<TSPI> handler, { bool verifyIsActiveScreen = true }) {
     testContext.executeScreen<TSPI>(screenId, handler, verifyIsActiveScreen: verifyIsActiveScreen);
@@ -651,7 +651,7 @@ class AFStateTestScreenShortcut<TSPI extends AFScreenStateProgrammingInterface> 
 
 class AFStateTestDrawerShortcut<TSPI extends AFDrawerStateProgrammingInterface> extends AFStateTestScreenLikeShortcut<TSPI> {
 
-  AFStateTestDrawerShortcut(AFStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
+  AFStateTestDrawerShortcut(AFSpecificStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
 
   void executeDrawer(AFStateTestScreenHandlerDelegate<TSPI> handler) {
     testContext.executeDrawer<TSPI>(screenId, handler);
@@ -667,7 +667,7 @@ class AFStateTestDrawerShortcut<TSPI extends AFDrawerStateProgrammingInterface> 
 
 class AFStateTestDialogShortcut<TSPI extends AFDialogStateProgrammingInterface> extends AFStateTestScreenLikeShortcut<TSPI> {
 
-  AFStateTestDialogShortcut(AFStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
+  AFStateTestDialogShortcut(AFSpecificStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
 
   void executeDialog(AFStateTestScreenHandlerDelegate<TSPI> handler) {
     testContext.executeDialog<TSPI>(screenId, handler);
@@ -683,7 +683,7 @@ class AFStateTestDialogShortcut<TSPI extends AFDialogStateProgrammingInterface> 
 
 class AFStateTestBottomSheetShortcut<TSPI extends AFBottomSheetStateProgrammingInterface> extends AFStateTestScreenLikeShortcut<TSPI> {
 
-  AFStateTestBottomSheetShortcut(AFStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
+  AFStateTestBottomSheetShortcut(AFSpecificStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
 
   void executeBottomSheet(AFStateTestScreenHandlerDelegate<TSPI> handler) {
     testContext.executeBottomSheet<TSPI>(screenId, handler);
@@ -753,11 +753,11 @@ class AFStateTestWidgetShortcut<TSPI extends AFWidgetStateProgrammingInterface> 
 
 }
 
-class AFStateTestDefinitionContext<TState extends AFFlexibleState> {
+class AFSpecificStateTestDefinitionContext<TState extends AFFlexibleState> {
   static const errSpecifyTypeParameter = "You must specify a type parameter to this function call";
-  final AFStateTestDefinitionsContext definitions;
+  final AFStateTestDefinitionContext definitions;
   final AFStateTest<TState> test;
-  AFStateTestDefinitionContext(this.definitions, this.test);
+  AFSpecificStateTestDefinitionContext(this.definitions, this.test);
 
   AFStateTestScreenShortcut<TSPI> createScreenShortcut<TSPI extends AFScreenStateProgrammingInterface>(AFScreenID screenId) {
     return AFStateTestScreenShortcut<TSPI>(this, screenId);
@@ -1140,15 +1140,15 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
   }  
 
   /// 
-  void defineQueryResponse<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFStateTestDefinitionsContext definitions, dynamic idData) {
+  void defineQueryResponse<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFStateTestDefinitionContext definitions, dynamic idData) {
     currentStatements.addDefinitionStatement(_AFStateRegisterFixedResultStatement<TQuery>(querySpecifier, definitions, idData), hasExecutionStatements: currentStatements.hasExecutionStatements);
   }
 
-  void defineQueryResponseNone<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFStateTestDefinitionsContext definitions) {
+  void defineQueryResponseNone<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFStateTestDefinitionContext definitions) {
     currentStatements.addDefinitionStatement(_AFStateRegisterSpecialResultStatement<TQuery>.resultNone(querySpecifier), hasExecutionStatements: currentStatements.hasExecutionStatements);
   }
 
-  void defineQueryResponseNull<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFStateTestDefinitionsContext definitions) {
+  void defineQueryResponseNull<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFStateTestDefinitionContext definitions) {
     currentStatements.addDefinitionStatement(_AFStateRegisterSpecialResultStatement<TQuery>.resultNull(querySpecifier), hasExecutionStatements: currentStatements.hasExecutionStatements);
   }
 

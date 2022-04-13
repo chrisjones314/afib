@@ -156,10 +156,35 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const fileTestConfig = AFUISourceTemplateID("test_config");
   static const fileScreenTest = AFUISourceTemplateID("screen_test");
   static const fileScreen = AFUISourceTemplateID("file_screen");
+  static const fileAppcodeAFib = AFUISourceTemplateID("appcode_afib");
   static const fileModel = AFUISourceTemplateID("file_model");
+  static const fileStateView = AFUISourceTemplateID("file_state_view");
   static const fileSimpleQuery = AFUISourceTemplateID("file_simple_query");
   static const fileDeferredQuery = AFUISourceTemplateID("file_deferred_query");
-
+  static const fileExtendBase = AFUISourceTemplateID("file_extend_base");
+  static const fileExtendBaseThirdParty = AFUISourceTemplateID("file_extend_base_third_party");
+  static const fileExtendCommand = AFUISourceTemplateID("file_extend_command");
+  static const fileExtendCommandThirdParty = AFUISourceTemplateID("file_extend_command_third_party");
+  static const fileCreateDartParams = AFUISourceTemplateID("file_create_dart_params");
+  static const fileExtendThirdParty = AFUISourceTemplateID("file_extend_third_party");
+  static const fileExtendApplication = AFUISourceTemplateID("file_extend_application");
+  static const fileMain = AFUISourceTemplateID("file_main");
+  static const fileApp = AFUISourceTemplateID("file_app");
+  static const fileAppcodeID = AFUISourceTemplateID("file_appcode_id");
+  static const fileEnvironment = AFUISourceTemplateID("file_enviroment");
+  static const fileStateModelAccess = AFUISourceTemplateID("file_state_model_access");
+  static const fileState = AFUISourceTemplateID("file_state");
+  static const fileMainAFibTest = AFUISourceTemplateID("file_main_afib_test");
+  static const fileConnectedBase = AFUISourceTemplateID("file_connected_base");
+  static const fileExtendApp = AFUISourceTemplateID("file_extend_app");
+  static const fileExtendTest = AFUISourceTemplateID("file_extend_test");
+  static const fileDefaultTheme = AFUISourceTemplateID("file_default_theme");
+  static const fileScreenMap = AFUISourceTemplateID("file_screen_map");
+  static const fileFundamentalTheme = AFUISourceTemplateID("file_fundamental_theme");
+  static const fileDefineTests = AFUISourceTemplateID("file_define_tests");
+  static const fileTestData = AFUISourceTemplateID("file_test_data");
+  static const fileStateTestShortcuts = AFUISourceTemplateID("file_state_test_shortcuts");
+  
   static const stmtDeclareID = AFUISourceTemplateID("declare_id");
   static const stmtDeclareRouteParam = AFUISourceTemplateID("declare_route_param");
   static const stmtDeclareStateView = AFUISourceTemplateID("declare_state_view");
@@ -178,6 +203,7 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textAppNamespace = AFUISourceTemplateID("app_namespace");
   static const textPackageName = AFUISourceTemplateID("package_name");
   static const textPackagePath = AFUISourceTemplateID("package_path");
+  static const textStateViewName = AFUISourceTemplateID("state_view_name");
   static const textModelName = AFUISourceTemplateID("model_name");
   static const textQueryName = AFUISourceTemplateID("query_name");
   static const textStateType = AFUISourceTemplateID("state_type");
@@ -186,6 +212,8 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textImportStatements = AFUISourceTemplateID("import_statements");
   static const textBuildWithSPIImpl = AFUISourceTemplateID("build_with_spi_impl");
   static const textBuildBodyImpl = AFUISourceTemplateID("build_body_impl");
+  static const textEnvironmentName = AFUISourceTemplateID("environment_name");
+  static const textTestKind = AFUISourceTemplateID("test_kind");
   
   static const textAdditionalMethods = AFUISourceTemplateID("additional_methods");
   static const textFileRelativePath = AFUISourceTemplateID("file_relative_path");

@@ -4,12 +4,17 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-    
-    
+    {
+      "name": "Dart: AFib Bootstrap",
+      "type": "dart",
+      "request": "launch",
+      "program": "/Users/chrisjones/projects/afib/afib/bin/afib_bootstrap.dart",
+      "cwd": "/Users/chrisjones/projects/afib/temp/hellocounter",
+    },
     {
       "name": "Flutter",
       "request": "launch",
-      "type": "dart"
+      "type": "dart",
     }
   ]
 }

@@ -24,7 +24,7 @@ class AFCodeBuffer {
   });
 
   factory AFCodeBuffer.empty() {
-    return AFCodeBuffer(projectPath: null, lines: <String>[], modified: true);
+    return AFCodeBuffer(projectPath: null, lines: <String>[], modified: false);
   }
 
   factory AFCodeBuffer.fromPath(List<String> projectPath) {
@@ -37,7 +37,7 @@ class AFCodeBuffer {
 
     final ls = LineSplitter();
     final lines = ls.convert(file.readAsStringSync());    
-    return AFCodeBuffer(projectPath: projectPath, lines: lines, modified: true);    
+    return AFCodeBuffer(projectPath: projectPath, lines: lines, modified: false);    
   }
 
   factory AFCodeBuffer.fromTemplate(AFSourceTemplate template) {
@@ -46,6 +46,14 @@ class AFCodeBuffer {
     return AFCodeBuffer(projectPath: null, lines: lines, modified: true);
   }
 
+
+  void resetText(String text) {
+    final ls = LineSplitter();
+    final newLines = ls.convert(text);    
+    lines.clear();
+    lines.addAll(newLines);
+    modified = true;
+  }    
   /// Replaces the specified id with the content of the specified source
   /// template anywhere in the file.
   /// 
@@ -59,6 +67,7 @@ class AFCodeBuffer {
   void executeStandardReplacements(AFCommandContext context) {
     replaceText(context, AFUISourceTemplateID.textAppNamespace, AFibD.config.appNamespace);
     replaceText(context, AFUISourceTemplateID.textPackageName, AFibD.config.packageName);
+    replaceText(context, AFUISourceTemplateID.textPackagePath, context.generator.packagePath(AFibD.config.packageName));
   }
 
   void appendLine(String line) {
@@ -66,10 +75,12 @@ class AFCodeBuffer {
   }
 
   void appendEmptyLine() {
+    modified = true;
     lines.add('');
   }
 
   void addLinesAfter(AFCommandContext context, RegExp match, List<String> toInsert) {
+    modified = true;
     for(var i = 0; i < lines.length; i++) {
       final line = lines[i];
       if(line.contains(match)) {
@@ -81,10 +92,12 @@ class AFCodeBuffer {
   }
 
   void addLinesAtEnd(AFCommandContext context, List<String> toInsert) {
+    modified = true;
     lines.addAll(toInsert);
   }
 
   void addLinesBefore(AFCommandContext context, RegExp match, List<String> toInsert) {
+    modified = true;
     for(var i = 0; i < lines.length; i++) {
       final line = lines[i];
       if(line.contains(match)) {
@@ -144,6 +157,7 @@ class AFCodeBuffer {
 
 
   void replaceInLine(AFCommandContext context, int lineIdx, String code, List<String> Function(AFCommandContext context, List<String> options) createValue) {
+    modified = true;
     final lineStart = lines[lineIdx];
     final codeStart = "$startCode$code";
     var curStart = lineStart.lastIndexOf(codeStart);
@@ -186,34 +200,4 @@ class AFCodeBuffer {
     return lines.join("\n");
   }
 
-  /*
-  void writeLine(String line) {
-    currentLine.write(line);
-    lines.add(currentLine.toString());
-    currentLine.clear();
-  }
-
-  void write(String content) {
-    currentLine.write(content);
-  }
-
-  String withIndent(String indent) {
-    final result = StringBuffer();
-    if(currentLine.isNotEmpty) {
-      writeLine("");
-    }
-    for(var i = 0; i < lines.length; i++) {
-      final line = lines[i];
-      if(i > 0) {
-        result.write(indent);
-      }
-      if(i+1 < lines.length) {
-        result.writeln(line);
-      } else {
-        result.write(line);
-      }
-    }
-    return result.toString();
-  }
-  */
 }

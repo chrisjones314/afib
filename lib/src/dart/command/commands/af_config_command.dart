@@ -47,9 +47,6 @@ class AFConfigCommand extends AFCommand {
     final projectPath = generator.pathAfibConfig;
     final configFile = generator.overwriteFile(ctx, projectPath, AFUISourceTemplateID.fileConfig);
     configFile.replaceTemplate(ctx, AFUISourceTemplateID.dynConfigEntries, DeclareConfigEntriesT(AFibD.config, AFibD.configEntries));
-
-    // replace any default 
-    generator.finalizeAndWriteFiles(ctx);
   }
 
   @override
@@ -62,5 +59,9 @@ class AFConfigCommand extends AFCommand {
 
     updateConfig(ctx, AFibD.config, AFibD.configEntries, ctx.arguments);
     writeUpdatedConfig(ctx);
+
+    // replace any default 
+    ctx.generator.finalizeAndWriteFiles(ctx);
+
   }
 }

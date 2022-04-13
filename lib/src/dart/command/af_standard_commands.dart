@@ -19,10 +19,15 @@ void afRegisterAppCommands(AFCommandExtensionContext definitions) {
   definitions.registerStandardCommands();
 }
 
+void afRegisterBootstrapCommands(AFCommandExtensionContext definitions) {
+  definitions.registerBootstrapCommands();
+}
+
+
 /// Used to initialize and execute commands available via afib_bootstrap
 Future<void> afBootstrapCommandMain(AFDartParams paramsD, List<String> args) async {
   await _afCommandMain(paramsD, args, "afib_bootstrap", "Command used to create new afib projects", null, null, [
-    afRegisterAppCommands
+    afRegisterBootstrapCommands
   ], null);
 }
 

@@ -2,8 +2,9 @@ import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
+import 'package:afib/src/dart/command/commands/af_create_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_model_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_screen_command.dart';
 import 'package:afib/src/dart/command/commands/af_test_command.dart';
@@ -65,7 +66,7 @@ abstract class AFCommand {
   /// manipulated from the command line.
   void run(AFCommandContext ctx) {
     // make sure we are in the project root.
-    if(!errorIfNotProjectRoot(ctx.out)) {
+    if(!errorIfNotProjectRoot(ctx)) {
       return;
     }
 
@@ -79,9 +80,9 @@ abstract class AFCommand {
   void finalize() {}
   void execute(AFCommandContext ctx);
 
-  bool errorIfNotProjectRoot(AFCommandOutput output) {
-    if(!AFProjectPaths.inRootOfAfibProject) {
-      output.writeErrorLine("Please run the $name command from the project root");
+  bool errorIfNotProjectRoot(AFCommandContext ctx) {
+    if(!AFProjectPaths.inRootOfAfibProject(ctx)) {
+      ctx.output.writeErrorLine("Please run the $name command from the project root");
       return false;
     }
     return true;
@@ -91,12 +92,44 @@ abstract class AFCommand {
     throw AFCommandError(error: error, usage: usage);
   }
 
+  static Never throwUsageErrorStatic(String error, String usage) {
+    throw AFCommandError(error: error, usage: usage);
+  }
+
   String verifyEndsWith(String value, String endsWith) {
     if(!value.endsWith(endsWith)) {
       throwUsageError("$value must end with $endsWith");
     }
     return value;
   }
+
+  void verifyEndsWithOneOf(String value, List<String> suffixes) {
+    for(final suffix in suffixes) {
+      if(value.endsWith(suffix)) {
+        return;
+      }
+    }
+    throwUsageError("$value must end with one of $suffixes");
+  }
+
+  void verifyAllUppercase(String value) {
+    for(var i = 0; i < value.length; i++) {
+      final c = value[i];
+      if(c != c.toUpperCase()) {
+        throwUsageError("Expected $value to be all uppercase");
+      }
+    }
+  }
+
+  void verifyAllLowercase(String value) {
+    for(var i = 0; i < value.length; i++) {
+      final c = value[i];
+      if(c != c.toLowerCase()) {
+        throwUsageError("Expected $value to be all lowercase");
+      }
+    }
+  }
+
 
   String convertToPrefix(String value, String suffix) {
     final lower = suffix.toLowerCase();
@@ -429,6 +462,13 @@ class AFCommandExtensionContext extends AFCommandThirdPartyExtensionContext {
       }
     }
 
+    void registerBootstrapCommands() {
+      register(AFVersionCommand());
+      register(AFCreateAppCommand());
+
+    }
+
+
     void registerStandardCommands() {
       register(AFVersionCommand());
       register(AFConfigCommand());
@@ -438,7 +478,7 @@ class AFCommandExtensionContext extends AFCommandThirdPartyExtensionContext {
 
 
       registerGenerateSubcommand(AFGenerateScreenSubcommand());
-      registerGenerateSubcommand(AFGenerateModelSubcommand());
+      registerGenerateSubcommand(AFGenerateStateSubcommand());
       registerGenerateSubcommand(AFGenerateQuerySubcommand());
     }
 }

@@ -9,6 +9,7 @@ import 'package:afib/src/dart/command/code_generation/af_code_generator.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:colorize/colorize.dart';
+import 'package:pubspec_parse/pubspec_parse.dart';
 
 enum AFGeneratedFileAction {
   create,
@@ -56,6 +57,9 @@ class AFGeneratedFile {
     return AFCodeGenerator.importPathStatementStatic(projectPath);
   }
 
+  Pubspec loadPubspec() {
+    return Pubspec.parse(buffer.toString());
+  }
 
   void executeStandardReplacements(AFCommandContext context) {
     buffer.executeStandardReplacements(context);
@@ -153,9 +157,7 @@ class AFGeneratedFile {
   }
 
   void writeIfModified(AFCommandContext context) {
-    if(buffer.modified) {
-      write(context);
-    }
+    write(context);
   }
 
   void write(AFCommandContext context) {
@@ -183,10 +185,15 @@ class AFGeneratedFile {
       color: color);
     var text = "create";
     if(action == AFGeneratedFileAction.modify) {
-      text = "modify";
+      if(!buffer.modified) {
+        text = "skip";
+      } else {
+        text = "modify";
+      }
     } else if(action == AFGeneratedFileAction.overwrite) {
       text = "overwrite";
     }
+    
     output.write("$text ");
   }
 }

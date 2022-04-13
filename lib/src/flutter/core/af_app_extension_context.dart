@@ -113,15 +113,17 @@ class AFTestExtensionContext {
     required AFInitUnitTestsDelegate defineUnitTests,
     required AFInitStateTestsDelegate defineStateTests,
     required AFInitScreenTestsDelegate defineScreenTests,
-    required AFInitWorkflowStateTestsDelegate defineWorkflowStateTests,
+    AFInitWorkflowStateTestsDelegate? defineWorkflowStateTests,
     AFInitWireframesDelegate? defineWireframes,
   }) {
     addInitTestData(defineTestData);
     addInitUnitTest(defineUnitTests);
     addInitStateTest(defineStateTests);
     addInitScreenTest(defineScreenTests);
-    addInitWorkflowStateTest(defineWorkflowStateTests);
     addInitWireframe(defineWireframes);
+    if(defineWorkflowStateTests != null) {
+      addInitWorkflowStateTest(defineWorkflowStateTests);
+    }
   }
 
   void initializeForApp() {
@@ -179,13 +181,13 @@ class AFTestExtensionContext {
     }
   }
 
-  void _initStateTests(AFStateTestDefinitionsContext context) {
+  void _initStateTests(AFStateTestDefinitionContext context) {
     for(final init in initStateTests) {
       init(context);
     }
   }
 
-  void _initScreenTests(AFScreenTestDefinitionContext context) {
+  void _initScreenTests(AFUIPrototypeDefinitionContext context) {
     for(final init in initScreenTests) {
       init(context);
     }
@@ -223,13 +225,13 @@ class AFTestExtensionContext {
       );
       _initUnitTests(unitTestDefineContext);
       
-      final stateTestDefineContext = AFStateTestDefinitionsContext(
+      final stateTestDefineContext = AFStateTestDefinitionContext(
         tests: stateTests,
         testData: testData
       );
       _initStateTests(stateTestDefineContext);
       
-      final singleTestDefineContext = AFScreenTestDefinitionContext(
+      final singleTestDefineContext = AFUIPrototypeDefinitionContext(
         screenTests: screenTests,
         widgetTests: widgetTests,
         dialogTests: dialogTests,

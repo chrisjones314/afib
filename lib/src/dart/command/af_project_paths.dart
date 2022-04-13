@@ -1,5 +1,6 @@
 
 import 'dart:io';
+import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:path/path.dart';
@@ -19,7 +20,6 @@ class AFProjectPaths {
   static const initializationFolder = 'initialization';
   static const libPath = [libFolder];
   static const initializationPath = [libFolder, initializationFolder];
-  static const afibConfigPath = [libFolder, initializationFolder, afibConfigFile];
   static const pubspecPath = [pubspecFile];
   static const idFile = "id.dart";
   static const idPath = [libFolder, idFile];
@@ -116,11 +116,11 @@ class AFProjectPaths {
     return joinAll(temp);
   }
 
-  static bool get inRootOfAfibProject {
+  static bool inRootOfAfibProject(AFCommandContext ctx) {
     if(!AFProjectPaths.projectFileExists(AFProjectPaths.pubspecPath)) {
       return false;
     }
-    if(!AFProjectPaths.projectFileExists(createPath(AFProjectPaths.afibConfigPath))) {
+    if(!AFProjectPaths.projectFileExists(ctx.generator.pathAfibConfig)) {
       return false;
     }
 

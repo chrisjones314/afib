@@ -12,22 +12,22 @@ void nullConfigFunction(AFConfig config) {}
 /// can still be used from command-line executables.
 @immutable
 class AFDartParams<AppState> {
-  final AFInitConfigurationDelegate initAfib;
-  final AFInitConfigurationDelegate initAppConfig;
-  final AFInitConfigurationDelegate initDebugConfig;
-  final AFInitConfigurationDelegate initProductionConfig;
-  final AFInitConfigurationDelegate initPrototypeConfig;
-  final AFInitConfigurationDelegate initTestConfig;
+  final AFInitConfigurationDelegate configureAfib;
+  final AFInitConfigurationDelegate configureAppConfig;
+  final AFInitConfigurationDelegate configureDebugConfig;
+  final AFInitConfigurationDelegate configureProductionConfig;
+  final AFInitConfigurationDelegate condfigurePrototypeConfig;
+  final AFInitConfigurationDelegate configureTestConfig;
   final Logger? logger;
   final AFEnvironment? forceEnv;   
   
   AFDartParams({
-    required this.initAfib,
-    required this.initAppConfig,
-    required this.initDebugConfig,
-    required this.initProductionConfig,
-    required this.initPrototypeConfig,
-    required this.initTestConfig,
+    required this.configureAfib,
+    required this.configureAppConfig,
+    required this.configureDebugConfig,
+    required this.configureProductionConfig,
+    required this.condfigurePrototypeConfig,
+    required this.configureTestConfig,
     this.logger,
     this.forceEnv
   });
@@ -38,12 +38,12 @@ class AFDartParams<AppState> {
 
   static AFDartParams createEmpty() {
     return AFDartParams(
-      initAfib: nullConfigFunction,
-      initAppConfig: nullConfigFunction,
-      initDebugConfig: nullConfigFunction,
-      initProductionConfig: nullConfigFunction,
-      initPrototypeConfig: nullConfigFunction,
-      initTestConfig: nullConfigFunction,
+      configureAfib: nullConfigFunction,
+      configureAppConfig: nullConfigFunction,
+      configureDebugConfig: nullConfigFunction,
+      configureProductionConfig: nullConfigFunction,
+      condfigurePrototypeConfig: nullConfigFunction,
+      configureTestConfig: nullConfigFunction,
     );
   }
 
@@ -59,12 +59,12 @@ class AFDartParams<AppState> {
     AFEnvironment? forceEnv,
   }) {
     return AFDartParams(
-      initAfib: initAfib ?? this.initAfib,
-      initAppConfig: initAppConfig ?? this.initAppConfig,
-      initDebugConfig: initDebugConfig ?? this.initDebugConfig,
-      initProductionConfig: initProductionConfig ?? this.initProductionConfig,
-      initPrototypeConfig: initPrototypeConfig ?? this.initPrototypeConfig,
-      initTestConfig: initTestConfig ?? this.initTestConfig,
+      configureAfib: initAfib ?? this.configureAfib,
+      configureAppConfig: initAppConfig ?? this.configureAppConfig,
+      configureDebugConfig: initDebugConfig ?? this.configureDebugConfig,
+      configureProductionConfig: initProductionConfig ?? this.configureProductionConfig,
+      condfigurePrototypeConfig: initPrototypeConfig ?? this.condfigurePrototypeConfig,
+      configureTestConfig: initTestConfig ?? this.configureTestConfig,
       logger: logger ?? this.logger,
       forceEnv: forceEnv ?? this.forceEnv
     );

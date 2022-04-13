@@ -150,7 +150,23 @@ Options
     }
 
     final uiName = unnamed[0];
+    final generator = ctx.generator;
+    final args = parseArguments(unnamed, defaults: {
+      argStateView: generator.nameDefaultStateView,
+      argTheme: generator.nameDefaultTheme
+    });
 
+    verifyMixedCase(uiName, "ui name");
+    verifyNotOption(uiName);
+
+    createScreen(ctx, uiName, args);
+
+    // replace any default 
+    generator.finalizeAndWriteFiles(ctx);
+
+  }
+
+  static AFGeneratedFile createScreen(AFCommandContext ctx, String uiName, Map<String, dynamic> args) {
     AFUIControlSettings? controlSettings;
     for(final candidateControlKind in controlKinds) {
       if(candidateControlKind.matchesName(uiName)) {
@@ -159,25 +175,17 @@ Options
       }
     }
     if(controlSettings == null) {
-      throwUsageError("$uiName must end with one of $controlKinds");
+      throw AFCommandError(error: "$uiName must end with one of $controlKinds");
     }
 
-    verifyMixedCase(uiName, "ui name");
-    verifyNotOption(uiName);
     final ns = AFibD.config.appNamespace.toUpperCase();
-    final defaultStateView = "${ns}DefaultStateView";
-    final defaultTheme = "${ns}DefaultTheme";
+    final generator = ctx.generator;
 
-    final args = parseArguments(unnamed, defaults: {
-      argStateView: defaultStateView,
-      argTheme: defaultTheme
-    });
 
     final screenIdType = "$ns${controlSettings.suffix}ID";
     final spiParentType = "$ns${controlSettings.suffix}SPI";
 
     // create a screen name
-    final generator = ctx.generator;
     final projectPath = generator.pathUI(uiName, controlSettings);
     final screenFile = generator.createFile(ctx, projectPath, AFUISourceTemplateID.fileScreen);
 
@@ -234,7 +242,6 @@ Options
       before: AFCodeRegExp.startScreenMap
     );            
 
-    /*
     // create a state test shortcut declaration function.
     final shortcut = DeclareStateTestScreenShortcutT().toBuffer();
     shortcut.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
@@ -255,8 +262,6 @@ Options
     generator.addExportsForFiles(ctx, args, [
       screenFile
     ]);
-
-    */
 
     final generatePrototypes = AFibD.config.generateUIPrototypes;
     if(generatePrototypes) {
@@ -293,8 +298,7 @@ Options
       screenTestsFile.addLinesAfter(ctx, AFCodeRegExp.startDefineScreenTestsFunction, callFunction.lines);
     }
 
-    // replace any default 
-    generator.finalizeAndWriteFiles(ctx);
+    return screenFile;
   }
 
 }

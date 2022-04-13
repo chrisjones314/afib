@@ -34,7 +34,7 @@ typedef AFOnLifecycleEventDelegate = void Function(AppLifecycleState newState);
 typedef AFCreateAFAppDelegate = AFApp Function();
 
 /// Delegate used to populate single-screen tests.
-typedef AFInitScreenTestsDelegate = void Function(AFScreenTestDefinitionContext context);
+typedef AFInitScreenTestsDelegate = void Function(AFUIPrototypeDefinitionContext context);
 
 /// Delegate used to populate multi-screen tests.
 typedef AFInitWorkflowStateTestsDelegate = void Function(AFWorkflowTestDefinitionContext context);
@@ -88,7 +88,7 @@ typedef AFInitTestDataDelegate = void Function(AFCompositeTestDataRegistry regis
 typedef AFInitUnitTestsDelegate = void Function(AFUnitTestDefinitionContext context);
 
 /// Delegate used to initialize state tests.
-typedef AFInitStateTestsDelegate = void Function(AFStateTestDefinitionsContext context);
+typedef AFInitStateTestsDelegate = void Function(AFStateTestDefinitionContext context);
 
 /// Delegate 
 typedef AFProcessQueryDelegate<TQuery extends AFAsyncQuery> = dynamic Function(AFStateTestContext context, TQuery query);
@@ -97,7 +97,7 @@ typedef AFProcessQueryDelegate<TQuery extends AFAsyncQuery> = dynamic Function(A
 typedef AFCreateQueryResultDelegate<TQuery extends AFAsyncQuery> = dynamic Function(AFStateTestContext context, TQuery query);
 
 /// Delegate used to process a state test.
-typedef AFStateTestDefinitionDelegate = void Function(AFStateTestDefinitionContext test);
+typedef AFStateTestDefinitionDelegate = void Function(AFSpecificStateTestDefinitionContext test);
 
 /// Delegate used to verify a state change, from before to after
 typedef AFStateTestVerifyStateDelegate = void Function(AFStateTestExecute execute, AFStateTestStateVerificationContext context);

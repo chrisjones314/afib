@@ -2439,10 +2439,10 @@ class AFUnitTestDefinitionContext extends AFBaseTestDefinitionContext {
 /// This class is intended to provide a quick start for the most common
 /// methods in defining state tests, and to enable extensions
 /// later without changing the test definition function profile.
-class AFStateTestDefinitionsContext extends AFBaseTestDefinitionContext {
+class AFStateTestDefinitionContext extends AFBaseTestDefinitionContext {
   final AFStateTests tests;
 
-  AFStateTestDefinitionsContext({
+  AFStateTestDefinitionContext({
     required this.tests,
     required AFCompositeTestDataRegistry testData
   }): super(testData);
@@ -2474,14 +2474,14 @@ class AFStateTestDefinitionsContext extends AFBaseTestDefinitionContext {
 /// This class is intended to provide a quick start for the most common
 /// methods in defining single screen tests, and to enable extensions
 /// later without changing the test definition function profile.
-class AFScreenTestDefinitionContext extends AFBaseTestDefinitionContext {
+class AFUIPrototypeDefinitionContext extends AFBaseTestDefinitionContext {
   final AFSingleScreenTests screenTests; 
   final AFWidgetTests widgetTests;
   final AFDialogTests dialogTests;
   final AFBottomSheetTests bottomSheetTests;
   final AFDrawerTests drawerTests;
   
-  AFScreenTestDefinitionContext({
+  AFUIPrototypeDefinitionContext({
     required this.screenTests,
     required this.widgetTests,
     required this.dialogTests,

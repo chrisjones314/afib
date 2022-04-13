@@ -10,6 +10,14 @@ import 'package:meta/meta.dart';
 @immutable
 class [!af_model_name] {
   [!af_model_name]();
+
+  factory [!af_model_name].initialValue() {
+    return [!af_model_name]();
+  }
+
+  [!af_model_name] copyWith() {
+    return [!af_model_name]();
+  }
 }
 ''';
 }

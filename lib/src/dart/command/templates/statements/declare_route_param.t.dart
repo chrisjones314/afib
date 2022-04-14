@@ -5,17 +5,7 @@ class DeclareRouteParamT extends AFSourceTemplate {
 [!af_comment_route_param_intro]
 @immutable
 class [!af_screen_name]RouteParam extends AFRouteParam {
-
-  [!af_screen_name]RouteParam(): super(id: [!af_screen_id_type].[!af_screen_id]);
-
-  factory [!af_screen_name]RouteParam.create() {
-    return [!af_screen_name]RouteParam();
-  }
-
-  [!af_screen_name]RouteParam copyWith() {
-    return [!af_screen_name]RouteParam(
-    );
-  }
+  [!af_route_param_impls]
 }
 ''';  
 }

@@ -27,7 +27,6 @@ class [!af_query_name] extends [!af_query_type]<[!af_state_type], [!af_result_ty
     // note that while prototyping, you don't need to implement this, as 
     // screen and state prototypes will automatically skip this method and pass a specified
     // response to the method below.
-    throw UnimplementedError();
   }
 
   @override

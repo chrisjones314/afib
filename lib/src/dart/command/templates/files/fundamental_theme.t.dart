@@ -12,8 +12,8 @@ import 'package:flutter/material.dart';
 
 void defineFundamentalThemeArea(AFFundamentalDeviceTheme device, AFComponentStates appState, AFAppFundamentalThemeAreaBuilder primary) {
 
-  final colorPrimary = Color(0xFF0d47a1);
-  final colorSecondary = Color(0xFF00695c);
+  const colorPrimary = Color(0xFF0d47a1);
+  const colorSecondary = Color(0xFF00695c);
 
   final colorsLight = ColorScheme(
     primary: colorPrimary,
@@ -30,7 +30,7 @@ void defineFundamentalThemeArea(AFFundamentalDeviceTheme device, AFComponentStat
   );
 
 
-  final colorsDarkBase = ColorScheme.dark();  
+  const colorsDarkBase = ColorScheme.dark();  
   final colorsDark = ColorScheme(
     primary: colorPrimary,
     secondary: colorSecondary,
@@ -45,8 +45,8 @@ void defineFundamentalThemeArea(AFFundamentalDeviceTheme device, AFComponentStat
     brightness: Brightness.dark
   );
 
-  final origDark = Typography.whiteCupertino;
-  final origLight = Typography.blackCupertino;
+  const origDark = Typography.whiteCupertino;
+  const origLight = Typography.blackCupertino;
 
   final themeDark = origDark.copyWith(
     bodyText1: origDark.bodyText1?.copyWith(fontWeight: FontWeight.bold)
@@ -65,6 +65,9 @@ void defineFundamentalThemeArea(AFFundamentalDeviceTheme device, AFComponentStat
 
   primary.setAfibFundamentals();
 
+  primary.setTranslations(AFUILocaleID.englishUS, {
+    AFUITranslationID.appTitle: "[!af_package_name]"
+  });
 }
 ''';
 

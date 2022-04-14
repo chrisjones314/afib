@@ -19,12 +19,13 @@ class [!af_app_namespace(upper)]State extends AFFlexibleState with [!af_app_name
     return [!af_app_namespace(upper)]State(models);
   }
 
+  @override
   AFFlexibleState createWith(Map<String, Object> models) {
     return [!af_app_namespace(upper)]State(models);
   }
 
   factory [!af_app_namespace(upper)]State.initial() {
-    return [!af_app_namespace(upper)]State.fromList([
+    return [!af_app_namespace(upper)]State.fromList(const [
     ]);
   }
 }''';

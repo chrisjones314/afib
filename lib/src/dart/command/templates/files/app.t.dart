@@ -10,7 +10,6 @@ class AFAppT extends AFSourceTemplate {
   final String template = '''
 import 'package:afib/afib_flutter.dart';
 import 'package:[!af_package_path]/state/[!af_app_namespace]_state.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class [!af_app_namespace(upper)]App extends AFMaterialApp<[!af_app_namespace(upper)]State> {

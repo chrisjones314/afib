@@ -4,6 +4,11 @@ import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_screen_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_demo_screen_build_body.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_demo_screen_route_param_impls.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_demo_screen_screen_impls.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_screen_build_with_spi_no_back.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_demo_screen_spi_impls.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 /// Parent for commands executed through the afib command line app.
@@ -95,7 +100,12 @@ Options
       AFCommand.argPrivate: false,
     };
 
-    AFGenerateScreenSubcommand.createScreen(ctx, "StartupScreen", args);
+    AFGenerateScreenSubcommand.createScreen(ctx, "StartupScreen", args,
+      buildWithSPI: DeclareScreenBuildWithSPINoBackImplT(),
+      buildBody: DeclareDemoScreenBuildBodyT(),
+      spiImpls: DeclareDemoScreenSPIImplsT(),
+      screenImpls: DeclareDemoScreenScreenImplsT(),
+      routeParamImpls: DeclareDemoScreenRouteParamImplsT());
   }
 
   void _createStateFiles(AFCommandContext ctx) {

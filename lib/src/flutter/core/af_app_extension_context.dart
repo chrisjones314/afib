@@ -570,7 +570,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
         componentStates.add(s);
       }
     }    
-
+    componentStates.add(AFUIState.initialValue());
 
     for(final thirdParty in libraries) {
       thirdParty.initComponentStates(componentStates);

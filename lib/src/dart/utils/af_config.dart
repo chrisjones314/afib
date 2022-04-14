@@ -530,11 +530,17 @@ class AFConfig {
   }
 
   List<String> stringListFor(AFConfigurationItem entry) {
-    List result = valueFor(entry);
-    if(result.isEmpty) {
-      return <String>[];
+    final result = valueFor(entry);
+    if(result is String) {
+      return [result];
     }
-    return result.map((x) => x.toString()).toList();
+    if(result is List) {
+      if(result.isEmpty) {
+        return <String>[];
+      }
+      return result.map((x) => x.toString()).toList();
+    }
+    throw AFException("Unexpected data type ${result.runtimeType} for entry ${entry.name}");
   }
 
   /// Casts the value for [entry] to a boolean and returns it.

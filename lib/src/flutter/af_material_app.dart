@@ -72,7 +72,7 @@ abstract class AFMaterialApp<AppState> extends AFApp<AppState> {
   }
 
   /// Build a [MaterialApp] for the application
-  Widget buildMaterialApp(AFFundamentalThemeState themeData);
+  Widget buildMaterialApp(AFFundamentalThemeState fundamentals);
 
   AFNavigatorObserver createAFNavigatorObserver() {
     return AFNavigatorObserver();

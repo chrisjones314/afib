@@ -139,8 +139,8 @@ class AFCodeGenerator {
     return _createPath(testPath, uiPrototypesFilename);
   }
 
-  String get stateViewFullLoginID {
-    return "stateViewFullLogin";
+  String get stateFullLoginID {
+    return "stateFullLogin";
   }
 
   String? _namedObjectToFilename(String stateViewName, String suffix) {

@@ -60,6 +60,7 @@ class AFUIWidgetID extends AFWidgetID {
   static const positionedCenterHosted = AFUIWidgetID("positioned_center_hosted");
   static const contHostedControls = AFUIWidgetID("cont_hosted_controls");
   static const unused = AFUIWidgetID("unused");
+  static const widgetWelcome = AFUIWidgetID("welcome");
 }
 
 class AFUIScreenTestID extends AFScreenTestID {
@@ -152,7 +153,6 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   const AFUISourceTemplateID(String code) : super(code, AFUILibraryID.id);
  
   static const fileConfig = AFUISourceTemplateID("config");
-  static const fileIds = AFUISourceTemplateID("ids");
   static const fileTestConfig = AFUISourceTemplateID("test_config");
   static const fileScreenTest = AFUISourceTemplateID("screen_test");
   static const fileScreen = AFUISourceTemplateID("file_screen");
@@ -220,6 +220,8 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textFullTestDataID = AFUISourceTemplateID("full_test_data_id");
   static const textScreenTestID = AFUISourceTemplateID("screen_test_id");
   static const textIDTypeSuffix = AFUISourceTemplateID("id_type_suffix");
+  static const textScreenImpls = AFUISourceTemplateID("screen_impls");
+  static const textRouteParamImpls = AFUISourceTemplateID("route_param_impls");
 
   static const commentSPIIntro = AFUISourceTemplateID("comment_spi_intro");
   static const commentRouteParamIntro = AFUISourceTemplateID("comment_route_param_intro");

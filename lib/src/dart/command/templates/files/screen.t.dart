@@ -47,6 +47,8 @@ class [!af_screen_name] extends [!af_app_namespace(upper)]Connected[!af_control_
   Widget _buildBody([!af_screen_name]SPI spi) {
     [!af_build_body_impl]
   }
+
+  [!af_screen_impls]
 }
 ''';
 }

@@ -152,7 +152,11 @@ class AFGeneratedFile {
   /// 
   /// Note that you can use this function, combined with a [AFDynamicSourceTemplate] subclass,
   /// in order to insert dynamically generated sections of code in an existing template.
-  void replaceTemplate(AFCommandContext context, dynamic id, AFSourceTemplate template) {
+  void replaceTemplate(AFCommandContext context, dynamic id, AFSourceTemplate? template) {
+    if(template == null) {
+      buffer.replaceText(context, id, "");
+      return;
+    }
     return buffer.replaceTemplate(context, id, template);
   }
 

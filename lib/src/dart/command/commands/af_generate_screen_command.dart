@@ -13,6 +13,7 @@ import 'package:afib/src/dart/command/templates/statements/declare_screen_build_
 import 'package:afib/src/dart/command/templates/statements/declare_screen_map_entry.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_spi_on_pressed_closed.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_spi_on_tap_close.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_standard_route_param_impls.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_state_test_screen_shortcut.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
@@ -166,7 +167,13 @@ Options
 
   }
 
-  static AFGeneratedFile createScreen(AFCommandContext ctx, String uiName, Map<String, dynamic> args) {
+  static AFGeneratedFile createScreen(AFCommandContext ctx, String uiName, Map<String, dynamic> args, {
+    AFSourceTemplate? buildWithSPI,
+    AFSourceTemplate? buildBody,
+    AFSourceTemplate? spiImpls,
+    AFSourceTemplate? screenImpls,
+    AFSourceTemplate? routeParamImpls,
+  }) {
     AFUIControlSettings? controlSettings;
     for(final candidateControlKind in controlKinds) {
       if(candidateControlKind.matchesName(uiName)) {
@@ -215,16 +222,18 @@ Options
     screenFile.replaceText(ctx, AFUISourceTemplateID.textStateViewPrefix, stateViewPrefix);
     screenFile.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
     screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textImportStatements, imports);
-    screenFile.replaceTemplate(ctx, AFUISourceTemplateID.textBuildWithSPIImpl, controlSettings.implBuildWithSPI);
-    screenFile.replaceTemplate(ctx, AFUISourceTemplateID.textBuildBodyImpl, controlSettings.implBuildBody);
+    screenFile.replaceTemplate(ctx, AFUISourceTemplateID.textBuildWithSPIImpl, buildWithSPI ?? controlSettings.implBuildWithSPI);
+    screenFile.replaceTemplate(ctx, AFUISourceTemplateID.textBuildBodyImpl, buildBody ?? controlSettings.implBuildBody);
+    screenFile.replaceTemplate(ctx, AFUISourceTemplateID.textRouteParamImpls, routeParamImpls ?? DeclareStandardRouteParamImplsT());
     
-    final templateSPI = controlSettings.implsSPI.toBuffer();
+    final templateSPI = spiImpls?.toBuffer() ?? controlSettings.implsSPI.toBuffer();
     templateSPI.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
     screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textSPIImpls, templateSPI.lines);
 
     final templateSuper = controlSettings.implsSuper.toBuffer();
     templateSuper.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
     screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textSuperImpls, templateSuper.lines);
+    screenFile.replaceTemplate(ctx, AFUISourceTemplateID.textScreenImpls, screenImpls);
 
 
     // put the screen in the screen map
@@ -269,7 +278,7 @@ Options
       final pathScreenTest = generator.pathScreenTest(uiName, controlSettings);
       final screenTestFile = generator.createFile(ctx, pathScreenTest, AFUISourceTemplateID.fileScreenTest);
       screenTestFile.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
-      screenTestFile.replaceText(ctx, AFUISourceTemplateID.textFullTestDataID, generator.stateViewFullLoginID);
+      screenTestFile.replaceText(ctx, AFUISourceTemplateID.textFullTestDataID, generator.stateFullLoginID);
       screenTestFile.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
       screenTestFile.executeStandardReplacements(ctx);
       generator.addImport(ctx,

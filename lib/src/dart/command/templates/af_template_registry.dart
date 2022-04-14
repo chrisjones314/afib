@@ -11,7 +11,7 @@ import 'package:afib/src/dart/command/templates/files/afib_test_config.t.dart';
 import 'package:afib/src/dart/command/templates/files/app.t.dart';
 import 'package:afib/src/dart/command/templates/files/app_state.t.dart';
 import 'package:afib/src/dart/command/templates/files/appcode_afib.t.dart';
-import 'package:afib/src/dart/command/templates/files/appcode_id.t.dart';
+import 'package:afib/src/dart/command/templates/files/id.t.dart';
 import 'package:afib/src/dart/command/templates/files/application.t.dart';
 import 'package:afib/src/dart/command/templates/files/connected_base.t.dart';
 import 'package:afib/src/dart/command/templates/files/create_dart_params.t.dart';
@@ -57,7 +57,6 @@ class AFTemplateRegistry {
     register(AFUISourceTemplateID.fileConfig, AFibT());
     register(AFUISourceTemplateID.fileScreen, AFScreenT());
     register(AFUISourceTemplateID.fileModel, AFModelT());
-    register(AFUISourceTemplateID.fileIds, IdentifierT());
     register(AFUISourceTemplateID.fileTestConfig, AFTestConfigT());
     register(AFUISourceTemplateID.fileScreenTest, AFScreenTestT());
     register(AFUISourceTemplateID.fileAppcodeAFib, AFAppcodeAFibT());

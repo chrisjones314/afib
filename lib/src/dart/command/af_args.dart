@@ -1,3 +1,5 @@
+import 'package:colorize/colorize.dart';
+
 /// Utility for accessing arguments to an afib command. 
 /// 
 /// All methods ignore the command name itself, which is already implied
@@ -39,9 +41,15 @@ class AFArgs {
     args.add(arg);
   }
 
-  void debugResetTo(String arguments) {
-    print("USING DEBUG ARGUMENTS $arguments");
-    final parsed = arguments.split(RegExp(r"[ \t]"));
+  void setDebugArgs(String revised) {
+    final out = Colorize("ERROR: ").apply(Styles.RED);
+    final result = StringBuffer();
+    result.write(out);
+    result.writeln("********* USING DEBUG ARGUMENTS **************");
+    result.writeln("  $revised");
+    print(result.toString());
+
+    final parsed = revised.split(RegExp(r"[ \t]"));
     args.clear();
     args.addAll(parsed);
   }

@@ -9,6 +9,9 @@ class AFCodeRegExp {
   static final startScreenMap = RegExp(r"void\s+defineScreenMap\(AFScreenMap\s+.*\)\s+{");
   static final startDefineStateClass = RegExp(r"class\s+.*State\s+extends\s+AFFlexibleState\s+with\s+.*StateModelAccess\s+{");
   static final startReturnInitialState = RegExp(r"return\s+.*State.fromList\(\[");
+  static final startExtendThirdPartyBase = RegExp(r"void\s+extendThirdPartyBase\(AFBaseExtensionContext\s+context\)\s+{");
+  static final startExtendThirdPartyCommand = RegExp(r"void\s+extendThirdPartyCommand\(AFCommandThirdPartyExtensionContext\s+context\)\s+{");
+  static final startExtendThirdPartyUI = RegExp(r"void\s+extendThirdPartyUI\(AFAppThirdPartyExtensionContext\s+context\)\s+{");
 
   static RegExp startUIID(String kind) {
     return RegExp("class\\s+.*${kind}ID\\s+extends\\s+AFScreenID\\s+{");

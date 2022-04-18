@@ -23,10 +23,9 @@ void afRegisterBootstrapCommands(AFCommandExtensionContext definitions) {
   definitions.registerBootstrapCommands();
 }
 
-
 /// Used to initialize and execute commands available via afib_bootstrap
-Future<void> afBootstrapCommandMain(AFDartParams paramsD, List<String> args) async {
-  await _afCommandMain(paramsD, args, "afib_bootstrap", "Command used to create new afib projects", null, null, [
+Future<void> afBootstrapCommandMain(AFDartParams paramsD, AFArgs args) async {
+  await _afCommandMain(paramsD, args.args, "afib_bootstrap", "Command used to create new afib projects", null, null, [
     afRegisterBootstrapCommands
   ], null);
 }
@@ -36,11 +35,18 @@ void afCommandStartup(Future<void> Function() onRun) async {
   await onRun();
 }
 
-Future<void> afAppCommandMain(AFDartParams paramsD, List<String> args, AFExtendBaseDelegate initBase, AFExtendBaseDelegate initBaseThirdParty, AFExtendCommandsDelegate initApp, AFExtendCommandsThirdPartyDelegate initExtend) async {
-  await _afCommandMain(paramsD, args, "afib", "App-specific afib command", initBase, initBaseThirdParty, [
+Future<void> afAppCommandMain({
+  required AFArgs args, 
+  required AFDartParams paramsDart, 
+  required AFExtendBaseDelegate extendBase, 
+  required AFExtendCommandsDelegate extendCommand, 
+  required AFExtendBaseDelegate extendThirdPartyBase, 
+  required AFExtendCommandsThirdPartyDelegate extendThirdPartyCommand
+}) async {
+  await _afCommandMain(paramsDart, args.args, "afib", "App-specific afib command", extendBase, extendThirdPartyBase, [
     afRegisterAppCommands,
-    initApp
-  ], initExtend);
+    extendCommand
+  ], extendThirdPartyCommand);
 }
 
 Future<void> afUILibraryCommandMain(AFDartParams paramsD, List<String> args, AFExtendBaseDelegate initBase, AFExtendBaseDelegate initBaseThirdParty, AFExtendCommandsDelegate initApp, AFExtendCommandsThirdPartyDelegate initExtend) async {

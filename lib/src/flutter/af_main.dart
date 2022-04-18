@@ -20,19 +20,20 @@ void afMainWrapper(Function() onReady) {
 
 
 /// [afMain] handles startup, execution, and shutdown sequence for an afApp
-void afMain<TState extends AFFlexibleState>(
-  AFDartParams paramsD, 
+void afMain<TState extends AFFlexibleState>({
+  required AFDartParams paramsD, 
   AFExtendBaseDelegate? extendBase,
-  AFExtendBaseDelegate? extendBaseThirdParty,
-  AFExtendAppDelegate extendApp, 
-  AFExtendThirdPartyDelegate? extendThirdParty, 
-  AFExtendTestDelegate extendTest) {
+  AFExtendBaseDelegate? extendThirdPartyBase,
+  required AFExtendAppDelegate extendApp, 
+  AFExtendThirdPartyUIDelegate? extendThirdPartyUI, 
+  required AFExtendTestDelegate extendTest
+}) {
   final baseContext = AFBaseExtensionContext();
   if(extendBase != null) {
     extendBase(baseContext);
   }
-  if(extendBaseThirdParty != null) {
-    extendBaseThirdParty(baseContext);
+  if(extendThirdPartyBase != null) {
+    extendThirdPartyBase(baseContext);
   }
   AFibD.initialize(paramsD);
 
@@ -41,8 +42,8 @@ void afMain<TState extends AFFlexibleState>(
 
   extendApp(context);
   extendTest(context.test);
-  if(extendThirdParty != null) {
-    extendThirdParty(context.thirdParty);
+  if(extendThirdPartyUI != null) {
+    extendThirdPartyUI(context.thirdParty);
   }
 
 

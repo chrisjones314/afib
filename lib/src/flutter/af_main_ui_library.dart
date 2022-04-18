@@ -23,5 +23,11 @@ void afMainUILibrary<TState extends AFFlexibleState>(AFLibraryID id, AFDartParam
     );
   };
 
-  afMain<TState>(paramsProto, extendBase, extendBaseThirdParty, extendAppFull, null, extendTest);
+  afMain<TState>(
+    paramsD: paramsProto, 
+    extendBase: extendBase, 
+    extendThirdPartyBase: extendBaseThirdParty, 
+    extendApp: extendAppFull, 
+    extendTest: extendTest
+  );
 }

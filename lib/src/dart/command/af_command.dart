@@ -7,6 +7,7 @@ import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_screen_command.dart';
+import 'package:afib/src/dart/command/commands/af_integrate_command.dart';
 import 'package:afib/src/dart/command/commands/af_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/command/templates/af_template_registry.dart';
@@ -405,14 +406,30 @@ Available Commands
 class AFCommandHelp extends AFCommand {
   final name = "help";
   final description = "Show help for other commands";
-  final usage = '''
-Usage:  afib help <command> [<subcommand>]
-''';
+  
+  
+  final usage = "afib help <command> [<subcommand>]";
+
+
+  void printFullUsage(AFCommandContext ctx) {
+    final result = StringBuffer('''
+Usage: $usage
+
+Available commands:
+''');
+
+    for(final command in ctx.definitions.commands.all) {
+      result.writeln("  ${command.name} - ${command.description}");
+    }
+
+    result.writeln("\nNote: to create a new afib project, use the afib_bootstrap command");
+    print(result.toString());
+  }
 
   void execute(AFCommandContext ctx) {
     final args = ctx.arguments.arguments;
     if(args.length < 2) {
-      print(usage);
+      printFullUsage(ctx);
       return;
     }
 
@@ -470,12 +487,12 @@ class AFCommandExtensionContext extends AFCommandThirdPartyExtensionContext {
 
 
     void registerStandardCommands() {
-      register(AFVersionCommand());
+      //register(AFVersionCommand());
       register(AFConfigCommand());
       register(AFGenerateParentCommand());
       register(AFTestCommand());
       register(AFCommandHelp());
-
+      register(AFIntegrateCommand());
 
       registerGenerateSubcommand(AFGenerateScreenSubcommand());
       registerGenerateSubcommand(AFGenerateStateSubcommand());

@@ -265,8 +265,8 @@ class AFCodeGenerator {
     return _createPath(statePath, filename);
   }
 
-  List<String> get pathExtendBaseThirdParty {
-    final filename = "extend_base_third_party.g.dart";
+  List<String> get pathExtendThirdPartyBase {
+    final filename = "extend_third_party_base.dart";
     return _createPath(extendPath, filename);
   }
 
@@ -275,13 +275,13 @@ class AFCodeGenerator {
     return _createPath(extendPath, filename);
   }
 
-  List<String> get pathExtendCommandThirdParty {
-    final filename = "extend_command_third_party.g.dart";
+  List<String> get pathExtendThirdPartyCommand {
+    final filename = "extend_third_party_command.dart";
     return _createPath(extendPath, filename);
   }
 
-  List<String> get pathExtendThirdParty {
-    final filename = "extend_third_party.g.dart";
+  List<String> get pathExtendThirdPartyUI {
+    final filename = "extend_third_party_ui.dart";
     return _createPath(extendPath, filename);
   }
 

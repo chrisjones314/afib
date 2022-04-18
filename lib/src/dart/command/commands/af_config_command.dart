@@ -12,7 +12,7 @@ import 'package:args/args.dart' as args;
 /// that modifed values under the initialization/afib.g.dart.
 class AFConfigCommand extends AFCommand { 
   final name = "config";
-  final description = "Set configuration values in afib.g.dart";
+  final description = "Set configuration values in xx_afib_config.g.dart";
 
   static void updateConfig(AFCommandContext ctx, AFConfig config, List<AFConfigurationItem> items, args.ArgResults? argResults) {
     final output = ctx.output;

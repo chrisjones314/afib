@@ -22,7 +22,7 @@ class AFCreateAppCommand extends AFCommand {
   String get usage {
     return '''
 Usage 
-  afib_bootstrap.dart create [$kindApp|$kindUILibrary] yourpackagename YAC
+  afib_bootstrap.dart create [$kindApp|$kindUILibrary] yourpackagename YPC
 
 Description
   $description
@@ -33,7 +33,7 @@ Options
   
   yourpackage - the full identifier for your package, all lowercase.   This is the value from your pubspec.yaml's
     name field, which should be in the folder you are running this command from. 
-  YAC - a 2-5 digit the code/prefix for your app, all uppercase.  For example, for the AFib Signin library this is AFSI (
+  YPC - a 2-5 digit the code/prefix for your app, all uppercase.  For example, for the AFib Signin library this is AFSI (
     note that you should not prefix yours with AF)
 ''';
   }
@@ -62,17 +62,17 @@ Options
       throwUsageError("Expected kind to be $kindApp or $kindUILibrary");
     }
 
-    verifyAllUppercase(packageCode);
+    verifyAllLowercase(packageCode);
     verifyAllLowercase(packageName);
     AFibD.registerGlobals();
 
-    AFibD.config.putInternal(AFConfigEntries.appNamespace, packageCode.toLowerCase());
+    AFibD.config.putInternal(AFConfigEntries.appNamespace, packageCode);
     AFibD.config.putInternal(AFConfigEntries.packageName, packageName);
     AFibD.config.putInternal(AFConfigEntries.environment, AFEnvironment.debug);
 
 
     final generator = ctx.generator;
-    _updatePubspec(ctx, packageName);
+    _verifyPubspec(ctx, packageName);
 
     _createAppCommand(ctx);
     _createStandardFile(ctx, generator.pathAppId, AFUISourceTemplateID.fileAppcodeID);
@@ -170,10 +170,10 @@ Options
   void _createInitializationFiles(AFCommandContext ctx) {
     final generator = ctx.generator;
     _createStandardFile(ctx, generator.pathExtendBase, AFUISourceTemplateID.fileExtendBase);
-    _createStandardFile(ctx, generator.pathExtendBaseThirdParty, AFUISourceTemplateID.fileExtendBaseThirdParty);
+    _createStandardFile(ctx, generator.pathExtendThirdPartyBase, AFUISourceTemplateID.fileExtendBaseThirdParty);
     _createStandardFile(ctx, generator.pathExtendCommand, AFUISourceTemplateID.fileExtendCommand);
-    _createStandardFile(ctx, generator.pathExtendCommandThirdParty, AFUISourceTemplateID.fileExtendCommandThirdParty);
-    _createStandardFile(ctx, generator.pathExtendThirdParty, AFUISourceTemplateID.fileExtendThirdParty);
+    _createStandardFile(ctx, generator.pathExtendThirdPartyCommand, AFUISourceTemplateID.fileExtendCommandThirdParty);
+    _createStandardFile(ctx, generator.pathExtendThirdPartyUI, AFUISourceTemplateID.fileExtendThirdParty);
     _createStandardFile(ctx, generator.pathExtendApplication, AFUISourceTemplateID.fileExtendApplication);
     _createStandardFile(ctx, generator.pathExtendApp, AFUISourceTemplateID.fileExtendApp);
     _createStandardFile(ctx, generator.pathExtendTest, AFUISourceTemplateID.fileExtendTest);
@@ -188,7 +188,7 @@ Options
     AFConfigCommand.writeUpdatedConfig(ctx);
   }
 
-  AFGeneratedFile _updatePubspec(AFCommandContext ctx, String packageName) {
+  AFGeneratedFile _verifyPubspec(AFCommandContext ctx, String packageName) {
     final generator = ctx.generator;
     final pathPubspec = generator.pathPubspecYaml;
     if(!generator.fileExists(pathPubspec)) {

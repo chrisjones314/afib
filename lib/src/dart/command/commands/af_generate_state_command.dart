@@ -2,12 +2,11 @@
 
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_screen_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_initial_value.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_model_access_statement.t.dart';
 import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
-import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 class AFGenerateStateSubcommand extends AFGenerateSubcommand {
@@ -25,15 +24,15 @@ class AFGenerateStateSubcommand extends AFGenerateSubcommand {
   @override 
   String get usage {
     return '''
-Usage 
-  afib generate state [YourModel|YourStateView] [any --options]
+$usageHeader
+  $nameOfExecutable generate state [YourModel|YourStateView] [any --options]
 
-Description
+$descriptionHeader
   If your identifier ends with Model, creates a new model linked to the root of your application state.
   If your identifier ends with StateView, creates a new state view and supporting classes for that state view
 
-Options
-  --${AFGenerateScreenSubcommand.argTheme} The type of the theme to use, defaults to your default theme
+$optionsHeader
+  --${AFGenerateUISubcommand.argTheme} The type of the theme to use, defaults to your default theme
   ${AFCommand.argPrivateOptionHelp}
 
 ''';
@@ -54,7 +53,7 @@ Options
     verifyEndsWithOneOf(modelName, [modelSuffix, stateViewSuffix]);
 
     final args = parseArguments(unnamed, defaults: {
-      AFGenerateScreenSubcommand.argTheme: ctx.generator.nameDefaultTheme
+      AFGenerateUISubcommand.argTheme: ctx.generator.nameDefaultTheme
     });
 
     generateStateStatic(ctx, modelName, args);
@@ -129,7 +128,7 @@ Options
     if(stateViewPath == null) {
       throw AFCommandError(error: "Invalid identifier $identifier");
     }
-    final theme = args[AFGenerateScreenSubcommand.argTheme];
+    final theme = args[AFGenerateUISubcommand.argTheme];
     final stateViewFile = generator.createFile(ctx, stateViewPath, AFUISourceTemplateID.fileStateView);
     stateViewFile.replaceText(ctx, AFUISourceTemplateID.textStateViewName, identifier);
     stateViewFile.replaceText(ctx, AFUISourceTemplateID.textThemeType, theme);
@@ -138,7 +137,7 @@ Options
 
     final imports = <String>[];
     // if we can find the specified theme, then we need to import it.
-    final pathTheme = generator.pathTheme(theme);
+    final pathTheme = generator.pathTheme(theme, isCustomParent: false);
     if(pathTheme != null) {
       generator.addImportsForPath(ctx, pathTheme, imports: imports, requireExists: false);    
     }

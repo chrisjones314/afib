@@ -18,9 +18,9 @@ import 'package:[!af_package_path]/initialization/extend/extend_third_party_comm
 void main(List<String> args) {
   afCommandStartup(() async {
     final paramsD = createDartParams();
-    var argsFull = AFArgs(args);
+    var argsFull = AFArgs.create(args);
     
-    // argsFull.setDebugArguments("your command arguments here");
+    // argsFull.setDebugArgs("your command arguments here");
 
     // execute the command.
     await afAppCommandMain(

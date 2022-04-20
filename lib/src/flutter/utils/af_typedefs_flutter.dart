@@ -82,7 +82,7 @@ typedef AFWorkflowTestBodyExecuteDelegate = Future<void> Function(AFWorkflowTest
 typedef AFWidgetBuilderDelegate<TBuildContext extends AFBuildContext> = Widget Function(TBuildContext context);
 
 /// Delegate used to initialize test data 
-typedef AFInitTestDataDelegate = void Function(AFCompositeTestDataRegistry registry);
+typedef AFInitTestDataDelegate = void Function(AFDefineTestDataContext registry);
 
 /// Delegate used to initialize unit tests.
 typedef AFInitUnitTestsDelegate = void Function(AFUnitTestDefinitionContext context);
@@ -146,7 +146,7 @@ typedef AFInitPluginFundamentalThemeDelegate = void Function(AFFundamentalDevice
 typedef AFInitAppFundamentalThemeDelegate = void Function(AFFundamentalDeviceTheme device, AFComponentStates appState, AFAppFundamentalThemeAreaBuilder builder);
 
 /// Create a conceptual theme used by a subset of the app, or used by a third party plugin.
-typedef AFInitFunctionalThemeDelegate = void Function(AFFunctionalThemeDefinitionContext context);
+typedef AFInitUIDelegate = void Function(AFUIDefinitionContext context);
 
 /// Optional delegate used to create the flutter ThemeData, rather than allowing AFib to do it for you based on the primary fundamental theme.
 typedef AFOverrideCreateThemeDataDelegate = ThemeData Function(AFFundamentalDeviceTheme device, AFComponentStates appState, AFFundamentalThemeArea primary);
@@ -163,7 +163,7 @@ typedef AFOnChangedBoolDelegate = void Function(bool);
 
 typedef AFOnChangedStringDelegate = void Function(String);
 
-typedef AFCreateFunctionalThemeDelegate = AFFunctionalTheme Function(AFFundamentalThemeState fundamentals);
+typedef AFCreateFunctionalThemeDelegate = AFFunctionalTheme Function(AFThemeID id, AFFundamentalThemeState fundamentals);
 
 typedef AFWireframeExecutionDelegate<TStateView extends AFFlexibleStateView> = void Function(AFWireframeExecutionContext<TStateView> we);
 

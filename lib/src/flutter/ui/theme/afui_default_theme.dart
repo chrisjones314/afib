@@ -10,7 +10,11 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
       1: FlexColumnWidth(),
     };
 
-  AFUIDefaultTheme(AFFundamentalThemeState fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.defaultTheme);
+  AFUIDefaultTheme(AFThemeID id, AFFundamentalThemeState fundamentals): super(id, fundamentals);
+
+  factory AFUIDefaultTheme.create(AFThemeID id, AFFundamentalThemeState fundamentals) {
+    return AFUIDefaultTheme(id, fundamentals);
+  }
 
 
   Color get colorDisabled {

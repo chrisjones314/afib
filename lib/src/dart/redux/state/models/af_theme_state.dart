@@ -1465,10 +1465,10 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   static const orderedFormFactors = <AFFormFactor>[AFFormFactor.smallPhone, AFFormFactor.standardPhone, AFFormFactor.largePhone, AFFormFactor.smallTablet, AFFormFactor.standardTablet, AFFormFactor.largeTablet];
   final AFThemeID id;
   final AFFundamentalThemeState fundamentals;
-  AFFunctionalTheme({
-    required this.fundamentals,
-    required this.id,
-  });
+  AFFunctionalTheme(
+    this.id,
+    this.fundamentals,
+  );
 
   ThemeData? get themeData {
     return fundamentals.themeData;
@@ -2792,7 +2792,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
 /// Can be used as a template parameter when you don't want a theme.
 class AFFunctionalThemeUnused extends AFFunctionalTheme {
-  AFFunctionalThemeUnused(AFFundamentalThemeState fundamentals): super(fundamentals: fundamentals, id: AFUIThemeID.unused);
+  AFFunctionalThemeUnused(AFFundamentalThemeState fundamentals): super(AFUIThemeID.unused, fundamentals);
 }
 
 /// Captures the current state of the primary theme, and

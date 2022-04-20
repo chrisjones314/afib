@@ -1,5 +1,7 @@
 import 'package:afib/afib_flutter.dart';
+import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
+import 'package:logger/logger.dart';
 
 class AFWireframes {
   final wireframes = <AFWireframe>[];
@@ -90,7 +92,7 @@ class AFWireframe<TStateView extends AFFlexibleStateView> {
   final AFPrototypeID id;
   final AFNavigatePushAction navigate;
   final AFWireframeExecutionDelegate<TStateView> body;
-  final AFCompositeTestDataRegistry testData;
+  final AFDefineTestDataContext testData;
   final dynamic models;
   final AFCreateStateViewDelegate<TStateView> stateViewCreator;
 
@@ -146,7 +148,7 @@ class AFWireframe<TStateView extends AFFlexibleStateView> {
 
 class AFWireframeDefinitionContext {
   final AFWireframes wireframes;
-  final AFCompositeTestDataRegistry testData;
+  final AFDefineTestDataContext testData;
 
   AFWireframeDefinitionContext({
     required this.wireframes,
@@ -172,4 +174,9 @@ class AFWireframeDefinitionContext {
     wireframes.add(wf);
     return wf;
   }
+
+  Logger? get log {
+    return AFibD.log(AFConfigEntryLogArea.test);
+  }
+
 }

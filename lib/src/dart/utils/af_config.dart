@@ -138,10 +138,12 @@ class AFConfigEntryDescription {
   final String textValue;
   final dynamic runtimeValue;
   final String help;
+  final String? title;
   AFConfigEntryDescription({
     required this.help,
     required this.textValue,
     required this.runtimeValue,
+    this.title,
   });
 
 }
@@ -169,6 +171,16 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
       ordinal: ordinal, 
       help: help
     );
+
+  void addChoiceSection(String title) {
+    choices.add(AFConfigEntryDescription(
+      textValue: "title",
+      runtimeValue: "",
+      help: "",
+      title: title,
+    ));
+
+  }
 
   void addChoice({
     required String textValue, 
@@ -590,9 +602,11 @@ class AFConfig {
     if(result.contains(AFConfigEntryLogArea.standard)) {
       _addIfMissing(result, AFConfigEntryLogArea.afRoute);
       _addIfMissing(result, AFConfigEntryLogArea.afState);
+      _addIfMissing(result, AFConfigEntryLogArea.afState);
       _addIfMissing(result, AFConfigEntryLogArea.query);
       _addIfMissing(result, AFConfigEntryLogArea.ui);
     }
+
     return result;
   }
 

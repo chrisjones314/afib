@@ -1,6 +1,4 @@
 
-import 'dart:io';
-
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_call_extend.t.dart';
@@ -11,20 +9,23 @@ class AFIntegrateCommand extends AFCommand {
   final description = "Integrate a third-party library";
 
 
-  final usage = '''
-Usage: afib integrate otherpackagename OPC
+  String get usage {
+    return '''
+$usageHeader
+  $nameOfExecutable integrate otherpackagename OPC
 
-Description
+$descriptionHeader
   Integrates an afib-aware third party library's commands, tests,
   and UI
 
-Options
+$optionsHeader
   otherpackagename - the package name for the library, e.g. afib_signin
   OPC - the 3-5 letter all lowercase code the library uses.  This value
     is declared in the libraries ...afib_config.g.dart file, it is not a
     value that you get to choose.  For example, for afib_signin it is AFSI.
     The library's installation instructions should tell you this value.
 ''';
+  }
 
   @override
   void execute(AFCommandContext ctx) {

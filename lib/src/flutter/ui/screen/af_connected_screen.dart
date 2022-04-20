@@ -253,7 +253,8 @@ abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extend
     final theme = standard.themes.findById(themeId);
     _updateFundamentalThemeState(buildContext);
     final withContext = createContext(standard, dataContext.s as TStateView, dataContext.p as TRouteParam, dataContext.children);
-    final spi = spiCreator(withContext, theme as TTheme, parentScreenId, wid, paramSource);
+    final spiCreatorOverride = AFibF.g.findSPICreatorOverride<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme>() ?? spiCreator;
+    final spi = spiCreatorOverride(withContext, theme as TTheme, parentScreenId, wid, paramSource);
     return spi;
   }
 

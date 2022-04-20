@@ -42,12 +42,10 @@ class AFArgs {
   }
 
   void setDebugArgs(String revised) {
-    final out = Colorize("ERROR: ").apply(Styles.RED);
     final result = StringBuffer();
-    result.write(out);
-    result.writeln("********* USING DEBUG ARGUMENTS **************");
-    result.writeln("  $revised");
-    print(result.toString());
+    result.writeln("********* ATTENTION: USING DEBUG ARGUMENTS: '$revised' ******************************");
+    final colorized = Colorize(result.toString()).apply(Styles.RED);    
+    print(colorized);
 
     final parsed = revised.split(RegExp(r"[ \t]"));
     args.clear();

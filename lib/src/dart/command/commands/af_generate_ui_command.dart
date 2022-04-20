@@ -1,8 +1,10 @@
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
+import 'package:afib/src/dart/command/templates/files/theme.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_bottom_sheet_build_body.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_call_define_screen_test.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_define_theme.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_dialog_build_body.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_drawer_build_body.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_empty_statement.t.dart';
@@ -15,6 +17,8 @@ import 'package:afib/src/dart/command/templates/statements/declare_spi_on_presse
 import 'package:afib/src/dart/command/templates/statements/declare_spi_on_tap_close.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_standard_route_param_impls.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_state_test_screen_shortcut.dart';
+import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
+import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 enum AFUIControlKind {
@@ -59,10 +63,13 @@ class AFUIControlSettings {
   }
 }
 
-class AFGenerateScreenSubcommand extends AFGenerateSubcommand {
+class AFGenerateUISubcommand extends AFGenerateSubcommand {
   static const argRouteParam = "routeParam";
   static const argStateView = "state-view";
   static const argTheme = "theme";
+  static const argParentTheme = "parent-theme";
+  static const argParentThemeID = "parent-theme-id";
+  static const argParentPackageName = "parent-package-name";
   static const screenSuffix = "Screen";
   static const bottomSheetSuffix = "BottomSheet";
   static const drawerSuffix = "Drawer";
@@ -116,7 +123,7 @@ class AFGenerateScreenSubcommand extends AFGenerateSubcommand {
     ),
   ];
 
-  AFGenerateScreenSubcommand();
+  AFGenerateUISubcommand();
   
   @override
   String get description => "Generate a screen";
@@ -127,17 +134,18 @@ class AFGenerateScreenSubcommand extends AFGenerateSubcommand {
 
   String get usage {
     return '''
-Usage
-  afib.dart generate ui YourScreenName[${controlKinds.join('|')}] [any --options]
+$usageHeader
+  $nameOfExecutable generate ui YourScreenName[${controlKinds.join('|')}] [any --options]
 
-Description
+$descriptionHeader
   Create a new screen template under lib/ui/screens, adding an appropriate screen id and 
   test shortcut.
 
-Options
+$optionsHeader
   YourScreen... - should end with one of the specified suffixes, e.g. $screenSuffix, $bottomSheetSuffix, etc.
-  --$argStateView [YourStateView] - the state view to use, falls back to your default state view
-  --$argTheme [YourTheme] - the theme to use, falls back to your default theme
+  --$argStateView YourStateView - the state view to use, falls back to your default state view
+  --$argTheme YourTheme - the theme to use, falls back to your default theme, NOT used when creating themes
+
   ${AFCommand.argPrivateOptionHelp}
   
 ''';
@@ -154,17 +162,87 @@ Options
     final generator = ctx.generator;
     final args = parseArguments(unnamed, defaults: {
       argStateView: generator.nameDefaultStateView,
-      argTheme: generator.nameDefaultTheme
+      argTheme: generator.nameDefaultTheme,
+      argParentTheme: generator.nameDefaultParentTheme,
+      argParentThemeID: generator.nameDefaultParentThemeID
     });
 
     verifyMixedCase(uiName, "ui name");
     verifyNotOption(uiName);
 
-    createScreen(ctx, uiName, args);
+    if(uiName.endsWith("Theme")) {
+      createTheme(ctx, uiName, args);
+    } else {
+      createScreen(ctx, uiName, args);
+    }
 
     // replace any default 
     generator.finalizeAndWriteFiles(ctx);
 
+  }
+
+  static AFGeneratedFile createTheme(AFCommandContext ctx, String uiName, Map<String, dynamic> args) {
+    final generator = ctx.generator;
+    final parentTheme = args[argParentTheme];
+    final String parentThemeID = args[argParentThemeID];
+    final isCustomParent = parentTheme != generator.nameDefaultParentTheme;
+
+    final pathTheme = generator.pathTheme(uiName, isCustomParent: isCustomParent);
+    if(pathTheme == null) {
+      throw AFException("Could not generate theme path");
+    }
+
+    if(isCustomParent) {
+      if(parentThemeID == generator.nameDefaultParentThemeID) {
+        throw AFCommandError(error: "You specified $parentTheme as the parent theme, you must also specify its full theme id using --$argParentThemeID");
+      }
+    } 
+
+    // create the theme file itself.
+    final fileTheme = generator.createFile(ctx, pathTheme, AFThemeT());
+    final imports = <String>[];
+    if(isCustomParent) {
+      final idxThemeId = parentThemeID.indexOf("ThemeID.");
+      if(idxThemeId < 0) {
+        throw AFCommandError(error: "Expected --$argParentThemeID to contain ...ThemeID.");
+      }
+
+      final prefix = parentThemeID.substring(0, idxThemeId).toLowerCase();
+      var parentThemePackage = AFibD.findLibraryWithPrefix(prefix)?.name;
+      if(parentThemePackage == null) {
+        parentThemePackage = args[argParentPackageName];
+      }
+
+      if(parentThemePackage == null) {
+        throw AFCommandError(error: "Could not find an installed afib library with the prefix $prefix (maybe you need to run 'afib integrate'?");
+      }
+      final import = ImportFromPackage().toBuffer();
+      import.replaceText(ctx, AFUISourceTemplateID.textPackageName, parentThemePackage);
+      import.replaceText(ctx, AFUISourceTemplateID.textPackagePath, "${prefix}_flutter.dart");
+      imports.addAll(import.lines);      
+    }
+
+    fileTheme.replaceText(ctx, AFUISourceTemplateID.textThemeType, uiName);
+    fileTheme.replaceText(ctx, AFUISourceTemplateID.textParentThemeType, parentTheme ?? "AFFunctionalTheme");
+    fileTheme.replaceTextLines(ctx, AFUISourceTemplateID.textImportStatements, imports);
+
+    // add the line that installs it
+    final fileDefineUI = generator.modifyFile(ctx, generator.pathDefineUI);
+    final defineTheme = DeclareDefineThemeT().toBuffer();
+    defineTheme.replaceText(ctx, AFUISourceTemplateID.textThemeType, uiName);
+    defineTheme.replaceText(ctx, AFUISourceTemplateID.textThemeID, parentThemeID);
+    fileDefineUI.addLinesAfter(ctx, AFCodeRegExp.startDefineThemes, defineTheme.lines);
+    if(imports.isNotEmpty) {
+      fileDefineUI.addLinesBefore(ctx, AFCodeRegExp.startDefineUI, imports);
+    }
+
+    generator.addImport(ctx, 
+      importPath: fileTheme.importPathStatement, 
+      to: fileDefineUI,
+      before: AFCodeRegExp.startDefineUI
+    );
+    
+    return fileTheme;
   }
 
   static AFGeneratedFile createScreen(AFCommandContext ctx, String uiName, Map<String, dynamic> args, {
@@ -175,6 +253,7 @@ Options
     AFSourceTemplate? routeParamImpls,
   }) {
     AFUIControlSettings? controlSettings;
+
     for(final candidateControlKind in controlKinds) {
       if(candidateControlKind.matchesName(uiName)) {
         controlSettings = candidateControlKind;
@@ -206,7 +285,7 @@ Options
     if(pathStateView != null) {
       generator.addImportsForPath(ctx, pathStateView, imports: imports);
     }
-    final pathTheme = generator.pathTheme(theme);
+    final pathTheme = generator.pathTheme(theme, isCustomParent: false);
     if(pathTheme != null) {
       generator.addImportsForPath(ctx, pathTheme, imports: imports);    
     }
@@ -242,13 +321,13 @@ Options
     declareScreenInMap.replaceText(ctx, AFUISourceTemplateID.textScreenID, screenId);
     declareScreenInMap.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
     declareScreenInMap.executeStandardReplacements(ctx);
-    final screenMapPath = generator.pathScreenMap;
+    final screenMapPath = generator.pathDefineUI;
     final screenMapFile = generator.modifyFile(ctx, screenMapPath);
     screenMapFile.addLinesAfter(ctx, AFCodeRegExp.startScreenMap, declareScreenInMap.lines);
     generator.addImport(ctx, 
       importPath: screenFile.importPathStatement, 
       to: screenMapFile, 
-      before: AFCodeRegExp.startScreenMap
+      before: AFCodeRegExp.startDefineUI
     );            
 
     // create a state test shortcut declaration function.

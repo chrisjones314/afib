@@ -4,10 +4,12 @@ import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_create_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_command_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_screen_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/commands/af_integrate_command.dart';
+import 'package:afib/src/dart/command/commands/af_override_command.dart';
 import 'package:afib/src/dart/command/commands/af_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/command/templates/af_template_registry.dart';
@@ -53,12 +55,29 @@ abstract class AFCommand {
   static const argPrivate = "private";
   static const argPrivateOptionHelp = "--${AFCommand.argPrivate} - if specified for a library, does not export the generated class via [YourAppNamespace]_flutter.dart";
   
+  
   final subcommands = <String, AFCommand>{};
 
   String get name;
   String get description;
   String get usage {
     return "";
+  }
+
+  String get usageHeader {
+    return "Usage";
+  }
+
+  String get descriptionHeader {
+    return "Description";
+  }
+
+  String get optionsHeader {
+    return "Options";
+  }
+
+  String get nameOfExecutable {
+    return "bin/${AFibD.config.appNamespace}_afib.dart";
   }
 
   /// Override this to implement the command.   The first item in the list is the command name.
@@ -202,6 +221,13 @@ abstract class AFCommand {
     msg.write(")");
     throwUsageError(msg.toString());
   }
+
+  AFGeneratedFile createStandardFile(AFCommandContext ctx, List<String> path, AFUISourceTemplateID templateId) {
+    final appCommandFile = ctx.generator.createFile(ctx, path, templateId);
+    appCommandFile.executeStandardReplacements(ctx);
+    return appCommandFile;
+  }
+
 }
 
 abstract class AFCommandGroup extends AFCommand {
@@ -267,6 +293,9 @@ class AFCommandContext {
 
 
 class AFBaseExtensionContext {
+  void registerLibrary(AFLibraryID id) {
+    AFibD.registerLibrary(id);
+  }
   void registerConfigurationItem(AFConfigurationItem entry) {
     AFibD.registerConfigEntry(entry);
   }
@@ -285,7 +314,7 @@ class AFCommandThirdPartyExtensionContext extends AFBaseExtensionContext {
 
   /// Used to register a new root level command 
   /// command line.
-  void register(AFCommand command) {
+  void defineCommand(AFCommand command) {
     commands.addCommand(command);
   }
 
@@ -480,22 +509,24 @@ class AFCommandExtensionContext extends AFCommandThirdPartyExtensionContext {
     }
 
     void registerBootstrapCommands() {
-      register(AFVersionCommand());
-      register(AFCreateAppCommand());
+      defineCommand(AFVersionCommand());
+      defineCommand(AFCreateAppCommand());
 
     }
 
 
     void registerStandardCommands() {
       //register(AFVersionCommand());
-      register(AFConfigCommand());
-      register(AFGenerateParentCommand());
-      register(AFTestCommand());
-      register(AFCommandHelp());
-      register(AFIntegrateCommand());
+      defineCommand(AFConfigCommand());
+      defineCommand(AFGenerateParentCommand());
+      defineCommand(AFTestCommand());
+      defineCommand(AFCommandHelp());
+      defineCommand(AFIntegrateCommand());
+      defineCommand(AFOverrideCommand());
 
-      registerGenerateSubcommand(AFGenerateScreenSubcommand());
+      registerGenerateSubcommand(AFGenerateUISubcommand());
       registerGenerateSubcommand(AFGenerateStateSubcommand());
       registerGenerateSubcommand(AFGenerateQuerySubcommand());
+      registerGenerateSubcommand(AFGenerateCommandSubcommand());
     }
 }

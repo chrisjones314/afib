@@ -9,7 +9,7 @@ import 'package:args/args.dart' as args;
 /// Initialize commands that are used only from the afib command
 /// line app itself (e.g. new).
 void afRegisterAfibOnlyCommands(AFCommandExtensionContext commands) {
-  commands.register(AFVersionCommand());
+  commands.defineCommand(AFVersionCommand());
   //commands.register(AFNewProjectCommand());
 }
 

@@ -2,13 +2,13 @@
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_screen_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_demo_screen_build_body.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_demo_screen_route_param_impls.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_demo_screen_screen_impls.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_screen_build_with_spi_no_back.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_demo_screen_spi_impls.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_screen_build_with_spi_no_back.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 /// Parent for commands executed through the afib command line app.
@@ -21,13 +21,13 @@ class AFCreateAppCommand extends AFCommand {
 
   String get usage {
     return '''
-Usage 
+$usageHeader
   afib_bootstrap.dart create [$kindApp|$kindUILibrary] yourpackagename YPC
 
-Description
+$descriptionHeader
   $description
 
-Options
+$optionsHeader
   $kindApp - Install to create a full app
   $kindUILibrary - Install to create a UI library which exports screens, state, and queries for use in apps
   
@@ -75,32 +75,41 @@ Options
     _verifyPubspec(ctx, packageName);
 
     _createAppCommand(ctx);
-    _createStandardFile(ctx, generator.pathAppId, AFUISourceTemplateID.fileAppcodeID);
+    createStandardFile(ctx, generator.pathAppId, AFUISourceTemplateID.fileAppcodeID);
     _createInitializationFiles(ctx);
     _createQueryFiles(ctx);
     _createStateFiles(ctx);
     _createTestFiles(ctx);
-    _createUIFiles(ctx);
+    _createUIFiles(ctx, packageName);
     
     _createMainFiles(ctx);
 
     generator.finalizeAndWriteFiles(ctx);
   }
 
-  void _createUIFiles(AFCommandContext ctx) {
+  void _createUIFiles(AFCommandContext ctx, String packageName) {
     final generator = ctx.generator;
-    _createStandardFile(ctx, generator.pathConnectedBaseFile, AFUISourceTemplateID.fileConnectedBase);
-    _createStandardFile(ctx, generator.pathDefaultTheme, AFUISourceTemplateID.fileDefaultTheme);
-    _createStandardFile(ctx, generator.pathScreenMap, AFUISourceTemplateID.fileScreenMap);
-    _createStandardFile(ctx, generator.pathFundamentalTheme, AFUISourceTemplateID.fileFundamentalTheme);
+    createStandardFile(ctx, generator.pathConnectedBaseFile, AFUISourceTemplateID.fileConnectedBase);
+    createStandardFile(ctx, generator.pathDefineUI, AFUISourceTemplateID.fileDefineUI);
+
+    final argsTheme = {
+      AFGenerateUISubcommand.argParentTheme: generator.nameDefaultParentTheme,
+      AFGenerateUISubcommand.argParentThemeID: generator.nameDefaultParentThemeID,
+      AFGenerateUISubcommand.argParentPackageName: packageName,
+    };
+
+    // create the theme
+    AFGenerateUISubcommand.createTheme(ctx, "${generator.appNamespaceUpper}DefaultTheme", argsTheme);
+
+
 
     final args = {
-      AFGenerateScreenSubcommand.argStateView: generator.nameDefaultStateView,
-      AFGenerateScreenSubcommand.argTheme: generator.nameDefaultTheme,
+      AFGenerateUISubcommand.argStateView: generator.nameDefaultStateView,
+      AFGenerateUISubcommand.argTheme: generator.nameDefaultTheme,
       AFCommand.argPrivate: false,
     };
 
-    AFGenerateScreenSubcommand.createScreen(ctx, "StartupScreen", args,
+    AFGenerateUISubcommand.createScreen(ctx, "StartupScreen", args,
       buildWithSPI: DeclareScreenBuildWithSPINoBackImplT(),
       buildBody: DeclareDemoScreenBuildBodyT(),
       spiImpls: DeclareDemoScreenSPIImplsT(),
@@ -111,12 +120,12 @@ Options
   void _createStateFiles(AFCommandContext ctx) {
     final generator = ctx.generator;
 
-    _createStandardFile(ctx, generator.pathStateModelAccess, AFUISourceTemplateID.fileStateModelAccess);
-    _createStandardFile(ctx, generator.pathAppState, AFUISourceTemplateID.fileState);
+    createStandardFile(ctx, generator.pathStateModelAccess, AFUISourceTemplateID.fileStateModelAccess);
+    createStandardFile(ctx, generator.pathAppState, AFUISourceTemplateID.fileState);
 
     final args = { 
       AFCommand.argPrivate: false,
-      AFGenerateScreenSubcommand.argTheme: ctx.generator.nameDefaultTheme
+      AFGenerateUISubcommand.argTheme: ctx.generator.nameDefaultTheme
     };
     
     AFGenerateStateSubcommand.generateStateStatic(ctx, ctx.generator.nameDefaultStateView, args);
@@ -142,9 +151,9 @@ Options
     final generator = ctx.generator;
 
     generator.renameExistingFileToOld(ctx, generator.pathOriginalWidgetTest);
-    _createStandardFile(ctx, generator.pathMainAFibTest, AFUISourceTemplateID.fileMainAFibTest);
-    _createStandardFile(ctx, generator.pathTestData, AFUISourceTemplateID.fileTestData);
-    _createStandardFile(ctx, generator.pathStateTestShortcutsFile, AFUISourceTemplateID.fileStateTestShortcuts);
+    createStandardFile(ctx, generator.pathMainAFibTest, AFUISourceTemplateID.fileMainAFibTest);
+    createStandardFile(ctx, generator.pathTestData, AFUISourceTemplateID.fileTestData);
+    createStandardFile(ctx, generator.pathStateTestShortcutsFile, AFUISourceTemplateID.fileStateTestShortcuts);
     
     _createTestDefinitionFile(ctx, "Wireframe");
     _createTestDefinitionFile(ctx, "UIPrototype", filename: "ui_prototype");
@@ -155,7 +164,7 @@ Options
 
   AFGeneratedFile _createTestDefinitionFile(AFCommandContext ctx, String kind, { String? filename }) {
     final generator = ctx.generator;
-    final file = _createStandardFile(ctx, generator.pathTestDefinitions(filename ?? AFCodeGenerator.convertMixedToSnake(kind)), AFUISourceTemplateID.fileDefineTests);
+    final file = createStandardFile(ctx, generator.pathTestDefinitions(filename ?? AFCodeGenerator.convertMixedToSnake(kind)), AFUISourceTemplateID.fileDefineTests);
     file.replaceText(ctx, AFUISourceTemplateID.textTestKind, kind);
     return file;
   }
@@ -163,26 +172,26 @@ Options
   void _createMainFiles(AFCommandContext ctx) {
     final generator = ctx.generator;
     generator.renameExistingFileToOld(ctx, generator.pathMain);
-    _createStandardFile(ctx, generator.pathMain, AFUISourceTemplateID.fileMain);
-    _createStandardFile(ctx, generator.pathApp, AFUISourceTemplateID.fileApp);
+    createStandardFile(ctx, generator.pathMain, AFUISourceTemplateID.fileMain);
+    createStandardFile(ctx, generator.pathApp, AFUISourceTemplateID.fileApp);
   }
 
   void _createInitializationFiles(AFCommandContext ctx) {
     final generator = ctx.generator;
-    _createStandardFile(ctx, generator.pathExtendBase, AFUISourceTemplateID.fileExtendBase);
-    _createStandardFile(ctx, generator.pathExtendThirdPartyBase, AFUISourceTemplateID.fileExtendBaseThirdParty);
-    _createStandardFile(ctx, generator.pathExtendCommand, AFUISourceTemplateID.fileExtendCommand);
-    _createStandardFile(ctx, generator.pathExtendThirdPartyCommand, AFUISourceTemplateID.fileExtendCommandThirdParty);
-    _createStandardFile(ctx, generator.pathExtendThirdPartyUI, AFUISourceTemplateID.fileExtendThirdParty);
-    _createStandardFile(ctx, generator.pathExtendApplication, AFUISourceTemplateID.fileExtendApplication);
-    _createStandardFile(ctx, generator.pathExtendApp, AFUISourceTemplateID.fileExtendApp);
-    _createStandardFile(ctx, generator.pathExtendTest, AFUISourceTemplateID.fileExtendTest);
+    createStandardFile(ctx, generator.pathExtendBase, AFUISourceTemplateID.fileExtendBase);
+    createStandardFile(ctx, generator.pathExtendThirdPartyBase, AFUISourceTemplateID.fileExtendBaseThirdParty);
+    createStandardFile(ctx, generator.pathExtendCommand, AFUISourceTemplateID.fileExtendCommand);
+    createStandardFile(ctx, generator.pathExtendThirdPartyCommand, AFUISourceTemplateID.fileExtendCommandThirdParty);
+    createStandardFile(ctx, generator.pathExtendThirdPartyUI, AFUISourceTemplateID.fileExtendThirdParty);
+    createStandardFile(ctx, generator.pathExtendApplication, AFUISourceTemplateID.fileExtendApplication);
+    createStandardFile(ctx, generator.pathExtendApp, AFUISourceTemplateID.fileExtendApp);
+    createStandardFile(ctx, generator.pathExtendTest, AFUISourceTemplateID.fileExtendTest);
     
     _createEnvironmentFile(ctx, "Debug");
     _createEnvironmentFile(ctx, "Prototype");
     _createEnvironmentFile(ctx, "Test");
     _createEnvironmentFile(ctx, "Production");
-    _createStandardFile(ctx, generator.pathCreateDartParams, AFUISourceTemplateID.fileCreateDartParams);
+    createStandardFile(ctx, generator.pathCreateDartParams, AFUISourceTemplateID.fileCreateDartParams);
 
     AFConfigCommand.updateConfig(ctx, AFibD.config, AFibD.configEntries, ctx.arguments);
     AFConfigCommand.writeUpdatedConfig(ctx);
@@ -215,18 +224,13 @@ Options
   AFGeneratedFile _createAppCommand(AFCommandContext ctx) {
     final generator = ctx.generator;
     final pathAppCommand = generator.pathAppCommand;
-    return _createStandardFile(ctx, pathAppCommand, AFUISourceTemplateID.fileAppcodeAFib);
+    return createStandardFile(ctx, pathAppCommand, AFUISourceTemplateID.fileAppcodeAFib);
   }
 
 
-  AFGeneratedFile _createStandardFile(AFCommandContext ctx, List<String> path, AFUISourceTemplateID templateId) {
-    final appCommandFile = ctx.generator.createFile(ctx, path, templateId);
-    appCommandFile.executeStandardReplacements(ctx);
-    return appCommandFile;
-  }
 
   AFGeneratedFile _createEnvironmentFile(AFCommandContext ctx, String suffix) {
-    final result = _createStandardFile(ctx, ctx.generator.pathEnvironment(suffix), AFUISourceTemplateID.fileEnvironment);
+    final result = createStandardFile(ctx, ctx.generator.pathEnvironment(suffix), AFUISourceTemplateID.fileEnvironment);
     result.replaceText(ctx, AFUISourceTemplateID.textEnvironmentName, suffix);
     return result;
   }

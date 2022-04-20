@@ -93,8 +93,7 @@ class AFTestMissingTranslations {
 class AFibGlobalState<TState extends AFFlexibleState> {
   final AFAppExtensionContext appContext;
 
-  final AFScreenMap screenMap = AFScreenMap();
-  final AFCompositeTestDataRegistry _afTestData = AFCompositeTestDataRegistry.create();
+  final AFDefineTestDataContext _afTestData = AFDefineTestDataContext.create();
   final primaryUITests = AFLibraryTestHolder<TState>();
   final thirdPartyUITests = <AFLibraryID, AFLibraryTestHolder>{};
   final internalOnlyScreens = <AFScreenID, AFibTestOnlyScreenElement>{};
@@ -104,7 +103,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   final sharedTestContext = AFSharedTestExtensionContext();
   final widgetsBindingObserver = AFWidgetsBindingObserver();
   final testOnlyShowUIReturn = <AFScreenID, dynamic>{};
-  final themeFactories = AFFunctionalThemeDefinitionContext();
+  final uiDefinitions = AFUIDefinitionContext();
   final testMissingTranslations = AFTestMissingTranslations();
   final wireframes = AFWireframes();
   final testOnlyDialogCompleters = <AFScreenID, void Function(dynamic)>{}; 
@@ -141,7 +140,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     screenMap.registerDialog(AFUIScreenID.dialogStandardChoice, (_) => AFUIStandardChoiceDialog());
     appContext.defineScreenMap(screenMap, libraries);
 
-    appContext.initializeFunctionalThemeFactories(themeFactories, libraries);
+    appContext.initializeFunctionalThemeFactories(uiDefinitions, libraries);
     
     final middleware = <Middleware<AFState>>[];
     middleware.addAll(createRouteMiddleware());
@@ -197,6 +196,10 @@ class AFibGlobalState<TState extends AFFlexibleState> {
       middleware: middleware
     );
     storeDispatcherInternalOnly = AFStoreDispatcher(storeInternalOnly!);
+  }
+
+  AFScreenMap get screenMap {
+    return uiDefinitions.screenMap;
   }
 
   Iterable<AFUILibraryExtensionContext> get thirdPartyLibraries {
@@ -256,6 +259,11 @@ class AFibGlobalState<TState extends AFFlexibleState> {
 
     return test is AFWorkflowStatePrototype;
     
+  }
+
+  AFCreateWidgetSPIDelegate<TSPI, TBuildContext, TTheme>? findSPICreatorOverride<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme>() {
+    final found = uiDefinitions.spiOverrides[TSPI];
+    return found as AFCreateWidgetSPIDelegate<TSPI, TBuildContext, TTheme>?;    
   }
 
   void testOnlySimulateCloseDialogOrSheet<TResult>(AFScreenID screenId, TResult result) {
@@ -450,6 +458,8 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     return appContext.createInitialComponentStates(thirdPartyLibraries);
   }
 
+
+
   /// This is called internally by AFib and should not really exist.
   /// 
   /// It appears it is only possible to get a valid themeData using an actual [BuildContext],
@@ -477,7 +487,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
       fundamentals = fundamentals.reviseOverrideThemeValue(AFUIThemeID.brightness, Brightness.dark);
     }
 
-    final functionals = themeFactories.createFunctionals(fundamentals);
+    final functionals = uiDefinitions.createFunctionals(fundamentals);
     return AFThemeState.create(
       fundamentals: fundamentals,
       functionals: functionals,
@@ -488,7 +498,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   AFThemeState rebuildFunctionalThemes({AFThemeState? initial}) {
     AFibD.logThemeAF?.d("Rebuild functional themes only");
     final themes = initial ?? storeInternalOnly!.state.public.themes;
-    final functionals = themeFactories.createFunctionals(themes.fundamentals);
+    final functionals = uiDefinitions.createFunctionals(themes.fundamentals);
     return themes.copyWith(
       functionals: functionals
     );   
@@ -599,7 +609,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   }
 
   /// Mapping from string ids to builders for specific screens for the real app.
-  AFCompositeTestDataRegistry get testData {
+  AFDefineTestDataContext get testData {
     return _afTestData;
   }
 

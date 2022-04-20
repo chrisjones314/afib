@@ -1,19 +1,36 @@
 
-
-
-
 import 'package:afib/src/dart/command/af_source_template.dart';
 
-class AFFundamentalThemeT extends AFSourceTemplate {
+class AFDefineUIT extends AFSourceTemplate {
 
   final String template = '''
-import 'package:afib/afib_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:afib/afib_flutter.dart';
+import 'package:[!af_package_name]/[!af_app_namespace]_id.dart';
+import 'package:[!af_package_path]/ui/screens/startup_screen.dart';
+
+void defineUI(AFUIDefinitionContext context) {
+  defineFunctionalThemes(context);
+  defineSPIOverrides(context);
+  defineScreens(context);
+}
+
+void defineFunctionalThemes(AFUIDefinitionContext context) {
+
+}
+
+void defineSPIOverrides(AFUIDefinitionContext context) {
+
+}
+
+void defineScreens(AFUIDefinitionContext context) {
+  context.defineStartupScreen([!af_app_namespace(upper)]ScreenID.startup, () => StartupScreenRouteParam.create());
+}  
 
 void defineFundamentalThemeArea(AFFundamentalDeviceTheme device, AFComponentStates appState, AFAppFundamentalThemeAreaBuilder primary) {
 
-  const colorPrimary = Color(0xFF0d47a1);
-  const colorSecondary = Color(0xFF00695c);
+  const colorPrimary = Color(0xFF344955);
+  const colorSecondary = Color(0xFF5d4037);
 
   final colorsLight = ColorScheme(
     primary: colorPrimary,
@@ -69,6 +86,6 @@ void defineFundamentalThemeArea(AFFundamentalDeviceTheme device, AFComponentStat
     AFUITranslationID.appTitle: "[!af_package_name]"
   });
 }
-''';
 
+''';
 }

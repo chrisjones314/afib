@@ -3,8 +3,6 @@
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_query_shutdown_method.t.dart';
-import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:args/args.dart' as args;
 
 class AFGenerateQuerySubcommand extends AFGenerateSubcommand {
   static const kindSimple = "simple";
@@ -23,13 +21,13 @@ class AFGenerateQuerySubcommand extends AFGenerateSubcommand {
 
   String get usage {
     return '''
-Usage 
-  afib.dart generate query [$kindSimple|$kindListener|$kindDeferred] YourQueryName [any --options]
+$usageHeader
+  $nameOfExecutable generate query [$kindSimple|$kindListener|$kindDeferred] YourQueryName [any --options]
 
-Description
-  Creates a new query of the specified kind.  
+$descriptionHeader
+  $description
 
-Options
+$optionsHeader
   $kindSimple - A simple query that reads/writes a value and then completes,
   $kindListener - A query that listens for repeated updates which are pushed in from the outside world
   $kindDeferred - A query that waits for a duration and then executes, used for deferred calculation

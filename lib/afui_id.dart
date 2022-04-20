@@ -179,11 +179,11 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const fileExtendApp = AFUISourceTemplateID("file_extend_app");
   static const fileExtendTest = AFUISourceTemplateID("file_extend_test");
   static const fileDefaultTheme = AFUISourceTemplateID("file_default_theme");
-  static const fileScreenMap = AFUISourceTemplateID("file_screen_map");
-  static const fileFundamentalTheme = AFUISourceTemplateID("file_fundamental_theme");
+  static const fileDefineUI = AFUISourceTemplateID("file_define_ui");
   static const fileDefineTests = AFUISourceTemplateID("file_define_tests");
   static const fileTestData = AFUISourceTemplateID("file_test_data");
   static const fileStateTestShortcuts = AFUISourceTemplateID("file_state_test_shortcuts");
+  static const fileCommand = AFUISourceTemplateID("file_command");
   
   static const stmtDeclareID = AFUISourceTemplateID("declare_id");
   static const stmtDeclareRouteParam = AFUISourceTemplateID("declare_route_param");
@@ -195,6 +195,8 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textScreenIDType = AFUISourceTemplateID("screen_id_type");
   static const textSPIParentType = AFUISourceTemplateID("spi_parent_type");
   static const textThemeType = AFUISourceTemplateID("theme_type");
+  static const textThemeID = AFUISourceTemplateID("theme_id");
+  static const textParentThemeType = AFUISourceTemplateID("parent_theme_type");
   static const textStateViewPrefix = AFUISourceTemplateID("state_view_prefix");
   static const textControlTypeSuffix = AFUISourceTemplateID("control_type_suffix");
   static const textSPIImpls = AFUISourceTemplateID("spi_impls");
@@ -224,6 +226,8 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textIDTypeSuffix = AFUISourceTemplateID("id_type_suffix");
   static const textScreenImpls = AFUISourceTemplateID("screen_impls");
   static const textRouteParamImpls = AFUISourceTemplateID("route_param_impls");
+  static const textCommandName = AFUISourceTemplateID("command_name");
+  static const textCommandNameShort = AFUISourceTemplateID("command_name_short");
 
   static const commentSPIIntro = AFUISourceTemplateID("comment_spi_intro");
   static const commentRouteParamIntro = AFUISourceTemplateID("comment_route_param_intro");

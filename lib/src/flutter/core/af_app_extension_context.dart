@@ -168,7 +168,7 @@ class AFTestExtensionContext {
     sharedTestContext.registerExtractor(extract);
   }
 
-  void _initTestData(AFCompositeTestDataRegistry testData) {
+  void _initTestData(AFDefineTestDataContext testData) {
     for(final init in initTestDatas) {
       init(testData);
     }
@@ -206,7 +206,7 @@ class AFTestExtensionContext {
   }
 
   void initialize({
-    required AFCompositeTestDataRegistry testData, 
+    required AFDefineTestDataContext testData, 
     required AFUnitTests unitTests,
     required AFStateTests stateTests,
     required AFWidgetTests widgetTests,
@@ -257,12 +257,40 @@ class AFTestExtensionContext {
   }
 }
 
-class AFFunctionalThemeDefinitionContext {
+class AFUIDefinitionContext {
   final themeFactories = <AFThemeID, AFCreateFunctionalThemeDelegate>{};
+  final AFScreenMap screenMap = AFScreenMap();
+  final spiOverrides = <Type, AFCreateWidgetSPIDelegate>{};
 
-  AFFunctionalThemeDefinitionContext();
+  AFUIDefinitionContext();
 
-  void initUnlessPresent(AFThemeID id, { required AFCreateFunctionalThemeDelegate createTheme }) {
+  void defineStartupScreen(AFScreenID screenId, AFCreateRouteParamDelegate createParam) {    
+    screenMap.registerStartupScreen(screenId, createParam);
+  }
+
+  void defineScreen(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
+    screenMap.registerScreen(screenKey, screenBuilder);
+  }
+
+  void defineDrawer(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
+    screenMap.registerDrawer(screenKey, screenBuilder);
+  }
+
+  void defineDialog(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
+    screenMap.registerDialog(screenKey, screenBuilder);
+  }
+
+  void defineBottomSheet(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
+    screenMap.registerBottomSheet(screenKey, screenBuilder);
+  }
+
+  void defineScreenSPIOverride<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme>(AFCreateScreenSPIDelegate<TSPI, TBuildContext, TTheme> creator) {
+    spiOverrides[TSPI] = ((context, theme, screenId, wid, paramSource) {
+      return creator(context as TBuildContext, theme as TTheme, screenId);
+    });
+  }
+
+  void defineTheme(AFThemeID id, { required AFCreateFunctionalThemeDelegate createTheme }) {
     if(themeFactories.containsKey(id)) {
       return;
     }
@@ -273,7 +301,7 @@ class AFFunctionalThemeDefinitionContext {
     final create = themeFactories[id];
     if(create == null) throw AFException("No theme registered with id $id");
 
-    return create(fundamentals);
+    return create(id, fundamentals);
   }
 
   AFCreateFunctionalThemeDelegate factoryFor(AFThemeID id) {
@@ -288,7 +316,7 @@ class AFFunctionalThemeDefinitionContext {
     for(final id in themeFactories.keys) {
       final create = themeFactories[id];
       if(create != null) {
-        result[id] = create(fundamentals);
+        result[id] = create(id, fundamentals);
       }
     }
 
@@ -307,7 +335,7 @@ class AFPluginExtensionContext {
   final querySuccessListenerDelegates = <AFQuerySuccessListenerDelegate>[];
   AFTestExtensionContext test = AFTestExtensionContext();
   final thirdParty = AFAppThirdPartyExtensionContext();
-  final defineFunctionalThemes = <AFInitFunctionalThemeDelegate>[];
+  final defineUI = <AFInitUIDelegate>[];
   final defineFundamentalThemeAreas = <AFInitPluginFundamentalThemeDelegate>[];
   final errorListenerByState = <Type, AFOnErrorDelegate>{};
 
@@ -331,8 +359,8 @@ class AFPluginExtensionContext {
     initialComponentStates.add(initComponentState);
   }
 
-  void addCreateFunctionalTheme(AFInitFunctionalThemeDelegate init) {
-    defineFunctionalThemes.add(init);
+  void addCreateFunctionalTheme(AFInitUIDelegate init) {
+    defineUI.add(init);
   }
 
   /// Used by the app or third parties to create a query that runs on lifecycle actions.
@@ -355,8 +383,8 @@ class AFPluginExtensionContext {
     }
   }
 
-  void defineFunctional(AFFunctionalThemeDefinitionContext context) {
-    for(final init in this.defineFunctionalThemes) {
+  void defineFunctional(AFUIDefinitionContext context) {
+    for(final init in this.defineUI) {
       init(context);
     }
   }
@@ -401,16 +429,14 @@ class AFUILibraryExtensionContext<TState extends AFFlexibleState> extends AFPlug
   }
 
   void initializeLibraryFundamentals<TState extends AFFlexibleState>({
-    required AFInitScreenMapDelegate defineScreenMap,
+    required AFInitUIDelegate defineUI,
     AFInitPluginFundamentalThemeDelegate? defineFundamentalThemeArea,
     AFInitializeComponentStateDelegate? initializeComponentState,
-    required AFInitFunctionalThemeDelegate defineFunctionalTheme,
   }) {
-    this.defineScreenMaps.add(defineScreenMap);
     if(initializeComponentState != null) {
       this.initialComponentStates.add(initializeComponentState);
     }
-    this.defineFunctionalThemes.add(defineFunctionalTheme);
+    this.defineUI.add(defineUI);
     if(defineFundamentalThemeArea != null) {
       this.defineFundamentalThemeAreas.add(defineFundamentalThemeArea);
     }
@@ -428,21 +454,19 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
   /// Used by the app to specify fundamental configuration/functionality
   /// that AFib requires.
   void initializeAppFundamentals<TState extends AFFlexibleState>({
-    required AFInitScreenMapDelegate defineScreenMap,
     required AFInitAppFundamentalThemeDelegate defineFundamentalThemeArea,
     required AFInitializeComponentStateDelegate initializeAppState,
     required AFCreateStartupQueryActionDelegate createStartupQueryAction,
     required AFCreateAFAppDelegate createApp,
-    required AFInitFunctionalThemeDelegate defineFunctionalThemes,
+    required AFInitUIDelegate defineUI,
     required AFOnErrorDelegate<AFFlexibleState> queryErrorHandler,
   }) {
     this.test.initializeForApp();
-    this.defineScreenMaps.add(defineScreenMap);
+    this.defineUI.add(defineUI);
     this.initialComponentStates.add(initializeAppState);
     this.createStartupQueries.add(createStartupQueryAction);
     this.errorListenerByState[TState] = queryErrorHandler;
     this.createApp = createApp;
-    this.defineFunctionalThemes.add(defineFunctionalThemes);
     this.defineFundamentalThemeArea = defineFundamentalThemeArea;
     _verifyNotNull(defineFundamentalThemeArea, "defineFundamentalTheme");
     _verifyNotNull(defineScreenMap, "defineScreenMap");
@@ -465,7 +489,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     this.createApp = createApp;
     this.defineFundamentalThemeArea = source.defineFundamentalThemeArea ?? defineFundamentalThemeArea;
     this.defineFundamentalThemeAreas.addAll(source.defineFundamentalThemeAreas);
-    this.defineFunctionalThemes.addAll(source.defineFunctionalThemes);    
+    this.defineUI.addAll(source.defineUI);    
   }
 
   AFOnErrorDelegate<TState>? errorHandlerForState<TState extends AFFlexibleState>() {
@@ -550,12 +574,12 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     return result;
   }
 
-  void initializeFunctionalThemeFactories(AFFunctionalThemeDefinitionContext context, Iterable<AFUILibraryExtensionContext> libraries) {
-    for(final init in defineFunctionalThemes) {
+  void initializeFunctionalThemeFactories(AFUIDefinitionContext context, Iterable<AFUILibraryExtensionContext> libraries) {
+    for(final init in defineUI) {
       init(context);
     }
 
-    context.initUnlessPresent(AFUIThemeID.defaultTheme, createTheme: (f) => AFUIDefaultTheme(f));
+    context.defineTheme(AFUIThemeID.defaultTheme, createTheme: AFUIDefaultTheme.create);
 
     for(final thirdParty in libraries) {
       thirdParty.defineFunctional(context);

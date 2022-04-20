@@ -50,6 +50,7 @@ class AFConfigEntryLogArea extends AFConfigurationItemOptionChoice {
   static const query = "query";
   static const ui = "ui";
   static const test = "test";
+  static const all = "all";
   static const afRoute = "af:route";
   static const afState = "af:state";
   static const afConfig = "af:config";
@@ -57,22 +58,24 @@ class AFConfigEntryLogArea extends AFConfigurationItemOptionChoice {
   static const afQuery = "af:query";
   static const afUI = "af:ui";
   static const afTest = "af:test";
-  static const none = "none";
+  static const commentOption = "//";
   static const standard = "standard";
 
   AFConfigEntryLogArea(): super(
     libraryId: AFUILibraryID.id,
     name: "logs-enabled", 
-    defaultValue: [query, ui, afRoute, afState], 
+    defaultValue: [query, ui, test, commentOption, afRoute, afState], 
     validContexts: AFConfigurationItem.validContextsAllButNew, 
     ordinal: 200.0, 
     allowMultiple: true
   ) {
-    addChoice(textValue: none, help: "Turn off all logging");
-    addChoice(textValue: standard, help: "Logging for app query and ui, plus afib route and state");
-    addChoice(textValue: ui, help: "App logging on any AFBuildContext");
-    addChoice(textValue: query, help: "App logging on AFStartQueryContext, AFFinishQuerySuccessContext or AFFinishQueryErrorContext");
-    addChoice(textValue: test, help: "App logging on test definition contexts and all test execution contexts");
+    addChoice(textValue: all, help: "Turn on all logging");
+    addChoice(textValue: commentOption, help: "Disable all items after this in the logs-enabled array");
+
+    addChoice(textValue: standard, help: "Logging for app/third-party query and ui, plus afib route and state");
+    addChoice(textValue: ui, help: "App/third-party logging for any AFStateProgrammingInterface.log (e.g ...SPI.log) or AFBuildContext.log.");
+    addChoice(textValue: query, help: "App/third-party logging on AFStartQueryContext.log, AFFinishQuerySuccessContext.log or AFFinishQueryErrorContext.log");
+    addChoice(textValue: test, help: "App/third-party logging on test contexts: AFUIPrototypeDefinitionContext.log, AFStateTestDefinitionContext.log, AFDefineTestDataContext.log, AFDefineTestDataContext.log, AFWireframeDefinitionContext.log");    
 
     addChoice(textValue: afConfig, help: "Logging on any non-test definition/initialization context, and of afib.g.dart/startup configuration values");
     addChoice(textValue: afRoute, help: "Internal AFib logging related to routes and navigation");
@@ -288,9 +291,12 @@ class AFConfigEntryTestSize extends AFConfigurationItemOptionChoice {
   @override
   String codeValue(AFConfig config) {
     dynamic val = config.valueFor(this);
-    if(!val.contains("custom")) {
+    if(val is String && !val.contains("custom")) {
       return '"$val"';
     } 
+    if(!val.identifier.contains("custom")) {
+      return '"${val.identifier}"';
+    }     
     return '"${val.width}x${val.height}"';
   }
 

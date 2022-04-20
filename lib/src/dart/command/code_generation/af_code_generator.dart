@@ -7,15 +7,15 @@ import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/code_generation/af_generated_file.dart';
-import 'package:afib/src/dart/command/commands/af_generate_screen_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_export_statement.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_id_statement.t.dart';
 import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:colorize/colorize.dart';
 import 'package:collection/collection.dart';
+import 'package:colorize/colorize.dart';
 
 class AFCodeGenerator { 
   static const afibConfigFile = "afib.g.dart";
@@ -39,6 +39,8 @@ class AFCodeGenerator {
   static const extendFolder = "extend";
   static const environmentsFolder = "environments";
   static const afibFolder = "afib";
+  static const overrideFolder = "override";
+  static const commandFolder = "command";
 
   static const testAFibPath = [testFolder, afibFolder];
   static const screensPath = [libFolder, uiFolder, screensFolder];
@@ -53,15 +55,16 @@ class AFCodeGenerator {
   static const modelsPath = [libFolder, stateFolder, modelsFolder];
   static const statePath = [libFolder, stateFolder];
   static const queryPath = [libFolder, queryFolder];
+  static const commandPath = [libFolder, commandFolder];
   static const initializationPath = [libFolder, initializationFolder];
   static const libPath = [libFolder];
   static const uiPath = [libFolder, uiFolder];
   static const stateViewsPath = [libFolder, stateFolder, stateViewsFolder];
   static const themesPath = [libFolder, uiFolder, themesFolder];
+  static const overrideThemesPath = [libFolder, overrideFolder, themesFolder];
   static const testPath = [libFolder, testFolder];
   static const prototypesPath = [libFolder, testFolder, uiPrototypesFolder];
   static const uiPrototypesFilename = "ui_prototypes.dart";
-  static const screenMapFilename = "screen_map.dart";
 
   final AFCommandExtensionContext definitions;
   final created = <String, AFGeneratedFile>{};
@@ -78,7 +81,7 @@ class AFCodeGenerator {
   }
 
   List<String> get pathAfibConfig {
-    final filename = "${appNamespace}_afib_config.g.dart";
+    final filename = "${appNamespace}_config.g.dart";
     return _createPath(initializationPath, filename);
   }
 
@@ -90,8 +93,8 @@ class AFCodeGenerator {
     return AFibD.config.appNamespace.toUpperCase();
   }
 
-  List<String> get pathScreenMap { 
-    return _createPath(uiPath, screenMapFilename);
+  List<String> get pathDefineUI { 
+    return _createPath(uiPath, "${appNamespace}_define_ui.dart");
   }
 
   List<String> get pathStateTestShortcutsFile {
@@ -121,12 +124,13 @@ class AFCodeGenerator {
     return _createPath(stateViewsPath, filename);
   }
 
-  List<String>? pathTheme(String themeName) {
+  List<String>? pathTheme(String themeName, { required bool isCustomParent }) {
     final filename = _namedObjectToFilename(themeName, "Theme");
     if(filename == null) {
       return null;
     }
-    return _createPath(themesPath, filename);
+    final path = isCustomParent ? overrideThemesPath : themesPath;
+    return _createPath(path, filename);
     
   }
 
@@ -161,6 +165,11 @@ class AFCodeGenerator {
   List<String> get pathConnectedBaseFile {
     final filename = "${AFibD.config.appNamespace}_connected_base.dart";
     return _createPath(uiPath, filename);
+  }
+
+  List<String> pathCommand(String commandName) {
+    final filename = "${convertMixedToSnake(commandName)}.dart";
+    return _createPath(commandPath, filename);
   }
 
   List<String> get pathDefaultTheme {
@@ -244,7 +253,15 @@ class AFCodeGenerator {
   String get nameDefaultTheme {
     return "${appNamespaceUpper}DefaultTheme";
   }
-    
+
+  String get nameDefaultParentTheme {
+    return "AFFunctionalTheme";
+  }
+
+  String get nameDefaultParentThemeID {
+    return "${appNamespaceUpper}ThemeID.defaultTheme";
+  }
+
   String get nameRootState {
     final defaultRootStateType = "${appNamespaceUpper}State";
     return defaultRootStateType;

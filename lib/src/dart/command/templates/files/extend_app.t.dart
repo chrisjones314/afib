@@ -7,11 +7,9 @@ class AFExtendAppT extends AFSourceTemplate {
   final String template = '''
 import 'package:afib/afib_flutter.dart';
 import 'package:[!af_package_name]/app.dart';
-import 'package:[!af_package_path]/ui/screen_map.dart';
+import 'package:[!af_package_path]/ui/[!af_app_namespace]_define_ui.dart';
 import 'package:[!af_package_path]/query/startup_query.dart';
 import 'package:[!af_package_path]/state/[!af_app_namespace]_state.dart';
-import 'package:[!af_package_path]/ui/themes/[!af_app_namespace]_default_theme.dart';
-import 'package:[!af_package_path]/ui/themes/[!af_app_namespace]_fundamental_theme.dart';
 
 void queryErrorHandler(AFFinishQueryErrorContext<AFFlexibleState> context) {
 
@@ -20,12 +18,11 @@ void queryErrorHandler(AFFinishQueryErrorContext<AFFlexibleState> context) {
 void extendApp(AFAppExtensionContext extend) {
 
     extend.initializeAppFundamentals<[!af_app_namespace(upper)]State>(
-      defineScreenMap: defineScreenMap, 
+      defineUI: defineUI,
       defineFundamentalThemeArea: defineFundamentalThemeArea, 
       initializeAppState: () => [!af_app_namespace(upper)]State.initial(), 
       createStartupQueryAction: () => StartupQuery(),
       createApp: () => [!af_app_namespace(upper)]App(),
-      defineFunctionalThemes: defineFunctionalThemes,
       queryErrorHandler: queryErrorHandler
     );
 

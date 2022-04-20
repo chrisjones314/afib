@@ -4,9 +4,10 @@ import 'package:afib/src/dart/utils/af_dart_params.dart';
 
 void main(List<String> argsIn) {  
   final emptyParams = AFDartParams.createEmpty();
-  final argsFull = AFArgs(argsIn);
+  final argsFull = AFArgs.create(argsIn);
   
-  //argsIn = ["version"];
+  //argsFull.setDebugArgs("create app hellocounter hc");
+
   afBootstrapCommandMain(emptyParams, argsFull);
 }
 

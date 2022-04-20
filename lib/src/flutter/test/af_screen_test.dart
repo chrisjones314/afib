@@ -1225,7 +1225,7 @@ abstract class AFScreenPrototype {
   AFNavigatePushAction get navigate;
   List<String> paramDescriptions(AFScreenTestID id) { return <String>[]; }
   List<AFScreenTestID> get sectionIds { return <AFScreenTestID>[]; }
-  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models });
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? models });
   Future<void> run(AFScreenTestContext context, { Function onEnd});
   void onDrawerReset(AFDispatcher dispatcher);
   Future<void> onDrawerRun(AFBuildContext context, AFScreenTestContextSimulator? prevContext, AFSingleScreenTestState state, AFScreenTestID testId, Function onEnd);
@@ -1312,7 +1312,7 @@ class AFSingleScreenPrototype extends AFScreenLikePrototype {
 
 
   @override
-  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? models }) {
     final ms = models ?? this.models;
     final rvp = routeParam ?? this.navigate.param;
     final actualModels = registry.resolveStateViewModels(ms);
@@ -1389,7 +1389,7 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
     return body;
   }
 
-  void startScreen(AFDispatcher dispatcher,  BuildContext? flutterContext, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
+  void startScreen(AFDispatcher dispatcher,  BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? models }) {
     final ms = models ?? this.models;
     final rpp = routeParam ?? this.navigate.param;
 
@@ -1470,7 +1470,7 @@ class AFDialogPrototype extends AFScreenLikePrototype {
     return AFUIScreenID.screenPrototypeDialog;
   }
 
-  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? models }) {
     final ms = models ?? this.models;
     final rpp = routeParam ?? this.navigate.param;
 
@@ -1530,7 +1530,7 @@ class AFBottomSheetPrototype extends AFScreenLikePrototype {
     return AFUIScreenID.screenPrototypeBottomSheet;
   }
 
-  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? models }) {
     final ms = models ?? this.models;
     final rpp = routeParam ?? this.navigate.param;
 
@@ -1589,7 +1589,7 @@ class AFDrawerPrototype extends AFScreenLikePrototype {
     return AFUIScreenID.screenPrototypeDrawer;
   }
 
-  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? models }) {
     final ms = models ?? this.models;
     final rpp = routeParam ?? this.navigate.param;
 
@@ -1675,7 +1675,7 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
     return AFibF.g.screenTests;
   }
 
-  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFCompositeTestDataRegistry registry, { AFRouteParam? routeParam, List<Object>? models }) {
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? models }) {
     initializeMultiscreenPrototype<TState>(dispatcher, this);
   }
 
@@ -2015,7 +2015,7 @@ class AFSingleScreenTests<TState> {
   }
 
   void registerData(dynamic id, dynamic data) {
-    AFibF.g.testData.register(id, data);
+    AFibF.g.testData.define(id, data);
   }
 
   dynamic findData(dynamic id) {
@@ -2389,7 +2389,7 @@ class AFWorkflowStateTests<TState extends AFFlexibleState> {
 /// Base test definition wrapper, with access to test data.
 /// 
 class AFBaseTestDefinitionContext {
-  final AFCompositeTestDataRegistry registry;
+  final AFDefineTestDataContext registry;
   AFBaseTestDefinitionContext(this.registry);
 
   /// Looks up the test data defined in your test_data.dart file for a particular
@@ -2426,7 +2426,7 @@ class AFUnitTestDefinitionContext extends AFBaseTestDefinitionContext {
 
   AFUnitTestDefinitionContext({
     required this.tests,
-    required AFCompositeTestDataRegistry testData
+    required AFDefineTestDataContext testData
   }): super(testData);
 
   void addTest(AFBaseTestID id, AFUnitTestBodyExecuteDelegate fnTest) {
@@ -2444,7 +2444,7 @@ class AFStateTestDefinitionContext extends AFBaseTestDefinitionContext {
 
   AFStateTestDefinitionContext({
     required this.tests,
-    required AFCompositeTestDataRegistry testData
+    required AFDefineTestDataContext testData
   }): super(testData);
 
   /// Define a state test. 
@@ -2487,7 +2487,7 @@ class AFUIPrototypeDefinitionContext extends AFBaseTestDefinitionContext {
     required this.dialogTests,
     required this.drawerTests,
     required this.bottomSheetTests,
-    required AFCompositeTestDataRegistry testData
+    required AFDefineTestDataContext testData
   }): super(testData);
 
 
@@ -2610,7 +2610,7 @@ class AFWorkflowTestDefinitionContext extends AFBaseTestDefinitionContext {
 
   AFWorkflowTestDefinitionContext({
     required this.tests,
-    required AFCompositeTestDataRegistry testData
+    required AFDefineTestDataContext testData
   }): super(testData);
 
   AFWorkflowStateTestPrototype definePrototype({

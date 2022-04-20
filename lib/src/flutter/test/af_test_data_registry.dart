@@ -1,5 +1,8 @@
+import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
+import 'package:logger/logger.dart';
 
 
 
@@ -10,17 +13,17 @@ import 'package:afib/src/flutter/utils/af_state_view.dart';
 /// data store uses integer ids (just convert the integers).  Using strings
 /// allows you to use descriptive ids for test data, which will then often
 /// show up as part of widget ids in your UI, making debugging easier.
-class AFCompositeTestDataRegistry {
+class AFDefineTestDataContext {
 
   final Map<dynamic, dynamic> testData;
   static int uniqueIdBase = 1;
   static List<String> createdTestIds = <String>[];
   
-  AFCompositeTestDataRegistry({
+  AFDefineTestDataContext({
     required this.testData
   });
 
-  void register(dynamic id, dynamic data) {
+  void define(dynamic id, dynamic data) {
     testData[id] = data;
   }
 
@@ -30,9 +33,13 @@ class AFCompositeTestDataRegistry {
     return result;
   }  
 
-  factory AFCompositeTestDataRegistry.create() {
-    return AFCompositeTestDataRegistry(testData: <dynamic, dynamic>{});
+  factory AFDefineTestDataContext.create() {
+    return AFDefineTestDataContext(testData: <dynamic, dynamic>{});
   }  
+
+  Logger? get log {
+    return AFibD.log(AFConfigEntryLogArea.test);
+  }
 
   /// Find a test data object by its id, but if the id is not a string,
   /// just return it.

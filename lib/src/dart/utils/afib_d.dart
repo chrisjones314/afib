@@ -3,6 +3,7 @@ import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/utils/af_log_printer.dart';
 import 'package:collection/collection.dart';
 import 'package:logger/logger.dart';
@@ -11,11 +12,20 @@ class AFibD<AppState> {
     static final AFConfig _afConfig = AFConfig();
     static final configEntries = <AFConfigurationItem>[];
     static final standardSizes = <String, AFFormFactorSize>{};
+    static final libraries = <AFLibraryID>[];
     static final logs = <String, Logger>{};
 
     /// Register an entry in the configuration file.
     static void registerConfigEntry(AFConfigurationItem entry) {
       configEntries.add(entry);
+    }
+
+    static void registerLibrary(AFLibraryID id) {
+      libraries.add(id);
+    }
+
+    static AFLibraryID? findLibraryWithPrefix(String prefix) {
+      return libraries.firstWhereOrNull((id) => id.codeId == prefix);
     }
 
     static AFConfigurationItem? findConfigEntry(String name) {
@@ -90,6 +100,9 @@ class AFibD<AppState> {
 
       var logsEnabled = AFibD.config.logsEnabled;
       for(final area in logsEnabled) {
+        if(area == AFConfigEntryLogArea.commentOption) {
+          break;
+        }
         final logger = Logger(printer: AFLogPrinter(area));
         logs[area] = logger;
       }
@@ -104,15 +117,19 @@ class AFibD<AppState> {
   }
 
   static Logger? log(String area) {
+    final all = logs[AFConfigEntryLogArea.all];
+    if(all != null) {
+      return all;
+    }
     return logs[area]; 
   }
 
   static Logger? get logUIApp {
-    return logs[AFConfigEntryLogArea.ui];
+    return log(AFConfigEntryLogArea.ui);
   }
 
   static Logger? get logQueryApp {
-    return logs[AFConfigEntryLogArea.query];
+    return log(AFConfigEntryLogArea.query);
   }
 
   static Logger? get logQueryAF {

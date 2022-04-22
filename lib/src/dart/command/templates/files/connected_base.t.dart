@@ -5,7 +5,7 @@ class AFConnectedBaseT extends AFSourceTemplate {
 
   final String template = '''
 import 'package:afib/afib_flutter.dart';
-import 'package:[!af_package_path]/[!af_app_namespace]_id.dart';
+import 'package:[!af_package_name]/[!af_app_namespace]_id.dart';
 import 'package:[!af_package_path]/state/[!af_app_namespace]_state.dart';
 import 'package:[!af_package_path]/ui/themes/[!af_app_namespace]_default_theme.dart';
 

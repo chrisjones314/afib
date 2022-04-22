@@ -1384,14 +1384,6 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     }
   }
 
-  /// Log to the appRender topic.  
-  /// 
-  /// The logger can be null, so you should
-  /// use something like context.log?.d("my message");
-  Logger? get log { 
-    return AFibD.log(AFConfigEntryLogArea.ui);
-  }
-
   bool operator==(dynamic o) {
     if(o is! AFBuildContext<TStateView, TRouteParam>) {
       return false;
@@ -1479,7 +1471,7 @@ class AFStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext 
   }
 
   Logger? get log {
-    return context.log;
+    return AFibD.log(AFConfigEntryLogArea.ui);
   }
 
   void dispatch(dynamic action) {

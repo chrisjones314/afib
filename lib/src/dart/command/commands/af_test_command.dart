@@ -28,6 +28,7 @@ class AFTestCommand extends AFCommand {
 
     AFConfigCommand.updateConfig(ctx, config, [AFConfigEntries.testSize, AFConfigEntries.testOrientation], ctx.arguments);
     AFConfigCommand.writeUpdatedConfig(ctx);
+    ctx.generator.finalizeAndWriteFiles(ctx);
       
     Process.start('flutter', ['test', AFProjectPaths.relativePathFor(AFProjectPaths.afTestPath)]).then((process) {
       stdout.addStream(process.stdout);

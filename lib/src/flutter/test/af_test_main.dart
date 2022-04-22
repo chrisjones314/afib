@@ -1,3 +1,4 @@
+import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
@@ -38,15 +39,15 @@ class AFibTestsFailedMatcher extends Matcher {
 Future<void> afTestMainUILibrary<TState extends AFFlexibleState>({
   required AFLibraryID id, 
   required AFExtendBaseDelegate extendBase, 
-  required AFExtendBaseDelegate extendThirdPartyBase, 
-  required AFExtendUILibraryDelegate extendApp, 
-  required AFExtendThirdPartyUIDelegate extendThirdPartyUI, 
+  required AFExtendBaseDelegate extendBaseLibrary, 
+  required AFExtendUILibraryDelegate extendUI, 
+  required AFExtendLibraryUIDelegate extendUILibrary, 
   required AFExtendTestDelegate extendTest, 
-  required AFDartParams paramsD, 
+  required AFDartParams paramsDart, 
   required WidgetTester widgetTester
 }) async {
   final contextLibrary = AFUILibraryExtensionContext(id: id);
-  extendApp(contextLibrary);
+  extendUI(contextLibrary);
 
   final extendAppFull = (context) {
     context.fromUILibrary(contextLibrary,
@@ -55,25 +56,27 @@ Future<void> afTestMainUILibrary<TState extends AFFlexibleState>({
     );
   };
 
-  return afTestMain<TState>(
+  return afTestMainApp<TState>(
+    id: AFUILibraryID.id,
     extendBase: extendBase, 
-    extendThirdPartyBase: extendThirdPartyBase, 
+    extendBaseLibrary: extendBaseLibrary, 
     extendApp: extendAppFull, 
-    extendThirdPartyUI: extendThirdPartyUI, 
+    extendUILibrary: extendUILibrary, 
     extendTest: extendTest, 
-    paramsD: paramsD, 
+    paramsDart: paramsDart, 
     widgetTester: widgetTester
   );
 }
 
 /// The main function which executes the store test defined in your initStateTests function.
-Future<void> afTestMain<TState extends AFFlexibleState>({
+Future<void> afTestMainApp<TState extends AFFlexibleState>({
+  required AFLibraryID id,
   AFExtendBaseDelegate? extendBase, 
-  AFExtendBaseDelegate? extendThirdPartyBase, 
+  AFExtendBaseDelegate? extendBaseLibrary, 
   required AFExtendAppDelegate extendApp, 
-  AFExtendThirdPartyUIDelegate? extendThirdPartyUI, 
+  AFExtendLibraryUIDelegate? extendUILibrary, 
   required AFExtendTestDelegate extendTest, 
-  required AFDartParams paramsD, 
+  required AFDartParams paramsDart, 
   required WidgetTester widgetTester
 }) async {
   final stopwatch = Stopwatch();
@@ -83,11 +86,11 @@ Future<void> afTestMain<TState extends AFFlexibleState>({
   if(extendBase != null) {
     extendBase(baseContext);
   }
-  if(extendThirdPartyBase != null) {
-    extendThirdPartyBase(baseContext);
+  if(extendBaseLibrary != null) {
+    extendBaseLibrary(baseContext);
   }
 
-  final paramsTest = paramsD.forceEnvironment(AFEnvironment.prototype);
+  final paramsTest = paramsDart.forceEnvironment(AFEnvironment.prototype);
   AFibD.initialize(paramsTest);
 
   final formFactor = AFibD.config.formFactorWithOrientation;
@@ -100,8 +103,8 @@ Future<void> afTestMain<TState extends AFFlexibleState>({
   final context = AFAppExtensionContext();
   extendApp(context);
   extendTest(context.test);
-  if(extendThirdPartyUI != null) {
-    extendThirdPartyUI(context.thirdParty);
+  if(extendUILibrary != null) {
+    extendUILibrary(context.thirdParty);
   }
 
   AFibF.initialize<TState>(context);
@@ -111,17 +114,17 @@ Future<void> afTestMain<TState extends AFFlexibleState>({
   final stats = AFTestStats();
 
   AFibD.logTestAF?.d("entering afUnitTestMain");
-  afUnitTestMain<TState>(output, stats, paramsD);
+  afUnitTestMain<TState>(output, stats, paramsDart);
   AFibD.logTestAF?.d("exiting afUnitTestMain");
 
   // then state tests
   AFibD.logTestAF?.d("entering afStateTestMain");
-  afStateTestMain<TState>(output, stats, paramsD);
+  afStateTestMain<TState>(output, stats, paramsDart);
   AFibD.logTestAF?.d("exiting afStateTestMain");
 
   /// then screen tests
   AFibD.logTestAF?.d("entering afScreenTestMain");
-  await afScreenTestMain<TState>(output, stats, paramsD, widgetTester);
+  await afScreenTestMain<TState>(output, stats, paramsDart, widgetTester);
   AFibD.logTestAF?.d("exiting afScreenTestMain");
 
   if(stats.hasErrors) {

@@ -141,6 +141,15 @@ abstract class AFCommand {
     }
   }
 
+  void verifyOneOf(String value, List<String> oneOf) {
+    final found = oneOf.contains(value);
+    if(!found) {
+      throwUsageError("Expected $value to be one of $oneOf");
+    }
+
+  }
+
+
   void verifyAllLowercase(String value) {
     for(var i = 0; i < value.length; i++) {
       final c = value[i];
@@ -253,7 +262,7 @@ Available subcommands
 }
 
 class AFCommandContext {
-  final AFCommandExtensionContext definitions;
+  final AFCommandAppExtensionContext definitions;
   final AFCommandOutput output;
   final AFCodeGenerator generator;
   final args.ArgResults arguments;
@@ -301,12 +310,12 @@ class AFBaseExtensionContext {
   }
 }
 
-class AFCommandThirdPartyExtensionContext extends AFBaseExtensionContext {
+class AFCommandUILibraryExtensionContext extends AFBaseExtensionContext {
   final AFDartParams paramsD;
   final AFCommandRunner commands;
   final AFTemplateRegistry templates;
 
-  AFCommandThirdPartyExtensionContext({
+  AFCommandUILibraryExtensionContext({
     required this.paramsD, 
     required this.commands, 
     required this.templates, 
@@ -485,8 +494,8 @@ Available commands:
 }
 
 
-class AFCommandExtensionContext extends AFCommandThirdPartyExtensionContext {
-  AFCommandExtensionContext({
+class AFCommandAppExtensionContext extends AFCommandUILibraryExtensionContext {
+  AFCommandAppExtensionContext({
     required AFDartParams paramsD, 
     required AFCommandRunner commands
   }): super(

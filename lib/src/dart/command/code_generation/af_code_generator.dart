@@ -66,7 +66,7 @@ class AFCodeGenerator {
   static const prototypesPath = [libFolder, testFolder, uiPrototypesFolder];
   static const uiPrototypesFilename = "ui_prototypes.dart";
 
-  final AFCommandExtensionContext definitions;
+  final AFCommandAppExtensionContext definitions;
   final created = <String, AFGeneratedFile>{};
   final modified = <String, AFGeneratedFile>{};
   final renamed = <List<String>, List<String>>{};
@@ -167,6 +167,16 @@ class AFCodeGenerator {
     return _createPath(uiPath, filename);
   }
 
+  List<String> get pathInstallUI {
+    final filename = "${appNamespace}_install_ui.dart";
+    return _createPath(libPath, filename);
+  }
+
+  List<String> get pathInstallCommand {
+    final filename = "${appNamespace}_install_command.dart";
+    return _createPath(libPath, filename);
+  }
+
   List<String> pathCommand(String commandName) {
     final filename = "${convertMixedToSnake(commandName)}.dart";
     return _createPath(commandPath, filename);
@@ -209,7 +219,7 @@ class AFCodeGenerator {
 
   List<String> get pathMain {
     final filename = "main.dart";
-    return _createPath(libPath, filename);
+    return _createPath(libPath, filename, underSrc: false);
   }
 
   List<String> get pathMainAFibTest {
@@ -239,7 +249,7 @@ class AFCodeGenerator {
 
   List<String> get pathAppId {
     final filename = "${appNamespace}_id.dart";
-    return _createPath(libPath, filename);
+    return _createPath(libPath, filename, underSrc: false);
   }
 
   String get nameStartupQuery {
@@ -282,8 +292,8 @@ class AFCodeGenerator {
     return _createPath(statePath, filename);
   }
 
-  List<String> get pathExtendThirdPartyBase {
-    final filename = "extend_third_party_base.dart";
+  List<String> get pathExtendLibraryBase {
+    final filename = "extend_base_library.dart";
     return _createPath(extendPath, filename);
   }
 
@@ -292,13 +302,13 @@ class AFCodeGenerator {
     return _createPath(extendPath, filename);
   }
 
-  List<String> get pathExtendThirdPartyCommand {
-    final filename = "extend_third_party_command.dart";
+  List<String> get pathExtendLibraryCommand {
+    final filename = "extend_command_library.dart";
     return _createPath(extendPath, filename);
   }
 
-  List<String> get pathExtendThirdPartyUI {
-    final filename = "extend_third_party_ui.dart";
+  List<String> get pathExtendLibraryUI {
+    final filename = "extend_ui_library.dart";
     return _createPath(extendPath, filename);
   }
 
@@ -316,6 +326,11 @@ class AFCodeGenerator {
 
   List<String> get pathFlutterExportsFile {
     final filename = "${AFibD.config.appNamespace}_flutter.dart";
+    return [libFolder, filename];
+  }
+
+  List<String> get pathCommandExportsFile {
+    final filename = "${AFibD.config.appNamespace}_command.dart";
     return [libFolder, filename];
   }
 
@@ -372,7 +387,9 @@ class AFCodeGenerator {
   }
 
 
-  void addExportsForFiles(AFCommandContext context, Map<String, dynamic> args, List<AFGeneratedFile> files) {
+  void addExportsForFiles(AFCommandContext context, Map<String, dynamic> args, List<AFGeneratedFile> files, {
+    List<String>? toPath,
+  }) {
     if(args[AFCommand.argPrivate]) {
       return;
     }
@@ -380,7 +397,7 @@ class AFCodeGenerator {
       return;
     }
     
-    final pathExports = pathFlutterExportsFile;
+    final pathExports = toPath ?? pathFlutterExportsFile;
     final fileExports = modifyFile(context, pathExports);
     for(final exportFile in files) {
       final decl = DeclareExportStatementT().toBuffer();
@@ -409,8 +426,8 @@ class AFCodeGenerator {
     return _createPath(statePath, filename);
   }
 
-  List<String> _createPath(List<String> folders, String filename) {
-    return AFProjectPaths.createFile(folders, filename);
+  List<String> _createPath(List<String> folders, String filename, { bool underSrc = true }) {
+    return AFProjectPaths.createFile(folders, filename, underSrc: underSrc);
   }
 
   String packagePath(String packageName) {

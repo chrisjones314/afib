@@ -6,7 +6,7 @@ class AFExtendAppT extends AFSourceTemplate {
 
   final String template = '''
 import 'package:afib/afib_flutter.dart';
-import 'package:[!af_package_name]/app.dart';
+import 'package:[!af_package_path]/app.dart';
 import 'package:[!af_package_path]/ui/[!af_app_namespace]_define_ui.dart';
 import 'package:[!af_package_path]/query/startup_query.dart';
 import 'package:[!af_package_path]/state/[!af_app_namespace]_state.dart';

@@ -4,8 +4,12 @@ import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_call_define_test_data.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_define_define_test_data.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_initial_value.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_model_access_statement.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_reference_test_data.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_test_id.t.dart';
 import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
@@ -95,6 +99,41 @@ $optionsHeader
     final declareInitialValue = DeclareInitialValueT().toBuffer();
     declareInitialValue.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
     stateFile.addLinesAfter(ctx, AFCodeRegExp.startReturnInitialState, declareInitialValue.lines);
+
+    // add an initial test-data value
+    // first, create a subprocedure for defining that kind of test data.
+    final declareCallDefineTest = DeclareCallDefineTestDataT().toBuffer();
+    declareCallDefineTest.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
+    
+    final testDataFile = generator.modifyFile(ctx, generator.pathTestData);
+    testDataFile.addLinesAfter(ctx, AFCodeRegExp.startDefineTestData, declareCallDefineTest.lines);
+
+    final declareDefineTestData  = DeclareDefineDefineTestDataT().toBuffer();
+    declareDefineTestData.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
+    declareDefineTestData.executeStandardReplacements(ctx);
+
+    // then, declare the function that we just called.
+    testDataFile.addLinesAtEnd(ctx, declareDefineTestData.lines);
+
+    // need to import the model itself.
+    generator.addImport(ctx, 
+      importPath: modelFile.importPathStatement, 
+      to: testDataFile, 
+      before: AFCodeRegExp.startDefineTestData
+    );
+    
+    // finally, add the id we are using.
+    final declareTestID = DeclareTestIDT().toBuffer();
+    declareTestID.replaceText(ctx, AFUISourceTemplateID.textTestID, "stateFullLogin$identifier");
+
+    final idFile = generator.modifyFile(ctx, generator.pathIdFile);
+    idFile.addLinesAfter(ctx, AFCodeRegExp.startDeclareTestDataID, declareTestID.lines);
+
+    // then, add in the new test data to the full signed in state.
+    final declareInitTestData = DeclareReferenceTestDataT().toBuffer();
+    declareInitTestData.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
+    declareInitTestData.executeStandardReplacements(ctx);
+    testDataFile.addLinesAfter(ctx, AFCodeRegExp.startDeclareTestData, declareInitTestData.lines);
 
     // we need to add it to the default state view access
     final pathStateViewAccess = generator.pathStateViewAccess();

@@ -6,6 +6,7 @@ void main(List<String> argsIn) {
   final emptyParams = AFDartParams.createEmpty();
   final argsFull = AFArgs.create(argsIn);
   
+  //argsFull.setDebugArgs("create ui_library hellolib hl");
   //argsFull.setDebugArgs("create app hellocounter hc");
 
   afBootstrapCommandMain(emptyParams, argsFull);

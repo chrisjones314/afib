@@ -8,7 +8,7 @@ class DeclareDemoScreenRouteParamImplsT extends AFSourceTemplate {
   final int clickCount;
   StartupScreenRouteParam({
     required this.clickCount,
-  }): super(id: HCScreenID.startup);
+  }): super(id: [!af_app_namespace(upper)]ScreenID.startup);
 
   factory StartupScreenRouteParam.create() {
     return StartupScreenRouteParam(clickCount: 0);

@@ -8,18 +8,18 @@ import 'package:args/args.dart' as args;
 
 /// Initialize commands that are used only from the afib command
 /// line app itself (e.g. new).
-void afRegisterAfibOnlyCommands(AFCommandExtensionContext commands) {
+void afRegisterAfibOnlyCommands(AFCommandAppExtensionContext commands) {
   commands.defineCommand(AFVersionCommand());
   //commands.register(AFNewProjectCommand());
 }
 
 /// Initialize afib comamnds that are used from the application-specific
 /// commamd
-void afRegisterAppCommands(AFCommandExtensionContext definitions) {
+void afRegisterAppCommands(AFCommandAppExtensionContext definitions) {
   definitions.registerStandardCommands();
 }
 
-void afRegisterBootstrapCommands(AFCommandExtensionContext definitions) {
+void afRegisterBootstrapCommands(AFCommandAppExtensionContext definitions) {
   definitions.registerBootstrapCommands();
 }
 
@@ -40,32 +40,39 @@ Future<void> afAppCommandMain({
   required AFDartParams paramsDart, 
   required AFExtendBaseDelegate extendBase, 
   required AFExtendCommandsDelegate extendCommand, 
-  required AFExtendBaseDelegate extendThirdPartyBase, 
-  required AFExtendCommandsThirdPartyDelegate extendThirdPartyCommand
+  required AFExtendBaseDelegate extendBaseLibrary, 
+  required AFExtendCommandsLibraryDelegate extendCommandLibrary
 }) async {
-  await _afCommandMain(paramsDart, args.args, "afib", "App-specific afib command", extendBase, extendThirdPartyBase, [
+  await _afCommandMain(paramsDart, args.args, "afib", "App-specific afib command", extendBase, extendBaseLibrary, [
     afRegisterAppCommands,
     extendCommand
-  ], extendThirdPartyCommand);
+  ], extendCommandLibrary);
 }
 
-Future<void> afUILibraryCommandMain(AFDartParams paramsD, List<String> args, AFExtendBaseDelegate initBase, AFExtendBaseDelegate initBaseThirdParty, AFExtendCommandsDelegate initApp, AFExtendCommandsThirdPartyDelegate initExtend) async {
+Future<void> afUILibraryCommandMain({ 
+  required AFDartParams paramsDart, 
+  required AFArgs args, 
+  required AFExtendBaseDelegate extendBase, 
+  required AFExtendBaseDelegate extendBaseLibrary, 
+  required AFExtendCommandsDelegate extendCommand, 
+  required AFExtendCommandsLibraryDelegate extendCommandLibrary
+}) async {
   AFibD.config.setIsLibraryCommand(isLib: true);
-  await _afCommandMain(paramsD, args, "afib", "App-specific afib command", initBase, initBaseThirdParty, [
+  await _afCommandMain(paramsDart, args.args, "afib", "App-specific afib command", extendBase, extendBaseLibrary, [
     afRegisterAppCommands,
-    initApp
-  ], initExtend);
+    extendCommand,
+  ], extendCommandLibrary);
 }
 
-Future<void> _afCommandMain(AFDartParams paramsD, List<String> argsIn, String cmdName, String cmdDescription, AFExtendBaseDelegate? initBase, AFExtendBaseDelegate? initBaseThirdParty, List<AFExtendCommandsDelegate> inits, AFExtendCommandsThirdPartyDelegate? initExtend) async {
-  final definitions = AFCommandExtensionContext(paramsD: paramsD, commands: AFCommandRunner(cmdName, cmdDescription));
+Future<void> _afCommandMain(AFDartParams paramsD, List<String> argsIn, String cmdName, String cmdDescription, AFExtendBaseDelegate? initBase, AFExtendBaseDelegate? initBaseLibrary, List<AFExtendCommandsDelegate> inits, AFExtendCommandsLibraryDelegate? initExtend) async {
+  final definitions = AFCommandAppExtensionContext(paramsD: paramsD, commands: AFCommandRunner(cmdName, cmdDescription));
   final baseContext = AFBaseExtensionContext();
 
   if(initBase != null) {
     initBase(baseContext);
   }
-  if(initBaseThirdParty != null) {
-    initBaseThirdParty(baseContext);
+  if(initBaseLibrary != null) {
+    initBaseLibrary(baseContext);
   }
 
   // initialize the stuff that is accessible from dart/the command line.

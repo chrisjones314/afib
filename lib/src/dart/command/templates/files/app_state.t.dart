@@ -10,10 +10,12 @@ import 'package:meta/meta.dart';
 @immutable
 class [!af_app_namespace(upper)]State extends AFFlexibleState with [!af_app_namespace(upper)]StateModelAccess {
 
-  static final AFCreateComponentStateDelegate creator = (models) => [!af_app_namespace(upper)]State(models);
+  [!af_app_namespace(upper)]State(Map<String, Object> models): super(models: models, create: [!af_app_namespace(upper)]State.create);
 
-  [!af_app_namespace(upper)]State(Map<String, Object> models): super(models: models, create: creator);
-  
+  factory [!af_app_namespace(upper)]State.create(Map<String, Object> models) {
+      return [!af_app_namespace(upper)]State(models);
+  }
+
   factory [!af_app_namespace(upper)]State.fromList(List<Object> toIntegrate) {
     final models = AFFlexibleState.integrate(AFFlexibleState.empty(), toIntegrate);
     return [!af_app_namespace(upper)]State(models);
@@ -25,7 +27,7 @@ class [!af_app_namespace(upper)]State extends AFFlexibleState with [!af_app_name
   }
 
   factory [!af_app_namespace(upper)]State.initial() {
-    return [!af_app_namespace(upper)]State.fromList(const [
+    return [!af_app_namespace(upper)]State.fromList([
     ]);
   }
 }''';

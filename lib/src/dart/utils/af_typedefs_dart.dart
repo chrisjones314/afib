@@ -28,10 +28,10 @@ typedef AFParamListenerDelegate = void Function(AFRouteParam param);
 typedef AFInitializeComponentStateDelegate = AFFlexibleState? Function();
 
 /// Delegate use to define commands that are part of the afib command-line app.
-typedef AFExtendCommandsDelegate = void Function(AFCommandExtensionContext context);
+typedef AFExtendCommandsDelegate = void Function(AFCommandAppExtensionContext context);
 
 /// Used by third party extensions to defined commands for the command-line app.
-typedef AFExtendCommandsThirdPartyDelegate = void Function(AFCommandThirdPartyExtensionContext context);
+typedef AFExtendCommandsLibraryDelegate = void Function(AFCommandUILibraryExtensionContext context);
 
 /// Just a typed sort function.
 typedef AFTypedSortDelegate<TSort> = int Function(TSort left, TSort right);

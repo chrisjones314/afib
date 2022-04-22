@@ -83,19 +83,16 @@ class AFProjectPaths {
     Directory(path).createSync(recursive: true);
   }
 
-  static List<String> createPath(List<String> folders) {
+  static List<String> createPath(List<String> folders, { required bool underSrc }) {
     final path = List<String>.from(folders);
-    if(AFibD.config.isLibraryCommand) {
-      if(path[0] != libFolder) {
-        throw AFException("Expected lib folder at root");
-      }
+    if(underSrc && AFibD.config.isLibraryCommand && path[0] == libFolder) {
       path.insert(1, srcFolder);
     }
     return path;
   }
 
-  static List<String> createFile(List<String> folders, String filename) {
-    final path = createPath(folders);
+  static List<String> createFile(List<String> folders, String filename, { required bool underSrc }) {
+    final path = createPath(folders, underSrc: underSrc);
     path.add(filename);
     return path;
   }

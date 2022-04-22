@@ -240,7 +240,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     return err.substring(idx+1);
   }
 
-  void buildThirdPartyPrototypeNav({
+  void buildLibraryPrototypeNav({
     required AFStateProgrammingInterface spi,
     required List<Widget> rows,
     required AFLibraryTestHolder tests,

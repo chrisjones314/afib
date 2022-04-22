@@ -2,6 +2,7 @@
 import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
@@ -52,7 +53,15 @@ class AFUIWelcomeWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, AFUIDe
       margin: t.margin.v.standard,
       child: t.childText("afibframework.io/start", style: t.styleOnCard.headline6)
     ));
-    rows.add(Text("for tutorials and documentation", style: t.styleOnCard.bodyText2));
+    rows.add(t.childMargin(
+      margin: t.margin.b.s5,
+      child: Text("for tutorials and documentation.", style: t.styleOnCard.bodyText2)
+    ));
+
+    rows.add(Text("Try changing to AFEnvironment.prototype in", style: t.styleOnCard.bodyText2));
+    rows.add(Text("in ${AFibD.config.appNamespace}_config.g.dart", style: t.styleOnCard.bodyText2));
+    rows.add(Text("to use prototype mode.", style: t.styleOnCard.bodyText2));
+
 
     return Card(child: 
       t.childMargin(

@@ -334,7 +334,7 @@ class AFPluginExtensionContext {
   final createLifecycleQueryActions = <AFCreateLifecycleQueryAction>[];
   final querySuccessListenerDelegates = <AFQuerySuccessListenerDelegate>[];
   AFTestExtensionContext test = AFTestExtensionContext();
-  final thirdParty = AFAppThirdPartyExtensionContext();
+  final thirdParty = AFAppLibraryExtensionContext();
   final defineUI = <AFInitUIDelegate>[];
   final defineFundamentalThemeAreas = <AFInitPluginFundamentalThemeDelegate>[];
   final errorListenerByState = <Type, AFOnErrorDelegate>{};
@@ -406,7 +406,7 @@ class AFPluginExtensionContext {
 
 }
 
-class AFAppThirdPartyExtensionContext {
+class AFAppLibraryExtensionContext {
   final libraries = <AFLibraryID, AFUILibraryExtensionContext>{};
   
   AFUILibraryExtensionContext register(AFLibraryID id) {
@@ -449,7 +449,7 @@ class AFUILibraryExtensionContext<TState extends AFFlexibleState> extends AFPlug
 /// Enables you, or third parties, to register extensions
 //  recognized by AFib.
 class AFAppExtensionContext extends AFPluginExtensionContext {
-  final libraries = AFAppThirdPartyExtensionContext();
+  final libraries = AFAppLibraryExtensionContext();
 
   /// Used by the app to specify fundamental configuration/functionality
   /// that AFib requires.
@@ -550,7 +550,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
       AFUITranslationID.screenPrototypes: "UI Prototypes",
       AFUITranslationID.workflowTests: "Workflow Tests",
       AFUITranslationID.stateTests: "State Tests",
-      AFUITranslationID.thirdParty: "Third Party",
+      AFUITranslationID.libraries: "Libraries",
       AFUITranslationID.searchResults: "Search Results",
       AFUITranslationID.testResults: "Test Results",
       AFUITranslationID.run: "Run {0}",
@@ -560,6 +560,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
       AFUITranslationID.afibPrototypeMode: "${AFibD.config.appNamespace.toUpperCase()} Prototype Mode",
       AFUITranslationID.afibPrototypeLoading: "",
       AFUITranslationID.wireframes: "Wireframes",
+      AFUITranslationID.afibUnimplemented: "Unimplemented",
     });
 
     final result = AFFundamentalThemeState(

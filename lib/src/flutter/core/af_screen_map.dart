@@ -5,6 +5,7 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/screen/af_startup_screen.dart';
+import 'package:afib/src/flutter/ui/screen/afui_unimplemented_screen.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:flutter/material.dart';
 
@@ -38,6 +39,7 @@ class AFScreenMap {
        return MapEntry(k.code, v);
      });
      result[AFUIScreenID.screenStartupWrapper.code] = (_) => AFStartupScreenWrapper();
+     result[AFUIScreenID.screenUnimplemented.code] = (_) => AFUIUnimplementedScreen();
      return result;
   }
 

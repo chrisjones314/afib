@@ -12,6 +12,7 @@ class AFUIQueryID extends AFQueryID {
 
 class AFUIScreenID extends AFScreenID {
   const AFUIScreenID(String code) : super(code, AFUILibraryID.id);
+  static const screenUnimplemented = AFUIScreenID("screen_unimplemented");
   static const screenPrototypeDrawer = AFUIScreenID("screen_prototype_drawer");
   static const screenPrototypeBottomSheet = AFUIScreenID("screen_prototype_bottom_sheet");
   static const screenPrototypeDialog = AFUIScreenID("screen_prototype_dialog");
@@ -29,8 +30,8 @@ class AFUIScreenID extends AFScreenID {
   static const screenPrototypeWidget = AFUIScreenID("prototype_widget");
   static const screenStartupWrapper = AFUIScreenID("startup_wrapper");
   static const dialogStandardAlert = AFUIScreenID("standard_alert_dialog");
-  static const screenPrototypeThirdPartyList = AFUIScreenID("protoype_third_party_list");
-  static const screenPrototypeThirdPartyHome = AFUIScreenID("protoype_third_party_home");
+  static const screenPrototypeLibraryList = AFUIScreenID("protoype_library_list");
+  static const screenPrototypeLibraryHome = AFUIScreenID("protoype_library_home");
   static const dialogStandardChoice = AFUIScreenID("standard_choice_dialog");
 }
 
@@ -52,7 +53,7 @@ class AFUIWidgetID extends AFWidgetID {
   static const buttonCancel = AFUIWidgetID("button_cancel");
   static const textFilter = AFUIWidgetID("filter_text");
   static const widgetPrototypeTest = AFUIWidgetID("widget_prototype_test");
-  static const cardThirdParty = AFUIWidgetID("third_party");
+  static const cardLibrary = AFUIWidgetID("library");
   static const textTime = AFUIWidgetID("text_time");
   static const textTimeAdjust = AFUIWidgetID("text_time_adjust");
   static const positionedTopHosted = AFUIWidgetID("positioned_top_hosted");
@@ -84,13 +85,14 @@ class AFUITranslationID extends AFTranslationID{
   static const run = AFUITranslationID("run");
   static const testResults = AFUITranslationID("test_results");
   static const searchResults = AFUITranslationID("search_results");
-  static const thirdParty = AFUITranslationID("third_party");
+  static const libraries = AFUITranslationID("third_party");
   static const workflowTests = AFUITranslationID("workflow_prototypes");
   static const screenPrototypes = AFUITranslationID("screen_prototypes");
   static const widgetPrototypes = AFUITranslationID("widget_prototypes");
   static const appTitle = AFUITranslationID("app_title");
   static const notTranslated = AFUITranslationID("not_translated");
   static const afibPrototypeLoading = AFUITranslationID("afib_prototype_loading");
+  static const afibUnimplemented = AFUITranslationID("afib_unimplemented");
 }
 
 /// Identifiers for the fundamental theme
@@ -162,13 +164,14 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const fileSimpleQuery = AFUISourceTemplateID("file_simple_query");
   static const fileDeferredQuery = AFUISourceTemplateID("file_deferred_query");
   static const fileExtendBase = AFUISourceTemplateID("file_extend_base");
-  static const fileExtendBaseThirdParty = AFUISourceTemplateID("file_extend_base_third_party");
+  static const fileExtendBaseLibrary = AFUISourceTemplateID("file_extend_base_third_party");
   static const fileExtendCommand = AFUISourceTemplateID("file_extend_command");
-  static const fileExtendCommandThirdParty = AFUISourceTemplateID("file_extend_command_third_party");
+  static const fileExtendCommandLibrary = AFUISourceTemplateID("file_extend_command_third_party");
   static const fileCreateDartParams = AFUISourceTemplateID("file_create_dart_params");
-  static const fileExtendThirdParty = AFUISourceTemplateID("file_extend_third_party");
+  static const fileExtendLibrary = AFUISourceTemplateID("file_extend_third_party");
   static const fileExtendApplication = AFUISourceTemplateID("file_extend_application");
   static const fileMain = AFUISourceTemplateID("file_main");
+  static const fileMainUILibrary = AFUISourceTemplateID("file_main_ui_library");
   static const fileApp = AFUISourceTemplateID("file_app");
   static const fileAppcodeID = AFUISourceTemplateID("file_appcode_id");
   static const fileEnvironment = AFUISourceTemplateID("file_enviroment");
@@ -177,6 +180,7 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const fileMainAFibTest = AFUISourceTemplateID("file_main_afib_test");
   static const fileConnectedBase = AFUISourceTemplateID("file_connected_base");
   static const fileExtendApp = AFUISourceTemplateID("file_extend_app");
+  static const fileExtendAppUILibrary = AFUISourceTemplateID("file_extend_app_ui_library");
   static const fileExtendTest = AFUISourceTemplateID("file_extend_test");
   static const fileDefaultTheme = AFUISourceTemplateID("file_default_theme");
   static const fileDefineUI = AFUISourceTemplateID("file_define_ui");
@@ -184,6 +188,9 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const fileTestData = AFUISourceTemplateID("file_test_data");
   static const fileStateTestShortcuts = AFUISourceTemplateID("file_state_test_shortcuts");
   static const fileCommand = AFUISourceTemplateID("file_command");
+  static const fileLibExports = AFUISourceTemplateID("file_lib_exports");
+  static const fileInstallUI = AFUISourceTemplateID("file_install_ui");
+  static const fileInstallCommand = AFUISourceTemplateID("file_install_command");
   
   static const stmtDeclareID = AFUISourceTemplateID("declare_id");
   static const stmtDeclareRouteParam = AFUISourceTemplateID("declare_route_param");
@@ -218,6 +225,10 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textTestKind = AFUISourceTemplateID("test_kind");
   static const textPackageCode = AFUISourceTemplateID("package_code");
   static const textExtendKind = AFUISourceTemplateID("extend_kind");
+  static const textTestID = AFUISourceTemplateID("test_id");
+  static const textLibKind = AFUISourceTemplateID("lib_kind");
+  static const textExtendAppParam = AFUISourceTemplateID("extend_app_param");
+  static const textFundamentalThemeInit = AFUISourceTemplateID("fundamental_theme_init");
   
   static const textAdditionalMethods = AFUISourceTemplateID("additional_methods");
   static const textFileRelativePath = AFUISourceTemplateID("file_relative_path");

@@ -430,13 +430,13 @@ class AFTranslationSet {
 
 }
 
-class AFPluginFundamentalThemeAreaBuilder {
+class AFUILibraryFundamentalThemeAreaBuilder {
   final values = <AFThemeID, AFFundamentalThemeValue>{};
   final translationSet = <Locale, AFTranslationSet>{};
   final supportedLocalesApp = <Locale>[];
   Map<AFThemeID, List<dynamic>> optionsForType;
 
-  AFPluginFundamentalThemeAreaBuilder(
+  AFUILibraryFundamentalThemeAreaBuilder(
     this.optionsForType
   );
 
@@ -685,7 +685,7 @@ mixin AFThemeAreaUtilties {
   }
 }
 
-class AFAppFundamentalThemeAreaBuilder extends AFPluginFundamentalThemeAreaBuilder with AFThemeAreaUtilties {
+class AFAppFundamentalThemeAreaBuilder extends AFUILibraryFundamentalThemeAreaBuilder with AFThemeAreaUtilties {
   ThemeData? themeLight;
   ThemeData? themeDark;
   static const bootstrapStandardMargins = <double>[0, 2.0, 4.0, 8.0, 12.0, 16.0];

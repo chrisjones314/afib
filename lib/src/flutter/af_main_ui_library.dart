@@ -9,12 +9,19 @@ import 'package:afib/src/flutter/core/af_app_extension_context.dart';
 import 'package:afib/src/flutter/ui/theme/af_default_fundamental_theme.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 
-/// [afMain] handles startup, execution, and shutdown sequence for an afApp
-void afMainUILibrary<TState extends AFFlexibleState>(AFLibraryID id, AFDartParams paramsD, AFExtendBaseDelegate extendBase, AFExtendBaseDelegate extendBaseThirdParty, AFExtendUILibraryDelegate extendApp, AFExtendTestDelegate extendTest) {
+/// [afMainApp] handles startup, execution, and shutdown sequence for an afApp
+void afMainUILibrary<TState extends AFFlexibleState>({
+  required AFLibraryID id, 
+  required AFDartParams paramsDart, 
+  required AFExtendBaseDelegate extendBase, 
+  required AFExtendBaseDelegate extendBaseLibrary, 
+  required AFExtendUILibraryDelegate extendUI, 
+  required AFExtendTestDelegate extendTest
+}) {
   final contextLibrary = AFUILibraryExtensionContext(id: id);
-  extendApp(contextLibrary);
+  extendUI(contextLibrary);
 
-  final paramsProto = paramsD.forceEnvironment(AFEnvironment.prototype);
+  final paramsProto = paramsDart.forceEnvironment(AFEnvironment.prototype);
  
   final extendAppFull = (context) {
     context.fromUILibrary(contextLibrary,
@@ -23,10 +30,10 @@ void afMainUILibrary<TState extends AFFlexibleState>(AFLibraryID id, AFDartParam
     );
   };
 
-  afMain<TState>(
-    paramsD: paramsProto, 
+  afMainApp<TState>(
+    paramsDart: paramsProto, 
     extendBase: extendBase, 
-    extendThirdPartyBase: extendBaseThirdParty, 
+    extendBaseLibrary: extendBaseLibrary, 
     extendApp: extendAppFull, 
     extendTest: extendTest
   );

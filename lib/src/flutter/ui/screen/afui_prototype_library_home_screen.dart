@@ -13,47 +13,47 @@ import 'package:flutter/material.dart';
 
 /// Parameter uses to filter the tests shown on the screen.
 @immutable
-class AFUIPrototypeThirdPartyHomeParam extends AFRouteParam {
+class AFUIPrototypeLibraryHomeParam extends AFRouteParam {
   final AFUILibraryExtensionContext libraryContext;
 
-  AFUIPrototypeThirdPartyHomeParam({required this.libraryContext}): super(id: AFUIScreenID.screenPrototypeThirdPartyHome);
+  AFUIPrototypeLibraryHomeParam({required this.libraryContext}): super(id: AFUIScreenID.screenPrototypeLibraryHome);
   
-  factory AFUIPrototypeThirdPartyHomeParam.create(AFUILibraryExtensionContext context) {
-    return AFUIPrototypeThirdPartyHomeParam(libraryContext: context);
+  factory AFUIPrototypeLibraryHomeParam.create(AFUILibraryExtensionContext context) {
+    return AFUIPrototypeLibraryHomeParam(libraryContext: context);
   }
 }
 
-class AFUIPrototypeThirdPartyHomeScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeThirdPartyHomeParam> {
-  AFUIPrototypeThirdPartyHomeScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeThirdPartyHomeParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
+class AFUIPrototypeLibraryHomeScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeLibraryHomeParam> {
+  AFUIPrototypeLibraryHomeScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeLibraryHomeParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
   
-  factory AFUIPrototypeThirdPartyHomeScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeThirdPartyHomeParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
-    return AFUIPrototypeThirdPartyHomeScreenSPI(context, screenId, theme,
+  factory AFUIPrototypeLibraryHomeScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeLibraryHomeParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
+    return AFUIPrototypeLibraryHomeScreenSPI(context, screenId, theme,
     );
   }
 }
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
 /// and display them in a list.
-class AFUIPrototypeThirdPartyHomeScreen extends AFUIConnectedScreen<AFUIPrototypeThirdPartyHomeScreenSPI, AFUIDefaultStateView, AFUIPrototypeThirdPartyHomeParam> {
+class AFUIPrototypeLibraryHomeScreen extends AFUIConnectedScreen<AFUIPrototypeLibraryHomeScreenSPI, AFUIDefaultStateView, AFUIPrototypeLibraryHomeParam> {
 
-  static final config =  AFUIDefaultScreenConfig<AFUIPrototypeThirdPartyHomeScreenSPI, AFUIPrototypeThirdPartyHomeParam> (
-    spiCreator: AFUIPrototypeThirdPartyHomeScreenSPI.create,
+  static final config =  AFUIDefaultScreenConfig<AFUIPrototypeLibraryHomeScreenSPI, AFUIPrototypeLibraryHomeParam> (
+    spiCreator: AFUIPrototypeLibraryHomeScreenSPI.create,
   );
 
-  AFUIPrototypeThirdPartyHomeScreen(): super(screenId: AFUIScreenID.screenPrototypeThirdPartyHome, config: config);
+  AFUIPrototypeLibraryHomeScreen(): super(screenId: AFUIScreenID.screenPrototypeLibraryHome, config: config);
 
   static AFNavigatePushAction navigatePush(AFUILibraryExtensionContext libraryContext) {
     return AFNavigatePushAction(
-      routeParam: AFUIPrototypeThirdPartyHomeParam.create(libraryContext));
+      routeParam: AFUIPrototypeLibraryHomeParam.create(libraryContext));
   }
 
   @override
-  Widget buildWithSPI(AFUIPrototypeThirdPartyHomeScreenSPI spi) {
-    return _buildThirdParty(spi);
+  Widget buildWithSPI(AFUIPrototypeLibraryHomeScreenSPI spi) {
+    return _buildLibrary(spi);
   }
 
   /// 
-  Widget _buildThirdParty(AFUIPrototypeThirdPartyHomeScreenSPI spi) {
+  Widget _buildLibrary(AFUIPrototypeLibraryHomeScreenSPI spi) {
     final t = spi.t;
     final context = spi.context;
     final libraryContext = context.p.libraryContext;
@@ -63,7 +63,7 @@ class AFUIPrototypeThirdPartyHomeScreen extends AFUIConnectedScreen<AFUIPrototyp
     
     final cardRows = t.column();
     if(libraryTests != null) {
-      t.buildThirdPartyPrototypeNav(
+      t.buildLibraryPrototypeNav(
         spi: spi,
         tests: libraryTests,
         rows: cardRows,

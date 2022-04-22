@@ -95,9 +95,10 @@ class AFGeneratedFile {
     }
 
     // just checking the first line works for both function and id declarations
-    final line = lines.first;
+    var firstNonEmpty = lines.firstWhere((element) => element.isNotEmpty);
+    
     for(final lineTest in buffer.lines) {
-      if(lineTest.contains(line)) {
+      if(lineTest.contains(firstNonEmpty)) {
         return true;
       }
     }    

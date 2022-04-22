@@ -20,15 +20,20 @@ import 'package:afib/src/dart/command/templates/files/define_tests.t.dart';
 import 'package:afib/src/dart/command/templates/files/define_ui.t.dart';
 import 'package:afib/src/dart/command/templates/files/environment.t.dart';
 import 'package:afib/src/dart/command/templates/files/extend_app.t.dart';
+import 'package:afib/src/dart/command/templates/files/extend_app_ui_library.t.dart';
 import 'package:afib/src/dart/command/templates/files/extend_base.t.dart';
 import 'package:afib/src/dart/command/templates/files/extend_command.t.dart';
 import 'package:afib/src/dart/command/templates/files/extend_test.t.dart';
-import 'package:afib/src/dart/command/templates/files/extend_third_party_base.t.dart';
-import 'package:afib/src/dart/command/templates/files/extend_third_party_command.t.dart';
-import 'package:afib/src/dart/command/templates/files/extend_third_party_ui.t.dart';
+import 'package:afib/src/dart/command/templates/files/extend_library_base.t.dart';
+import 'package:afib/src/dart/command/templates/files/extend_library_command.t.dart';
+import 'package:afib/src/dart/command/templates/files/extend_library_ui.t.dart';
 import 'package:afib/src/dart/command/templates/files/id.t.dart';
+import 'package:afib/src/dart/command/templates/files/install_command.t.dart';
+import 'package:afib/src/dart/command/templates/files/install_ui.t.dart';
+import 'package:afib/src/dart/command/templates/files/lib_exports.t.dart';
 import 'package:afib/src/dart/command/templates/files/main.t.dart';
 import 'package:afib/src/dart/command/templates/files/main_afib_test.t.dart';
+import 'package:afib/src/dart/command/templates/files/main_ui_library.t.dart';
 import 'package:afib/src/dart/command/templates/files/model.t.dart';
 import 'package:afib/src/dart/command/templates/files/screen.t.dart';
 import 'package:afib/src/dart/command/templates/files/screen_test.t.dart';
@@ -66,12 +71,13 @@ class AFTemplateRegistry {
     register(AFUISourceTemplateID.fileDeferredQuery, DeferredQueryT());
     register(AFUISourceTemplateID.stmtDeclareSPI, DeclareSPIT());
     register(AFUISourceTemplateID.fileExtendBase, AFExtendBaseT());
-    register(AFUISourceTemplateID.fileExtendBaseThirdParty, AFExtendThirdPartyBaseT());
+    register(AFUISourceTemplateID.fileExtendBaseLibrary, AFExtendLibraryBaseT());
     register(AFUISourceTemplateID.fileExtendCommand, AFExtendCommandT());
-    register(AFUISourceTemplateID.fileExtendCommandThirdParty, AFExtendThirdPartyCommandT());
-    register(AFUISourceTemplateID.fileExtendThirdParty, AFExtendThirdPartyUIT());
+    register(AFUISourceTemplateID.fileExtendCommandLibrary, AFExtendLibraryCommandT());
+    register(AFUISourceTemplateID.fileExtendLibrary, AFExtendLibraryUIT());
     register(AFUISourceTemplateID.fileExtendApplication, AFExtendApplicationT());
     register(AFUISourceTemplateID.fileMain, AFMainT());
+    register(AFUISourceTemplateID.fileMainUILibrary, AFMainUILibraryT());
     register(AFUISourceTemplateID.fileApp, AFAppT());
     register(AFUISourceTemplateID.fileAppcodeID, AFAppcodeIDT());
     register(AFUISourceTemplateID.fileEnvironment, AFEnvironmentT());
@@ -81,6 +87,8 @@ class AFTemplateRegistry {
     register(AFUISourceTemplateID.fileMainAFibTest, AFMainAFibTestT());
     register(AFUISourceTemplateID.fileConnectedBase, AFConnectedBaseT());
     register(AFUISourceTemplateID.fileExtendApp, AFExtendAppT());
+    register(AFUISourceTemplateID.fileExtendAppUILibrary, AFExtendAppUILibraryT());
+    
     register(AFUISourceTemplateID.fileDefaultTheme, AFThemeT());
     register(AFUISourceTemplateID.fileExtendTest, AFExtendTestT());
     register(AFUISourceTemplateID.fileDefineTests, AFDefineTestsT());
@@ -88,6 +96,10 @@ class AFTemplateRegistry {
     register(AFUISourceTemplateID.fileStateTestShortcuts, AFStateTestShortcutsT());
     register(AFUISourceTemplateID.fileDefineUI, AFDefineUIT());
     register(AFUISourceTemplateID.fileCommand, AFCommandT());
+    register(AFUISourceTemplateID.fileLibExports, AFLibExportsT());
+    register(AFUISourceTemplateID.fileInstallUI, AFInstallUIT());
+    register(AFUISourceTemplateID.fileInstallCommand, AFInstallCommandT());
+    
     
     register(AFUISourceTemplateID.fileCreateDartParams, AFCreateDartParamsT());
     register(AFUISourceTemplateID.commentSPIIntro, SPIIntroComment());

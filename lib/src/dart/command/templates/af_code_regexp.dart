@@ -8,14 +8,17 @@ class AFCodeRegExp {
   static final startDefineScreenTestFunction = RegExp(r"void\s+define.*Prototypes\(AFUIPrototypeDefinitionContext\s+definitions\)\s+{");
   static final startScreenMap = RegExp(r"void\s+defineScreens\(AFUIDefinitionContext\s+context\)\s+{");
   static final startDefineStateClass = RegExp(r"class\s+.*State\s+extends\s+AFFlexibleState\s+with\s+.*StateModelAccess\s+{");
-  static final startReturnInitialState = RegExp(r"return\s+.*State.fromList\(\[");
-  static final startExtendThirdPartyBase = RegExp(r"void\s+extendThirdPartyBase\(AFBaseExtensionContext\s+context\)\s+{");
-  static final startExtendThirdPartyCommand = RegExp(r"void\s+extendThirdPartyCommand\(AFCommandThirdPartyExtensionContext\s+context\)\s+{");
-  static final startExtendThirdPartyUI = RegExp(r"void\s+extendThirdPartyUI\(AFAppThirdPartyExtensionContext\s+context\)\s+{");
+  static final startReturnInitialState = RegExp(r"return\s+.*State.fromList\(\s*\[");
+  static final startExtendLibraryBase = RegExp(r"void\s+extendBaseLibrary\(AFBaseExtensionContext\s+context\)\s+{");
+  static final startExtendLibraryCommand = RegExp(r"void\s+extendCommandLibrary\(AFCommandUILibraryExtensionContext\s+context\)\s+{");
+  static final startExtendLibraryUI = RegExp(r"void\s+extendUILibrary\(AFAppLibraryExtensionContext\s+context\)\s+{");
   static final startDefineThemes = RegExp(r"void\s+defineFunctionalThemes\(AFUIDefinitionContext\s+context\)\s+{");
   static final startDefineUI = RegExp(r"void\s+defineUI\(AFUIDefinitionContext\s+context\)\s+{");
   static final startExtendCommand = RegExp(r"void\s+extendCommand\(AFCommandExtensionContext\s+context\)\s+{");
-  
+  static final startDefineTestData = RegExp(r"void\s+defineTestData\(AFDefineTestDataContext\s+testData\)\s+{");
+  static final startDeclareTestData = RegExp(r"testData\.define\(.*TestDataID\.stateFullLogin,\s+.*State.fromList\(\s*\[");
+  static final startDeclareTestDataID = RegExp(r"class\s+.*TestDataID\s+{");
+
   static RegExp startUIID(String kind) {
     return RegExp("class\\s+.*${kind}ID\\s+extends\\s+AFScreenID\\s+{");
   }

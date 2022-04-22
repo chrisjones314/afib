@@ -6,8 +6,8 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/ui/screen/afui_prototype_library_list_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_list_screen.dart';
-import 'package:afib/src/flutter/ui/screen/afui_prototype_third_party_list_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
 import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:afib/src/flutter/utils/af_param_ui_state_holder.dart';
@@ -113,7 +113,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFPrototypeHomeScreenSPI
 
     final protoRows = t.column();
 
-    t.buildThirdPartyPrototypeNav(
+    t.buildLibraryPrototypeNav(
       spi: spi,
       rows: protoRows,
       tests: primaryTests,
@@ -139,8 +139,8 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFPrototypeHomeScreenSPI
       ));
     }
 
-    releaseRows.add(t.childListNav(title: AFUITranslationID.thirdParty, onPressed: () {
-      spi.navigatePush(AFUIPrototypeThirdPartyListScreen.navigatePush());
+    releaseRows.add(t.childListNav(title: AFUITranslationID.libraries, onPressed: () {
+      spi.navigatePush(AFUIPrototypeLibraryListScreen.navigatePush());
     }));
 
 

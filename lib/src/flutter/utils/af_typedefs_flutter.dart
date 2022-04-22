@@ -137,10 +137,10 @@ typedef AFOnTapDelegate = void Function();
 typedef AFExtendUILibraryDelegate = void Function(AFUILibraryExtensionContext context);
 typedef AFExtendAppDelegate = void Function(AFAppExtensionContext context);
 typedef AFExtendTestDelegate = void Function(AFTestExtensionContext context);
-typedef AFExtendThirdPartyUIDelegate = void Function(AFAppThirdPartyExtensionContext context);
+typedef AFExtendLibraryUIDelegate = void Function(AFAppLibraryExtensionContext context);
 
 /// Allows plug-ins to contribute fundamental theme values
-typedef AFInitPluginFundamentalThemeDelegate = void Function(AFFundamentalDeviceTheme device, AFComponentStates appState, AFPluginFundamentalThemeAreaBuilder builder);
+typedef AFInitPluginFundamentalThemeDelegate = void Function(AFFundamentalDeviceTheme device, AFComponentStates appState, AFUILibraryFundamentalThemeAreaBuilder builder);
 
 /// Allows the app to contribute fundamental theme values
 typedef AFInitAppFundamentalThemeDelegate = void Function(AFFundamentalDeviceTheme device, AFComponentStates appState, AFAppFundamentalThemeAreaBuilder builder);

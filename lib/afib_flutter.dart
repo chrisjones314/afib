@@ -15,6 +15,7 @@ export "src/dart/redux/actions/af_deferred_query.dart";
 export "src/dart/redux/actions/af_query_actions.dart";
 export 'src/dart/redux/actions/af_route_actions.dart';
 export "src/dart/redux/middleware/af_async_queries.dart";
+export "src/dart/redux/queries/af_navigate_unimplemented_query.dart";
 export "src/dart/redux/queries/af_package_info_query.dart";
 export "src/dart/redux/queries/af_time_update_listener_query.dart";
 export "src/dart/redux/state/af_state.dart";

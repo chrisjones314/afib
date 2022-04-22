@@ -5,6 +5,7 @@ import 'package:afib/src/dart/redux/actions/af_always_fail_query.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
+import 'package:afib/src/dart/redux/queries/af_navigate_unimplemented_query.dart';
 import 'package:afib/src/dart/redux/queries/af_time_update_listener_query.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
@@ -1081,6 +1082,11 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
       }
     }
 
+    if(query is AFNavigateUnimplementedQuery) {
+      query.startAsyncAF(context.dispatcher, context.store);
+      return;
+    }
+
     var h = results[key];
     if(h == null) {
       /// Ummm, this might be a good place to admit that sometimes the type system
@@ -1088,6 +1094,7 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
       if(key.toString().startsWith("AFAlwaysFailQuery")) {
         h = results["AFAlwaysFailQuery<AFAppStateAreaUnused>"];
       }
+
     }
 
     if(h == null) {    

@@ -1,9 +1,13 @@
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
+import 'package:afib/src/dart/command/templates/comments/navigate_push_intro.t.dart';
 import 'package:afib/src/dart/command/templates/files/theme.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_bottom_sheet_build_body.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_call_define_screen_test.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_create_screen_prototype.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_create_widget_prototype.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_define_navigate_push.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_define_theme.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_dialog_build_body.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_drawer_build_body.t.dart';
@@ -12,11 +16,19 @@ import 'package:afib/src/dart/command/templates/statements/declare_launch_param_
 import 'package:afib/src/dart/command/templates/statements/declare_no_scaffold_build_with_spi.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_screen_build_body_impl.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_screen_build_with_spi_impl.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_screen_impls_super.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_screen_map_entry.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_spi.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_spi_on_pressed_closed.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_spi_on_tap_close.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_standard_route_param_impls.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_state_test_screen_shortcut.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_state_test_widget_shortcut.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_widget_build_body.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_widget_impls_super.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_widget_params_constructor.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_widget_route_param_impls.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_widget_spi.t.dart';
 import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
@@ -37,16 +49,28 @@ class AFUIControlSettings {
   final AFSourceTemplate implBuildBody;
   final AFSourceTemplate implsSPI;
   final AFSourceTemplate implsSuper;
+  final AFSourceTemplate paramsConstructor;
+  final AFSourceTemplate routeParamImpls;
+  final AFSourceTemplate navigatePush;
+  final AFSourceTemplate spi;
+  final AFSourceTemplate stateTestShortcut;
+  final AFSourceTemplate createPrototype;
 
-  const AFUIControlSettings(
-    this.kind,
-    this.suffix,
-    this.path,
-    this.implBuildWithSPI,
-    this.implBuildBody,
-    this.implsSPI,
-    this.implsSuper,
-  );
+  const AFUIControlSettings({
+    required this.kind,
+    required this.suffix,
+    required this.path,
+    required this.implBuildWithSPI,
+    required this.implBuildBody,
+    required this.implsSPI,
+    required this.implsSuper,
+    required this.paramsConstructor,
+    required this.routeParamImpls,
+    required this.navigatePush,
+    required this.spi,
+    required this.stateTestShortcut,
+    required this.createPrototype,
+  });
 
   bool matchesName(String uiName) {
     return uiName.endsWith(suffix);
@@ -77,49 +101,79 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
   static const widgetSuffix = "Widget";
   static final controlKinds = [
     AFUIControlSettings(
-      AFUIControlKind.screen, 
-      screenSuffix, 
-      AFCodeGenerator.screensPath,
-      DeclareScreenBuildWithSPIImplT(),
-      DeclareScreenBuildBodyImplT(),
-      DeclareEmptyStatementT(),
-      DeclareEmptyStatementT(),
+      kind: AFUIControlKind.screen, 
+      suffix: screenSuffix, 
+      path: AFCodeGenerator.screensPath,
+      implBuildWithSPI: DeclareScreenBuildWithSPIImplT(),
+      implBuildBody: DeclareScreenBuildBodyImplT(),
+      implsSPI: DeclareEmptyStatementT(),
+      implsSuper: DeclareScreenImplsSuperT(),
+      paramsConstructor: DeclareEmptyStatementT(),
+      routeParamImpls: DeclareStandardRouteParamImplsT(),
+      navigatePush: DeclareDefineNavigatePushT(),
+      spi: DeclareSPIT(),
+      stateTestShortcut: DeclareStateTestScreenShortcutT(),
+      createPrototype: DeclareCreateScreenPrototypeT(),
     ),
     AFUIControlSettings(
-      AFUIControlKind.bottomSheet, 
-      bottomSheetSuffix, 
-      AFCodeGenerator.bottomSheetsPath,
-      DeclareNoScaffoldBuildWithSPIImplT(),
-      DeclareBottomSheetBuildBodyImplT(),
-      DeclareSPIOnPressedCloseImplT(),
-      DeclareEmptyStatementT(),
+      kind: AFUIControlKind.bottomSheet, 
+      suffix: bottomSheetSuffix, 
+      path: AFCodeGenerator.bottomSheetsPath,
+      implBuildWithSPI: DeclareNoScaffoldBuildWithSPIImplT(),
+      implBuildBody: DeclareBottomSheetBuildBodyImplT(),
+      implsSPI: DeclareSPIOnPressedCloseImplT(),
+      implsSuper: DeclareScreenImplsSuperT(),
+      paramsConstructor: DeclareEmptyStatementT(),
+      routeParamImpls: DeclareStandardRouteParamImplsT(),
+      navigatePush: DeclareDefineNavigatePushT(),
+      spi: DeclareSPIT(),
+      stateTestShortcut: DeclareStateTestScreenShortcutT(),
+      createPrototype: DeclareCreateScreenPrototypeT(),
     ),
     AFUIControlSettings(
-      AFUIControlKind.drawer, 
-      drawerSuffix, 
-      AFCodeGenerator.drawersPath,
-      DeclareNoScaffoldBuildWithSPIImplT(),
-      DeclareDrawerBuildBodyImplT(),
-      DeclareSPIOnTapCloseImplT(),
-      DeclareLaunchParamImplT()
+      kind: AFUIControlKind.drawer, 
+      suffix: drawerSuffix, 
+      path: AFCodeGenerator.drawersPath,
+      implBuildWithSPI: DeclareNoScaffoldBuildWithSPIImplT(),
+      implBuildBody: DeclareDrawerBuildBodyImplT(),
+      implsSPI: DeclareSPIOnTapCloseImplT(),
+      implsSuper: DeclareLaunchParamImplT(),
+      paramsConstructor: DeclareEmptyStatementT(),
+      routeParamImpls: DeclareStandardRouteParamImplsT(),
+      navigatePush: DeclareDefineNavigatePushT(),
+      spi: DeclareSPIT(),
+      stateTestShortcut: DeclareStateTestScreenShortcutT(),
+      createPrototype: DeclareCreateScreenPrototypeT(),
     ),
     AFUIControlSettings(
-      AFUIControlKind.dialog, 
-      dialogSuffix, 
-      AFCodeGenerator.dialogsPath,
-      DeclareNoScaffoldBuildWithSPIImplT(),
-      DeclareDialogBuildBodyImplT(),
-      DeclareSPIOnPressedCloseImplT(),
-      DeclareEmptyStatementT(),
+      kind: AFUIControlKind.dialog, 
+      suffix: dialogSuffix, 
+      path: AFCodeGenerator.dialogsPath,
+      implBuildWithSPI: DeclareNoScaffoldBuildWithSPIImplT(),
+      implBuildBody: DeclareDialogBuildBodyImplT(),
+      implsSPI: DeclareSPIOnPressedCloseImplT(),
+      implsSuper: DeclareScreenImplsSuperT(),
+      paramsConstructor: DeclareEmptyStatementT(),
+      routeParamImpls: DeclareStandardRouteParamImplsT(),
+      navigatePush: DeclareDefineNavigatePushT(),
+      spi: DeclareSPIT(),
+      stateTestShortcut: DeclareStateTestScreenShortcutT(),
+      createPrototype: DeclareCreateScreenPrototypeT(),
     ),
     AFUIControlSettings(
-      AFUIControlKind.widget, 
-      widgetSuffix, 
-      AFCodeGenerator.widgetsPath,
-      DeclareNoScaffoldBuildWithSPIImplT(),
-      DeclareBottomSheetBuildBodyImplT(),
-      DeclareEmptyStatementT(),
-      DeclareEmptyStatementT(),
+      kind: AFUIControlKind.widget, 
+      suffix: widgetSuffix, 
+      path: AFCodeGenerator.widgetsPath,
+      implBuildWithSPI: DeclareNoScaffoldBuildWithSPIImplT(),
+      implBuildBody: DeclareWidgetBuildBodyImplT(),
+      implsSPI: DeclareEmptyStatementT(),
+      implsSuper: DeclareWidgetImplsSuperT(),
+      paramsConstructor: DeclareWidgetParamsConstructorT(),
+      routeParamImpls: DeclareWidgetRouteParamImplsT(),
+      navigatePush: DeclareEmptyStatementT(),
+      spi: DeclareWidgetSPIT(),
+      stateTestShortcut: DeclareStateTestWidgetShortcutT(),
+      createPrototype: DeclareCreateWidgetPrototypeT(),
     ),
   ];
 
@@ -291,6 +345,19 @@ $optionsHeader
     }
     final screenId = generator.declareUIID(ctx, uiName, controlSettings);
 
+    final templateSPI = controlSettings.spi.toBuffer();
+    /*
+    templateSPI.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
+    templateSPI.executeStandardReplacements(ctx);
+    */
+
+    final templateSPIImpls = spiImpls?.toBuffer() ?? controlSettings.implsSPI.toBuffer();
+    templateSPI.replaceTextLines(ctx, AFUISourceTemplateID.textSPIImpls, templateSPIImpls.lines);
+    screenFile.replaceTextLines(ctx, AFUISourceTemplateID.stmtDeclareSPI, templateSPI.lines);
+    
+    final templateSuper = controlSettings.implsSuper.toBuffer();
+    screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textSuperImpls, templateSuper.lines);
+
     // create the screen file itself.
     screenFile.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
     screenFile.replaceText(ctx, AFUISourceTemplateID.textScreenID, screenId);
@@ -302,36 +369,50 @@ $optionsHeader
     screenFile.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
     screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textImportStatements, imports);
     screenFile.replaceTemplate(ctx, AFUISourceTemplateID.textBuildWithSPIImpl, buildWithSPI ?? controlSettings.implBuildWithSPI);
-    screenFile.replaceTemplate(ctx, AFUISourceTemplateID.textBuildBodyImpl, buildBody ?? controlSettings.implBuildBody);
-    screenFile.replaceTemplate(ctx, AFUISourceTemplateID.textRouteParamImpls, routeParamImpls ?? DeclareStandardRouteParamImplsT());
-    
-    final templateSPI = spiImpls?.toBuffer() ?? controlSettings.implsSPI.toBuffer();
-    templateSPI.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
-    screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textSPIImpls, templateSPI.lines);
+    final templateBody = buildBody ?? controlSettings.implBuildBody;
+    final body = templateBody.toBuffer();
+    body.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
 
-    final templateSuper = controlSettings.implsSuper.toBuffer();
-    templateSuper.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
-    screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textSuperImpls, templateSuper.lines);
+    screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textBuildBodyImpl, body.lines);
+    final routeParamTemplate = routeParamImpls ?? controlSettings.routeParamImpls;
+    final routeParam = routeParamTemplate.toBuffer();
+    routeParam.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
+    routeParam.executeStandardReplacements(ctx);
+    screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textRouteParamImpls, routeParam.lines);
+    
+
     screenFile.replaceTemplate(ctx, AFUISourceTemplateID.textScreenImpls, screenImpls);
+
+    screenFile.replaceTemplate(ctx, AFUISourceTemplateID.textParamsConstructor, controlSettings.paramsConstructor);
+    
+    final templatePush = controlSettings.navigatePush.toBuffer();
+    templatePush.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
+    templatePush.replaceTemplate(ctx, AFUISourceTemplateID.commentNavigatePush, NavigatePushIntroComment());
+
+    screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textNavigateMethods, templatePush.lines);
+
+
 
 
     // put the screen in the screen map
-    final declareScreenInMap = DeclareRegisterScreenMapT().toBuffer();
-    declareScreenInMap.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
-    declareScreenInMap.replaceText(ctx, AFUISourceTemplateID.textScreenID, screenId);
-    declareScreenInMap.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
-    declareScreenInMap.executeStandardReplacements(ctx);
-    final screenMapPath = generator.pathDefineUI;
-    final screenMapFile = generator.modifyFile(ctx, screenMapPath);
-    screenMapFile.addLinesAfter(ctx, AFCodeRegExp.startScreenMap, declareScreenInMap.lines);
-    generator.addImport(ctx, 
-      importPath: screenFile.importPathStatement, 
-      to: screenMapFile, 
-      before: AFCodeRegExp.startDefineUI
-    );            
+    if(controlSettings.kind != AFUIControlKind.widget) {
+      final declareScreenInMap = DeclareRegisterScreenMapT().toBuffer();
+      declareScreenInMap.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
+      declareScreenInMap.replaceText(ctx, AFUISourceTemplateID.textScreenID, screenId);
+      declareScreenInMap.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
+      declareScreenInMap.executeStandardReplacements(ctx);
+      final screenMapPath = generator.pathDefineUI;
+      final screenMapFile = generator.modifyFile(ctx, screenMapPath);
+      screenMapFile.addLinesAfter(ctx, AFCodeRegExp.startScreenMap, declareScreenInMap.lines);
+      generator.addImport(ctx, 
+        importPath: screenFile.importPathStatement, 
+        to: screenMapFile, 
+        before: AFCodeRegExp.startDefineUI
+      );            
+    }
 
     // create a state test shortcut declaration function.
-    final shortcut = DeclareStateTestScreenShortcutT().toBuffer();
+    final shortcut = controlSettings.stateTestShortcut.toBuffer();
     shortcut.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
     shortcut.replaceText(ctx, AFUISourceTemplateID.textScreenID, screenId);
     shortcut.replaceText(ctx, AFUISourceTemplateID.textScreenIDType, screenIdType);
@@ -356,9 +437,12 @@ $optionsHeader
       // create a new screen test files
       final pathScreenTest = generator.pathScreenTest(uiName, controlSettings);
       final screenTestFile = generator.createFile(ctx, pathScreenTest, AFUISourceTemplateID.fileScreenTest);
+      screenTestFile.replaceTemplate(ctx, AFUISourceTemplateID.textDeclareCreatePrototype, controlSettings.createPrototype);
       screenTestFile.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
       screenTestFile.replaceText(ctx, AFUISourceTemplateID.textFullTestDataID, generator.stateFullLoginID);
       screenTestFile.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
+      screenTestFile.replaceText(ctx, AFUISourceTemplateID.textScreenID, screenId);
+
       screenTestFile.executeStandardReplacements(ctx);
       generator.addImport(ctx,
         importPath: screenFile.importPathStatement,

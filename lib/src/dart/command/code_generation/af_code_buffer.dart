@@ -58,6 +58,11 @@ class AFCodeBuffer {
   /// template anywhere in the file.
   /// 
   void replaceTemplate(AFCommandContext context, dynamic id, AFSourceTemplate content) {
+    if(content.isComment && !AFibD.config.generateBeginnerComments) {
+      replaceText(context, id, "");
+      return;
+    }
+
     final idCode = id.toString();
     for(var i = 0; i < lines.length; i++) {
       replaceInLine(context, i, idCode, content.createLinesWithOptions);
@@ -113,6 +118,14 @@ class AFCodeBuffer {
     throw AFCommandError(error: "Could not find regular expression $match in $location");
   }
 
+  void replaceTextLines(AFCommandContext context, dynamic id, List<String> lines) {
+    final value = StringBuffer();
+    for(final line in lines) {
+      value.write(line);
+      value.write("\n");
+    }
+    return replaceText(context, id, value.toString());
+  }
 
   /// Replaces the specified id with the specified text value anywhere in the file.
   /// 

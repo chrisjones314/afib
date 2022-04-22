@@ -69,7 +69,6 @@ class AFTemplateRegistry {
     register(AFUISourceTemplateID.stmtDeclareStateView, DeclareStateViewT());
     register(AFUISourceTemplateID.fileSimpleQuery, SimpleQueryT());
     register(AFUISourceTemplateID.fileDeferredQuery, DeferredQueryT());
-    register(AFUISourceTemplateID.stmtDeclareSPI, DeclareSPIT());
     register(AFUISourceTemplateID.fileExtendBase, AFExtendBaseT());
     register(AFUISourceTemplateID.fileExtendBaseLibrary, AFExtendLibraryBaseT());
     register(AFUISourceTemplateID.fileExtendCommand, AFExtendCommandT());
@@ -105,7 +104,6 @@ class AFTemplateRegistry {
     register(AFUISourceTemplateID.commentSPIIntro, SPIIntroComment());
     register(AFUISourceTemplateID.commentRouteParamIntro, RouteParamIntroComment());
     register(AFUISourceTemplateID.commentConfigDecl, ConfigDeclIntroComment());
-    register(AFUISourceTemplateID.commentNavigatePush, NavigatePushIntroComment());
     register(AFUISourceTemplateID.commentBuildWithSPI, BuildWithSPIComment());
     register(AFUISourceTemplateID.commentBuildBody, BuildBodyIntroComment());
 

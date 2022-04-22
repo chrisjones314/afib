@@ -40,10 +40,10 @@ class [!af_app_namespace(upper)]FlexibleStateView extends AFFlexibleStateView  {
 
 abstract class [!af_app_namespace(upper)]ConnectedScreen<TSPI extends AFScreenStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreen<[!af_app_namespace(upper)]State, [!af_app_namespace(upper)]DefaultTheme, TStateView, TRouteParam, TSPI> {
   [!af_app_namespace(upper)]ConnectedScreen({
-    required AFConnectedUIConfig<[!af_app_namespace(upper)]State, [!af_app_namespace(upper)]DefaultTheme, TStateView, TRouteParam, TSPI>  config,
+    required AFConnectedUIConfig<[!af_app_namespace(upper)]State, [!af_app_namespace(upper)]DefaultTheme, TStateView, TRouteParam, TSPI>  uiConfig,
     required AFScreenID screenId,
     TRouteParam? launchParam,
-  }): super(config: config, screenId: screenId, launchParam: launchParam);
+  }): super(config: uiConfig, screenId: screenId, launchParam: launchParam);
 }
 
 abstract class [!af_app_namespace(upper)]ConnectedDialog<TSPI extends AFDialogStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedDialog<[!af_app_namespace(upper)]State, [!af_app_namespace(upper)]DefaultTheme, TStateView, TRouteParam, TSPI>  {

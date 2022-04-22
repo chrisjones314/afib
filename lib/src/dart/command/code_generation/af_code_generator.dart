@@ -573,10 +573,11 @@ class AFCodeGenerator {
   }
 
   String declareUIID(AFCommandContext ctx, String screenName, AFUIControlSettings control) {  
+    final suffixSuper = control.kind == AFUIControlKind.widget ? "Widget" : "Screen";
     return _declareID(ctx,
       name: screenName,
       suffix: control.suffix,
-      after: AFCodeRegExp.startUIID(control.suffix),
+      after: AFCodeRegExp.startUIID(control.suffix, suffixSuper),
     );    
   }
 

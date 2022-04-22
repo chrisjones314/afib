@@ -11,11 +11,7 @@ void define[!af_screen_name]Prototypes(AFUIPrototypeDefinitionContext definition
 }
 
 void _define[!af_screen_name]PrototypeInitial(AFUIPrototypeDefinitionContext definitions) {  
-  var prototype = definitions.define[!af_control_type_suffix]Prototype(
-    id: [!af_app_namespace(upper)]PrototypeID.[!af_screen_test_id],
-    navigate: [!af_screen_name].navigatePush(),
-    models: [!af_app_namespace(upper)]TestDataID.[!af_full_test_data_id],
-  );
+  [!af_declare_create_prototype]
 
   prototype.defineSmokeTest( 
     body: (e) async {

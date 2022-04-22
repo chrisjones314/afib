@@ -197,7 +197,10 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const stmtDeclareStateView = AFUISourceTemplateID("declare_state_view");
   static const stmtDeclareSPI = AFUISourceTemplateID("declare_spi");
 
+
+  static const textDeclareCreatePrototype = AFUISourceTemplateID("declare_create_prototype");
   static const textScreenName = AFUISourceTemplateID("screen_name");
+  static const textNavigateMethods = AFUISourceTemplateID("navigate_methods");
   static const textScreenID = AFUISourceTemplateID("screen_id");
   static const textScreenIDType = AFUISourceTemplateID("screen_id_type");
   static const textSPIParentType = AFUISourceTemplateID("spi_parent_type");
@@ -236,6 +239,7 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textScreenTestID = AFUISourceTemplateID("screen_test_id");
   static const textIDTypeSuffix = AFUISourceTemplateID("id_type_suffix");
   static const textScreenImpls = AFUISourceTemplateID("screen_impls");
+  static const textParamsConstructor = AFUISourceTemplateID("params_constructor");
   static const textRouteParamImpls = AFUISourceTemplateID("route_param_impls");
   static const textCommandName = AFUISourceTemplateID("command_name");
   static const textCommandNameShort = AFUISourceTemplateID("command_name_short");

@@ -19,8 +19,8 @@ class AFCodeRegExp {
   static final startDeclareTestData = RegExp(r"testData\.define\(.*TestDataID\.stateFullLogin,\s+.*State.fromList\(\s*\[");
   static final startDeclareTestDataID = RegExp(r"class\s+.*TestDataID\s+{");
 
-  static RegExp startUIID(String kind) {
-    return RegExp("class\\s+.*${kind}ID\\s+extends\\s+AFScreenID\\s+{");
+  static RegExp startUIID(String kind, String kindSuper) {
+    return RegExp("class\\s+.*${kind}ID\\s+extends\\s+AF${kindSuper}ID\\s+{");
   }
     
 }

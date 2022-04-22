@@ -114,11 +114,7 @@ class AFGeneratedFile {
       final template = templates.find(id);
       assert(template != null);
       if(template != null) {
-        if(template.isComment && !AFibD.config.generateBeginnerComments) {
-          buffer.replaceText(context, id, "");
-        } else {
-          buffer.replaceTemplate(context, id.toString(), template);
-        }
+        buffer.replaceTemplate(context, id.toString(), template);
       }
     }
   }
@@ -132,13 +128,9 @@ class AFGeneratedFile {
   }
 
   void replaceTextLines(AFCommandContext context, dynamic id, List<String> lines) {
-    final value = StringBuffer();
-    for(final line in lines) {
-      value.write(line);
-      value.write("\n");
-    }
-    return buffer.replaceText(context, id, value.toString());
+    buffer.replaceTextLines(context, id, lines);
   }
+
 
   void replaceTextTemplate(AFCommandContext context, dynamic id, AFSourceTemplate? template) {
     if(template == null) {

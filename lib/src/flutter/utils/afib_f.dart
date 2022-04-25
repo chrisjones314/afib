@@ -261,6 +261,18 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     
   }
 
+  AFLibraryProgrammingInterface createLPI(AFLibraryProgrammingInterfaceID id, AFDispatcher dispatcher) {
+      final factory = uiDefinitions.lpiFactories[id];
+      if(factory == null) {
+        throw AFException("No factory for LPI $id");
+      }
+      final store = storeInternalOnly;
+      if(store == null) {
+        throw AFException("Internal error, no store");
+      }
+      return factory(id, dispatcher, store.state.public);
+  }
+
   AFCreateWidgetSPIDelegate<TSPI, TBuildContext, TTheme>? findSPICreatorOverride<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme>() {
     final found = uiDefinitions.spiOverrides[TSPI];
     return found as AFCreateWidgetSPIDelegate<TSPI, TBuildContext, TTheme>?;    

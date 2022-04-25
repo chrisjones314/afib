@@ -28,6 +28,7 @@ export "src/dart/utils/af_config.dart";  // ok
 export 'src/dart/utils/af_config_entries.dart'; // ok
 export "src/dart/utils/af_exception.dart"; // ok
 export "src/dart/utils/af_id.dart";
+export 'src/dart/utils/af_library_programming_interface.dart';
 export "src/dart/utils/af_object_with_key.dart";
 export "src/dart/utils/af_query_error.dart";
 export "src/dart/utils/af_route_param.dart";
@@ -47,8 +48,8 @@ export 'src/flutter/core/af_screen_map.dart';
 export 'src/flutter/test/af_matchers.dart';
 export 'src/flutter/test/af_screen_test.dart';
 export 'src/flutter/test/af_screen_test_main.dart';
-export "src/flutter/test/af_state_test.dart";
 export 'src/flutter/test/af_state_test.dart';
+export "src/flutter/test/af_state_test.dart";
 export 'src/flutter/test/af_state_test_main.dart';
 export "src/flutter/test/af_test_data_registry.dart";
 export "src/flutter/test/af_test_main.dart";

@@ -44,3 +44,4 @@ typedef AFCreateComponentStateDelegate = AFFlexibleState Function(Map<String, Ob
 
 /// Used to create a default child param the first time a particular child wid is used.
 typedef AFCreateDefaultChildParamDelegate = AFRouteParam? Function(AFID wid, dynamic public, dynamic segParent);
+

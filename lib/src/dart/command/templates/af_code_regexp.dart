@@ -18,6 +18,8 @@ class AFCodeRegExp {
   static final startDefineTestData = RegExp(r"void\s+defineTestData\(AFDefineTestDataContext\s+testData\)\s+{");
   static final startDeclareTestData = RegExp(r"testData\.define\(.*TestDataID\.stateFullLogin,\s+.*State.fromList\(\s*\[");
   static final startDeclareTestDataID = RegExp(r"class\s+.*TestDataID\s+{");
+  static final startDefineLPI = RegExp(r"void\s+defineLibraryProgrammingInterfaces\(AFUIDefinitionContext\s+context\)\s+{");
+  static final startDeclareLPI = RegExp(r"class\s+.*LPI\s+extends\s+.*LPI\s+{");
 
   static RegExp startUIID(String kind, String kindSuper) {
     return RegExp("class\\s+.*${kind}ID\\s+extends\\s+AF${kindSuper}ID\\s+{");

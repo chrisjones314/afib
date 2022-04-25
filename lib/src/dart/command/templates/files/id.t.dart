@@ -35,6 +35,10 @@ class [!af_app_namespace(upper)]WidgetID extends AFWidgetID {
   const [!af_app_namespace(upper)]WidgetID(String code) : super(code, [!af_app_namespace(upper)]LibraryID.id);
 }
 
+class [!af_app_namespace(upper)]LibraryProgrammingInterfaceID extends AFLibraryProgrammingInterfaceID {  
+  const [!af_app_namespace(upper)]LibraryProgrammingInterfaceID(String code) : super(code, [!af_app_namespace(upper)]LibraryID.id);
+}
+
 class [!af_app_namespace(upper)]TestDataID {
   static const stateFullLogin = "state_full_login";
 }

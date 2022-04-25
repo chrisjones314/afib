@@ -189,7 +189,7 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
   String get usage {
     return '''
 $usageHeader
-  $nameOfExecutable generate ui YourScreenName[${controlKinds.join('|')}] [any --options]
+  $nameOfExecutable generate ui Your[${controlKinds.join('|')}]|YourTheme [any --options]
 
 $descriptionHeader
   Create a new screen template under lib/ui/screens, adding an appropriate screen id and 
@@ -235,12 +235,16 @@ $optionsHeader
 
   }
 
-  static AFGeneratedFile createTheme(AFCommandContext ctx, String uiName, Map<String, dynamic> args) {
+  static AFGeneratedFile createTheme(AFCommandContext ctx, String uiName, Map<String, dynamic> args, {
+    String? fullId,
+    AFLibraryID? fromLib,
+  }) {
     final generator = ctx.generator;
     final parentTheme = args[argParentTheme];
     final String parentThemeID = args[argParentThemeID];
     final isCustomParent = parentTheme != generator.nameDefaultParentTheme;
 
+    final isOverride = fullId != null;
     final pathTheme = generator.pathTheme(uiName, isCustomParent: isCustomParent);
     if(pathTheme == null) {
       throw AFException("Could not generate theme path");
@@ -255,24 +259,11 @@ $optionsHeader
     // create the theme file itself.
     final fileTheme = generator.createFile(ctx, pathTheme, AFThemeT());
     final imports = <String>[];
-    if(isCustomParent) {
-      final idxThemeId = parentThemeID.indexOf("ThemeID.");
-      if(idxThemeId < 0) {
-        throw AFCommandError(error: "Expected --$argParentThemeID to contain ...ThemeID.");
-      }
-
-      final prefix = parentThemeID.substring(0, idxThemeId).toLowerCase();
-      var parentThemePackage = AFibD.findLibraryWithPrefix(prefix)?.name;
-      if(parentThemePackage == null) {
-        parentThemePackage = args[argParentPackageName];
-      }
-
-      if(parentThemePackage == null) {
-        throw AFCommandError(error: "Could not find an installed afib library with the prefix $prefix (maybe you need to run 'afib integrate'?");
-      }
+    if(isCustomParent && fromLib != null) {
+      var parentThemePackage = fromLib.name;
       final import = ImportFromPackage().toBuffer();
       import.replaceText(ctx, AFUISourceTemplateID.textPackageName, parentThemePackage);
-      import.replaceText(ctx, AFUISourceTemplateID.textPackagePath, "${prefix}_flutter.dart");
+      import.replaceText(ctx, AFUISourceTemplateID.textPackagePath, "${fromLib.codeId}_flutter.dart");
       imports.addAll(import.lines);      
     }
 
@@ -288,6 +279,14 @@ $optionsHeader
     fileDefineUI.addLinesAfter(ctx, AFCodeRegExp.startDefineThemes, defineTheme.lines);
     if(imports.isNotEmpty) {
       fileDefineUI.addLinesBefore(ctx, AFCodeRegExp.startDefineUI, imports);
+      if(fromLib != null) {
+        generator.addImportIDFile(ctx,
+          libraryId: fromLib,
+          to: fileDefineUI,
+          before: AFCodeRegExp.startDefineUI,
+        );
+      }
+
     }
 
     generator.addImport(ctx, 
@@ -295,6 +294,10 @@ $optionsHeader
       to: fileDefineUI,
       before: AFCodeRegExp.startDefineUI
     );
+
+    if(!isOverride) {
+      generator.addExportsForFiles(ctx, args, [fileTheme]);
+    }
     
     return fileTheme;
   }
@@ -428,9 +431,11 @@ $optionsHeader
     );
 
     // add exports for files
-    generator.addExportsForFiles(ctx, args, [
-      screenFile
-    ]);
+    if(uiName != "StartupScreen") {
+      generator.addExportsForFiles(ctx, args, [
+        screenFile
+      ]);
+    }
 
     final generatePrototypes = AFibD.config.generateUIPrototypes;
     if(generatePrototypes) {

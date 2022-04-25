@@ -13,6 +13,7 @@ import 'package:afib/src/dart/command/templates/statements/declare_export_statem
 import 'package:afib/src/dart/command/templates/statements/declare_id_statement.t.dart';
 import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:collection/collection.dart';
 import 'package:colorize/colorize.dart';
@@ -41,6 +42,7 @@ class AFCodeGenerator {
   static const afibFolder = "afib";
   static const overrideFolder = "override";
   static const commandFolder = "command";
+  static const lpisFolder = "lpis";
 
   static const testAFibPath = [testFolder, afibFolder];
   static const screensPath = [libFolder, uiFolder, screensFolder];
@@ -52,6 +54,8 @@ class AFCodeGenerator {
   static const drawersPath = [libFolder, uiFolder, drawersFolder];
   static const dialogsPath = [libFolder, uiFolder, dialogsFolder];
   static const widgetsPath = [libFolder, uiFolder, widgetsFolder];
+  static const lpisPath = [libFolder, stateFolder, lpisFolder];
+  static const lpisOverridePath = [libFolder, overrideFolder, lpisFolder];
   static const modelsPath = [libFolder, stateFolder, modelsFolder];
   static const statePath = [libFolder, stateFolder];
   static const queryPath = [libFolder, queryFolder];
@@ -111,6 +115,12 @@ class AFCodeGenerator {
     return _createPath(modelsPath, filename);
   }
 
+  List<String> pathLPI(String lpiName, { required bool isOverride}) {
+    final shortened = removeSuffix(removePrefix(lpiName, appNamespaceUpper), "LPI");
+    final filename = "${appNamespace}_${convertMixedToSnake(shortened)}_lpi.dart";
+    return _createPath(isOverride ? lpisOverridePath : lpisPath, filename);
+  }
+
   List<String> pathQuery(String modelName) {
     final filename = "${convertMixedToSnake(modelName)}.dart";
     return _createPath(queryPath, filename);
@@ -131,7 +141,6 @@ class AFCodeGenerator {
     }
     final path = isCustomParent ? overrideThemesPath : themesPath;
     return _createPath(path, filename);
-    
   }
 
   List<String> pathScreenTest(String screenName, AFUIControlSettings control) {
@@ -371,26 +380,84 @@ class AFCodeGenerator {
     } 
     return false;
   }
-  // void defineTestScreenTests(AFScreenTestDefinitionContext definitions) {
-  // void\s+defineTestScreenTests(AFScreenTestDefinitionContext\s+definitions)\s+{
+
+  void addImportIDFile(AFCommandContext ctx, {
+    required AFLibraryID libraryId,
+    required AFGeneratedFile to,
+    required RegExp before,
+  }) {
+      addImport(ctx,
+        packageName: libraryId.name, 
+        importPath: "${libraryId.codeId}_id.dart",
+        to: to,
+        before: before,
+      );
+
+  }
+
+  void addImportFlutterFile(AFCommandContext ctx, {
+    required AFLibraryID libraryId,
+    required AFGeneratedFile to,
+    required RegExp before,
+  }) {
+      addImport(ctx,
+        packageName: libraryId.name, 
+        importPath: "${libraryId.codeId}_flutter.dart",
+        to: to,
+        before: before,
+      );
+
+  }
 
   void addImport(AFCommandContext ctx, {
     required String importPath,
     required AFGeneratedFile to,
     required RegExp before,
+    String? packageName
   }) {
     final declareImport = ImportFromPackage().toBuffer();
-    declareImport.replaceText(ctx, AFUISourceTemplateID.textPackageName, AFibD.config.packageName);
+    declareImport.replaceText(ctx, AFUISourceTemplateID.textPackageName, packageName ?? AFibD.config.packageName);
     declareImport.replaceText(ctx, AFUISourceTemplateID.textPackagePath, importPath);
     to.addLinesBefore(ctx, before, declareImport.lines);
 
   }
 
+  String deriveFullLibraryIDFromType(String parentType, String suffix, {
+    String? typeKind
+  }) {
+    final lib = findLibraryForTypeWithPrefix(parentType);
+    if(!parentType.endsWith(suffix)) {
+      throw AFCommandError(error: "Expected $parentType to end with $suffix");
+    }
+    final libNamespace = lib.codeId.toUpperCase();
+    var identifier = removeSuffixAndCamel(removePrefix(parentType, libNamespace), suffix);
+    if(identifier == "default") {
+      identifier = "${identifier}$suffix";
+    }
+    return "$libNamespace${typeKind ?? suffix}ID.$identifier";
+  }
+
+  AFLibraryID findLibraryForTypeWithPrefix(String parentType) {
+    // first, derive the prefix
+    final libs = List<AFLibraryID>.from(AFibD.libraries);
+
+    // sort them from longest to shortest, to be sure we don't take a short one that is a prefix
+    // of a long one.
+    libs.sort((l, r) => r.codeId.length.compareTo(l.codeId.length));
+
+    for(final lib in libs) {
+      if(parentType.startsWith(lib.codeId.toUpperCase())) {
+        return lib;
+      }
+    }
+    throw AFCommandError(error: "Expected $parentType to start with a valid library prefix: ${libs.map((l) => l.codeId.toUpperCase())}");
+  }
 
   void addExportsForFiles(AFCommandContext context, Map<String, dynamic> args, List<AFGeneratedFile> files, {
     List<String>? toPath,
   }) {
-    if(args[AFCommand.argPrivate]) {
+    final isPrivate = args[AFCommand.argPrivate];
+    if(isPrivate != null && isPrivate) {
       return;
     }
     if(!AFibD.config.isLibraryCommand) {
@@ -560,6 +627,15 @@ class AFCodeGenerator {
     return result;
   }
 
+  String removePrefix(String value, String prefix) {
+    if(!value.startsWith(prefix)) {
+      throw AFException("Expected $value to start with $prefix");
+    }
+    final result = value.substring(prefix.length);
+    return result;
+  }
+
+
   String removeSuffixAndCamel(String value, String suffix) {
     if(!value.endsWith(suffix)) {
       throw AFException("Expected $value to end with $suffix");
@@ -571,6 +647,7 @@ class AFCodeGenerator {
   String toCamelCase(String value) {
     return "${value[0].toLowerCase()}${value.substring(1)}";
   }
+
 
   String declareUIID(AFCommandContext ctx, String screenName, AFUIControlSettings control) {  
     final suffixSuper = control.kind == AFUIControlKind.widget ? "Widget" : "Screen";

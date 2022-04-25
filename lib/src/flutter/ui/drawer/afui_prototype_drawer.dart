@@ -117,7 +117,7 @@ class AFUIPrototypeDrawerSPI extends AFUIDrawerSPI<AFUIDefaultStateView, AFUIPro
     try {
       revised = DateTime.parse(textVal);
     } on FormatException {
-      context.showDialogErrorText(
+      showDialogErrorText(
         themeOrId: t,
         title: "Could not parse time",
         body: "Could not parse the time during DateTime.parse.  Note that days and hours must be two digits (e.g. 05, not 5)",        
@@ -139,7 +139,7 @@ class AFUIPrototypeDrawerSPI extends AFUIDrawerSPI<AFUIDefaultStateView, AFUIPro
     try {
       duration = AFTimeState.parseDuration(context.p.timeAdjustText);
     } on FormatException {
-      context.showDialogErrorText(
+      showDialogErrorText(
         themeOrId: t,
         title: "Could not parse duration",
         body: "Please specify duration as a space separated set of tokens, each starting with a number and ending with a suffix, like 2d 1h 3m 4s 5ms"        

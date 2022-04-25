@@ -227,6 +227,10 @@ class AFQueryTestID extends AFID {
   const AFQueryTestID(String code, AFLibraryID library) : super("querytest", code, library);
 }
 
+class AFLibraryProgrammingInterfaceID extends AFID {
+  const AFLibraryProgrammingInterfaceID(String code, AFLibraryID library) : super("lpi", code, library);
+}
+
 class AFQueryID extends AFID {
   const AFQueryID(String code, AFLibraryID library): super("q", code, library);
 }

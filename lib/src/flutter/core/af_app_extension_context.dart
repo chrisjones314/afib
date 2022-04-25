@@ -261,7 +261,8 @@ class AFUIDefinitionContext {
   final themeFactories = <AFThemeID, AFCreateFunctionalThemeDelegate>{};
   final AFScreenMap screenMap = AFScreenMap();
   final spiOverrides = <Type, AFCreateWidgetSPIDelegate>{};
-
+  final lpiFactories = <AFLibraryProgrammingInterfaceID, AFCreateLibraryProgrammingInterfaceDelegate>{};
+  
   AFUIDefinitionContext();
 
   void defineStartupScreen(AFScreenID screenId, AFCreateRouteParamDelegate createParam) {    
@@ -284,10 +285,17 @@ class AFUIDefinitionContext {
     screenMap.registerBottomSheet(screenKey, screenBuilder);
   }
 
-  void defineScreenSPIOverride<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme>(AFCreateScreenSPIDelegate<TSPI, TBuildContext, TTheme> creator) {
+  void defineScreenSPIOverride<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme>({ required AFCreateScreenSPIDelegate<TSPI, TBuildContext, TTheme> createSPI }) {
     spiOverrides[TSPI] = ((context, theme, screenId, wid, paramSource) {
-      return creator(context as TBuildContext, theme as TTheme, screenId);
+      return createSPI(context as TBuildContext, theme as TTheme, screenId);
     });
+  }
+
+  void defineLPI(AFLibraryProgrammingInterfaceID id, { required AFCreateLibraryProgrammingInterfaceDelegate createLPI }) {
+    if(lpiFactories.containsKey(id)) {
+      return;
+    }
+    lpiFactories[id] = createLPI;
   }
 
   void defineTheme(AFThemeID id, { required AFCreateFunctionalThemeDelegate createTheme }) {

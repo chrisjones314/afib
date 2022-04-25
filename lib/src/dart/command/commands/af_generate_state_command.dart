@@ -6,7 +6,9 @@ import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_call_define_test_data.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_define_define_test_data.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_define_lpi.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_initial_value.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_lpi_id_statement.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_model_access_statement.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_reference_test_data.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_test_id.t.dart';
@@ -16,6 +18,7 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 class AFGenerateStateSubcommand extends AFGenerateSubcommand {
   static const modelSuffix = "Model";
   static const stateViewSuffix = "StateView";
+  static const lpiSuffix = "LPI";
 
   AFGenerateStateSubcommand();
   
@@ -29,16 +32,16 @@ class AFGenerateStateSubcommand extends AFGenerateSubcommand {
   String get usage {
     return '''
 $usageHeader
-  $nameOfExecutable generate state [YourModel|YourStateView] [any --options]
+  $nameOfExecutable generate state [Your$modelSuffix|Your$stateViewSuffix|Your$lpiSuffix] [any --options]
 
 $descriptionHeader
-  If your identifier ends with Model, creates a new model linked to the root of your application state.
-  If your identifier ends with StateView, creates a new state view and supporting classes for that state view
+  If your identifier ends with $modelSuffix, creates a new model linked to the root of your application state.
+  If your identifier ends with $stateViewSuffix, creates a new state view and supporting classes for that state view
+  If your identifier ends with $lpiSuffix, creates a new LibraryProgrammingInterface (primarily used in libraries, app usually override existing LPIs)
 
 $optionsHeader
   --${AFGenerateUISubcommand.argTheme} The type of the theme to use, defaults to your default theme
-  ${AFCommand.argPrivateOptionHelp}
-
+  ${AFCommand.argPrivateOptionHelp}    
 ''';
   }
 
@@ -54,7 +57,7 @@ $optionsHeader
     final modelName = unnamed[0];
 
     verifyMixedCase(modelName, "model name");
-    verifyEndsWithOneOf(modelName, [modelSuffix, stateViewSuffix]);
+    verifyEndsWithOneOf(modelName, [modelSuffix, stateViewSuffix, lpiSuffix]);
 
     final args = parseArguments(unnamed, defaults: {
       AFGenerateUISubcommand.argTheme: ctx.generator.nameDefaultTheme
@@ -71,11 +74,76 @@ $optionsHeader
   static void generateStateStatic(AFCommandContext ctx, String identifier, Map<String, dynamic> args) {
     if(identifier.endsWith(modelSuffix)) {
       _generateModelStatic(ctx, identifier, args);
+    } else if(identifier.endsWith(lpiSuffix)) {
+      generateLPIStatic(ctx, identifier, args);
     } else {
       _generateStateViewStatic(ctx, identifier, args);
     }
   }
-  
+
+  static void generateLPIStatic(AFCommandContext ctx, String identifier, Map<String, dynamic> args, {
+    String? fullId, 
+    AFLibraryID? fromLib,
+    String parentType = "AFLibraryProgrammingInterface"
+  }) {
+    final generator = ctx.generator;
+
+    if(!identifier.startsWith(generator.appNamespaceUpper)) {
+      throw AFCommandError(error: "$identifier must start with ${generator.appNamespaceUpper}");
+    }
+
+    // create the LPI file
+    final isOverride = fullId != null;
+    final lpiPath = generator.pathLPI(identifier, isOverride: isOverride);
+    final lpiFile = generator.createFile(ctx, lpiPath, AFUISourceTemplateID.fileLPI);
+    lpiFile.replaceText(ctx, AFUISourceTemplateID.textLPIType, identifier);
+    lpiFile.replaceText(ctx, AFUISourceTemplateID.textLPIParentType, parentType);
+    if(fromLib != null) {
+      generator.addImportFlutterFile(ctx, 
+        libraryId: fromLib, 
+        to: lpiFile,
+        before: AFCodeRegExp.startDeclareLPI,
+      );
+    }    
+
+    final idIdentifier = generator.removeSuffixAndCamel(generator.removePrefix(identifier, generator.appNamespaceUpper), "LPI");
+
+    // create an ID for the LPI
+    if(!isOverride) {
+      final declareId = DeclareLPIIDStatementT().toBuffer();
+      declareId.replaceText(ctx, AFUISourceTemplateID.textLPIID, idIdentifier);
+      declareId.executeStandardReplacements(ctx);
+      final idFile = generator.modifyFile(ctx,  generator.pathIdFile);
+      final kind = "LibraryProgrammingInterface";
+      final after = AFCodeRegExp.startUIID(kind, kind);
+      idFile.addLinesAfter(ctx, after, declareId.lines);
+    } 
+
+    // register the LPI
+    final definesFile = generator.modifyFile(ctx, generator.pathDefineUI);
+    final defineLPI = DeclareDefineLPIT().toBuffer();
+    defineLPI.replaceText(ctx, AFUISourceTemplateID.textLPIType, identifier);
+    defineLPI.replaceText(ctx, AFUISourceTemplateID.textLPIID, fullId ?? "${generator.appNamespaceUpper}LibraryProgrammingInterfaceID.$idIdentifier");
+    definesFile.addLinesAfter(ctx, AFCodeRegExp.startDefineLPI, defineLPI.lines);
+    generator.addImport(ctx,
+      importPath: lpiFile.importPathStatement, 
+      to: definesFile, 
+      before: AFCodeRegExp.startDefineUI,
+    );
+
+    if(isOverride && fromLib != null) {
+      generator.addImportIDFile(ctx,
+        libraryId: fromLib,
+        to: definesFile,
+        before: AFCodeRegExp.startDefineUI,
+      );
+    }
+
+    if(!isOverride) {
+      generator.addExportsForFiles(ctx, args, [lpiFile]);
+    } 
+  }
+
   
   static void _generateModelStatic(AFCommandContext ctx, String identifier, Map<String, dynamic> args) {
     

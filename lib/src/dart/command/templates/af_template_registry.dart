@@ -3,7 +3,6 @@ import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/templates/comments/build_body_intro.t.dart';
 import 'package:afib/src/dart/command/templates/comments/build_with_spi.t.dart';
 import 'package:afib/src/dart/command/templates/comments/config_decl_intro_comment.dart';
-import 'package:afib/src/dart/command/templates/comments/navigate_push_intro.t.dart';
 import 'package:afib/src/dart/command/templates/comments/route_param_intro.t.dart';
 import 'package:afib/src/dart/command/templates/comments/spi_intro.t.dart';
 import 'package:afib/src/dart/command/templates/files/afib.t.dart';
@@ -23,14 +22,15 @@ import 'package:afib/src/dart/command/templates/files/extend_app.t.dart';
 import 'package:afib/src/dart/command/templates/files/extend_app_ui_library.t.dart';
 import 'package:afib/src/dart/command/templates/files/extend_base.t.dart';
 import 'package:afib/src/dart/command/templates/files/extend_command.t.dart';
-import 'package:afib/src/dart/command/templates/files/extend_test.t.dart';
 import 'package:afib/src/dart/command/templates/files/extend_library_base.t.dart';
 import 'package:afib/src/dart/command/templates/files/extend_library_command.t.dart';
 import 'package:afib/src/dart/command/templates/files/extend_library_ui.t.dart';
+import 'package:afib/src/dart/command/templates/files/extend_test.t.dart';
 import 'package:afib/src/dart/command/templates/files/id.t.dart';
 import 'package:afib/src/dart/command/templates/files/install_command.t.dart';
 import 'package:afib/src/dart/command/templates/files/install_ui.t.dart';
 import 'package:afib/src/dart/command/templates/files/lib_exports.t.dart';
+import 'package:afib/src/dart/command/templates/files/lpi.t.dart';
 import 'package:afib/src/dart/command/templates/files/main.t.dart';
 import 'package:afib/src/dart/command/templates/files/main_afib_test.t.dart';
 import 'package:afib/src/dart/command/templates/files/main_ui_library.t.dart';
@@ -45,7 +45,6 @@ import 'package:afib/src/dart/command/templates/files/test_data.t.dart';
 import 'package:afib/src/dart/command/templates/files/theme.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_id_statement.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_route_param.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_spi.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_state_view.t.dart';
 
 
@@ -98,6 +97,7 @@ class AFTemplateRegistry {
     register(AFUISourceTemplateID.fileLibExports, AFLibExportsT());
     register(AFUISourceTemplateID.fileInstallUI, AFInstallUIT());
     register(AFUISourceTemplateID.fileInstallCommand, AFInstallCommandT());
+    register(AFUISourceTemplateID.fileLPI, AFLPIT());
     
     
     register(AFUISourceTemplateID.fileCreateDartParams, AFCreateDartParamsT());

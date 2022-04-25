@@ -11,11 +11,16 @@ import 'package:[!af_package_path]/ui/screens/startup_screen.dart';
 
 void defineUI(AFUIDefinitionContext context) {
   defineFunctionalThemes(context);
-  defineSPIOverrides(context);
+  defineLibraryProgrammingInterfaces(context);
   defineScreens(context);
+  defineSPIOverrides(context);
 }
 
 void defineFunctionalThemes(AFUIDefinitionContext context) {
+
+}
+
+void defineLibraryProgrammingInterfaces(AFUIDefinitionContext context) {
 
 }
 

@@ -2541,16 +2541,16 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   /// Show the text in a snackbar. 
   /// 
-  /// You might prefer [AFBuildContext.showSnackbarText], as it 
-  /// cooresponds [AFFinishQueryContext.showSnackbarText] more clearly.
-  void showSnackbarText(AFBuildContext context, String text) {
-    context.showSnackbarText(text);
+  /// You might prefer [AFStateProgrammingInterface.showSnackbarText].  This is just
+  /// a one line call to that method for discoverability.
+  void showSnackbarText(AFStateProgrammingInterface spi, String text) {
+    spi.showSnackbarText(text);
   }
 
-  /// See [AFBuildContext.showDialog], this is just a one line call to that method
+  /// See [AFStateProgrammingInterface.showDialogAFib], this is just a one line call to that method
   /// for discoverability.
   void showDialog<TReturn>({
-    required AFBuildContext context,
+    required AFStateProgrammingInterface spi,
     required AFNavigatePushAction navigate,
     void Function(TReturn?)? onReturn,
     bool barrierDismissible = true,
@@ -2559,7 +2559,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     bool useRootNavigator = true,
     RouteSettings? routeSettings
   }) {
-    context.showDialog(
+    spi.showDialogAFib(
       navigate: navigate,
       onReturn: onReturn,
       barrierDismissible: barrierDismissible,
@@ -2570,9 +2570,9 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     );
   }
 
-  /// See [AFBuildContext.showModalBottomSheet], this is a one line call to that method, here for discoverability.
+  /// See [AFStateProgrammingInterface.showModalBottomSheetAFib], this is a one line call to that method, here for discoverability.
   void showModalBottomSheet({
-    required AFBuildContext context,
+    required AFStateProgrammingInterface spi,
     required AFNavigatePushAction navigate,
     AFReturnValueDelegate? onReturn,
     Color? backgroundColor,
@@ -2586,7 +2586,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     bool enableDrag = true,
     RouteSettings? routeSettings,  
   }) {
-    return context.showModalBottomSheet(
+    return spi.showModalBottomSheetAFib(
       navigate: navigate,
       onReturn: onReturn,
       backgroundColor: backgroundColor,
@@ -2602,16 +2602,16 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     );
   }
 
-  /// See [AFBuildContext.showBottomSheet], this is a one line call to that method, here for discoverability.
+  /// See [AFStateProgrammingInterface.showBottomSheet], this is a one line call to that method, here for discoverability.
   void showBottomSheet({
-    required AFBuildContext context,
+    required AFStateProgrammingInterface spi,
     required AFNavigatePushAction navigate,
     Color? backgroundColor,
     double? elevation,
     ShapeBorder? shape,
     Clip? clipBehavior,
   }) {
-    return context.showBottomSheet(
+    return spi.showBottomSheet(
       navigate: navigate,
       backgroundColor: backgroundColor,
       elevation: elevation,
@@ -2722,7 +2722,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   /// 
   AFShouldContinueCheckDelegate standardShouldContinueAlertCheck({
-    required AFBuildContext context,
+    required AFStateProgrammingInterface spi,
     required bool shouldAsk,
     required AFNavigatePushAction navigate
   }) {
@@ -2732,7 +2732,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
         if(shouldAsk && !AFibD.config.isTestContext) {
           // set up the buttons
           // show the dialog
-          context.showDialog<AFShouldContinueRouteParam>(
+          spi.showDialogAFib<AFShouldContinueRouteParam>(
             navigate: navigate,
             onReturn: (param) {
               if(param != null) {

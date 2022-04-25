@@ -4,6 +4,7 @@ import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_theme_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:afib/src/dart/utils/af_library_programming_interface.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_should_continue_route_param.dart';
 import 'package:afib/src/flutter/af_app.dart';
@@ -196,3 +197,5 @@ typedef AFCreateConnectedWidgetDelegate = AFConnectedUIBase Function(AFConnected
 typedef AFCreateConnectedWidgetWithLaunchParamDelegate = AFConnectedUIBase Function(AFConnectedUIBase parent, AFRouteParam param);
 
 typedef AFBuildWithSPIDelegate<TSPI extends AFStateProgrammingInterface> = Widget Function(TSPI spi);
+
+typedef AFCreateLibraryProgrammingInterfaceDelegate = AFLibraryProgrammingInterface Function(AFLibraryProgrammingInterfaceID id, AFDispatcher dispatcher, AFPublicState state);

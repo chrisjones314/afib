@@ -543,7 +543,7 @@ abstract class AFConnectedDrawer<TState extends AFFlexibleState, TTheme extends 
 
 /// Use this to connect a dialog to the store.
 /// 
-/// You can open a dialog with [AFBuildContext.showDialog].
+/// You can open a dialog with [AFBuildContext.showDialogAFib].
 abstract class AFConnectedDialog<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFDialogStateProgrammingInterface> extends AFConnectedScreen<TState, TTheme, TStateView, TRouteParam, TSPI> {
   AFConnectedDialog({
     required AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> config,
@@ -588,6 +588,10 @@ mixin AFNavigateMixin {
     AFNavigateReplaceAllAction action
   ) {
     dispatch(action);
+  }
+
+  void navigateToUnimplementedScreen(String message) {
+    dispatch(AFNavigateUnimplementedQuery(message));
   }
 
   void navigatePopN({ 
@@ -654,6 +658,10 @@ mixin AFUpdateAppStateMixin<TState extends AFFlexibleState> {
 }
 
 mixin AFContextShowMixin {
+  
+
+  AFDispatcher get dispatcher;
+
   /// Open a dialog with the specified screen id and param
   /// 
   /// You must either specify a screen id and param, or you
@@ -671,7 +679,7 @@ mixin AFContextShowMixin {
   /// context.closeDialog(context.p);
   /// ```
   /// inside the dialog screen.
-  void showDialog<TReturn extends Object?>({
+  void showDialogAFib<TReturn extends Object?>({
     required AFNavigatePushAction navigate,
     AFReturnValueDelegate<TReturn>? onReturn,
     bool barrierDismissible = true,
@@ -798,6 +806,11 @@ mixin AFContextShowMixin {
     );
   }
 
+  TLPI createLPI<TLPI extends AFLibraryProgrammingInterface>(AFLibraryProgrammingInterfaceID id) {
+    final lpi = AFibF.g.createLPI(id, dispatcher);
+    return lpi as TLPI;
+  } 
+
   AFFunctionalTheme _findTheme(Object themeOrId) {
     var theme;
     if(themeOrId is AFFunctionalTheme) {
@@ -836,7 +849,7 @@ mixin AFContextShowMixin {
     if(buttonTitles == null) {
       buttonTitles = ["OK"];
     }
-    showDialog<int>(
+    showDialogAFib<int>(
        navigate: AFUIStandardChoiceDialog.navigatePush(
           icon: icon,
           title: richTitle, 
@@ -858,7 +871,7 @@ mixin AFContextShowMixin {
     required List<String> buttonTitles,   
     required void Function(int?)? onReturn
   }) {
-    showDialog<int>(
+    showDialogAFib<int>(
        navigate: AFUIStandardChoiceDialog.navigatePush(
             icon: icon,
             title: title, 
@@ -999,7 +1012,7 @@ mixin AFContextShowMixin {
   /// context.closeBottomSheet(context.p);
   /// ```
   /// inside the bottom sheet screen.
-  void showModalBottomSheet<TReturn extends Object?>({
+  void showModalBottomSheetAFib<TReturn extends Object?>({
     required AFNavigatePushAction navigate,
     AFReturnValueDelegate<TReturn>? onReturn,
     material.Color? backgroundColor,
@@ -1034,7 +1047,7 @@ mixin AFContextShowMixin {
 
   /// Shows a bottom sheet
   /// 
-  /// See also [showModalBottomSheet].
+  /// See also [showModalBottomSheetAFib].
   void showBottomSheet({
     required AFNavigatePushAction navigate,
     material.Color? backgroundColor,
@@ -1237,7 +1250,7 @@ class AFBuildStateViewContext<TState extends AFFlexibleState?, TRouteParam exten
 /// screen data and param to many functions, to make things more concise.  
 /// 
 /// The framework cannot pass you this itself because 
-class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> with AFContextShowMixin {
+class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> {
   AFStandardBuildContextData standard;
   TStateView stateView;
   TRouteParam routeParam;
@@ -1311,6 +1324,13 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     }
     return null;
   }
+
+  BuildContext get contextNullCheck {
+    final ctx = flutterContext;
+    if(ctx == null) { throw AFException("Missing build context"); }
+    return ctx;
+  }
+
 
   Iterable<TChildRouteParam> childrenOfType<TChildRouteParam extends AFRouteParam>() {
     final result = <TChildRouteParam>[];

@@ -191,6 +191,7 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const fileLibExports = AFUISourceTemplateID("file_lib_exports");
   static const fileInstallUI = AFUISourceTemplateID("file_install_ui");
   static const fileInstallCommand = AFUISourceTemplateID("file_install_command");
+  static const fileLPI = AFUISourceTemplateID("file_lpi");
   
   static const stmtDeclareID = AFUISourceTemplateID("declare_id");
   static const stmtDeclareRouteParam = AFUISourceTemplateID("declare_route_param");
@@ -209,6 +210,7 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textParentThemeType = AFUISourceTemplateID("parent_theme_type");
   static const textStateViewPrefix = AFUISourceTemplateID("state_view_prefix");
   static const textControlTypeSuffix = AFUISourceTemplateID("control_type_suffix");
+  static const textLPIID = AFUISourceTemplateID("lpi_id");
   static const textSPIImpls = AFUISourceTemplateID("spi_impls");
   static const textSuperImpls = AFUISourceTemplateID("super_impls");
   static const textStateViewType = AFUISourceTemplateID("state_view_type");
@@ -232,6 +234,8 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textLibKind = AFUISourceTemplateID("lib_kind");
   static const textExtendAppParam = AFUISourceTemplateID("extend_app_param");
   static const textFundamentalThemeInit = AFUISourceTemplateID("fundamental_theme_init");
+  static const textLPIType = AFUISourceTemplateID("lpi_type");
+  static const textLPIParentType = AFUISourceTemplateID("lpi_parent_type");
   
   static const textAdditionalMethods = AFUISourceTemplateID("additional_methods");
   static const textFileRelativePath = AFUISourceTemplateID("file_relative_path");

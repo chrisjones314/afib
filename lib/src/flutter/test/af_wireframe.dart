@@ -50,6 +50,10 @@ class AFWireframeExecutionContext<TStateView extends AFFlexibleStateView> {
     return this.screen == screenId;
   }
 
+  TResult getEventParam<TResult>() {
+    return eventParam as TResult;
+  }
+
   bool isWidget(AFWidgetID widgetId) {
     return this.widget == widgetId;
   }

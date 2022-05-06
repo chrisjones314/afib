@@ -541,8 +541,12 @@ class AFCodeGenerator {
       fileOrig.renameSync(pathRevised);
     }
 
+    // verify that none of the files still contain [!af_] tags
+    _validateNoAFTags(context, created.values);
+    _validateNoAFTags(context, modified.values);
+
+
     for(final generatedFile in created.values) {
-      generatedFile.executeStandardReplacements(context);
       generatedFile.writeIfModified(context);
     }
 
@@ -550,6 +554,19 @@ class AFCodeGenerator {
       modifiedFile.writeIfModified(context);
     }
   }
+
+
+  void _validateNoAFTags(AFCommandContext context, Iterable<AFGeneratedFile> files) {
+    for(final file in files) {
+      file.executeStandardReplacements(context);
+      final afTag = file.findFirstAFTag();
+      if(afTag != null) {
+        throw AFException("Internal error: $afTag [!af... tag still present in ${file.projectPath.join('/')}");
+      }
+
+    }
+
+  } 
 
   void renameExistingFileToOld(AFCommandContext context, List<String> projectPath) {
     if(!AFProjectPaths.projectFileExists(projectPath)) {

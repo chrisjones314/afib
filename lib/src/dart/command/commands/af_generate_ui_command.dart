@@ -349,10 +349,6 @@ $optionsHeader
     final screenId = generator.declareUIID(ctx, uiName, controlSettings);
 
     final templateSPI = controlSettings.spi.toBuffer();
-    /*
-    templateSPI.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
-    templateSPI.executeStandardReplacements(ctx);
-    */
 
     final templateSPIImpls = spiImpls?.toBuffer() ?? controlSettings.implsSPI.toBuffer();
     templateSPI.replaceTextLines(ctx, AFUISourceTemplateID.textSPIImpls, templateSPIImpls.lines);
@@ -380,6 +376,8 @@ $optionsHeader
     final routeParamTemplate = routeParamImpls ?? controlSettings.routeParamImpls;
     final routeParam = routeParamTemplate.toBuffer();
     routeParam.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
+    routeParam.replaceText(ctx, AFUISourceTemplateID.textScreenID, screenId);
+    routeParam.replaceText(ctx, AFUISourceTemplateID.textScreenIDType, screenIdType);
     routeParam.executeStandardReplacements(ctx);
     screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textRouteParamImpls, routeParam.lines);
     
@@ -389,8 +387,8 @@ $optionsHeader
     screenFile.replaceTemplate(ctx, AFUISourceTemplateID.textParamsConstructor, controlSettings.paramsConstructor);
     
     final templatePush = controlSettings.navigatePush.toBuffer();
-    templatePush.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
     templatePush.replaceTemplate(ctx, AFUISourceTemplateID.commentNavigatePush, NavigatePushIntroComment());
+    templatePush.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
 
     screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textNavigateMethods, templatePush.lines);
 

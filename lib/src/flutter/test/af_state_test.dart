@@ -99,7 +99,7 @@ abstract class AFStateTestContext<TState extends AFFlexibleState> extends AFStat
 
   void finishAndUpdateStats(AFTestStats stats) {
     stats.addPasses(errors.pass);
-    stats.addErrors(errors.errorCount);
+    stats.addErrors(errors);
   }
 }
 

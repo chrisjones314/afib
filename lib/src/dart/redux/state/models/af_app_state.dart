@@ -241,6 +241,11 @@ class AFComponentStates {
     return AFComponentStates(states: revisedStates);    
   }
 
+  TState? findState<TState extends AFFlexibleState>() {
+    final key = _keyForComponent(TState);
+    return states[key] as TState?;
+  }
+
   AFFlexibleState? stateFor(Type areaType) {
     final key = _keyForComponent(areaType);
     return states[key];

@@ -6,6 +6,7 @@ import 'package:afib/src/dart/command/af_command_error.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_generator.dart';
+import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 /// Used to insert code at a particular point in a file.
@@ -44,6 +45,15 @@ class AFCodeBuffer {
     final ls = LineSplitter();
     final lines = ls.convert(template.template);    
     return AFCodeBuffer(projectPath: null, lines: lines, modified: true);
+  }
+
+  String? findFirstAFTag() {
+    for(final line in lines) {
+      if(line.contains(AFCodeRegExp.afTag)) {
+        return line;
+      }
+    }
+    return null;
   }
 
 

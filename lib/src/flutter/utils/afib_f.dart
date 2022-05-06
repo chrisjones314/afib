@@ -270,7 +270,8 @@ class AFibGlobalState<TState extends AFFlexibleState> {
       if(store == null) {
         throw AFException("Internal error, no store");
       }
-      return factory(id, dispatcher, store.state.public);
+      final context = AFLibraryProgrammingInterfaceContext(dispatcher: dispatcher, state: store.state.public);
+      return factory(id, context);
   }
 
   AFCreateWidgetSPIDelegate<TSPI, TBuildContext, TTheme>? findSPICreatorOverride<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme>() {
@@ -376,7 +377,6 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     if(drawer != null) {
       return drawer;
     }
-  
 
     final multi = tests.afWorkflowStateTests.findById(testId);
     if(multi != null) {

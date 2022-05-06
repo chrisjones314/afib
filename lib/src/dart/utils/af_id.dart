@@ -194,6 +194,11 @@ class AFFromStringTestID extends AFBaseTestID {
   final String fullId;
   AFFromStringTestID(this.fullId): super("", "", AFUILibraryID.id);
 
+  
+  String get id {
+    return fullId;
+  }
+
   String toString() {
     return fullId;
   }

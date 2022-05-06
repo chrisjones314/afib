@@ -1,7 +1,6 @@
 
 import 'dart:io';
 import 'package:afib/src/dart/command/af_command.dart';
-import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:path/path.dart';
 

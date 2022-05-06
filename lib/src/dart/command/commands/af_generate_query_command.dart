@@ -117,7 +117,7 @@ $optionsHeader
     generator.addImportsForPath(ctx, stateFilePath, imports: imports, requireExists: false);
     
     // if the result exists in the models area
-    final modelFilePath = generator.pathModel(rootStateType);
+    final modelFilePath = generator.pathModel(resultModelType);
     generator.addImportsForPath(ctx, modelFilePath, imports: imports);
 
     queryFile.replaceTextLines(ctx, AFUISourceTemplateID.textImportStatements, imports);

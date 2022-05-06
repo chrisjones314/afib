@@ -1184,7 +1184,7 @@ class AFScreenTestContextWidgetTester extends AFScreenTestContext {
     stats.addPasses(errors.pass);
     final errorCount = errors.errorCount;
     if(errorCount > 0) {
-      stats.addErrors(errorCount);
+      stats.addErrors(errors);
       AFBaseTestExecute.printErrors(output, errors.errors);
     } 
 
@@ -2374,7 +2374,7 @@ class AFWorkflowStateTests<TState extends AFFlexibleState> {
 
   AFWorkflowStatePrototype? findById(AFBaseTestID id) {
     for(final test in stateTests) {
-      if(test.id == id || test.stateTestId == id) {
+      if(test.id == id || test.actualDisplayId == id) {
         return test;
       }
     }

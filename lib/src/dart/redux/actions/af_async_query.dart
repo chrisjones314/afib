@@ -7,6 +7,8 @@ import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_theme_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
@@ -65,8 +67,24 @@ class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextShowMix
     return result;
   }
 
+  TTheme findTheme<TTheme extends AFFunctionalTheme>(AFThemeID themeId) {
+    final theme = state.public.themes.findById(themeId);
+    if(theme == null) {
+      throw AFException("Unknown theme $themeId");
+    }
+    return theme as TTheme;
+  }
+
+  AFTimeState get currentTime {
+    return state.public.time;    
+  }
+
   AFRouteSegment? findRouteSegment(AFScreenID screen) {
     return state.public.route.findParamFor(screen);
+  }
+
+  TState? findState<TState extends AFFlexibleState>() {
+    return state.public.components.findState<TState>();
   }
 
   TRouteParam? findRouteParam<TRouteParam extends AFRouteParam>(AFScreenID screen) {

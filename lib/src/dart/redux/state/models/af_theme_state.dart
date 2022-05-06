@@ -1540,6 +1540,11 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return render();
   }
 
+  Widget childTextEmpty() {
+    return childText("");
+  }
+
+
   /// A utility for creating a list of child widgets
   /// 
   /// This allows for a readable syntax like:

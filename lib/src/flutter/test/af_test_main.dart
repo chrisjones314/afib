@@ -128,6 +128,14 @@ Future<void> afTestMainApp<TState extends AFFlexibleState>({
   AFibD.logTestAF?.d("exiting afScreenTestMain");
 
   if(stats.hasErrors) {
+    if(stats.failedTests.isNotEmpty) {
+      output.writeLine("The following tests failed: ");
+      output.indent();
+      for(final failed in stats.failedTests) {
+        output.writeLine(failed.toString());
+      }
+      output.outdent();
+    }
     expect("${stats.totalErrors} errors (see details above)", AFibTestsFailedMatcher());
   } else if(AFConfigEntries.testsEnabled.isI18NEnabled(AFibD.config)) {
     final missing = AFibF.g.testMissingTranslations;
@@ -154,5 +162,6 @@ Future<void> afTestMainApp<TState extends AFFlexibleState>({
     }
     AFBaseTestExecute.writeSeparatorLine(output);
   }
+
   return null;
 }

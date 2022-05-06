@@ -53,6 +53,10 @@ class AFGeneratedFile {
     );
   }
 
+  String? findFirstAFTag() {
+    return buffer.findFirstAFTag();
+  }
+
   String get importPathStatement {
     return AFCodeGenerator.importPathStatementStatic(projectPath);
   }

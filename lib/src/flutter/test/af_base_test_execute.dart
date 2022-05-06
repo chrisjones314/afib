@@ -332,8 +332,8 @@ void printTestTotal(AFCommandOutput output, List<AFBaseTestExecute> baseContexts
   var totalErrors = 0;
   for(var context in baseContexts) {
     totalErrors += context.printFailMessages(output);
+    stats.addErrors(context.errors);
   }
-  stats.addErrors(totalErrors);
 }
 
 /*

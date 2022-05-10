@@ -634,6 +634,28 @@ mixin AFUpdateAppStateMixin<TState extends AFFlexibleState> {
     dispatch(query);
   }
 
+  /// Shuts down all existing listener and deferred queries.   Often called
+  /// as part of a signout process.
+  void executeShutdownAllActiveQueries() {
+    dispatch(AFShutdownOngoingQueriesAction());
+  }
+
+  void executeDeferredCallback<TState extends AFFlexibleState>(Duration duration, AFOnResponseDelegate<TState, AFUnused> callback) {
+    dispatch(AFDeferredSuccessQuery<TState>(duration, callback));
+  }
+
+  /// Resets your application state to it's initial state (see your static initialState method).
+  /// This is often called as part of a signout process.
+  /// 
+  /// Note that you have to be a little careful with the ordering of this, as if you are navigating
+  /// from a screen within your app that references state, back out to a signin screen, Flutter will
+  /// usually re-render the screen within your app once more as part of the animation.  You may need
+  /// to first do the navigation, then use context.executeDeferredCallback with a ~500 ms delay to 
+  /// allow the animation to complete, then reset the state once you are fully on the signin screen.
+  void executeResetToInitialState() {
+    dispatch(AFResetToInitialStateAction());    
+  }
+
   /// A utility which delays for the specified time, then updates the resulting code.   
   /// 
   /// This deferral is active in UIs, but is disabled during automated tests to speed results and reduce 

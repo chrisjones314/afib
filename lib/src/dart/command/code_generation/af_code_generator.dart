@@ -115,6 +115,10 @@ class AFCodeGenerator {
     return _createPath(modelsPath, filename);
   }
 
+  List<String> pathModelFile(String filename) {
+    return _createPath(modelsPath, filename);
+  }
+
   List<String> pathLPI(String lpiName, { required bool isOverride}) {
     final shortened = removeSuffix(removePrefix(lpiName, appNamespaceUpper), "LPI");
     final filename = "${appNamespace}_${convertMixedToSnake(shortened)}_lpi.dart";

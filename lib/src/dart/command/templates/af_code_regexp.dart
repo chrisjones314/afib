@@ -14,7 +14,7 @@ class AFCodeRegExp {
   static final startExtendLibraryUI = RegExp(r"void\s+extendUILibrary\(AFAppLibraryExtensionContext\s+context\)\s+{");
   static final startDefineThemes = RegExp(r"void\s+defineFunctionalThemes\(AFUIDefinitionContext\s+context\)\s+{");
   static final startDefineUI = RegExp(r"void\s+defineUI\(AFUIDefinitionContext\s+context\)\s+{");
-  static final startExtendCommand = RegExp(r"void\s+extendCommand\(AFCommandExtensionContext\s+context\)\s+{");
+  static final startExtendCommand = RegExp(r"void\s+extendCommand\(AFCommand.*ExtensionContext\s+context\)\s+{");
   static final startDefineTestData = RegExp(r"void\s+defineTestData\(AFDefineTestDataContext\s+testData\)\s+{");
   static final startDeclareTestData = RegExp(r"testData\.define\(.*TestDataID\.stateFullLogin,\s+.*State.fromList\(\s*\[");
   static final startDeclareTestDataID = RegExp(r"class\s+.*TestDataID\s+{");

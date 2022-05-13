@@ -82,7 +82,7 @@ class AFUIPrototypeDrawerScreen extends AFUIConnectedScreen<AFUIPrototypeDrawerS
       child: t.childButtonPrimaryText(
         text: "Show Drawer",
         onPressed: () {
-          spi.showDrawer(navigate: test.navigate);
+          spi.context.showDrawer(navigate: test.navigate);
         }
     ));
   }

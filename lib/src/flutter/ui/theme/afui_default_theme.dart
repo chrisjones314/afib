@@ -113,13 +113,13 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
       tagsText.write(prototype.id.tagsText);
     }
     final onPressed = onTap ?? () {
-      spi.dispatch(AFNavigateSetParamAction(
+      spi.context.dispatch(AFNavigateSetParamAction(
         param: AFUIPrototypeDrawerRouteParam.createOncePerScreen(AFUIPrototypeDrawerRouteParam.viewTest),
         children: null,
         route: AFNavigateRoute.routeGlobalPool
       ));
-      spi.dispatch(AFUpdateActivePrototypeAction(prototypeId: prototype.id));
-      prototype.startScreen(spi.d, spi.flutterContext, AFibF.g.testData);
+      spi.context.dispatch(AFUpdateActivePrototypeAction(prototypeId: prototype.id));
+      prototype.startScreen(spi.context.d, spi.flutterContext, AFibF.g.testData);
       
     };
     return childListTileNavDown(
@@ -259,7 +259,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     ));
 
     rows.add(childListNav(title: AFUITranslationID.wireframes, onPressed: () {
-      spi.navigatePush(AFUIPrototypeWireframesListScreen.navigatePush());
+      spi.context.navigatePush(AFUIPrototypeWireframesListScreen.navigatePush());
     }));
 
   }
@@ -273,7 +273,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     return childListNav(
       title: title,
       onPressed: () {
-        spi.navigatePush(AFUIPrototypeTestScreen.navigatePush(tests, title));
+        spi.context.navigatePush(AFUIPrototypeTestScreen.navigatePush(tests, title));
     });    
   }
 

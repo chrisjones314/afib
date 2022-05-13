@@ -2,20 +2,15 @@ import 'dart:async';
 
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
-import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
-import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
-import 'package:afib/src/dart/redux/state/models/af_theme_state.dart';
-import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
-import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
-import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/utils/af_api_mixins.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
@@ -24,114 +19,54 @@ import 'package:flutter/material.dart' as material;
 import 'package:logger/logger.dart';
 
 
-class AFStartQueryContext<TResponse> with AFUpdateComponentStateMixin {
+class AFQueryContext with AFContextShowMixin, AFStandardAPIContextMixin, AFNonUIAPIContextMixin {
   final AFDispatcher dispatcher;
-  final void Function(TResponse) onSuccess;
-  final void Function(AFQueryError) onError;
 
-  AFStartQueryContext({
-    required this.dispatcher,
-    required this.onSuccess, 
-    required this.onError
+  AFQueryContext({
+    required this.dispatcher
   });
+
+  void dispatch(dynamic action) {
+    dispatcher.dispatch(action);
+  }
 
   Logger? get log {
     return AFibD.log(AFConfigEntryLogArea.query);
   }
 
-  void dispatch(dynamic action) {
-    dispatcher.dispatch(action);
+  material.BuildContext? get flutterContext {
+    final route = AFibF.g.storeInternalOnly!.state.public.route;
+    final currentScreenId = route.activeScreenId;
+    final activeScreen = AFibF.g.internalOnlyFindScreen(currentScreenId);
+    return activeScreen?.element;
   }
 }
 
-mixin AFStateAccessMixin {
-  AFPublicState get publicState;
-  void dispatch(dynamic action);
+class AFStartQueryContext<TResponse> extends AFQueryContext {
+  final void Function(TResponse) onSuccess;
+  final void Function(AFQueryError) onError;
 
-  TTheme findTheme<TTheme extends AFFunctionalTheme>(AFThemeID themeId) {
-    final theme = publicState.themes.findById(themeId);
-    if(theme == null) {
-      throw AFException("Unknown theme $themeId");
-    }
-    return theme as TTheme;
-  }
-
-  AFTimeState get currentTime {
-    return publicState.time;    
-  }
-
-  AFScreenID get activeScreenId {
-    return publicState.route.activeScreenId;
-  }
-
-  AFRouteSegment? findRouteSegment(AFScreenID screen) {
-    return publicState.route.findParamFor(screen);
-  }
-
-  TState? findState<TState extends AFFlexibleState>() {
-    return publicState.components.findState<TState>();
-  }
-
-  TRouteParam? findRouteParam<TRouteParam extends AFRouteParam>(AFScreenID screen) {
-    final seg = findRouteSegment(screen);
-    return seg?.param as TRouteParam?;
-  }
-  TRouteParam? findChildRouteParam<TRouteParam extends AFRouteParam>(AFScreenID screen, AFID child) {
-    final seg = findRouteSegment(screen);
-    final result = seg?.children?.findParamById(child);
-    return result as TRouteParam?;
-  }
-
-  TRouteParam? findGlobalRouteParam<TRouteParam>(AFID id) {
-    final seg = publicState.route.findGlobalParam(id);
-    final param = seg?.param as TRouteParam?;
-    return param;
-  }
-
-  /// Dispatches an action that updates the route parameter for the specified screen.
-  void updateRouteParam(AFRouteParam param, { 
-    AFNavigateRoute route = AFNavigateRoute.routeHierarchy
-  }) {
-    dispatch(AFNavigateSetParamAction(param: param, route: route));
-  }
-
-  void updateGlobalRouteParam(AFRouteParam param) {
-    dispatch(AFNavigateSetParamAction(param: param, route: AFNavigateRoute.routeGlobalPool));
-  }
-
-  /// Dispatches an action that updates the route parameter for the specified screen.
-  void updateChildRouteParam(AFScreenID screen, AFRouteParam param, { 
-    AFWidgetParamSource paramSource = AFWidgetParamSource.child,
-    AFNavigateRoute route = AFNavigateRoute.routeHierarchy
-  }) {
-    dispatch(AFNavigateSetChildParamAction(
-      screen: screen,
-      param: param, 
-      route: route,
-      paramSource: paramSource
-    ));
-  }
-
+  AFStartQueryContext({
+    required AFDispatcher dispatcher,
+    required this.onSuccess, 
+    required this.onError
+  }): super(
+    dispatcher: dispatcher
+  );
 }
 
-class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextShowMixin, AFUpdateComponentStateMixin<TState>, AFNavigateMixin, AFStateAccessMixin {
-  final AFDispatcher dispatcher;
+
+class AFFinishQueryContext<TState extends AFFlexibleState> extends AFQueryContext with AFAccessStateSynchronouslyMixin {
   AFState state;
 
   AFFinishQueryContext({
-    required this.dispatcher, 
+    required AFDispatcher dispatcher, 
     required this.state
-  });
+  }): super(
+    dispatcher: dispatcher
+  );
 
-  void dispatch(dynamic action) {
-    dispatcher.dispatch(action);
-  }
-
-  AFDispatcher get d {
-    return dispatcher;
-  }
-
-  AFPublicState get publicState {
+  AFPublicState get accessPublicState {
     return state.public;
   }
 
@@ -147,12 +82,6 @@ class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextShowMix
   }
 
 
-  material.BuildContext? get flutterContext {
-    final route = state.public.route;
-    final currentScreenId = route.activeScreenId;
-    final activeScreen = AFibF.g.internalOnlyFindScreen(currentScreenId);
-    return activeScreen?.element;
-  }
 }
 
 

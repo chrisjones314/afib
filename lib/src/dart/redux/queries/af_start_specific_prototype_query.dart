@@ -35,7 +35,7 @@ class AFStartSpecificPrototypeQuery extends AFDeferredQuery<AFFlexibleState> {
       timeHandling: AFTestTimeHandling.running
     );
     context.dispatch(AFStartWireframeAction(wireframe: wireframe));
-    test.startScreen(context.d, null, wireframe.testData);
+    test.startScreen(context.dispatcher, null, wireframe.testData);
   }
 
   void _startScreenPrototype(AFFinishQuerySuccessContext<AFFlexibleState, AFUnused> context, AFPrototypeID protoId) {
@@ -49,7 +49,7 @@ class AFStartSpecificPrototypeQuery extends AFDeferredQuery<AFFlexibleState> {
       route: AFNavigateRoute.routeGlobalPool
     ));
     context.dispatch(AFUpdateActivePrototypeAction(prototypeId: prototype.id));
-    prototype.startScreen(context.d, null, AFibF.g.testData);
+    prototype.startScreen(context.dispatcher, null, AFibF.g.testData);
 
   }
 

@@ -57,7 +57,7 @@ class AFUIPrototypeLibraryListScreen extends AFUIConnectedScreen<AFUIPrototypeLi
           title: t.childText(thirdParty.id.name),
           subtitle: t.childText(subtitle),
           onTap: () {
-            spi.dispatch(AFUIPrototypeLibraryHomeScreen.navigatePush(thirdParty));
+            spi.context.navigatePush(AFUIPrototypeLibraryHomeScreen.navigatePush(thirdParty));
           }
       ));
     }

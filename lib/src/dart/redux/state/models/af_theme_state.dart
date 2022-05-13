@@ -2549,7 +2549,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   /// You might prefer [AFStateProgrammingInterface.showSnackbarText].  This is just
   /// a one line call to that method for discoverability.
   void showSnackbarText(AFStateProgrammingInterface spi, String text) {
-    spi.showSnackbarText(text);
+    spi.context.showSnackbarText(text);
   }
 
   /// See [AFStateProgrammingInterface.showDialogAFib], this is just a one line call to that method
@@ -2564,7 +2564,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     bool useRootNavigator = true,
     RouteSettings? routeSettings
   }) {
-    spi.showDialogAFib(
+    spi.context.showDialogAFib(
       navigate: navigate,
       onReturn: onReturn,
       barrierDismissible: barrierDismissible,
@@ -2591,7 +2591,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     bool enableDrag = true,
     RouteSettings? routeSettings,  
   }) {
-    return spi.showModalBottomSheetAFib(
+    return spi.context.showModalBottomSheetAFib(
       navigate: navigate,
       onReturn: onReturn,
       backgroundColor: backgroundColor,
@@ -2616,7 +2616,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     ShapeBorder? shape,
     Clip? clipBehavior,
   }) {
-    return spi.showBottomSheet(
+    return spi.context.showBottomSheet(
       navigate: navigate,
       backgroundColor: backgroundColor,
       elevation: elevation,
@@ -2704,8 +2704,8 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
         tooltip: translate(tooltip),
         onPressed: () async {
           if(shouldContinueCheck == null || await shouldContinueCheck() == AFShouldContinue.yesContinue) {
-            spi.navigatePop(worksInSingleScreenTest: worksInSingleScreenTest);
-            spi.executeWireframeEvent(wid, null);
+            spi.context.navigatePop(worksInSingleScreenTest: worksInSingleScreenTest);
+            spi.context.executeWireframeEvent(spi, wid, null);
           } 
         }
     );
@@ -2737,7 +2737,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
         if(shouldAsk && !AFibD.config.isTestContext) {
           // set up the buttons
           // show the dialog
-          spi.showDialogAFib<AFShouldContinueRouteParam>(
+          spi.context.showDialogAFib<AFShouldContinueRouteParam>(
             navigate: navigate,
             onReturn: (param) {
               if(param != null) {

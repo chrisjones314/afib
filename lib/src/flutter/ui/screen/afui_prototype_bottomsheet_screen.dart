@@ -84,7 +84,7 @@ class AFUIPrototypeBottomSheetScreen extends AFUIConnectedScreen<AFUIPrototypeBo
       child: t.childButtonPrimaryText(
         text: "Show Bottom Sheet",
         onPressed: () {
-          spi.showBottomSheet(navigate: test.navigate);
+          spi.context.showBottomSheet(navigate: test.navigate);
         }
     ));
   }

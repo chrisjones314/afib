@@ -126,7 +126,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFPrototypeHomeScreenSPI
 
     releaseRows.add(t.childListNav(title: AFUITranslationID.stateTests, onPressed: () {
       final tests = primaryTests.afWorkflowTestsForStateTests.all;
-      spi.navigatePush(AFUIPrototypeTestScreen.navigatePush(tests, "State Tests"));
+      spi.context.navigatePush(AFUIPrototypeTestScreen.navigatePush(tests, "State Tests"));
     }));
 
     final workflowTests = primaryTests.afWorkflowStateTests.all;
@@ -140,7 +140,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFPrototypeHomeScreenSPI
     }
 
     releaseRows.add(t.childListNav(title: AFUITranslationID.libraries, onPressed: () {
-      spi.navigatePush(AFUIPrototypeLibraryListScreen.navigatePush());
+      spi.context.navigatePush(AFUIPrototypeLibraryListScreen.navigatePush());
     }));
 
 

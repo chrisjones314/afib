@@ -282,7 +282,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
       if(store == null) {
         throw AFException("Internal error, no store");
       }
-      final context = AFLibraryProgrammingInterfaceContext(dispatcher: dispatcher, state: store.state.public);
+      final context = AFLibraryProgrammingInterfaceContext(dispatcher: dispatcher);
       return factory(id, context);
   }
 

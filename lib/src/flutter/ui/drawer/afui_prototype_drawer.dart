@@ -107,6 +107,44 @@ class AFUIPrototypeDrawerSPI extends AFUIDrawerSPI<AFUIDefaultStateView, AFUIPro
   }
 
   //--------------------------------------------------------------------------------------
+  void onPressedViewButton(int view) {
+     context.updateRouteParam(context.p.copyWith(view: view));
+  }
+
+  //--------------------------------------------------------------------------------------
+  void onExpandArea(String area, { required bool expanded }) {
+    context.updateRouteParam(context.p.reviseExpanded(area, expanded: expanded));
+  }
+
+  //--------------------------------------------------------------------------------------
+  void onChangedTimeAdjust(String val) {
+    context.updateRouteParam(context.p.reviseTimeAdjust(val));
+  }
+
+  //--------------------------------------------------------------------------------------
+  void onChangedTimeText(String val) {
+    context.updateRouteParam(context.p.reviseTimeText(val));
+  }
+
+  //--------------------------------------------------------------------------------------
+  void onPressedGetTime(String timeStr) {
+    context.p.textControllers.reviseOne(AFUIWidgetID.textTime, timeStr);
+    context.updateRouteParam(context.p.reviseTimeText(timeStr));
+  }
+
+  //--------------------------------------------------------------------------------------
+  void onPressedPlayTime(AFTimeUpdateListenerQuery timeQuery) {
+    final revisedBase = timeQuery.baseTime.reviseForPlay();
+    context.executeQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
+  }
+
+  //--------------------------------------------------------------------------------------
+  void onPressedPauseTime(AFTimeUpdateListenerQuery timeQuery) {
+    final revisedBase = timeQuery.baseTime.reviseForPause();
+    context.executeQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
+  }
+
+  //--------------------------------------------------------------------------------------
   void onTapSetTime() {
     final timeQuery = context.s.timeQuery;
     if(timeQuery == null) {
@@ -117,7 +155,7 @@ class AFUIPrototypeDrawerSPI extends AFUIDrawerSPI<AFUIDefaultStateView, AFUIPro
     try {
       revised = DateTime.parse(textVal);
     } on FormatException {
-      showDialogErrorText(
+      context.showDialogErrorText(
         themeOrId: t,
         title: "Could not parse time",
         body: "Could not parse the time during DateTime.parse.  Note that days and hours must be two digits (e.g. 05, not 5)",        
@@ -125,7 +163,7 @@ class AFUIPrototypeDrawerSPI extends AFUIDrawerSPI<AFUIDefaultStateView, AFUIPro
       return;
     }
     final revisedBase = timeQuery.baseTime.reviseForDesiredNow(DateTime.now(), revised);
-    executeQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
+    context.executeQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
 
   }
 
@@ -139,7 +177,7 @@ class AFUIPrototypeDrawerSPI extends AFUIDrawerSPI<AFUIDefaultStateView, AFUIPro
     try {
       duration = AFTimeState.parseDuration(context.p.timeAdjustText);
     } on FormatException {
-      showDialogErrorText(
+      context.showDialogErrorText(
         themeOrId: t,
         title: "Could not parse duration",
         body: "Please specify duration as a space separated set of tokens, each starting with a number and ending with a suffix, like 2d 1h 3m 4s 5ms"        
@@ -147,7 +185,7 @@ class AFUIPrototypeDrawerSPI extends AFUIDrawerSPI<AFUIDefaultStateView, AFUIPro
       return;
     }
     final revisedBase = timeQuery.baseTime.reviseAdjustOffset(duration*multiple);
-    executeQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
+    context.executeQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
   }
 }
 
@@ -272,7 +310,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
       visualDensity: VisualDensity.compact,
       icon: Icon(icon),
       onPressed: () {
-        spi.updateRouteParam(context.p.copyWith(view: view));
+        spi.onPressedViewButton(view);
       },
     );
 
@@ -317,7 +355,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
 
     return Expanded(
       child: MediaQuery.removePadding(
-        context: spi.contextNullCheck, 
+        context: spi.context.contextNullCheck, 
         removeTop: true,
         child: ListView(
           children: [Column(
@@ -379,11 +417,11 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     required AFThemeID id, 
     dynamic value
   }) {
-      spi.dispatch(AFOverrideThemeValueAction(
+      spi.context.dispatch(AFOverrideThemeValueAction(
         id: id,
         value: value,
       ));     
-      spi.dispatch(AFRebuildFunctionalThemes());       
+      spi.context.dispatch(AFRebuildFunctionalThemes());       
   }
 
   Widget _buildLocaleAttributeRowValue(AFUIPrototypeDrawerSPI spi, AFThemeID attr, dynamic attrValue) {
@@ -513,7 +551,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     final content = ExpansionPanelList(
       expansionCallback: (index, isExpanded) {
         final area = areaList[index];
-        spi.updateRouteParam(context.p.reviseExpanded(area, expanded: !isExpanded));
+        spi.onExpandArea(area, expanded: !isExpanded);
       },
       children: panels,
     );
@@ -532,8 +570,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
       final prevContext = context.s.testContext as AFScreenTestContextSimulator?;
       final testState = context.s.singleScreenTestState;
       await test?.onDrawerRun(context, prevContext, testState, id, () {
-        final revised = context.p.reviseView(AFUIPrototypeDrawerRouteParam.viewResults);
-        spi.updateRouteParam(revised);
+        spi.onPressedViewButton(AFUIPrototypeDrawerRouteParam.viewResults);
         test.openTestDrawer(id);
       });
     });    
@@ -661,18 +698,13 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     final colsPlayPause = t.row();
     colsPlayPause.add(OutlinedButton(
       child: Icon(Icons.play_arrow),
-      onPressed: () {
-        final revisedBase = timeQuery.baseTime.reviseForPlay();
-        spi.executeQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
-      }
+      onPressed: () => spi.onPressedPlayTime(timeQuery)
+
     ));
 
     colsPlayPause.add(OutlinedButton(
       child: Icon(Icons.pause),
-      onPressed: () {
-        final revisedBase = timeQuery.baseTime.reviseForPause();
-        spi.executeQuery(AFTimeUpdateListenerQuery(baseTime: revisedBase));
-      }
+      onPressed: () => spi.onPressedPauseTime(timeQuery)
     ));
 
     rowsCurrent.add(Row(
@@ -693,9 +725,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
         border: OutlineInputBorder(),
         labelText: "Adjustment"
       ),
-      onChanged: (val) {
-        spi.updateRouteParam(context.p.reviseTimeAdjust(val));
-      },       
+      onChanged: spi.onChangedTimeAdjust
     ));
 
 
@@ -736,9 +766,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
         border: OutlineInputBorder(),
         labelText: "Enter Time"
       ),
-      onChanged: (val) {
-        spi.updateRouteParam(context.p.reviseTimeText(val));
-      },        
+      onChanged: spi.onChangedTimeText
 
     ));
 
@@ -750,8 +778,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
       ]),
       onPressed: () {
         final timeStr = time.toString();
-        context.p.textControllers.reviseOne(AFUIWidgetID.textTime, timeStr);
-        spi.updateRouteParam(context.p.reviseTimeText(timeStr));
+        spi.onPressedGetTime(timeStr);
       }
     ));
 

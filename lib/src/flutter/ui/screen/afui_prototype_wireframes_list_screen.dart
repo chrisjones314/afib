@@ -66,7 +66,7 @@ class AFUIPrototypeWireframesListScreen extends AFUIConnectedScreen<AFUIPrototyp
           title: wireframe.id.toString(),
           onTap: () {               
             context.dispatch(AFStartWireframeAction(wireframe: wireframe));
-            test.startScreen(spi.d, spi.flutterContext, wireframe.testData);
+            test.startScreen(spi.context.d, spi.flutterContext, wireframe.testData);
           }
         )
       );

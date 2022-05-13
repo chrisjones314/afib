@@ -42,7 +42,7 @@ class AFTimeUpdateListenerQuery<AFUIState extends AFFlexibleState> extends AFAsy
 
   @override
   void finishAsyncWithResponse(AFFinishQuerySuccessContext<AFUIState, AFTimeState> context) {  
-    processUpdatedTime(context.d, context.r,);
+    processUpdatedTime(context.dispatcher, context.r,);
 
   }
 }

@@ -81,7 +81,7 @@ class AFUIPrototypeDialogScreen extends AFUIConnectedScreen<AFUIPrototypeDialogS
       child: t.childButtonPrimaryText(
         text: "Show Dialog",
         onPressed: () {
-          spi.showDialogAFib(navigate: test.navigate);
+          spi.context.showDialogAFib(navigate: test.navigate);
         }
     ));
 

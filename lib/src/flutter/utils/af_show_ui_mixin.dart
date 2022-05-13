@@ -1,7 +1,0 @@
-
-
-
-mixin AFShowUIMixin {
-
-
-}

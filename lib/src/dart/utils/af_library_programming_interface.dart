@@ -1,14 +1,12 @@
 import 'package:afib/afib_flutter.dart';
+import 'package:afib/src/flutter/utils/af_api_mixins.dart';
 import 'package:meta/meta.dart';
 
-class AFLibraryProgrammingInterfaceContext<TState extends AFFlexibleState> with AFNavigateMixin, AFUpdateComponentStateMixin<TState>, AFStateAccessMixin {
-  final AFPublicState state;
-
+class AFCurrentStateContext<TState extends AFFlexibleState> with AFStandardAPIContextMixin, AFNonUIAPIContextMixin, AFAccessStateSynchronouslyMixin {
   @protected
   final AFDispatcher dispatcher;
 
-  AFLibraryProgrammingInterfaceContext({
-    required this.state,
+  AFCurrentStateContext({
     required this.dispatcher,
   });
 
@@ -17,27 +15,19 @@ class AFLibraryProgrammingInterfaceContext<TState extends AFFlexibleState> with 
   }
 
   AFPublicState get publicState {
-    return state;
-  }
-
-  TOtherState findState<TOtherState extends AFFlexibleState>() {
-    final result = state.components.findState<TOtherState>();
-    return result!;
+    return AFibF.g.storeInternalOnly!.state.public;
   }
 }
 
 
-class AFCurrentStateContext<TState extends AFFlexibleState> extends AFLibraryProgrammingInterfaceContext<TState> {
-
-  AFCurrentStateContext({
-    required AFPublicState state,
+class AFLibraryProgrammingInterfaceContext<TState extends AFFlexibleState> extends AFCurrentStateContext {
+  AFLibraryProgrammingInterfaceContext({
     required AFDispatcher dispatcher,
   }): super(
-    state: state,
     dispatcher: dispatcher,
   );
-
 }
+
 
 @immutable
 class AFLibraryProgrammingInterface<TState extends AFFlexibleState> {

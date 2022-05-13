@@ -29,6 +29,6 @@ class AFPackageInfoQuery<TState extends AFFlexibleState> extends AFAsyncQuery<TS
   void finishAsyncWithResponse(AFFinishQuerySuccessContext<TState, AFPackageInfoState> context) {
     final packageInfo = context.r;
   
-    context.updateAppStateOne(packageInfo);
+    context.updateComponentStateOne<TState>(packageInfo);
   }
 }

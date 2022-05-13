@@ -24,7 +24,7 @@ import 'package:flutter/material.dart' as material;
 import 'package:logger/logger.dart';
 
 
-class AFStartQueryContext<TResponse> {
+class AFStartQueryContext<TResponse> with AFUpdateComponentStateMixin {
   final AFDispatcher dispatcher;
   final void Function(TResponse) onSuccess;
   final void Function(AFQueryError) onError;
@@ -44,7 +44,77 @@ class AFStartQueryContext<TResponse> {
   }
 }
 
-class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextShowMixin, AFUpdateAppStateMixin<TState>, AFNavigateMixin {
+mixin AFStateAccessMixin {
+  AFPublicState get publicState;
+  void dispatch(dynamic action);
+
+  TTheme findTheme<TTheme extends AFFunctionalTheme>(AFThemeID themeId) {
+    final theme = publicState.themes.findById(themeId);
+    if(theme == null) {
+      throw AFException("Unknown theme $themeId");
+    }
+    return theme as TTheme;
+  }
+
+  AFTimeState get currentTime {
+    return publicState.time;    
+  }
+
+  AFScreenID get activeScreenId {
+    return publicState.route.activeScreenId;
+  }
+
+  AFRouteSegment? findRouteSegment(AFScreenID screen) {
+    return publicState.route.findParamFor(screen);
+  }
+
+  TState? findState<TState extends AFFlexibleState>() {
+    return publicState.components.findState<TState>();
+  }
+
+  TRouteParam? findRouteParam<TRouteParam extends AFRouteParam>(AFScreenID screen) {
+    final seg = findRouteSegment(screen);
+    return seg?.param as TRouteParam?;
+  }
+  TRouteParam? findChildRouteParam<TRouteParam extends AFRouteParam>(AFScreenID screen, AFID child) {
+    final seg = findRouteSegment(screen);
+    final result = seg?.children?.findParamById(child);
+    return result as TRouteParam?;
+  }
+
+  TRouteParam? findGlobalRouteParam<TRouteParam>(AFID id) {
+    final seg = publicState.route.findGlobalParam(id);
+    final param = seg?.param as TRouteParam?;
+    return param;
+  }
+
+  /// Dispatches an action that updates the route parameter for the specified screen.
+  void updateRouteParam(AFRouteParam param, { 
+    AFNavigateRoute route = AFNavigateRoute.routeHierarchy
+  }) {
+    dispatch(AFNavigateSetParamAction(param: param, route: route));
+  }
+
+  void updateGlobalRouteParam(AFRouteParam param) {
+    dispatch(AFNavigateSetParamAction(param: param, route: AFNavigateRoute.routeGlobalPool));
+  }
+
+  /// Dispatches an action that updates the route parameter for the specified screen.
+  void updateChildRouteParam(AFScreenID screen, AFRouteParam param, { 
+    AFWidgetParamSource paramSource = AFWidgetParamSource.child,
+    AFNavigateRoute route = AFNavigateRoute.routeHierarchy
+  }) {
+    dispatch(AFNavigateSetChildParamAction(
+      screen: screen,
+      param: param, 
+      route: route,
+      paramSource: paramSource
+    ));
+  }
+
+}
+
+class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextShowMixin, AFUpdateComponentStateMixin<TState>, AFNavigateMixin, AFStateAccessMixin {
   final AFDispatcher dispatcher;
   AFState state;
 
@@ -61,40 +131,14 @@ class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextShowMix
     return dispatcher;
   }
 
+  AFPublicState get publicState {
+    return state.public;
+  }
+
   TState get s {
     var result = state.public.componentStateOrNull<TState>();
     if(result == null) throw AFException("Missing $TState");
     return result;
-  }
-
-  TTheme findTheme<TTheme extends AFFunctionalTheme>(AFThemeID themeId) {
-    final theme = state.public.themes.findById(themeId);
-    if(theme == null) {
-      throw AFException("Unknown theme $themeId");
-    }
-    return theme as TTheme;
-  }
-
-  AFTimeState get currentTime {
-    return state.public.time;    
-  }
-
-  AFRouteSegment? findRouteSegment(AFScreenID screen) {
-    return state.public.route.findParamFor(screen);
-  }
-
-  TState? findState<TState extends AFFlexibleState>() {
-    return state.public.components.findState<TState>();
-  }
-
-  TRouteParam? findRouteParam<TRouteParam extends AFRouteParam>(AFScreenID screen) {
-    final seg = findRouteSegment(screen);
-    return seg?.param as TRouteParam?;
-  }
-  TRouteParam? findChildRouteParam<TRouteParam extends AFRouteParam>(AFScreenID screen, AFID child) {
-    final seg = findRouteSegment(screen);
-    final result = seg?.children?.findParamById(child);
-    return result as TRouteParam?;
   }
 
 
@@ -102,25 +146,6 @@ class AFFinishQueryContext<TState extends AFFlexibleState> with AFContextShowMix
     return AFibD.log(AFConfigEntryLogArea.query);
   }
 
-  /// Dispatches an action that updates the route parameter for the specified screen.
-  void updateRouteParam(AFRouteParam param, { 
-    AFNavigateRoute route = AFNavigateRoute.routeHierarchy
-  }) {
-    dispatch(AFNavigateSetParamAction(param: param, route: route));
-  }
-
-  /// Dispatches an action that updates the route parameter for the specified screen.
-  void updateChildRouteParam(AFScreenID screen, AFRouteParam param, { 
-    AFWidgetParamSource paramSource = AFWidgetParamSource.child,
-    AFNavigateRoute route = AFNavigateRoute.routeHierarchy
-  }) {
-    dispatch(AFNavigateSetChildParamAction(
-      screen: screen,
-      param: param, 
-      route: route,
-      paramSource: paramSource
-    ));
-  }
 
   material.BuildContext? get flutterContext {
     final route = state.public.route;

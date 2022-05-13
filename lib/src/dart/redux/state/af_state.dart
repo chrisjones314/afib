@@ -7,6 +7,18 @@ import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:meta/meta.dart';
 
+class AFPublicStateChange {
+  final dynamic action;
+  final AFPublicState before;
+  final AFPublicState after;
+
+  AFPublicStateChange({
+    required this.action,
+    required this.before,
+    required this.after,
+  });
+}
+
 /// State meant to be used by the app itself, including the
 /// app-specific state.
 class AFPublicState {

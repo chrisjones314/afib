@@ -74,10 +74,6 @@ abstract class AFFlexibleState extends AFStateModelAccess {
     required this.create,
   });
 
-  /*factory AFAppState.createFrom(Iterable<Object> models) {
-    return AFAppState(models: AFAppState.integrate(AFAppState.empty(), models));
-  }*/
-
   static Map<String, Object> createModels(Iterable<Object> toIntegrate) {
     return integrate(<String, Object>{}, toIntegrate);
   }

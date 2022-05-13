@@ -11,23 +11,6 @@ import 'package:afib/src/flutter/utils/afib_f.dart';
 abstract class AFDispatcher {
   dynamic dispatch(dynamic action);
 
-  bool isTestAction(dynamic action) {
-    var shouldPop = false;
-    if(action is AFNavigatePopAction) {
-      shouldPop = action.worksInSingleScreenTest;
-    }
-
-    return ( shouldPop ||
-             action is AFNavigateExitTestAction || 
-             action is AFUpdatePrototypeScreenTestModelsAction || 
-             action is AFPrototypeScreenTestAddError ||
-             action is AFPrototypeScreenTestIncrementPassCount ||
-             action is AFStartPrototypeScreenTestContextAction );
-  }
-
-  /// Only meant to make the public state visible in the debugger, not for use
-  /// in application code.
-  AFPublicState? get debugOnlyPublicState;
 }
 
 /// The production dispatcher which dispatches actions to the store.
@@ -47,6 +30,20 @@ class AFStoreDispatcher extends AFDispatcher {
 
   AFPublicState get debugOnlyPublicState {
     return store.state.public;
+  }
+
+  static bool isTestAction(dynamic action) {
+    var shouldPop = false;
+    if(action is AFNavigatePopAction) {
+      shouldPop = action.worksInSingleScreenTest;
+    }
+
+    return ( shouldPop ||
+             action is AFNavigateExitTestAction || 
+             action is AFUpdatePrototypeScreenTestModelsAction || 
+             action is AFPrototypeScreenTestAddError ||
+             action is AFPrototypeScreenTestIncrementPassCount ||
+             action is AFStartPrototypeScreenTestContextAction );
   }
 
 }

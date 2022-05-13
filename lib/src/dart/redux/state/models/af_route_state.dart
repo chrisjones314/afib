@@ -575,6 +575,14 @@ class AFRouteState {
     return seg; //?.param.paramFor(screen);
   }
 
+  AFRouteSegment? findChildParamFor(AFID screen, AFWidgetID wid, { bool includePrior = true }) {
+    final screenSeg = findParamFor(screen, includePrior: includePrior);
+    if(screenSeg == null) {
+      return null;
+    }
+    return screenSeg.findChild(wid);
+  }
+
   /// Finds a drawer param for the drawer with the specified screen id. 
   /// 
   /// This may return null, in which case you should use the drawer's createRouteParam method

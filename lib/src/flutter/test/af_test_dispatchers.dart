@@ -17,9 +17,6 @@ abstract class AFTestDispatcher extends AFDispatcher {
     return action is AFNavigateAction;
   }
 
-  AFPublicState? get debugOnlyPublicState {
-    return main.debugOnlyPublicState;
-  }
 }
 
 class AFStateScreenTestDispatcher extends AFTestDispatcher {
@@ -51,7 +48,7 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
 
   @override
   void dispatch(dynamic action) {
-    final isTestAct = isTestAction(action);
+    final isTestAct = AFStoreDispatcher.isTestAction(action);
 
     // if the action is a pop, then go ahead and do it.
     if(isTestAct) {

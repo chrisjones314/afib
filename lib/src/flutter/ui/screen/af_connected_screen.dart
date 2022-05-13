@@ -614,24 +614,42 @@ mixin AFNavigateMixin {
   }
 }
 
-mixin AFUpdateAppStateMixin<TState extends AFFlexibleState> {
+mixin AFUpdateComponentStateMixin<TState extends AFFlexibleState> implements AFDispatcher {
   void dispatch(dynamic action);
 
   /// Dispatches an action that updates a single value in the app state area associated
   /// with the [TState] type parameter.
-  void updateAppStateOne(Object toIntegrate) {
+  void updateComponentStateOne<TState extends AFFlexibleState>(Object toIntegrate) {
+    assert(TState != AFFlexibleState, "You must specify a state type as a type parameter");
     dispatch(AFUpdateAppStateAction(area: TState, toIntegrate: [toIntegrate]));
   }
 
   /// Dispatches an action that updates several blaues in the app state area associated
   /// with the [TState] type parameter.
-  void updateAppStateMany(List<Object> toIntegrate) {
+  void updateComponentStateMany<TState extends AFFlexibleState>(List<Object> toIntegrate) {
+    assert(TState != AFFlexibleState, "You must specify a state type as a type parameter");
     dispatch(AFUpdateAppStateAction(area: TState, toIntegrate: toIntegrate));
   }
 
   /// A utility which dispatches an asynchronous query.
   void executeQuery(AFAsyncQuery query) {
     dispatch(query);
+  }
+
+  Stream<AFPublicStateChange> get streamPublicStateChanges {
+    return AFibF.g.streamPublicStateChanges;
+  }
+
+
+  void accessCurrentState(AFAccessCurrentStateDelegate delegate) {
+    final public = AFibF.g.storeInternalOnly?.state.public;
+    if(public != null) {
+      final context = AFCurrentStateContext(
+        dispatcher: this,
+        state: public,
+      );
+      delegate(context);
+    }
   }
 
   /// Shuts down all existing listener and deferred queries.   Often called
@@ -1467,7 +1485,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
 
   /// Meant to make the public state visible in the debugger, absolutely not for runtime use.
   AFPublicState? get debugOnlyPublicState {
-    return dispatcher.debugOnlyPublicState;
+    return AFibF.g.storeInternalOnly?.state.public;
   }
 
   AFComponentStates? get debugOnlyComponentState {
@@ -1480,7 +1498,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
 }
 
 @immutable
-class AFStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> with AFContextShowMixin, AFUpdateAppStateMixin<TState>, AFNavigateMixin {
+class AFStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> with AFContextShowMixin, AFUpdateComponentStateMixin<TState>, AFNavigateMixin {
   static const errFlutterStateRequired = "You can only call this method if your route param is derived from AFRouteParamWithFlutterState";
   static const errNeedTextControllers = "When constructing the AFFlutterRouteParamState for your route parameter, you must make textControllers non-null";
   static const errNeedScrollControllers = "When constructing the AFFlutterRouteParamState for your route parameter, you must make scrollControllers non-null";

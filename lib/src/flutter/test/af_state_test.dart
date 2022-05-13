@@ -437,6 +437,7 @@ class _AFStateRegisterDynamicCrossQueryResultStatement<TQuerySource extends AFAs
 enum _AFStateRegisterSpecialResultKind {
   resultNone,
   resultNull,
+  resultLive,
 }
 
 class _AFStateRegisterSpecialResultStatement<TQuery extends AFAsyncQuery> extends _AFStateTestDefinitionStatement {
@@ -453,6 +454,10 @@ class _AFStateRegisterSpecialResultStatement<TQuery extends AFAsyncQuery> extend
     return _AFStateRegisterSpecialResultStatement(querySpecifier,_AFStateRegisterSpecialResultKind.resultNone);
   }
 
+  factory _AFStateRegisterSpecialResultStatement.resultLive(Object querySpecifier) {
+    return _AFStateRegisterSpecialResultStatement(querySpecifier,_AFStateRegisterSpecialResultKind.resultLive);
+  }
+
   void execute(AFStateTestContext context) {
     final test = context.test;
     test.registerResult(querySpecifier,  (context, q) {
@@ -461,6 +466,13 @@ class _AFStateRegisterSpecialResultStatement<TQuery extends AFAsyncQuery> extend
         // don't do a response.
       } else if(specialResult == _AFStateRegisterSpecialResultKind.resultNull) {
         query.testFinishAsyncWithResponse(context, null);
+      } else if(specialResult == _AFStateRegisterSpecialResultKind.resultLive) {
+        final store = AFibF.g.storeInternalOnly;
+        query.startAsyncAF(
+          AFStoreDispatcher(store as AFStore),
+          store
+        );
+
       } else {
         assert(false);
       }
@@ -795,6 +807,11 @@ class AFSpecificStateTestDefinitionContext<TState extends AFFlexibleState> {
   void defineQueryResponseNull<TQuery extends AFAsyncQuery>({ Object? querySpecifier }) {
     assert(TQuery != AFAsyncQuery, errSpecifyTypeParameter);
     test.defineQueryResponseNull<TQuery>(querySpecifier ?? TQuery, definitions);
+  }
+
+  void defineQueryResponseLive<TQuery extends AFAsyncQuery>({ Object? querySpecifier }) {
+    assert(TQuery != AFAsyncQuery, errSpecifyTypeParameter);
+    test.defineQueryResponseLive<TQuery>(querySpecifier ?? TQuery, definitions);
   }
 
   /// Create a response dynamically for a particular query.
@@ -1158,6 +1175,11 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
   void defineQueryResponseNull<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFStateTestDefinitionContext definitions) {
     currentStatements.addDefinitionStatement(_AFStateRegisterSpecialResultStatement<TQuery>.resultNull(querySpecifier), hasExecutionStatements: currentStatements.hasExecutionStatements);
   }
+
+  void defineQueryResponseLive<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFStateTestDefinitionContext definitions) {
+    currentStatements.addDefinitionStatement(_AFStateRegisterSpecialResultStatement<TQuery>.resultLive(querySpecifier), hasExecutionStatements: currentStatements.hasExecutionStatements);
+  }
+
 
   void defineQueryResponseDynamic<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFCreateQueryResultDelegate<TQuery> delegate) {
     currentStatements.addDefinitionStatement(_AFStateRegisterDynamicResultStatement<TQuery>(querySpecifier, delegate), hasExecutionStatements: currentStatements.hasExecutionStatements);

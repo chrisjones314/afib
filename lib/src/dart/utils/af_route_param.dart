@@ -6,6 +6,7 @@ import 'package:meta/meta.dart';
 enum AFWidgetParamSource {
   parent,
   child,
+  global,
   notApplicable
 }
 

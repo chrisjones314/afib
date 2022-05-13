@@ -199,3 +199,5 @@ typedef AFCreateConnectedWidgetWithLaunchParamDelegate = AFConnectedUIBase Funct
 typedef AFBuildWithSPIDelegate<TSPI extends AFStateProgrammingInterface> = Widget Function(TSPI spi);
 
 typedef AFCreateLibraryProgrammingInterfaceDelegate = AFLibraryProgrammingInterface Function(AFLibraryProgrammingInterfaceID id, AFLibraryProgrammingInterfaceContext context);
+
+typedef AFAccessCurrentStateDelegate = void Function(AFCurrentStateContext);

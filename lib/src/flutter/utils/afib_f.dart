@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/redux/middleware/af_query_middleware.dart';
@@ -109,6 +111,9 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   final testOnlyDialogCompleters = <AFScreenID, void Function(dynamic)>{}; 
   final testOnlyScreenSPIMap = <AFScreenID, AFStateProgrammingInterface>{};
   final testOnlyScreenBuildContextMap = <AFScreenID, BuildContext>{};
+  final stateChangeStreamController = StreamController<AFPublicStateChange>();
+  Stream<AFPublicStateChange>? stateChangeBroadcast;
+
   BuildContext? testOnlyShowBuildContext;
 
   AFScreenMap? _afPrototypeScreenMap;
@@ -196,6 +201,13 @@ class AFibGlobalState<TState extends AFFlexibleState> {
       middleware: middleware
     );
     storeDispatcherInternalOnly = AFStoreDispatcher(storeInternalOnly!);
+  }
+
+  Stream<AFPublicStateChange> get streamPublicStateChanges {
+    if(stateChangeBroadcast == null) {
+      stateChangeBroadcast = stateChangeStreamController.stream.asBroadcastStream();
+    }
+    return stateChangeBroadcast!;
   }
 
   AFScreenMap get screenMap {

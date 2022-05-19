@@ -17,6 +17,8 @@ class AFUIScreenID extends AFScreenID {
   static const screenPrototypeBottomSheet = AFUIScreenID("screen_prototype_bottom_sheet");
   static const screenPrototypeDialog = AFUIScreenID("screen_prototype_dialog");
   static const screenPrototypeWaiting = AFUIScreenID("screen_prototype_waiting");
+  static const screenDemoModeEnter = AFUIScreenID("screen_demo_mode_enter");
+  static const screenDemoModeExit = AFUIScreenID("screen_demo_mode_exit");
 
   static const unused = AFUIScreenID("unused");
   static const screenPrototypeWireframesList = AFUIScreenID("screen_prototype_wireframes_list");

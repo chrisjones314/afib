@@ -443,8 +443,8 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
   bool isEnabled(AFBaseTestID id) { return true; }
 
   AFTimeState get currentTime {
-    final state = AFibF.g.storeInternalOnly?.state;
-    final testState = state?.private.testState.findState(testId);
+    final state = AFibF.g.internalOnlyActiveStore.state;
+    final testState = state.private.testState.findState(testId);
     if(testState == null) {
       throw AFException("No test state for test $testId");
     }
@@ -452,7 +452,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
     var timeState;
     if(models == null) {
       // this is a workflow test.
-      timeState = state?.public.time;
+      timeState = state.public.time;
     } else {
       timeState = testState.models!["AFTimeState"] as AFTimeState?;
     }
@@ -552,8 +552,8 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
     AFFormFactor? atMost,
     Orientation? withOrientation
   }) {
-    final themes = AFibF.g.storeInternalOnly?.state.public.themes;
-    final functional = themes?.functionals.values.first;
+    final themes = AFibF.g.internalOnlyActiveStore.state.public.themes;
+    final functional = themes.functionals.values.first;
     if(functional == null) throw AFException("No functional themese defined.");
     return functional.deviceHasFormFactor(
       atLeast: atLeast,
@@ -1695,13 +1695,13 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
     if(testImpl == null) throw AFException("Test with ID ${test.stateTestId} not found");
     
     // then, execute the desired state test to bring us to our desired state.
-    final store = AFibF.g.storeInternalOnly;
-    final mainDispatcher = AFStoreDispatcher(store!);    
-    final stateDispatcher = AFStateScreenTestDispatcher(mainDispatcher);
+    final store = AFibF.g.internalOnlyActiveStore;
+    //final mainDispatcher = AFStoreDispatcher(store);    
+    //final stateDispatcher = AFStateScreenTestDispatcher(mainDispatcher);
 
-    final stateTestContext = AFStateTestContextForState<TState>(testImpl, store, stateDispatcher, isTrueTestContext: false);
+    final stateTestContext = AFStateTestContextForState<TState>(testImpl,  AFConceptualStore.appStore, isTrueTestContext: false);
     testImpl.execute(stateTestContext);
-    stateTestContext.dispatcher = mainDispatcher;
+    //stateTestContext.dispatcher = mainDispatcher;
 
 
     if(stateTestContext.errors.hasErrors) {
@@ -2042,7 +2042,7 @@ abstract class AFWorkflowTestExecute {
 
   Future<void> expectState<TState extends AFFlexibleState>( Future<void> Function(TState, AFRouteState) withState) async {
     assert(TState != AFFlexibleState, "You must specify the state type as a type parameter");
-    final public = AFibF.g.storeInternalOnly?.state.public;
+    final public = AFibF.g.internalOnlyActiveStore.state.public;
     if(public == null) throw AFException("Missing public state");
     return withState(public.componentState<TState>(), public.route);
   }
@@ -2104,8 +2104,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     assert(TQueryResponse != dynamic, "You need to specify a type for the query response");
     final td = definitions.td(testData);
     final successContext = AFFinishQuerySuccessContext<TState, TQueryResponse>(
-      dispatcher: AFibF.g.storeDispatcherInternalOnly!,
-      state: AFibF.g.storeInternalOnly!.state,
+      conceptualStore: AFibF.g.activeConceptualStore,
       response: td
     );
     query.finishAsyncWithResponseAF(successContext);
@@ -2241,12 +2240,10 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
       return;
     }
     final stateTest = AFibF.g.stateTests.findById(queryResults as AFStateTestID);
-    final store = AFibF.g.storeInternalOnly;
-    final dispatcher = AFibF.g.storeDispatcherInternalOnly;
 
     // This causes the query middleware to return results specified in the state test.
-    if(stateTest != null && store != null && dispatcher != null) {
-      final stateTestContext = AFStateTestContextForState(stateTest, store, dispatcher, isTrueTestContext: false);
+    if(stateTest != null) {
+      final stateTestContext = AFStateTestContextForState(stateTest, AFConceptualStore.appStore, isTrueTestContext: false);
       AFStateTestContext.currentTest = stateTestContext;    
     } else {
       assert(false);

@@ -75,7 +75,7 @@ class AFWireframeExecutionContext<TStateView extends AFFlexibleStateView> {
 
   void navigateTo(AFPrototypeID testId, { AFRouteParam? routeParam, List<Object>? models }) {
     final test = AFibF.g.findScreenTestById(testId);
-    final dispatcher = AFibF.g.storeDispatcherInternalOnly;
+    final dispatcher = AFibF.g.internalOnlyActiveDispatcher;
     assert(dispatcher != null && test != null);
     if(dispatcher != null && test != null) {
       test.startScreen(dispatcher, spi.context.flutterContext, wireframe.testData, routeParam: routeParam, models: models);
@@ -87,8 +87,8 @@ class AFWireframeExecutionContext<TStateView extends AFFlexibleStateView> {
   }
 
   void _dispatch(dynamic action) {
-    assert(AFibF.g.storeDispatcherInternalOnly != null);
-    AFibF.g.storeDispatcherInternalOnly?.dispatch(action);
+    assert(AFibF.g.internalOnlyActiveDispatcher != null);
+    AFibF.g.internalOnlyActiveDispatcher.dispatch(action);
   }
 }
 
@@ -140,7 +140,7 @@ class AFWireframe<TStateView extends AFFlexibleStateView> {
     // if the state view changed, then we need to update the models
     // in the test data state.
     if(stateViewOrig != context.stateView) {
-      AFibF.g.storeInternalOnly?.dispatch(AFUpdatePrototypeScreenTestModelsAction(
+      AFibF.g.internalOnlyActiveStore.dispatch(AFUpdatePrototypeScreenTestModelsAction(
         AFUIScreenTestID.wireframe,
         context.models 
       ));

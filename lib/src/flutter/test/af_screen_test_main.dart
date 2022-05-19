@@ -52,7 +52,7 @@ Future<void> afScreenTestMain<TState extends AFFlexibleState>(AFCommandOutput ou
   for(final locale in locales) {
     AFBaseTestExecute.writeSeparatorLine(output);
     output.writeLine("Running in locale $locale");
-    AFibF.g.storeDispatcherInternalOnly!.dispatch(AFOverrideThemeValueAction(
+    AFibF.g.internalOnlyActiveDispatcher.dispatch(AFOverrideThemeValueAction(
       id: AFUIThemeID.locale,
       value: locale,
     ));            
@@ -112,11 +112,11 @@ Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
       printPrototypeStart(output, prototype.id);
       final startActions = createPush(prototype);
       for(final action in startActions) {
-        AFibF.g.storeInternalOnly!.dispatch(action);
+        AFibF.g.internalOnlyActiveStore.dispatch(action);
       }
       AFibD.logTestAF?.d("Starting ${prototype.id}");
   
-      final storeDispatcher = AFStoreDispatcher(AFibF.g.storeInternalOnly!);
+      final storeDispatcher = AFStoreDispatcher(AFibF.g.internalOnlyActiveStore);
       final dispatcher = AFSingleScreenTestDispatcher(prototype.id, storeDispatcher, null);
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, prototype.id, output, localStats);
       storeDispatcher.dispatch(AFResetToInitialStateAction());
@@ -129,7 +129,7 @@ Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
         if(baseTime == null) {
           throw AFException("If you set runTime to true in a screen or widget test, one of your models must be an AFTimeState");
         }
-        AFibF.g.storeInternalOnly!.dispatch(AFTimeUpdateListenerQuery(baseTime: baseTime));
+        AFibF.g.internalOnlyActiveStore.dispatch(AFTimeUpdateListenerQuery(baseTime: baseTime));
       }
 
       // tell the store to go to the correct screen.
@@ -147,9 +147,9 @@ Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
       AFibD.logTestAF?.d("Finished ${prototype.id}");
       output.outdent();
       // pop this test screen off so that we are ready for the next one.
-      AFibF.g.storeInternalOnly!.dispatch(AFNavigateExitTestAction());
+      AFibF.g.internalOnlyActiveStore.dispatch(AFNavigateExitTestAction());
       if(prototype.timeHandling == AFTestTimeHandling.running) {
-        AFibF.g.storeInternalOnly!.dispatch(AFShutdownOngoingQueriesAction());
+        AFibF.g.internalOnlyActiveStore.dispatch(AFShutdownOngoingQueriesAction());
       }
       
       dispatcher.setContext(context);
@@ -157,7 +157,7 @@ Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
     }
   }
 
-  AFibF.g.storeInternalOnly!.dispatch(AFResetTestState());
+  AFibF.g.internalOnlyActiveStore.dispatch(AFResetTestState());
   final baseContexts = List<AFBaseTestExecute>.of(simpleContexts);
   printTestTotal(output, baseContexts, localStats);
   stats.mergeIn(localStats);
@@ -265,7 +265,7 @@ Future<void> _afWorkflowTestMain<TState extends AFFlexibleState>(AFCommandOutput
       printPrototypeStart(output, test.id);
       output.indent();
       AFibD.logTestAF?.d("Starting test ${test.id}");
-      final dispatcher = AFStoreDispatcher(AFibF.g.storeInternalOnly!);
+      final dispatcher = AFStoreDispatcher(AFibF.g.internalOnlyActiveStore);
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id, output, localStats);
       multiContexts.add(context);
 
@@ -279,8 +279,8 @@ Future<void> _afWorkflowTestMain<TState extends AFFlexibleState>(AFCommandOutput
       AFibD.logTestAF?.d("Finished ${test.id}");
 
       // pop this test screen off so that we are ready for the next one.
-      AFibF.g.storeInternalOnly!.dispatch(AFNavigateExitTestAction());
-      AFibF.g.storeInternalOnly!.dispatch(AFShutdownOngoingQueriesAction());
+      AFibF.g.internalOnlyActiveStore.dispatch(AFNavigateExitTestAction());
+      AFibF.g.internalOnlyActiveStore.dispatch(AFShutdownOngoingQueriesAction());
       
       //dispatcher.setContext(context);
       await tester.pumpAndSettle(Duration(seconds: 1));

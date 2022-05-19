@@ -20,11 +20,17 @@ import 'package:logger/logger.dart';
 
 
 class AFQueryContext with AFContextShowMixin, AFStandardAPIContextMixin, AFNonUIAPIContextMixin {
-  final AFDispatcher dispatcher;
+  final AFConceptualStore conceptualStore;
+
 
   AFQueryContext({
-    required this.dispatcher
+    required this.conceptualStore,
   });
+
+
+  AFDispatcher get dispatcher {
+    return AFibF.g.internalOnlyStoreEntry(conceptualStore).dispatcher!;
+  }
 
   void dispatch(dynamic action) {
     dispatcher.dispatch(action);
@@ -35,7 +41,7 @@ class AFQueryContext with AFContextShowMixin, AFStandardAPIContextMixin, AFNonUI
   }
 
   material.BuildContext? get flutterContext {
-    final route = AFibF.g.storeInternalOnly!.state.public.route;
+    final route = AFibF.g.internalOnlyActiveStore.state.public.route;
     final currentScreenId = route.activeScreenId;
     final activeScreen = AFibF.g.internalOnlyFindScreen(currentScreenId);
     return activeScreen?.element;
@@ -47,24 +53,26 @@ class AFStartQueryContext<TResponse> extends AFQueryContext {
   final void Function(AFQueryError) onError;
 
   AFStartQueryContext({
-    required AFDispatcher dispatcher,
+    required AFConceptualStore conceptualStore,
     required this.onSuccess, 
     required this.onError
   }): super(
-    dispatcher: dispatcher
+    conceptualStore: conceptualStore,
   );
 }
 
 
 class AFFinishQueryContext<TState extends AFFlexibleState> extends AFQueryContext with AFAccessStateSynchronouslyMixin {
-  AFState state;
 
   AFFinishQueryContext({
-    required AFDispatcher dispatcher, 
-    required this.state
+    required AFConceptualStore conceptualStore,
   }): super(
-    dispatcher: dispatcher
+    conceptualStore: conceptualStore,
   );
+
+  AFState get state {
+    return AFibF.g.internalOnlyStoreEntry(conceptualStore).store!.state;
+  }
 
   AFPublicState get accessPublicState {
     return state.public;
@@ -88,10 +96,9 @@ class AFFinishQueryContext<TState extends AFFlexibleState> extends AFQueryContex
 class AFFinishQuerySuccessContext<TState extends AFFlexibleState, TResponse> extends AFFinishQueryContext<TState>  {
   final TResponse response;
   AFFinishQuerySuccessContext({
-    required AFDispatcher dispatcher, 
-    required AFState state, 
+    required AFConceptualStore conceptualStore,
     required this.response
-  }): super(dispatcher: dispatcher, state: state);
+  }): super(conceptualStore: conceptualStore);
 
 
   TResponse get r {
@@ -102,10 +109,9 @@ class AFFinishQuerySuccessContext<TState extends AFFlexibleState, TResponse> ext
 class AFFinishQueryErrorContext<TState extends AFFlexibleState> extends AFFinishQueryContext<TState> {
   final AFQueryError error;
   AFFinishQueryErrorContext({
-    required AFDispatcher dispatcher, 
-    required AFState state, 
+    required AFConceptualStore conceptualStore,
     required this.error
-  }): super(dispatcher: dispatcher, state: state);
+  }): super(conceptualStore: conceptualStore);
 
   AFQueryError get e {
     return error;
@@ -115,6 +121,7 @@ class AFFinishQueryErrorContext<TState extends AFFlexibleState> extends AFFinish
 /// Superclass for a kind of action that queries some data asynchronously, then knows
 /// how to process the result.
 abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends AFActionWithKey {
+  AFConceptualStore conceptualStore = AFConceptualStore.appStore;
   final AFOnResponseDelegate<TState, TResponse>? onSuccessDelegate;
   final AFOnErrorDelegate<TState>? onErrorDelegate;
   final AFPreExecuteResponseDelegate<TResponse>? onPreExecuteResponseDelegate;
@@ -124,25 +131,33 @@ abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends A
     this.onSuccessDelegate, 
     this.onErrorDelegate, 
     this.onPreExecuteResponseDelegate
-  }): super(id: id);
+  }): super(id: id) {
+    conceptualStore = AFibF.g.activeConceptualStore;
+  }
 
   /// Called internally when redux middleware begins processing a query.
   void startAsyncAF(AFDispatcher dispatcher, AFStore store, { void Function(dynamic)? onResponseExtra, void Function(dynamic)? onErrorExtra }) {
     final startContext = AFStartQueryContext<TResponse>(
-      dispatcher: dispatcher,
+      conceptualStore: conceptualStore,
       onSuccess: (response) { 
         // note: there could be multiple queries outstanding at once, meaning the state
         // might be changed by some other query while we are waiting for a responser.  
         // Consequently, it is important not to make a copy of the state above this point,
         // as it might go out of date.
-        final successContext = AFFinishQuerySuccessContext<TState, TResponse>(dispatcher: dispatcher, state: store.state, response: response);
+        final successContext = AFFinishQuerySuccessContext<TState, TResponse>(
+          conceptualStore: conceptualStore, 
+          response: response
+        );
         finishAsyncWithResponseAF(successContext);
         if(onResponseExtra != null) {
           onResponseExtra(successContext);
         }
       }, 
       onError: (error) {
-        final errorContext = AFFinishQueryErrorContext<TState>(dispatcher: dispatcher, state: store.state, error: error);
+        final errorContext = AFFinishQueryErrorContext<TState>(
+          conceptualStore: conceptualStore, 
+          error: error
+        );
         finishAsyncWithErrorAF(errorContext);
         if(onErrorExtra != null) {
           onErrorExtra(errorContext);
@@ -152,7 +167,9 @@ abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends A
     final pre = onPreExecuteResponseDelegate;
     if(pre != null) {
       final preResponse = pre();
-      final successContext = AFFinishQuerySuccessContext<TState, TResponse>(dispatcher: dispatcher, state: store.state, response: preResponse);
+      final successContext = AFFinishQuerySuccessContext<TState, TResponse>(
+        conceptualStore: conceptualStore,
+        response: preResponse);
       finishAsyncWithResponseAF(successContext);
 
     }
@@ -166,7 +183,6 @@ abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends A
     final onSuccessD = onSuccessDelegate;
 
     // finishAsyncWithResponse might have updated the state.
-    context.state = AFibF.global!.storeInternalOnly!.state;
     if(onSuccessD != null) {
       onSuccessD(context);
     }
@@ -202,10 +218,8 @@ abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends A
 
   /// Called during testing to simulate results from an asynchronous call.
   void testFinishAsyncWithResponse(AFStateTestContext context, TResponse response) {
-    final afState = AFibF.g.storeInternalOnly!.state;
     final successContext = AFFinishQuerySuccessContext<TState, TResponse>(
-      dispatcher: context.dispatcher, 
-      state: afState, 
+      conceptualStore: conceptualStore,
       response: response
     );
     finishAsyncWithResponseAF(successContext);
@@ -214,8 +228,7 @@ abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends A
   /// Called during testing to simulate results from an asynchronous call.
   void testFinishAsyncWithError(AFStateTestContext context, AFQueryError error) {
     final errorContext = AFFinishQueryErrorContext<TState>(
-      dispatcher: context.dispatcher,
-      state: context.afState,
+      conceptualStore: conceptualStore,
       error: error
     );
     finishAsyncWithErrorAF(errorContext);
@@ -350,13 +363,17 @@ class AFConsolidatedQuery<TState extends AFFlexibleState> extends AFAsyncQuery<T
           onResponseExtra: (dynamic localResponse) {
             queryResponse.completeResponse(localResponse);
             if(queryResponses.isComplete) {
-              completer.complete(true);
+              if(!completer.isCompleted) {
+                completer.complete(true);
+              }
             }
           },
           onErrorExtra: (dynamic error) {
             queryResponse.completeError(error);
             if(queryResponses.isComplete) {
-              completer.complete(true);
+              if(!completer.isCompleted) {
+                completer.complete(true);
+              }
             }
           }
         );
@@ -366,15 +383,13 @@ class AFConsolidatedQuery<TState extends AFFlexibleState> extends AFAsyncQuery<T
       completer.future.then((_) {
         if(queryResponses.hasError) {
           final errorContext = AFFinishQueryErrorContext<TState>(
-            dispatcher: dispatcher,
-            state: store.state,
+            conceptualStore: conceptualStore,
             error: AFQueryError(code: queryFailedCode, message: queryFailedMessage)
           );
           finishAsyncWithErrorAF(errorContext);
         } else {
           final successContext = AFFinishQuerySuccessContext<TState, AFConsolidatedQueryResponse>(
-            dispatcher: dispatcher,
-            state: store.state,
+            conceptualStore: conceptualStore,
             response: queryResponses
           );
           finishAsyncWithResponseAF(successContext);

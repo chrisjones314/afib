@@ -44,6 +44,14 @@ class AFPublicState {
     return components.stateFor(T) as T?;
   }
 
+  AFPublicState reviseComponents(AFComponentStates components) {
+    return copyWith(components: components);
+  }
+
+  AFPublicState reviseRoute(AFRouteState route) {
+    return copyWith(route: route);
+  }
+
   AFPublicState copyWith({
     AFRouteState? route,
     AFThemeState? themes,
@@ -108,6 +116,10 @@ class AFState {
       )
     );
   }  
+
+  AFState revisePublic(AFPublicState public) {
+    return copyWith(public: public);
+  }
 
   /// Modify the specified properties and leave everything else the same.
   AFState copyWith({

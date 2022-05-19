@@ -444,7 +444,7 @@ class AFRouteStateSegments {
       // in a real app it would get recreated each time you visit the test screen.   
       // This can cause stuff in the param to get re-used after it is disposed.  So, in prototype
       // mode we don't call dispose.
-      if(!AFibD.config.isPrototypeMode) {
+      if(!AFibD.config.isPrototypeMode && !AFibF.g.isDemoMode) {
         expiredSegment.dispose();
       }
     }

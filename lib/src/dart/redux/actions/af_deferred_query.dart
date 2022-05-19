@@ -84,8 +84,7 @@ abstract class AFDeferredQuery<TState extends AFFlexibleState> extends AFAsyncQu
     required AFState state, 
   }) {
     return AFFinishQuerySuccessContext<TState, AFUnused>(    
-      dispatcher: dispatcher,
-      state: state,
+      conceptualStore: conceptualStore,
       response: AFUnused(),
     );
   }

@@ -2006,13 +2006,13 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   /// As long as you are calling [AFFunctionalTheme.childScaffold], you don't need
   /// to worry about this, it will be done for you.
   Widget? _createDebugDrawer(Widget? drawer, int testDrawerSide) {
-    final store = AFibF.g.storeInternalOnly;
-    final state = store?.state;
-    final testState = state?.private.testState;
-    final activeTestId = testState?.activeTestId;
+    final store = AFibF.g.internalOnlyActiveStore;
+    final state = store.state;
+    final testState = state.private.testState;
+    final activeTestId = testState.activeTestId;
     if(activeTestId != null) {
       final test = AFibF.g.findScreenTestById(activeTestId);
-      if(test != null && test.testDrawerSide == testDrawerSide) {
+      if(test != null && test.testDrawerSide == testDrawerSide && !AFibF.g.isDemoMode) {
         return AFUIPrototypeDrawer(launchParam: AFUIPrototypeDrawerRouteParam.createOncePerScreen(AFUIPrototypeDrawerRouteParam.viewTest));
       }
     }

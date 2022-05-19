@@ -70,7 +70,7 @@ class AFUIPrototypeDialogScreen extends AFUIConnectedScreen<AFUIPrototypeDialogS
     AFibF.g.testOnlyShowBuildContext = context.c;
     final t = spi.t;
     final test = context.p.test;
-    final testStateSource = AFibF.g.storeInternalOnly?.state.private.testState;    
+    final testStateSource = AFibF.g.internalOnlyActiveStore.state.private.testState;    
 
     if(testStateSource == null) {
       throw AFException("Missing test state");

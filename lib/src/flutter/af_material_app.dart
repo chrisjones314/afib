@@ -45,12 +45,11 @@ abstract class AFMaterialApp<AppState> extends AFApp<AppState> {
   
   /// Construct an app with the specified [AFScreenMap]
   AFMaterialApp(): super();
-
+  
   /// This widget is the root of your application
   @override
   Widget build(BuildContext context) {
-    final store = AFibF.g.storeInternalOnly;
-    if(store == null) throw AFException("Missing store");
+    final store = AFibF.g.internalOnlyActiveStore;
     return StoreProvider(
       store: store,      
       child: OverlaySupport(

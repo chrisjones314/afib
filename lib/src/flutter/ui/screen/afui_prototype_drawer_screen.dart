@@ -66,11 +66,6 @@ class AFUIPrototypeDrawerScreen extends AFUIConnectedScreen<AFUIPrototypeDrawerS
   }
 
   Widget _buildScreen(AFUIPrototypeDrawerScreenSPI spi) {
-    final testStateSource = AFibF.g.storeInternalOnly?.state.private.testState;    
-
-    if(testStateSource == null) {
-      throw AFException("Missing test state");
-    }
     return _createScaffold(spi);
   }
 

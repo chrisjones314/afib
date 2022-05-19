@@ -68,7 +68,7 @@ class AFUIPrototypeBottomSheetScreen extends AFUIConnectedScreen<AFUIPrototypeBo
   Widget _buildScreen(AFUIPrototypeBottomSheetScreenSPI spi) {
     final context = spi.context;
     AFibF.g.testOnlyShowBuildContext = context.c;
-    final testStateSource = AFibF.g.storeInternalOnly?.state.private.testState;    
+    final testStateSource = AFibF.g.internalOnlyActiveStore.state.private.testState;    
 
     if(testStateSource == null) {
       throw AFException("Missing test state");

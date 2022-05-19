@@ -1,14 +1,37 @@
 import 'dart:async';
 
 import 'package:afib/afib_flutter.dart';
+import 'package:afib/src/dart/redux/actions/af_root_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/redux/middleware/af_query_middleware.dart';
 import 'package:afib/src/dart/redux/middleware/af_route_middleware.dart';
 import 'package:afib/src/dart/redux/reducers/af_reducer.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/flutter/test/af_init_prototype_screen_map.dart';
+import 'package:afib/src/flutter/ui/screen/afui_demo_mode_transition_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
+
+/// Used internally to indicate whether you are talking about the store that drives the UI,
+/// or the background store, which holds a secondary state in demo mode that doesn't impact
+/// the UI.
+enum AFTargetStore {
+  /// The store which is attached to the UI, and which modifies the navigation state
+  /// when nav actions occur
+  uiStore,
+
+  /// A background state used in demo mode and testing which can be built without impacting
+  /// the visible UI.
+  backgroudStore,
+}
+
+/// Used internally to indicate whether you are the apps real store/data, or about demo mode
+/// data.
+enum AFConceptualStore {
+  appStore,
+
+  demoModeStore,
+}
 
 
 class AFibTestOnlyScreenElement {
@@ -22,7 +45,7 @@ class AFWidgetsBindingObserver extends WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final dispatcher = AFibF.g.storeDispatcherInternalOnly;
+    final dispatcher = AFibF.g.internalOnlyActiveDispatcher;
     assert(dispatcher != null);
     if(dispatcher == null) return;
     AFibF.g.dispatchLifecycleActions(dispatcher, state);    
@@ -54,7 +77,7 @@ class AFWidgetsBindingObserver extends WidgetsBindingObserver {
 
   void rebuildTheme() {
     // rebuild our theme with the new values, and then update it.
-    AFibF.g.storeDispatcherInternalOnly?.dispatch(AFRebuildThemeState());    
+    AFibF.g.internalOnlyActiveDispatcher.dispatch(AFRebuildThemeState());    
   }
 }
 
@@ -91,6 +114,38 @@ class AFTestMissingTranslations {
   }
 }
 
+class AFibStoreStackEntry {
+  AFTargetStore target;
+  AFConceptualStore conceptual;
+  AFStore? store;
+  AFDispatcher? dispatcher;
+
+  AFibStoreStackEntry({
+    required this.target,
+    required this.store,
+    required this.conceptual,
+    required this.dispatcher,
+  });
+
+  void swapConceptual() {
+    if(conceptual == AFConceptualStore.appStore) {
+      conceptual = AFConceptualStore.demoModeStore;
+    } else {
+      conceptual = AFConceptualStore.appStore;
+    }
+  }
+}
+
+class AFibStateStackEntry {
+  final String name;
+  final AFState state;
+
+  AFibStateStackEntry({
+    required this.name,
+    required this.state,
+  });
+}
+
 
 class AFibGlobalState<TState extends AFFlexibleState> {
   final AFAppExtensionContext appContext;
@@ -113,6 +168,15 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   final testOnlyScreenBuildContextMap = <AFScreenID, BuildContext>{};
   final stateChangeStreamController = StreamController<AFPublicStateChange>();
   Stream<AFPublicStateChange>? stateChangeBroadcast;
+  
+  AFibStoreStackEntry? uiStore;
+  AFibStoreStackEntry? backgroundStore;
+  AFConceptualStore activeConceptualStore = AFConceptualStore.appStore;
+
+  final stateStack = <AFibStateStackEntry>[];
+  AFStateTestContext? demoModeTest;
+  AFRouteState? preDemoModeRoute;
+
 
   BuildContext? testOnlyShowBuildContext;
 
@@ -123,7 +187,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   /// The redux store, which contains the application state, NOT FOR PUBLIC USE.
   /// 
   /// WARNING: You should never
-  /// call this.  AFib's testing and prototyping systems sometimes operate in contexts
+  /// access this.  AFib's testing and prototyping systems sometimes operate in contexts
   /// with a specially modified store, without a store at all, or with a special dispatcher.  If you try to access
   /// the store directly, or dispatch actions on it directly, you will compromise these systems.   
   /// 
@@ -131,77 +195,150 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   /// If you need access to items from your reduce state, you should typically override
   /// [AFConnectedScreen.createStateView], [AFConnectedWidget.createStateView], or the same method
   /// for dialogs, bottom sheets, etc.
-  AFStore? storeInternalOnly;
+  AFStore get internalOnlyActiveStore {
+    return internalOnlyStoreEntry(activeConceptualStore).store!;
+  }
 
   /// WARNING: You should never call this.  See [internalOnlyStore] for details.
-  AFStoreDispatcher? storeDispatcherInternalOnly;
+  AFDispatcher get internalOnlyActiveDispatcher {
+    return internalOnlyStoreEntry(activeConceptualStore).dispatcher!;
+  }
 
   AFibGlobalState({
-    required this.appContext
+    required this.appContext,
+    required this.activeConceptualStore,
   });
+
+  void initializeTests() {
+    if(testData.isNotEmpty) {
+      return;
+    }
+
+    appContext.test.initialize(
+      testData: testData, 
+      unitTests: unitTests,
+      stateTests: stateTests,
+      widgetTests: widgetTests,
+      dialogTests: dialogTests,
+      bottomSheetTests: bottomSheetTests,
+      drawerTests: drawerTests,
+      screenTests: screenTests,
+      workflowTests: workflowTests,
+      wireframes: wireframes,
+    );
+
+    final libraries = thirdPartyLibraries;
+    for(final thirdParty in libraries) {
+      final holder = thirdParty.createScreenTestHolder();
+      thirdPartyUITests[thirdParty.id] = holder;
+      thirdParty.test.initialize(
+        testData: testData,
+        unitTests: holder.afUnitTests,
+        stateTests: holder.afStateTests,
+        widgetTests: holder.afWidgetTests,
+        dialogTests: holder.afDialogTests,
+        drawerTests: holder.afDrawerTests,
+        bottomSheetTests: holder.afBottomSheetTests,
+        screenTests: holder.afScreenTests,
+        workflowTests: holder.afWorkflowStateTests,
+        wireframes: wireframes
+      );
+    }
+    sharedTestContext.mergeWith(appContext.test.sharedTestContext);
+
+    final workflowBuild = workflowTestsForStateTests;
+    for(final stateTest in stateTests.all) {
+      final stateTestId = stateTest.id;
+      final protoId = AFUIPrototypeID.workflowStateTest.with1(stateTestId, stateTestId.tags);
+      workflowBuild.addPrototype(id: protoId, stateTestId: stateTestId, actualDisplayId: stateTestId);
+    }
+  }
 
   void initialize() {
     final libraries = thirdPartyLibraries;
     screenMap.registerDialog(AFUIScreenID.dialogStandardChoice, (_) => AFUIStandardChoiceDialog());
+    screenMap.registerScreen(AFUIScreenID.screenDemoModeEnter, (_) => AFUIDemoModeEnterScreen());
+    screenMap.registerScreen(AFUIScreenID.screenDemoModeExit, (_) => AFUIDemoModeExitScreen());
     appContext.defineScreenMap(screenMap, libraries);
 
     appContext.initializeFunctionalThemeFactories(uiDefinitions, libraries);
-    
-    final middleware = <Middleware<AFState>>[];
-    middleware.addAll(createRouteMiddleware());
-    middleware.add(AFQueryMiddleware());
-    
+        
     if(AFibD.config.requiresTestData) {      
-      appContext.test.initialize(
-        testData: testData, 
-        unitTests: unitTests,
-        stateTests: stateTests,
-        widgetTests: widgetTests,
-        dialogTests: dialogTests,
-        bottomSheetTests: bottomSheetTests,
-        drawerTests: drawerTests,
-        screenTests: screenTests,
-        workflowTests: workflowTests,
-        wireframes: wireframes,
-      );
-
-      for(final thirdParty in libraries) {
-        final holder = thirdParty.createScreenTestHolder();
-        thirdPartyUITests[thirdParty.id] = holder;
-        thirdParty.test.initialize(
-          testData: testData,
-          unitTests: holder.afUnitTests,
-          stateTests: holder.afStateTests,
-          widgetTests: holder.afWidgetTests,
-          dialogTests: holder.afDialogTests,
-          drawerTests: holder.afDrawerTests,
-          bottomSheetTests: holder.afBottomSheetTests,
-          screenTests: holder.afScreenTests,
-          workflowTests: holder.afWorkflowStateTests,
-          wireframes: wireframes
-        );
-      }
-      sharedTestContext.mergeWith(appContext.test.sharedTestContext);
-
-      final workflowBuild = workflowTestsForStateTests;
-      for(final stateTest in stateTests.all) {
-        final stateTestId = stateTest.id;
-        final protoId = AFUIPrototypeID.workflowStateTest.with1(stateTestId, stateTestId.tags);
-        workflowBuild.addPrototype(id: protoId, stateTestId: stateTestId, actualDisplayId: stateTestId);
-      }
+      initializeTests();
     }
     if(AFibD.config.requiresPrototypeData) {
       afInitPrototypeScreenMap(screenMap);
       setPrototypeScreenMap(screenMap);
     }
 
-    storeInternalOnly = AFStore(
-      afReducer,
-      initialState: AFState.initialState(),
-      middleware: middleware
+
+    uiStore = createStore(
+      target: AFTargetStore.uiStore,
+      conceptual: AFConceptualStore.appStore,
+      enableUIRouting: true,
     );
-    storeDispatcherInternalOnly = AFStoreDispatcher(storeInternalOnly!);
+
+    backgroundStore = createStore(
+      target: AFTargetStore.backgroudStore,
+      conceptual: AFConceptualStore.demoModeStore,
+      enableUIRouting: false,
+    );
   }
+
+  void swapActiveAndBackgroundStores({
+    required AFMergePublicStateDelegate mergePublicState,
+  }) {
+    // we need to actually swap public background state into the original state
+    final stateUI = uiStore!.store!.state;
+    final stateBackground = backgroundStore!.store!.state;
+    final revisedPublic = mergePublicState(stateUI.public, stateBackground.public);
+
+    final revisedUI = stateUI.revisePublic(revisedPublic);
+
+    // now, the UI state becomes the background state with the merged public data.
+    uiStore!.store!.dispatch(AFUpdateRootStateAction(revisedUI));
+
+    // and the background state becomes the former UI state.
+    backgroundStore!.store!.dispatch(AFUpdateRootStateAction(stateUI));
+
+    uiStore!.swapConceptual();
+    backgroundStore!.swapConceptual();
+
+  }
+
+  AFStore internalOnlyStore(AFConceptualStore conceptual) {
+    return internalOnlyStoreEntry(conceptual).store!;
+  }
+
+  AFDispatcher internalOnlyDispatcher(AFConceptualStore conceptual) {
+    return internalOnlyStoreEntry(conceptual).dispatcher!;
+  }
+
+  void setActiveStore(AFConceptualStore conceptual) {
+    this.activeConceptualStore = conceptual;
+  }
+
+  AFibStoreStackEntry get internalOnlyActive {
+    return internalOnlyStoreEntry(activeConceptualStore);
+  }
+
+  AFibStoreStackEntry internalOnlyStoreEntry(AFConceptualStore conceptual) {
+    if(uiStore!.conceptual == conceptual) {
+      return uiStore!;
+    } else {
+      assert(backgroundStore!.conceptual == conceptual);
+      return backgroundStore!;
+    }
+  }
+
+  bool get isDemoMode {
+    return demoModeTest != null;
+  }
+
+  void setPreDemoModeRoute(AFRouteState route) {
+    preDemoModeRoute = route;
+  }
+
 
   Stream<AFPublicStateChange> get streamPublicStateChanges {
     if(stateChangeBroadcast == null) {
@@ -218,6 +355,55 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     return appContext.thirdParty.libraries.values;
   }
 
+  AFibStoreStackEntry createStore({ 
+    required AFTargetStore target,
+    required AFConceptualStore conceptual,
+    required bool enableUIRouting,
+    AFPublicState? publicState,
+  }) {
+
+
+    final middleware = <Middleware<AFState>>[];
+    if(enableUIRouting) {
+      middleware.addAll(createRouteMiddleware());
+    }
+    middleware.add(AFQueryMiddleware());
+
+    var initialState = AFState.initialState();
+    if(publicState != null) {
+      initialState = initialState.copyWith(public: publicState);
+    }
+
+    final store = AFStore(
+      afReducer,
+      initialState: initialState,
+      middleware: middleware
+    );
+
+    final dispatcher = AFStoreDispatcher(store);
+    return AFibStoreStackEntry(target: target, conceptual: conceptual, store: store, dispatcher: dispatcher);
+  }
+
+  void pushState({
+    required String name,
+    AFPublicState? publicState,
+    AFPrivateState? privateState,
+  }) {
+
+    final state = internalOnlyActiveStore.state;
+    stateStack.add(AFibStateStackEntry(
+      name: name,
+      state: state,
+    ));
+
+    internalOnlyActiveDispatcher.dispatch(AFUpdateRootStateAction(
+      AFState(
+        public: publicState ?? state.public,
+        private: privateState ?? state.private,
+      )
+    ));
+  }
+
   void finishAsyncWithError<TState extends AFFlexibleState>(AFFinishQueryErrorContext context) {
     final handler = appContext.errorHandlerForState<TState>();
     if(handler != null) {
@@ -230,9 +416,8 @@ class AFibGlobalState<TState extends AFFlexibleState> {
       return;
     }
 
-    final state = storeInternalOnly?.state;
-    final routeState = state?.public.route;
-    if(routeState == null) throw AFException("Missing route state");
+    final state = internalOnlyActiveStore.state;
+    final routeState = state.public.route;
 
     if(!routeState.isActiveScreen(screenId)) {
       throw AFException("Screen $screenId is not the currently active screen in route ${routeState.toString()}");
@@ -246,15 +431,14 @@ class AFibGlobalState<TState extends AFFlexibleState> {
 
 
   AFPrototypeID? get testOnlyActivePrototypeId {
-    final state = AFibF.g.storeInternalOnly?.state;
-    final testId = state?.private.testState.activePrototypeId;
+    final state = AFibF.g.internalOnlyActiveStore.state;
+    final testId = state.private.testState.activePrototypeId;
     return testId;
   }
 
   AFScreenID get testOnlyActiveScreenId {
-    final state = AFibF.g.storeInternalOnly?.state;
-    final routeState = state?.public.route;
-    if(routeState == null) throw AFException("Missing route state");
+    final state = AFibF.g.internalOnlyActiveStore.state;
+    final routeState = state.public.route;
     return routeState.activeScreenId;
   }
 
@@ -278,7 +462,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
       if(factory == null) {
         throw AFException("No factory for LPI $id");
       }
-      final store = storeInternalOnly;
+      final store = internalOnlyActiveStore;
       if(store == null) {
         throw AFException("Internal error, no store");
       }
@@ -463,7 +647,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   }
 
   List<Locale> testEnabledLocales(AFConfig config) {
-    final fundamentals = storeInternalOnly!.state.public.themes.fundamentals;
+    final fundamentals = internalOnlyActiveStore.state.public.themes.fundamentals;
     if(AFConfigEntries.testsEnabled.isI18NEnabled(config)) {
       return fundamentals.supportedLocales.sublist(1);
     }
@@ -495,14 +679,14 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   /// Manually updating the themeData works because the themeData is constant across all the renders,
   /// and we recreate the fundamental and conceptual themes any time the themeData would actually change.
   void updateFundamentalThemeData(ThemeData themeData) {
-    final fundamentals = storeInternalOnly!.state.public.themes.fundamentals;
+    final fundamentals = internalOnlyActiveStore.state.public.themes.fundamentals;
     fundamentals.updateThemeData(themeData);
   }
 
   AFThemeState initializeThemeState({AFComponentStates? components}) {
     AFibD.logThemeAF?.d("Rebuild fundamental and functional themes");
     if(components == null) {
-      components = storeInternalOnly!.state.public.components;
+      components = internalOnlyActiveStore.state.public.components;
     }
     final device = AFFundamentalDeviceTheme.create();
     
@@ -521,7 +705,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
 
   AFThemeState rebuildFunctionalThemes({AFThemeState? initial}) {
     AFibD.logThemeAF?.d("Rebuild functional themes only");
-    final themes = initial ?? storeInternalOnly!.state.public.themes;
+    final themes = initial ?? internalOnlyActiveStore.state.public.themes;
     final functionals = uiDefinitions.createFunctionals(themes.fundamentals);
     return themes.copyWith(
       functionals: functionals
@@ -673,9 +857,12 @@ class AFibGlobalState<TState extends AFFlexibleState> {
 class AFibF {
   static AFibGlobalState? global;
 
-  static void initialize<TState extends AFFlexibleState>(AFAppExtensionContext appContext) {
+  static void initialize<TState extends AFFlexibleState>(
+    AFAppExtensionContext appContext,
+    AFConceptualStore activeConceptualStore) {
     global = AFibGlobalState<TState>(
-      appContext: appContext
+      appContext: appContext,
+      activeConceptualStore: activeConceptualStore,
     );
 
     global?.initialize();

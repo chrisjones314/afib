@@ -69,11 +69,7 @@ class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetS
   Widget _buildScreen(AFUIPrototypeWidgetScreenSPI spi) {
     final context = spi.context;
     final test = context.p.test;
-    final testStateSource = AFibF.g.storeInternalOnly?.state.private.testState;    
-
-    if(testStateSource == null) {
-      throw AFException("Missing test state");
-    }
+    final testStateSource = AFibF.g.internalOnlyActiveStore.state.private.testState;    
 
     final testContext = testStateSource.findContext(test.id);
     final testState = testStateSource.findState(test.id);

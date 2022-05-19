@@ -25,17 +25,15 @@ void afStateTestMain<TState extends AFFlexibleState> (AFCommandOutput output, AF
   final testKind = "State";
   final localStats = AFTestStats();
 
-  final store = AFibF.g.storeInternalOnly;
-  if(store == null) throw AFException("Missing store");
+  final store = AFibF.g.internalOnlyActiveStore;
 
-  final dispatcher = AFStoreDispatcher(store);
   for(final test in tests.tests) {
     if(AFConfigEntries.testsEnabled.isTestEnabled(AFibD.config, test.id)) {
       if(localStats.isEmpty) {
         printTestKind(output, testKind);
       }
       printPrototypeStart(output, test.id);
-      final context = AFStateTestContextForState<TState>(test as AFStateTest<AFFlexibleState>, store, dispatcher, isTrueTestContext: true);
+      final context = AFStateTestContextForState<TState>(test as AFStateTest<AFFlexibleState>,  AFConceptualStore.appStore, isTrueTestContext: true);
       
       context.store.dispatch(AFResetToInitialStateAction());
       context.store.dispatch(AFResetToInitialRouteAction());
@@ -47,12 +45,14 @@ void afStateTestMain<TState extends AFFlexibleState> (AFCommandOutput output, AF
       output.outdent();
       context.finishAndUpdateStats(localStats);
 
-      AFibF.g.storeInternalOnly!.dispatch(AFShutdownOngoingQueriesAction());
+      AFibF.g.internalOnlyActiveStore.dispatch(AFShutdownOngoingQueriesAction());
 
     }
   }
 
   store.dispatch(AFNavigateExitTestAction());
+  AFStateTestContext.currentTest = null;
+
 
   final baseContexts = List<AFBaseTestExecute>.of(contexts);
   printTestTotal(output, baseContexts, localStats);

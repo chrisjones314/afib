@@ -106,8 +106,7 @@ Future<void> afTestMainApp<TState extends AFFlexibleState>({
   if(extendUILibrary != null) {
     extendUILibrary(context.thirdParty);
   }
-
-  AFibF.initialize<TState>(context);
+  AFibF.initialize<TState>(context, AFConceptualStore.appStore);
 
   // first unit tests
   final output = AFCommandOutput();

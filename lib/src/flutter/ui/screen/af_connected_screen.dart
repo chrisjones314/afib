@@ -34,11 +34,15 @@ abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extend
         return testContext;
       }
     }
-
     var paramSeg = findRouteSegment(store.state, screenId, wid, paramSource: paramSource, launchParam: launchParam);
-    //if(TRouteParam == AFRouteParamUnused && param == null) {
-    //  param = AFRouteParamUnused.unused;
-    //}
+
+    // this is a super weird case where we are transitioning between the demo mode store and the real store,
+    // with different route states in each one.
+    if(screenId == AFUIScreenID.screenDemoModeEnter || screenId == AFUIScreenID.screenDemoModeExit) {
+      paramSeg = AFRouteSegment.withParam(AFRouteParamUnused.unused, null, null);
+    }
+
+ 
     if(paramSeg == null) {
       assert(false, "If you reached this in testing, you may not be on the screen you think you are on in your test scenario.");
       return null;
@@ -71,7 +75,7 @@ abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extend
 
   AFBuildContext<TStateView, TRouteParam>? _createTestContext(AFStore store, AFScreenID screenId, AFID wid, { required AFWidgetParamSource paramSource, required TRouteParam? launchParam }) {
     // find the test state.
-    if(AFibF.g.testOnlyIsInWorkflowTest) {
+    if(AFibF.g.testOnlyIsInWorkflowTest || AFStateTestContext.currentTest != null || AFibF.g.demoModeTest != null) {
       return null;
     }    
 
@@ -670,7 +674,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
   }
 
   void executeWireframeEvent(AFStateProgrammingInterface spi, AFID widget, Object? eventData) {
-    if(!AFibD.config.isPrototypeMode || AFibF.g.storeInternalOnly?.state.private.testState.activeWireframe == null) {
+    if(!AFibD.config.isPrototypeMode || AFibF.g.internalOnlyActiveStore.state.private.testState.activeWireframe == null) {
       return;
     }
     dispatch(AFWireframeEventAction(
@@ -767,7 +771,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     if(!AFibD.config.isTestContext) {
       return false;
     }
-    return AFibF.g.storeInternalOnly!.state.private.testState.activeWireframe != null;
+    return AFibF.g.internalOnlyActiveStore.state.private.testState.activeWireframe != null;
   }
 
 
@@ -861,7 +865,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
 
   /// Meant to make the public state visible in the debugger, absolutely not for runtime use.
   AFPublicState? get debugOnlyPublicState {
-    return AFibF.g.storeInternalOnly?.state.public;
+    return AFibF.g.internalOnlyActiveStore.state.public;
   }
 
   AFComponentStates? get debugOnlyComponentState {

@@ -5,6 +5,7 @@ import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:redux/redux.dart';
 
 class AFQueryMiddleware implements MiddlewareClass<AFState>
@@ -12,6 +13,7 @@ class AFQueryMiddleware implements MiddlewareClass<AFState>
   @override
   dynamic call(Store<AFState> store, dynamic query, NextDispatcher next) {
     if (query is AFAsyncQuery) {
+      final q  = query as AFAsyncQuery;
       // keep track of listener queries so we can shut them down at the end.
       _registerQuery(query, next);
 
@@ -20,15 +22,17 @@ class AFQueryMiddleware implements MiddlewareClass<AFState>
           _registerQuery(subQuery, next);
         }
       }
+      final entry = AFibF.g.internalOnlyStoreEntry(query.conceptualStore);
 
-      final testContext = AFStateTestContext.currentTest;
+      final testContext = AFStateTestContext.currentTest ?? AFibF.g.demoModeTest;
       if(testContext != null) {
-        testContext.processQuery(query);
+        testContext.processQuery(query, entry.store!, entry.dispatcher!);
         return;
       } else {
+
         query.startAsyncAF(
-          AFStoreDispatcher(store as AFStore),
-          store
+          entry.dispatcher!,
+          entry.store!
         );
       }
     }

@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:afib/afib_flutter.dart';
+import 'package:afib/src/dart/redux/state/models/afui_proto_state.dart';
 import 'package:afib/src/flutter/ui/dialog/afui_standard_notification.dart';
+import 'package:afib/src/flutter/ui/screen/afui_demo_mode_transition_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:overlay_support/overlay_support.dart';
@@ -41,7 +45,7 @@ mixin AFAccessStateSynchronouslyMixin {
   // access...
   //-------------------------------------------------------------------------------------
   AFPublicState get accessPublicState {
-    return AFibF.g.storeInternalOnly!.state.public;
+    return AFibF.g.internalOnlyActiveStore.state.public;
   }
 
   AFTimeState get accessCurrentTime {
@@ -113,17 +117,14 @@ mixin AFStandardAPIContextMixin<TState extends AFFlexibleState> implements AFDis
   /// However, you can use this in event handler code (usually within your SPI).  That said, you should
   /// not usually need to.   
   void accessCurrentState(AFAccessCurrentStateDelegate delegate) {
-    final public = AFibF.g.storeInternalOnly?.state.public;
-    if(public != null) {
-      final context = AFCurrentStateContext(
-        dispatcher: this,
-      );
-      delegate(context);
-    }
+    final context = AFCurrentStateContext(
+      dispatcher: this,
+    );
+    delegate(context);
   }
 
   AFPublicState get _publicState {
-    return AFibF.g.storeInternalOnly!.state.public;
+    return AFibF.g.internalOnlyActiveStore.state.public;
   }
 
   AFScreenID get accessActiveScreenId {
@@ -251,6 +252,108 @@ mixin AFStandardAPIContextMixin<TState extends AFFlexibleState> implements AFDis
   void executeListenerQuery(AFAsyncListenerQuery query) {
     dispatch(query);
   }
+
+  bool get isDemoMode {
+    return AFibF.g.isDemoMode;
+  }
+
+  void executeExitDemoMode({
+    required AFMergePublicStateDelegate mergePublicState,
+  }) {
+    // first, navigate to the entering/leaving demo model page.
+
+    // NOTE: this query was started in standard app mode, and so is linked to the standard app store.
+    // however, in this case, we need to manipualate the state in the demo app store.  So, we need to 
+    // explicitly dispatch our nav into that store.
+    final demoDispatcher = AFibF.g.internalOnlyDispatcher(AFConceptualStore.demoModeStore);
+    demoDispatcher.dispatch(AFUIDemoModeExitScreen.navigateReplaceAll());
+    
+    // wait for all navigation to complete, so that you don't have animations trying to 
+    // reference screens that existed prior to demo-mode, then:
+    
+    // Note: you cannot use executeDeferredCallback here, because in prototype mode it doesn't actually delay, 
+    // and we really need to delay and wait for the screen to render, even in prototype mode.
+    Timer(Duration(seconds: 1), () { 
+      AFibF.g.swapActiveAndBackgroundStores(
+        mergePublicState: (source, dest) {
+          var revised = mergePublicState(source, dest);
+          var origRoute = AFibF.g.preDemoModeRoute;
+          revised = revised.reviseRoute(origRoute!);
+          return revised;
+        }
+      );
+
+      AFibF.g.demoModeTest = null;        
+      AFibF.g.setActiveStore(AFConceptualStore.appStore);
+
+      assert(AFibF.g.internalOnlyActive.conceptual == AFConceptualStore.appStore);
+
+
+      final route = AFibF.g.internalOnlyActiveStore.state.public.route;
+      AFibF.g.internalOnlyActiveDispatcher.dispatch(AFNavigateSyncNavigatorStateWithRoute(route));
+    });    
+  }
+
+  void executeEnterDemoMode({
+    required AFStateTestID stateTestId,
+    required AFMergePublicStateDelegate mergePublicState,
+  }) async {
+
+    // save the route state prior to moving to the transition screen.
+    final route = AFibF.g.internalOnlyActiveStore.state.public.route;
+    AFibF.g.setPreDemoModeRoute(route);
+
+    // first, navigate to the entering/leaving demo model page.
+    navigateReplaceAll(AFUIDemoModeEnterScreen.navigateReplaceAll());
+    
+    // wait for all navigation to complete, so that you don't have animations trying to 
+    // reference screens that existed prior to demo-mode, then:
+    
+    // Note: you cannot use executeDeferredCallback here, because in prototype mode it doesn't actually delay, 
+    // and we really need to delay and wait for the screen to render, even in prototype mode.
+    Timer(Duration(seconds: 1), () { 
+      
+      // restore the demo mode store to its initial state.
+      final demoDispatcher = AFibF.g.internalOnlyDispatcher(AFConceptualStore.demoModeStore);
+      demoDispatcher.dispatch(AFResetToInitialStateAction());
+                  
+      AFibF.g.setActiveStore(AFConceptualStore.demoModeStore);
+
+      // build the test data.
+      AFibF.g.initializeTests();
+
+      // find the desired state test.
+      final test = AFibF.g.stateTests.findById(stateTestId);
+
+      // build that state test only.
+      final testContext = AFStateTestContextForState<AFUIState>(
+        test as AFStateTest<AFFlexibleState>, 
+        AFConceptualStore.demoModeStore,
+        isTrueTestContext: true
+      );
+
+      // this both generates the state, and configures all the query overrides, 
+      test.execute(testContext);
+
+      // allow them to merge down any parts of the state that they wish to preserve from the real
+      // app (for example, the help state.)
+      AFibF.g.swapActiveAndBackgroundStores(
+        mergePublicState: mergePublicState
+      );
+
+      assert(AFibF.g.internalOnlyActive.conceptual == AFConceptualStore.demoModeStore);
+
+      // this puts AFib into a mode where queries are routed through the state test's spoofed queries
+      // instead of through the true query handling mechanism.
+      //testContext.setTarget(AFTargetStore.uiStore);
+      AFibF.g.demoModeTest = testContext;        
+      
+      // now, you have the desired state, but you don't want to install all of it, so
+      // now, go ahead and synchronize 
+      final route = AFibF.g.internalOnlyActiveStore.state.public.route;
+      AFibF.g.internalOnlyActiveDispatcher.dispatch(AFNavigateSyncNavigatorStateWithRoute(route));
+    });  
+  }  
 
 }
 
@@ -420,7 +523,7 @@ mixin AFContextShowMixin {
     }
 
     if(themeOrId is AFThemeID) {
-      theme = AFibF.g.storeInternalOnly?.state.public.themes.findById(themeOrId);
+      theme = AFibF.g.internalOnlyActiveStore.state.public.themes.findById(themeOrId);
     } 
 
     if(theme == null) {

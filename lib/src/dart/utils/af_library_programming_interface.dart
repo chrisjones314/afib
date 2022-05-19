@@ -15,7 +15,7 @@ class AFCurrentStateContext<TState extends AFFlexibleState> with AFStandardAPICo
   }
 
   AFPublicState get publicState {
-    return AFibF.g.storeInternalOnly!.state.public;
+    return AFibF.g.internalOnlyActiveStore.state.public;
   }
 }
 

@@ -1,5 +1,6 @@
 
 
+import 'package:afib/src/dart/redux/actions/af_root_actions.dart';
 import 'package:afib/src/dart/redux/reducers/af_private_state_reducer.dart';
 import 'package:afib/src/dart/redux/reducers/af_public_state_reducer.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
@@ -9,6 +10,10 @@ import 'package:afib/src/dart/redux/state/af_state.dart';
 /// It handles routing and a reset state action, but otherwise delegates to the 
 /// application state reducer specified in [AFApp.initialize]
 AFState afReducer(AFState state, dynamic action) {
+
+  if(action is AFUpdateRootStateAction) {
+    return action.state;
+  }
 
   return AFState(
     private: afPrivateStateReducer(state.private, action),

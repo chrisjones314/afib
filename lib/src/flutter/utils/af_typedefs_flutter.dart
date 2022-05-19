@@ -201,3 +201,5 @@ typedef AFBuildWithSPIDelegate<TSPI extends AFStateProgrammingInterface> = Widge
 typedef AFCreateLibraryProgrammingInterfaceDelegate = AFLibraryProgrammingInterface Function(AFLibraryProgrammingInterfaceID id, AFLibraryProgrammingInterfaceContext context);
 
 typedef AFAccessCurrentStateDelegate = void Function(AFCurrentStateContext);
+
+typedef AFMergePublicStateDelegate = AFPublicState Function(AFPublicState realState, AFPublicState testState);

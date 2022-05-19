@@ -73,12 +73,11 @@ class AFStateTestStateVerificationContext {
 
 abstract class AFStateTestContext<TState extends AFFlexibleState> extends AFStateTestExecute {
   AFStateTest test;
-  final AFStore store;
-  AFDispatcher dispatcher;
   static AFStateTestContext? currentTest;
   final bool isTrueTestContext;
+  final AFConceptualStore targetStore;
   
-  AFStateTestContext(this.test, this.store, this.dispatcher, { required this.isTrueTestContext } );
+  AFStateTestContext(this.test, { required this.isTrueTestContext, required this.targetStore } );
 
   AFStateTestID get testID { return this.test.id as AFStateTestID; }
   AFState get afState { return store.state; }
@@ -87,9 +86,17 @@ abstract class AFStateTestContext<TState extends AFFlexibleState> extends AFStat
   AFPublicState get public { return store.state.public; }
   AFTimeState get currentTime { return public.time; }
 
-  void processQuery(AFAsyncQuery q) {
+  AFStore get store {
+    return AFibF.g.internalOnlyStore(targetStore);
+  }
+
+  AFDispatcher get dispatcher {
+    return AFibF.g.internalOnlyDispatcher(targetStore);
+  }
+
+  void processQuery(AFAsyncQuery q, AFStore store, AFDispatcher dispatcher) {
     AFibD.logQueryAF?.d("Processing ${q.runtimeType} for test $testID");
-    AFStateTest.processQuery(this, q);
+    AFStateTest.processQuery(this, q, store, dispatcher);
   }
 
   AFStateTestScreenContext<TSPI> createScreenContext<TSPI extends AFStateProgrammingInterface>({
@@ -106,12 +113,11 @@ abstract class AFStateTestContext<TState extends AFFlexibleState> extends AFStat
 class AFStateTestContextForState<TState extends AFFlexibleState> extends AFStateTestContext<TState> {
 
   AFStateTestContextForState(
-    AFStateTest test,
-    AFStore store,
-    AFDispatcher dispatcher, {
+    AFStateTest test, 
+    AFConceptualStore targetStore, {      
       required bool isTrueTestContext
     }
-  ): super(test, store, dispatcher, isTrueTestContext: isTrueTestContext);
+  ): super(test, isTrueTestContext: isTrueTestContext, targetStore: targetStore);
 
 
   AFStateTestScreenContext<TSPI> createScreenContext<TSPI extends AFStateProgrammingInterface>({
@@ -126,11 +132,10 @@ class AFStateTestContextForScreen<TState extends AFFlexibleState> extends AFStat
 
   AFStateTestContextForScreen(
     AFStateTest test,
-    AFStore store,
-    AFDispatcher dispatcher, {
+    AFConceptualStore targetStore, {
       required bool isTrueTestContext
     }
-  ): super(test, store, dispatcher, isTrueTestContext: isTrueTestContext);
+  ): super(test, isTrueTestContext: isTrueTestContext, targetStore: targetStore);
 
 
   AFStateTestScreenContext<TSPI> createScreenContext<TSPI extends AFStateProgrammingInterface>({
@@ -239,7 +244,7 @@ class _AFStateTestInjectListenerQueryResponseStatement extends _AFStateTestExecu
   _AFStateTestExecutionNext execute(AFStateTestContext<AFFlexibleState> context, {required bool verify}) {
     // need to lookup the query
     final listenerId = AFStateTest.specifierToId(querySpecfier);
-    final listenerQuery = AFibF.g.storeInternalOnly?.state.public.queries.findListenerQueryById(listenerId);
+    final listenerQuery = AFibF.g.internalOnlyActiveStore.state.public.queries.findListenerQueryById(listenerId);
     if(listenerQuery == null) {
       throw AFException("No listener query found with id $querySpecfier");
     }
@@ -274,7 +279,7 @@ class _AFStateTestScreenStatement<TSPI extends AFStateProgrammingInterface> exte
   @override
   _AFStateTestExecutionNext execute(AFStateTestContext context, { required bool verify }) {
     if(verify && verifyIsActiveScreen) {
-        final state = AFibF.g.storeInternalOnly!.state;
+        final state = AFibF.g.internalOnlyActiveStore.state;
         final route = state.public.route;
         context.expect(route.activeScreenId, ft.equals(screenId));      
     }
@@ -303,8 +308,9 @@ class _AFStateTestQueryStatement extends _AFStateTestExecutionStatement {
 
   @override
   _AFStateTestExecutionNext execute(AFStateTestContext context, { required bool verify }) {
+    final entry = AFibF.g.internalOnlyActive;
     for(final query in queries) {
-      AFStateTest.processQuery(context, query);
+      AFStateTest.processQuery(context, query, entry.store!, entry.dispatcher!);
     }
     return _AFStateTestExecutionNext.keepGoing;
   }
@@ -319,7 +325,7 @@ class _AFStateTestVerifyStatement extends _AFStateTestExecutionStatement {
   _AFStateTestVerifyStatement(this.verifyDelegate);
   _AFStateTestExecutionNext execute(AFStateTestContext context, { required bool verify }) {
     if(verify) {
-      final verifyContext = AFStateTestStateVerificationContext(afState: AFibF.g.storeInternalOnly!.state);
+      final verifyContext = AFStateTestStateVerificationContext(afState: AFibF.g.internalOnlyActiveStore.state);
       verifyDelegate(context, verifyContext);
     }
     return _AFStateTestExecutionNext.keepGoing;
@@ -331,7 +337,7 @@ class _AFStateTestAdvanceTimeStatement extends _AFStateTestExecutionStatement {
   _AFStateTestAdvanceTimeStatement(this.duration);
   _AFStateTestExecutionNext execute(AFStateTestContext context, { required bool verify }) {
     if(verify) {
-      final state = AFibF.g.storeInternalOnly!.state;
+      final state = AFibF.g.internalOnlyActiveStore.state;
       final currentTime = state.public.time;
       final revised = currentTime.reviseAdjustOffset(duration);
       final dispatcher = context.dispatcher;
@@ -356,7 +362,7 @@ class _AFStateTestSetAbsoluteTimeStatement extends _AFStateTestExecutionStatemen
   _AFStateTestSetAbsoluteTimeStatement(this.time);
   _AFStateTestExecutionNext execute(AFStateTestContext context, { required bool verify }) {
     if(verify) {
-      final state = AFibF.g.storeInternalOnly!.state;
+      final state = AFibF.g.internalOnlyActiveStore.state;
       final currentTime = state.public.time;
       final revised = currentTime.reviseToAbsoluteTime(this.time);
 
@@ -416,7 +422,7 @@ class _AFStateRegisterDynamicCrossQueryResultStatement<TQuerySource extends AFAs
     final test = context.test;
     test.registerResult<TQuerySource>(querySpecifier, (context, query) {
       final listenerId = AFStateTest.specifierToId(listenerSpecifier);
-      final listenerQuery = AFibF.g.storeInternalOnly?.state.public.queries.findListenerQueryById(listenerId);
+      final listenerQuery = AFibF.g.internalOnlyActiveStore.state.public.queries.findListenerQueryById(listenerId);
 
       if(listenerQuery == null) {
         return;
@@ -467,7 +473,7 @@ class _AFStateRegisterSpecialResultStatement<TQuery extends AFAsyncQuery> extend
       } else if(specialResult == _AFStateRegisterSpecialResultKind.resultNull) {
         query.testFinishAsyncWithResponse(context, null);
       } else if(specialResult == _AFStateRegisterSpecialResultKind.resultLive) {
-        final store = AFibF.g.storeInternalOnly;
+        final store = AFibF.g.internalOnlyActiveStore;
         query.startAsyncAF(
           AFStoreDispatcher(store as AFStore),
           store
@@ -604,7 +610,7 @@ class AFStateTestScreenContextForState<TSPI extends AFStateProgrammingInterface>
   }
 
   static TSPI createSPI<TSPI extends AFStateProgrammingInterface>(AFConnectedUIConfig config, AFScreenID screenId, AFWidgetID wid, { required AFWidgetParamSource paramSource, required AFRouteParam? launchParam }) {
-    final store = AFibF.g.storeInternalOnly!;
+    final store = AFibF.g.internalOnlyActiveStore;
     final context = config.createContextForDiff(store, screenId, wid, paramSource: paramSource, launchParam: launchParam);
     if(context == null) {
       throw AFException("Failed to create context");
@@ -1088,19 +1094,19 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
   
   /// Process a query by looking up the results we have for that query,
   /// and then feeding them to its testAsyncResponse method.
-  static void processQuery<TState extends AFFlexibleState>(AFStateTestContext context, AFAsyncQuery query) {
+  static void processQuery<TState extends AFFlexibleState>(AFStateTestContext context, AFAsyncQuery query, AFStore store, AFDispatcher dispatcher) {
     final key = AFStateTest.specifierToId(query);
     final results = context.test.results;
 
     if(query is AFTimeUpdateListenerQuery) {
       if(AFibF.g.testOnlyIsInWorkflowTest) {
-        query.startAsyncAF(context.dispatcher, context.store);
+        query.startAsyncAF(dispatcher, store);
         return;
       }
     }
 
     if(query is AFNavigateUnimplementedQuery) {
-      query.startAsyncAF(context.dispatcher, context.store);
+      query.startAsyncAF(dispatcher, store);
       return;
     }
 
@@ -1118,8 +1124,8 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
       /// deferred queries don't have any results.
       if(query is AFDeferredQuery) {
         final successContext = query.createSuccessContext(
-          dispatcher: context.dispatcher,
-          state: context.afState
+          dispatcher: dispatcher,
+          state: store.state,
         );
 
         var duration = query.finishAsyncExecute(successContext);
@@ -1133,8 +1139,7 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
 
       if(query is AFConsolidatedQuery) {
         final successContext = AFFinishQuerySuccessContext<TState, AFConsolidatedQueryResponse>(
-          dispatcher: context.dispatcher,
-          state: context.store.state,
+          conceptualStore: AFibF.g.activeConceptualStore,
           response: query.queryResponses
         );
         for(final consolidatedQueries in query.queryResponses.responses) {
@@ -1285,5 +1290,6 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
     } on AFExceptionStopHere {
       // nothing to do, just stop.
     }
+
   }
 }

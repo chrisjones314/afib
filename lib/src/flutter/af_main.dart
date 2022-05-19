@@ -47,7 +47,7 @@ void afMainApp<TState extends AFFlexibleState>({
   }
 
 
-  AFibF.initialize<TState>(context);
+  AFibF.initialize<TState>(context, AFConceptualStore.appStore);
   
   final createApp = AFibF.g.createApp;
   if(createApp == null) throw AFException("Missing create app function");

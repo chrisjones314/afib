@@ -4,9 +4,6 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:logger/logger.dart';
 
-
-
-
 /// A registry of test data objects which can be referenced by an id.
 /// 
 /// It is usually best to use strings for ids, even if your underlying
@@ -36,6 +33,14 @@ class AFDefineTestDataContext {
   factory AFDefineTestDataContext.create() {
     return AFDefineTestDataContext(testData: <dynamic, dynamic>{});
   }  
+
+  bool get isEmpty {
+    return testData.isEmpty;
+  }
+
+  bool get isNotEmpty {
+    return testData.isNotEmpty;
+  }
 
   Logger? get log {
     return AFibD.log(AFConfigEntryLogArea.test);

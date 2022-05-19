@@ -40,7 +40,7 @@ class _AFStartupScreenState extends State<AFStartupScreenWrapper> {
 
     WidgetsBinding.instance?.addObserver(AFibF.g.widgetsBindingObserver);
 
-    final storeDisp = AFibF.g.storeDispatcherInternalOnly;
+    final storeDisp = AFibF.g.internalOnlyActiveDispatcher;
     assert(storeDisp != null);
     if(AFibD.config.requiresPrototypeData) {
       // if this is not the general prototype mode, then fire a startup query which 

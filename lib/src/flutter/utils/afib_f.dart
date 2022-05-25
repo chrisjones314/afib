@@ -637,7 +637,13 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   /// Used internally in tests to keep track of recently dispatched actions
   /// so that we can verify their contents.
   void testOnlyRegisterRegisterAction(AFActionWithKey action) {
-    _recentActions.add(action);
+    // uggg!  So, with all the different cases we have to handle, it is hard 
+    // to register each action exactly once.   Instead, we allow them to be 
+    // registered redundantly, and if it already exists we don't add it twice.
+    final idxOf = _recentActions.indexWhere((x) => x == action);
+    if(idxOf < 0) {
+      _recentActions.add(action);
+    }
   }
 
   /// Used internally to get the most recent action with the specified key.

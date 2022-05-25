@@ -37,6 +37,9 @@ typedef AFCreateAFAppDelegate = AFApp Function();
 /// Delegate used to populate single-screen tests.
 typedef AFInitScreenTestsDelegate = void Function(AFUIPrototypeDefinitionContext context);
 
+/// Delegate used to verify outcomes in UI tests
+typedef AFUIVerifyDelegate = void Function(AFUIVerifyContext context);
+
 /// Delegate used to populate multi-screen tests.
 typedef AFInitWorkflowStateTestsDelegate = void Function(AFWorkflowTestDefinitionContext context);
 

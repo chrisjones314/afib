@@ -870,13 +870,6 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     return AFibF.g.internalOnlyActiveStore.state.public;
   }
 
-  AFComponentStates? get debugOnlyComponentState {
-    final public = debugOnlyPublicState;
-    if(public == null) {
-      return null;
-    }
-    return public.components;
-  }
 }
 
 @immutable
@@ -921,8 +914,8 @@ class AFStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext 
     return context.debugOnlyPublicState;
   }
 
-  AFComponentStates? get debugOnlyComponentState {
-    return context.debugOnlyComponentState;
+  TState? get debugOnlyAppState {
+    return context.debugOnlyPublicState?.components.findState<TState>();
   }
 
   TFunctionalTheme findTheme<TFunctionalTheme extends AFFunctionalTheme>(AFThemeID themeId) {

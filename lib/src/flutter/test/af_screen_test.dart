@@ -423,6 +423,93 @@ class AFTestParams {
   }
 }
 
+@immutable
+class AFUIVerifyContext {
+  final List<AFActionWithKey> actions;
+  final Map<AFScreenID, dynamic> showResults;
+  final AFScreenID activeScreenId;
+
+  AFUIVerifyContext({
+    required this.actions,
+    required this.activeScreenId,
+    required this.showResults,
+  });
+
+  TAction accessOneAction<TAction extends AFActionWithKey>() {
+    final found = actions.whereType<TAction>();
+    if(found.isEmpty) {
+      throw AFException("Failed to find action of type $TAction");
+    }
+
+    if(found.length > 1) {
+      throw AFException("Found more than one action of type $TAction");
+    }
+
+    return found.first;
+  }
+
+  TResult accessShowResult<TResult>(AFScreenID screenId) {
+    final result = showResults[screenId];
+    if(result == null) {
+      throw AFException("No result for screen $screenId");
+    }
+    return result;
+  }
+
+  TResult accessActiveScreenShowResult<TResult>() {
+    return accessShowResult(activeScreenId);
+  }
+
+  TQuery accessOneQuery<TQuery extends AFAsyncQuery>() {
+    final queries = accessQueries<TQuery>();
+    if(queries.isEmpty) {
+      throw AFException("Found no queries with type $TQuery");
+    }
+    if(queries.length > 1) {
+      throw AFException("Found multiple queries of type $TQuery, use accessQueries");
+    }
+    return queries.first;
+  }
+
+  List<TQuery> accessQueries<TQuery extends AFAsyncQuery>() {
+    final queries = actions.whereType<TQuery>();
+    return queries.toList();
+  }
+    
+
+
+  List<TRouteParam> accessRouteParamUpdates<TRouteParam extends AFRouteParam>() {
+    final candidates = actions.whereType<AFNavigateSetParamAction>();
+    final correctTypes = candidates.where((act) { 
+      return act.param is TRouteParam;
+    });
+
+    final childCandidates = actions.whereType<AFNavigateSetChildParamAction>();
+    final correctChildTypes = childCandidates.where((act) {
+      return act.param is TRouteParam;
+    });
+    
+    final result = correctTypes.map((x) => x.param as TRouteParam ).toList();
+    result.addAll(correctChildTypes.map((x) => x.param as TRouteParam));
+    return result;
+  }
+
+  TRouteParam accessRouteParamUpdate<TRouteParam extends AFRouteParam>() {
+    final correctTypes = accessRouteParamUpdates<TRouteParam>();
+
+    if(correctTypes.isEmpty) {
+      throw AFException("Found no AFNavigateSetParam actions for param type $TRouteParam");
+    }
+
+    if(correctTypes.length > 1) {
+      throw AFException("Error, found ${correctTypes.length} updated to route param $TRouteParam, use accessRouteParamUpdates");
+    }
+
+    final correctType = correctTypes.first;
+    return correctType;
+  }
+}
+
 abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFactorMixin {
   AFBaseTestID testId;
   final underPaths = <AFSparsePathWidgetSelector?>[];
@@ -562,9 +649,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
   }
 
   /// Tap on the specified widget, then expect a dialog which you can interact with via the onDialog parameter.
-  Future<void> applyTapExpectDialog(dynamic selectorTap, final AFScreenID dialogScreenId, AFTestScreenExecuteDelegate onDialog, {
-    AFVerifyReturnValueDelegate? verifyReturn
-  }) async {
+  Future<void> applyTapExpectDialog(dynamic selectorTap, final AFScreenID dialogScreenId, AFTestScreenExecuteDelegate onDialog) async {
     await applyTap(selectorTap);
     await pauseForRender();
     
@@ -572,19 +657,12 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
       await onDialog(this);
     });
 
-    final result = AFibF.g.testOnlyShowUIReturn[dialogScreenId];
-    if(verifyReturn != null) {
-      verifyReturn(result);
-    }
-    
     return null;
 
   }
 
   /// Tap on the specified widget, then expect a dialog which you can interact with via the onSheet parameter.
-  Future<void> applyTapExpectModalBottomSheet(dynamic selectorTap, final AFScreenID dialogScreenId, AFTestScreenExecuteDelegate onSheet, {
-    AFVerifyReturnValueDelegate? verifyReturn
-  }) async {
+  Future<void> applyTapExpectModalBottomSheet(dynamic selectorTap, final AFScreenID dialogScreenId, AFTestScreenExecuteDelegate onSheet) async {
     await applyTap(selectorTap);
     await pauseForRender();
     
@@ -592,11 +670,6 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
       await onSheet(this);
     });
 
-    final result = AFibF.g.testOnlyShowUIReturn[dialogScreenId];
-    if(verifyReturn != null) {
-      verifyReturn(result);
-    }
-    
     return null;
 
   }
@@ -637,10 +710,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
   }
   
   Future<void> applyWidgetValue(dynamic selector, dynamic value, String applyType, { 
-    AFActionListenerDelegate? verifyActions, 
-    AFParamListenerDelegate? verifyParamUpdate,
-    AFAsyncQueryListenerDelegate? verifyQuery,
-    AFVerifyResultDelegate? verifyResult,
+    AFUIVerifyDelegate? verify,
     int maxWidgets = 1, 
     int extraFrames = 0,
     bool ignoreUnderWidget = false, 
@@ -649,46 +719,56 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
   Future<void> applyTap(dynamic selector, { 
     int extraFrames = 0,
     dynamic tapData,
-    AFActionListenerDelegate? verifyActions, 
-    AFParamListenerDelegate? verifyParamUpdate,
-    AFAsyncQueryListenerDelegate? verifyQuery, 
-    AFVerifyResultDelegate? verifyResult,
+    AFUIVerifyDelegate? verify,
     bool ignoreUnderWidget = false,
   }) {
-    return applyWidgetValue(selector, tapData, AFApplyWidgetAction.applyTap, ignoreUnderWidget: ignoreUnderWidget, extraFrames: extraFrames+1, verifyActions: verifyActions, verifyParamUpdate: verifyParamUpdate, verifyQuery: verifyQuery, verifyResult: verifyResult);
+    return applyWidgetValue(selector, tapData, AFApplyWidgetAction.applyTap, 
+      ignoreUnderWidget: ignoreUnderWidget, 
+      extraFrames: extraFrames+1, 
+      verify: verify, 
+    );
   }
 
   Future<void> applySwipeDismiss(dynamic selector, { 
     int maxWidgets = 1, 
     int extraFrames = 0, 
-    AFActionListenerDelegate? verifyActions, 
-    AFParamListenerDelegate? verifyParamUpdate,
-    AFAsyncQueryListenerDelegate? verifyQuery,
+    AFUIVerifyDelegate? verify,
     bool ignoreUnderWidget = false, 
   }) {
-    return applyWidgetValue(selector, null, AFApplyWidgetAction.applyDismiss, ignoreUnderWidget: ignoreUnderWidget, maxWidgets: maxWidgets, extraFrames: extraFrames+1, verifyActions: verifyActions, verifyParamUpdate: verifyParamUpdate, verifyQuery: verifyQuery);
+    return applyWidgetValue(selector, null, AFApplyWidgetAction.applyDismiss, 
+      ignoreUnderWidget: ignoreUnderWidget, 
+      maxWidgets: maxWidgets, 
+      extraFrames: extraFrames+1, 
+      verify: verify, 
+    );
   }
 
   Future<void> setValue(dynamic selector, dynamic value, { 
     int maxWidgets = 1, 
     int extraFrames = 0, 
-    AFActionListenerDelegate? verifyActions, 
-    AFParamListenerDelegate? verifyParamUpdate,
-    AFAsyncQueryListenerDelegate? verifyQuery,    
+    AFUIVerifyDelegate? verify,
     bool ignoreUnderWidget = false,
   }) {
-    return applyWidgetValue(selector, value, AFApplyWidgetAction.applySetValue, ignoreUnderWidget: ignoreUnderWidget, maxWidgets:  maxWidgets, extraFrames: extraFrames+1, verifyActions: verifyActions, verifyParamUpdate: verifyParamUpdate, verifyQuery: verifyQuery);
+    return applyWidgetValue(selector, value, AFApplyWidgetAction.applySetValue, 
+      ignoreUnderWidget: ignoreUnderWidget, 
+      maxWidgets:  maxWidgets, 
+      extraFrames: extraFrames+1, 
+      verify: verify, 
+    );
   }
 
   Future<void> applyEnterText(dynamic selector, dynamic value, { 
     int maxWidgets = 1, 
     int extraFrames = 0, 
-    AFActionListenerDelegate? verifyActions, 
-    AFParamListenerDelegate? verifyParamUpdate,
-    AFAsyncQueryListenerDelegate? verifyQuery,    
+    AFUIVerifyDelegate? verify,
     bool ignoreUnderWidget = false
   }) {
-    return applyWidgetValue(selector, value, AFApplyWidgetAction.applySetValue, ignoreUnderWidget: ignoreUnderWidget, maxWidgets:  maxWidgets, extraFrames: extraFrames+1, verifyActions: verifyActions, verifyParamUpdate: verifyParamUpdate, verifyQuery: verifyQuery);
+    return applyWidgetValue(selector, value, AFApplyWidgetAction.applySetValue, 
+      ignoreUnderWidget: ignoreUnderWidget, 
+      maxWidgets:  maxWidgets, 
+      extraFrames: extraFrames+1, 
+      verify: verify,
+    );
   }
 
   Future<List<Element>> findElementsFor(dynamic selector, { required bool shouldScroll, required bool ignoreUnderWidget }) async {
@@ -1020,10 +1100,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   AFBaseTestID get testID { return this.testId; }
 
   Future<void> applyWidgetValue(dynamic selectorDyn, dynamic value, String applyType, { 
-      AFActionListenerDelegate? verifyActions, 
-      AFParamListenerDelegate? verifyParamUpdate,
-      AFAsyncQueryListenerDelegate? verifyQuery,
-      AFVerifyResultDelegate? verifyResult,
+      AFUIVerifyDelegate? verify,
       int maxWidgets = 1, 
       int extraFrames = 0,
       bool ignoreUnderWidget = false, 
@@ -1045,36 +1122,15 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
       throw AFException("No AFApplyWidgetAction found for ${elem.widget.runtimeType}, you can register one using AFScreenTests.registerApplicator");
     }
     tapable.apply(applyType, selector, elem, value);    
-    if(verifyActions != null) {
-      verifyActions(AFibF.g.testOnlyRecentActions);
-    } 
-    if(verifyParamUpdate != null) {
-      final setParam = AFibF.g.testOnlyRecentActions.firstWhereOrNull( (act) => (act is AFNavigateSetParamAction)) as AFNavigateSetParamAction?;
-      var paramInner;
-      if(setParam != null) {
-        paramInner = setParam.param;
-      } else {
-        final setChildParam = AFibF.g.testOnlyRecentActions.firstWhereOrNull( (act) => (act is AFNavigateSetChildParamAction)) as AFNavigateSetChildParamAction?;
-        if(setChildParam != null) {
-          paramInner = setChildParam.param;
-        }
-      }
-      
-      if(paramInner == null) {
-        throw AFException("Expected a recent AFNavigateSetParamAction or AFNavigateSetChildParamAction");
-      }
-      verifyParamUpdate(paramInner);
-    }
-    if(verifyQuery != null) {
-      final query = AFibF.g.testOnlyRecentActions.firstWhereOrNull( (act) => (act is AFAsyncQuery)) as AFAsyncQuery?;
-      if(query == null) {
-        throw AFException("Passed in verifyQuery, but there was not an AFAsyncQuery dispatched by action");
-      }
-      verifyQuery(query);
-    }
-    if(verifyResult != null) {
-      final result = AFibF.g.testOnlyShowUIReturn[activeScreenId];
-      verifyResult(result);
+
+    final verifyUIContext = AFUIVerifyContext(
+      actions: AFibF.g.testOnlyRecentActions,
+      activeScreenId: activeScreenId,
+      showResults: Map<AFScreenID, dynamic>.from(AFibF.g.testOnlyShowUIReturn),
+    );
+
+    if(verify != null) {
+      verify(verifyUIContext);
     }
 
     await pauseForRender();

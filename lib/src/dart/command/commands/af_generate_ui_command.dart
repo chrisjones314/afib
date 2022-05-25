@@ -30,7 +30,6 @@ import 'package:afib/src/dart/command/templates/statements/declare_widget_params
 import 'package:afib/src/dart/command/templates/statements/declare_widget_route_param_impls.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_widget_spi.t.dart';
 import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
-import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 enum AFUIControlKind {

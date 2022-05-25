@@ -146,9 +146,8 @@ void _navigateReplaceAllAction(Store<AFState> store, AFNavigateReplaceAllAction 
 //---------------------------------------------------------------------------
 void _navigateExitTestAction(Store<AFState> store, AFNavigateExitTestAction action, NextDispatcher next) {
   /// Clear out our cache of screen info for the next test.
-  //AFibF.g.resetTestScreens();
-
   final route = _getRouteState(store);
+
   final popCount = route.popCountToRoot;
   AFibF.g.doMiddlewareNavigation( (navState) {
     for(var i = 0; i < popCount; i++) {

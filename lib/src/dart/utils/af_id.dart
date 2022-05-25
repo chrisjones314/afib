@@ -161,7 +161,7 @@ class AFLibraryID extends AFID {
   final String name;
   const AFLibraryID({
     required String code, 
-    required this.name
+    required this.name,
   }) : super("lib", code, null);
 }
 

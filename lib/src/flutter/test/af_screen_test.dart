@@ -554,7 +554,6 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
   }) {
     final themes = AFibF.g.internalOnlyActiveStore.state.public.themes;
     final functional = themes.functionals.values.first;
-    if(functional == null) throw AFException("No functional themese defined.");
     return functional.deviceHasFormFactor(
       atLeast: atLeast,
       atMost: atMost,
@@ -1494,7 +1493,7 @@ class AFDialogPrototype extends AFScreenLikePrototype {
     //final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
     final testContext = prepareRun(dispatcher, prevContext, selectedTestId);
 
-    final buildContext = AFibF.g.testOnlyShowBuildContext;
+    final buildContext = AFibF.g.testOnlyShowBuildContext(AFUIType.drawer);
     assert(buildContext != null);
 
     // show the dialog, but don't wait it, because it won't return until the dialog is closed.
@@ -1553,7 +1552,7 @@ class AFBottomSheetPrototype extends AFScreenLikePrototype {
     //final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
     final testContext = prepareRun(dispatcher, prevContext, selectedTestId);
 
-    final buildContext = AFibF.g.testOnlyShowBuildContext;
+    final buildContext = AFibF.g.testOnlyShowBuildContext(AFUIType.bottomSheet);
     assert(buildContext != null);
 
     // show the dialog, but don't wait it, because it won't return until the dialog is closed.
@@ -1612,7 +1611,7 @@ class AFDrawerPrototype extends AFScreenLikePrototype {
     //final screenUpdateCount = AFibF.testOnlyScreenUpdateCount(screenId);
     final testContext = prepareRun(dispatcher, prevContext, selectedTestId);
 
-    final buildContext = AFibF.g.testOnlyShowBuildContext;
+    final buildContext = AFibF.g.testOnlyShowBuildContext(AFUIType.drawer);
     assert(buildContext != null);
 
     // show the dialog, but don't wait it, because it won't return until the dialog is closed.
@@ -1711,9 +1710,12 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
     // now, perform an action that navigates to the specified path, only in flutter.
     final route = store.state.public.route;
     dispatcher.dispatch(AFNavigateSyncNavigatorStateWithRoute(route));
-    final showScreenId = route.showScreen.screenId;
-    if(showScreenId != AFUIScreenID.unused) {
-      
+    final showingScreens = route.activeShowingScreens;
+    if(showingScreens.length > 1) {
+      throw AFException("Currently, you cannot jump into a state test at a point where more than one transient UI element (dialog, drawer, bottomsheet) is simultaneously showing");
+    }
+    if(showingScreens.isNotEmpty) {
+      final showingScreen = showingScreens.first;
       // this occurs when a dialog, bottomsheet, or drawer is actively displayed 
       // in the current route.   In this scenario, we have already executed the 
       // state part of opening the dialog, etc, but we haven't actually done the open
@@ -1721,7 +1723,8 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
       // actual open, then make sure to route the result through the expected code-path
       // as though it had been opened the normal way.
       Future.delayed(Duration(seconds: 1), () async {
-        final uiType = route.showScreen.kind;
+        final uiType = showingScreen.kind;
+        final showScreenId = showingScreen.screenId;
 
         final builder = AFibF.g.screenMap.findBy(showScreenId);
         final ctx = AFibF.g.testOnlyScreenBuildContextMap[route.activeScreenId];
@@ -2043,7 +2046,6 @@ abstract class AFWorkflowTestExecute {
   Future<void> expectState<TState extends AFFlexibleState>( Future<void> Function(TState, AFRouteState) withState) async {
     assert(TState != AFFlexibleState, "You must specify the state type as a type parameter");
     final public = AFibF.g.internalOnlyActiveStore.state.public;
-    if(public == null) throw AFException("Missing public state");
     return withState(public.componentState<TState>(), public.route);
   }
 

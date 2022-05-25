@@ -7,6 +7,7 @@ import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/redux/queries/af_time_update_listener_query.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
@@ -18,6 +19,7 @@ import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
+import 'package:afib/src/flutter/ui/screen/afui_prototype_bottomsheet_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_dialog_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_drawer_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_widget_screen.dart';
@@ -100,13 +102,15 @@ Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
   final simpleContexts = <AFScreenTestContextWidgetTester>[];
   final testKind = sectionTitle;
   final localStats = AFTestStats();
+  var printHeader = true;
   for(var prototype in allPrototypes) {
     if(!prototype.hasTests) {
       continue;
     }
     if(AFConfigEntries.testsEnabled.isTestEnabled(AFibD.config, prototype.id)) {
-      if(localStats.isEmpty) {
+      if(printHeader) {
         printTestKind(output, testKind);
+        printHeader = false;
       }
 
       printPrototypeStart(output, prototype.id);
@@ -138,7 +142,6 @@ Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
       if(showItem != null) {
         await showItem(dispatcher, prototype);
         await tester.pumpAndSettle(Duration(seconds: 1));
-
       }
 
       output.indent();
@@ -181,7 +184,7 @@ Future<void> _afDialogTestMain<TState extends AFFlexibleState>(AFCommandOutput o
       AFUIPrototypeDialogScreen.navigatePush(test as AFDialogPrototype)
     ];
   }, showItem: (dispatcher, test) async {
-    final buildContext = AFibF.g.testOnlyShowBuildContext;
+    final buildContext = AFibF.g.testOnlyShowBuildContext(AFUIType.dialog);
     assert(buildContext != null);
 
     // show the dialog, but don't wait it, because it won't return until the dialog is closed.
@@ -194,14 +197,14 @@ Future<void> _afDialogTestMain<TState extends AFFlexibleState>(AFCommandOutput o
 }
 
 Future<void> _afBottomSheetTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
-  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.dialogTests.all, "Dialog", createPush: (test) {
+  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.bottomSheetTests.all, "BottomSheet", createPush: (test) {
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
       AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models),
-      AFUIPrototypeDialogScreen.navigatePush(test as AFDialogPrototype)
+      AFUIPrototypeBottomSheetScreen.navigatePush(test as AFBottomSheetPrototype)
     ];
   }, showItem: (dispatcher, test) async {
-    final buildContext = AFibF.g.testOnlyShowBuildContext;
+    final buildContext = AFibF.g.testOnlyShowBuildContext(AFUIType.bottomSheet);
     assert(buildContext != null);
 
     // show the dialog, but don't wait it, because it won't return until the dialog is closed.
@@ -221,7 +224,7 @@ Future<void> _afDrawerTestMain<TState extends AFFlexibleState>(AFCommandOutput o
       AFUIPrototypeDrawerScreen.navigatePush(test as AFDrawerPrototype)
     ];
   }, showItem: (dispatcher, test) async {
-    final buildContext = AFibF.g.testOnlyShowBuildContext;
+    final buildContext = AFibF.g.testOnlyShowBuildContext(AFUIType.drawer);
     assert(buildContext != null);
 
     // show the dialog, but don't wait it, because it won't return until the dialog is closed.

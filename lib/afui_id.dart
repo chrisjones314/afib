@@ -1,7 +1,7 @@
 import 'package:afib/src/dart/utils/af_id.dart';
 
 class AFUILibraryID {
-  static const id = AFLibraryID(code: "af", name: "AFib Core Library");
+  static const id = AFLibraryID(code: "af", name: "afib");
 }
 
 class AFUIQueryID extends AFQueryID {

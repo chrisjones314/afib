@@ -121,7 +121,7 @@ class AFDefineTestDataContext {
   List<TData> findList<TData>(List<dynamic> ids) {
     final list = <TData>[];
     for(final id in ids) {
-      TData data = find(id);
+      final data = find(id);
       list.add(data);
     }
     return list;

@@ -3,13 +3,11 @@ import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/flutter/test/af_test_dispatchers.dart';
-import 'package:afib/src/flutter/ui/dialog/afui_standard_notification.dart';
 import 'package:afib/src/flutter/utils/af_api_mixins.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:logger/logger.dart';
-import 'package:overlay_support/overlay_support.dart';
 import 'package:quiver/core.dart';
 
 abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> {
@@ -627,31 +625,35 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
   /// Shorthand for accessing the route param.
   TRouteParam get p { return routeParam; }
 
+  AFConceptualStore get targetStore {
+    return AFibF.g.activeConceptualStore;
+  }
+
   /// Shorthand for accessing data from the store
   TStateView get s { return stateView; }
 
-  AFScreenID get screenId {
+  AFScreenID get accessScreenId {
     return standard.screenId!;
   }
 
   void updateRouteParam(AFRouteParam param) {
     final config = standard.config;
-    config.updateRouteParam(this, screenId, null, param, paramSource: AFWidgetParamSource.child);
+    config.updateRouteParam(this, accessScreenId, null, param, paramSource: AFWidgetParamSource.child);
   }
 
   void updateChildRouteParam(AFRouteParam revised) {
     final config = standard.config;
-    config.updateChildRouteParam(this, screenId, revised);
+    config.updateChildRouteParam(this, accessScreenId, revised);
   }
 
   void updateAddChildRouteParam(AFRouteParam revised) {
     final config = standard.config;
-    config.updateAddChildParam(this, screenId, revised);
+    config.updateAddChildParam(this, accessScreenId, revised);
   }
 
   void updateRemoveChildRouteParam(AFWidgetID wid) {
     final config = standard.config;
-    config.updateRemoveChildParam(this, screenId, wid);
+    config.updateRemoveChildParam(this, accessScreenId, wid);
   }
 
   void closeBottomSheetFromScreen(AFScreenID sheetId, dynamic result) {
@@ -679,7 +681,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     }
     dispatch(AFWireframeEventAction(
       spi: spi,
-      screen: screenId,
+      screen: accessScreenId,
       widget: widget,
       eventParam: eventData
     ));

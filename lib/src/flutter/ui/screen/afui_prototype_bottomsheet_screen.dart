@@ -1,6 +1,6 @@
 import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
-import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -67,12 +67,8 @@ class AFUIPrototypeBottomSheetScreen extends AFUIConnectedScreen<AFUIPrototypeBo
 
   Widget _buildScreen(AFUIPrototypeBottomSheetScreenSPI spi) {
     final context = spi.context;
-    AFibF.g.testOnlyShowBuildContext = context.c;
-    final testStateSource = AFibF.g.internalOnlyActiveStore.state.private.testState;    
+    AFibF.g.setTestOnlyShowBuildContext(AFUIType.bottomSheet, context.c);
 
-    if(testStateSource == null) {
-      throw AFException("Missing test state");
-    }
     return _createScaffold(spi);
   }
 

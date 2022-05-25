@@ -475,7 +475,7 @@ class _AFStateRegisterSpecialResultStatement<TQuery extends AFAsyncQuery> extend
       } else if(specialResult == _AFStateRegisterSpecialResultKind.resultLive) {
         final store = AFibF.g.internalOnlyActiveStore;
         query.startAsyncAF(
-          AFStoreDispatcher(store as AFStore),
+          AFStoreDispatcher(store),
           store
         );
 

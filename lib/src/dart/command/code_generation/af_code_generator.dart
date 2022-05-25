@@ -6,6 +6,7 @@ import 'package:afib/src/dart/command/af_command_error.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
+import 'package:afib/src/dart/command/code_generation/af_code_buffer.dart';
 import 'package:afib/src/dart/command/code_generation/af_generated_file.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
@@ -436,7 +437,7 @@ class AFCodeGenerator {
     final libNamespace = lib.codeId.toUpperCase();
     var identifier = removeSuffixAndCamel(removePrefix(parentType, libNamespace), suffix);
     if(identifier == "default") {
-      identifier = "${identifier}$suffix";
+      identifier = "$identifier$suffix";
     }
     return "$libNamespace${typeKind ?? suffix}ID.$identifier";
   }
@@ -634,18 +635,22 @@ class AFCodeGenerator {
       template = templates.find(templateOrId);
     }
     
-    if(template == null) {
-      throw AFException("Could not find template with id $templateOrId");
-    }
-
     if(action == AFGeneratedFileAction.create && AFProjectPaths.projectFileExists(projectPath) && !isRenamed(projectPath)) {
       throw AFCommandError(error: "File at $projectPath needs to be created, but already exists, delete or move it if you'd like to re-create it.");
     }
 
-    final result = AFGeneratedFile.fromTemplate(projectPath: projectPath, template: template, action: action);
-    created[projectPath.join('/')] = result;
-    result.resolveTemplateReferences(context: context);
-    return result;
+    AFGeneratedFile generated;
+    if(template != null) {
+      generated = AFGeneratedFile.fromTemplate(projectPath: projectPath, template: template, action: action);
+    } else if(templateOrId is AFCodeBuffer) {
+      generated = AFGeneratedFile.fromBuffer(projectPath: projectPath, buffer: templateOrId, action: action);
+    } else {
+      throw AFException("Could not find template with id $templateOrId");
+    }
+
+    created[projectPath.join('/')] = generated;
+    generated.resolveTemplateReferences(context: context);
+    return generated;
   }
 
   String removePrefix(String value, String prefix) {
@@ -735,19 +740,32 @@ class AFCodeGenerator {
   }
 
   static String convertMixedToSnake(String convert) {
-    final sb = StringBuffer();
+    final tokens = <String>[];
+    final currentToken = StringBuffer();
+
     for(var i = 0; i < convert.length; i++) {
-      final c = convert[i];
-      if(c == c.toUpperCase()) {
-        if(i > 0) {
-          sb.write("_");
+      final currentChar = convert[i];
+      final isUpper = currentChar == currentChar.toUpperCase();
+      if(isUpper && i > 0) {
+        final prevChar = convert[i-1];
+        final prevIsUpper = prevChar == prevChar.toUpperCase();
+        final nextChar = (i+1 < convert.length) ? convert[i+1] : 'a';
+        final nextIsUpper = nextChar == nextChar.toUpperCase();
+        if(!prevIsUpper || !nextIsUpper) {
+          tokens.add(currentToken.toString());
+          currentToken.clear();
         }
-        sb.write(c.toLowerCase());
-      } else {
-        sb.write(c);
       }
+
+      currentToken.write(currentChar);
     }
-    return sb.toString().toLowerCase();
+
+    if(currentToken.isNotEmpty) {
+      tokens.add(currentToken.toString());
+    }
+
+    final allLower = tokens.map((x) => x.toLowerCase());
+    return allLower.join("_");
   }  
 
   static String convertMixedToSpaces(String convert) {

@@ -1,6 +1,6 @@
 import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
-import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -67,14 +67,9 @@ class AFUIPrototypeDialogScreen extends AFUIConnectedScreen<AFUIPrototypeDialogS
 
   Widget _buildScreen(AFUIPrototypeDialogScreenSPI spi) {
     final context = spi.context;
-    AFibF.g.testOnlyShowBuildContext = context.c;
+    AFibF.g.setTestOnlyShowBuildContext(AFUIType.dialog, context.c);
     final t = spi.t;
     final test = context.p.test;
-    final testStateSource = AFibF.g.internalOnlyActiveStore.state.private.testState;    
-
-    if(testStateSource == null) {
-      throw AFException("Missing test state");
-    }
 
     //final sourceWidget = test.render(screenId, AFUIWidgetID.widgetPrototypeTest);
     Widget resultWidget = Center(

@@ -1,5 +1,4 @@
 import 'package:afib/afib_command.dart';
-import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/commands/af_typedefs_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';

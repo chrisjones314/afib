@@ -44,11 +44,11 @@ class AFArgs {
   void setDebugArgs(String revised) {
     final result = StringBuffer();
     result.writeln("********* ATTENTION: USING DEBUG ARGUMENTS: '$revised' ******************************");
-    final colorized = Colorize(result.toString()).apply(Styles.RED);    
+    final colorized = Colorize(result.toString()).apply(Styles.YELLOW);    
     print(colorized);
 
-    final parsed = revised.split(RegExp(r"[ \t]"));
-    args.clear();
+    final parsed = revised.trim().split(RegExp(r"[ \t]"));
+    args = <String>[];
     args.addAll(parsed);
   }
 

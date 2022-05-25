@@ -1,6 +1,6 @@
 import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
-import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -100,7 +100,7 @@ class AFUIPrototypeDrawerScreen extends AFUIConnectedScreen<AFUIPrototypeDrawerS
         spiParent: spi,
         config: config,
         builder: (spiUnder) {
-          AFibF.g.testOnlyShowBuildContext = spiUnder.flutterContext;
+          AFibF.g.setTestOnlyShowBuildContext(AFUIType.drawer, spiUnder.flutterContext);
           return _childShowButton(spiUnder);
         }
       )

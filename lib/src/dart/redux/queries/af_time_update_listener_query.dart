@@ -27,7 +27,6 @@ class AFTimeUpdateListenerQuery<AFUIState extends AFFlexibleState> extends AFAsy
         context.onSuccess(updatedTime);
       }
     });
-
   }
 
   @override 

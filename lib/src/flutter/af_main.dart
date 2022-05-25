@@ -1,9 +1,7 @@
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_typedefs_command.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
-import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:afib/src/flutter/core/af_app_extension_context.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +35,7 @@ void afMainApp<TState extends AFFlexibleState>({
   }
   AFibD.initialize(paramsDart);
 
-  final context = AFAppExtensionContext();
+  final context = AFibF.context;
 
 
   extendApp(context);

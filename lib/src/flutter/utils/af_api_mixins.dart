@@ -82,6 +82,7 @@ mixin AFAccessStateSynchronouslyMixin {
 mixin AFStandardAPIContextMixin<TState extends AFFlexibleState> implements AFDispatcher {
 
   AFDispatcher get dispatcher;
+  AFConceptualStore get targetStore;
 
   void dispatch(dynamic action) {
     dispatcher.dispatch(action);
@@ -99,12 +100,12 @@ mixin AFStandardAPIContextMixin<TState extends AFFlexibleState> implements AFDis
   }
 
   TLPI accessLPI<TLPI extends AFLibraryProgrammingInterface>(AFLibraryProgrammingInterfaceID id) {
-    final lpi = AFibF.g.createLPI(id, dispatcher);
+    final lpi = AFibF.g.createLPI(id, dispatcher, targetStore);
     return lpi as TLPI;
   } 
 
   Stream<AFPublicStateChange> get accessStreamPublicStateChanges {
-    return AFibF.g.streamPublicStateChanges;
+    return AFibF.g.activeStageChangeStream;
   }
 
   /// Synchronously accesses the current public state, providing it to a callback.
@@ -119,6 +120,7 @@ mixin AFStandardAPIContextMixin<TState extends AFFlexibleState> implements AFDis
   void accessCurrentState(AFAccessCurrentStateDelegate delegate) {
     final context = AFCurrentStateContext(
       dispatcher: this,
+      targetStore: targetStore,
     );
     delegate(context);
   }
@@ -286,7 +288,7 @@ mixin AFStandardAPIContextMixin<TState extends AFFlexibleState> implements AFDis
       AFibF.g.demoModeTest = null;        
       AFibF.g.setActiveStore(AFConceptualStore.appStore);
 
-      assert(AFibF.g.internalOnlyActive.conceptual == AFConceptualStore.appStore);
+      assert(AFibF.g.internalOnlyActiveStore.state.public.conceptualStore == AFConceptualStore.appStore);
 
 
       final route = AFibF.g.internalOnlyActiveStore.state.public.route;
@@ -320,10 +322,14 @@ mixin AFStandardAPIContextMixin<TState extends AFFlexibleState> implements AFDis
       AFibF.g.setActiveStore(AFConceptualStore.demoModeStore);
 
       // build the test data.
-      AFibF.g.initializeTests();
+      final globalState = AFibGlobalState(
+        appContext: AFibF.context,
+        activeConceptualStore: AFConceptualStore.demoModeStore
+      );
+      globalState.initializeForDemoMode();
 
       // find the desired state test.
-      final test = AFibF.g.stateTests.findById(stateTestId);
+      final test = globalState.stateTests.findById(stateTestId);
 
       // build that state test only.
       final testContext = AFStateTestContextForState<AFUIState>(
@@ -341,7 +347,7 @@ mixin AFStandardAPIContextMixin<TState extends AFFlexibleState> implements AFDis
         mergePublicState: mergePublicState
       );
 
-      assert(AFibF.g.internalOnlyActive.conceptual == AFConceptualStore.demoModeStore);
+      assert(AFibF.g.internalOnlyActive.store!.state.public.conceptualStore == AFConceptualStore.demoModeStore);
 
       // this puts AFib into a mode where queries are routed through the state test's spoofed queries
       // instead of through the true query handling mechanism.

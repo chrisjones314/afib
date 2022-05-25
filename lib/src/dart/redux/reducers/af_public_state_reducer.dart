@@ -18,7 +18,7 @@ AFPublicState afPublicStateReducer(AFPublicState state, dynamic action) {
     time: afTimeStateReducer(state.time, action),
   );
 
-  AFibF.g.stateChangeStreamController.sink.add(AFPublicStateChange(
+  AFibF.g.activeStateChangeController.add(AFPublicStateChange(
     action: action,
     before: state,
     after: revised

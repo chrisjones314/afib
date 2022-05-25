@@ -7,7 +7,6 @@ import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_buffer.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_generator.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
-import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:colorize/colorize.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 
@@ -29,6 +28,19 @@ class AFGeneratedFile {
     required this.buffer,
     required this.action,
   });
+
+  factory AFGeneratedFile.fromBuffer({
+    required List<String> projectPath,
+    required AFCodeBuffer buffer,
+    required AFGeneratedFileAction action
+  }) {
+    return AFGeneratedFile(
+      projectPath: projectPath,
+      action: action,
+      buffer: buffer
+    );
+
+  }
 
   factory AFGeneratedFile.fromTemplate({
     required List<String> projectPath,

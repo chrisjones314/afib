@@ -1,6 +1,4 @@
 import 'package:afib/afib_command.dart';
-import 'package:afib/src/dart/command/af_command_output.dart';
-import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_create_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';

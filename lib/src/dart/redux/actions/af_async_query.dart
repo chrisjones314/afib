@@ -20,16 +20,23 @@ import 'package:logger/logger.dart';
 
 
 class AFQueryContext with AFContextShowMixin, AFStandardAPIContextMixin, AFNonUIAPIContextMixin {
-  final AFConceptualStore conceptualStore;
+  AFConceptualStore conceptualStore;
 
 
   AFQueryContext({
     required this.conceptualStore,
   });
 
+  AFConceptualStore get targetStore {
+    return conceptualStore;
+  }
 
   AFDispatcher get dispatcher {
     return AFibF.g.internalOnlyStoreEntry(conceptualStore).dispatcher!;
+  }
+
+  void retargetStore(AFConceptualStore target) {
+    conceptualStore = target;
   }
 
   void dispatch(dynamic action) {
@@ -133,6 +140,10 @@ abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends A
     this.onPreExecuteResponseDelegate
   }): super(id: id) {
     conceptualStore = AFibF.g.activeConceptualStore;
+  }
+
+  void retargetStore(AFConceptualStore target) {
+    conceptualStore = target;
   }
 
   /// Called internally when redux middleware begins processing a query.

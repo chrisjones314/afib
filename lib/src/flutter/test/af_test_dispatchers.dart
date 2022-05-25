@@ -1,6 +1,5 @@
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
-import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_object_with_key.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
@@ -58,7 +57,9 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
       action is AFNavigateAddChildParamAction ||
       action is AFNavigateRemoveChildParamAction ||
       //action is AFNavigateSortConnectedChildrenAction ||
-      action is AFWireframeEventAction) {
+      action is AFWireframeEventAction ||
+      action is AFNavigateShowScreenBeginAction || 
+      action is AFNavigateShowScreenEndAction) {
         main.dispatch(action);
     } 
 

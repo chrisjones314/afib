@@ -46,8 +46,6 @@ class AFWidgetsBindingObserver extends WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final dispatcher = AFibF.g.internalOnlyActiveDispatcher;
-    assert(dispatcher != null);
-    if(dispatcher == null) return;
     AFibF.g.dispatchLifecycleActions(dispatcher, state);    
   }
 
@@ -115,24 +113,21 @@ class AFTestMissingTranslations {
 }
 
 class AFibStoreStackEntry {
-  AFTargetStore target;
-  AFConceptualStore conceptual;
   AFStore? store;
   AFDispatcher? dispatcher;
+  final stateChangeController = StreamController<AFPublicStateChange>();
+  Stream<AFPublicStateChange>? stageChangeStream;
 
   AFibStoreStackEntry({
-    required this.target,
     required this.store,
-    required this.conceptual,
     required this.dispatcher,
   });
 
-  void swapConceptual() {
-    if(conceptual == AFConceptualStore.appStore) {
-      conceptual = AFConceptualStore.demoModeStore;
-    } else {
-      conceptual = AFConceptualStore.appStore;
+  Stream<AFPublicStateChange> get changeEvents {
+    if(stageChangeStream == null) {
+      stageChangeStream = stateChangeController.stream.asBroadcastStream();
     }
+    return stageChangeStream!;
   }
 }
 
@@ -166,8 +161,6 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   final testOnlyDialogCompleters = <AFScreenID, void Function(dynamic)>{}; 
   final testOnlyScreenSPIMap = <AFScreenID, AFStateProgrammingInterface>{};
   final testOnlyScreenBuildContextMap = <AFScreenID, BuildContext>{};
-  final stateChangeStreamController = StreamController<AFPublicStateChange>();
-  Stream<AFPublicStateChange>? stateChangeBroadcast;
   
   AFibStoreStackEntry? uiStore;
   AFibStoreStackEntry? backgroundStore;
@@ -178,7 +171,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   AFRouteState? preDemoModeRoute;
 
 
-  BuildContext? testOnlyShowBuildContext;
+  final _testOnlyShowBuildContext = <AFUIType, BuildContext?>{};
 
   AFScreenMap? _afPrototypeScreenMap;
   AFScreenID? forcedStartupScreen;
@@ -199,6 +192,26 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     return internalOnlyStoreEntry(activeConceptualStore).store!;
   }
 
+  StreamController<AFPublicStateChange> get activeStateChangeController {
+    return internalOnlyStoreEntry(activeConceptualStore).stateChangeController;
+  }
+  
+  Stream<AFPublicStateChange> get activeStageChangeStream {
+    return internalOnlyStoreEntry(activeConceptualStore).changeEvents;
+  }
+
+  Stream<AFPublicStateChange> stateChangeStream(AFConceptualStore conceptual) {
+    return internalOnlyStoreEntry(conceptual).changeEvents;
+  }
+
+  BuildContext? testOnlyShowBuildContext(AFUIType uiType) {
+    return _testOnlyShowBuildContext[uiType];
+  }
+
+  void setTestOnlyShowBuildContext(AFUIType uiType, BuildContext? ctx) {
+    _testOnlyShowBuildContext[uiType] = ctx;
+  }
+
   /// WARNING: You should never call this.  See [internalOnlyStore] for details.
   AFDispatcher get internalOnlyActiveDispatcher {
     return internalOnlyStoreEntry(activeConceptualStore).dispatcher!;
@@ -208,6 +221,30 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     required this.appContext,
     required this.activeConceptualStore,
   });
+
+  void initializeForDemoMode() {
+    if(testData.isNotEmpty) {
+      return;
+    }
+
+    appContext.test.initializeForDemoMode(
+      testData: testData,
+      stateTests: stateTests
+    );
+
+    final libraries = thirdPartyLibraries;
+    for(final thirdParty in libraries) {
+      final holder = thirdParty.createScreenTestHolder();
+      thirdPartyUITests[thirdParty.id] = holder;
+      thirdParty.test.initializeForDemoMode(
+        testData: testData,
+        stateTests: holder.afStateTests,
+      );
+    }
+
+    sharedTestContext.mergeWith(appContext.test.sharedTestContext);
+  }
+
 
   void initializeTests() {
     if(testData.isNotEmpty) {
@@ -273,13 +310,11 @@ class AFibGlobalState<TState extends AFFlexibleState> {
 
 
     uiStore = createStore(
-      target: AFTargetStore.uiStore,
       conceptual: AFConceptualStore.appStore,
       enableUIRouting: true,
     );
 
     backgroundStore = createStore(
-      target: AFTargetStore.backgroudStore,
       conceptual: AFConceptualStore.demoModeStore,
       enableUIRouting: false,
     );
@@ -300,10 +335,6 @@ class AFibGlobalState<TState extends AFFlexibleState> {
 
     // and the background state becomes the former UI state.
     backgroundStore!.store!.dispatch(AFUpdateRootStateAction(stateUI));
-
-    uiStore!.swapConceptual();
-    backgroundStore!.swapConceptual();
-
   }
 
   AFStore internalOnlyStore(AFConceptualStore conceptual) {
@@ -323,10 +354,11 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   }
 
   AFibStoreStackEntry internalOnlyStoreEntry(AFConceptualStore conceptual) {
-    if(uiStore!.conceptual == conceptual) {
+
+    if(uiStore!.store!.state.public.conceptualStore == conceptual) {
       return uiStore!;
     } else {
-      assert(backgroundStore!.conceptual == conceptual);
+      assert(backgroundStore!.store!.state.public.conceptualStore == conceptual);
       return backgroundStore!;
     }
   }
@@ -339,14 +371,6 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     preDemoModeRoute = route;
   }
 
-
-  Stream<AFPublicStateChange> get streamPublicStateChanges {
-    if(stateChangeBroadcast == null) {
-      stateChangeBroadcast = stateChangeStreamController.stream.asBroadcastStream();
-    }
-    return stateChangeBroadcast!;
-  }
-
   AFScreenMap get screenMap {
     return uiDefinitions.screenMap;
   }
@@ -355,8 +379,11 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     return appContext.thirdParty.libraries.values;
   }
 
+  bool get isPrototypeMode {
+    return AFibD.config.requiresPrototypeData;    
+  }
+
   AFibStoreStackEntry createStore({ 
-    required AFTargetStore target,
     required AFConceptualStore conceptual,
     required bool enableUIRouting,
     AFPublicState? publicState,
@@ -369,7 +396,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     }
     middleware.add(AFQueryMiddleware());
 
-    var initialState = AFState.initialState();
+    var initialState = AFState.initialState(conceptual);
     if(publicState != null) {
       initialState = initialState.copyWith(public: publicState);
     }
@@ -381,7 +408,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     );
 
     final dispatcher = AFStoreDispatcher(store);
-    return AFibStoreStackEntry(target: target, conceptual: conceptual, store: store, dispatcher: dispatcher);
+    return AFibStoreStackEntry(store: store, dispatcher: dispatcher);
   }
 
   void pushState({
@@ -457,16 +484,15 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     
   }
 
-  AFLibraryProgrammingInterface createLPI(AFLibraryProgrammingInterfaceID id, AFDispatcher dispatcher) {
+  AFLibraryProgrammingInterface createLPI(AFLibraryProgrammingInterfaceID id, AFDispatcher dispatcher, AFConceptualStore targetStore) {
       final factory = uiDefinitions.lpiFactories[id];
       if(factory == null) {
         throw AFException("No factory for LPI $id");
       }
-      final store = internalOnlyActiveStore;
-      if(store == null) {
-        throw AFException("Internal error, no store");
-      }
-      final context = AFLibraryProgrammingInterfaceContext(dispatcher: dispatcher);
+      final context = AFLibraryProgrammingInterfaceContext(
+        dispatcher: dispatcher,
+        targetStore: targetStore,
+      );
       return factory(id, context);
   }
 
@@ -855,6 +881,8 @@ class AFibGlobalState<TState extends AFFlexibleState> {
 /// application.  Globals contain debugging utilities (e.g. logging)
 /// and configuration that is immutable after startup (e.g. configuration).
 class AFibF {
+  static final context = AFAppExtensionContext();
+
   static AFibGlobalState? global;
 
   static void initialize<TState extends AFFlexibleState>(

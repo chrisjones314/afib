@@ -8,6 +8,8 @@ export 'src/dart/command/af_args.dart'; // ok
 export "src/dart/command/af_command.dart";
 export "src/dart/command/af_command_enums.dart";
 export 'src/dart/command/af_command_error.dart';
+export 'src/dart/command/af_command_output.dart';
+export 'src/dart/command/af_project_paths.dart';
 export 'src/dart/command/af_source_template.dart';
 export "src/dart/command/af_standard_commands.dart";
 export 'src/dart/command/code_generation/af_code_buffer.dart';

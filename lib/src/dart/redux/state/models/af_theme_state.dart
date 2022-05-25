@@ -1174,16 +1174,13 @@ class AFFundamentalThemeState {
     return themeDataActive.colorScheme.primary;
   }
 
-  Color get colorPrimaryVariant {
-    return themeDataActive.colorScheme.primaryVariant;
+  Color get colorPrimaryDarker {
+    return colorPrimary;
   }
+
 
   Color get colorOnPrimary {
     return themeDataActive.colorScheme.onPrimary;
-  }
-
-  Color get colorSecondaryVariant {
-    return themeDataActive.colorScheme.secondaryVariant;
   }
 
   Color get colorBackground {
@@ -1583,6 +1580,10 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return fundamentals.colorPrimary;
   }
 
+  Color get colorPrimaryDarker {
+    return fundamentals.colorPrimaryDarker;
+  }
+
   Color get colorPrimaryDisabled {
     final result = Colors.grey[400];
     if(result == null) {
@@ -1594,14 +1595,6 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   /// The foreground color on a primary background from [ThemeData]
   Color get colorOnPrimary {
     return fundamentals.colorOnPrimary;
-  }
-
-  Color get colorPrimaryVariant {
-    return fundamentals.colorPrimaryVariant;
-  }
-
-  Color get colorSecondaryVariant {
-    return fundamentals.colorSecondaryVariant;
   }
 
   Color get colorSurface {
@@ -1884,6 +1877,11 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
       textColor: colorOnPrimary,
       onPressed: onPressed
     );
+  }
+
+  //--------------------------------------------------------------------------------------
+  Widget childExtraScrollSpacer({double height = 100}) {
+    return SizedBox(width: double.infinity, height: height);
   }
 
   /// Create a button that the user is most likely to click.

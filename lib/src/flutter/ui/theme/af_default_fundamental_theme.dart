@@ -8,10 +8,10 @@ void defineAFDefaultFundamentalThemeArea(AFFundamentalDeviceTheme device, AFComp
   
   final colorPrimary = Color(0xff8d5b4c);
   final colorPrimaryDark = Color(0xff5d3124);
-  final colorPrimaryDarker = Color(0xff320a00);
+  //final colorPrimaryDarker = Color(0xff320a00);
   final colorSecondary = Color(0xff706677);
   final colorSecondaryDark = Color(0xff453c4b);
-  final colorSecondaryDarker = Color(0xff1e1623);
+  //final colorSecondaryDarker = Color(0xff1e1623);
   final colorWhite = Colors.white;
   final colorError = Color(0xffbf0603);
   final colorBlack = Colors.black;
@@ -20,9 +20,7 @@ void defineAFDefaultFundamentalThemeArea(AFFundamentalDeviceTheme device, AFComp
 
   final colorsLight = ColorScheme(
     primary: colorPrimary,
-    primaryVariant: colorPrimaryDark,
     secondary: colorSecondary,
-    secondaryVariant: colorSecondaryDark,
     onPrimary: colorWhite,
     onSecondary: colorWhite,
     onBackground: colorBlack,
@@ -36,9 +34,7 @@ void defineAFDefaultFundamentalThemeArea(AFFundamentalDeviceTheme device, AFComp
 
   final colorsDark = ColorScheme(
     primary: colorPrimaryDark,
-    primaryVariant: colorPrimaryDarker,
     secondary: colorSecondaryDark,
-    secondaryVariant: colorSecondaryDarker,
     onPrimary: colorWhite,
     onSecondary: colorWhite,
     onBackground: colorWhite,

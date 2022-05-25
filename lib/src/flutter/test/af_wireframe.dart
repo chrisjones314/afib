@@ -76,8 +76,8 @@ class AFWireframeExecutionContext<TStateView extends AFFlexibleStateView> {
   void navigateTo(AFPrototypeID testId, { AFRouteParam? routeParam, List<Object>? models }) {
     final test = AFibF.g.findScreenTestById(testId);
     final dispatcher = AFibF.g.internalOnlyActiveDispatcher;
-    assert(dispatcher != null && test != null);
-    if(dispatcher != null && test != null) {
+    assert(test != null);
+    if(test != null) {
       test.startScreen(dispatcher, spi.context.flutterContext, wireframe.testData, routeParam: routeParam, models: models);
     }
   }
@@ -87,7 +87,6 @@ class AFWireframeExecutionContext<TStateView extends AFFlexibleStateView> {
   }
 
   void _dispatch(dynamic action) {
-    assert(AFibF.g.internalOnlyActiveDispatcher != null);
     AFibF.g.internalOnlyActiveDispatcher.dispatch(action);
   }
 }

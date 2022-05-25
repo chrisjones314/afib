@@ -41,21 +41,16 @@ class _AFStartupScreenState extends State<AFStartupScreenWrapper> {
     WidgetsBinding.instance?.addObserver(AFibF.g.widgetsBindingObserver);
 
     final storeDisp = AFibF.g.internalOnlyActiveDispatcher;
-    assert(storeDisp != null);
     if(AFibD.config.requiresPrototypeData) {
       // if this is not the general prototype mode, then fire a startup query which 
       // loads that specific prototype.
       if(AFibD.config.environment != AFEnvironment.prototype) {
-        if(storeDisp != null) {
-          storeDisp.dispatch(AFStartSpecificPrototypeQuery());
-        }
+        storeDisp.dispatch(AFStartSpecificPrototypeQuery());
       }
     } else {
       // Kick off the app by firing a query.  In a typical app this might check the user's
       // logged in status while a splash screen displays.
-      if(storeDisp != null) {
-        AFibF.g.dispatchStartupQueries(storeDisp);
-      }
+      AFibF.g.dispatchStartupQueries(storeDisp);
     }
   }
 

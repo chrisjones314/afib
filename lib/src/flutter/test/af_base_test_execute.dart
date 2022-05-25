@@ -329,9 +329,8 @@ void printTestTotal(AFCommandOutput output, List<AFBaseTestExecute> baseContexts
   final totalPass = stats.totalPasses;
   AFBaseTestExecute.printTotalPass(output, "TOTAL", totalPass);
 
-  var totalErrors = 0;
   for(var context in baseContexts) {
-    totalErrors += context.printFailMessages(output);
+     context.printFailMessages(output);
     stats.addErrors(context.errors);
   }
 }

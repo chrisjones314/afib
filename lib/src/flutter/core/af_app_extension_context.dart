@@ -205,6 +205,19 @@ class AFTestExtensionContext {
     }
   }
 
+  void initializeForDemoMode({
+    required AFDefineTestDataContext testData, 
+    required AFStateTests stateTests,
+  }) {
+      _initTestData(testData);
+      
+      final stateTestDefineContext = AFStateTestDefinitionContext(
+        tests: stateTests,
+        testData: testData
+      );
+      _initStateTests(stateTestDefineContext);
+  }
+
   void initialize({
     required AFDefineTestDataContext testData, 
     required AFUnitTests unitTests,

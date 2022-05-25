@@ -22,6 +22,7 @@ class AFPublicStateChange {
 /// State meant to be used by the app itself, including the
 /// app-specific state.
 class AFPublicState {
+  final AFConceptualStore conceptualStore;
   final AFRouteState route;
   final AFThemeState themes;
   final AFQueryState queries;
@@ -29,6 +30,7 @@ class AFPublicState {
   final AFTimeState time;
 
   AFPublicState({
+    required this.conceptualStore,
     required this.route,
     required this.themes,
     required this.components,
@@ -60,6 +62,7 @@ class AFPublicState {
     AFTimeState? time,
   }) {
     return AFPublicState(
+      conceptualStore: this.conceptualStore,
       components: components ?? this.components,
       themes: themes ?? this.themes,
       route: route ?? this.route,
@@ -101,10 +104,11 @@ class AFState {
   });
 
   /// 
-  factory AFState.initialState() {
+  factory AFState.initialState(AFConceptualStore conceptualStore) {
     final components = AFibF.g.createInitialComponentStates();
     return AFState(
       public: AFPublicState(
+        conceptualStore: conceptualStore,
         route: AFRouteState.initialState(),
         themes: AFibF.g.initializeThemeState(components: components),
         components: components,

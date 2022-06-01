@@ -517,7 +517,7 @@ abstract class AFConnectedWidget<TState extends AFFlexibleState, TTheme extends 
 /// Drawers are special because the user can drag in from the left or right to open them.
 /// Consequently, you will need to override [AFConnectedScreenWithGlobalParam.createDefaultRouteParam],
 /// which will be used to create your route parameter if the drawer was dragged onto the
-/// screen without you explicitly calling [AFBuildContext.showDrawer].
+/// screen without you explicitly calling [AFBuildContext.showLeftSideDrawer].
 abstract class AFConnectedDrawer<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFScreenStateProgrammingInterface> extends AFConnectedScreen<TState, TTheme, TStateView, TRouteParam, TSPI> {
   AFConnectedDrawer({
     required AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> config,
@@ -601,6 +601,14 @@ class AFBuildStateViewContext<TState extends AFFlexibleState?, TRouteParam exten
     required this.children,
     required this.private,
   });
+
+  TState get accessAppState {
+    return stateApp;
+  }
+
+  TOtherState accessComponentState<TOtherState extends AFFlexibleState>() {
+    return statePublic.components.findState<TOtherState>()!;
+  }
 
   Map<String, Object> createModelsByType(Iterable<Object> toIntegrate) {
     return AFFlexibleStateView.createModels(toIntegrate);

@@ -20,6 +20,10 @@ import 'package:collection/collection.dart';
 import 'package:colorize/colorize.dart';
 
 class AFCodeGenerator { 
+  static const rootSuffix = "Root";
+  static const stateViewSuffix = "StateView";
+  static const lpiSuffix = "LPI";
+
   static const afibConfigFile = "afib.g.dart";
   static const libFolder = "lib";
   static const uiFolder = "ui";
@@ -44,6 +48,10 @@ class AFCodeGenerator {
   static const overrideFolder = "override";
   static const commandFolder = "command";
   static const lpisFolder = "lpis";
+  static const rootFolder = "root";
+  static const stateTestsFolder = "state_tests";
+  static const unitTestsFolder = "unit_tests";
+  static const wireframesFolder = "wireframes";
 
   static const testAFibPath = [testFolder, afibFolder];
   static const screensPath = [libFolder, uiFolder, screensFolder];
@@ -58,6 +66,7 @@ class AFCodeGenerator {
   static const lpisPath = [libFolder, stateFolder, lpisFolder];
   static const lpisOverridePath = [libFolder, overrideFolder, lpisFolder];
   static const modelsPath = [libFolder, stateFolder, modelsFolder];
+  static const rootsPath = [libFolder, stateFolder, rootFolder];
   static const statePath = [libFolder, stateFolder];
   static const queryPath = [libFolder, queryFolder];
   static const commandPath = [libFolder, commandFolder];
@@ -69,12 +78,17 @@ class AFCodeGenerator {
   static const overrideThemesPath = [libFolder, overrideFolder, themesFolder];
   static const testPath = [libFolder, testFolder];
   static const prototypesPath = [libFolder, testFolder, uiPrototypesFolder];
+  static const stateTestsPath = [libFolder, testFolder, stateTestsFolder];
+  static const unitTestsPath = [libFolder, testFolder, unitTestsFolder];
+  static const wireframesPath = [libFolder, testFolder, wireframesFolder];
+
   static const uiPrototypesFilename = "ui_prototypes.dart";
 
   final AFCommandAppExtensionContext definitions;
   final created = <String, AFGeneratedFile>{};
   final modified = <String, AFGeneratedFile>{};
   final renamed = <List<String>, List<String>>{};
+  final ensuredFolders = <List<String>>[];
 
   AFCodeGenerator({
     required this.definitions
@@ -113,7 +127,11 @@ class AFCodeGenerator {
 
   List<String> pathModel(String modelName) {
     final filename = "${convertMixedToSnake(modelName)}.dart";
-    return _createPath(modelsPath, filename);
+    var path = modelsPath;
+    if(modelName.endsWith(AFCodeGenerator.rootSuffix)) {
+      path = rootsPath;
+    }
+    return _createPath(path, filename);
   }
 
   List<String> pathModelFile(String filename) {
@@ -137,6 +155,10 @@ class AFCodeGenerator {
       return null;
     }
     return _createPath(stateViewsPath, filename);
+  }
+
+  void ensureFolderExists(List<String> path) {
+    ensuredFolders.add(path);
   }
 
   List<String>? pathTheme(String themeName, { required bool isCustomParent }) {
@@ -516,6 +538,31 @@ class AFCodeGenerator {
     return path;
   }
 
+  void outputThreeColumns(AFCommandContext context, 
+    String col1,
+    String col2, 
+    String col3,
+  ) {
+    final output = context.output;
+    output.startColumn(
+      alignment: AFOutputAlignment.alignRight,
+      width: 15,
+      color: Styles.GREEN);
+    output.write(col1);
+    output.startColumn(
+      alignment: AFOutputAlignment.alignLeft
+    );
+    output.write(col2);
+
+    output.startColumn(
+      alignment: AFOutputAlignment.alignLeft,
+      width: 40,
+    );
+    output.write(col3);
+    output.endLine();
+
+  }
+
   void finalizeAndWriteFiles(AFCommandContext context) {
     for(final original in renamed.keys) {
       final revised = renamed[original];
@@ -523,21 +570,7 @@ class AFCodeGenerator {
         continue;
       }
       final output = context.output;
-      output.startColumn(
-        alignment: AFOutputAlignment.alignRight,
-        width: 15,
-        color: Styles.GREEN);
-      output.write("rename ");
-      output.startColumn(
-        alignment: AFOutputAlignment.alignLeft
-      );
-      output.write(AFProjectPaths.relativePathFor(original));
-
-      output.startColumn(
-        alignment: AFOutputAlignment.alignLeft,
-        width: 40,
-      );
-      output.write("-> ${AFProjectPaths.relativePathFor(revised)}");
+      outputThreeColumns(context, "rename ", AFProjectPaths.relativePathFor(original), "-> ${AFProjectPaths.relativePathFor(revised)}");
       output.endLine();
 
       final pathOrig = AFProjectPaths.fullPathFor(original);
@@ -550,13 +583,19 @@ class AFCodeGenerator {
     _validateNoAFTags(context, created.values);
     _validateNoAFTags(context, modified.values);
 
-
     for(final generatedFile in created.values) {
       generatedFile.writeIfModified(context);
     }
 
     for(final modifiedFile in modified.values) {
       modifiedFile.writeIfModified(context);
+    }
+
+    for(final folder in ensuredFolders) {
+      if(!AFProjectPaths.projectFileExists(folder)) {
+        outputThreeColumns(context, "create ", AFProjectPaths.relativePathFor(folder), "");
+        AFProjectPaths.createProjectFolder(folder);
+      }
     }
   }
 

@@ -70,12 +70,17 @@ class AFProjectPaths {
   static bool ensureFolderExistsForFile(List<String> filePath) {
     final temp = List<String>.of(filePath);
     temp.removeLast();
-    if(!projectFileExists(temp)) {
-      createProjectFolder(temp);
+    return ensureFolderExists(temp);
+  }
+
+  static bool ensureFolderExists(List<String> filePath) {
+    if(!projectFileExists(filePath)) {
+      createProjectFolder(filePath);
       return true;
     }
     return false;
   }
+
 
   static void createProjectFolder(List<String> projectPath) {
     final path = fullPathFor(projectPath);

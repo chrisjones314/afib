@@ -24,7 +24,7 @@ class DeclareDemoScreenSPIImplsT extends AFSourceTemplate {
     /// to the route parameter which achieve specific conceptual goals.  It makes it easy to find
     /// the existing revise methods when I pick up the code later.
     final revised = context.p.reviseIncrementClickCount();
-    updateRouteParam(revised);
+    context.updateRouteParam(revised);
   }
 ''';
 }

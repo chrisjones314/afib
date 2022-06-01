@@ -77,7 +77,9 @@ $optionsHeader
     final generator = ctx.generator;
     _verifyPubspec(ctx, packageName);
 
+    _createStandardFolders(ctx, isApp: isApp);
     if(!isApp) {
+      _createStandardLibraryFolders(ctx);
       _createLibExportsFiles(ctx);
     }
     _createAppCommand(ctx, libKind);
@@ -277,6 +279,39 @@ $optionsHeader
     final result = createStandardFile(ctx, ctx.generator.pathEnvironment(suffix), AFUISourceTemplateID.fileEnvironment);
     result.replaceText(ctx, AFUISourceTemplateID.textEnvironmentName, suffix);
     return result;
+  }
+
+  void _createStandardFolders(AFCommandContext ctx, { required bool isApp }) {
+    final generator = ctx.generator;
+    generator.ensureFolderExists(AFCodeGenerator.commandPath);
+
+    generator.ensureFolderExists(AFCodeGenerator.bottomSheetsPath);
+    generator.ensureFolderExists(AFCodeGenerator.drawersPath);
+    generator.ensureFolderExists(AFCodeGenerator.dialogsPath);
+    generator.ensureFolderExists(AFCodeGenerator.widgetsPath);
+    
+    generator.ensureFolderExists(AFCodeGenerator.modelsPath);
+    generator.ensureFolderExists(AFCodeGenerator.rootsPath);
+    generator.ensureFolderExists(AFCodeGenerator.stateViewsPath);
+
+    generator.ensureFolderExists(AFCodeGenerator.queryPath);
+    
+    if(isApp) {
+      generator.ensureFolderExists(AFCodeGenerator.lpisOverridePath);
+      generator.ensureFolderExists(AFCodeGenerator.overrideThemesPath);
+    }
+
+    generator.ensureFolderExists(AFCodeGenerator.prototypesPath);
+    generator.ensureFolderExists(AFCodeGenerator.stateTestsPath);
+    generator.ensureFolderExists(AFCodeGenerator.unitTestsPath);
+    generator.ensureFolderExists(AFCodeGenerator.wireframesPath);
+
+  }
+
+  void _createStandardLibraryFolders(AFCommandContext ctx) {
+    final generator = ctx.generator;
+    generator.ensureFolderExists(AFCodeGenerator.lpisOverridePath);
+
   }
   
 }

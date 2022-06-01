@@ -16,7 +16,7 @@ void defineTestData(AFDefineTestDataContext testData) {
 }
 
 void defineStates(AFDefineTestDataContext testData) {
-  testData.define([!af_app_namespace(upper)]TestDataID.stateFullLogin, [!af_app_namespace(upper)]State.fromList(const [
+  testData.define([!af_app_namespace(upper)]TestDataID.stateFullLogin, [!af_app_namespace(upper)]State.fromList([
 
   ]));
 }

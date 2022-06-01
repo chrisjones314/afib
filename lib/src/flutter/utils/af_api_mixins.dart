@@ -139,14 +139,14 @@ mixin AFStandardAPIContextMixin<TState extends AFFlexibleState> implements AFDis
 
   /// Dispatches an action that updates a single value in the app state area associated
   /// with the [TState] type parameter.
-  void updateComponentStateOne<TState extends AFFlexibleState>(Object toIntegrate) {
+  void updateComponentRootStateOne<TState extends AFFlexibleState>(Object toIntegrate) {
     assert(TState != AFFlexibleState, "You must specify a state type as a type parameter");
     dispatch(AFUpdateAppStateAction(area: TState, toIntegrate: [toIntegrate]));
   }
 
   /// Dispatches an action that updates several blaues in the app state area associated
   /// with the [TState] type parameter.
-  void updateComponentStateMany<TState extends AFFlexibleState>(List<Object> toIntegrate) {
+  void updateComponentRootStateMany<TState extends AFFlexibleState>(List<Object> toIntegrate) {
     assert(TState != AFFlexibleState, "You must specify a state type as a type parameter");
     dispatch(AFUpdateAppStateAction(area: TState, toIntegrate: toIntegrate));
   }
@@ -858,7 +858,7 @@ mixin AFContextShowMixin {
   /// then your [AFConnectedDrawer.createDefaultRouteParam]
   /// method will be called to create it the very first time the drawer is shown.  Subsequently, it will
   /// use the param you pass to this function, or if you omit it, the value that is already in the global route pool.
-  void showDrawer({
+  void showLeftSideDrawer({
     required AFNavigatePushAction navigate
   }) {
     showDrawerStatic(
@@ -883,7 +883,7 @@ mixin AFContextShowMixin {
   }
 
   /// Open the end drawer that you specified for your [Scaffold].
-  void showEndDrawer({
+  void showRightSideDrawer({
     required AFNavigatePushAction navigate
   }) {
     _updateOptionalGlobalParam(navigate);

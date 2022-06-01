@@ -16,9 +16,6 @@ import 'package:afib/src/dart/command/templates/statements/import_statements.t.d
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 class AFGenerateStateSubcommand extends AFGenerateSubcommand {
-  static const modelSuffix = "Model";
-  static const stateViewSuffix = "StateView";
-  static const lpiSuffix = "LPI";
 
   AFGenerateStateSubcommand();
   
@@ -32,12 +29,13 @@ class AFGenerateStateSubcommand extends AFGenerateSubcommand {
   String get usage {
     return '''
 $usageHeader
-  $nameOfExecutable generate state [Your$modelSuffix|Your$stateViewSuffix|Your$lpiSuffix] [any --options]
+  $nameOfExecutable generate state [Your${AFCodeGenerator.rootSuffix}|Your${AFCodeGenerator.stateViewSuffix}|Your${AFCodeGenerator.lpiSuffix}|YourModelWithNoSpecialSuffix] [any --options]
 
 $descriptionHeader
-  If your identifier ends with $modelSuffix, creates a new model linked to the root of your application state.
-  If your identifier ends with $stateViewSuffix, creates a new state view and supporting classes for that state view
-  If your identifier ends with $lpiSuffix, creates a new LibraryProgrammingInterface (primarily used in libraries, app usually override existing LPIs)
+  If your identifier ends with ${AFCodeGenerator.rootSuffix}, creates a new root model linked to the root of your component/application state.
+  If your identifier ends with ${AFCodeGenerator.stateViewSuffix}, creates a new state view and supporting classes for that state view
+  If your identifier ends with ${AFCodeGenerator.lpiSuffix}, creates a new LibraryProgrammingInterface (primarily used in libraries, app usually override existing LPIs)
+  If your identifer does not end with any special suffix, creates a new immutable model object under state/models, generally these objects are referenced under on of your root models.
 
 $optionsHeader
   --${AFGenerateUISubcommand.argTheme} The type of the theme to use, defaults to your default theme
@@ -57,7 +55,6 @@ $optionsHeader
     final modelName = unnamed[0];
 
     verifyMixedCase(modelName, "model name");
-    verifyEndsWithOneOf(modelName, [modelSuffix, stateViewSuffix, lpiSuffix]);
 
     final args = parseArguments(unnamed, defaults: {
       AFGenerateUISubcommand.argTheme: ctx.generator.nameDefaultTheme
@@ -72,12 +69,12 @@ $optionsHeader
   }
 
   static void generateStateStatic(AFCommandContext ctx, String identifier, Map<String, dynamic> args) {
-    if(identifier.endsWith(modelSuffix)) {
-      _generateModelStatic(ctx, identifier, args);
-    } else if(identifier.endsWith(lpiSuffix)) {
+    if(identifier.endsWith(AFCodeGenerator.lpiSuffix)) {
       generateLPIStatic(ctx, identifier, args);
-    } else {
+    } else if(identifier.endsWith(AFCodeGenerator.stateViewSuffix)) {
       _generateStateViewStatic(ctx, identifier, args);
+    } else {
+      _generateModelStatic(ctx, identifier, args);    
     }
   }
 
@@ -149,73 +146,75 @@ $optionsHeader
     
     // generate the model file itself.
     final generator = ctx.generator;
+    final isRoot = identifier.endsWith(AFCodeGenerator.rootSuffix);
     final modelPath = generator.pathModel(identifier);
     final modelFile = generator.createFile(ctx, modelPath, AFUISourceTemplateID.fileModel);
-
     modelFile.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
 
-    // add it to the root application state
-    final pathState = generator.pathAppState;
-    final stateFile = generator.modifyFile(ctx, pathState);
-    generator.addImport(ctx,
-      importPath: modelFile.importPathStatement,
-      to: stateFile,
-      before: AFCodeRegExp.startDefineStateClass
-    );
+    if(isRoot) {
+      // add it to the root application state
+      final pathState = generator.pathAppState;
+      final stateFile = generator.modifyFile(ctx, pathState);
+      generator.addImport(ctx,
+        importPath: modelFile.importPathStatement,
+        to: stateFile,
+        before: AFCodeRegExp.startDefineStateClass
+      );
 
-    // add its initial value to the state
-    final declareInitialValue = DeclareInitialValueT().toBuffer();
-    declareInitialValue.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
-    stateFile.addLinesAfter(ctx, AFCodeRegExp.startReturnInitialState, declareInitialValue.lines);
+      // add its initial value to the state
+      final declareInitialValue = DeclareInitialValueT().toBuffer();
+      declareInitialValue.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
+      stateFile.addLinesAfter(ctx, AFCodeRegExp.startReturnInitialState, declareInitialValue.lines);
 
-    // add an initial test-data value
-    // first, create a subprocedure for defining that kind of test data.
-    final declareCallDefineTest = DeclareCallDefineTestDataT().toBuffer();
-    declareCallDefineTest.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
-    
-    final testDataFile = generator.modifyFile(ctx, generator.pathTestData);
-    testDataFile.addLinesAfter(ctx, AFCodeRegExp.startDefineTestData, declareCallDefineTest.lines);
+      // add an initial test-data value
+      // first, create a subprocedure for defining that kind of test data.
+      final declareCallDefineTest = DeclareCallDefineTestDataT().toBuffer();
+      declareCallDefineTest.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
+      
+      final testDataFile = generator.modifyFile(ctx, generator.pathTestData);
+      testDataFile.addLinesAfter(ctx, AFCodeRegExp.startDefineTestData, declareCallDefineTest.lines);
 
-    final declareDefineTestData  = DeclareDefineDefineTestDataT().toBuffer();
-    declareDefineTestData.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
-    declareDefineTestData.executeStandardReplacements(ctx);
+      final declareDefineTestData  = DeclareDefineDefineTestDataT().toBuffer();
+      declareDefineTestData.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
+      declareDefineTestData.executeStandardReplacements(ctx);
 
-    // then, declare the function that we just called.
-    testDataFile.addLinesAtEnd(ctx, declareDefineTestData.lines);
+      // then, declare the function that we just called.
+      testDataFile.addLinesAtEnd(ctx, declareDefineTestData.lines);
 
-    // need to import the model itself.
-    generator.addImport(ctx, 
-      importPath: modelFile.importPathStatement, 
-      to: testDataFile, 
-      before: AFCodeRegExp.startDefineTestData
-    );
-    
-    // finally, add the id we are using.
-    final declareTestID = DeclareTestIDT().toBuffer();
-    declareTestID.replaceText(ctx, AFUISourceTemplateID.textTestID, "stateFullLogin$identifier");
+      // need to import the model itself.
+      generator.addImport(ctx, 
+        importPath: modelFile.importPathStatement, 
+        to: testDataFile, 
+        before: AFCodeRegExp.startDefineTestData
+      );
+      
+      // finally, add the id we are using.
+      final declareTestID = DeclareTestIDT().toBuffer();
+      declareTestID.replaceText(ctx, AFUISourceTemplateID.textTestID, "stateFullLogin$identifier");
 
-    final idFile = generator.modifyFile(ctx, generator.pathIdFile);
-    idFile.addLinesAfter(ctx, AFCodeRegExp.startDeclareTestDataID, declareTestID.lines);
+      final idFile = generator.modifyFile(ctx, generator.pathIdFile);
+      idFile.addLinesAfter(ctx, AFCodeRegExp.startDeclareTestDataID, declareTestID.lines);
 
-    // then, add in the new test data to the full signed in state.
-    final declareInitTestData = DeclareReferenceTestDataT().toBuffer();
-    declareInitTestData.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
-    declareInitTestData.executeStandardReplacements(ctx);
-    testDataFile.addLinesAfter(ctx, AFCodeRegExp.startDeclareTestData, declareInitTestData.lines);
+      // then, add in the new test data to the full signed in state.
+      final declareInitTestData = DeclareReferenceTestDataT().toBuffer();
+      declareInitTestData.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
+      declareInitTestData.executeStandardReplacements(ctx);
+      testDataFile.addLinesAfter(ctx, AFCodeRegExp.startDeclareTestData, declareInitTestData.lines);
 
-    // we need to add it to the default state view access
-    final pathStateViewAccess = generator.pathStateViewAccess();
-    final accessFile = generator.modifyFile(ctx, pathStateViewAccess);
-    final regexMixinStart = AFCodeRegExp.startMixinStateAccess;
-    final declareAccess = DeclareModelAccessStatementT().toBuffer();
-    declareAccess.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
-    accessFile.addLinesAfter(ctx, regexMixinStart, declareAccess.lines);
+      // we need to add it to the default state view access
+      final pathStateViewAccess = generator.pathStateViewAccess();
+      final accessFile = generator.modifyFile(ctx, pathStateViewAccess);
+      final regexMixinStart = AFCodeRegExp.startMixinStateAccess;
+      final declareAccess = DeclareModelAccessStatementT().toBuffer();
+      declareAccess.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
+      accessFile.addLinesAfter(ctx, regexMixinStart, declareAccess.lines);
 
-    final declareImport = ImportFromPackage().toBuffer();
-    declareImport.replaceText(ctx, AFUISourceTemplateID.textPackageName, AFibD.config.packageName);
-    declareImport.replaceText(ctx, AFUISourceTemplateID.textPackagePath, modelFile.importPathStatement);
-    
-    accessFile.addLinesBefore(ctx, regexMixinStart, declareImport.lines);
+      final declareImport = ImportFromPackage().toBuffer();
+      declareImport.replaceText(ctx, AFUISourceTemplateID.textPackageName, AFibD.config.packageName);
+      declareImport.replaceText(ctx, AFUISourceTemplateID.textPackagePath, modelFile.importPathStatement);
+      
+      accessFile.addLinesBefore(ctx, regexMixinStart, declareImport.lines);
+    }
 
     // export it
     generator.addExportsForFiles(ctx, args, [
@@ -239,7 +238,7 @@ $optionsHeader
     final stateViewFile = generator.createFile(ctx, stateViewPath, AFUISourceTemplateID.fileStateView);
     stateViewFile.replaceText(ctx, AFUISourceTemplateID.textStateViewName, identifier);
     stateViewFile.replaceText(ctx, AFUISourceTemplateID.textThemeType, theme);
-    stateViewFile.replaceText(ctx, AFUISourceTemplateID.textStateViewPrefix, generator.removeSuffix(identifier, stateViewSuffix));
+    stateViewFile.replaceText(ctx, AFUISourceTemplateID.textStateViewPrefix, generator.removeSuffix(identifier, AFCodeGenerator.stateViewSuffix));
     stateViewFile.executeStandardReplacements(ctx);
 
     final imports = <String>[];

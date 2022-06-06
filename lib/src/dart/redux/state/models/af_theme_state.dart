@@ -1174,11 +1174,6 @@ class AFFundamentalThemeState {
     return themeDataActive.colorScheme.primary;
   }
 
-  Color get colorPrimaryDarker {
-    return colorPrimary;
-  }
-
-
   Color get colorOnPrimary {
     return themeDataActive.colorScheme.onPrimary;
   }
@@ -1298,6 +1293,7 @@ class AFFundamentalThemeState {
   AFSpacing get margin {
     return marginSpacing;
   }
+
 
   AFSpacing get padding {
     return paddingSpacing;
@@ -1580,10 +1576,12 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return fundamentals.colorPrimary;
   }
 
+  //--------------------------------------------------------------------------------------
   Color get colorPrimaryDarker {
-    return fundamentals.colorPrimaryDarker;
+    return fundamentals.findValue(AFUIThemeID.colorPrimaryDarker) as Color? ?? colorPrimary;
   }
 
+  //--------------------------------------------------------------------------------------
   Color get colorPrimaryDisabled {
     final result = Colors.grey[400];
     if(result == null) {
@@ -2499,6 +2497,11 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   AFSpacing get margin {
     return fundamentals.margin;
   }
+
+  AFSpacing get contentPadding {
+    return fundamentals.marginSpacing;
+  }
+
 
   AFSpacing get padding {
     return fundamentals.padding;

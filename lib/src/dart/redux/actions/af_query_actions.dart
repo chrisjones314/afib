@@ -12,6 +12,14 @@ class AFRegisterDeferredQueryAction {
   AFRegisterDeferredQueryAction(this.query);
 }
 
+
+class AFRegisterPeriodicQueryAction {
+  final AFPeriodicQuery query;
+  AFRegisterPeriodicQueryAction(this.query);
+}
+
+
+
 /// Shuts down outstanding deferred and listener queries.
 class AFShutdownOngoingQueriesAction extends AFActionWithKey {
 }
@@ -25,4 +33,9 @@ class AFShutdownDeferredQueryAction {
 class AFShutdownListenerQueryAction {
   final String key;
   AFShutdownListenerQueryAction(this.key);
+}
+
+class AFShutdownPeriodicQueryAction {
+  final String key;
+  AFShutdownPeriodicQueryAction(this.key);
 }

@@ -150,6 +150,9 @@ class AFUIThemeID extends AFThemeID {
   /// Indicates that where a UI uses AFLanguageIDs for translation, the UI should show the IDs rather than the 
   /// translations.
   static const showTranslationsIDs = AFUIThemeID("show_translation_ids", tagFundamental);
+
+  static const colorPrimaryDarker = AFUIThemeID("color_primary_darker", tagFundamental);
+
 }
 
 

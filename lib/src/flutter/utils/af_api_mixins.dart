@@ -213,8 +213,8 @@ mixin AFStandardAPIContextMixin<TState extends AFFlexibleState> implements AFDis
     dispatch(AFShutdownOngoingQueriesAction());
   }
 
-  void executeDeferredCallback<TState extends AFFlexibleState>(Duration duration, AFOnResponseDelegate<TState, AFUnused> callback) {
-    dispatch(AFDeferredSuccessQuery<TState>(duration, callback));
+  void executeDeferredCallback<TState extends AFFlexibleState>(AFID uniqueQueryId, Duration duration, AFOnResponseDelegate<TState, AFUnused> callback) {
+    dispatch(AFDeferredSuccessQuery<TState>(uniqueQueryId, duration, callback));
   }
 
   //-------------------------------------------------------------------------------------
@@ -238,6 +238,10 @@ mixin AFStandardAPIContextMixin<TState extends AFFlexibleState> implements AFDis
   /// This deferral is active in UIs, but is disabled during automated tests to speed results and reduce 
   /// complexity.
   void executeDeferredQuery(AFDeferredQuery query) {
+    dispatch(query);
+  }
+
+  void executePeriodicQuery(AFPeriodicQuery query) {
     dispatch(query);
   }
 

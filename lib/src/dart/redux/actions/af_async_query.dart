@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
+import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
@@ -428,7 +429,7 @@ class AFConsolidatedQuery<TState extends AFFlexibleState> extends AFAsyncQuery<T
 /// Afib will automatically track these queries when you dispatch them.  You can dispatch the
 /// [AFShutdownQueryListeners] action to call the shutdown method on some or all outstanding
 /// listeners.  
-abstract class AFAsyncListenerQuery<TState extends AFFlexibleState, TResponse> extends AFAsyncQuery<TState, TResponse> {
+abstract class AFAsyncListenerQuery<TState extends AFFlexibleState, TResponse> extends AFAsyncQuery<TState, TResponse> implements AFTrackedQuery {
   AFAsyncListenerQuery({
     AFID? id, 
     AFPreExecuteResponseDelegate<TResponse>? onPreExecuteResponseDelegate,
@@ -440,6 +441,12 @@ abstract class AFAsyncListenerQuery<TState extends AFFlexibleState, TResponse> e
     AFibD.logQueryAF?.d("Shutting down listener query $this");
     shutdown();
   }
+
+  /// Returns the new query, causing any existing query to be shutdown and replaced with the new one
+  AFTrackedQuery? mergeWith(AFTrackedQuery newQuery) {
+    return newQuery;
+  }
+
 
   void shutdown();
 }

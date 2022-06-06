@@ -21,6 +21,9 @@ class AFDefineTestDataContext {
   });
 
   void define(dynamic id, dynamic data) {
+    if(testData.containsKey(id)) {
+      assert(false, "You should not redefine a of the existing id $id in the test data");
+    }
     testData[id] = data;
   }
 

@@ -246,7 +246,8 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
       margin: t.margin.v.s3,
       child: t.childText(
           context.s.prototype?.id.toString(), 
-          style: t.styleOnPrimary.bodyText2
+          style: t.styleOnPrimary.bodyText2,
+          overflow: TextOverflow.ellipsis,
       )
     ));
 

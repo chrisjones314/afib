@@ -11,15 +11,19 @@ class AFQueryMiddleware implements MiddlewareClass<AFState>
   @override
   dynamic call(Store<AFState> store, dynamic query, NextDispatcher next) {
     if (query is AFAsyncQuery) {
+      final entry = AFibF.g.internalOnlyStoreEntry(query.conceptualStore);
+
       // keep track of listener queries so we can shut them down at the end.
-      _registerQuery(query, next);
+      if(!_registerQuery(entry, query, next)) {
+        return;
+      }
 
       if(query is AFConsolidatedQuery) {
         for(final subQuery in query.allQueries) {
-          _registerQuery(subQuery, next);
+          _registerQuery(entry, subQuery, next);
         }
       }
-      final entry = AFibF.g.internalOnlyStoreEntry(query.conceptualStore);
+
 
       final testContext = AFStateTestContext.currentTest ?? AFibF.g.demoModeTest;
       if(testContext != null) {
@@ -36,13 +40,49 @@ class AFQueryMiddleware implements MiddlewareClass<AFState>
     next(query);
   }
 
-  void _registerQuery(AFAsyncQuery query, NextDispatcher next) {
+  bool _registerQuery(AFibStoreStackEntry entry, AFAsyncQuery query, NextDispatcher next) {
+    if(query is! AFTrackedQuery) {
+      return true;
+    }
+
+    final merged = _mergeTracked(entry.store!.state.public, query);
+    if(merged == null) {
+      return false;
+    }
+
     if(query is AFAsyncListenerQuery) {
-      next(AFRegisterListenerQueryAction(query));
+      next(AFRegisterListenerQueryAction(merged as AFAsyncListenerQuery));
     }
 
     if(query is AFDeferredQuery) {
-      next(AFRegisterDeferredQueryAction(query));
+      next(AFRegisterDeferredQueryAction(merged as AFDeferredQuery));
     }
+
+    if(query is AFPeriodicQuery) {
+      next(AFRegisterPeriodicQueryAction(merged as AFPeriodicQuery));
+    }
+
+    return true;
+  }
+
+  AFTrackedQuery? _mergeTracked(AFPublicState public, AFAsyncQuery query) {
+    if(query is! AFTrackedQuery) {
+      assert(false);
+      return null;
+    }
+
+    final newTracked = query as AFTrackedQuery;
+
+    final existing = public.queries.findTrackedByQueryId(query.key);
+    if(existing == null) {
+      return query as AFTrackedQuery;
+    }
+
+    final merged = existing.mergeWith(newTracked);
+    if(merged == existing) {
+      return null;
+    }
+
+    return merged;
   }
 }

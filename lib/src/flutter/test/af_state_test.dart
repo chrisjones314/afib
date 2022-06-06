@@ -4,6 +4,7 @@ import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/redux/actions/af_always_fail_query.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
+import 'package:afib/src/dart/redux/actions/af_query_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/queries/af_navigate_unimplemented_query.dart';
 import 'package:afib/src/dart/redux/queries/af_time_update_listener_query.dart';
@@ -1117,7 +1118,6 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
       if(key.toString().startsWith("AFAlwaysFailQuery")) {
         h = results["AFAlwaysFailQuery<AFAppStateAreaUnused>"];
       }
-
     }
 
     if(h == null) {    
@@ -1128,12 +1128,45 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
           state: store.state,
         );
 
-        var duration = query.finishAsyncExecute(successContext);
-        if(duration != null) {
-          Timer(duration, () {
-            successContext.executeDeferredQuery(query);
-          });
+        query.finishAsyncExecute(successContext);
+        dispatcher.dispatch(AFShutdownDeferredQueryAction(query.key));
+
+        return;
+      }
+
+      if(query is AFPeriodicQuery) {
+        // TODO: This seems to work, but I think you want something more nuanced here.  You really
+        // want to be synchronous in command-line tests, and also in state tests executed within prototype mode
+        // but in the background.   Then, you want to add asynchronous waits in prototype mode once the UI
+        // is actually displayed, and the user is interacting with it.
+        if(AFibF.g.isPrototypeMode) {
+          Timer.periodic(query.delay, (timer) {
+
+            final successContext = query.createSuccessContext(
+              dispatcher: dispatcher,
+              state: store.state,
+            );
+            final keepGoing = query.finishAsyncExecute(successContext);
+            if(!keepGoing) {
+              timer.cancel();
+              dispatcher.dispatch(AFShutdownPeriodicQueryAction(query.key));
+            }
+          });          
+        } else {
+          var keepGoing = true;
+          while(keepGoing) {
+            final successContext = query.createSuccessContext(
+              dispatcher: dispatcher,
+              state: store.state,
+            );
+            keepGoing = query.finishAsyncExecute(successContext);
+            if(!keepGoing) {
+              query.shutdown();
+              dispatcher.dispatch(AFShutdownPeriodicQueryAction(query.key));
+            }
+          }
         }
+
         return;
       }
 

@@ -7,27 +7,32 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 class AFQueryState {
   final Map<String, AFAsyncListenerQuery?> listenerQueries;
   final Map<String, AFDeferredQuery> deferredQueries;
+  final Map<String, AFPeriodicQuery> periodicQueries;
 
   AFQueryState({
     required this.listenerQueries,
     required this.deferredQueries,
+    required this.periodicQueries,
   });
 
 
   factory AFQueryState.initialState() {
     return AFQueryState(
       listenerQueries: <String, AFAsyncListenerQuery>{},
-      deferredQueries: <String, AFDeferredQuery>{}
+      deferredQueries: <String, AFDeferredQuery>{},
+      periodicQueries: <String, AFPeriodicQuery>{},
     );
   }
 
   AFQueryState copyWith({
     Map<String, AFAsyncListenerQuery?>? listenerQueries,
-    Map<String, AFDeferredQuery>? deferredQueries
+    Map<String, AFDeferredQuery>? deferredQueries,
+    Map<String, AFPeriodicQuery>? periodicQueries,
   }) {
     return AFQueryState(
       listenerQueries: listenerQueries ?? this.listenerQueries,
-      deferredQueries: deferredQueries ?? this.deferredQueries
+      deferredQueries: deferredQueries ?? this.deferredQueries,
+      periodicQueries: periodicQueries ?? this.periodicQueries,
     );
   }
 
@@ -48,6 +53,17 @@ class AFQueryState {
     return copyWith(listenerQueries: revised);
   }
 
+  AFTrackedQuery? findTrackedByQueryId(String id) {
+    dynamic result = listenerQueries[id];
+    if(result == null) {
+      result = deferredQueries[id];
+      if(result == null) {
+        result = periodicQueries[id];
+      }
+    }
+    return result as AFTrackedQuery?;
+  }
+
   /// Register a query which executes asynchronously later.
   /// 
   /// This is used internally by AFib anytime you dispatch a deferred query,
@@ -63,6 +79,23 @@ class AFQueryState {
     final revised = Map<String, AFDeferredQuery>.from(deferredQueries);
     revised[key] = query; 
     return copyWith(deferredQueries: revised);
+  }
+
+  /// Register a query which executes asynchronously later.
+  /// 
+  /// This is used internally by AFib anytime you dispatch a deferred query,
+  /// you should not call it directly.
+  AFQueryState reviseAddPeriodic(AFPeriodicQuery query) {
+    final key = query.key;
+    AFibD.logQueryAF?.d("Registering periodic query $key");
+    final current = periodicQueries[key];
+    if(current != null) {
+      AFibD.logQueryAF?.d("Shutting down existing deferred query $key");
+      current.afShutdown();
+    }
+    final revised = Map<String, AFPeriodicQuery>.from(periodicQueries);
+    revised[key] = query; 
+    return copyWith(periodicQueries: revised);
   }
 
 
@@ -89,6 +122,19 @@ class AFQueryState {
     revised.remove(key);
     return copyWith(listenerQueries: revised);
   }
+
+  AFQueryState reviseShutdownPeriodic(String key) {
+    final query = periodicQueries[key];
+    if(query != null) {
+      AFibD.logQueryAF?.d("Shutting down existing deferred listener $key");
+      query.afShutdown();
+    }
+
+    final revised = Map<String, AFPeriodicQuery>.from(periodicQueries);
+    revised.remove(key);
+    return copyWith(periodicQueries: revised);
+  }
+
 
   /// Shutdown all outstanding listener queries using [AFAsyncListenerQuery.shutdown]
   /// 

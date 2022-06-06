@@ -32,33 +32,41 @@ class AFRichTextBuilder {
     return spans.isNotEmpty;
   }
 
-  void insertNormal(int idx, dynamic idOrText) {
+  void insertNormal(int idx, dynamic idOrText, {
+    GestureRecognizer? onGesture
+  }) {
     final text = theme.translate(idOrText);
-    spans.insert(idx, TextSpan(text: text, style: styleNormal));
+    spans.insert(idx, TextSpan(text: text, style: styleNormal, recognizer: onGesture));
   }
 
-  void writeTapable(dynamic idOrText, TapGestureRecognizer recognizer) {
+  void writeTapable(dynamic idOrText, GestureRecognizer recognizer) {
     final text = theme.translate(idOrText);
     spans.add(TextSpan(text: text, style: styleTapable, recognizer: recognizer));
   }
 
-  void writeBold(dynamic idOrText) {
+  void writeBold(dynamic idOrText, {
+    GestureRecognizer? onGesture
+  }) {
     final text = theme.translate(idOrText);
     spans.add(TextSpan(text: text, style: styleBold));
   }
 
-  void writeMuted(dynamic idOrText) {
+  void writeMuted(dynamic idOrText, {
+    GestureRecognizer? onGesture
+  }) {
     final text = theme.translate(idOrText);
-    spans.add(TextSpan(text: text, style: styleMuted));
+    spans.add(TextSpan(text: text, style: styleMuted, recognizer: onGesture));
   }
 
   void writeWidget(Widget widget) {
     spans.add(WidgetSpan(child: widget));
   }
 
-  void writeStyled(dynamic idOrText, TextStyle style) {
+  void writeStyled(dynamic idOrText, TextStyle? style, {
+    GestureRecognizer? onGesture
+  }) {
     final text = theme.translate(idOrText);
-    spans.add(TextSpan(text: text, style: style));
+    spans.add(TextSpan(text: text, style: style, recognizer: onGesture));
   }
 
   void writeNormal(dynamic idOrText) {
@@ -87,10 +95,13 @@ class AFRichTextBuilder {
   Widget toRichText({
     TextAlign textAlign = TextAlign.start,
     TextOverflow overflow = TextOverflow.clip,
+    int? maxLines
   }) {
     return RichText(
         key: AFFunctionalTheme.keyForWIDStatic(wid),
         textAlign: textAlign,
+        overflow: overflow,
+        maxLines: maxLines,
         text: TextSpan(
         children: spans
         

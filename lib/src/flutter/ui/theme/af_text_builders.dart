@@ -14,6 +14,7 @@ class AFRichTextBuilder {
   final TextStyle? styleMuted;
   
   final spans = <InlineSpan>[];
+  int markPoint = -1;
 
   AFRichTextBuilder({
     required this.theme,
@@ -30,6 +31,10 @@ class AFRichTextBuilder {
 
   bool get isNotEmpty {
     return spans.isNotEmpty;
+  }
+
+  void mark() {
+    markPoint = spans.length;
   }
 
   void insertNormal(int idx, dynamic idOrText, {
@@ -67,6 +72,41 @@ class AFRichTextBuilder {
   }) {
     final text = theme.translate(idOrText);
     spans.add(TextSpan(text: text, style: style, recognizer: onGesture));
+  }
+
+  void writeIfNonEmpty(dynamic idOrText, {
+    TextStyle? style,
+    GestureRecognizer? onGesture
+  }) {
+    if(isNotEmpty) {
+      final text = theme.translate(idOrText);
+      spans.add(TextSpan(text: text, style: style, recognizer: onGesture));
+    }
+  }
+
+  bool get isAtMark {
+    return markPoint == spans.length;
+  }
+
+  void writeIfAtMark(dynamic idOrText, {
+    TextStyle? style,
+    GestureRecognizer? onGesture
+  }) {
+    if(markPoint == spans.length) {
+      final text = theme.translate(idOrText);
+      spans.add(TextSpan(text: text, style: style, recognizer: onGesture));
+    }
+  }
+
+
+  void writeIfPastMark(dynamic idOrText, {
+    TextStyle? style,
+    GestureRecognizer? onGesture
+  }) {
+    if(markPoint < spans.length) {
+      final text = theme.translate(idOrText);
+      spans.add(TextSpan(text: text, style: style, recognizer: onGesture));
+    }
   }
 
   void writeNormal(dynamic idOrText) {

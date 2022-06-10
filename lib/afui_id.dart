@@ -152,6 +152,7 @@ class AFUIThemeID extends AFThemeID {
   static const showTranslationsIDs = AFUIThemeID("show_translation_ids", tagFundamental);
 
   static const colorPrimaryDarker = AFUIThemeID("color_primary_darker", tagFundamental);
+  static const colorPrimaryLighter = AFUIThemeID("color_primary_lighter", tagFundamental);
 
 }
 

@@ -166,24 +166,51 @@ class AFLibraryID extends AFID {
 }
 
 class AFWidgetID extends AFID {
-  const AFWidgetID(String code, AFLibraryID library) : super("wid", code, library);
+  final List<Object>? withItems; 
+  const AFWidgetID(String code, AFLibraryID library, {
+    this.withItems
+  }) : super("wid", code, library);
 
-  AFWidgetID with1(dynamic item) {
-    final lib = library;
-    if(lib == null) throwLibNotNull();
-    return AFWidgetID("${code}_${item.toString()}", lib);
+  AFWidgetID with1(Object? item) {
+    return with3(item, null, null);
   }
 
-  AFWidgetID with2(dynamic first, dynamic second) {
+  AFWidgetID with2(Object? first, Object? second) {
+    return with3(first, second, null);
+  }
+
+  AFWidgetID with3(Object? first, Object? second, Object? third) {
     final key = StringBuffer(code);
-    key.write("_${first.toString()}");
+    final items = <Object>[];
+    if(first != null) {
+      key.write("_$first");
+      items.add(first);
+    }
     if(second != null) {
-      key.write("_${second.toString()}");
+      key.write("_$second");
+      items.add(second);
+    }
+    if(third != null) {
+      key.write("_$third");
+      items.add(third);
     }
     final lib = library;
     if(lib == null) throwLibNotNull();
-    return AFWidgetID(key.toString(), lib);
+    return AFWidgetID(key.toString(), lib, withItems: items);
   }
+
+  int get withCount {
+    return withItems?.length ?? 0;
+  }
+
+  TItem accessWithItem<TItem extends Object>(int n) {
+    final wi = withItems;
+    if(wi == null || n >= wi.length || n < 0) {
+      throw AFException("Invalid index $n for with items $wi");
+    }
+    return wi[n] as TItem;
+  }
+  
 }
 
 class AFBaseTestID extends AFIDWithTags {

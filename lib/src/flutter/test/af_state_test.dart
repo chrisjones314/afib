@@ -795,6 +795,10 @@ class AFSpecificStateTestDefinitionContext<TState extends AFFlexibleState> {
     return AFStateTestBottomSheetShortcut<TSPI>(this, screenId);
   }
 
+  dynamic accessTestData(dynamic id) {
+    return definitions.accessTestData(id);
+  }
+
   /// Specify a response for a particular query.
   /// 
   /// When the query 'executes', its [AFAsyncQuery.startAsync] method will be skipped

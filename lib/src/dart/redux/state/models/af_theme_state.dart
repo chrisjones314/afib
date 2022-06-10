@@ -1582,6 +1582,11 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   //--------------------------------------------------------------------------------------
+  Color get colorPrimaryLighter {
+    return fundamentals.findValue(AFUIThemeID.colorPrimaryLighter) as Color? ?? colorPrimary;
+  }
+
+  //--------------------------------------------------------------------------------------
   Color get colorPrimaryDisabled {
     final result = Colors.grey[400];
     if(result == null) {

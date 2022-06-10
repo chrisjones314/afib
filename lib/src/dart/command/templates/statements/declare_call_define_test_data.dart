@@ -1,5 +1,5 @@
 import 'package:afib/src/dart/command/af_source_template.dart';
 
 class DeclareCallDefineTestDataT extends AFSourceTemplate {
-  final String template = '  define[!af_model_name](testData);';
+  final String template = '  _define[!af_model_name](context);';
 }

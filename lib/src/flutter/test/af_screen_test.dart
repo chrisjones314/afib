@@ -2460,7 +2460,7 @@ class AFBaseTestDefinitionContext {
 
   /// Looks up the test data defined in your test_data.dart file for a particular
   /// test data id.
-  T accessTestData<T extends Object>(dynamic testDataId) {
+  T testData<T extends Object>(dynamic testDataId) {
     final value = registry.find(testDataId);
     if(value == null) {
       throw AFException("Missing test value for id $testDataId");

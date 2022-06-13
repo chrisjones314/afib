@@ -25,6 +25,11 @@ mixin AFNonUIAPIContextMixin implements AFDispatcher {
     dispatch(AFNavigateSetParamAction(param: param, route: AFNavigateRoute.routeGlobalPool));
   }
 
+  void executeStartTimeListenerQuery(AFTimeState baseTime) {
+    dispatch(AFTimeUpdateListenerQuery(baseTime: baseTime));
+  }
+
+
   /// Dispatches an action that updates the route parameter for the specified screen.
   void updateChildRouteParam(AFScreenID screen, AFRouteParam param, { 
     AFWidgetParamSource paramSource = AFWidgetParamSource.child,
@@ -443,6 +448,23 @@ mixin AFContextShowMixin {
 
     dispatch(AFNavigateShowScreenBeginAction(verifiedScreenId, AFUIType.dialog));
 
+    if(AFibD.config.isTestContext) {
+       // Ugg, so the issue here is that flutter handles return values from a dialog,
+       // but it does the processing asynchronously.   I couldn't figure out how to 
+       // wait for the return value to be processed at the time you are closing the 
+       // dialog with Flutter's navigator (see AFBuildContext.closeDialog).  So, 
+       // in test contexts we always follow this path for handling return values
+       // synchronously, and then below we need to ingore the result in the test context,
+       // because we are handling it here.
+       AFibF.g.testOnlySimulateShowDialogOrSheet<TReturn>(verifiedScreenId, (val) {
+        AFibF.g.testOnlyShowUIRegisterReturn(verifiedScreenId, val);
+        if(onReturn != null) {
+          onReturn(val);
+        }
+        dispatch(AFNavigateShowScreenEndAction(verifiedScreenId));
+       });
+    }
+
     final ctx = flutterContext;
     if(ctx != null) {
       // in the normal UI, we let the flutter navigation stuff handle returning 
@@ -458,21 +480,16 @@ mixin AFContextShowMixin {
       );
 
       AFibF.g.testOnlyShowUIRegisterReturn(verifiedScreenId, result);
-      if(onReturn != null) {
+      final notTestContext = !AFibD.config.isTestContext;
+      if(onReturn != null && notTestContext) {
         onReturn(result);
       }
-      dispatch(AFNavigateShowScreenEndAction(verifiedScreenId));
 
-    } else {
-      // this happens in state testing, where there is no BuildContext.  We still
-      // need to handle calling onReturn when someone calls closeDialog.
-       AFibF.g.testOnlySimulateShowDialogOrSheet<TReturn>(verifiedScreenId, (val) {
-        if(onReturn != null) {
-          onReturn(val);
-        }
+      if(notTestContext) {
         dispatch(AFNavigateShowScreenEndAction(verifiedScreenId));
-       });
-    }
+      }
+    } 
+
   }
 
   void showDialogInfoText({

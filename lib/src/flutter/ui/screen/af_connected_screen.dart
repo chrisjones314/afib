@@ -809,11 +809,21 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     final didNav = (ctx != null && AFibF.g.doMiddlewareNavigation( (navState) {
         material.Navigator.pop(ctx, returnValue); 
       }));
-    if(!didNav) {
+
+    // Uggg.  Leaving this in but commented out for now.   Originally, this only followed
+    // the test path if we weren't in the real UI (command line tests, etc).   However,
+    // the problem is that the navigator pop/return is async.  So, the return handler won't
+    // be called synchronously, and tests will fail because the verification code gets called
+    // before the return logic gets called and does what it was supposed to do.   So, now
+    // we always execute the test path, which forces the return to happen synchronously, in
+    // any test context, even a real UI test context.
+    //if(!didNav) {
+    if(AFibD.config.isTestContext) {
       AFibF.g.testOnlySimulateCloseDialogOrSheet(dialogId, returnValue); 
-    } else {
-      AFibF.g.testOnlyShowUIReturn[dialogId] = returnValue;
     }
+    //} else {
+      //AFibF.g.testOnlyShowUIReturn[dialogId] = returnValue;
+    //}
   }
 
   /// Closes the dialog, and returns the [returnValue] to the callback function that was

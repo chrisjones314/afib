@@ -796,7 +796,7 @@ class AFSpecificStateTestDefinitionContext<TState extends AFFlexibleState> {
   }
 
   dynamic accessTestData(dynamic id) {
-    return definitions.accessTestData(id);
+    return definitions.testData(id);
   }
 
   /// Specify a response for a particular query.

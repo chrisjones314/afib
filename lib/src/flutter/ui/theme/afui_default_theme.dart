@@ -21,6 +21,10 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     return Colors.deepOrange;
   }
 
+  Widget iconClear() {
+    return Icon(Icons.clear);
+  }
+
   @override
   Text childText(dynamic text, {
     AFWidgetID? wid, 
@@ -77,18 +81,6 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     );  
   }
 
-
-  Widget createReusableTag() {
-    return Container(
-      padding: padding.a.standard,
-      decoration: BoxDecoration(
-        color: colorPrimary,
-        borderRadius: BorderRadius.circular(4.0),
-      ),
-      child: childText("Reusable", style: this.styleOnPrimary.bodyText1)
-    );
-  }    
-
   Widget createTestListTile(AFStateProgrammingInterface spi, AFScreenPrototype prototype, {
     String? title,
     String? subtitle,
@@ -97,9 +89,6 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     final titleText = title ?? prototype.displayId.code;
     final cols = row();
     cols.add(Expanded(child: childText(titleText, overflow: TextOverflow.fade)));
-    if(prototype.hasReusable) {
-      cols.add(createReusableTag());
-    }
 
     final titleRow = Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -108,10 +97,8 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     final tagsText = this.childTextBuilder();
     if(subtitle != null) {
       tagsText.write(subtitle);
-    } else {
-      tagsText.write("tags: ");
-      tagsText.write(prototype.id.tagsText);
-    }
+    } 
+    
     final onPressed = onTap ?? () {
       spi.context.dispatch(AFNavigateSetParamAction(
         param: AFUIPrototypeDrawerRouteParam.createOncePerScreen(AFUIPrototypeDrawerRouteParam.viewTest),
@@ -147,18 +134,15 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
       ));
   }
 
-  Widget buildPrototypeScaffold(dynamic title, List<Widget> rows, { Widget? leading }) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(        
-            leading: leading,
-            automaticallyImplyLeading: false,
-            title: this.childText(title)
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate(rows),)
-      ])    
+  Widget buildPrototypeScaffold(AFScreenStateProgrammingInterface spi, dynamic title, Widget body, { Widget? leading }) {
+    return childScaffold(
+      spi: spi,
+      body: body,
+      appBar: AppBar(
+        title: childText(title),
+        leading: leading,
+        automaticallyImplyLeading: false,
+      )
     );
   }
 

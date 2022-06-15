@@ -409,6 +409,7 @@ class AFConfig {
   AFPrototypeID? startupWireframe;
   AFPrototypeID? startupScreenPrototype;
   AFPrototypeID? startupWorkflowPrototype;
+  List<AFBaseTestID>? favoriteTestIds;
   bool isLibraryCommand = false;
   final Map<AFConfigurationItem, dynamic> values = <AFConfigurationItem, dynamic>{};
 
@@ -426,6 +427,10 @@ class AFConfig {
 
   void setIsLibraryCommand({required bool isLib}) {
     isLibraryCommand = isLib;
+  }
+
+  void setFavoriteTests(List<AFBaseTestID> testIds) {
+    favoriteTestIds = testIds;
   }
 
   AFPrototypeID get startupPrototypeId {

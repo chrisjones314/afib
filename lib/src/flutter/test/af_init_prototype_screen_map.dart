@@ -16,6 +16,7 @@ import 'package:afib/src/flutter/ui/screen/afui_prototype_loading_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_waiting_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_wireframes_list_screen.dart';
+import 'package:afib/src/flutter/ui/screen/afui_state_test_list_screen.dart';
 
 void afInitPrototypeScreenMap(AFScreenMap screens) {
   final enabledTests = AFibD.config.stringListFor(AFConfigEntries.testsEnabled);
@@ -31,6 +32,7 @@ void afInitPrototypeScreenMap(AFScreenMap screens) {
   screens.registerScreen(AFUIScreenID.screenPrototypeHome, (_) => AFPrototypeHomeScreen());
   screens.registerScreen(AFUIScreenID.screenPrototypeLoading, (_) => AFPrototypeLoadingScreen());
   screens.registerScreen(AFUIScreenID.screenPrototypeListSingleScreen, (_) => AFUIPrototypeTestScreen());
+  screens.registerScreen(AFUIScreenID.screenStateTestListScreen, (_) => AFUIStateTestListScreen());
   screens.registerScreen(AFUIScreenID.screenPrototypeWidget, (_) => AFUIPrototypeWidgetScreen());
   screens.registerScreen(AFUIScreenID.screenPrototypeLibraryList, (_) => AFUIPrototypeLibraryListScreen());
   screens.registerScreen(AFUIScreenID.screenPrototypeLibraryHome, (_) => AFUIPrototypeLibraryHomeScreen());

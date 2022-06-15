@@ -175,7 +175,7 @@ abstract class AFBaseTestExecute extends AFModelWithCustomID {
         suffix: " passed", 
         color: Styles.GREEN, 
         fill: ".",
-        tags: testID.tagsText);
+        tags: testID.code);
     }
   }
 
@@ -208,7 +208,7 @@ abstract class AFBaseTestExecute extends AFModelWithCustomID {
         count: errors.errorCount, 
         suffix: " failed", 
         color: Styles.RED, 
-        tags: testID.tagsText);
+        tags: testID.codeId);
       output.indent();
       for(var error in errors.errors) {
          output.writeLine(error.toString());

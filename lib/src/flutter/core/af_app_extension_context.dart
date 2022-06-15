@@ -578,6 +578,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
       AFUITranslationID.prototype: "Prototype",
       AFUITranslationID.release: "Release",
       AFUITranslationID.recent: "Recent",
+      AFUITranslationID.favorites: "Favorites",
       AFUITranslationID.afibPrototypeMode: "${AFibD.config.appNamespace.toUpperCase()} Prototype Mode",
       AFUITranslationID.afibPrototypeLoading: "",
       AFUITranslationID.wireframes: "Wireframes",

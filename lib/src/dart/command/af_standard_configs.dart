@@ -175,12 +175,6 @@ class AFConfigEntryEnabledTests extends AFConfigurationItemOptionChoice {
     if(areas.contains(id.code)) {
       return true;
     }
-    for(final area in areas) {
-      final actualTag = _extractTag(area);
-      if(id.hasTag(actualTag)) {
-        return true;
-      }
-    }
     return false;
   }
 
@@ -220,13 +214,6 @@ class AFConfigEntryEnabledTests extends AFConfigurationItemOptionChoice {
     return area.substring(0, idx);
   }
 
-  String _extractTag(String area) {
-    final idx = area.indexOf(":");
-    if(idx < 0) {
-      return area;
-    }
-    return area.substring(idx+1);
-  }
 }
 
 

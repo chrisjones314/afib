@@ -3,10 +3,18 @@ import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:quiver/core.dart';
 
 class AFID {
+  final List<Object>? withItems; 
   final String? prefix;
   final String codeId;
   final AFLibraryID? library;
-  const AFID(this.prefix, this.codeId, this.library);
+  const AFID(this.prefix, this.codeId, this.library, {
+    this.withItems
+  });
+
+  String get libraryTag {
+    assert(library != null);
+    return library?.codeId ?? "unknown";
+  }
 
   String get code {
     final lib = library;
@@ -42,8 +50,32 @@ class AFID {
     //return (other is AFID && other.code == code);
   }
 
+  TItem accessFirstWithItem<TItem extends Object>() {
+    return accessWithItem(0);
+  }
+
+  TItem accessSecondWithItem<TItem extends Object>() {
+    return accessWithItem(1);
+  }
+
+  TItem accessThirdWithItem<TItem extends Object>() {
+    return accessWithItem(2);
+  }
+
+  TItem accessWithItem<TItem extends Object>(int n) {
+    final wi = withItems;
+    if(wi == null || n >= wi.length || n < 0) {
+      throw AFException("Invalid index $n for with items $wi");
+    }
+    return wi[n] as TItem;
+  }
+
   int get hashCode {
     return code.hashCode;
+  }
+
+  int get withCount {
+    return withItems?.length ?? 0;
   }
 
   Never throwLibNotNull() {
@@ -52,54 +84,6 @@ class AFID {
 
   bool endsWith(String ends) {
     return code.endsWith(ends);
-  }
-
-}
-
-class AFIDWithTags extends AFID {
-  final dynamic group;
-  final List<String>? tags;
-
-  const AFIDWithTags(String prefix, String code,  AFLibraryID library, { this.tags, this.group, }): super(prefix, code, library);
-
-  String get tagsText {
-    final t = tags;
-    if(t == null) {
-      return "";
-    }
-    return t.join(", ");
-  }
-
-  String? get effectiveGroup {
-    if(group != null) {
-      return group.toString();
-    }
-
-    final t = tags;
-    if(t != null && t.isNotEmpty) {
-      return t.first;
-    }
-
-    return null;
-  }
-
-  bool hasTag(String tag) {
-    final t = tags;
-    return t != null && t.contains(tag);
-  }
-
-  bool hasTagLike(String tag) {
-    if(tag.length < 2 || tags == null) {
-      return false;
-    }
-    final t = tags;
-    if(t == null) return false;
-    for(final test in t) {
-      if(test.contains(tag)) {
-        return true;
-      }
-    }
-    return false;
   }
 }
 
@@ -166,10 +150,9 @@ class AFLibraryID extends AFID {
 }
 
 class AFWidgetID extends AFID {
-  final List<Object>? withItems; 
   const AFWidgetID(String code, AFLibraryID library, {
-    this.withItems
-  }) : super("wid", code, library);
+    List<Object>? withItems,
+  }) : super("wid", code, library, withItems: withItems);
 
   AFWidgetID with1(Object? item) {
     return with3(item, null, null);
@@ -199,22 +182,11 @@ class AFWidgetID extends AFID {
     return AFWidgetID(key.toString(), lib, withItems: items);
   }
 
-  int get withCount {
-    return withItems?.length ?? 0;
-  }
-
-  TItem accessWithItem<TItem extends Object>(int n) {
-    final wi = withItems;
-    if(wi == null || n >= wi.length || n < 0) {
-      throw AFException("Invalid index $n for with items $wi");
-    }
-    return wi[n] as TItem;
-  }
   
 }
 
-class AFBaseTestID extends AFIDWithTags {
-  const AFBaseTestID(String prefix, String code, AFLibraryID library, {String? group, List<String>? tags}) : super(prefix, code, library, tags: tags, group: group);
+class AFBaseTestID extends AFID {
+  const AFBaseTestID(String prefix, String code, AFLibraryID library) : super(prefix, code, library);
 }
 
 class AFFromStringTestID extends AFBaseTestID {
@@ -235,22 +207,22 @@ class AFFromStringTestID extends AFBaseTestID {
 
 class AFStateTestID extends AFBaseTestID {
   static const stateTestPrefix = "statetest";
-  const AFStateTestID(String code, AFLibraryID library, {String? group, List<String>? tags, }) : super(stateTestPrefix, code, library, tags: tags, group: group);
+  const AFStateTestID(String code, AFLibraryID library) : super(stateTestPrefix, code, library);
 }
 
 class AFScreenTestID extends AFBaseTestID {
   static const screenTestPrefix = "screentest";
-  const AFScreenTestID(String code, AFLibraryID library, {String? group, List<String>? tags }) : super(screenTestPrefix, code, library, tags: tags, group: group);
+  const AFScreenTestID(String code, AFLibraryID library) : super(screenTestPrefix, code, library);
 }
 
 class AFPrototypeID extends AFBaseTestID {
   static const prototypePrefix = "pr";
-  const AFPrototypeID(String code, AFLibraryID library, {String? group, List<String>? tags, }) : super(prototypePrefix, code, library, tags: tags, group: group);
+  const AFPrototypeID(String code, AFLibraryID library) : super(prototypePrefix, code, library);
 
-  AFPrototypeID with1(dynamic item, List<String>? tags) {
+  AFPrototypeID with1(dynamic item) {
     final lib = library;
     if(lib == null) throwLibNotNull();
-    return AFPrototypeID("${code}_${item.toString()}", lib, tags: tags);
+    return AFPrototypeID("${code}_${item.toString()}", lib);
   }
 
 }
@@ -267,11 +239,10 @@ class AFQueryID extends AFID {
   const AFQueryID(String code, AFLibraryID library): super("q", code, library);
 }
 
-class AFThemeID extends AFIDWithTag {
+class AFThemeID extends AFID {
   const AFThemeID(
     String code,
-    AFLibraryID library,
-    String tag): super("theme", code, library, tag: tag);   
+    AFLibraryID library): super("theme", code, library);   
 }
 
 class AFSourceTemplateID extends AFID {

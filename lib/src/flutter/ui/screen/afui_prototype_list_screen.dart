@@ -1,5 +1,6 @@
 import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
+import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -13,15 +14,15 @@ import 'package:flutter/widgets.dart';
 /// Parameter uses to filter the tests/protoypes shown on the screen.
 @immutable
 class AFUIPrototypeTestScreenParam extends AFRouteParam {
-  static const untaggedGroup = "untagged";
   final String? filter;
   final dynamic title;
-
-  final Map<String, List<AFScreenPrototype>> screenTestsByGroup;
+  final AFUIType activeUIType;
+  final  List<AFScreenPrototype> allTests;
 
   AFUIPrototypeTestScreenParam({
-    required this.screenTestsByGroup,
+    required this.allTests,
     required this.title,
+    required this.activeUIType,
     this.filter
   }): super(id: AFUIScreenID.screenPrototypeListSingleScreen);
 
@@ -30,43 +31,24 @@ class AFUIPrototypeTestScreenParam extends AFRouteParam {
     required dynamic title,
     required List<AFScreenPrototype> tests
   }) {
-    final groups = <String, List<AFScreenPrototype>>{};
-    for(final test in tests) {
-      var group = test.id.effectiveGroup;
-      if(group == null) {
-       group = untaggedGroup; 
-      }
-      var tests = groups[group];      
-      if(tests == null) {
-        tests = <AFScreenPrototype>[];
-        groups[group] = tests;
-      }
-
-      tests.add(test);
-    }
-
-    // go through all the test entries and sort them.
-    groups.forEach((group, tests) { 
-      tests.sort( (left, right) {
-        return left.id.compareTo(right.id);
-      });
-    });
-
-    return AFUIPrototypeTestScreenParam(title: title, screenTestsByGroup: groups);
+    return AFUIPrototypeTestScreenParam(title: title, allTests: tests, activeUIType: AFUIType.screen);
   }
 
   AFUIPrototypeTestScreenParam copyWith({
     String? filter,
     String? title,
-    Map<String, List<AFScreenPrototype>>? screenTestsByGroup
+    Map<String, List<AFScreenPrototype>>? screenTestsByGroup,
+    AFUIType? activeUIType
   }) {
     return AFUIPrototypeTestScreenParam(
-      screenTestsByGroup: screenTestsByGroup ?? this.screenTestsByGroup,
+      allTests: allTests,
       filter: filter ?? this.filter,
-      title: title ?? this.title
+      title: title ?? this.title,
+      activeUIType: activeUIType ?? this.activeUIType,
     );
   }
 }
+
 
 class AFUIPrototypeTestScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> {
   AFUIPrototypeTestScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
@@ -75,6 +57,34 @@ class AFUIPrototypeTestScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFU
     return AFUIPrototypeTestScreenSPI(context, screenId, theme,
     );
   }
+
+  AFUIType get activeView {
+    return context.p.activeUIType;
+  }
+
+  void onPressedView(AFUIType uiType) {
+    final revised = context.p.copyWith(activeUIType: uiType);
+    context.updateRouteParam(revised);
+  }
+
+  Map<AFID, List<AFScreenPrototype>> get activeTestGroups {
+    final activeTests = context.p.allTests.where((t) => t.uiType == activeView);
+    
+    final result = <AFID, List<AFScreenPrototype>>{};
+    for(final test in activeTests) {
+      final nav = test.navigate;
+      final screenId = nav.screenId;
+      var list = result[screenId];
+      if(list == null) {
+        list = <AFScreenPrototype>[];
+        result[screenId] = list;
+      }
+      list.add(test);
+    }
+
+    return result;
+  }
+
 }
 
 /// A screen used internally in prototype mode to render screens and widgets with test data,
@@ -93,48 +103,78 @@ class AFUIPrototypeTestScreen extends AFUIConnectedScreen<AFUIPrototypeTestScree
 
   @override
   Widget buildWithSPI(AFUIPrototypeTestScreenSPI spi) {
-    return _buildList(spi);
+    final t = spi.t;
+    final body = _buildBody(spi);
+    final leading = t.childButtonStandardBack(spi, screen: screenId);
+    return t.buildPrototypeScaffold(spi, spi.context.p.title, body, leading: leading);    
+  }
+  
+  Widget _buildHeader(AFUIPrototypeTestScreenSPI spi) {
+    final t = spi.t;
+    final cols = t.row();
+    
+    cols.add(_childTopTab(spi, AFUIType.screen, "Scre"));
+    cols.add(_childTopTab(spi, AFUIType.dialog, "Dial"));
+    cols.add(_childTopTab(spi, AFUIType.bottomSheet, "Bot"));
+    cols.add(_childTopTab(spi, AFUIType.drawer, "Dra"));
+    cols.add(_childTopTab(spi, AFUIType.widget, "Wid"));
+
+    return t.childMargin(
+      margin: t.margin.smaller,
+      child: t.childTopTabContainer(children: cols)
+    );
   }
 
-  List<String> _sortIterable(Iterable<String> items) {
-    final result = List<String>.of(items);
-    result.sort();
-
-    final idxUngrouped = result.indexOf(AFUIPrototypeTestScreenParam.untaggedGroup);
-    if(idxUngrouped > 0) {
-      result.removeAt(idxUngrouped);
-      result.insert(0, AFUIPrototypeTestScreenParam.untaggedGroup);
-    }   
-
-    return result;
+  Widget _childTopTab(AFUIPrototypeTestScreenSPI spi, AFUIType thisView, String title) {
+    return spi.t.childTopTab(
+      text: title,
+      isSel: spi.activeView == thisView,
+      onPressed: () => spi.onPressedView(thisView),
+    );
   }
 
-  Widget _buildList(AFUIPrototypeTestScreenSPI spi) {
+
+  Widget _buildBody(AFUIPrototypeTestScreenSPI spi) {
     final t = spi.t;
     final context = spi.context;
+
+    final header = _buildHeader(spi);
     final rows = t.column();
-    final groups = _sortIterable(context.p.screenTestsByGroup.keys);
-    for(final group in groups) {
-      final tests = context.p.screenTestsByGroup[group];
-      assert(tests != null);
-      if(tests != null) {
-        rows.add(_addGroup(spi, AFUIWidgetID.cardTestGroup.with1(group), group, tests));
+
+    final groups = spi.activeTestGroups;
+
+    final groupIds = groups.keys.toList();
+    groupIds.sort((l, r) => l.codeId.compareTo(r.codeId));
+    for(final groupId in groupIds) {
+      final group = groups[groupId];
+      if(group != null) {
+        rows.add(_addGroup(spi, AFUIWidgetID.cardTestGroup.with1(groupId), groupId, group));
       }
     }
 
-    final leading = t.childButtonStandardBack(spi, screen: screenId);
-    return spi.t.buildPrototypeScaffold(context.p.title, rows, leading: leading);
+    final main = ListView(
+      children: rows
+    );
+
+    return t.childTopBottomHostedControls(
+      context.c, 
+      main,
+      topControls: header,
+      topHeight: 60.0
+    );
   }
 
-  Widget _addGroup(AFUIPrototypeTestScreenSPI spi, AFWidgetID widGroup, String group, List<AFScreenPrototype> tests) {
+  Widget _addGroup(AFUIPrototypeTestScreenSPI spi, AFWidgetID widGroup, AFID group, List<AFScreenPrototype> tests) {
     final t = spi.t;
     final context = spi.context;
     final rows = t.column();
+
+    tests.sort((a, b) => a.id.codeId.compareTo(b.id.codeId));
     for(final test in tests) {
       rows.add(t.createTestListTile(spi, test));
     }
 
-    return t.childCardHeader(context, widGroup, group, rows);
+    return t.childCardHeader(context, widGroup, group.codeId, rows);
   }
 
 }

@@ -72,7 +72,8 @@ class AFUIPrototypeLibraryHomeScreen extends AFUIConnectedScreen<AFUIPrototypeLi
     
     final rows = t.column();
     rows.add(t.childCardHeader(context, AFUIWidgetID.cardPrototype, "Prototypes and Tests", cardRows, margin: t.margin.b.s3));
+    final main = ListView(children: rows);
     final leading = t.childButtonStandardBack(spi, screen: screenId);
-    return t.buildPrototypeScaffold(libraryName, rows, leading: leading);
+    return t.buildPrototypeScaffold(spi, libraryName, main, leading: leading);
   }
 }

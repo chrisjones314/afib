@@ -31,10 +31,10 @@ class [!af_command_name] extends AFCommand {
   }
 
   @override
-  void execute(AFCommandContext ctx) {
+  void execute(AFCommandContext context) {
     print("Executing \$name");
 
-    final unnamed = ctx.unnamedArguments;
+    final unnamed = context.unnamedArguments;
     if(unnamed == null || unnamed.isNotEmpty) {
       throwUsageError("Expected at least one arguments");
     }

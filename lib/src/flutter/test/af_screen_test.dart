@@ -1253,10 +1253,12 @@ abstract class AFScreenPrototype {
   static const testDrawerSideEnd = 1;
   static const testDrawerSideBegin = 2;
 
+  final AFUIType uiType;
   final AFPrototypeID id;
   final int testDrawerSide;
 
   AFScreenPrototype({
+    required this.uiType,
     required this.id,
     this.testDrawerSide = testDrawerSideEnd
   });
@@ -1318,7 +1320,8 @@ abstract class AFScreenLikePrototype extends AFScreenPrototype {
     required this.navigate,
     required this.body,
     required this.timeHandling,
-  }): super(id: id);
+    required AFUIType uiType,
+  }): super(id: id, uiType: uiType);
 
   AFID get displayId {
     return id;
@@ -1364,6 +1367,7 @@ class AFSingleScreenPrototype extends AFScreenLikePrototype {
     models: models,
     navigate: navigate,
     body: body,
+    uiType: AFUIType.screen,
     timeHandling: timeHandling);
 
 
@@ -1427,7 +1431,7 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
     required this.render,
     this.createWidgetWrapperDelegate,
     String? title
-  }): super(id: id);
+  }): super(id: id, uiType: AFUIType.widget);
 
   AFID get displayId {
     return id;
@@ -1520,7 +1524,7 @@ class AFDialogPrototype extends AFScreenLikePrototype {
     models: models,
     navigate: navigate,
     body: body,
-    timeHandling: timeHandling);
+    timeHandling: timeHandling, uiType: AFUIType.dialog);
 
   AFScreenID get screenId {
     return AFUIScreenID.screenPrototypeDialog;
@@ -1580,7 +1584,9 @@ class AFBottomSheetPrototype extends AFScreenLikePrototype {
     models: models,
     navigate: navigate,
     body: body,
-    timeHandling: timeHandling);
+    timeHandling: timeHandling,
+    uiType: AFUIType.bottomSheet
+  );
 
   AFScreenID get screenId {
     return AFUIScreenID.screenPrototypeBottomSheet;
@@ -1639,7 +1645,9 @@ class AFDrawerPrototype extends AFScreenLikePrototype {
     models: models,
     navigate: navigate,
     body: body,
-    timeHandling: timeHandling);
+    timeHandling: timeHandling,
+    uiType: AFUIType.drawer
+  );
 
   AFScreenID get screenId {
     return AFUIScreenID.screenPrototypeDrawer;
@@ -1697,7 +1705,7 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
     required this.stateTestId,
     required this.body,
     this.actualDisplayId,
-  }): super(id: id);
+  }): super(id: id, uiType: AFUIType.screen);
 
   List<AFScreenTestDescription> get smokeTests { return List<AFScreenTestDescription>.from(body.smokeTests); }
   List<AFScreenTestDescription> get reusableTests { return  List<AFScreenTestDescription>.from(body.reusableTests); }
@@ -1862,6 +1870,13 @@ abstract class AFScreenKindTests<TState, TPrototype extends AFScreenPrototype> {
     return _connectedTests.firstWhereOrNull( (test) => test.id == id);
   }
 
+  void findByTokens(List<String> tokens, List<AFScreenPrototype> results) {
+    results.addAll(_connectedTests.where((test) {
+      return AFSingleScreenTests.matchesTokens(test.id, tokens);
+    }));
+  }
+
+
   List<TPrototype> get all {
     return _connectedTests;
   }
@@ -1896,6 +1911,13 @@ class AFWidgetTests<TState> {
   AFWidgetPrototype? findById(AFBaseTestID id) {
     return _connectedTests.firstWhereOrNull( (test) => test.id == id);
   }
+
+  void findByTokens(List<String> tokens, List<AFScreenPrototype> results) {
+    results.addAll(_connectedTests.where((test) {
+      return AFSingleScreenTests.matchesTokens(test.id, tokens);
+    }));
+  }
+  
 
   List<AFWidgetPrototype> get all {
     return _connectedTests;
@@ -2073,6 +2095,23 @@ class AFSingleScreenTests<TState> {
   AFSingleScreenPrototype? findById(AFBaseTestID id) {
     return _singleScreenTests.firstWhereOrNull((test) => test.id == id);
   }
+
+  void findByTokens(List<String> tokens, List<AFScreenPrototype> results) {
+    results.addAll(_singleScreenTests.where((test) {
+      return AFSingleScreenTests.matchesTokens(test.id, tokens);
+    }));
+  }
+
+  static bool matchesTokens(AFBaseTestID id, List<String> tokens) {
+    final idLower = id.code.toLowerCase();
+    for(final token in tokens) {
+      if(!idLower.contains(token)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
 
   void registerData(dynamic id, dynamic data) {
     AFibF.g.testData.define(id, data);
@@ -2435,6 +2474,12 @@ class AFWorkflowStateTests<TState extends AFFlexibleState> {
       }
     }
     return null;
+  }
+
+  void findByTokens(List<String> tokens, List<AFScreenPrototype> results) {
+    results.addAll(stateTests.where((test) {
+      return AFSingleScreenTests.matchesTokens(test.id, tokens);
+    }));
   }
 
   

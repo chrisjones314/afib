@@ -211,6 +211,14 @@ class AFColorPairing extends AFThemeResolvableValue {
 /// drawer.
 @immutable
 class AFFundamentalThemeArea with AFThemeAreaUtilties {
+  static const deviceThemeIds = [
+      AFUIThemeID.brightness,
+      AFUIThemeID.alwaysUse24HourFormat,
+      AFUIThemeID.textScaleFactor,
+      AFUIThemeID.locale,
+      AFUIThemeID.formFactor,
+      AFUIThemeID.formOrientation,
+  ];
   final ThemeData themeLight;
   final ThemeData themeDark;
   final Map<AFThemeID, AFFundamentalThemeValue> values;
@@ -267,7 +275,7 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
   List<String> get areaList {
     final map = <String, bool>{};
     for(final val in this.values.values) {
-      final tag = val.id.tag;
+      final tag = val.id.libraryTag;
       if(tag != null) {
         map[tag] = true;
       }
@@ -278,21 +286,20 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
   }
 
   List<AFThemeID> attrsForArea(String area) {
+    if(area == AFUIThemeID.tagDevice) {
+      return deviceThemeIds;
+    }
+
     final result = <AFThemeID>[];
     for(final val in this.values.values) {
-      if(val.id.tag == area) {
+      if(area == AFUILibraryID.id.codeId && deviceThemeIds.contains(val.id)) {
+        continue;
+      }
+      if(val.id.libraryTag == area) {
         result.add(val.id);
       }
     }
 
-    if(area == AFUIThemeID.tagDevice) {
-      result.add(AFUIThemeID.brightness);
-      result.add(AFUIThemeID.alwaysUse24HourFormat);
-      result.add(AFUIThemeID.textScaleFactor);
-      result.add(AFUIThemeID.locale);
-      result.add(AFUIThemeID.formFactor);
-      result.add(AFUIThemeID.formOrientation);
-    }
     return result;
   }
 
@@ -1264,7 +1271,7 @@ class AFFundamentalThemeState {
 
   Object? findValue(AFThemeID id) {
     var result = area.findValue(id);
-    if(result == null && id.tag == AFUIThemeID.tagDevice) {
+    if(result == null && id.libraryTag == AFUIThemeID.tagDevice) {
       result = device.findDeviceValue(id);
     }
     return result;
@@ -1982,6 +1989,38 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     );
   }
 
+  Widget childTopTab({
+    AFWidgetID? wid, 
+    required String text,
+    required bool isSel, 
+    required AFPressedDelegate onPressed
+  }) {
+    final style = isSel ? styleOnPrimary.bodyText1 : styleOnPrimary.bodyText2;
+    final colorButton = isSel ? colorPrimaryDarker : colorPrimary;
+    final buttonStyle = TextButton.styleFrom(
+      backgroundColor: colorButton,
+      textStyle: style,
+    );
+    return TextButton(
+      key: keyForWID(wid),
+      style: buttonStyle,
+      child: childText(text, style: style),
+      onPressed: onPressed
+    );
+  }
+
+  Widget childTopTabContainer({required List<Widget> children}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: colorPrimary,
+          borderRadius: borderRadius.standard,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: children
+      )
+    );
+  }  
 
   Widget childCardColumn(List<Widget> rows, {
     EdgeInsets? padding,

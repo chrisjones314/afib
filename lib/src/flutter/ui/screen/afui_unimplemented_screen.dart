@@ -58,7 +58,8 @@ class AFUIUnimplementedScreen extends AFUIConnectedScreen<AFUIUnimplementedScree
 
     
     final leading = t.childButtonStandardBack(spi, screen: screenId);
-    return spi.t.buildPrototypeScaffold(AFUITranslationID.afibUnimplemented, rows, leading: leading);
+    final main = ListView(children: rows);
+    return spi.t.buildPrototypeScaffold(spi, AFUITranslationID.afibUnimplemented, main, leading: leading);
   }
 
 

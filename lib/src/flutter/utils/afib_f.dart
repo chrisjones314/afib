@@ -286,7 +286,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     final workflowBuild = workflowTestsForStateTests;
     for(final stateTest in stateTests.all) {
       final stateTestId = stateTest.id;
-      final protoId = AFUIPrototypeID.workflowStateTest.with1(stateTestId, stateTestId.tags);
+      final protoId = AFUIPrototypeID.workflowStateTest.with1(stateTestId);
       workflowBuild.addPrototype(id: protoId, stateTestId: stateTestId, actualDisplayId: stateTestId);
     }
   }
@@ -564,6 +564,17 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     return thirdPartyUITests[id];
   }
 
+  List<AFScreenPrototype> findScreenTestByTokens(List<String> tokens) {
+    final result = <AFScreenPrototype>[];
+    _findUITestInSetByTokens(tokens, primaryUITests, result);
+
+    for(final thirdParty in thirdPartyUITests.values) {
+      _findUITestInSetByTokens(tokens, thirdParty, result);
+    }
+    return result;
+  }
+
+
   AFScreenPrototype? findScreenTestById(AFBaseTestID testId) {
     var test = _findTestInSet(testId, primaryUITests);
     if(test != null) {
@@ -578,6 +589,16 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     }
     return null;
   }
+
+  void _findUITestInSetByTokens(List<String> tokens, AFLibraryTestHolder tests, List<AFScreenPrototype> results) {
+    tests.afScreenTests.findByTokens(tokens, results);
+    tests.afDialogTests.findByTokens(tokens, results);
+    tests.afBottomSheetTests.findByTokens(tokens, results);
+    tests.afDrawerTests.findByTokens(tokens, results);
+    tests.afWidgetTests.findByTokens(tokens, results);
+    tests.afWorkflowTestsForStateTests.findByTokens(tokens, results);
+  }
+
 
   AFScreenPrototype? _findTestInSet(AFBaseTestID testId, AFLibraryTestHolder tests) {
     final single = tests.afScreenTests.findById(testId);
@@ -819,7 +840,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     for(final test in tests) {
       for(final area in areas) {        
         final testCode = test.id.code;
-        if((reusable && test.hasReusable) || addAll || (area.length > 2 && testCode.contains(area)) || test.id.hasTagLike(area)) {
+        if((reusable && test.hasReusable) || addAll || (area.length > 2 && testCode.contains(area))) {
           if(!results.contains(test)) {
             results.add(test);
           }

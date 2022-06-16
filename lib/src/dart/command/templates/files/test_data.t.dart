@@ -21,7 +21,7 @@ void defineStates(AFDefineTestDataContext context) {
   ];
 
 
-  context.define([!af_app_namespace(upper)]TestDataID.stateFullLogin, [!af_app_namespace(upper)]State.fromList(stateFullLogin));
+  context.define([!af_app_namespace(upper)]TestDataID.[!af_app_namespace]StateFullLogin, [!af_app_namespace(upper)]State.fromList(stateFullLogin));
 }
 
 ''';

@@ -40,7 +40,7 @@ class [!af_app_namespace(upper)]LibraryProgrammingInterfaceID extends AFLibraryP
 }
 
 class [!af_app_namespace(upper)]TestDataID {
-  static const stateFullLogin = "state_full_login";
+  static const stateFullLogin = "[!af_app_namespace]StateFullLogin";
 }
 
 class [!af_app_namespace(upper)]StateTestID extends AFStateTestID {

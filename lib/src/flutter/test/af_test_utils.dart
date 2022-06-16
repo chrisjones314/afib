@@ -1,9 +1,8 @@
 
 class AFTestUtils {
     static String createTestId(String prefix, Object source) {
-    final sourceData = source.toString().toLowerCase();
+    final sourceData = source.toString();
     var charCodes = <int>[];
-    final replacement = '_'.codeUnits[0];
 
     for (final codeUnit in sourceData.codeUnits) {
       final validNumber = codeUnit > 47 && codeUnit <= 57;
@@ -12,11 +11,10 @@ class AFTestUtils {
       if (validNumber || validUpper || validLower) {
         charCodes.add(codeUnit);
       } else {
-        charCodes.add(replacement);
       }
     }
 
-    return "${prefix}_${String.fromCharCodes(charCodes)}";  
+    return "$prefix${String.fromCharCodes(charCodes)}";  
   }
 
 }

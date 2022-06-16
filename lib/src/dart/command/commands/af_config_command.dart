@@ -61,7 +61,10 @@ $optionsHeader
     final generator = ctx.generator;
     final projectPath = generator.pathAfibConfig;
     final configFile = generator.overwriteFile(ctx, projectPath, AFUISourceTemplateID.fileConfig);
-    configFile.replaceTemplate(ctx, AFUISourceTemplateID.dynConfigEntries, DeclareConfigEntriesT(AFibD.config, AFibD.configEntries));
+    configFile.replaceTemplate(ctx, 
+      AFUISourceTemplateID.dynConfigEntries,
+      DeclareConfigEntriesT(AFibD.config, AFibD.configEntries)
+    );
   }
 
   @override

@@ -12,66 +12,66 @@ class AFUIQueryID extends AFQueryID {
 
 class AFUIScreenID extends AFScreenID {
   const AFUIScreenID(String code) : super(code, AFUILibraryID.id);
-  static const screenUnimplemented = AFUIScreenID("screen_unimplemented");
-  static const screenPrototypeDrawer = AFUIScreenID("screen_prototype_drawer");
-  static const screenPrototypeBottomSheet = AFUIScreenID("screen_prototype_bottom_sheet");
-  static const screenPrototypeDialog = AFUIScreenID("screen_prototype_dialog");
-  static const screenPrototypeWaiting = AFUIScreenID("screen_prototype_waiting");
-  static const screenDemoModeEnter = AFUIScreenID("screen_demo_mode_enter");
-  static const screenDemoModeExit = AFUIScreenID("screen_demo_mode_exit");
+  static const screenUnimplemented = AFUIScreenID("screenUnimplemented");
+  static const screenPrototypeDrawer = AFUIScreenID("screenPrototypeDrawer");
+  static const screenPrototypeBottomSheet = AFUIScreenID("screenPrototypeBottomSheet");
+  static const screenPrototypeDialog = AFUIScreenID("screenPrototypeDialog");
+  static const screenPrototypeWaiting = AFUIScreenID("screenPrototypeWaiting");
+  static const screenDemoModeEnter = AFUIScreenID("screenDemoModeEnter");
+  static const screenDemoModeExit = AFUIScreenID("screenDemoModeExit");
 
   static const unused = AFUIScreenID("unused");
-  static const screenPrototypeWireframesList = AFUIScreenID("screen_prototype_wireframes_list");
-  static const screenPrototypeListSingleScreen = AFUIScreenID("prototype_list_single_screen");
-  static const screenStateTestListScreen = AFUIScreenID("screen_state_test_list_screen");
-  static const screenPrototypeListWorkflow = AFUIScreenID("prototype_list_multi_screen");
-  static const screenPrototypeSingleScreen = AFUIScreenID("prototype_single_screen");
-  static const screenPrototypeWorkflow = AFUIScreenID("prototype_multi_screen");
-  static const drawerPrototype = AFUIScreenID("drawer_prototype");
-  static const screenPrototypeHome = AFUIScreenID("prototype_home");
-  static const screenPrototypeLoading = AFUIScreenID("prototype_loading");
-  static const screenPrototypeWidget = AFUIScreenID("prototype_widget");
-  static const screenStartupWrapper = AFUIScreenID("startup_wrapper");
-  static const dialogStandardAlert = AFUIScreenID("standard_alert_dialog");
-  static const screenPrototypeLibraryList = AFUIScreenID("protoype_library_list");
-  static const screenPrototypeLibraryHome = AFUIScreenID("protoype_library_home");
-  static const dialogStandardChoice = AFUIScreenID("standard_choice_dialog");
+  static const screenPrototypeWireframesList = AFUIScreenID("screenPrototypeWireframesList");
+  static const screenPrototypeListSingleScreen = AFUIScreenID("screenPrototypeListSingleScreen");
+  static const screenStateTestListScreen = AFUIScreenID("screenStateTestListScreen");
+  static const screenPrototypeListWorkflow = AFUIScreenID("screenPrototypeListWorkflow");
+  static const screenPrototypeSingleScreen = AFUIScreenID("screenPrototypeSingleScreen");
+  static const screenPrototypeWorkflow = AFUIScreenID("screenPrototypeWorkflow");
+  static const drawerPrototype = AFUIScreenID("drawerPrototype");
+  static const screenPrototypeHome = AFUIScreenID("screenPrototypeHome");
+  static const screenPrototypeLoading = AFUIScreenID("screenPrototypeLoading");
+  static const screenPrototypeWidget = AFUIScreenID("screenPrototypeWidget");
+  static const screenStartupWrapper = AFUIScreenID("screenStartupWrapper");
+  static const dialogStandardAlert = AFUIScreenID("dialogStandardAlert");
+  static const screenPrototypeLibraryList = AFUIScreenID("screenPrototypeLibraryList");
+  static const screenPrototypeLibraryHome = AFUIScreenID("screenPrototypeLibraryHome");
+  static const dialogStandardChoice = AFUIScreenID("dialogStandardChoice");
 }
 
 class AFUIWidgetID extends AFWidgetID {
   const AFUIWidgetID(String code) : super(code, AFUILibraryID.id);
   static const cardSearchResults = AFUIWidgetID("cardSearchResults");
-  static const rowSearchControls = AFUIWidgetID("row_search_controls");
-  static const cardSearchControls = AFUIWidgetID("card_search_controls");
-  static const columnSearchControls = AFUIWidgetID("column_search_controls");
+  static const rowSearchControls = AFUIWidgetID("rowSearchControls");
+  static const cardSearchControls = AFUIWidgetID("cardSearchControls");
+  static const columnSearchControls = AFUIWidgetID("columnSearchControls");
   static const editSearch = AFUIWidgetID("editSearch");
-  static const cardRelease = AFUIWidgetID("card_release");
-  static const viewParent = AFUIWidgetID("view_parent");
-  static const viewDepth = AFUIWidgetID("view_depth");
+  static const cardRelease = AFUIWidgetID("cardRelease");
+  static const viewParent = AFUIWidgetID("viewParent");
+  static const viewDepth = AFUIWidgetID("viewDepth");
 
-  static const cardWireframes = AFUIWidgetID("card_wireframes");
+  static const cardWireframes = AFUIWidgetID("cardWireframes");
 
-  static const afibPassthroughSuffix = "_passthough";
-  //static const screenStartup = AFUIScreenID("${afibScreenPrefix}startup");
-  static const buttonBack = AFUIWidgetID("button_back");  
-  static const textTestSearch = AFUIWidgetID("test_search");
-  static const cardPrototype = AFUIWidgetID("card_prototype");
-  static const contTestSearchControls = AFUIWidgetID("cont_test_search_controls");
-  static const cardRecent = AFUIWidgetID("card_test_home_search_and_run");
-  static const cardTestGroup = AFUIWidgetID("card_test_group");
-  static const buttonOK = AFUIWidgetID("button_ok");
-  static const buttonCancel = AFUIWidgetID("button_cancel");
-  static const textFilter = AFUIWidgetID("filter_text");
-  static const widgetPrototypeTest = AFUIWidgetID("widget_prototype_test");
-  static const cardLibrary = AFUIWidgetID("library");
-  static const textTime = AFUIWidgetID("text_time");
-  static const textTimeAdjust = AFUIWidgetID("text_time_adjust");
-  static const positionedTopHosted = AFUIWidgetID("positioned_top_hosted");
-  static const positionedBottomHosted = AFUIWidgetID("positioned_bottom_hosted");
-  static const positionedCenterHosted = AFUIWidgetID("positioned_center_hosted");
-  static const contHostedControls = AFUIWidgetID("cont_hosted_controls");
+  static const afibPassthroughSuffix = "afibPassthroughSuffix";
+  //static const screenStartup = AFUIScreenID("screenStartup");
+  static const buttonBack = AFUIWidgetID("buttonBack");  
+  static const textTestSearch = AFUIWidgetID("textTestSearch");
+  static const cardPrototype = AFUIWidgetID("cardPrototype");
+  static const contTestSearchControls = AFUIWidgetID("contTestSearchControls");
+  static const cardRecent = AFUIWidgetID("cardRecent");
+  static const cardTestGroup = AFUIWidgetID("cardTestGroup");
+  static const buttonOK = AFUIWidgetID("buttonOK");
+  static const buttonCancel = AFUIWidgetID("buttonCancel");
+  static const textFilter = AFUIWidgetID("textFilter");
+  static const widgetPrototypeTest = AFUIWidgetID("widgetPrototypeTest");
+  static const cardLibrary = AFUIWidgetID("cardLibrary");
+  static const textTime = AFUIWidgetID("textTime");
+  static const textTimeAdjust = AFUIWidgetID("textTimeAdjust");
+  static const positionedTopHosted = AFUIWidgetID("positionedTopHosted");
+  static const positionedBottomHosted = AFUIWidgetID("positionedBottomHosted");
+  static const positionedCenterHosted = AFUIWidgetID("positionedCenterHosted");
+  static const contHostedControls = AFUIWidgetID("contHostedControls");
   static const unused = AFUIWidgetID("unused");
-  static const widgetWelcome = AFUIWidgetID("welcome");
+  static const widgetWelcome = AFUIWidgetID("widgetWelcome");
 }
 
 class AFUIScreenTestID extends AFScreenTestID {
@@ -85,32 +85,32 @@ class AFUIScreenTestID extends AFScreenTestID {
 
 class AFUITranslationID extends AFTranslationID{
   const AFUITranslationID(String code) : super(code, AFUILibraryID.id);
-  static const stateTests = AFUITranslationID("state_tests");
+  static const stateTests = AFUITranslationID("stateTests");
   static const release = AFUITranslationID("release");
   
   static const wireframes = AFUITranslationID("wireframes");
-  static const afibPrototypeMode = AFUITranslationID("afib_prototype_mode");
+  static const afibPrototypeMode = AFUITranslationID("afibPrototypeMode");
   static const recent = AFUITranslationID("recent");
   static const favorites = AFUITranslationID('favorites');
-  static const prototype = AFUITranslationID("prototypes");
+  static const prototype = AFUITranslationID("prototype");
   static const run = AFUITranslationID("run");
-  static const testResults = AFUITranslationID("test_results");
-  static const searchResults = AFUITranslationID("search_results");
-  static const libraries = AFUITranslationID("third_party");
-  static const workflowTests = AFUITranslationID("workflow_prototypes");
-  static const screenPrototypes = AFUITranslationID("screen_prototypes");
-  static const widgetPrototypes = AFUITranslationID("widget_prototypes");
-  static const appTitle = AFUITranslationID("app_title");
-  static const notTranslated = AFUITranslationID("not_translated");
-  static const afibPrototypeLoading = AFUITranslationID("afib_prototype_loading");
-  static const afibUnimplemented = AFUITranslationID("afib_unimplemented");
+  static const testResults = AFUITranslationID("testResults");
+  static const searchResults = AFUITranslationID("searchResults");
+  static const libraries = AFUITranslationID("libraries");
+  static const workflowTests = AFUITranslationID("workflowTests");
+  static const screenPrototypes = AFUITranslationID("screenPrototypes");
+  static const widgetPrototypes = AFUITranslationID("widgetPrototypes");
+  static const appTitle = AFUITranslationID("appTitle");
+  static const notTranslated = AFUITranslationID("notTranslated");
+  static const afibPrototypeLoading = AFUITranslationID("afibPrototypeLoading");
+  static const afibUnimplemented = AFUITranslationID("afibUnimplemented");
 }
 
 /// Identifiers for the fundamental theme
 /// 
 /// These identifiers can be used by third parties, and are usually the values used to create the flutter ThemeData.
 class AFUIThemeID extends AFThemeID {
-  static const tagDevice = "device";
+  static const tagDevice = "tagDevice";
   const AFUIThemeID(String code): super(code, AFUILibraryID.id);   
 
   /// constant used by [AFFunctionalTheme.childButtonStandardBack]
@@ -119,54 +119,54 @@ class AFUIThemeID extends AFThemeID {
   static const shouldContinue = 2;
 
   static const unused = AFUIThemeID("unused");
-  static const defaultTheme = AFUIThemeID("default");
+  static const defaultTheme = AFUIThemeID("defaultTheme");
   
   /// Used for the icon that indicates you are navigating up into a parent screen, often the left caret.
-  static const iconBack = AFUIThemeID("icon_back");
+  static const iconBack = AFUIThemeID("iconBack");
 
   /// Used for the icon that indicates you are navigating down into more detailed screens, often a right caret.
-  static const iconNavDown = AFUIThemeID("icon_nav_down");
+  static const iconNavDown = AFUIThemeID("iconNavDown");
 
   /// Used to determine the values of [AFFunctionalTheme.margin...], must be an array of 6 values, indicating the
   /// margin amount for s0 through s5 (the first should be zero, or s0 will be confusing).
-  static const marginSizes = AFUIThemeID("margin_sizes");
-  static const paddingSizes = AFUIThemeID("padding_sizes");
-  static const borderRadiusSizes = AFUIThemeID("border_radius_sizes");
-  static const formFactor = AFUIThemeID("form_factor");
-  static const formOrientation = AFUIThemeID("form_orientation");
-  static const formFactorDelegate = AFUIThemeID("form_factor_delegate");
+  static const marginSizes = AFUIThemeID("marginSizes");
+  static const paddingSizes = AFUIThemeID("paddingSizes");
+  static const borderRadiusSizes = AFUIThemeID("borderRadiusSizes");
+  static const formFactor = AFUIThemeID("formFactor");
+  static const formOrientation = AFUIThemeID("formOrientation");
+  static const formFactorDelegate = AFUIThemeID("formFactorDelegate");
 
   /// Color used for text that can be tapped like a hyperlink.
-  static const colorTapableText = AFUIThemeID("color_tapable_text");
+  static const colorTapableText = AFUIThemeID("colorTapableText");
 
   /// Used in prototype mode to override the device value.  Shouldn't generally be used in production.
   static const brightness = AFUIThemeID("brightness");
 
   /// Used in prototype mode to override the device value.  Shouldn't generally be used in production.
-  static const alwaysUse24HourFormat = AFUIThemeID("always_use_24_hour_format");
+  static const alwaysUse24HourFormat = AFUIThemeID("alwaysUse24HourFormat");
 
   /// Used in prototype mode to override the device value.  Shouldn't generally be used in production.
   static const locale = AFUIThemeID("locale");
 
   /// Used in prototype mode to override the device value.  Shouldn't generally be used in production.
-  static const textScaleFactor = AFUIThemeID("text_scale_factor");
+  static const textScaleFactor = AFUIThemeID("textScaleFactor");
 
   /// Used in prototype mode to display the value in the test/theme drawer, should not be used in production and cannot be overriden.
-  static const physicalSize = AFUIThemeID("physical_size");
+  static const physicalSize = AFUIThemeID("physicalSize");
 
   /// Indicates that where a UI uses AFLanguageIDs for translation, the UI should show the IDs rather than the 
   /// translations.
-  static const showTranslationsIDs = AFUIThemeID("show_translation_ids");
+  static const showTranslationsIDs = AFUIThemeID("showTranslationsIDs");
 
-  static const colorPrimaryDarker = AFUIThemeID("color_primary_darker");
-  static const colorPrimaryLighter = AFUIThemeID("color_primary_lighter");
+  static const colorPrimaryDarker = AFUIThemeID("colorPrimaryDarker");
+  static const colorPrimaryLighter = AFUIThemeID("colorPrimaryLighter");
 
 }
 
 
 class AFUISourceTemplateID extends AFSourceTemplateID {
   const AFUISourceTemplateID(String code) : super(code, AFUILibraryID.id);
- 
+
   static const fileConfig = AFUISourceTemplateID("config");
   static const fileTestConfig = AFUISourceTemplateID("test_config");
   static const fileScreenTest = AFUISourceTemplateID("screen_test");
@@ -268,12 +268,12 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const commentBuildWithSPI = AFUISourceTemplateID("comment_build_with_spi");
   static const commentBuildBody = AFUISourceTemplateID("comment_build_body");
 
-  static const dynConfigEntries = AFUISourceTemplateID("config_entries");
+  static const dynConfigEntries = AFUISourceTemplateID("config_entries"); 
 }
 
 class AFUIPrototypeID extends AFPrototypeID {
   const AFUIPrototypeID(String code, { List<String>? tags }): super(code, AFUILibraryID.id); 
   static const visualize = AFUIPrototypeID("visualize");
-  static const workflowStateTest = AFUIPrototypeID("workflow_state_test");
+  static const workflowStateTest = AFUIPrototypeID("workflowStateTest");
 
 }

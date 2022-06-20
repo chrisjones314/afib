@@ -28,12 +28,12 @@ abstract class AFTrackedQuery {
 
 /// A version of [AFAsyncQuery] for queries that should be run in the background
 /// after a delay.  
-abstract class AFDeferredQuery<TState extends AFFlexibleState> extends AFAsyncQuery<TState, AFUnused> implements AFTrackedQuery {
+abstract class AFDeferredQuery<TState extends AFFlexibleState> extends AFAsyncQuery<AFUnused> implements AFTrackedQuery {
   final Duration delay;
 
   AFDeferredQuery(this.delay, {
     AFID? id, 
-    AFOnResponseDelegate<TState, AFUnused>? onSuccessDelegate
+    AFOnResponseDelegate<AFUnused>? onSuccessDelegate
   }): super(id: id, onSuccessDelegate: onSuccessDelegate);
 
   /// Delays for [nextDelay] and then calls [finishAsyncWithResponse] with null as the value.
@@ -62,7 +62,7 @@ abstract class AFDeferredQuery<TState extends AFFlexibleState> extends AFAsyncQu
 
   /// Calls the more appropriate [finishAsyncExecute] when the [initialDelay] associated with this
   /// query has expired.
-  void finishAsyncWithResponse(AFFinishQuerySuccessContext<TState, AFUnused> context) {
+  void finishAsyncWithResponse(AFFinishQuerySuccessContext<AFUnused> context) {
     finishAsyncExecute(context);
     context.dispatch(AFShutdownDeferredQueryAction(this.key));
   }
@@ -77,7 +77,7 @@ abstract class AFDeferredQuery<TState extends AFFlexibleState> extends AFAsyncQu
   /// 
   /// Return null if you are done executing, or return a duration if you'd like to try executing
   /// again after another delay.
-  void finishAsyncExecute(AFFinishQuerySuccessContext<TState, AFUnused> context);
+  void finishAsyncExecute(AFFinishQuerySuccessContext<AFUnused> context);
 
   void afShutdown(AFStartQueryContext<AFUnused>? context) {
     shutdown();
@@ -85,11 +85,11 @@ abstract class AFDeferredQuery<TState extends AFFlexibleState> extends AFAsyncQu
 
   void shutdown();
 
-  AFFinishQuerySuccessContext<TState, AFUnused> createSuccessContext({
+  AFFinishQuerySuccessContext<AFUnused> createSuccessContext({
     required AFDispatcher dispatcher, 
     required AFState state, 
   }) {
-    return AFFinishQuerySuccessContext<TState, AFUnused>(    
+    return AFFinishQuerySuccessContext<AFUnused>(    
       conceptualStore: conceptualStore,
       response: AFUnused(),
     );
@@ -98,14 +98,14 @@ abstract class AFDeferredQuery<TState extends AFFlexibleState> extends AFAsyncQu
 }
 
 /// A version of [AFAsyncQuery] for queries that should be run periodically in the background.  
-abstract class AFPeriodicQuery<TState extends AFFlexibleState> extends AFAsyncQuery<TState, AFUnused> implements AFTrackedQuery {
+abstract class AFPeriodicQuery extends AFAsyncQuery<AFUnused> implements AFTrackedQuery {
   final Duration delay;
   Timer? timer;
   bool keepGoing;
 
   AFPeriodicQuery(this.delay, {
     AFID? id, 
-    AFOnResponseDelegate<TState, AFUnused>? onSuccessDelegate,
+    AFOnResponseDelegate<AFUnused>? onSuccessDelegate,
     this.keepGoing = true,
   }): super(id: id, onSuccessDelegate: onSuccessDelegate);
 
@@ -126,14 +126,14 @@ abstract class AFPeriodicQuery<TState extends AFFlexibleState> extends AFAsyncQu
 
   /// Calls the more appropriate [finishAsyncExecute] when the [initialDelay] associated with this
   /// query has expired.
-  void finishAsyncWithResponse(AFFinishQuerySuccessContext<TState, AFUnused> context) {
+  void finishAsyncWithResponse(AFFinishQuerySuccessContext<AFUnused> context) {
     keepGoing = finishAsyncExecute(context);
     if(!keepGoing) {
       context.dispatch(AFShutdownPeriodicQueryAction(this.key));
     }      
   }
 
-  bool finishAsyncExecute(AFFinishQuerySuccessContext<TState, AFUnused> context);
+  bool finishAsyncExecute(AFFinishQuerySuccessContext<AFUnused> context);
 
   void afShutdown() {
     if(timer != null) {
@@ -151,11 +151,11 @@ abstract class AFPeriodicQuery<TState extends AFFlexibleState> extends AFAsyncQu
 
   void shutdown();
 
-  AFFinishQuerySuccessContext<TState, AFUnused> createSuccessContext({
+  AFFinishQuerySuccessContext<AFUnused> createSuccessContext({
     required AFDispatcher dispatcher, 
     required AFState state, 
   }) {
-    return AFFinishQuerySuccessContext<TState, AFUnused>(    
+    return AFFinishQuerySuccessContext<AFUnused>(    
       conceptualStore: conceptualStore,
       response: AFUnused(),
     );
@@ -165,10 +165,10 @@ abstract class AFPeriodicQuery<TState extends AFFlexibleState> extends AFAsyncQu
 
 /// A deferred query which waits a specified duration, then calls its onSuccessDelegate,
 /// but does not otherwise do anything.
-class AFDeferredSuccessQuery<TState extends AFFlexibleState> extends AFDeferredQuery<TState> {
+class AFDeferredSuccessQuery extends AFDeferredQuery {
 
-  AFDeferredSuccessQuery(AFID id, Duration delayOnce, AFOnResponseDelegate<TState, AFUnused> onSuccessDelegate): super(delayOnce, id: id, onSuccessDelegate: onSuccessDelegate);
-  Duration? finishAsyncExecute(AFFinishQuerySuccessContext<TState, AFUnused> context) {
+  AFDeferredSuccessQuery(AFID id, Duration delayOnce, AFOnResponseDelegate<AFUnused> onSuccessDelegate): super(delayOnce, id: id, onSuccessDelegate: onSuccessDelegate);
+  Duration? finishAsyncExecute(AFFinishQuerySuccessContext<AFUnused> context) {
     final onSuccessD = this.onSuccessDelegate;
     if(onSuccessD != null) {
       onSuccessD(context);

@@ -3,13 +3,13 @@ import 'dart:isolate';
 import 'package:afib/afib_flutter.dart';
 
 
-abstract class AFIsolateListenerQuery<TState extends AFFlexibleState, TMessage> extends AFAsyncListenerQuery<TState, TMessage> {
+abstract class AFIsolateListenerQuery<TMessage> extends AFAsyncListenerQuery<TMessage> {
   Isolate? isolate;
 
   AFIsolateListenerQuery({
     AFID? id,
-    AFOnResponseDelegate<TState, TMessage>? onSuccessDelegate,
-    AFOnErrorDelegate<TState>? onErrorDelegate,
+    AFOnResponseDelegate<TMessage>? onSuccessDelegate,
+    AFOnErrorDelegate? onErrorDelegate,
     AFPreExecuteResponseDelegate<TMessage>? onPreExecuteResponseDelegate
   }): super(
     id: id,

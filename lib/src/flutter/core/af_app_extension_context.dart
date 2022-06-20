@@ -480,7 +480,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     required AFCreateStartupQueryActionDelegate createStartupQueryAction,
     required AFCreateAFAppDelegate createApp,
     required AFInitUIDelegate defineUI,
-    required AFOnErrorDelegate<AFFlexibleState> queryErrorHandler,
+    required AFOnErrorDelegate queryErrorHandler,
   }) {
     this.test.initializeForApp();
     this.defineUI.add(defineUI);
@@ -513,7 +513,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     this.defineUI.addAll(source.defineUI);    
   }
 
-  AFOnErrorDelegate<TState>? errorHandlerForState<TState extends AFFlexibleState>() {
+  AFOnErrorDelegate? errorHandlerForState<TState extends AFFlexibleState>() {
     return errorListenerByState[TState];
   }
 

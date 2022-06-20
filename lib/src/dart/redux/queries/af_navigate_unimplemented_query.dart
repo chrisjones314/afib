@@ -1,8 +1,7 @@
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/dart/redux/state/models/afui_proto_state.dart';
 import 'package:afib/src/flutter/ui/screen/afui_unimplemented_screen.dart';
 
-class AFNavigateUnimplementedQuery extends AFAsyncQuery<AFUIState, AFUnused> {
+class AFNavigateUnimplementedQuery extends AFAsyncQuery<AFUnused> {
   final String message;
 
   AFNavigateUnimplementedQuery(this.message);
@@ -13,7 +12,7 @@ class AFNavigateUnimplementedQuery extends AFAsyncQuery<AFUIState, AFUnused> {
   }
 
   @override
-  void finishAsyncWithResponse(AFFinishQuerySuccessContext<AFUIState, AFUnused> context) {
+  void finishAsyncWithResponse(AFFinishQuerySuccessContext<AFUnused> context) {
     context.navigatePush(AFUIUnimplementedScreen.navigatePush(message));
   }
 }

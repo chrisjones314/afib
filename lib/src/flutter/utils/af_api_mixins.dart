@@ -218,8 +218,8 @@ mixin AFStandardAPIContextMixin<TState extends AFFlexibleState> implements AFDis
     dispatch(AFShutdownOngoingQueriesAction());
   }
 
-  void executeDeferredCallback<TState extends AFFlexibleState>(AFID uniqueQueryId, Duration duration, AFOnResponseDelegate<TState, AFUnused> callback) {
-    dispatch(AFDeferredSuccessQuery<TState>(uniqueQueryId, duration, callback));
+  void executeDeferredCallback(AFID uniqueQueryId, Duration duration, AFOnResponseDelegate<AFUnused> callback) {
+    dispatch(AFDeferredSuccessQuery(uniqueQueryId, duration, callback));
   }
 
   //-------------------------------------------------------------------------------------

@@ -431,10 +431,10 @@ class AFibGlobalState<TState extends AFFlexibleState> {
     ));
   }
 
-  void finishAsyncWithError<TState extends AFFlexibleState>(AFFinishQueryErrorContext context) {
+  void finishAsyncWithError(AFFinishQueryErrorContext context) {
     final handler = appContext.errorHandlerForState<TState>();
     if(handler != null) {
-      handler(context as AFFinishQueryErrorContext<TState>);
+      handler(context);
     }
   }
 

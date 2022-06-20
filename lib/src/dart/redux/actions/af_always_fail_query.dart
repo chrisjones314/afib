@@ -1,6 +1,6 @@
 import 'package:afib/afib_flutter.dart';
 
-class AFAlwaysFailQuery<TState extends AFFlexibleState> extends AFAsyncQuery<TState, String> {
+class AFAlwaysFailQuery<TState extends AFFlexibleState> extends AFAsyncQuery<String> {
   final String message;
   
   //------------------------------------------------------------------------
@@ -19,7 +19,7 @@ class AFAlwaysFailQuery<TState extends AFFlexibleState> extends AFAsyncQuery<TSt
 
   //------------------------------------------------------------------------
   @override
-  void finishAsyncWithResponse(AFFinishQuerySuccessContext<TState, String> context) {
+  void finishAsyncWithResponse(AFFinishQuerySuccessContext<String> context) {
     throw UnimplementedError();
   }
 }

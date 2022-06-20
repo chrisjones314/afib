@@ -2200,7 +2200,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     assert(TState != AFFlexibleState, "You need to specify a AFFlexibleState subclass as a type parameter");
     assert(TQueryResponse != dynamic, "You need to specify a type for the query response");
     final td = definitions.td(testData);
-    final successContext = AFFinishQuerySuccessContext<TState, TQueryResponse>(
+    final successContext = AFFinishQuerySuccessContext<TQueryResponse>(
       conceptualStore: AFibF.g.activeConceptualStore,
       response: td
     );

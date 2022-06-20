@@ -3,12 +3,12 @@ import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 
-class AFStartSpecificPrototypeQuery extends AFDeferredQuery<AFFlexibleState> {
+class AFStartSpecificPrototypeQuery extends AFDeferredQuery {
   AFStartSpecificPrototypeQuery():
     super(const Duration(milliseconds: 500));
 
   @override
-  Duration? finishAsyncExecute(AFFinishQuerySuccessContext<AFFlexibleState, AFUnused> context) {
+  Duration? finishAsyncExecute(AFFinishQuerySuccessContext<AFUnused> context) {
     // Basically, for each different type of test, look it up, then update the state to properly, 
     // then redirect to the test.
     final config = AFibD.config;
@@ -23,7 +23,7 @@ class AFStartSpecificPrototypeQuery extends AFDeferredQuery<AFFlexibleState> {
     return null;
   }
 
-  void _startWireframe(AFFinishQuerySuccessContext<AFFlexibleState, AFUnused> context, AFPrototypeID protoId) {
+  void _startWireframe(AFFinishQuerySuccessContext<AFUnused> context, AFPrototypeID protoId) {
     final wireframe = AFibF.g.wireframes.find(protoId);
     
     final body = AFSingleScreenPrototypeBody(wireframe.id);
@@ -38,7 +38,7 @@ class AFStartSpecificPrototypeQuery extends AFDeferredQuery<AFFlexibleState> {
     test.startScreen(context.dispatcher, null, wireframe.testData);
   }
 
-  void _startScreenPrototype(AFFinishQuerySuccessContext<AFFlexibleState, AFUnused> context, AFPrototypeID protoId) {
+  void _startScreenPrototype(AFFinishQuerySuccessContext<AFUnused> context, AFPrototypeID protoId) {
     final prototype = AFibF.g.findScreenTestById(protoId);
     if(prototype == null) {
       throw AFException("Could not find prototype $protoId");

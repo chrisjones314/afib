@@ -114,10 +114,10 @@ typedef AFUnitTestBodyExecuteDelegate = void Function(AFUnitTestExecute e);
 typedef AFPreExecuteResponseDelegate<TResponse> = TResponse Function();
 
 /// Delegate used when an [AFAsyncQuery] results in a successful response.
-typedef AFOnResponseDelegate<TState extends AFFlexibleState, TResponse> = void Function(AFFinishQuerySuccessContext<TState, TResponse> context);
+typedef AFOnResponseDelegate<TResponse> = void Function(AFFinishQuerySuccessContext<TResponse> context);
 
 /// Delegate used when an [AFAsyncQuery] results in an error.
-typedef AFOnErrorDelegate<TState extends AFFlexibleState> = void Function(AFFinishQueryErrorContext<TState> context);
+typedef AFOnErrorDelegate = void Function(AFFinishQueryErrorContext context);
 
 /// Delegate used to process an [AFAsyncQuery]
 typedef AFAsyncQueryListenerDelegate = void Function(AFAsyncQuery query);

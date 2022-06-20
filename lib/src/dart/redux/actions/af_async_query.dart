@@ -73,7 +73,7 @@ class AFStartQueryContext<TResponse> extends AFQueryContext {
 }
 
 
-class AFFinishQueryContext<TState extends AFFlexibleState> extends AFQueryContext with AFAccessStateSynchronouslyMixin {
+class AFFinishQueryContext extends AFQueryContext with AFAccessStateSynchronouslyMixin {
 
   AFFinishQueryContext({
     required AFConceptualStore conceptualStore,
@@ -89,13 +89,6 @@ class AFFinishQueryContext<TState extends AFFlexibleState> extends AFQueryContex
     return state.public;
   }
 
-  TState get s {
-    var result = state.public.componentStateOrNull<TState>();
-    if(result == null) throw AFException("Missing $TState");
-    return result;
-  }
-
-
   Logger? get log {
     return AFibD.log(AFConfigEntryLogArea.query);
   }
@@ -104,7 +97,7 @@ class AFFinishQueryContext<TState extends AFFlexibleState> extends AFQueryContex
 }
 
 
-class AFFinishQuerySuccessContext<TState extends AFFlexibleState, TResponse> extends AFFinishQueryContext<TState>  {
+class AFFinishQuerySuccessContext<TResponse> extends AFFinishQueryContext  {
   final TResponse response;
   AFFinishQuerySuccessContext({
     required AFConceptualStore conceptualStore,
@@ -117,7 +110,7 @@ class AFFinishQuerySuccessContext<TState extends AFFlexibleState, TResponse> ext
   }
 }
 
-class AFFinishQueryErrorContext<TState extends AFFlexibleState> extends AFFinishQueryContext<TState> {
+class AFFinishQueryErrorContext extends AFFinishQueryContext {
   final AFQueryError error;
   AFFinishQueryErrorContext({
     required AFConceptualStore conceptualStore,
@@ -131,10 +124,10 @@ class AFFinishQueryErrorContext<TState extends AFFlexibleState> extends AFFinish
 
 /// Superclass for a kind of action that queries some data asynchronously, then knows
 /// how to process the result.
-abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends AFActionWithKey {
+abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
   AFConceptualStore conceptualStore = AFConceptualStore.appStore;
-  final AFOnResponseDelegate<TState, TResponse>? onSuccessDelegate;
-  final AFOnErrorDelegate<TState>? onErrorDelegate;
+  final AFOnResponseDelegate<TResponse>? onSuccessDelegate;
+  final AFOnErrorDelegate? onErrorDelegate;
   final AFPreExecuteResponseDelegate<TResponse>? onPreExecuteResponseDelegate;
 
   AFAsyncQuery({
@@ -159,7 +152,7 @@ abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends A
         // might be changed by some other query while we are waiting for a responser.  
         // Consequently, it is important not to make a copy of the state above this point,
         // as it might go out of date.
-        final successContext = AFFinishQuerySuccessContext<TState, TResponse>(
+        final successContext = AFFinishQuerySuccessContext<TResponse>(
           conceptualStore: conceptualStore, 
           response: response
         );
@@ -169,7 +162,7 @@ abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends A
         }
       }, 
       onError: (error) {
-        final errorContext = AFFinishQueryErrorContext<TState>(
+        final errorContext = AFFinishQueryErrorContext(
           conceptualStore: conceptualStore, 
           error: error
         );
@@ -182,7 +175,7 @@ abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends A
     final pre = onPreExecuteResponseDelegate;
     if(pre != null) {
       final preResponse = pre();
-      final successContext = AFFinishQuerySuccessContext<TState, TResponse>(
+      final successContext = AFFinishQuerySuccessContext<TResponse>(
         conceptualStore: conceptualStore,
         response: preResponse);
       finishAsyncWithResponseAF(successContext);
@@ -193,7 +186,7 @@ abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends A
   }
 
   /// Called internally by the framework to do pre and post processing before [finishAsyncWithResponse]
-  void finishAsyncWithResponseAF(AFFinishQuerySuccessContext<TState, TResponse> context) {
+  void finishAsyncWithResponseAF(AFFinishQuerySuccessContext<TResponse> context) {
     finishAsyncWithResponse(context);
     final onSuccessD = onSuccessDelegate;
 
@@ -204,7 +197,7 @@ abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends A
     AFibF.g.onQuerySuccess(this, context);
   }
 
-  void finishAsyncWithErrorAF(AFFinishQueryErrorContext<TState> context) {
+  void finishAsyncWithErrorAF(AFFinishQueryErrorContext context) {
     finishAsyncWithError(context);
     final onErrorD = onErrorDelegate;
     if(onErrorD != null) {
@@ -214,8 +207,8 @@ abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends A
 
   /// The default implementation calls the error handler passed in to 
   /// [initializeLibraryFundamentals] in extend_app.dart
-  void finishAsyncWithError(AFFinishQueryErrorContext<TState> context) {
-    AFibF.g.finishAsyncWithError<TState>(context);
+  void finishAsyncWithError(AFFinishQueryErrorContext context) {
+    AFibF.g.finishAsyncWithError(context);
   }
 
   /// Called at the start of an asynchronous process, starts the query using data from the
@@ -229,11 +222,11 @@ abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends A
   /// into the state (preserving immutability by making copies of the relevant portions of the state using copyWith), 
   /// and then use the dispatcher to call set actions for any modified 
   /// state elements.
-  void finishAsyncWithResponse(AFFinishQuerySuccessContext<TState, TResponse> context);
+  void finishAsyncWithResponse(AFFinishQuerySuccessContext<TResponse> context);
 
   /// Called during testing to simulate results from an asynchronous call.
   void testFinishAsyncWithResponse(AFStateTestContext context, TResponse response) {
-    final successContext = AFFinishQuerySuccessContext<TState, TResponse>(
+    final successContext = AFFinishQuerySuccessContext<TResponse>(
       conceptualStore: conceptualStore,
       response: response
     );
@@ -242,7 +235,7 @@ abstract class AFAsyncQuery<TState extends AFFlexibleState, TResponse> extends A
 
   /// Called during testing to simulate results from an asynchronous call.
   void testFinishAsyncWithError(AFStateTestContext context, AFQueryError error) {
-    final errorContext = AFFinishQueryErrorContext<TState>(
+    final errorContext = AFFinishQueryErrorContext(
       conceptualStore: conceptualStore,
       error: error
     );
@@ -316,7 +309,7 @@ class AFConsolidatedQueryResponse {
   }
 }
 
-class AFConsolidatedQuery<TState extends AFFlexibleState> extends AFAsyncQuery<TState, AFConsolidatedQueryResponse> {
+class AFConsolidatedQuery extends AFAsyncQuery<AFConsolidatedQueryResponse> {
   static const queryFailedCode = 792;
   static const queryFailedMessage = "At least one query in a consolidated query failed.";
 
@@ -324,8 +317,8 @@ class AFConsolidatedQuery<TState extends AFFlexibleState> extends AFAsyncQuery<T
 
   AFConsolidatedQuery(this.queryResponses, {
     AFID? id, 
-    AFOnResponseDelegate<TState, AFConsolidatedQueryResponse>? onSuccessDelegate, 
-    AFOnErrorDelegate<TState>? onErrorDelegate,     
+    AFOnResponseDelegate<AFConsolidatedQueryResponse>? onSuccessDelegate, 
+    AFOnErrorDelegate? onErrorDelegate,     
   }): super(id: id, onSuccessDelegate: onSuccessDelegate, onErrorDelegate: onErrorDelegate);
 
   static List<AFAsyncQuery> createList() {
@@ -334,8 +327,8 @@ class AFConsolidatedQuery<TState extends AFFlexibleState> extends AFAsyncQuery<T
 
   factory AFConsolidatedQuery.createFrom({
     required List<AFAsyncQuery> queries,
-    AFOnResponseDelegate<TState, AFConsolidatedQueryResponse>? onSuccessDelegate,
-    AFOnErrorDelegate<TState>? onErrorDelegate
+    AFOnResponseDelegate<AFConsolidatedQueryResponse>? onSuccessDelegate,
+    AFOnErrorDelegate? onErrorDelegate
   }) {
     final response = AFConsolidatedQueryResponse.createFrom(queries);
     return AFConsolidatedQuery(response,
@@ -397,13 +390,13 @@ class AFConsolidatedQuery<TState extends AFFlexibleState> extends AFAsyncQuery<T
       // when they have all completed, then process our response.
       completer.future.then((_) {
         if(queryResponses.hasError) {
-          final errorContext = AFFinishQueryErrorContext<TState>(
+          final errorContext = AFFinishQueryErrorContext(
             conceptualStore: conceptualStore,
             error: AFQueryError(code: queryFailedCode, message: queryFailedMessage)
           );
           finishAsyncWithErrorAF(errorContext);
         } else {
-          final successContext = AFFinishQuerySuccessContext<TState, AFConsolidatedQueryResponse>(
+          final successContext = AFFinishQuerySuccessContext<AFConsolidatedQueryResponse>(
             conceptualStore: conceptualStore,
             response: queryResponses
           );
@@ -421,7 +414,7 @@ class AFConsolidatedQuery<TState extends AFFlexibleState> extends AFAsyncQuery<T
   /// 
   /// You can override this in your own subclass if you want, but many uses cases 
   /// are adequately covered by passing onSuccessDelegate.
-  void finishAsyncWithResponse(AFFinishQuerySuccessContext<TState, AFConsolidatedQueryResponse> response) {
+  void finishAsyncWithResponse(AFFinishQuerySuccessContext<AFConsolidatedQueryResponse> response) {
 
   }
 }
@@ -432,12 +425,12 @@ class AFConsolidatedQuery<TState extends AFFlexibleState> extends AFAsyncQuery<T
 /// Afib will automatically track these queries when you dispatch them.  You can dispatch the
 /// [AFShutdownQueryListeners] action to call the shutdown method on some or all outstanding
 /// listeners.  
-abstract class AFAsyncListenerQuery<TState extends AFFlexibleState, TResponse> extends AFAsyncQuery<TState, TResponse> implements AFTrackedQuery {
+abstract class AFAsyncListenerQuery<TResponse> extends AFAsyncQuery<TResponse> implements AFTrackedQuery {
   AFAsyncListenerQuery({
     AFID? id, 
     AFPreExecuteResponseDelegate<TResponse>? onPreExecuteResponseDelegate,
-    AFOnResponseDelegate<TState, TResponse>? onSuccessDelegate, 
-    AFOnErrorDelegate<TState>? onErrorDelegate
+    AFOnResponseDelegate<TResponse>? onSuccessDelegate, 
+    AFOnErrorDelegate? onErrorDelegate
   }): super(id: id, onSuccessDelegate: onSuccessDelegate, onPreExecuteResponseDelegate: onPreExecuteResponseDelegate);
 
   void afShutdown() {

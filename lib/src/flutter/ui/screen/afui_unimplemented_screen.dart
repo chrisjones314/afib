@@ -38,7 +38,7 @@ class AFUIUnimplementedScreen extends AFUIConnectedScreen<AFUIUnimplementedScree
   AFUIUnimplementedScreen(): super(screenId: AFUIScreenID.screenUnimplemented, config: config);
 
   static AFNavigatePushAction navigatePush(String message) {
-    return AFNavigatePushAction(routeParam: AFUIUnimplementedScreenRouteParam(message: message));
+    return AFNavigatePushAction(param: AFUIUnimplementedScreenRouteParam(message: message));
   }
 
   @override

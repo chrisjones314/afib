@@ -158,7 +158,13 @@ class AFCodeGenerator {
   }
 
   void ensureFolderExists(List<String> path) {
-    ensuredFolders.add(path);
+
+    final modifiedPath = path.toList();
+    if(AFibD.config.isLibraryCommand && path.first == libFolder) {
+      modifiedPath.insert(1, srcFolder);
+    }
+
+    ensuredFolders.add(modifiedPath);
   }
 
   List<String>? pathTheme(String themeName, { required bool isCustomParent }) {
@@ -180,7 +186,7 @@ class AFCodeGenerator {
   }
 
   String get stateFullLoginID {
-    return "stateFullLogin";
+    return "${AFibD.config.appNamespace}StateFullLogin";
   }
 
   String? _namedObjectToFilename(String stateViewName, String suffix) {

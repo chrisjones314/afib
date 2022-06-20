@@ -16,43 +16,55 @@ class [!af_app_namespace(upper)]LibraryID {
 }
 
 class [!af_app_namespace(upper)]QueryID extends AFQueryID {
+
+
   const [!af_app_namespace(upper)]QueryID(String code): super(code, [!af_app_namespace(upper)]LibraryID.id);
 }
 
 class [!af_app_namespace(upper)]ThemeID extends AFThemeID {
-  static const tag[!af_app_namespace(upper)]Theme = "[!af_app_namespace]";
-  static const defaultTheme = [!af_app_namespace(upper)]ThemeID("default_theme", tag[!af_app_namespace(upper)]Theme);
+  static const defaultTheme = [!af_app_namespace(upper)]ThemeID("defaultTheme");
 
-
-  const [!af_app_namespace(upper)]ThemeID(String code, String tag): super(code, [!af_app_namespace(upper)]LibraryID.id, tag);   
+  const [!af_app_namespace(upper)]ThemeID(String code): super(code, [!af_app_namespace(upper)]LibraryID.id);   
 }
 
 class [!af_app_namespace(upper)]ScreenID extends AFScreenID {
+
+
   const [!af_app_namespace(upper)]ScreenID(String code) : super(code, [!af_app_namespace(upper)]LibraryID.id);
 }
 
 class [!af_app_namespace(upper)]WidgetID extends AFWidgetID {  
+
+
   const [!af_app_namespace(upper)]WidgetID(String code) : super(code, [!af_app_namespace(upper)]LibraryID.id);
 }
 
 class [!af_app_namespace(upper)]LibraryProgrammingInterfaceID extends AFLibraryProgrammingInterfaceID {  
+
+
   const [!af_app_namespace(upper)]LibraryProgrammingInterfaceID(String code) : super(code, [!af_app_namespace(upper)]LibraryID.id);
 }
 
 class [!af_app_namespace(upper)]TestDataID {
-  static const stateFullLogin = "[!af_app_namespace]StateFullLogin";
+  static const [!af_app_namespace]StateFullLogin = "[!af_app_namespace]StateFullLogin";
 }
 
 class [!af_app_namespace(upper)]StateTestID extends AFStateTestID {
-  const [!af_app_namespace(upper)]StateTestID(String code, { List<String>? tags }): super(code, [!af_app_namespace(upper)]LibraryID.id, tags: tags); 
+
+
+  const [!af_app_namespace(upper)]StateTestID(String code): super(code, [!af_app_namespace(upper)]LibraryID.id); 
 }
 
 class [!af_app_namespace(upper)]ScreenTestID extends AFScreenTestID {
-  const [!af_app_namespace(upper)]ScreenTestID(String code, { List<String>? tags }): super(code, [!af_app_namespace(upper)]LibraryID.id, tags: tags); 
+
+
+  const [!af_app_namespace(upper)]ScreenTestID(String code): super(code, [!af_app_namespace(upper)]LibraryID.id); 
 }
 
 class [!af_app_namespace(upper)]PrototypeID extends AFPrototypeID {
-  const [!af_app_namespace(upper)]PrototypeID(String code, { List<String>? tags }): super(code, [!af_app_namespace(upper)]LibraryID.id, tags: tags); 
+
+
+  const [!af_app_namespace(upper)]PrototypeID(String code): super(code, [!af_app_namespace(upper)]LibraryID.id); 
 }
 
 ''';

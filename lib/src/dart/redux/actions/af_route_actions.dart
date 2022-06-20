@@ -99,6 +99,13 @@ class AFNavigateReplaceAllAction extends AFNavigateAction {
   factory AFNavigateReplaceAllAction.toStartupScreen({required AFRouteParam param}) {
     return AFNavigateReplaceAllAction(param: param);
   }
+
+  AFNavigatePushAction toPush() {
+    return AFNavigatePushAction(
+      id: id,
+      param: param
+    );
+  }
 }
 
 /// Action that adds a new screen after the current screen in the route.
@@ -107,11 +114,11 @@ class AFNavigateReplaceAllAction extends AFNavigateAction {
 class AFNavigatePushAction extends AFNavigateActionWithReturn {
   AFNavigatePushAction({
     AFID? id, 
-    required AFRouteParam routeParam, 
+    required AFRouteParam param, 
     List<AFRouteParam>? children,
     AFActionOnReturnDelegate? onReturn,
     AFCreateDefaultChildParamDelegate? createDefaultChildParam,
-  }): super(id: id, param: routeParam, children: children, onReturn: onReturn, createDefaultChildParam: createDefaultChildParam);
+  }): super(id: id, param: param, children: children, onReturn: onReturn, createDefaultChildParam: createDefaultChildParam);
 
 }
 

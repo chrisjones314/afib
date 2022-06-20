@@ -44,7 +44,7 @@ class AFUIPrototypeLibraryHomeScreen extends AFUIConnectedScreen<AFUIPrototypeLi
 
   static AFNavigatePushAction navigatePush(AFUILibraryExtensionContext libraryContext) {
     return AFNavigatePushAction(
-      routeParam: AFUIPrototypeLibraryHomeParam.create(libraryContext));
+      param: AFUIPrototypeLibraryHomeParam.create(libraryContext));
   }
 
   @override

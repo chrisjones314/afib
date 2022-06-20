@@ -243,7 +243,7 @@ Future<void> _afSingleScreenTestMain<TState extends AFFlexibleState>(AFCommandOu
       AFUpdateActivePrototypeAction(prototypeId: test.id),
       AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: stateViews),
       AFNavigatePushAction(
-        routeParam: test.navigate.param,
+        param: test.navigate.param,
         children: test.navigate.children,
         createDefaultChildParam: test.navigate.createDefaultChildParam,
       )

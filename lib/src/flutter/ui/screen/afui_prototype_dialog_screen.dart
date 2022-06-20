@@ -55,7 +55,7 @@ class AFUIPrototypeDialogScreen extends AFUIConnectedScreen<AFUIPrototypeDialogS
   static AFNavigateAction navigatePush(AFDialogPrototype test, {AFID? id}) {
     return AFNavigatePushAction(
       id: id,
-      routeParam: AFUIPrototypeDialogRouteParam(test: test, routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeDialog)),
+      param: AFUIPrototypeDialogRouteParam(test: test, routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeDialog)),
     );
   }
 

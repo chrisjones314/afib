@@ -35,7 +35,7 @@ class AFUIPrototypeWireframesListScreen extends AFUIConnectedScreen<AFUIPrototyp
 
   static AFNavigatePushAction navigatePush() {
     return AFNavigatePushAction(
-      routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeWireframesList)
+      param: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeWireframesList)
     );
   }
 

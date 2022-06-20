@@ -7,7 +7,7 @@ void main(List<String> argsIn) {
   final argsFull = AFArgs.create(argsIn);
   
   //argsFull.setDebugArgs("create ui_library hellolib hl");
-  //argsFull.setDebugArgs("create app hellocounter hc");
+  //argsFull.setDebugArgs("create ui_library dinnerfamilias_shared dfs");
 
   afBootstrapCommandMain(emptyParams, argsFull);
 }

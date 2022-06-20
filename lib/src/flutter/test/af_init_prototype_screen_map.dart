@@ -23,7 +23,7 @@ void afInitPrototypeScreenMap(AFScreenMap screens) {
   final config = AFibD.config;
   final env = config.environment;
   if(env == AFEnvironment.prototype) {
-    screens.registerStartupScreen(AFUIScreenID.screenPrototypeHome, () => AFUIPrototypeHomeScreenParam.createOncePerScreen(filter: enabledTests.join(" ")));
+    screens.registerStartupScreen(AFUIScreenID.screenPrototypeHome, () => AFUIPrototypeHomeScreenParam.createOncePerScreen());
   } else {
     assert(config.isPrototypeEnvironment);
     screens.registerStartupScreen(AFUIScreenID.screenPrototypeLoading, () => AFRouteParam(id: AFUIScreenID.screenPrototypeLoading));

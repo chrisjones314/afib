@@ -32,7 +32,7 @@ class AFUIPrototypeWaitingScreen extends AFUIConnectedScreen<AFUIPrototypeWaitin
 
   static AFNavigatePushAction navigatePush() {
     return AFNavigatePushAction(
-      routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeWaiting));
+      param: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeWaiting));
   }
 
   @override

@@ -41,7 +41,7 @@ class AFStateTestStateVerificationContext {
     required this.afState,
   });
 
-  TAppState stateApp<TAppState extends AFFlexibleState>() {
+  TAppState accessComponentState<TAppState extends AFFlexibleState>() {
     return _findComponentState<TAppState>(afState);
   }
 

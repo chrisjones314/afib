@@ -48,14 +48,12 @@ class AFUIPrototypeHomeScreenParam extends AFRouteParamWithFlutterState {
     return copyWith(filter: filter);
   }
 
-  factory AFUIPrototypeHomeScreenParam.createOncePerScreen({
-    required String filter,
-  }) {
+  factory AFUIPrototypeHomeScreenParam.createOncePerScreen() {
     final textControllers = AFTextEditingControllers.createOne(AFUIWidgetID.editSearch, "");
     final flutterState = AFFlutterRouteParamState(
       textControllers: textControllers
     );
-
+    final filter = "";
     final controllers = AFTextEditingControllers.createOne(AFUIWidgetID.textTestSearch, filter);
     return AFUIPrototypeHomeScreenParam(
       view: viewFilter,

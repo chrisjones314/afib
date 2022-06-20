@@ -55,7 +55,7 @@ class AFUIPrototypeBottomSheetScreen extends AFUIConnectedScreen<AFUIPrototypeBo
   static AFNavigateAction navigatePush(AFBottomSheetPrototype test, {AFID? id}) {
     return AFNavigatePushAction(
       id: id,
-      routeParam: AFUIPrototypeBottomSheetRouteParam(test: test, routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeBottomSheet)),
+      param: AFUIPrototypeBottomSheetRouteParam(test: test, routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeBottomSheet)),
     );
   }
 

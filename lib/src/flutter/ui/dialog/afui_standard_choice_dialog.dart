@@ -55,7 +55,7 @@ class AFUIStandardChoiceDialog extends AFUIConnectedDialog<AFUIStandardChoiceDia
     required List<String> buttonTitles
   }) {
     return AFNavigatePushAction(
-      routeParam: AFUIStandardChoiceDialogRouteParam(
+      param: AFUIStandardChoiceDialogRouteParam(
         title: title,
         body: body,
         icon: icon,

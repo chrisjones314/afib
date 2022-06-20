@@ -98,7 +98,7 @@ class AFUIPrototypeTestScreen extends AFUIConnectedScreen<AFUIPrototypeTestScree
 
   static AFNavigatePushAction navigatePush(List<AFScreenPrototype> tests, dynamic title) {
     return AFNavigatePushAction(
-      routeParam: AFUIPrototypeTestScreenParam.createFromList(title: title, tests: tests));
+      param: AFUIPrototypeTestScreenParam.createFromList(title: title, tests: tests));
   }
 
   @override

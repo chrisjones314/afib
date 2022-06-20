@@ -173,7 +173,7 @@ class AFTestState {
       models: models,
       pass: 0, 
       errors: <String>[],
-      navigate: AFNavigatePushAction(routeParam: AFRouteParamUnused.unused),
+      navigate: AFNavigatePushAction(param: AFRouteParamUnused.unused),
       timeHandling: AFTestTimeHandling.running,
     );
     revisedStates[testId] = currentState.reviseModels(models);

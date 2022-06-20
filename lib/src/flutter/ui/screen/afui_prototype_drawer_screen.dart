@@ -55,7 +55,7 @@ class AFUIPrototypeDrawerScreen extends AFUIConnectedScreen<AFUIPrototypeDrawerS
   static AFNavigateAction navigatePush(AFDrawerPrototype test, {AFID? id}) {
     return AFNavigatePushAction(
       id: id,
-      routeParam: AFUIPrototypeDrawerScreenRouteParam(test: test, routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeDrawer)),
+      param: AFUIPrototypeDrawerScreenRouteParam(test: test, routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeDrawer)),
     );
   }
 

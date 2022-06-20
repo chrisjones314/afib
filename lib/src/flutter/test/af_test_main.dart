@@ -113,17 +113,17 @@ Future<void> afTestMainApp<TState extends AFFlexibleState>({
   final stats = AFTestStats();
 
   AFibD.logTestAF?.d("entering afUnitTestMain");
-  afUnitTestMain<TState>(output, stats, paramsDart);
+  afUnitTestMain(output, stats, paramsDart);
   AFibD.logTestAF?.d("exiting afUnitTestMain");
 
   // then state tests
   AFibD.logTestAF?.d("entering afStateTestMain");
-  afStateTestMain<TState>(output, stats, paramsDart);
+  afStateTestMain(output, stats, paramsDart);
   AFibD.logTestAF?.d("exiting afStateTestMain");
 
   /// then screen tests
   AFibD.logTestAF?.d("entering afScreenTestMain");
-  await afScreenTestMain<TState>(output, stats, paramsDart, widgetTester);
+  await afScreenTestMain(output, stats, paramsDart, widgetTester);
   AFibD.logTestAF?.d("exiting afScreenTestMain");
 
   if(stats.hasErrors) {

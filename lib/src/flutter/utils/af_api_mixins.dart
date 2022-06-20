@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/dart/redux/state/models/afui_proto_state.dart';
 import 'package:afib/src/flutter/ui/dialog/afui_standard_notification.dart';
 import 'package:afib/src/flutter/ui/screen/afui_demo_mode_transition_screen.dart';
 import 'package:flutter/material.dart';
@@ -341,8 +340,8 @@ mixin AFStandardAPIContextMixin<TState extends AFFlexibleState> implements AFDis
       final test = globalState.stateTests.findById(stateTestId);
 
       // build that state test only.
-      final testContext = AFStateTestContextForState<AFUIState>(
-        test as AFStateTest<AFFlexibleState>, 
+      final testContext = AFStateTestContextForState(
+        test as AFStateTest, 
         AFConceptualStore.demoModeStore,
         isTrueTestContext: true
       );

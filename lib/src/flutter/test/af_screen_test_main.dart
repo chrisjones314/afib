@@ -29,7 +29,7 @@ import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Future<void> afScreenTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, AFDartParams paramsD1, WidgetTester tester) async {
+Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams paramsD1, WidgetTester tester) async {
   final isWidget = AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.widgetTests);
   final isSingle = AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.screenTests);
   final isMulti  = AFConfigEntries.testsEnabled.isAreaEnabled(AFibD.config, AFConfigEntryEnabledTests.workflowTests);
@@ -60,27 +60,27 @@ Future<void> afScreenTestMain<TState extends AFFlexibleState>(AFCommandOutput ou
     ));            
 
     if(isWidget) {
-      await _afWidgetTestMain<TState>(output, stats, tester, app);
+      await _afWidgetTestMain(output, stats, tester, app);
     }
 
     if(isDialog) {
-      await _afDialogTestMain<TState>(output, stats, tester, app);
+      await _afDialogTestMain(output, stats, tester, app);
     }
 
     if(isBottomSheet) {
-      await _afBottomSheetTestMain<TState>(output, stats, tester, app);
+      await _afBottomSheetTestMain(output, stats, tester, app);
     }
 
     if(isDrawer) {
-      await _afDrawerTestMain<TState>(output, stats, tester, app);
+      await _afDrawerTestMain(output, stats, tester, app);
     }
 
     if(isSingle) {
-      await _afSingleScreenTestMain<TState>(output, stats, tester, app);
+      await _afSingleScreenTestMain(output, stats, tester, app);
     }
 
     if(isMulti) {
-      await _afWorkflowTestMain<TState>(output, stats, tester, app);
+      await _afWorkflowTestMain(output, stats, tester, app);
     }
   }
 
@@ -89,7 +89,7 @@ Future<void> afScreenTestMain<TState extends AFFlexibleState>(AFCommandOutput ou
 
 
 
-Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
+Future<void> _afStandardScreenTestMain(
   AFCommandOutput output, 
   AFTestStats stats, 
   WidgetTester tester, 
@@ -166,8 +166,8 @@ Future<void> _afStandardScreenTestMain<TState extends AFFlexibleState>(
   stats.mergeIn(localStats);
 }
 
-Future<void> _afWidgetTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
-  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.widgetTests.all, "Widget", createPush: (test) {
+Future<void> _afWidgetTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+  return _afStandardScreenTestMain(output, stats, tester, app, AFibF.g.widgetTests.all, "Widget", createPush: (test) {
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
       AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models),
@@ -176,8 +176,8 @@ Future<void> _afWidgetTestMain<TState extends AFFlexibleState>(AFCommandOutput o
   });
 }
 
-Future<void> _afDialogTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
-  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.dialogTests.all, "Dialog", createPush: (test) {
+Future<void> _afDialogTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+  return _afStandardScreenTestMain(output, stats, tester, app, AFibF.g.dialogTests.all, "Dialog", createPush: (test) {
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
       AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models),
@@ -196,8 +196,8 @@ Future<void> _afDialogTestMain<TState extends AFFlexibleState>(AFCommandOutput o
   });
 }
 
-Future<void> _afBottomSheetTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
-  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.bottomSheetTests.all, "BottomSheet", createPush: (test) {
+Future<void> _afBottomSheetTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+  return _afStandardScreenTestMain(output, stats, tester, app, AFibF.g.bottomSheetTests.all, "BottomSheet", createPush: (test) {
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
       AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models),
@@ -216,8 +216,8 @@ Future<void> _afBottomSheetTestMain<TState extends AFFlexibleState>(AFCommandOut
   });
 }
 
-Future<void> _afDrawerTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
-  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.drawerTests.all, "Drawer", createPush: (test) {
+Future<void> _afDrawerTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+  return _afStandardScreenTestMain(output, stats, tester, app, AFibF.g.drawerTests.all, "Drawer", createPush: (test) {
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
       AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models),
@@ -236,8 +236,8 @@ Future<void> _afDrawerTestMain<TState extends AFFlexibleState>(AFCommandOutput o
   });
 }
 
-Future<void> _afSingleScreenTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
-  return _afStandardScreenTestMain<TState>(output, stats, tester, app, AFibF.g.screenTests.all, "Single-Screen", createPush: (test) {
+Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+  return _afStandardScreenTestMain(output, stats, tester, app, AFibF.g.screenTests.all, "Single-Screen", createPush: (test) {
     final stateViews = AFibF.g.testData.resolveStateViewModels(test.models);
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),

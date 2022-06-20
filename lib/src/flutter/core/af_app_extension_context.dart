@@ -438,18 +438,18 @@ class AFAppLibraryExtensionContext {
   }
 }
 
-class AFUILibraryExtensionContext<TState extends AFFlexibleState> extends AFPluginExtensionContext {
+class AFUILibraryExtensionContext extends AFPluginExtensionContext {
   final AFLibraryID id;
 
   AFUILibraryExtensionContext({
     required this.id,
   });
 
-  AFLibraryTestHolder<TState> createScreenTestHolder() {
-    return AFLibraryTestHolder<TState>();
+  AFLibraryTestHolder createScreenTestHolder() {
+    return AFLibraryTestHolder();
   }
 
-  void initializeLibraryFundamentals<TState extends AFFlexibleState>({
+  void initializeLibraryFundamentals({
     required AFInitUIDelegate defineUI,
     AFInitPluginFundamentalThemeDelegate? defineFundamentalThemeArea,
     AFInitializeComponentStateDelegate? initializeComponentState,

@@ -1,15 +1,13 @@
 import 'package:afib/afib_flutter.dart';
 
-class AFAlwaysFailQuery<TState extends AFFlexibleState> extends AFAsyncQuery<String> {
+class AFAlwaysFailQuery extends AFAsyncQuery<String> {
   final String message;
   
   //------------------------------------------------------------------------
   AFAlwaysFailQuery({
     required this.message, 
     AFID? id
-  }): super(id: id) {
-    assert(TState != AFFlexibleState);
-  }
+  }): super(id: id);
   
   //------------------------------------------------------------------------
   @override

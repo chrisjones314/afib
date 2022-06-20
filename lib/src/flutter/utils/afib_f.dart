@@ -79,16 +79,16 @@ class AFWidgetsBindingObserver extends WidgetsBindingObserver {
   }
 }
 
-class AFLibraryTestHolder<TState extends AFFlexibleState> {
-  final AFStateTests afStateTests = AFStateTests<TState>();
+class AFLibraryTestHolder {
+  final AFStateTests afStateTests = AFStateTests();
   final AFUnitTests afUnitTests = AFUnitTests();
   final AFSingleScreenTests afScreenTests = AFSingleScreenTests();
   final AFWidgetTests afWidgetTests = AFWidgetTests();
   final AFDialogTests afDialogTests = AFDialogTests();
   final AFBottomSheetTests afBottomSheetTests = AFBottomSheetTests();
   final AFDrawerTests afDrawerTests = AFDrawerTests();
-  final AFWorkflowStateTests afWorkflowStateTests = AFWorkflowStateTests<TState>();
-  final AFWorkflowStateTests afWorkflowTestsForStateTests = AFWorkflowStateTests<TState>();
+  final AFWorkflowStateTests afWorkflowStateTests = AFWorkflowStateTests();
+  final AFWorkflowStateTests afWorkflowTestsForStateTests = AFWorkflowStateTests();
 }
 
 class AFTestMissingTranslations {
@@ -146,7 +146,7 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   final AFAppExtensionContext appContext;
 
   final AFDefineTestDataContext _afTestData = AFDefineTestDataContext.create();
-  final primaryUITests = AFLibraryTestHolder<TState>();
+  final primaryUITests = AFLibraryTestHolder();
   final thirdPartyUITests = <AFLibraryID, AFLibraryTestHolder>{};
   final internalOnlyScreens = <AFScreenID, AFibTestOnlyScreenElement>{};
   AFibTestOnlyScreenElement? testOnlyMostRecentScreen;

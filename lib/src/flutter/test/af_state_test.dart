@@ -72,7 +72,7 @@ class AFStateTestStateVerificationContext {
   }
 }
 
-abstract class AFStateTestContext<TState extends AFFlexibleState> extends AFStateTestExecute {
+abstract class AFStateTestContext extends AFStateTestExecute {
   AFStateTest test;
   static AFStateTestContext? currentTest;
   final bool isTrueTestContext;
@@ -82,7 +82,6 @@ abstract class AFStateTestContext<TState extends AFFlexibleState> extends AFStat
 
   AFStateTestID get testID { return this.test.id as AFStateTestID; }
   AFState get afState { return store.state; }
-  TState? get state { return store.state.public.componentStateOrNull<TState>(); }
   AFRouteState get route { return store.state.public.route; }
   AFPublicState get public { return store.state.public; }
   AFTimeState get currentTime { return public.time; }
@@ -111,7 +110,7 @@ abstract class AFStateTestContext<TState extends AFFlexibleState> extends AFStat
   }
 }
 
-class AFStateTestContextForState<TState extends AFFlexibleState> extends AFStateTestContext<TState> {
+class AFStateTestContextForState extends AFStateTestContext {
 
   AFStateTestContextForState(
     AFStateTest test, 
@@ -129,7 +128,7 @@ class AFStateTestContextForState<TState extends AFFlexibleState> extends AFState
   }
 }
 
-class AFStateTestContextForScreen<TState extends AFFlexibleState> extends AFStateTestContext<TState> {
+class AFStateTestContextForScreen extends AFStateTestContext {
 
   AFStateTestContextForScreen(
     AFStateTest test,
@@ -148,10 +147,10 @@ class AFStateTestContextForScreen<TState extends AFFlexibleState> extends AFStat
 }
 
 
-class AFStateTests<TState extends AFFlexibleState> {
+class AFStateTests {
   final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
-  final List<AFStateTest<dynamic>> tests = <AFStateTest<dynamic>>[];
-  AFStateTestContext<dynamic>? context;
+  final List<AFStateTest> tests = <AFStateTest>[];
+  AFStateTestContext? context;
 
   void addTest({
     required AFStateTestID id, 
@@ -161,7 +160,7 @@ class AFStateTests<TState extends AFFlexibleState> {
     String? description,
     String? disabled 
   }) {
-    final test = AFStateTest<TState>(
+    final test = AFStateTest(
       id: id, 
       idPredecessor: extendTest,
       tests: this,
@@ -176,14 +175,14 @@ class AFStateTests<TState extends AFFlexibleState> {
     body(defContext);
   }
 
-  List<AFStateTest<dynamic>> get all {
+  List<AFStateTest> get all {
     return tests;
   }
 
   AFStateTest? findById(AFStateTestID id) {
     for(var test in tests) {
       if(test.id == id) {
-        return test as AFStateTest;
+        return test;
       }
     }
     return null;
@@ -242,7 +241,7 @@ class _AFStateTestInjectListenerQueryResponseStatement extends _AFStateTestExecu
   _AFStateTestInjectListenerQueryResponseStatement(this.querySpecfier, this.result);
 
   @override
-  _AFStateTestExecutionNext execute(AFStateTestContext<AFFlexibleState> context, {required bool verify}) {
+  _AFStateTestExecutionNext execute(AFStateTestContext context, {required bool verify}) {
     // need to lookup the query
     final listenerId = AFStateTest.specifierToId(querySpecfier);
     final listenerQuery = AFibF.g.internalOnlyActiveStore.state.public.queries.findListenerQueryById(listenerId);
@@ -259,7 +258,7 @@ class _AFStateTestDebugStopHereStatement extends _AFStateTestExecutionStatement 
   
   
   @override
-  _AFStateTestExecutionNext execute(AFStateTestContext<AFFlexibleState> context, {required bool verify}) {
+  _AFStateTestExecutionNext execute(AFStateTestContext context, {required bool verify}) {
     return _AFStateTestExecutionNext.stop;
   }
 
@@ -773,10 +772,10 @@ class AFStateTestWidgetShortcut<TSPI extends AFWidgetStateProgrammingInterface> 
 
 }
 
-class AFSpecificStateTestDefinitionContext<TState extends AFFlexibleState> {
+class AFSpecificStateTestDefinitionContext {
   static const errSpecifyTypeParameter = "You must specify a type parameter to this function call";
   final AFStateTestDefinitionContext definitions;
-  final AFStateTest<TState> test;
+  final AFStateTest test;
   AFSpecificStateTestDefinitionContext(this.definitions, this.test);
 
   AFStateTestScreenShortcut<TSPI> createScreenShortcut<TSPI extends AFScreenStateProgrammingInterface>(AFScreenID screenId) {
@@ -1002,8 +1001,8 @@ class _AFStateExtendedExecutionConfiguration {
   
 }
 
-class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescription {
-  final AFStateTests<TState> tests;
+class AFStateTest extends AFScreenTestDescription {
+  final AFStateTests tests;
   final AFStateTestID? idPredecessor;
   final Map<String, _AFStateResultEntry> results = <String, _AFStateResultEntry>{};
   final extendedStatements = _AFStateExtendedExecutionConfiguration();
@@ -1020,9 +1019,6 @@ class AFStateTest<TState extends AFFlexibleState> extends AFScreenTestDescriptio
     registerResult<AFAlwaysFailQuery>(AFAlwaysFailQuery, (context, query) {
       query.testFinishAsyncWithError(context, AFQueryError(message: "Always fail in state test"));
     });
-    if(TState.runtimeType == AFFlexibleState) {
-      throw AFException("You must explicitly specify your app state on AFStateTest instances");
-    }
   }
 
 

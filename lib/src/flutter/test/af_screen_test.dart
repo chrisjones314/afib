@@ -1762,7 +1762,7 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
     //final mainDispatcher = AFStoreDispatcher(store);    
     //final stateDispatcher = AFStateScreenTestDispatcher(mainDispatcher);
 
-    final stateTestContext = AFStateTestContextForState<TState>(testImpl,  AFConceptualStore.appStore, isTrueTestContext: false);
+    final stateTestContext = AFStateTestContextForState(testImpl,  AFConceptualStore.appStore, isTrueTestContext: false);
     testImpl.execute(stateTestContext);
     //stateTestContext.dispatcher = mainDispatcher;
 
@@ -2435,7 +2435,7 @@ class AFWorkflowStateTestPrototype {
 /// 
 /// These tests by combine an initial state from an [AFStateTest] with a series
 /// of screen manipulations from an [AFScreenTest]
-class AFWorkflowStateTests<TState extends AFFlexibleState> {
+class AFWorkflowStateTests {
   final stateTests = <AFWorkflowStatePrototype>[];
 
   AFWorkflowStateTestPrototype addPrototype({
@@ -2448,7 +2448,7 @@ class AFWorkflowStateTests<TState extends AFFlexibleState> {
     return instance.body;
   }
 
-  static AFWorkflowStatePrototype createPrototype<TState extends AFFlexibleState>({
+  static AFWorkflowStatePrototype createPrototype({
     required AFWorkflowStateTests tests,
     required AFPrototypeID id,
     required AFBaseTestID stateTestId,

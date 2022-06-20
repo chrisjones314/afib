@@ -4,7 +4,7 @@ import 'package:afib/src/flutter/utils/af_api_mixins.dart';
 import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
 
-class AFCurrentStateContext<TState extends AFFlexibleState> with AFStandardAPIContextMixin, AFNonUIAPIContextMixin, AFAccessStateSynchronouslyMixin {
+class AFCurrentStateContext with AFStandardAPIContextMixin, AFNonUIAPIContextMixin, AFAccessStateSynchronouslyMixin {
   final AFDispatcher dispatcher;
   final AFConceptualStore targetStore;
 
@@ -22,7 +22,7 @@ class AFCurrentStateContext<TState extends AFFlexibleState> with AFStandardAPICo
   }
 }
 
-class AFLibraryProgrammingInterfaceContext<TState extends AFFlexibleState> extends AFCurrentStateContext {
+class AFLibraryProgrammingInterfaceContext extends AFCurrentStateContext {
   AFLibraryProgrammingInterfaceContext({
     required AFDispatcher dispatcher,
     required AFConceptualStore targetStore,
@@ -38,7 +38,7 @@ class AFLibraryProgrammingInterfaceContext<TState extends AFFlexibleState> exten
 
 
 @immutable
-class AFLibraryProgrammingInterface<TState extends AFFlexibleState> {
+class AFLibraryProgrammingInterface {
   final AFLibraryProgrammingInterfaceID id;
 
   @protected 

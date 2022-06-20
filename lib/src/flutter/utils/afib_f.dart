@@ -142,7 +142,7 @@ class AFibStateStackEntry {
 }
 
 
-class AFibGlobalState<TState extends AFFlexibleState> {
+class AFibGlobalState {
   final AFAppExtensionContext appContext;
 
   final AFDefineTestDataContext _afTestData = AFDefineTestDataContext.create();
@@ -432,8 +432,8 @@ class AFibGlobalState<TState extends AFFlexibleState> {
   }
 
   void finishAsyncWithError(AFFinishQueryErrorContext context) {
-    final handler = appContext.errorHandlerForState<TState>();
-    if(handler != null) {
+    final handlers = appContext.errorHandlers;
+    for(final handler in handlers) {
       handler(context);
     }
   }
@@ -912,10 +912,10 @@ class AFibF {
 
   static AFibGlobalState? global;
 
-  static void initialize<TState extends AFFlexibleState>(
+  static void initialize(
     AFAppExtensionContext appContext,
     AFConceptualStore activeConceptualStore) {
-    global = AFibGlobalState<TState>(
+    global = AFibGlobalState(
       appContext: appContext,
       activeConceptualStore: activeConceptualStore,
     );

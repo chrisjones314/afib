@@ -358,7 +358,7 @@ class AFPluginExtensionContext {
   final thirdParty = AFAppLibraryExtensionContext();
   final defineUI = <AFInitUIDelegate>[];
   final defineFundamentalThemeAreas = <AFInitPluginFundamentalThemeDelegate>[];
-  final errorListenerByState = <Type, AFOnErrorDelegate>{};
+  final errorListeners = <AFOnErrorDelegate>[];
 
   /// Used by third parties to register extra query actions they'd like to take.
   void addPluginStartupQuery(AFCreateStartupQueryActionDelegate createStartupQueryAction) {
@@ -394,8 +394,8 @@ class AFPluginExtensionContext {
     querySuccessListenerDelegates.add(queryListenerDelegate);
   } 
 
-  void addQueryErrorListener<TState extends AFFlexibleState>(AFOnErrorDelegate onError) {
-    errorListenerByState[TState] = onError;
+  void addQueryErrorListener(AFOnErrorDelegate onError) {
+    errorListeners.add(onError);
   }
 
   void defineScreenMap(AFScreenMap screenMap, Iterable<AFUILibraryExtensionContext> libraries) {
@@ -474,7 +474,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
 
   /// Used by the app to specify fundamental configuration/functionality
   /// that AFib requires.
-  void initializeAppFundamentals<TState extends AFFlexibleState>({
+  void initializeAppFundamentals({
     required AFInitAppFundamentalThemeDelegate defineFundamentalThemeArea,
     required AFInitializeComponentStateDelegate initializeAppState,
     required AFCreateStartupQueryActionDelegate createStartupQueryAction,
@@ -486,7 +486,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     this.defineUI.add(defineUI);
     this.initialComponentStates.add(initializeAppState);
     this.createStartupQueries.add(createStartupQueryAction);
-    this.errorListenerByState[TState] = queryErrorHandler;
+    this.errorListeners.add(queryErrorHandler);
     this.createApp = createApp;
     this.defineFundamentalThemeArea = defineFundamentalThemeArea;
     _verifyNotNull(defineFundamentalThemeArea, "defineFundamentalTheme");
@@ -503,7 +503,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     this.defineScreenMaps.addAll(source.defineScreenMaps);
     this.initialComponentStates.addAll(source.initialComponentStates);
     this.createStartupQueries.addAll(source.createStartupQueries);
-    this.errorListenerByState.addAll(source.errorListenerByState);
+    this.errorListeners.addAll(source.errorListeners);
     this.createApp = createApp;
     this.test = source.test;
     this.test.initializeForApp();
@@ -513,8 +513,8 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     this.defineUI.addAll(source.defineUI);    
   }
 
-  AFOnErrorDelegate? errorHandlerForState<TState extends AFFlexibleState>() {
-    return errorListenerByState[TState];
+  List<AFOnErrorDelegate> get errorHandlers {
+    return errorListeners;
   }
 
   void dispatchStartupQueries(AFDispatcher dispatcher) {

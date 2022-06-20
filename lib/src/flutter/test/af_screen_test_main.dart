@@ -251,7 +251,7 @@ Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, 
   });
 }
 
-Future<void> _afWorkflowTestMain<TState extends AFFlexibleState>(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
+Future<void> _afWorkflowTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
  final multiContexts = <AFScreenTestContextWidgetTester>[];
   final testKind = "Workflow";
   final localStats = AFTestStats();
@@ -272,7 +272,7 @@ Future<void> _afWorkflowTestMain<TState extends AFFlexibleState>(AFCommandOutput
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, test.id, output, localStats);
       multiContexts.add(context);
 
-      AFWorkflowStatePrototype.initializeMultiscreenPrototype<TState>(dispatcher, test);
+      AFWorkflowStatePrototype.initializeMultiscreenPrototype(dispatcher, test);
       
       // tell the store to go to the correct screen.
       await tester.pumpAndSettle(Duration(seconds: 1));

@@ -36,7 +36,7 @@ class AFibTestsFailedMatcher extends Matcher {
   }
 }
 
-Future<void> afTestMainUILibrary<TState extends AFFlexibleState>({
+Future<void> afTestMainUILibrary({
   required AFLibraryID id, 
   required AFExtendBaseDelegate extendBase, 
   required AFExtendBaseDelegate extendBaseLibrary, 
@@ -56,7 +56,7 @@ Future<void> afTestMainUILibrary<TState extends AFFlexibleState>({
     );
   };
 
-  return afTestMainApp<TState>(
+  return afTestMainApp(
     id: AFUILibraryID.id,
     extendBase: extendBase, 
     extendBaseLibrary: extendBaseLibrary, 
@@ -69,7 +69,7 @@ Future<void> afTestMainUILibrary<TState extends AFFlexibleState>({
 }
 
 /// The main function which executes the store test defined in your initStateTests function.
-Future<void> afTestMainApp<TState extends AFFlexibleState>({
+Future<void> afTestMainApp({
   required AFLibraryID id,
   AFExtendBaseDelegate? extendBase, 
   AFExtendBaseDelegate? extendBaseLibrary, 
@@ -106,7 +106,7 @@ Future<void> afTestMainApp<TState extends AFFlexibleState>({
   if(extendUILibrary != null) {
     extendUILibrary(context.thirdParty);
   }
-  AFibF.initialize<TState>(context, AFConceptualStore.appStore);
+  AFibF.initialize(context, AFConceptualStore.appStore);
 
   // first unit tests
   final output = AFCommandOutput();

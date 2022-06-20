@@ -1,6 +1,5 @@
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_typedefs_command.dart';
-import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
@@ -18,7 +17,7 @@ void afMainWrapper(Function() onReady) {
 
 
 /// [afMainApp] handles startup, execution, and shutdown sequence for an afApp
-void afMainApp<TState extends AFFlexibleState>({
+void afMainApp({
   required AFDartParams paramsDart, 
   AFExtendBaseDelegate? extendBase,
   AFExtendBaseDelegate? extendBaseLibrary,
@@ -45,7 +44,7 @@ void afMainApp<TState extends AFFlexibleState>({
   }
 
 
-  AFibF.initialize<TState>(context, AFConceptualStore.appStore);
+  AFibF.initialize(context, AFConceptualStore.appStore);
   
   final createApp = AFibF.g.createApp;
   if(createApp == null) throw AFException("Missing create app function");

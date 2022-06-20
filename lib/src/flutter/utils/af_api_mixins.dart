@@ -83,7 +83,7 @@ mixin AFAccessStateSynchronouslyMixin {
 
 }
 
-mixin AFStandardAPIContextMixin<TState extends AFFlexibleState> implements AFDispatcher {
+mixin AFStandardAPIContextMixin implements AFDispatcher {
 
   AFDispatcher get dispatcher;
   AFConceptualStore get targetStore;

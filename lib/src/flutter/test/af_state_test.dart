@@ -1095,7 +1095,7 @@ class AFStateTest extends AFScreenTestDescription {
   
   /// Process a query by looking up the results we have for that query,
   /// and then feeding them to its testAsyncResponse method.
-  static void processQuery<TState extends AFFlexibleState>(AFStateTestContext context, AFAsyncQuery query, AFStore store, AFDispatcher dispatcher) {
+  static void processQuery(AFStateTestContext context, AFAsyncQuery query, AFStore store, AFDispatcher dispatcher) {
     final key = AFStateTest.specifierToId(query);
     final results = context.test.results;
 

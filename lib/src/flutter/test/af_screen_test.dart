@@ -1695,7 +1695,7 @@ class AFDrawerPrototype extends AFScreenLikePrototype {
 
 /// The information necessary to start a test with a baseline state
 /// (determined by a state test) and an initial screen/route.
-class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenPrototype {
+class AFWorkflowStatePrototype extends AFScreenPrototype {
   final AFStateTestID stateTestId;
   final AFWorkflowStateTestPrototype body;
   final AFID? actualDisplayId;
@@ -1740,10 +1740,10 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
   }
 
   void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? models }) {
-    initializeMultiscreenPrototype<TState>(dispatcher, this);
+    initializeMultiscreenPrototype(dispatcher, this);
   }
 
-  static void initializeMultiscreenPrototype<TState extends AFFlexibleState>(AFDispatcher dispatcher, AFWorkflowStatePrototype test) {
+  static void initializeMultiscreenPrototype(AFDispatcher dispatcher, AFWorkflowStatePrototype test) {
     dispatcher.dispatch(AFResetToInitialStateAction());
     dispatcher.dispatch(AFUpdateActivePrototypeAction(prototypeId: test.id));
 
@@ -1827,7 +1827,7 @@ class AFWorkflowStatePrototype<TState extends AFFlexibleState> extends AFScreenP
 
   void onDrawerReset(AFDispatcher dispatcher) {
     dispatcher.dispatch(AFNavigateExitTestAction());
-    initializeMultiscreenPrototype<TState>(dispatcher, this);
+    initializeMultiscreenPrototype(dispatcher, this);
   }
 
   @override
@@ -2170,7 +2170,7 @@ abstract class AFWorkflowTestExecute {
     required Function(AFScreenTestExecute) body,
   });
   
-  Future<void> pushQueryListener<TState extends AFFlexibleState, TQueryResponse>(AFAsyncListenerQuery specifier, AFWorkflowTestDefinitionContext definitions, dynamic testData);
+  Future<void> pushQueryListener<TQueryResponse>(AFAsyncListenerQuery specifier, AFWorkflowTestDefinitionContext definitions, dynamic testData);
 }
 
 
@@ -2196,8 +2196,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     } 
   }
 
-  Future<void> pushQueryListener<TState extends AFFlexibleState, TQueryResponse>(AFAsyncListenerQuery query, AFWorkflowTestDefinitionContext definitions, dynamic testData) async {
-    assert(TState != AFFlexibleState, "You need to specify a AFFlexibleState subclass as a type parameter");
+  Future<void> pushQueryListener<TQueryResponse>(AFAsyncListenerQuery query, AFWorkflowTestDefinitionContext definitions, dynamic testData) async {
     assert(TQueryResponse != dynamic, "You need to specify a type for the query response");
     final td = definitions.td(testData);
     final successContext = AFFinishQuerySuccessContext<TQueryResponse>(

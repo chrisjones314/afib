@@ -15,9 +15,9 @@ void queryErrorHandler(AFFinishQueryErrorContext context) {
 
 }
 
-void extendApp(AFAppExtensionContext extend) {
+void installCoreApp(AFAppExtensionContext context) {
 
-    extend.initializeAppFundamentals(
+    context.installCoreApp(
       defineUI: defineUI,
       defineFundamentalThemeArea: defineFundamentalThemeArea, 
       createStartupQuery: () => StartupQuery(),
@@ -26,13 +26,13 @@ void extendApp(AFAppExtensionContext extend) {
     );
 
     // you can add queries to run at startup.
-    // extend.addPluginStartupQuery();
+    // context.addPluginStartupQuery();
 
     // you can add queries which respond to app lifecycle events
-    // extend.addLifecycleQueryAction((state) => UpdateLifecycleStateQuery(state: state));
+    // context.addLifecycleQueryAction((state) => UpdateLifecycleStateQuery(state: state));
     
     // you can add a callback which gets notified anytime a query successfully finishes.
-    // extend.addQuerySuccessListener();
+    // context.addQuerySuccessListener();
 }
 ''';
 }

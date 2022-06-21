@@ -210,7 +210,7 @@ class AFCodeGenerator {
   }
 
   List<String> get pathInstall {
-    final filename = "${appNamespace}_install.dart";
+    final filename = "${appNamespace}_install_core.dart";
     return _createPath(libPath, filename);
   }
 

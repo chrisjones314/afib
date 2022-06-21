@@ -22,10 +22,11 @@ void afMainUILibrary({
 
   final paramsProto = paramsDart.forceEnvironment(AFEnvironment.prototype);
  
-  final extendAppFull = (context) {
+  // ignore: omit_local_variable_types
+  final AFExtendAppDelegate extendAppFull = (context) {
     context.fromUILibrary(contextLibrary,
       createApp: () => AFAppUILibrary(),
-      defineFundamentalThemeArea: defineAFDefaultFundamentalThemeArea,
+      defineFundamentalTheme: defineAFDefaultFundamentalTheme,
     );
   };
 
@@ -33,7 +34,7 @@ void afMainUILibrary({
     paramsDart: paramsProto, 
     installBase: installBase,
     installBaseLibrary: installBaseLibrary,
-    installApp: extendAppFull,
+    installCoreApp: extendAppFull,
     installTest: installTest
   );
 }

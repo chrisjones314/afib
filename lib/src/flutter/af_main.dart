@@ -21,8 +21,8 @@ void afMainApp({
   required AFDartParams paramsDart, 
   AFExtendBaseDelegate? installBase,
   AFExtendBaseDelegate? installBaseLibrary,
-  required AFExtendAppDelegate installApp, 
-  AFExtendLibraryUIDelegate? installUILibrary, 
+  required AFExtendAppDelegate installCoreApp, 
+  AFExtendLibraryUIDelegate? installCoreLibrary, 
   required AFExtendTestDelegate installTest
 }) {
   final baseContext = AFBaseExtensionContext();
@@ -37,10 +37,10 @@ void afMainApp({
   final context = AFibF.context;
 
 
-  installApp(context);
+  installCoreApp(context);
   installTest(context.test);
-  if(installUILibrary != null) {
-    installUILibrary(context.thirdParty);
+  if(installCoreLibrary != null) {
+    installCoreLibrary(context.thirdParty);
   }
 
 

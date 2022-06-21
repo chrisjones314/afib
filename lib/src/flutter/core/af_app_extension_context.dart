@@ -276,8 +276,31 @@ class AFCoreDefinitionContext {
   final themeFactories = <AFThemeID, AFCreateFunctionalThemeDelegate>{};
   final AFScreenMap screenMap = AFScreenMap();
   final componentStateInitializers = <AFInitializeComponentStateDelegate>[];
-  
+  final errorListeners = <AFOnErrorDelegate>[];
+  final createStartupQueries = <AFCreateStartupQueryActionDelegate>[];
+  /// Used by the app or third parties to create a query that runs on lifecycle actions.
+  final createLifecycleQueryActions = <AFCreateLifecycleQueryAction>[];
+  /// Used by app or third parties to listen in to all successful queries.
+  final querySuccessListenerDelegates = <AFQuerySuccessListenerDelegate>[];
+
   AFCoreDefinitionContext();
+
+  void addQuerySuccessListener(AFQuerySuccessListenerDelegate queryListenerDelegate) {
+    querySuccessListenerDelegates.add(queryListenerDelegate);
+  } 
+
+  void addLifecycleQueryAction(AFCreateLifecycleQueryAction createLifecycleQueryAction) {
+    createLifecycleQueryActions.add(createLifecycleQueryAction);
+  }
+
+  /// Used by third parties to register extra query actions they'd like to take.
+  void addPluginStartupQuery(AFCreateStartupQueryActionDelegate createStartupQueryAction) {
+    createStartupQueries.add(createStartupQueryAction);
+  }
+
+  void addDefaultQueryErrorHandler(AFOnErrorDelegate onError) {
+    errorListeners.add(onError);
+  }
 
   void defineScreenSPIOverride<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme>({ required AFCreateScreenSPIDelegate<TSPI, TBuildContext, TTheme> createSPI }) {
     spiOverrides[TSPI] = ((context, theme, screenId, wid, paramSource) {
@@ -350,25 +373,37 @@ class AFCoreDefinitionContext {
     return result;
   }
 
+  void dispatchStartupQueries(AFDispatcher dispatcher) {
+    for(final creator in this.createStartupQueries) {
+      final action = creator();
+      dispatcher.dispatch(action);
+    }
+  }
+
+  void dispatchLifecycleActions(AFDispatcher dispatcher, AppLifecycleState lifecycle) {
+    for(final creator in createLifecycleQueryActions) {
+      final action = creator(lifecycle);
+      dispatcher.dispatch(action);  
+    }
+  }
+
+  void updateQueryListeners(AFAsyncQuery query, AFFinishQuerySuccessContext successContext) {
+    for(final listener in querySuccessListenerDelegates) {
+      listener(query, successContext);
+    }
+  }
+
 }
 
 class AFPluginExtensionContext {
   AFCreateAFAppDelegate? createApp;
-  AFInitAppFundamentalThemeDelegate? defineFundamentalThemeArea;
+  AFInitAppFundamentalThemeDelegate? defineAppFundamentalTheme;
   final defineScreenMaps = <AFInitScreenMapDelegate>[];
-  final createStartupQueries = <AFCreateStartupQueryActionDelegate>[];
-  final createLifecycleQueryActions = <AFCreateLifecycleQueryAction>[];
-  final querySuccessListenerDelegates = <AFQuerySuccessListenerDelegate>[];
   AFTestExtensionContext test = AFTestExtensionContext();
   final thirdParty = AFAppLibraryExtensionContext();
   final defineCore = <AFInitCoreDelegate>[];
-  final defineFundamentalThemeAreas = <AFInitPluginFundamentalThemeDelegate>[];
-  final errorListeners = <AFOnErrorDelegate>[];
-
-  /// Used by third parties to register extra query actions they'd like to take.
-  void addPluginStartupQuery(AFCreateStartupQueryActionDelegate createStartupQueryAction) {
-    createStartupQueries.add(createStartupQueryAction);
-  }
+  final defineFundamentalLibraryThemes = <AFInitPluginFundamentalThemeDelegate>[];
+  final themeInitializers = <AFInitPluginFundamentalThemeDelegate>[];
 
   /// Used by third parties to register screens that can be used by the app.
   void addPluginInitScreenMapAction(AFInitScreenMapDelegate defineScreenMap) {
@@ -377,25 +412,11 @@ class AFPluginExtensionContext {
 
   /// Used by third parties to register screens that can be used by the app.
   void addPluginFundamentalThemeArea(AFInitPluginFundamentalThemeDelegate initArea) {
-    defineFundamentalThemeAreas.add(initArea);
+    defineFundamentalLibraryThemes.add(initArea);
   }
 
   void addCreateFunctionalTheme(AFInitCoreDelegate init) {
     defineCore.add(init);
-  }
-
-  /// Used by the app or third parties to create a query that runs on lifecycle actions.
-  void addLifecycleQueryAction(AFCreateLifecycleQueryAction createLifecycleQueryAction) {
-    createLifecycleQueryActions.add(createLifecycleQueryAction);
-  }
-
-  /// Used by app or third parties to listen in to all successful queries.
-  void addQuerySuccessListener(AFQuerySuccessListenerDelegate queryListenerDelegate) {
-    querySuccessListenerDelegates.add(queryListenerDelegate);
-  } 
-
-  void addQueryErrorListener(AFOnErrorDelegate onError) {
-    errorListeners.add(onError);
   }
 
   void defineScreenMap(AFScreenMap screenMap, Iterable<AFCoreLibraryExtensionContext> libraries) {
@@ -453,13 +474,13 @@ class AFCoreLibraryExtensionContext extends AFPluginExtensionContext {
 
   void installCoreLibrary({
     AFInitCoreDelegate? defineCore,
-    AFInitPluginFundamentalThemeDelegate? defineFundamentalThemeArea,
+    AFInitPluginFundamentalThemeDelegate? defineFundamentalTheme
   }) {
     if(defineCore != null) {
       this.defineCore.add(defineCore);
     }
-    if(defineFundamentalThemeArea != null) {
-      this.defineFundamentalThemeAreas.add(defineFundamentalThemeArea);
+    if(defineFundamentalTheme != null) {
+      this.defineFundamentalLibraryThemes.add(defineFundamentalTheme);
     }
     _verifyNotNull(defineScreenMap, "defineScreenMap");
   }
@@ -470,46 +491,38 @@ class AFCoreLibraryExtensionContext extends AFPluginExtensionContext {
 //  recognized by AFib.
 class AFAppExtensionContext extends AFPluginExtensionContext {
   final libraries = AFAppLibraryExtensionContext();
+  final createStartupQueries = <AFCreateStartupQueryActionDelegate>[];
 
   /// Used by the app to specify fundamental configuration/functionality
   /// that AFib requires.
-  void installApp({
-    required AFInitAppFundamentalThemeDelegate defineFundamentalThemeArea,
+  void installCoreApp({
     required AFCreateStartupQueryActionDelegate createStartupQuery,
     required AFCreateAFAppDelegate createApp,
     required AFInitCoreDelegate defineCore,
-    required AFOnErrorDelegate queryErrorHandler,
+    required AFInitAppFundamentalThemeDelegate defineFundamentalTheme,
   }) {
     this.test.initializeForApp();
     this.defineCore.add(defineCore);
     this.createStartupQueries.add(createStartupQuery);
-    this.errorListeners.add(queryErrorHandler);
     this.createApp = createApp;
-    this.defineFundamentalThemeArea = defineFundamentalThemeArea;
-    _verifyNotNull(defineFundamentalThemeArea, "defineFundamentalTheme");
+    this.defineAppFundamentalTheme = defineFundamentalTheme;
     _verifyNotNull(defineScreenMap, "defineScreenMap");
     _verifyNotNull(createStartupQuery, "createStartupQueryAction");
     _verifyNotNull(createApp, "createApp");
   }
 
   void fromUILibrary(AFCoreLibraryExtensionContext source, {
-    required AFInitAppFundamentalThemeDelegate defineFundamentalThemeArea,
+    required AFInitAppFundamentalThemeDelegate defineFundamentalTheme,
     required AFCreateAFAppDelegate createApp,
   }) {
     this.defineScreenMaps.addAll(source.defineScreenMaps);
-    this.createStartupQueries.addAll(source.createStartupQueries);
-    this.errorListeners.addAll(source.errorListeners);
     this.createApp = createApp;
     this.test = source.test;
     this.test.initializeForApp();
     this.createApp = createApp;
-    this.defineFundamentalThemeArea = source.defineFundamentalThemeArea ?? defineFundamentalThemeArea;
-    this.defineFundamentalThemeAreas.addAll(source.defineFundamentalThemeAreas);
+    this.defineAppFundamentalTheme = source.defineAppFundamentalTheme ?? defineFundamentalTheme;
+    this.defineFundamentalLibraryThemes.addAll(source.defineFundamentalLibraryThemes);
     this.defineCore.addAll(source.defineCore);    
-  }
-
-  List<AFOnErrorDelegate> get errorHandlers {
-    return errorListeners;
   }
 
   void dispatchStartupQueries(AFDispatcher dispatcher) {
@@ -519,27 +532,14 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     }
   }
 
-  void dispatchLifecycleActions(AFDispatcher dispatcher, AppLifecycleState lifecycle) {
-    for(final creator in createLifecycleQueryActions) {
-      final action = creator(lifecycle);
-      dispatcher.dispatch(action);  
-    }
-  }
-
-  void updateQueryListeners(AFAsyncQuery query, AFFinishQuerySuccessContext successContext) {
-    for(final listener in querySuccessListenerDelegates) {
-      listener(query, successContext);
-    }
-  }
-
   AFFundamentalThemeState createFundamentalTheme(AFFundamentalDeviceTheme device, AFComponentStates areas, Iterable<AFCoreLibraryExtensionContext> libraries) {
     final builder = AFAppFundamentalThemeAreaBuilder.create();
-    final initThemeArea = this.defineFundamentalThemeArea;
+    final initThemeArea = this.defineAppFundamentalTheme;
     if(initThemeArea != null) {
       initThemeArea(device, areas, builder);
     }
 
-    for(final init in this.defineFundamentalThemeAreas) {
+    for(final init in this.defineFundamentalLibraryThemes) {
       init(device, areas, builder);
     }
 
@@ -548,7 +548,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     }
 
     for(final library in libraries) {
-      final inits = library.defineFundamentalThemeAreas;
+      final inits = library.defineFundamentalLibraryThemes;
       for(final init in inits) {
         init(device, areas, builder);
       }

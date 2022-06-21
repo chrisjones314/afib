@@ -31,7 +31,7 @@ typedef AFInitializeComponentStateDelegate = AFComponentState? Function();
 typedef AFExtendCommandsDelegate = void Function(AFCommandAppExtensionContext context);
 
 /// Used by third party extensions to defined commands for the command-line app.
-typedef AFExtendCommandsLibraryDelegate = void Function(AFCommandUILibraryExtensionContext context);
+typedef AFExtendCommandsLibraryDelegate = void Function(AFCommandLibraryExtensionContext context);
 
 /// Just a typed sort function.
 typedef AFTypedSortDelegate<TSort> = int Function(TSort left, TSort right);

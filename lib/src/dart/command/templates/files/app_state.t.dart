@@ -8,7 +8,7 @@ import 'package:[!af_package_path]/state/[!af_app_namespace]_state_model_access.
 import 'package:meta/meta.dart';
 
 @immutable
-class [!af_app_namespace(upper)]State extends AFFlexibleState with [!af_app_namespace(upper)]StateModelAccess {
+class [!af_app_namespace(upper)]State extends AFComponentState with [!af_app_namespace(upper)]StateModelAccess {
 
   [!af_app_namespace(upper)]State(Map<String, Object> models): super(models: models, create: [!af_app_namespace(upper)]State.create);
 
@@ -17,12 +17,12 @@ class [!af_app_namespace(upper)]State extends AFFlexibleState with [!af_app_name
   }
 
   factory [!af_app_namespace(upper)]State.fromList(List<Object> toIntegrate) {
-    final models = AFFlexibleState.integrate(AFFlexibleState.empty(), toIntegrate);
+    final models = AFComponentState.integrate(AFComponentState.empty(), toIntegrate);
     return [!af_app_namespace(upper)]State(models);
   }
 
   @override
-  AFFlexibleState createWith(Map<String, Object> models) {
+  AFComponentState createWith(Map<String, Object> models) {
     return [!af_app_namespace(upper)]State(models);
   }
 

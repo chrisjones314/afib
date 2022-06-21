@@ -167,6 +167,8 @@ class AFUIThemeID extends AFThemeID {
 class AFUISourceTemplateID extends AFSourceTemplateID {
   const AFUISourceTemplateID(String code) : super(code, AFUILibraryID.id);
 
+  static const stmtIncludeInstallTest = AFUISourceTemplateID("include_install_tests");
+  static const stmtCallInstallTest = AFUISourceTemplateID("call_install_tests");
   static const fileConfig = AFUISourceTemplateID("config");
   static const fileTestConfig = AFUISourceTemplateID("test_config");
   static const fileScreenTest = AFUISourceTemplateID("screen_test");
@@ -194,6 +196,7 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const fileConnectedBase = AFUISourceTemplateID("file_connected_base");
   static const fileExtendApp = AFUISourceTemplateID("file_extend_app");
   static const fileExtendAppUILibrary = AFUISourceTemplateID("file_extend_app_ui_library");
+  static const fileExtendAppStateLibrary = AFUISourceTemplateID("file_extend_app_state_library");
   static const fileExtendTest = AFUISourceTemplateID("file_extend_test");
   static const fileDefaultTheme = AFUISourceTemplateID("file_default_theme");
   static const fileDefineUI = AFUISourceTemplateID("file_define_ui");
@@ -202,7 +205,7 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const fileStateTestShortcuts = AFUISourceTemplateID("file_state_test_shortcuts");
   static const fileCommand = AFUISourceTemplateID("file_command");
   static const fileLibExports = AFUISourceTemplateID("file_lib_exports");
-  static const fileInstallUI = AFUISourceTemplateID("file_install_ui");
+  static const fileInstallCore = AFUISourceTemplateID("file_install_ui");
   static const fileInstallCommand = AFUISourceTemplateID("file_install_command");
   static const fileLPI = AFUISourceTemplateID("file_lpi");
   
@@ -210,6 +213,8 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const stmtDeclareRouteParam = AFUISourceTemplateID("declare_route_param");
   static const stmtDeclareStateView = AFUISourceTemplateID("declare_state_view");
   static const stmtDeclareSPI = AFUISourceTemplateID("declare_spi");
+  static const stmtDeclareUIFunctions = AFUISourceTemplateID("declare_ui_functions");
+  static const stmtCallUIFunctions = AFUISourceTemplateID("call_ui_functions");
 
 
   static const textDeclareCreatePrototype = AFUISourceTemplateID("declare_create_prototype");

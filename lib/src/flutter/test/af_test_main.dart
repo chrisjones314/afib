@@ -50,7 +50,7 @@ Future<void> afTestMainUILibrary({
   final extendAppFull = (context) {
     context.fromUILibrary(contextLibrary,
       createApp: () => AFAppUILibrary(),
-      defineFundamentalThemeArea: defineAFDefaultFundamentalThemeArea,
+      defineAppFundamentalTheme: defineAFDefaultFundamentalTheme,
     );
   };
 
@@ -58,7 +58,7 @@ Future<void> afTestMainUILibrary({
     id: AFUILibraryID.id,
     installBase: installBase, 
     installBaseLibrary: installBaseLibrary, 
-    installApp: extendAppFull, 
+    installCoreApp: extendAppFull, 
     installTest: installTest, 
     paramsDart: paramsDart, 
     widgetTester: widgetTester
@@ -70,7 +70,7 @@ Future<void> afTestMainApp({
   required AFLibraryID id,
   AFExtendBaseDelegate? installBase, 
   AFExtendBaseDelegate? installBaseLibrary, 
-  required AFExtendAppDelegate installApp, 
+  required AFExtendAppDelegate installCoreApp, 
   AFExtendLibraryUIDelegate? installUILibrary, 
   required AFExtendTestDelegate installTest, 
   required AFDartParams paramsDart, 
@@ -98,7 +98,7 @@ Future<void> afTestMainApp({
 
 
   final context = AFAppExtensionContext();
-  installApp(context);
+  installCoreApp(context);
   installTest(context.test);
   if(installUILibrary != null) {
     installUILibrary(context.thirdParty);

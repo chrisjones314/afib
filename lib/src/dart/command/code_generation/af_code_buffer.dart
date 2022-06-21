@@ -187,7 +187,11 @@ class AFCodeBuffer {
     while(curStart >= 0) {
       final charNext = lineStart[curStart+codeStart.length];
       if(charNext != "]" && charNext != "(") {
-        curStart = lines[lineIdx].lastIndexOf(codeStart, curStart-1);
+        if(curStart > 0) {
+          curStart = lines[lineIdx].lastIndexOf(codeStart, curStart-1);
+        } else {
+          curStart = -1;
+        }
         continue;
       }
       final lineCur = lines[lineIdx];

@@ -308,12 +308,12 @@ class AFBaseExtensionContext {
   }
 }
 
-class AFCommandUILibraryExtensionContext extends AFBaseExtensionContext {
+class AFCommandLibraryExtensionContext extends AFBaseExtensionContext {
   final AFDartParams paramsD;
   final AFCommandRunner commands;
   final AFTemplateRegistry templates;
 
-  AFCommandUILibraryExtensionContext({
+  AFCommandLibraryExtensionContext({
     required this.paramsD, 
     required this.commands, 
     required this.templates, 
@@ -492,7 +492,7 @@ Available commands:
 }
 
 
-class AFCommandAppExtensionContext extends AFCommandUILibraryExtensionContext {
+class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
   AFCommandAppExtensionContext({
     required AFDartParams paramsD, 
     required AFCommandRunner commands
@@ -528,7 +528,7 @@ class AFCommandAppExtensionContext extends AFCommandUILibraryExtensionContext {
       defineCommand(AFGenerateParentCommand());
       defineCommand(AFTestCommand());
       defineCommand(AFCommandHelp());
-      defineCommand(AFIntegrateCommand());
+      defineCommand(AFInstallCommand());
       defineCommand(AFOverrideCommand());
 
       registerGenerateSubcommand(AFGenerateUISubcommand());

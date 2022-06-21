@@ -4,12 +4,17 @@ import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_call_define_ui_functions.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_call_install_tests.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_define_ui_functions.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_demo_screen_build_body.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_demo_screen_route_param_impls.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_demo_screen_screen_impls.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_demo_screen_spi_impls.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_empty_statement.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_fundamental_theme_init.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_fundamental_theme_init_ui_library.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_include_install_tests.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_screen_build_with_spi_no_back.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
@@ -63,11 +68,9 @@ $optionsHeader
 
     final isApp = kind == kindApp;
     var libKind = "App";
-    if(kind == kindUILibrary) {
-      libKind = "UILibrary";
-    } else if(kind == kindStateLibrary) {
-      libKind = "StateLibrary";
-    }
+    if(kind == kindUILibrary || kind == kindStateLibrary) {
+      libKind = "Library";
+    } 
     AFibD.config.setIsLibraryCommand(isLib: !isApp);
     final packageName = args[2];
     final packageCode = args[3];
@@ -87,14 +90,17 @@ $optionsHeader
     _createStandardFolders(ctx, kind: kind);
     if(!isApp) {
       _createStandardLibraryFolders(ctx);
-      _createLibExportsFiles(ctx);
+      _createLibExportsFiles(ctx, kind);
     }
     _createAppCommand(ctx, libKind);
     createStandardFile(ctx, generator.pathAppId, AFUISourceTemplateID.fileAppcodeID);
-    final extendAppId = isApp ? AFUISourceTemplateID.fileExtendApp : AFUISourceTemplateID.fileExtendAppUILibrary;
-    _createInitializationFiles(ctx, extendAppId, libKind, includeUI: kind != kindStateLibrary);
+    final fundamentalInit = isApp ? DeclareFundamentalThemeInitT() : DeclareFundamentalThemeInitUILibraryT();
+    _createInitializationFiles(ctx, libKind, 
+      isApp: isApp,
+      kind: kind,
+      defineFundamentalImpl: fundamentalInit);
     _createQueryFiles(ctx);
-    _createStateFiles(ctx);
+    _createStateFiles(ctx, kind);
     if(kind != kindStateLibrary) {
       _createTestFiles(ctx, libKind);
     }
@@ -102,8 +108,7 @@ $optionsHeader
       final mainTemplateId = isApp ? AFUISourceTemplateID.fileMain : AFUISourceTemplateID.fileMainUILibrary;
       _createMainFiles(ctx, mainTemplateId);
 
-      final fundamentalInit = isApp ? DeclareFundamentalThemeInitT() : DeclareFundamentalThemeInitUILibraryT();
-      _createUIFiles(ctx, packageName, libKind, fundamentalInit);
+      _createUIFiles(ctx, packageName, libKind, );
     }
 
     if(!isApp) {
@@ -125,19 +130,27 @@ $optionsHeader
     generator.addExportsForFiles(ctx, args, [fileInstallCommand], toPath: generator.pathCommandExportsFile);
 
     // create the file and add it to the ui exports
-    final fileInstallUI = createStandardFile(ctx, generator.pathInstall, AFUISourceTemplateID.fileInstallUI);
+    final fileInstallUI = createStandardFile(ctx, generator.pathInstall, AFUISourceTemplateID.fileInstallCore);
+    final includeUI = kind != kindStateLibrary;
+    final templateInclude = includeUI ? DeclareIncludeInstallTestsT() : DeclareEmptyStatementT();
+    final templateCall = includeUI ? DeclareCallInstallTestsT() : DeclareEmptyStatementT();
+    final includeBuffer = templateInclude.toBuffer();
+    final appSuffix = kind == kindApp ? "app" : "library";
+    final importCore = "import 'package:[!af_package_path]/initialization/install/install_core_$appSuffix.dart';";
+    includeBuffer.addLinesAtEnd(ctx, [importCore]);
+
+    fileInstallUI.replaceTextLines(ctx, AFUISourceTemplateID.stmtIncludeInstallTest, includeBuffer.lines);
+    fileInstallUI.replaceTemplate(ctx, AFUISourceTemplateID.stmtCallInstallTest, templateCall);
+    
+    fileInstallUI.replaceText(ctx, AFUISourceTemplateID.textImportStatements, importCore);
+    
     generator.addExportsForFiles(ctx, args, [fileInstallUI]);
 
   }
 
-  void _createUIFiles(AFCommandContext ctx, String packageName, String libKind, AFSourceTemplate defineFundamentalImpl) {
+  void _createUIFiles(AFCommandContext ctx, String packageName, String libKind) {
     final generator = ctx.generator;
     createStandardFile(ctx, generator.pathConnectedBaseFile, AFUISourceTemplateID.fileConnectedBase);
-    final fileDefineUI = createStandardFile(ctx, generator.pathDefineCore, AFUISourceTemplateID.fileDefineUI);
-    fileDefineUI.replaceText(ctx, AFUISourceTemplateID.textLibKind, libKind);
-    final defineFundImpl = defineFundamentalImpl.toBuffer();
-    defineFundImpl.executeStandardReplacements(ctx);
-    fileDefineUI.replaceTextLines(ctx, AFUISourceTemplateID.textFundamentalThemeInit, defineFundImpl.lines);
 
     final argsTheme = {
       AFGenerateUISubcommand.argParentTheme: generator.nameDefaultParentTheme,
@@ -162,13 +175,13 @@ $optionsHeader
       routeParamImpls: DeclareDemoScreenRouteParamImplsT());
   }
 
-  void _createLibExportsFiles(AFCommandContext ctx) {
+  void _createLibExportsFiles(AFCommandContext ctx, String kind) {
     final generator = ctx.generator;
     createStandardFile(ctx, generator.pathFlutterExportsFile, AFUISourceTemplateID.fileLibExports);
     createStandardFile(ctx, generator.pathCommandExportsFile, AFUISourceTemplateID.fileLibExports);
   }
 
-  void _createStateFiles(AFCommandContext ctx) {
+  void _createStateFiles(AFCommandContext ctx, String kind) {
     final generator = ctx.generator;
 
     createStandardFile(ctx, generator.pathStateModelAccess, AFUISourceTemplateID.fileStateModelAccess);
@@ -179,7 +192,9 @@ $optionsHeader
       AFGenerateUISubcommand.argTheme: ctx.generator.nameDefaultTheme
     };
     
-    AFGenerateStateSubcommand.generateStateStatic(ctx, ctx.generator.nameDefaultStateView, args);
+    if(kind != kindStateLibrary) {
+      AFGenerateStateSubcommand.generateStateStatic(ctx, ctx.generator.nameDefaultStateView, args);
+    }
   }
 
   void _createQueryFiles(AFCommandContext ctx) {
@@ -230,18 +245,63 @@ $optionsHeader
     createStandardFile(ctx, generator.pathApp, AFUISourceTemplateID.fileApp);
   }
 
-  void _createInitializationFiles(AFCommandContext ctx, AFUISourceTemplateID extendAppId, String libKind, { required bool includeUI }) {
+  void _createInitializationFiles(AFCommandContext ctx, String libKind, { 
+    required bool isApp,
+    required String kind,
+    required AFSourceTemplate defineFundamentalImpl,
+  }) {
+    final includeUI = kind != kindStateLibrary;
+
+
     final generator = ctx.generator;
+    final fileDefineCore = createStandardFile(ctx, generator.pathDefineCore, AFUISourceTemplateID.fileDefineUI);
+    fileDefineCore.replaceText(ctx, AFUISourceTemplateID.textLibKind, libKind);
+    final declareUIFn = includeUI ? DeclareUIFunctionsT() : DeclareEmptyStatementT();
+    final callUIFn = includeUI ? CallUIFunctionsT() : DeclareEmptyStatementT();
+    fileDefineCore.replaceTemplate(ctx, AFUISourceTemplateID.stmtDeclareUIFunctions, declareUIFn);
+    fileDefineCore.replaceTemplate(ctx, AFUISourceTemplateID.stmtCallUIFunctions, callUIFn);
+
+    final imports = AFCodeBuffer.empty();
+
+    if(includeUI) {
+      imports.addLinesAtEnd(ctx, [
+        "import 'package:afib/afib_flutter.dart",
+        "import 'package:[!af_package_name]/[!af_app_namespace]_id.dart';",
+        "import 'package:[!af_package_path]/ui/screens/startup_screen.dart';"
+      ]);
+    }
+
+    imports.addLinesAtEnd(ctx, [
+      "import 'package:[!af_package_path]/state/[!af_app_namespace]_state.dart';"
+    ]);
+    fileDefineCore.replaceTextLines(ctx, AFUISourceTemplateID.textImportStatements, imports.lines);
+
+
+    final defineFundImpl = defineFundamentalImpl.toBuffer();
+    defineFundImpl.executeStandardReplacements(ctx);
+    fileDefineCore.replaceTextLines(ctx, AFUISourceTemplateID.textFundamentalThemeInit, defineFundImpl.lines);
+
     createStandardFile(ctx, generator.pathInstallBase, AFUISourceTemplateID.fileExtendBase);
     createStandardFile(ctx, generator.pathInstallLibraryBase, AFUISourceTemplateID.fileExtendBaseLibrary);
     final fileExtendCommand = createStandardFile(ctx, generator.pathExtendCommand, AFUISourceTemplateID.fileExtendCommand);
     fileExtendCommand.replaceText(ctx, AFUISourceTemplateID.textLibKind, libKind);
 
+    var extendAppId = AFUISourceTemplateID.fileExtendApp;
+    if(kind == kindUILibrary) {
+      extendAppId = AFUISourceTemplateID.fileExtendAppUILibrary;
+    } else if(kind == kindStateLibrary) {
+      extendAppId = AFUISourceTemplateID.fileExtendAppStateLibrary;
+    }
+    final pathAppCore = isApp ? generator.pathInstallCoreApp : generator.pathInstallLibraryCore;
     createStandardFile(ctx, generator.pathInstallLibraryCommand, AFUISourceTemplateID.fileExtendCommandLibrary);
-    createStandardFile(ctx, generator.pathInstallLibraryCore, AFUISourceTemplateID.fileExtendLibrary);
     createStandardFile(ctx, generator.pathExtendApplication, AFUISourceTemplateID.fileExtendApplication);
-    createStandardFile(ctx, generator.pathInstallCoreApp, extendAppId);
-    createStandardFile(ctx, generator.pathInstallTest, AFUISourceTemplateID.fileExtendTest);
+    if(!includeUI) {
+      createStandardFile(ctx, generator.pathInstallLibraryCore, AFUISourceTemplateID.fileExtendLibrary);
+    }
+    createStandardFile(ctx, pathAppCore, extendAppId);
+    if(includeUI) {
+      createStandardFile(ctx, generator.pathInstallTest, AFUISourceTemplateID.fileExtendTest);
+    }
     
     _createEnvironmentFile(ctx, "Debug");
     _createEnvironmentFile(ctx, "Prototype");

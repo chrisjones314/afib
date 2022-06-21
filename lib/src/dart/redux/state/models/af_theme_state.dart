@@ -481,7 +481,7 @@ class AFUILibraryFundamentalThemeAreaBuilder {
   /// values for plugins.
   void setValues(Map<AFThemeID, dynamic> toSet) {
     toSet.forEach((id, val) {
-      values[id] = AFFundamentalThemeValue(id: id, value: val);
+      setValue(id, val);
     });
   }
 

@@ -1,24 +1,25 @@
 
 import 'package:afib/afib_command.dart';
+import 'package:afib/src/dart/command/commands/af_create_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_call_extend.t.dart';
 import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
 
-class AFIntegrateCommand extends AFCommand { 
-  final name = "integrate";
-  final description = "Integrate a third-party library";
+class AFInstallCommand extends AFCommand { 
+  final name = "install";
+  final description = "Install a third-party library";
 
 
   String get usage {
     return '''
 $usageHeader
-  $nameOfExecutable integrate otherpackagename OPC
+  $nameOfExecutable $name otherpackagename OPC
 
 $descriptionHeader
-  Integrates an afib-aware third party library's commands, tests,
-  and UI
+  Integrates an afib-aware third party library's commands, tests and UI
 
 $optionsHeader
+
   otherpackagename - the package name for the library, e.g. afib_signin
   OPC - the 3-5 letter all lowercase code the library uses.  This value
     is declared in the libraries ...afib_config.g.dart file, it is not a

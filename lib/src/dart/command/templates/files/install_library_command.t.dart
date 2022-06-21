@@ -7,7 +7,7 @@ import 'package:afib/afib_command.dart';
 
 // You can use this function to add your own commands, or to
 // import AFib-aware third party commands.
-void installCommandLibrary(AFCommandUILibraryExtensionContext context) {
+void installCommandLibrary(AFCommandLibraryExtensionContext context) {
 }
 ''';
 

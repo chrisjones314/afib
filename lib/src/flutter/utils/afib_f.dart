@@ -432,7 +432,7 @@ class AFibGlobalState {
   }
 
   void finishAsyncWithError(AFFinishQueryErrorContext context) {
-    final handlers = appContext.errorHandlers;
+    final handlers = coreDefinitions.errorListeners;
     for(final handler in handlers) {
       handler(context);
     }
@@ -767,24 +767,34 @@ class AFibGlobalState {
 
   /// Used internally by the framework.
   /// 
-  /// If you'd like to dispatch a startup action, see [AFAppExtensionContext.installApp]
+  /// If you'd like to dispatch a startup action, see [AFAppExtensionContext.installCoreApp]
   /// or [AFAppExtensionContext.addStartupAction]
   void dispatchStartupQueries(AFDispatcher dispatcher) {
+    // this is the one from the app.
     appContext.dispatchStartupQueries(dispatcher);
+
+    // these are any startup queries from the libraries
+    coreDefinitions.dispatchStartupQueries(dispatcher);
   }
 
   Iterable<AFAsyncQuery> createStartupQueries() {
-    final factories = appContext.createStartupQueries;
+    final factories2 = appContext.createStartupQueries;
     final result = <AFAsyncQuery>[];
+    for(final factory in factories2) {
+      result.add(factory());
+    }
+
+    final factories = coreDefinitions.createStartupQueries;
     for(final factory in factories) {
       result.add(factory());
     }
+
     return result;
   }
 
   /// Used internally by the framework.
   void dispatchLifecycleActions(AFDispatcher dispatcher, AppLifecycleState lifecycle) {
-    appContext.dispatchLifecycleActions(dispatcher, lifecycle);
+    coreDefinitions.dispatchLifecycleActions(dispatcher, lifecycle);
   }
 
   /// Retrieves screen/data pairings used for prototyping and for screen-specific
@@ -887,7 +897,7 @@ class AFibGlobalState {
   /// Called internally when a query finishes successfully, see [AFFlutterParams.querySuccessDelegate] 
   /// to listen for query success.
   void onQuerySuccess(AFAsyncQuery query, AFFinishQuerySuccessContext successContext) {
-    appContext.updateQueryListeners(query, successContext);
+    coreDefinitions.updateQueryListeners(query, successContext);
   }
 
 

@@ -9,7 +9,7 @@
       "type": "dart",
       "request": "launch",
       "program": "/Users/chrisjones/projects/afib/afib/bin/afib_bootstrap.dart",
-      "cwd": "/Users/chrisjones/projects/dinnerfamilias/dinnerfamilias_shared",
+      "cwd": "/Users/chrisjones/projects/afib/afib_firebase",
     },
     {
       "name": "Flutter",

@@ -48,7 +48,7 @@ Future<void> afAppCommandMain({
   ], installCommandLibrary);
 }
 
-Future<void> afUILibraryCommandMain({ 
+Future<void> afLibraryCommandMain({ 
   required AFDartParams paramsDart, 
   required AFArgs args, 
   required AFExtendBaseDelegate installBase, 

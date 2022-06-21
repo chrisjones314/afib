@@ -23,7 +23,7 @@ void main() {
       paramsDart: paramsDart, 
       installBase: installBase, 
       installBaseLibrary: installBaseLibrary, 
-      installApp: installApp, 
+      installCoreApp: installCoreApp, 
       installCoreLibrary: installCoreLibrary, 
       installTest: installTest
     );

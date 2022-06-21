@@ -138,7 +138,7 @@ typedef AFChangedTextDelegate = void Function(String);
 typedef AFPressedDelegate = void Function();
 typedef AFOnTapDelegate = void Function();
 
-typedef AFExtendUILibraryDelegate = void Function(AFUILibraryExtensionContext context);
+typedef AFExtendUILibraryDelegate = void Function(AFCoreLibraryExtensionContext context);
 typedef AFExtendAppDelegate = void Function(AFAppExtensionContext context);
 typedef AFExtendTestDelegate = void Function(AFTestExtensionContext context);
 typedef AFExtendLibraryUIDelegate = void Function(AFAppLibraryExtensionContext context);
@@ -149,8 +149,7 @@ typedef AFInitPluginFundamentalThemeDelegate = void Function(AFFundamentalDevice
 /// Allows the app to contribute fundamental theme values
 typedef AFInitAppFundamentalThemeDelegate = void Function(AFFundamentalDeviceTheme device, AFComponentStates appState, AFAppFundamentalThemeAreaBuilder builder);
 
-/// Create a conceptual theme used by a subset of the app, or used by a third party plugin.
-typedef AFInitUIDelegate = void Function(AFUIDefinitionContext context);
+typedef AFInitCoreDelegate = void Function(AFCoreDefinitionContext context);
 
 /// Optional delegate used to create the flutter ThemeData, rather than allowing AFib to do it for you based on the primary fundamental theme.
 typedef AFOverrideCreateThemeDataDelegate = ThemeData Function(AFFundamentalDeviceTheme device, AFComponentStates appState, AFFundamentalThemeArea primary);

@@ -3,7 +3,6 @@ import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/commands/af_typedefs_command.dart';
-import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_dart_params.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
@@ -38,16 +37,15 @@ class AFibTestsFailedMatcher extends Matcher {
 
 Future<void> afTestMainUILibrary({
   required AFLibraryID id, 
-  required AFExtendBaseDelegate extendBase, 
-  required AFExtendBaseDelegate extendBaseLibrary, 
-  required AFExtendUILibraryDelegate extendUI, 
-  required AFExtendLibraryUIDelegate extendUILibrary, 
-  required AFExtendTestDelegate extendTest, 
+  required AFExtendBaseDelegate installBase, 
+  required AFExtendBaseDelegate installBaseLibrary, 
+  required AFExtendUILibraryDelegate installCoreLibrary, 
+  required AFExtendTestDelegate installTest, 
   required AFDartParams paramsDart, 
   required WidgetTester widgetTester
 }) async {
-  final contextLibrary = AFUILibraryExtensionContext(id: id);
-  extendUI(contextLibrary);
+  final contextLibrary = AFCoreLibraryExtensionContext(id: id);
+  installCoreLibrary(contextLibrary);
 
   final extendAppFull = (context) {
     context.fromUILibrary(contextLibrary,
@@ -58,11 +56,10 @@ Future<void> afTestMainUILibrary({
 
   return afTestMainApp(
     id: AFUILibraryID.id,
-    extendBase: extendBase, 
-    extendBaseLibrary: extendBaseLibrary, 
-    extendApp: extendAppFull, 
-    extendUILibrary: extendUILibrary, 
-    extendTest: extendTest, 
+    installBase: installBase, 
+    installBaseLibrary: installBaseLibrary, 
+    installApp: extendAppFull, 
+    installTest: installTest, 
     paramsDart: paramsDart, 
     widgetTester: widgetTester
   );
@@ -71,11 +68,11 @@ Future<void> afTestMainUILibrary({
 /// The main function which executes the store test defined in your initStateTests function.
 Future<void> afTestMainApp({
   required AFLibraryID id,
-  AFExtendBaseDelegate? extendBase, 
-  AFExtendBaseDelegate? extendBaseLibrary, 
-  required AFExtendAppDelegate extendApp, 
-  AFExtendLibraryUIDelegate? extendUILibrary, 
-  required AFExtendTestDelegate extendTest, 
+  AFExtendBaseDelegate? installBase, 
+  AFExtendBaseDelegate? installBaseLibrary, 
+  required AFExtendAppDelegate installApp, 
+  AFExtendLibraryUIDelegate? installUILibrary, 
+  required AFExtendTestDelegate installTest, 
   required AFDartParams paramsDart, 
   required WidgetTester widgetTester
 }) async {
@@ -83,11 +80,11 @@ Future<void> afTestMainApp({
   stopwatch.start();
 
   final baseContext = AFBaseExtensionContext();
-  if(extendBase != null) {
-    extendBase(baseContext);
+  if(installBase != null) {
+    installBase(baseContext);
   }
-  if(extendBaseLibrary != null) {
-    extendBaseLibrary(baseContext);
+  if(installBaseLibrary != null) {
+    installBaseLibrary(baseContext);
   }
 
   final paramsTest = paramsDart.forceEnvironment(AFEnvironment.prototype);
@@ -101,10 +98,10 @@ Future<void> afTestMainApp({
 
 
   final context = AFAppExtensionContext();
-  extendApp(context);
-  extendTest(context.test);
-  if(extendUILibrary != null) {
-    extendUILibrary(context.thirdParty);
+  installApp(context);
+  installTest(context.test);
+  if(installUILibrary != null) {
+    installUILibrary(context.thirdParty);
   }
   AFibF.initialize(context, AFConceptualStore.appStore);
 

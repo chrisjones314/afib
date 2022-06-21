@@ -20,7 +20,7 @@ mixin AFUIStateModelAccess on AFStateModelAccess {
 
 //---------------------------------------------------------------------------------------
 @immutable
-class AFUIState extends AFFlexibleState with AFUIStateModelAccess {
+class AFUIState extends AFComponentState with AFUIStateModelAccess {
   static const prototypeModel = "prototype_model";
 
   //---------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ class AFUIState extends AFFlexibleState with AFUIStateModelAccess {
   AFUIState(Map<String, Object> models): super(models: models, create: creator);
 
   static AFUIState initialValue() { 
-    return AFUIState(AFFlexibleState.createModels([
+    return AFUIState(AFComponentState.createModels([
       ]));
   }
 }

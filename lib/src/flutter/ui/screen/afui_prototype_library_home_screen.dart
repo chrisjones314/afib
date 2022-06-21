@@ -14,11 +14,11 @@ import 'package:flutter/material.dart';
 /// Parameter uses to filter the tests shown on the screen.
 @immutable
 class AFUIPrototypeLibraryHomeParam extends AFRouteParam {
-  final AFUILibraryExtensionContext libraryContext;
+  final AFCoreLibraryExtensionContext libraryContext;
 
   AFUIPrototypeLibraryHomeParam({required this.libraryContext}): super(id: AFUIScreenID.screenPrototypeLibraryHome);
   
-  factory AFUIPrototypeLibraryHomeParam.create(AFUILibraryExtensionContext context) {
+  factory AFUIPrototypeLibraryHomeParam.create(AFCoreLibraryExtensionContext context) {
     return AFUIPrototypeLibraryHomeParam(libraryContext: context);
   }
 }
@@ -42,7 +42,7 @@ class AFUIPrototypeLibraryHomeScreen extends AFUIConnectedScreen<AFUIPrototypeLi
 
   AFUIPrototypeLibraryHomeScreen(): super(screenId: AFUIScreenID.screenPrototypeLibraryHome, config: config);
 
-  static AFNavigatePushAction navigatePush(AFUILibraryExtensionContext libraryContext) {
+  static AFNavigatePushAction navigatePush(AFCoreLibraryExtensionContext libraryContext) {
     return AFNavigatePushAction(
       param: AFUIPrototypeLibraryHomeParam.create(libraryContext));
   }

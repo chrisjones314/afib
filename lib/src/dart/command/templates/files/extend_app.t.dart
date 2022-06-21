@@ -11,17 +11,16 @@ import 'package:[!af_package_path]/ui/[!af_app_namespace]_define_ui.dart';
 import 'package:[!af_package_path]/query/startup_query.dart';
 import 'package:[!af_package_path]/state/[!af_app_namespace]_state.dart';
 
-void queryErrorHandler(AFFinishQueryErrorContext<AFFlexibleState> context) {
+void queryErrorHandler(AFFinishQueryErrorContext context) {
 
 }
 
 void extendApp(AFAppExtensionContext extend) {
 
-    extend.initializeAppFundamentals<[!af_app_namespace(upper)]State>(
+    extend.initializeAppFundamentals(
       defineUI: defineUI,
       defineFundamentalThemeArea: defineFundamentalThemeArea, 
-      initializeAppState: () => [!af_app_namespace(upper)]State.initial(), 
-      createStartupQueryAction: () => StartupQuery(),
+      createStartupQuery: () => StartupQuery(),
       createApp: () => [!af_app_namespace(upper)]App(),
       queryErrorHandler: queryErrorHandler
     );

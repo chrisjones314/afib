@@ -12,13 +12,13 @@ import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 void afMainUILibrary({
   required AFLibraryID id, 
   required AFDartParams paramsDart, 
-  required AFExtendBaseDelegate extendBase, 
-  required AFExtendBaseDelegate extendBaseLibrary, 
-  required AFExtendUILibraryDelegate extendUI, 
-  required AFExtendTestDelegate extendTest
+  required AFExtendBaseDelegate installBase, 
+  required AFExtendBaseDelegate installBaseLibrary, 
+  required AFExtendUILibraryDelegate installCoreLibrary, 
+  required AFExtendTestDelegate installTest
 }) {
-  final contextLibrary = AFUILibraryExtensionContext(id: id);
-  extendUI(contextLibrary);
+  final contextLibrary = AFCoreLibraryExtensionContext(id: id);
+  installCoreLibrary(contextLibrary);
 
   final paramsProto = paramsDart.forceEnvironment(AFEnvironment.prototype);
  
@@ -31,9 +31,9 @@ void afMainUILibrary({
 
   afMainApp(
     paramsDart: paramsProto, 
-    extendBase: extendBase, 
-    extendBaseLibrary: extendBaseLibrary, 
-    extendApp: extendAppFull, 
-    extendTest: extendTest
+    installBase: installBase,
+    installBaseLibrary: installBaseLibrary,
+    installApp: extendAppFull,
+    installTest: installTest
   );
 }

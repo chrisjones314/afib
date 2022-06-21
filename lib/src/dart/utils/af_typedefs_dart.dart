@@ -25,7 +25,7 @@ typedef AFActionListenerDelegate = void Function(List<AFActionWithKey> actions);
 typedef AFParamListenerDelegate = void Function(AFRouteParam param);
 
 /// Delegate used to create the initial applications state.
-typedef AFInitializeComponentStateDelegate = AFFlexibleState? Function();
+typedef AFInitializeComponentStateDelegate = AFComponentState? Function();
 
 /// Delegate use to define commands that are part of the afib command-line app.
 typedef AFExtendCommandsDelegate = void Function(AFCommandAppExtensionContext context);
@@ -40,7 +40,7 @@ typedef AFTypedSortDelegate<TSort> = int Function(TSort left, TSort right);
 typedef AFCreateStateViewDelegate<TStateView extends AFFlexibleStateView> = TStateView Function(Map<String, Object> models);
 
 // Used to work around inability to instantiate templated types
-typedef AFCreateComponentStateDelegate = AFFlexibleState Function(Map<String, Object> models);
+typedef AFCreateComponentStateDelegate = AFComponentState Function(Map<String, Object> models);
 
 /// Used to create a default child param the first time a particular child wid is used.
 typedef AFCreateDefaultChildParamDelegate = AFRouteParam? Function(AFID wid, dynamic public, dynamic segParent);

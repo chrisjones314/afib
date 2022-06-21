@@ -41,7 +41,7 @@ class AFStateTestStateVerificationContext {
     required this.afState,
   });
 
-  TAppState accessComponentState<TAppState extends AFFlexibleState>() {
+  TAppState accessComponentState<TAppState extends AFComponentState>() {
     return _findComponentState<TAppState>(afState);
   }
 
@@ -57,7 +57,7 @@ class AFStateTestStateVerificationContext {
     return afState.public;
   }
 
-  TComponentState _findComponentState<TComponentState extends AFFlexibleState>(AFState state) {
+  TComponentState _findComponentState<TComponentState extends AFComponentState>(AFState state) {
     final areas = state.public.components;
     return areas.stateFor(TComponentState) as TComponentState;
   }

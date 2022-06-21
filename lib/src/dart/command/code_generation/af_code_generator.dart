@@ -42,7 +42,7 @@ class AFCodeGenerator {
   static const drawersFolder = "drawers";
   static const widgetsFolder = "widgets";
   static const binFolder = "bin";
-  static const extendFolder = "extend";
+  static const installFolder = "install";
   static const environmentsFolder = "environments";
   static const afibFolder = "afib";
   static const overrideFolder = "override";
@@ -59,7 +59,7 @@ class AFCodeGenerator {
   static const binPath = [binFolder];
   static const testsPath = [libFolder, testFolder];
   static const environmentsPath = [libFolder, initializationFolder, environmentsFolder];
-  static const extendPath = [libFolder, initializationFolder, extendFolder];
+  static const installPath = [libFolder, initializationFolder, installFolder];
   static const drawersPath = [libFolder, uiFolder, drawersFolder];
   static const dialogsPath = [libFolder, uiFolder, dialogsFolder];
   static const widgetsPath = [libFolder, uiFolder, widgetsFolder];
@@ -112,8 +112,8 @@ class AFCodeGenerator {
     return AFibD.config.appNamespace.toUpperCase();
   }
 
-  List<String> get pathDefineUI { 
-    return _createPath(uiPath, "${appNamespace}_define_ui.dart");
+  List<String> get pathDefineCore { 
+    return _createPath(initializationPath, "${appNamespace}_define_core.dart");
   }
 
   List<String> get pathStateTestShortcutsFile {
@@ -209,8 +209,8 @@ class AFCodeGenerator {
     return _createPath(uiPath, filename);
   }
 
-  List<String> get pathInstallUI {
-    final filename = "${appNamespace}_install_ui.dart";
+  List<String> get pathInstall {
+    final filename = "${appNamespace}_install.dart";
     return _createPath(libPath, filename);
   }
 
@@ -249,14 +249,14 @@ class AFCodeGenerator {
     return _createPath(initializationPath, filename);
   }
 
-  List<String> get pathExtendApp {
-    final filename = "extend_app.dart";
-    return _createPath(extendPath, filename);
+  List<String> get pathInstallCoreApp {
+    final filename = "install_core_app.dart";
+    return _createPath(installPath, filename);
   }
 
-  List<String> get pathExtendTest {
-    final filename = "extend_test.dart";
-    return _createPath(extendPath, filename);
+  List<String> get pathInstallTest {
+    final filename = "install_test.dart";
+    return _createPath(installPath, filename);
   }
 
   List<String> get pathMain {
@@ -319,9 +319,9 @@ class AFCodeGenerator {
     return defaultRootStateType;
   }
 
-  List<String> get pathExtendBase {
-    final filename = "extend_base.dart";
-    return _createPath(extendPath, filename);
+  List<String> get pathInstallBase {
+    final filename = "install_base.dart";
+    return _createPath(installPath, filename);
   }
 
   List<String> get pathStateModelAccess {
@@ -334,24 +334,24 @@ class AFCodeGenerator {
     return _createPath(statePath, filename);
   }
 
-  List<String> get pathExtendLibraryBase {
-    final filename = "extend_base_library.dart";
-    return _createPath(extendPath, filename);
+  List<String> get pathInstallLibraryBase {
+    final filename = "install_base_library.dart";
+    return _createPath(installPath, filename);
   }
 
   List<String> get pathExtendCommand {
-    final filename = "extend_command.dart";
-    return _createPath(extendPath, filename);
+    final filename = "install_command.dart";
+    return _createPath(installPath, filename);
   }
 
-  List<String> get pathExtendLibraryCommand {
-    final filename = "extend_command_library.dart";
-    return _createPath(extendPath, filename);
+  List<String> get pathInstallLibraryCommand {
+    final filename = "install_command_library.dart";
+    return _createPath(installPath, filename);
   }
 
-  List<String> get pathExtendLibraryUI {
-    final filename = "extend_ui_library.dart";
-    return _createPath(extendPath, filename);
+  List<String> get pathInstallLibraryCore {
+    final filename = "install_core_library.dart";
+    return _createPath(installPath, filename);
   }
 
 

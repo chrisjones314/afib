@@ -117,7 +117,7 @@ $optionsHeader
     } 
 
     // register the LPI
-    final definesFile = generator.modifyFile(ctx, generator.pathDefineUI);
+    final definesFile = generator.modifyFile(ctx, generator.pathDefineCore);
     final defineLPI = DeclareDefineLPIT().toBuffer();
     defineLPI.replaceText(ctx, AFUISourceTemplateID.textLPIType, identifier);
     defineLPI.replaceText(ctx, AFUISourceTemplateID.textLPIID, fullId ?? "${generator.appNamespaceUpper}LibraryProgrammingInterfaceID.$idIdentifier");

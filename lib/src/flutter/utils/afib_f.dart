@@ -155,7 +155,7 @@ class AFibGlobalState {
   final sharedTestContext = AFSharedTestExtensionContext();
   final widgetsBindingObserver = AFWidgetsBindingObserver();
   final testOnlyShowUIReturn = <AFScreenID, dynamic>{};
-  final uiDefinitions = AFUIDefinitionContext();
+  final coreDefinitions = AFCoreDefinitionContext();
   final testMissingTranslations = AFTestMissingTranslations();
   final wireframes = AFWireframes();
   final testOnlyDialogCompleters = <AFScreenID, void Function(dynamic)>{}; 
@@ -298,7 +298,7 @@ class AFibGlobalState {
     screenMap.registerScreen(AFUIScreenID.screenDemoModeExit, (_) => AFUIDemoModeExitScreen());
     appContext.defineScreenMap(screenMap, libraries);
 
-    appContext.initializeFunctionalThemeFactories(uiDefinitions, libraries);
+    appContext.initializeCore(coreDefinitions, libraries);
         
     if(AFibD.config.requiresTestData) {      
       initializeTests();
@@ -372,10 +372,10 @@ class AFibGlobalState {
   }
 
   AFScreenMap get screenMap {
-    return uiDefinitions.screenMap;
+    return coreDefinitions.screenMap;
   }
 
-  Iterable<AFUILibraryExtensionContext> get thirdPartyLibraries {
+  Iterable<AFCoreLibraryExtensionContext> get thirdPartyLibraries {
     return appContext.thirdParty.libraries.values;
   }
 
@@ -485,7 +485,7 @@ class AFibGlobalState {
   }
 
   AFLibraryProgrammingInterface createLPI(AFLibraryProgrammingInterfaceID id, AFDispatcher dispatcher, AFConceptualStore targetStore) {
-      final factory = uiDefinitions.lpiFactories[id];
+      final factory = coreDefinitions.lpiFactories[id];
       if(factory == null) {
         throw AFException("No factory for LPI $id");
       }
@@ -497,7 +497,7 @@ class AFibGlobalState {
   }
 
   AFCreateWidgetSPIDelegate<TSPI, TBuildContext, TTheme>? findSPICreatorOverride<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme>() {
-    final found = uiDefinitions.spiOverrides[TSPI];
+    final found = coreDefinitions.spiOverrides[TSPI];
     return found as AFCreateWidgetSPIDelegate<TSPI, TBuildContext, TTheme>?;    
   }
 
@@ -716,7 +716,7 @@ class AFibGlobalState {
 
   /// Returns a function that creates the initial applications state, used to reset the state.
   AFComponentStates createInitialComponentStates() {
-    return appContext.createInitialComponentStates(thirdPartyLibraries);
+    return appContext.createInitialComponentStates(coreDefinitions, thirdPartyLibraries);
   }
 
 
@@ -748,7 +748,7 @@ class AFibGlobalState {
       fundamentals = fundamentals.reviseOverrideThemeValue(AFUIThemeID.brightness, Brightness.dark);
     }
 
-    final functionals = uiDefinitions.createFunctionals(fundamentals);
+    final functionals = coreDefinitions.createFunctionals(fundamentals);
     return AFThemeState.create(
       fundamentals: fundamentals,
       functionals: functionals,
@@ -759,7 +759,7 @@ class AFibGlobalState {
   AFThemeState rebuildFunctionalThemes({AFThemeState? initial}) {
     AFibD.logThemeAF?.d("Rebuild functional themes only");
     final themes = initial ?? internalOnlyActiveStore.state.public.themes;
-    final functionals = uiDefinitions.createFunctionals(themes.fundamentals);
+    final functionals = coreDefinitions.createFunctionals(themes.fundamentals);
     return themes.copyWith(
       functionals: functionals
     );   
@@ -767,7 +767,7 @@ class AFibGlobalState {
 
   /// Used internally by the framework.
   /// 
-  /// If you'd like to dispatch a startup action, see [AFAppExtensionContext.initializeAppFundamentals]
+  /// If you'd like to dispatch a startup action, see [AFAppExtensionContext.installApp]
   /// or [AFAppExtensionContext.addStartupAction]
   void dispatchStartupQueries(AFDispatcher dispatcher) {
     appContext.dispatchStartupQueries(dispatcher);

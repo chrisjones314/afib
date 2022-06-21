@@ -271,7 +271,7 @@ $optionsHeader
     fileTheme.replaceTextLines(ctx, AFUISourceTemplateID.textImportStatements, imports);
 
     // add the line that installs it
-    final fileDefineUI = generator.modifyFile(ctx, generator.pathDefineUI);
+    final fileDefineUI = generator.modifyFile(ctx, generator.pathDefineCore);
     final defineTheme = DeclareDefineThemeT().toBuffer();
     defineTheme.replaceText(ctx, AFUISourceTemplateID.textThemeType, uiName);
     defineTheme.replaceText(ctx, AFUISourceTemplateID.textThemeID, parentThemeID);
@@ -401,7 +401,7 @@ $optionsHeader
       declareScreenInMap.replaceText(ctx, AFUISourceTemplateID.textScreenID, screenId);
       declareScreenInMap.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
       declareScreenInMap.executeStandardReplacements(ctx);
-      final screenMapPath = generator.pathDefineUI;
+      final screenMapPath = generator.pathDefineCore;
       final screenMapFile = generator.modifyFile(ctx, screenMapPath);
       screenMapFile.addLinesAfter(ctx, AFCodeRegExp.startScreenMap, declareScreenInMap.lines);
       generator.addImport(ctx, 

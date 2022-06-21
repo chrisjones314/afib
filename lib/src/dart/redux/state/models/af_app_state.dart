@@ -7,7 +7,7 @@ import 'package:quiver/core.dart';
 
 /// When wrapped around a model object, causes it to be 
 /// referenced by the specified id in an 
-/// [AFFlexibleState] or [AFFlexibleStateView].
+/// [AFComponentState] or [AFFlexibleStateView].
 ///
 class AFWrapModelWithCustomID {
   final String id;
@@ -21,7 +21,7 @@ class AFModelWithCustomID {
   final String? customStateId;
 
   /// By default each model uses its class name as a key to uniquely 
-  /// identify itself in the [AFFlexibleState].  However, if you want
+  /// identify itself in the [AFComponentState].  However, if you want
   /// to have two objects of the same class in the AFAppState,
   /// you can pass each one a unique [customStateKey].
   AFModelWithCustomID({this.customStateId});
@@ -65,11 +65,11 @@ abstract class AFStateModelAccess {
 /// 
 /// 
 @immutable
-abstract class AFFlexibleState extends AFStateModelAccess {
+abstract class AFComponentState extends AFStateModelAccess {
   final Map<String, Object> models;
   final AFCreateComponentStateDelegate create;
 
-  AFFlexibleState({
+  AFComponentState({
     required this.models,
     required this.create,
   });
@@ -95,7 +95,7 @@ abstract class AFFlexibleState extends AFStateModelAccess {
   }
 
   bool operator==(Object other) {
-    if(other is! AFFlexibleState) {
+    if(other is! AFComponentState) {
       return false;
     }
     final modelsO = other.models;
@@ -152,32 +152,32 @@ abstract class AFFlexibleState extends AFStateModelAccess {
     return result;
   }
 
-  AFFlexibleState mergeWith(AFFlexibleState other) {
+  AFComponentState mergeWith(AFComponentState other) {
     final revisedModels = integrate(this.models, other.models.values);
     return createWith(revisedModels);    
   }
 
-  AFFlexibleState copyWith(List<Object> toIntegrate) {
-    return createWith(AFFlexibleState.integrate(models, toIntegrate));
+  AFComponentState copyWith(List<Object> toIntegrate) {
+    return createWith(AFComponentState.integrate(models, toIntegrate));
   }
 
-  AFFlexibleState reviseModels(List<Object> toIntegrate) {
-    return createWith(AFFlexibleState.integrate(models, toIntegrate));
+  AFComponentState reviseModels(List<Object> toIntegrate) {
+    return createWith(AFComponentState.integrate(models, toIntegrate));
   }
 
-  AFFlexibleState copyWithOne(Object toIntegrate) {
+  AFComponentState copyWithOne(Object toIntegrate) {
     final toI = <Object>[];
     toI.add(toIntegrate);
     return copyWith(toI);
   }
 
-  AFFlexibleState createWith(Map<String, Object> models) {
+  AFComponentState createWith(Map<String, Object> models) {
     return create(models);
   }
 }
 
 @immutable
-class AFComponentStateUnused extends AFFlexibleState {
+class AFComponentStateUnused extends AFComponentState {
   static final AFCreateComponentStateDelegate creator = (models) => AFComponentStateUnused(models);
   AFComponentStateUnused(Map<String, Object> models): super(models: models, create: creator);
 
@@ -191,14 +191,14 @@ class AFComponentStateUnused extends AFFlexibleState {
 /// Tracks the application state and any state provided by third parties.
 @immutable
 class AFComponentStates {
-  final Map<String, AFFlexibleState> states;
+  final Map<String, AFComponentState> states;
 
   AFComponentStates({
     required this.states
   });
 
-  factory AFComponentStates.createFrom(List<AFFlexibleState> areas) {
-    final states = <String, AFFlexibleState>{};
+  factory AFComponentStates.createFrom(List<AFComponentState> areas) {
+    final states = <String, AFComponentState>{};
     for(final area in areas) {
       final areaType = _keyForComponent(area);
       states[areaType] = area;
@@ -214,7 +214,7 @@ class AFComponentStates {
   }
 
   AFComponentStates reviseComponent(Type areaType, List<Object> models) {
-    final revisedStates = Map<String, AFFlexibleState>.of(states);
+    final revisedStates = Map<String, AFComponentState>.of(states);
     final key = _keyForComponent(areaType);
     if(key == "AFFlexibleState") {
       throw AFException("Attempting to set models on 'AFFlexibleState', this is most likely because you forgot to explicitly specify your AFFlexibleState type as a type parameter somewhere.");
@@ -237,12 +237,12 @@ class AFComponentStates {
     return AFComponentStates(states: revisedStates);    
   }
 
-  TState? findState<TState extends AFFlexibleState>() {
+  TState? findState<TState extends AFComponentState>() {
     final key = _keyForComponent(TState);
     return states[key] as TState?;
   }
 
-  AFFlexibleState? stateFor(Type areaType) {
+  AFComponentState? stateFor(Type areaType) {
     final key = _keyForComponent(areaType);
     return states[key];
   }

@@ -6,12 +6,12 @@ class DeferredQueryT extends AFSourceTemplate {
 import 'package:afib/afib_flutter.dart';
 [!af_import_statements]
 
-class [!af_query_name]Query extends AFDeferredQuery<[!af_state_type]> {
+class [!af_query_name]Query extends AFDeferredQuery {
   
   [!af_query_name]Query({
     AFID? id,
     Duration duration = const Duration(milliseconds: 300),
-    AFOnResponseDelegate<[!af_state_type], AFUnused>? onSuccessDelegate,
+    AFOnResponseDelegate<AFUnused>? onSuccessDelegate,
   }): super(
     duration,
     id: id,

@@ -17,6 +17,7 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 class AFCreateAppCommand extends AFCommand { 
   static const kindApp = "app";
   static const kindUILibrary = "ui_library";
+  static const kindStateLibrary = "state_library";
 
   final String name = "create";
   final String description = "Install afib framework support into an existing flutter app project";
@@ -24,14 +25,15 @@ class AFCreateAppCommand extends AFCommand {
   String get usage {
     return '''
 $usageHeader
-  afib_bootstrap.dart create [$kindApp|$kindUILibrary] yourpackagename YPC
+  afib_bootstrap.dart create [$kindApp|$kindUILibrary|$kindStateLibrary] yourpackagename YPC
 
 $descriptionHeader
   $description
 
 $optionsHeader
   $kindApp - Install to create a full app
-  $kindUILibrary - Install to create a UI library which exports screens, state, and queries for use in apps
+  $kindUILibrary - Install a UI library which exports screens, state, and queries for use in apps
+  $kindStateLibrary - Install a state only library which can provide commands, state, lpis, but no UI 
   
   yourpackage - the full identifier for your package, all lowercase.   This is the value from your pubspec.yaml's
     name field, which should be in the folder you are running this command from. 
@@ -57,10 +59,15 @@ $optionsHeader
     }
 
     final kind = args[1];
-    verifyOneOf(kind, [kindApp, kindUILibrary]);
+    verifyOneOf(kind, [kindApp, kindUILibrary, kindStateLibrary]);
 
     final isApp = kind == kindApp;
-    final libKind = isApp ? "App" : "UILibrary";
+    var libKind = "App";
+    if(kind == kindUILibrary) {
+      libKind = "UILibrary";
+    } else if(kind == kindStateLibrary) {
+      libKind = "StateLibrary";
+    }
     AFibD.config.setIsLibraryCommand(isLib: !isApp);
     final packageName = args[2];
     final packageCode = args[3];
@@ -77,7 +84,7 @@ $optionsHeader
     final generator = ctx.generator;
     _verifyPubspec(ctx, packageName);
 
-    _createStandardFolders(ctx, isApp: isApp);
+    _createStandardFolders(ctx, kind: kind);
     if(!isApp) {
       _createStandardLibraryFolders(ctx);
       _createLibExportsFiles(ctx);
@@ -85,43 +92,48 @@ $optionsHeader
     _createAppCommand(ctx, libKind);
     createStandardFile(ctx, generator.pathAppId, AFUISourceTemplateID.fileAppcodeID);
     final extendAppId = isApp ? AFUISourceTemplateID.fileExtendApp : AFUISourceTemplateID.fileExtendAppUILibrary;
-    _createInitializationFiles(ctx, extendAppId, libKind);
+    _createInitializationFiles(ctx, extendAppId, libKind, includeUI: kind != kindStateLibrary);
     _createQueryFiles(ctx);
     _createStateFiles(ctx);
-    _createTestFiles(ctx, libKind);
-    final mainTemplateId = isApp ? AFUISourceTemplateID.fileMain : AFUISourceTemplateID.fileMainUILibrary;
-    _createMainFiles(ctx, mainTemplateId);
-    final fundamentalInit = isApp ? DeclareFundamentalThemeInitT() : DeclareFundamentalThemeInitUILibraryT();
-    _createUIFiles(ctx, packageName, libKind, fundamentalInit);
+    if(kind != kindStateLibrary) {
+      _createTestFiles(ctx, libKind);
+    }
+    if(kind != kindStateLibrary) {
+      final mainTemplateId = isApp ? AFUISourceTemplateID.fileMain : AFUISourceTemplateID.fileMainUILibrary;
+      _createMainFiles(ctx, mainTemplateId);
+
+      final fundamentalInit = isApp ? DeclareFundamentalThemeInitT() : DeclareFundamentalThemeInitUILibraryT();
+      _createUIFiles(ctx, packageName, libKind, fundamentalInit);
+    }
 
     if(!isApp) {
-      _createInstallFiles(ctx);
+      _createInstallFiles(ctx, kind);
     }
     
 
     generator.finalizeAndWriteFiles(ctx);
   }
 
-  void _createInstallFiles(AFCommandContext ctx) {
+  void _createInstallFiles(AFCommandContext ctx, String kind) {
     final generator = ctx.generator;
-
-    // create the file and add it to the ui exports
-    final fileInstallUI = createStandardFile(ctx, generator.pathInstallUI, AFUISourceTemplateID.fileInstallUI);
     final args = {
       AFCommand.argPrivate: false
     };
 
-    generator.addExportsForFiles(ctx, args, [fileInstallUI]);
-
     // create the file and add it to the command exports.
     final fileInstallCommand = createStandardFile(ctx, generator.pathInstallCommand, AFUISourceTemplateID.fileInstallCommand);    
     generator.addExportsForFiles(ctx, args, [fileInstallCommand], toPath: generator.pathCommandExportsFile);
+
+    // create the file and add it to the ui exports
+    final fileInstallUI = createStandardFile(ctx, generator.pathInstall, AFUISourceTemplateID.fileInstallUI);
+    generator.addExportsForFiles(ctx, args, [fileInstallUI]);
+
   }
 
   void _createUIFiles(AFCommandContext ctx, String packageName, String libKind, AFSourceTemplate defineFundamentalImpl) {
     final generator = ctx.generator;
     createStandardFile(ctx, generator.pathConnectedBaseFile, AFUISourceTemplateID.fileConnectedBase);
-    final fileDefineUI = createStandardFile(ctx, generator.pathDefineUI, AFUISourceTemplateID.fileDefineUI);
+    final fileDefineUI = createStandardFile(ctx, generator.pathDefineCore, AFUISourceTemplateID.fileDefineUI);
     fileDefineUI.replaceText(ctx, AFUISourceTemplateID.textLibKind, libKind);
     final defineFundImpl = defineFundamentalImpl.toBuffer();
     defineFundImpl.executeStandardReplacements(ctx);
@@ -218,18 +230,18 @@ $optionsHeader
     createStandardFile(ctx, generator.pathApp, AFUISourceTemplateID.fileApp);
   }
 
-  void _createInitializationFiles(AFCommandContext ctx, AFUISourceTemplateID extendAppId, String libKind) {
+  void _createInitializationFiles(AFCommandContext ctx, AFUISourceTemplateID extendAppId, String libKind, { required bool includeUI }) {
     final generator = ctx.generator;
-    createStandardFile(ctx, generator.pathExtendBase, AFUISourceTemplateID.fileExtendBase);
-    createStandardFile(ctx, generator.pathExtendLibraryBase, AFUISourceTemplateID.fileExtendBaseLibrary);
+    createStandardFile(ctx, generator.pathInstallBase, AFUISourceTemplateID.fileExtendBase);
+    createStandardFile(ctx, generator.pathInstallLibraryBase, AFUISourceTemplateID.fileExtendBaseLibrary);
     final fileExtendCommand = createStandardFile(ctx, generator.pathExtendCommand, AFUISourceTemplateID.fileExtendCommand);
     fileExtendCommand.replaceText(ctx, AFUISourceTemplateID.textLibKind, libKind);
 
-    createStandardFile(ctx, generator.pathExtendLibraryCommand, AFUISourceTemplateID.fileExtendCommandLibrary);
-    createStandardFile(ctx, generator.pathExtendLibraryUI, AFUISourceTemplateID.fileExtendLibrary);
+    createStandardFile(ctx, generator.pathInstallLibraryCommand, AFUISourceTemplateID.fileExtendCommandLibrary);
+    createStandardFile(ctx, generator.pathInstallLibraryCore, AFUISourceTemplateID.fileExtendLibrary);
     createStandardFile(ctx, generator.pathExtendApplication, AFUISourceTemplateID.fileExtendApplication);
-    createStandardFile(ctx, generator.pathExtendApp, extendAppId);
-    createStandardFile(ctx, generator.pathExtendTest, AFUISourceTemplateID.fileExtendTest);
+    createStandardFile(ctx, generator.pathInstallCoreApp, extendAppId);
+    createStandardFile(ctx, generator.pathInstallTest, AFUISourceTemplateID.fileExtendTest);
     
     _createEnvironmentFile(ctx, "Debug");
     _createEnvironmentFile(ctx, "Prototype");
@@ -281,14 +293,18 @@ $optionsHeader
     return result;
   }
 
-  void _createStandardFolders(AFCommandContext ctx, { required bool isApp }) {
+  void _createStandardFolders(AFCommandContext ctx, { required String kind }) {
     final generator = ctx.generator;
+    final isStateLib = kind == kindStateLibrary;
+
     generator.ensureFolderExists(AFCodeGenerator.commandPath);
 
-    generator.ensureFolderExists(AFCodeGenerator.bottomSheetsPath);
-    generator.ensureFolderExists(AFCodeGenerator.drawersPath);
-    generator.ensureFolderExists(AFCodeGenerator.dialogsPath);
-    generator.ensureFolderExists(AFCodeGenerator.widgetsPath);
+    if(!isStateLib) {
+      generator.ensureFolderExists(AFCodeGenerator.bottomSheetsPath);
+      generator.ensureFolderExists(AFCodeGenerator.drawersPath);
+      generator.ensureFolderExists(AFCodeGenerator.dialogsPath);
+      generator.ensureFolderExists(AFCodeGenerator.widgetsPath);
+    }
     
     generator.ensureFolderExists(AFCodeGenerator.modelsPath);
     generator.ensureFolderExists(AFCodeGenerator.rootsPath);
@@ -296,16 +312,15 @@ $optionsHeader
 
     generator.ensureFolderExists(AFCodeGenerator.queryPath);
     
-    if(isApp) {
-      generator.ensureFolderExists(AFCodeGenerator.lpisOverridePath);
-      generator.ensureFolderExists(AFCodeGenerator.overrideThemesPath);
+    generator.ensureFolderExists(AFCodeGenerator.lpisOverridePath);
+    generator.ensureFolderExists(AFCodeGenerator.overrideThemesPath);
+
+    if(!isStateLib) {
+      generator.ensureFolderExists(AFCodeGenerator.prototypesPath);
+      generator.ensureFolderExists(AFCodeGenerator.stateTestsPath);
+      generator.ensureFolderExists(AFCodeGenerator.unitTestsPath);
+      generator.ensureFolderExists(AFCodeGenerator.wireframesPath);
     }
-
-    generator.ensureFolderExists(AFCodeGenerator.prototypesPath);
-    generator.ensureFolderExists(AFCodeGenerator.stateTestsPath);
-    generator.ensureFolderExists(AFCodeGenerator.unitTestsPath);
-    generator.ensureFolderExists(AFCodeGenerator.wireframesPath);
-
   }
 
   void _createStandardLibraryFolders(AFCommandContext ctx) {

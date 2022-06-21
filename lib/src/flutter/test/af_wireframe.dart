@@ -69,7 +69,7 @@ class AFWireframeExecutionContext<TStateView extends AFFlexibleStateView> {
 
   void updateModels(dynamic sourceModels) {
     final resolved = wireframe.testData.resolveStateViewModels(sourceModels);
-    models = AFFlexibleState.integrate(models, resolved.values);
+    models = AFComponentState.integrate(models, resolved.values);
     stateView = stateViewCreator(models);
   }
 

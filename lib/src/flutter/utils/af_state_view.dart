@@ -5,14 +5,14 @@ import 'package:meta/meta.dart';
 
 
 @immutable
-abstract class AFFlexibleStateView extends AFFlexibleState {
+abstract class AFFlexibleStateView extends AFComponentState {
   AFFlexibleStateView({
     required Map<String, Object> models,
     required AFCreateStateViewDelegate create,
   }): super(models: models, create: create);
 
   static Map<String, Object> createModels(Iterable<Object> toIntegrate) {
-    return AFFlexibleState.createModels(toIntegrate);
+    return AFComponentState.createModels(toIntegrate);
   }
 
   TStateView castToStateView<TStateView extends AFFlexibleStateView>(AFCreateStateViewDelegate<TStateView> creator) {

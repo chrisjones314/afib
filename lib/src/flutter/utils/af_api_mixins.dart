@@ -56,7 +56,7 @@ mixin AFAccessStateSynchronouslyMixin {
     return accessPublicState.time;    
   }
 
-  TState accessComponentState<TState extends AFFlexibleState>() {
+  TState accessComponentState<TState extends AFComponentState>() {
     final result = accessPublicState.components.findState<TState>();
     return result!;
   }
@@ -143,15 +143,15 @@ mixin AFStandardAPIContextMixin implements AFDispatcher {
 
   /// Dispatches an action that updates a single value in the app state area associated
   /// with the [TState] type parameter.
-  void updateComponentRootStateOne<TState extends AFFlexibleState>(Object toIntegrate) {
-    assert(TState != AFFlexibleState, "You must specify a state type as a type parameter");
+  void updateComponentRootStateOne<TState extends AFComponentState>(Object toIntegrate) {
+    assert(TState != AFComponentState, "You must specify a state type as a type parameter");
     dispatch(AFUpdateAppStateAction(area: TState, toIntegrate: [toIntegrate]));
   }
 
   /// Dispatches an action that updates several blaues in the app state area associated
   /// with the [TState] type parameter.
-  void updateComponentRootStateMany<TState extends AFFlexibleState>(List<Object> toIntegrate) {
-    assert(TState != AFFlexibleState, "You must specify a state type as a type parameter");
+  void updateComponentRootStateMany<TState extends AFComponentState>(List<Object> toIntegrate) {
+    assert(TState != AFComponentState, "You must specify a state type as a type parameter");
     dispatch(AFUpdateAppStateAction(area: TState, toIntegrate: toIntegrate));
   }
 

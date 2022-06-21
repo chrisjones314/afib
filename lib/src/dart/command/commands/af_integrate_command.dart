@@ -53,7 +53,7 @@ $optionsHeader
     // extend base
     _extendFile(ctx, 
       importCode: importCommand, 
-      pathExtendFile: generator.pathExtendLibraryBase,
+      pathExtendFile: generator.pathInstallLibraryBase,
       startExtendRegex: AFCodeRegExp.startExtendLibraryBase,
       packageCode: packageCode,
       extendType: "Base",
@@ -62,7 +62,7 @@ $optionsHeader
     // extend command
     _extendFile(ctx, 
       importCode: importCommand, 
-      pathExtendFile: generator.pathExtendLibraryCommand,
+      pathExtendFile: generator.pathInstallLibraryCommand,
       startExtendRegex: AFCodeRegExp.startExtendLibraryCommand,
       packageCode: packageCode,
       extendType: "Command",
@@ -72,7 +72,7 @@ $optionsHeader
     // extend UI
     _extendFile(ctx, 
       importCode: importFlutter, 
-      pathExtendFile: generator.pathExtendLibraryUI,
+      pathExtendFile: generator.pathInstallLibraryCore,
       startExtendRegex: AFCodeRegExp.startExtendLibraryUI,
       packageCode: packageCode,
       extendType: "UI",

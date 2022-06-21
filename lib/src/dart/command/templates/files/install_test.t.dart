@@ -11,9 +11,9 @@ import 'package:[!af_package_path]/test/test_data.dart';
 import 'package:[!af_package_path]/test/unit_tests.dart';
 import 'package:[!af_package_path]/test/wireframes.dart';
 
-void extendTest(AFTestExtensionContext extend) {
+void installTest(AFTestExtensionContext extend) {
 
-    extend.initializeTestFundamentals(
+    extend.initializeTests(
       defineTestData: defineTestData,
       defineUnitTests: defineUnitTests,
       defineStateTests: defineStateTests,

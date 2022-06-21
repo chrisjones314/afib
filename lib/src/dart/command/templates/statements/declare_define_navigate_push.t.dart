@@ -5,7 +5,7 @@ class DeclareDefineNavigatePushT extends AFSourceTemplate {
   [!af_comment_navigate_push]
   static AFNavigatePushAction navigatePush() {
     return AFNavigatePushAction(
-      routeParam: [!af_screen_name]RouteParam.create()
+      param: [!af_screen_name]RouteParam.create()
     );
   }
   ''';

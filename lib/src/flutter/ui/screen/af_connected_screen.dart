@@ -10,7 +10,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:logger/logger.dart';
 import 'package:quiver/core.dart';
 
-abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> {
+abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> {
   final AFThemeID themeId;
   final AFCreateStateViewDelegate<TStateView> stateViewCreator;
   final AFCreateWidgetSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator;
@@ -312,7 +312,7 @@ abstract class AFConnectedUIConfig<TState extends AFFlexibleState, TTheme extend
   Iterable<Object?> createStateModels(AFBuildStateViewContext<TState, TRouteParam> routeParam);
 }
 
-abstract class AFScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> {
+abstract class AFScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> {
     AFScreenConfig({
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
@@ -328,7 +328,7 @@ abstract class AFScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TS
     );
 }
 
-abstract class AFDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> {
+abstract class AFDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> {
     AFDrawerConfig({
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
@@ -343,7 +343,7 @@ abstract class AFDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TS
     );
 }
 
-abstract class AFDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> {
+abstract class AFDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> {
     AFDialogConfig({
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
@@ -357,7 +357,7 @@ abstract class AFDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TS
     );
 }
 
-abstract class AFBottomSheetConfig<TSPI extends AFBottomSheetStateProgrammingInterface, TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> {
+abstract class AFBottomSheetConfig<TSPI extends AFBottomSheetStateProgrammingInterface, TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> {
     AFBottomSheetConfig({
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
@@ -372,7 +372,7 @@ abstract class AFBottomSheetConfig<TSPI extends AFBottomSheetStateProgrammingInt
 }
 
 
-abstract class AFWidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> {
+abstract class AFWidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> {
   AFWidgetConfig({
     required AFThemeID themeId,
     required AFCreateStateViewDelegate<TStateView> stateViewCreator,
@@ -396,7 +396,7 @@ abstract class AFWidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TS
 /// * [AFConnectedDrawer]
 /// * [AFConnectedDialog]
 /// * [AFConnectedBottomSheet]
-abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> extends material.StatelessWidget {
+abstract class AFConnectedUIBase<TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> extends material.StatelessWidget {
   final AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> uiConfig;
   final AFScreenID screenId;
   final AFWidgetID wid;
@@ -469,7 +469,7 @@ abstract class AFConnectedUIBase<TState extends AFFlexibleState, TTheme extends 
 
 /// Superclass for a screen Widget, which combined data from the store with data from
 /// the route in order to render itself.
-abstract class AFConnectedScreen<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFScreenStateProgrammingInterface> extends AFConnectedUIBase<TState, TTheme, TStateView, TRouteParam, TSPI> {
+abstract class AFConnectedScreen<TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFScreenStateProgrammingInterface> extends AFConnectedUIBase<TState, TTheme, TStateView, TRouteParam, TSPI> {
 
   AFConnectedScreen({
     required AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> config,
@@ -496,7 +496,7 @@ abstract class AFConnectedScreen<TState extends AFFlexibleState, TTheme extends 
 
 }
 
-abstract class AFConnectedWidget<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> extends AFConnectedUIBase<TState, TTheme, TStateView, TRouteParam, TSPI> { 
+abstract class AFConnectedWidget<TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> extends AFConnectedUIBase<TState, TTheme, TStateView, TRouteParam, TSPI> { 
   
   AFConnectedWidget({
     required AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> uiConfig,
@@ -518,7 +518,7 @@ abstract class AFConnectedWidget<TState extends AFFlexibleState, TTheme extends 
 /// Consequently, you will need to override [AFConnectedScreenWithGlobalParam.createDefaultRouteParam],
 /// which will be used to create your route parameter if the drawer was dragged onto the
 /// screen without you explicitly calling [AFBuildContext.showLeftSideDrawer].
-abstract class AFConnectedDrawer<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFScreenStateProgrammingInterface> extends AFConnectedScreen<TState, TTheme, TStateView, TRouteParam, TSPI> {
+abstract class AFConnectedDrawer<TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFScreenStateProgrammingInterface> extends AFConnectedScreen<TState, TTheme, TStateView, TRouteParam, TSPI> {
   AFConnectedDrawer({
     required AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> config,
     required AFScreenID screenId,
@@ -547,7 +547,7 @@ abstract class AFConnectedDrawer<TState extends AFFlexibleState, TTheme extends 
 /// Use this to connect a dialog to the store.
 /// 
 /// You can open a dialog with [AFBuildContext.showDialogAFib].
-abstract class AFConnectedDialog<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFDialogStateProgrammingInterface> extends AFConnectedScreen<TState, TTheme, TStateView, TRouteParam, TSPI> {
+abstract class AFConnectedDialog<TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFDialogStateProgrammingInterface> extends AFConnectedScreen<TState, TTheme, TStateView, TRouteParam, TSPI> {
   AFConnectedDialog({
     required AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> config,
     required AFScreenID screenId,
@@ -558,7 +558,7 @@ abstract class AFConnectedDialog<TState extends AFFlexibleState, TTheme extends 
 /// 
 /// You can open a bottom sheet with [AFBuildContext.showBottomSheet]
 /// or [AFBuildContext.showModalBottomSheeet].
-abstract class AFConnectedBottomSheet<TState extends AFFlexibleState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFBottomSheetStateProgrammingInterface> extends AFConnectedScreen<TState, TTheme, TStateView, TRouteParam, TSPI> {
+abstract class AFConnectedBottomSheet<TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFBottomSheetStateProgrammingInterface> extends AFConnectedScreen<TState, TTheme, TStateView, TRouteParam, TSPI> {
   AFConnectedBottomSheet({
     required AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> config,
     required AFScreenID screenId,
@@ -588,7 +588,7 @@ class AFStandardBuildContextData {
   });
 }
 
-class AFBuildStateViewContext<TState extends AFFlexibleState?, TRouteParam extends AFRouteParam> {
+class AFBuildStateViewContext<TState extends AFComponentState?, TRouteParam extends AFRouteParam> {
   final AFPublicState statePublic;
   final TState stateApp;
   final AFRouteSegmentChildren? children;
@@ -606,7 +606,7 @@ class AFBuildStateViewContext<TState extends AFFlexibleState?, TRouteParam exten
     return stateApp;
   }
 
-  TOtherState accessComponentState<TOtherState extends AFFlexibleState>() {
+  TOtherState accessComponentState<TOtherState extends AFComponentState>() {
     return statePublic.components.findState<TOtherState>()!;
   }
 
@@ -891,7 +891,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
 }
 
 @immutable
-class AFStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> {
+class AFStateProgrammingInterface<TState extends AFComponentState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> {
   static const errFlutterStateRequired = "You can only call this method if your route param is derived from AFRouteParamWithFlutterState";
   static const errNeedTextControllers = "When constructing the AFFlutterRouteParamState for your route parameter, you must make textControllers non-null";
   static const errNeedScrollControllers = "When constructing the AFFlutterRouteParamState for your route parameter, you must make scrollControllers non-null";
@@ -945,7 +945,7 @@ class AFStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext 
 }
 
 @immutable
-class AFScreenStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFStateProgrammingInterface<TState, TBuildContext, TTheme> {
+class AFScreenStateProgrammingInterface<TState extends AFComponentState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFStateProgrammingInterface<TState, TBuildContext, TTheme> {
   AFScreenStateProgrammingInterface(
     TBuildContext context,
     AFScreenID screenId,
@@ -958,7 +958,7 @@ class AFScreenStateProgrammingInterface<TState extends AFFlexibleState, TBuildCo
 }
 
 @immutable
-class AFDialogStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFScreenStateProgrammingInterface<TState, TBuildContext, TTheme> {
+class AFDialogStateProgrammingInterface<TState extends AFComponentState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFScreenStateProgrammingInterface<TState, TBuildContext, TTheme> {
   AFDialogStateProgrammingInterface(
     TBuildContext context,
     AFScreenID screenId,
@@ -976,7 +976,7 @@ class AFDialogStateProgrammingInterface<TState extends AFFlexibleState, TBuildCo
 
 
 @immutable
-class AFBottomSheetStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFScreenStateProgrammingInterface<TState, TBuildContext, TTheme> {
+class AFBottomSheetStateProgrammingInterface<TState extends AFComponentState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFScreenStateProgrammingInterface<TState, TBuildContext, TTheme> {
   AFBottomSheetStateProgrammingInterface(
     TBuildContext context,
     AFScreenID screenId,
@@ -990,7 +990,7 @@ class AFBottomSheetStateProgrammingInterface<TState extends AFFlexibleState, TBu
 }
 
 @immutable
-class AFDrawerStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFScreenStateProgrammingInterface<TState, TBuildContext, TTheme> {
+class AFDrawerStateProgrammingInterface<TState extends AFComponentState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFScreenStateProgrammingInterface<TState, TBuildContext, TTheme> {
   AFDrawerStateProgrammingInterface(
     TBuildContext context,
     AFScreenID screenId,
@@ -1000,7 +1000,7 @@ class AFDrawerStateProgrammingInterface<TState extends AFFlexibleState, TBuildCo
 
 
 @immutable
-class AFWidgetStateProgrammingInterface<TState extends AFFlexibleState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFStateProgrammingInterface<TState, TBuildContext, TTheme> {
+class AFWidgetStateProgrammingInterface<TState extends AFComponentState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFStateProgrammingInterface<TState, TBuildContext, TTheme> {
   final AFID wid;
   AFWidgetStateProgrammingInterface(
     TBuildContext context,

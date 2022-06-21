@@ -204,7 +204,7 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
   }
 
   /// The default implementation calls the error handler passed in to 
-  /// [initializeLibraryFundamentals] in extend_app.dart
+  /// [installCoreLibrary] in extend_app.dart
   void finishAsyncWithError(AFFinishQueryErrorContext context) {
     AFibF.g.finishAsyncWithError(context);
   }

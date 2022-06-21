@@ -38,11 +38,11 @@ class AFPublicState {
     required this.time,
   });
 
-  T componentState<T extends AFFlexibleState>() {
+  T componentState<T extends AFComponentState>() {
     return components.stateFor(T) as T;
   }
 
-  T? componentStateOrNull<T extends AFFlexibleState>() {
+  T? componentStateOrNull<T extends AFComponentState>() {
     return components.stateFor(T) as T?;
   }
 

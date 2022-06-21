@@ -2138,8 +2138,8 @@ abstract class AFWorkflowTestExecute {
     bool verifyScreen = true
   });
 
-  Future<void> expectState<TState extends AFFlexibleState>( Future<void> Function(TState, AFRouteState) withState) async {
-    assert(TState != AFFlexibleState, "You must specify the state type as a type parameter");
+  Future<void> expectState<TState extends AFComponentState>( Future<void> Function(TState, AFRouteState) withState) async {
+    assert(TState != AFComponentState, "You must specify the state type as a type parameter");
     final public = AFibF.g.internalOnlyActiveStore.state.public;
     return withState(public.componentState<TState>(), public.route);
   }

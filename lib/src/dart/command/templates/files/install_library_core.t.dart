@@ -9,7 +9,7 @@ class AFExtendLibraryUIT extends AFSourceTemplate {
   final String template = '''
 import 'package:afib/afib_flutter.dart';
 
-void extendUILibrary(AFAppLibraryExtensionContext context) {
+void installCoreLibrary(AFAppLibraryExtensionContext context) {
 
 }
 ''';

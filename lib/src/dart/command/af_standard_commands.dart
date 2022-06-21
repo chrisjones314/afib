@@ -37,30 +37,30 @@ void afCommandStartup(Future<void> Function() onRun) async {
 Future<void> afAppCommandMain({
   required AFArgs args, 
   required AFDartParams paramsDart, 
-  required AFExtendBaseDelegate extendBase, 
-  required AFExtendCommandsDelegate extendCommand, 
-  required AFExtendBaseDelegate extendBaseLibrary, 
-  required AFExtendCommandsLibraryDelegate extendCommandLibrary
+  required AFExtendBaseDelegate installBase, 
+  required AFExtendCommandsDelegate installCommand, 
+  required AFExtendBaseDelegate installBaseLibrary, 
+  required AFExtendCommandsLibraryDelegate installCommandLibrary
 }) async {
-  await _afCommandMain(paramsDart, args.args, "afib", "App-specific afib command", extendBase, extendBaseLibrary, [
+  await _afCommandMain(paramsDart, args.args, "afib", "App-specific afib command", installBase, installBaseLibrary, [
     afRegisterAppCommands,
-    extendCommand
-  ], extendCommandLibrary);
+    installCommand
+  ], installCommandLibrary);
 }
 
 Future<void> afUILibraryCommandMain({ 
   required AFDartParams paramsDart, 
   required AFArgs args, 
-  required AFExtendBaseDelegate extendBase, 
-  required AFExtendBaseDelegate extendBaseLibrary, 
-  required AFExtendCommandsDelegate extendCommand, 
-  required AFExtendCommandsLibraryDelegate extendCommandLibrary
+  required AFExtendBaseDelegate installBase, 
+  required AFExtendBaseDelegate installBaseLibrary, 
+  required AFExtendCommandsDelegate installCommand, 
+  required AFExtendCommandsLibraryDelegate installCommandLibrary
 }) async {
   AFibD.config.setIsLibraryCommand(isLib: true);
-  await _afCommandMain(paramsDart, args.args, "afib", "App-specific afib command", extendBase, extendBaseLibrary, [
+  await _afCommandMain(paramsDart, args.args, "afib", "App-specific afib command", installBase, installBaseLibrary, [
     afRegisterAppCommands,
-    extendCommand,
-  ], extendCommandLibrary);
+    installCommand,
+  ], installCommandLibrary);
 }
 
 Future<void> _afCommandMain(AFDartParams paramsD, List<String> argsIn, String cmdName, String cmdDescription, AFExtendBaseDelegate? initBase, AFExtendBaseDelegate? initBaseLibrary, List<AFExtendCommandsDelegate> inits, AFExtendCommandsLibraryDelegate? initExtend) async {

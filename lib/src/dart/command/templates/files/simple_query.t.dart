@@ -6,12 +6,12 @@ class SimpleQueryT extends AFSourceTemplate {
 import 'package:afib/afib_flutter.dart';
 [!af_import_statements]
 
-class [!af_query_name] extends [!af_query_type]<[!af_state_type], [!af_result_type]> {
+class [!af_query_name] extends [!af_query_type]<[!af_result_type]> {
   
   [!af_query_name]({
     AFID? id,
-    AFOnResponseDelegate<[!af_state_type], [!af_result_type]>? onSuccessDelegate,
-    AFOnErrorDelegate<[!af_state_type]>? onErrorDelegate,
+    AFOnResponseDelegate<[!af_result_type]>? onSuccessDelegate,
+    AFOnErrorDelegate? onErrorDelegate,
     AFPreExecuteResponseDelegate<[!af_result_type]>? onPreExecuteResponseDelegate
   }): super(
     id: id,
@@ -30,7 +30,7 @@ class [!af_query_name] extends [!af_query_type]<[!af_state_type], [!af_result_ty
   }
 
   @override
-  void finishAsyncWithResponse(AFFinishQuerySuccessContext<[!af_state_type], [!af_result_type]> context) {
+  void finishAsyncWithResponse(AFFinishQuerySuccessContext<[!af_result_type]> context) {
     // this is the value passed to context.onSuccess in startAsync:
     // final response = context.r;
     // use context.update... to integrate the response into your state.
@@ -38,7 +38,7 @@ class [!af_query_name] extends [!af_query_type]<[!af_state_type], [!af_result_ty
   }
 
   //@override
-  //void finishAsyncWithError(AFFinishQueryErrorContext<AFAHState> context) {
+  //void finishAsyncWithError(AFFinishQueryErrorContext context) {
     // for scenarios with errors that are code-paths, like bad password on login, you can use
     // this.  For network errors, etc, you will usually just let it fall through to the 
     // global error handler.

@@ -12,8 +12,10 @@ void [!af_app_namespace]InstallCore(AFAppLibraryExtensionContext context) {
   final libContext = context.register(
     [!af_app_namespace(upper)]LibraryID.id
   );
-  installCoreLibrary(libContext);
-  [!af_call_install_tests]
+  if(libContext != null) {
+    installCoreLibrary(libContext);
+    [!af_call_install_tests]
+  }
 }
 ''';
 }

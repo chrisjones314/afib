@@ -6,11 +6,11 @@ void defineAFDefaultFundamentalTheme(AFFundamentalDeviceTheme device, AFComponen
   final themeDark = Typography.whiteMountainView;
   final themeLight = Typography.blackMountainView;
   
-  final colorPrimary = Color(0xff8d5b4c);
-  final colorPrimaryDark = Color(0xff5d3124);
+  final colorPrimary = Color(0xff2D4580);
+  final colorPrimaryDark = Color(0xff1b2a4e);
   //final colorPrimaryDarker = Color(0xff320a00);
-  final colorSecondary = Color(0xff706677);
-  final colorSecondaryDark = Color(0xff453c4b);
+  final colorSecondary = Color(0xffA17918);
+  final colorSecondaryDark = Color(0xffA17818);
   //final colorSecondaryDarker = Color(0xff1e1623);
   final colorWhite = Colors.white;
   final colorError = Color(0xffbf0603);

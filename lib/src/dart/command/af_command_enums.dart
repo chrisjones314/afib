@@ -16,14 +16,14 @@ enum AFEnvironment {
   /// Used in command-line tests.
   test,
 
-  /// Used to startup in a specific wireframe
-  wireframe,
+  /// Used to start into a specific state test
+  startupInStateTest,
 
-  /// Used to startup in a specific workflow prototype
-  workflowPrototype,
+  /// Used to startup in a specific wireframe
+  startupInWireframe,
 
   /// Used to startup in a specific screen prototype
-  screenPrototype,
+  startupInScreenPrototype,
 }
 
 /// You can override [AFFunctionalTheme.deviceFormFactor] to modify

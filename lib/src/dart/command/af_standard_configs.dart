@@ -18,9 +18,9 @@ class AFConfigEntryEnvironment extends AFConfigurationItemOptionChoice {
     addChoice(textValue: "debug", help: "For debugging", runtimeValue: AFEnvironment.debug);
     addChoice(textValue: "production", help: "For production", runtimeValue: AFEnvironment.production);
     addChoice(textValue: "prototype", help: "Interact with prototype screens, and run tests against them on the simulator", runtimeValue: AFEnvironment.prototype);
-    addChoice(textValue: "wireframe", help: "Startup in a wireframe specified by AFConfig.setStartupWireframe $specificItemConfigLocation", runtimeValue: AFEnvironment.wireframe);
-    addChoice(textValue: "workflowPrototype", help: "Startup in a specific workflow prototype specified by AFConfig.setStartupWorkflowPrototype $specificItemConfigLocation", runtimeValue: AFEnvironment.workflowPrototype);
-    addChoice(textValue: "screenPrototype", help: "Startup in a specific screen prototype specified by AFConfig.setStartupScreenPrototype $specificItemConfigLocation", runtimeValue: AFEnvironment.screenPrototype);
+    addChoice(textValue: "startupInWireframe", help: "Startup in a wireframe specified by AFConfig.setStartupWireframe $specificItemConfigLocation", runtimeValue: AFEnvironment.startupInWireframe);
+    addChoice(textValue: "workflowPrototype", help: "Startup in the terminal state of a state test, specified by AFConfig.setStartupStateTest $specificItemConfigLocation", runtimeValue: AFEnvironment.startupInStateTest);
+    addChoice(textValue: "startupInScreenPrototype", help: "Startup in a specific screen prototype specified by AFConfig.setStartupScreenPrototype $specificItemConfigLocation", runtimeValue: AFEnvironment.startupInScreenPrototype);
     addChoice(textValue: "test", help: "Used internally when command-line tests are executing, not usually explicitly used by developers", runtimeValue: AFEnvironment.test);
 
   }

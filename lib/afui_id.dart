@@ -246,6 +246,7 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textBuildBodyImpl = AFUISourceTemplateID("build_body_impl");
   static const textEnvironmentName = AFUISourceTemplateID("environment_name");
   static const textTestKind = AFUISourceTemplateID("test_kind");
+  static const textContent = AFUISourceTemplateID("content");
   static const textPackageCode = AFUISourceTemplateID("package_code");
   static const textExtendKind = AFUISourceTemplateID("extend_kind");
   static const textTestID = AFUISourceTemplateID("test_id");

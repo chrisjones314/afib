@@ -119,9 +119,9 @@ class AFScreenMap {
     final environment = AFibD.config.environment;
     if(environment == AFEnvironment.prototype) {
       return _screens[AFUIScreenID.screenPrototypeHome];
-    } else if(environment == AFEnvironment.wireframe ||
-              environment == AFEnvironment.screenPrototype ||
-              environment == AFEnvironment.workflowPrototype) {
+    } else if(environment == AFEnvironment.startupInWireframe ||
+              environment == AFEnvironment.startupInScreenPrototype ||
+              environment == AFEnvironment.startupInStateTest) {
       return _screens[AFUIScreenID.screenPrototypeLoading];
     }
 

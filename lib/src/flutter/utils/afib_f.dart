@@ -748,21 +748,13 @@ class AFibGlobalState {
       fundamentals = fundamentals.reviseOverrideThemeValue(AFUIThemeID.brightness, Brightness.dark);
     }
 
-    final functionals = coreDefinitions.createFunctionals(fundamentals);
     return AFThemeState.create(
-      fundamentals: fundamentals,
-      functionals: functionals,
+      fundamentals: fundamentals
     );
   }
 
-
-  AFThemeState rebuildFunctionalThemes({AFThemeState? initial}) {
-    AFibD.logThemeAF?.d("Rebuild functional themes only");
-    final themes = initial ?? internalOnlyActiveStore.state.public.themes;
-    final functionals = coreDefinitions.createFunctionals(themes.fundamentals);
-    return themes.copyWith(
-      functionals: functionals
-    );   
+  BuildContext? get currentFlutterContext {
+    return navigatorKey.currentContext;
   }
 
   /// Used internally by the framework.
@@ -892,6 +884,23 @@ class AFibGlobalState {
 
   AFCreateAFAppDelegate? get createApp {
     return appContext.createApp;
+  }
+
+  AFPrototypeID prototypeIdForStartupId(AFID startupId) {
+    final workflowTests = workflowTestsForStateTests;
+    if(startupId is AFPrototypeID) {
+      return startupId;
+    }
+    if(startupId is! AFStateTestID) {
+      throw AFException("Unknown id type ${startupId.runtimeType}");
+    }
+
+    final found = workflowTests.findByStateTestId(startupId);
+    if(found == null) {
+      throw AFException("Could not find prototype for state test $startupId");
+    }
+  
+    return found.id;
   }
 
   /// Called internally when a query finishes successfully, see [AFFlutterParams.querySuccessDelegate] 

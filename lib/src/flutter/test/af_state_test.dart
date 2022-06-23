@@ -12,7 +12,6 @@ import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
-import 'package:afib/src/dart/redux/state/models/af_theme_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
@@ -45,10 +44,6 @@ class AFStateTestStateVerificationContext {
     return _findComponentState<TAppState>(afState);
   }
 
-  TAppTheme? theme<TAppTheme extends AFFunctionalTheme>(AFThemeID themeId) {
-    return _findAppTheme(afState, themeId);
-  }
-
   AFRouteState get route {
     return _routeFor(afState);
   }
@@ -60,11 +55,6 @@ class AFStateTestStateVerificationContext {
   TComponentState _findComponentState<TComponentState extends AFComponentState>(AFState state) {
     final areas = state.public.components;
     return areas.stateFor(TComponentState) as TComponentState;
-  }
-
-  TAppTheme? _findAppTheme<TAppTheme extends AFFunctionalTheme>(AFState state, AFThemeID themeId) {
-    final themes = state.public.themes;
-    return themes.findById(themeId) as TAppTheme;
   }
 
   AFRouteState _routeFor(AFState state) {

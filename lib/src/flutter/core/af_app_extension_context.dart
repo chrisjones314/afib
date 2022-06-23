@@ -270,6 +270,21 @@ class AFTestExtensionContext {
   }
 }
 
+void afDefaultQueryErrorHandler(AFFinishQueryErrorContext context) {
+  var msg = context.error.message;
+  assert(msg != null);
+  if(msg == null) {
+    msg = "";
+  }
+  context.showDialogErrorText(
+    themeOrId: AFUIThemeID.defaultTheme,
+    buttonTitles: ["OK"],
+    title: msg
+  );
+
+}
+
+
 class AFCoreDefinitionContext {
   final spiOverrides = <Type, AFCreateWidgetSPIDelegate>{};
   final lpiFactories = <AFLibraryProgrammingInterfaceID, AFCreateLibraryProgrammingInterfaceDelegate>{};
@@ -347,11 +362,11 @@ class AFCoreDefinitionContext {
     themeFactories[id] = createTheme;
   }
 
-  AFFunctionalTheme create(AFThemeID id, AFFundamentalThemeState fundamentals) {
+  AFFunctionalTheme createFunctionalTheme(AFThemeID id, AFFundamentalThemeState fundamentals, AFBuildContext context) {
     final create = themeFactories[id];
     if(create == null) throw AFException("No theme registered with id $id");
 
-    return create(id, fundamentals);
+    return create(id, fundamentals, context);
   }
 
   AFCreateFunctionalThemeDelegate factoryFor(AFThemeID id) {
@@ -360,18 +375,6 @@ class AFCoreDefinitionContext {
     return factory;
   }
 
-
-  Map<AFThemeID, AFFunctionalTheme> createFunctionals(AFFundamentalThemeState fundamentals) {
-    final result = <AFThemeID, AFFunctionalTheme>{};
-    for(final id in themeFactories.keys) {
-      final create = themeFactories[id];
-      if(create != null) {
-        result[id] = create(id, fundamentals);
-      }
-    }
-
-    return result;
-  }
 
   void dispatchStartupQueries(AFDispatcher dispatcher) {
     for(final creator in this.createStartupQueries) {
@@ -453,9 +456,13 @@ class AFPluginExtensionContext {
 class AFAppLibraryExtensionContext {
   final libraries = <AFLibraryID, AFCoreLibraryExtensionContext>{};
   
-  AFCoreLibraryExtensionContext register(AFLibraryID id) {
-    final context = AFCoreLibraryExtensionContext(id: id);
-    assert(!libraries.containsKey(id), "Duplicate library key $id");
+  AFCoreLibraryExtensionContext? register(AFLibraryID id) {
+    // this can occur when both an app, and a library the app loads, load some third library.
+    if(libraries.containsKey(id)) {
+      return null;
+    }
+    
+    final context = AFCoreLibraryExtensionContext(id: id, app: this);
     libraries[id] = context;
     return context;
   }
@@ -463,9 +470,11 @@ class AFAppLibraryExtensionContext {
 
 class AFCoreLibraryExtensionContext extends AFPluginExtensionContext {
   final AFLibraryID id;
+  final AFAppLibraryExtensionContext app;
 
   AFCoreLibraryExtensionContext({
     required this.id,
+    required this.app,
   });
 
   AFLibraryTestHolder createScreenTestHolder() {

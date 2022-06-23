@@ -910,6 +910,10 @@ class AFBorderRadius {
   AFBorderRadiusSet get top { return t; }
   AFBorderRadiusSet get bottom { return b; }
   BorderRadius get standard { return a.standard; }
+  BorderRadius get smaller { return a.s2; }
+  BorderRadius get smallest { return a.s1; }
+  BorderRadius get larger { return a.s4; }
+  BorderRadius get largest { return a.s5; }
   BorderRadius get none { return BorderRadius.zero; }
 
 
@@ -1084,6 +1088,7 @@ class AFSpacing {
 /// conceptual components in the UI based on the values in 
 /// a fundamental theme.
 class AFFundamentalThemeState {
+  static const orderedFormFactors = <AFFormFactor>[AFFormFactor.smallPhone, AFFormFactor.standardPhone, AFFormFactor.largePhone, AFFormFactor.smallTablet, AFFormFactor.standardTablet, AFFormFactor.largeTablet];
   static const badSizeIndexError = "You must specify an index into your 6 standard sizes";
   ThemeData? themeData;
   final AFFundamentalDeviceTheme device;
@@ -1107,6 +1112,42 @@ class AFFundamentalThemeState {
 
   void updateThemeData(ThemeData td) {
     themeData = td;
+  }
+
+  bool deviceHasFormFactor({
+    AFFormFactor? atLeast,
+    AFFormFactor? atMost,
+    Orientation? withOrientation
+  }) {
+    if(withOrientation != null) {
+      if(deviceOrientation != withOrientation) {
+        return false;
+      }
+    }
+    
+    var atLeastIdx = 0;
+    var atMostIdx = orderedFormFactors.length;
+    if(atLeast != null) {
+      atLeastIdx = orderedFormFactors.indexOf(atLeast);
+    }
+    if(atMost != null) {
+      atMostIdx = orderedFormFactors.indexOf(atMost);
+    }
+
+    final actualIdx = orderedFormFactors.indexOf(deviceFormFactor);
+    return (actualIdx >= atLeastIdx && actualIdx <= atMostIdx);
+  }
+
+  AFFormFactor get deviceFormFactor {
+    final dSize = device.physicalSize;
+    final delegate = findValue(AFUIThemeID.formFactorDelegate) as AFConvertSizeToFormFactorDelegate;
+    return delegate(dSize);
+  }
+
+  /// The orientation of the device.
+  Orientation get deviceOrientation {
+    final dSize = device.physicalSize;
+    return (dSize.height >= dSize.width) ? Orientation.portrait : Orientation.landscape;
   }
 
   AFFundamentalThemeState reviseOverrideThemeValue(AFThemeID id, dynamic value) {
@@ -1269,10 +1310,13 @@ class AFFundamentalThemeState {
     return area.weight(id);
   } 
 
-  Object? findValue(AFThemeID id) {
+  TReturn? findValue<TReturn extends Object>(AFThemeID id) {
     var result = area.findValue(id);
     if(result == null && id.libraryTag == AFUIThemeID.tagDevice) {
       result = device.findDeviceValue(id);
+    }
+    if(result is! TReturn?) {
+      throw AFException("Expected type $TReturn found ${result.runtimeType} for $id");
     }
     return result;
   }
@@ -1434,7 +1478,6 @@ mixin AFDeviceFormFactorMixin {
   bool get deviceIsLandscapeTablet {
     return deviceHasFormFactor(atLeast: AFFormFactor.smallTablet, withOrientation: Orientation.landscape);
   }
-
 }
 
 /// Functional themes are interfaces that provide UI theming
@@ -1462,12 +1505,13 @@ mixin AFDeviceFormFactorMixin {
 /// context.t methods.
 @immutable
 class AFFunctionalTheme with AFDeviceFormFactorMixin {
-  static const orderedFormFactors = <AFFormFactor>[AFFormFactor.smallPhone, AFFormFactor.standardPhone, AFFormFactor.largePhone, AFFormFactor.smallTablet, AFFormFactor.standardTablet, AFFormFactor.largeTablet];
   final AFThemeID id;
   final AFFundamentalThemeState fundamentals;
+  final AFBuildContext context;
   AFFunctionalTheme(
     this.id,
     this.fundamentals,
+    this.context,
   );
 
   ThemeData? get themeData {
@@ -1486,6 +1530,11 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   // or [AFFlexibleStateView.findId].
   void augmentModels(AFPublicState public, List<Object> models) {
     
+  }
+
+  TFunctionalTheme accessTheme<TFunctionalTheme extends AFFunctionalTheme>(AFThemeID themeId) {
+    final fundamentals = AFibF.g.internalOnlyActiveStore.state.public.themes.fundamentals;
+    return AFibF.g.coreDefinitions.createFunctionalTheme(themeId, fundamentals, context) as TFunctionalTheme;
   }
 
   /// A utility for creating a list of widgets in a row.   
@@ -2196,6 +2245,8 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     bool? enabled,
     bool obscureText = false,
     bool autofocus = false,
+    int? minLines,
+    int maxLines = 1,
     InputDecoration? decoration,
     bool autocorrect = true,
     TextAlign textAlign = TextAlign.start,
@@ -2209,11 +2260,14 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
       wid: wid,
       enabled: enabled,
       style: style,
+      
       controller: controller,
       controllers: controllers,
       parentParam: parentParam,
       expectedText: expectedText,
       onChanged: onChanged,
+      minLines: minLines,
+      maxLines: maxLines,
       keyboardType: keyboardType,
       obscureText: obscureText,
       autocorrect: autocorrect,
@@ -2288,8 +2342,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   /// The orientation of the device.
   Orientation get deviceOrientation {
-    final dSize = devicePhysicalSize;
-    return (dSize.height >= dSize.width) ? Orientation.portrait : Orientation.landscape;
+    return fundamentals.deviceOrientation;
   }
 
   /// An appoximate form factor for the device.   
@@ -2298,9 +2351,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   /// can be resized arbitrarily, in the web case this returns the best
   /// approximation in [AFFormFactor].
   AFFormFactor get deviceFormFactor {
-    final dSize = devicePhysicalSize;
-    final delegate = fundamentals.findValue(AFUIThemeID.formFactorDelegate) as AFConvertSizeToFormFactorDelegate;
-    return delegate(dSize);
+    return fundamentals.deviceFormFactor;
   }
 
   bool deviceHasFormFactor({
@@ -2308,23 +2359,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     AFFormFactor? atMost,
     Orientation? withOrientation
   }) {
-    if(withOrientation != null) {
-      if(deviceOrientation != withOrientation) {
-        return false;
-      }
-    }
-    
-    var atLeastIdx = 0;
-    var atMostIdx = orderedFormFactors.length;
-    if(atLeast != null) {
-      atLeastIdx = orderedFormFactors.indexOf(atLeast);
-    }
-    if(atMost != null) {
-      atMostIdx = orderedFormFactors.indexOf(atMost);
-    }
-
-    final actualIdx = orderedFormFactors.indexOf(deviceFormFactor);
-    return (actualIdx >= atLeastIdx && actualIdx <= atMostIdx);
+    return fundamentals.deviceHasFormFactor(atLeast: atLeast, atMost: atMost, withOrientation: withOrientation);
   }
 
 
@@ -2842,33 +2877,30 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
 /// Can be used as a template parameter when you don't want a theme.
 class AFFunctionalThemeUnused extends AFFunctionalTheme {
-  AFFunctionalThemeUnused(AFFundamentalThemeState fundamentals): super(AFUIThemeID.unused, fundamentals);
+  AFFunctionalThemeUnused(AFFundamentalThemeState fundamentals, AFBuildContext context): super(AFUIThemeID.unused, fundamentals, context);
 }
 
 /// Captures the current state of the primary theme, and
 /// any registered third-party themes.
 class AFThemeState {
   final AFFundamentalThemeState fundamentals;
-  final Map<AFThemeID, AFFunctionalTheme> functionals;  
 
   AFThemeState({
-    required this.fundamentals,
-    required this.functionals
+    required this.fundamentals
   });
 
-  AFFunctionalTheme? findById(AFThemeID id) {
-    return functionals[id];
-  }
 
   factory AFThemeState.create({
     required AFFundamentalThemeState fundamentals,
-    required Map<AFThemeID, AFFunctionalTheme> functionals
   }) {
 
     return AFThemeState(
-      fundamentals: fundamentals,
-      functionals: functionals
+      fundamentals: fundamentals
     );
+  }
+
+  AFFunctionalTheme createFunctionalTheme(AFThemeID themeId, AFBuildContext context) {
+    return AFibF.g.coreDefinitions.createFunctionalTheme(themeId, fundamentals, context);
   }
 
   AFThemeState reviseOverrideThemeValue(AFThemeID id, dynamic value) {
@@ -2877,15 +2909,11 @@ class AFThemeState {
       fundamentals: revised
     );
     AFibD.logThemeAF?.d("Overriding theme value: $id = $value");
-    return AFibF.g.rebuildFunctionalThemes(initial: revisedState);
+    return revisedState;
   }
 
   AFThemeState reviseRebuildAll() {
     return AFibF.g.initializeThemeState();
-  }
-
-  AFThemeState reviseRebuildFunctional() {
-    return AFibF.g.rebuildFunctionalThemes();
   }
 
   AFThemeState copyWith({
@@ -2893,7 +2921,6 @@ class AFThemeState {
      Map<AFThemeID, AFFunctionalTheme>? functionals,
   }) {
     return AFThemeState.create(
-      functionals: functionals ?? this.functionals,
       fundamentals: fundamentals ?? this.fundamentals
     );
   }

@@ -14,8 +14,9 @@ class AFStartSpecificPrototypeQuery extends AFDeferredQuery {
     final config = AFibD.config;
     final env = config.environment;
 
-    final protoId = config.startupPrototypeId;
-    if(env == AFEnvironment.wireframe) {
+    final startupId = config.startupPrototypeId;
+    final protoId = AFibF.g.prototypeIdForStartupId(startupId);
+    if(env == AFEnvironment.startupInWireframe) {
       _startWireframe(context, protoId);
     } else {
       _startScreenPrototype(context, protoId);

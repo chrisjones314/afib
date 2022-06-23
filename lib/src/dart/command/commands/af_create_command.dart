@@ -15,6 +15,7 @@ import 'package:afib/src/dart/command/templates/statements/declare_empty_stateme
 import 'package:afib/src/dart/command/templates/statements/declare_fundamental_theme_init.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_fundamental_theme_init_ui_library.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_include_install_tests.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_prototype_environmentcontent.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_screen_build_with_spi_no_back.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
@@ -303,10 +304,10 @@ $optionsHeader
       createStandardFile(ctx, generator.pathInstallTest, AFUISourceTemplateID.fileExtendTest);
     }
     
-    _createEnvironmentFile(ctx, "Debug");
-    _createEnvironmentFile(ctx, "Prototype");
-    _createEnvironmentFile(ctx, "Test");
-    _createEnvironmentFile(ctx, "Production");
+    _createEnvironmentFile(ctx, "Debug", null);
+    _createEnvironmentFile(ctx, "Prototype", DeclarePrototypeEnvironmentContentT());
+    _createEnvironmentFile(ctx, "Test", null);
+    _createEnvironmentFile(ctx, "Production", null);
     createStandardFile(ctx, generator.pathCreateDartParams, AFUISourceTemplateID.fileCreateDartParams);
 
     AFConfigCommand.updateConfig(ctx, AFibD.config, AFibD.configEntries, ctx.arguments);
@@ -347,9 +348,10 @@ $optionsHeader
 
 
 
-  AFGeneratedFile _createEnvironmentFile(AFCommandContext ctx, String suffix) {
+  AFGeneratedFile _createEnvironmentFile(AFCommandContext ctx, String suffix, AFSourceTemplate? content) {
     final result = createStandardFile(ctx, ctx.generator.pathEnvironment(suffix), AFUISourceTemplateID.fileEnvironment);
     result.replaceText(ctx, AFUISourceTemplateID.textEnvironmentName, suffix);
+    result.replaceTemplate(ctx, AFUISourceTemplateID.textContent, content ?? DeclareEmptyStatementT());
     return result;
   }
 

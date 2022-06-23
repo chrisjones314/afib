@@ -21,7 +21,9 @@ class AFibD<AppState> {
     }
 
     static void registerLibrary(AFLibraryID id) {
-      libraries.add(id);
+      if(!libraries.contains(id)) {
+        libraries.add(id);
+      }
     }
 
     static AFLibraryID? findLibraryWithPrefix(String prefix) {

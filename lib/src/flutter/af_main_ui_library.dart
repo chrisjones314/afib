@@ -7,6 +7,7 @@ import 'package:afib/src/flutter/af_main.dart';
 import 'package:afib/src/flutter/core/af_app_extension_context.dart';
 import 'package:afib/src/flutter/ui/theme/af_default_fundamental_theme.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
+import 'package:afib/src/flutter/utils/afib_f.dart';
 
 /// [afMainApp] handles startup, execution, and shutdown sequence for an afApp
 void afMainUILibrary({
@@ -14,10 +15,12 @@ void afMainUILibrary({
   required AFDartParams paramsDart, 
   required AFExtendBaseDelegate installBase, 
   required AFExtendBaseDelegate installBaseLibrary, 
-  required AFExtendUILibraryDelegate installCoreLibrary, 
+  required AFExtendCoreLibraryDelegate installCoreLibrary, 
   required AFExtendTestDelegate installTest
 }) {
-  final contextLibrary = AFCoreLibraryExtensionContext(id: id);
+  final appContext = AFibF.context;
+
+  final contextLibrary = AFCoreLibraryExtensionContext(id: id, app: appContext.thirdParty);
   installCoreLibrary(contextLibrary);
 
   final paramsProto = paramsDart.forceEnvironment(AFEnvironment.prototype);
@@ -35,6 +38,7 @@ void afMainUILibrary({
     installBase: installBase,
     installBaseLibrary: installBaseLibrary,
     installCoreApp: extendAppFull,
-    installTest: installTest
+    installTest: installTest,
+    appContext: appContext,
   );
 }

@@ -474,9 +474,15 @@ class AFTimeState {
     return copyWith(actualNow: DateTime.now());
   }
 
+  int get milliInDay {
+    var result = secondInDay * Duration.millisecondsPerSecond;
+    result += DateTime.now().millisecond;
+    return result;
+  }
+
   int get secondInDay {
     final now = currentPullTime;
-    final result = (now.hour*60*60) + now.minute*60 + now.second;
+    final result = (now.hour*Duration.secondsPerMinute*Duration.minutesPerHour) + now.minute*Duration.secondsPerMinute + now.second;
     return result;
   }
 

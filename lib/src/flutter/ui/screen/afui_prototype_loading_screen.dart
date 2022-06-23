@@ -38,10 +38,10 @@ class AFPrototypeLoadingScreen extends AFUIConnectedScreen<AFPrototypeLoadingScr
   Widget _buildLoading(AFPrototypeLoadingScreenSPI spi) {
     final t = spi.t;
 
-    final protoId = AFibD.config.startupPrototypeId;
+    final startupId = AFibD.config.startupPrototypeId;
     final rows = t.column();
     rows.add(t.childText("Loading Prototype"));
-    rows.add(t.childText(protoId.toString()));
+    rows.add(t.childText(startupId.toString()));
     
     return Scaffold(
       appBar: AppBar(        

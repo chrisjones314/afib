@@ -39,12 +39,13 @@ Future<void> afTestMainUILibrary({
   required AFLibraryID id, 
   required AFExtendBaseDelegate installBase, 
   required AFExtendBaseDelegate installBaseLibrary, 
-  required AFExtendUILibraryDelegate installCoreLibrary, 
+  required AFExtendCoreLibraryDelegate installCoreLibrary, 
   required AFExtendTestDelegate installTest, 
   required AFDartParams paramsDart, 
   required WidgetTester widgetTester
 }) async {
-  final contextLibrary = AFCoreLibraryExtensionContext(id: id);
+  final appContext = AFAppExtensionContext();
+  final contextLibrary = AFCoreLibraryExtensionContext(id: id, app: appContext.thirdParty);
   installCoreLibrary(contextLibrary);
 
   final extendAppFull = (context) {
@@ -61,7 +62,8 @@ Future<void> afTestMainUILibrary({
     installCoreApp: extendAppFull, 
     installTest: installTest, 
     paramsDart: paramsDart, 
-    widgetTester: widgetTester
+    widgetTester: widgetTester,
+    appContext: appContext,
   );
 }
 
@@ -74,7 +76,8 @@ Future<void> afTestMainApp({
   AFExtendLibraryUIDelegate? installUILibrary, 
   required AFExtendTestDelegate installTest, 
   required AFDartParams paramsDart, 
-  required WidgetTester widgetTester
+  required WidgetTester widgetTester,
+  AFAppExtensionContext? appContext,
 }) async {
   final stopwatch = Stopwatch();
   stopwatch.start();
@@ -97,7 +100,7 @@ Future<void> afTestMainApp({
   widgetTester.binding.window.devicePixelRatioTestValue = 1.0;
 
 
-  final context = AFAppExtensionContext();
+  final context = appContext ?? AFAppExtensionContext();
   installCoreApp(context);
   installTest(context.test);
   if(installUILibrary != null) {

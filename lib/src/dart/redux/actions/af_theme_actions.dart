@@ -33,7 +33,3 @@ class AFOverrideThemeValueAction {
 class AFRebuildThemeState {
 
 }
-
-class AFRebuildFunctionalThemes {
-  
-}

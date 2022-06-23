@@ -1,5 +1,6 @@
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:logger/logger.dart';
@@ -11,6 +12,8 @@ import 'package:logger/logger.dart';
 /// allows you to use descriptive ids for test data, which will then often
 /// show up as part of widget ids in your UI, making debugging easier.
 class AFDefineTestDataContext {
+  static const nowId = "__af__time_now";
+
 
   final Map<dynamic, dynamic> testData;
   static int uniqueIdBase = 1;
@@ -20,11 +23,26 @@ class AFDefineTestDataContext {
     required this.testData
   });
 
+
+
   void define(dynamic id, dynamic data) {
     if(testData.containsKey(id)) {
       assert(false, "You should not redefine a of the existing id $id in the test data");
     }
     testData[id] = data;
+  }
+
+  AFTimeState currentTime() {
+    var exists = testData[nowId];
+    if(exists == null) {
+      exists = AFTimeState.createNow();
+      testData[nowId] = exists;
+    }
+    return exists;
+  }
+
+  AFTimeState currentTimeUTC() {
+    return currentTime().reviseToUTC();
   }
 
   static String get uniqueId {

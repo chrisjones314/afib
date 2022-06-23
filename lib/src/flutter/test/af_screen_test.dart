@@ -640,7 +640,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
     Orientation? withOrientation
   }) {
     final themes = AFibF.g.internalOnlyActiveStore.state.public.themes;
-    final functional = themes.functionals.values.first;
+    final functional = themes.fundamentals;
     return functional.deviceHasFormFactor(
       atLeast: atLeast,
       atMost: atMost,
@@ -2475,6 +2475,15 @@ class AFWorkflowStateTests {
     return null;
   }
 
+  AFWorkflowStatePrototype? findByStateTestId(AFStateTestID id) {
+    for(final test in stateTests) {
+      if(test.stateTestId == id) {
+        return test;
+      }
+    }
+    return null;
+  }
+
   void findByTokens(List<String> tokens, List<AFScreenPrototype> results) {
     results.addAll(stateTests.where((test) {
       return AFSingleScreenTests.matchesTokens(test.id, tokens);
@@ -2664,13 +2673,13 @@ class AFUIPrototypeDefinitionContext extends AFBaseTestDefinitionContext {
     required AFPrototypeID id,
     required AFRenderConnectedChildDelegate render,
     dynamic models,
-    required AFRouteParam routeParam,
+    required AFRouteParam param,
   }) {
     return widgetTests.addConnectedPrototype(
       id: id,
       render: render,
       models: models,
-      routeParam: routeParam,
+      routeParam: param,
     );
   }
 

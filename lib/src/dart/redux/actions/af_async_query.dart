@@ -47,13 +47,7 @@ class AFQueryContext with AFContextShowMixin, AFStandardAPIContextMixin, AFNonUI
   }
 
   material.BuildContext? get flutterContext {
-    /*
-    final route = AFibF.g.internalOnlyActiveStore.state.public.route;
-    final currentScreenId = route.activeScreenId;
-    final activeScreen = AFibF.g.internalOnlyFindScreen(currentScreenId);
-    return activeScreen?.element;
-    */
-    return AFibF.g.navigatorKey.currentContext;
+    return AFibF.g.currentFlutterContext;
   }
 }
 

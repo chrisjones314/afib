@@ -74,10 +74,10 @@ class AFRouteParamWrapper extends AFRouteParam {
 class AFRouteParamUnused extends AFRouteParam {
   static const unused = AFRouteParamUnused(id: AFUIScreenID.unused);
 
-  const AFRouteParamUnused({ required AFScreenID id} ): super(id: id);
+  const AFRouteParamUnused({ required AFID id} ): super(id: id);
 
   factory AFRouteParamUnused.create({
-    required AFScreenID id
+    required AFID id
   }) {
     return AFRouteParamUnused(id: id);
   }

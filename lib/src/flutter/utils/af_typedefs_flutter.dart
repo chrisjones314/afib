@@ -138,7 +138,7 @@ typedef AFChangedTextDelegate = void Function(String);
 typedef AFPressedDelegate = void Function();
 typedef AFOnTapDelegate = void Function();
 
-typedef AFExtendUILibraryDelegate = void Function(AFCoreLibraryExtensionContext context);
+typedef AFExtendCoreLibraryDelegate = void Function(AFCoreLibraryExtensionContext libContext);
 typedef AFExtendAppDelegate = void Function(AFAppExtensionContext context);
 typedef AFExtendTestDelegate = void Function(AFTestExtensionContext context);
 typedef AFExtendLibraryUIDelegate = void Function(AFAppLibraryExtensionContext context);
@@ -166,7 +166,7 @@ typedef AFOnChangedBoolDelegate = void Function(bool);
 
 typedef AFOnChangedStringDelegate = void Function(String);
 
-typedef AFCreateFunctionalThemeDelegate = AFFunctionalTheme Function(AFThemeID id, AFFundamentalThemeState fundamentals);
+typedef AFCreateFunctionalThemeDelegate = AFFunctionalTheme Function(AFThemeID id, AFFundamentalThemeState fundamentals, AFBuildContext context);
 
 typedef AFWireframeExecutionDelegate<TStateView extends AFFlexibleStateView> = void Function(AFWireframeExecutionContext<TStateView> we);
 

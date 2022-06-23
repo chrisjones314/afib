@@ -422,7 +422,6 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
         id: id,
         value: value,
       ));     
-      spi.context.dispatch(AFRebuildFunctionalThemes());       
   }
 
   Widget _buildLocaleAttributeRowValue(AFUIPrototypeDrawerSPI spi, AFThemeID attr, dynamic attrValue) {

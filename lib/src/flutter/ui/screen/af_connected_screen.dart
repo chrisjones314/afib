@@ -9,6 +9,7 @@ import 'package:flutter/material.dart' as material;
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:logger/logger.dart';
 import 'package:quiver/core.dart';
+import 'package:redux/redux.dart';
 
 abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> {
   final AFThemeID themeId;
@@ -119,13 +120,6 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
 
     final param = paramSeg?.param as TRouteParam;
     return createContext(standard, stateView, param, paramSeg?.children);
-  }
-
-  TTheme findPrimaryTheme(AFState state) {
-    final themes = state.public.themes;
-    final theme = themes.findById(themeId) as TTheme?; 
-    if(theme == null) throw AFException("Missing theme for $themeId");    
-    return theme;
   }
 
   AFDispatcher createDispatcher(AFStore store) {
@@ -253,9 +247,9 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
       themes: dataContext.standard.themes,
     );
 
-    final theme = standard.themes.findById(themeId);
     _updateFundamentalThemeState(buildContext);
     final withContext = createContext(standard, dataContext.s as TStateView, dataContext.p as TRouteParam, dataContext.children);
+    final theme = standard.themes.createFunctionalTheme(themeId, withContext);
     final spiCreatorOverride = AFibF.g.findSPICreatorOverride<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme>() ?? spiCreator;
     final spi = spiCreatorOverride(withContext, theme as TTheme, parentScreenId, wid, paramSource);
     return spi;
@@ -415,7 +409,7 @@ abstract class AFConnectedUIBase<TState extends AFComponentState, TTheme extends
   //--------------------------------------------------------------------------------------
   @override
   material.Widget build(material.BuildContext context) {
-    return StoreConnector<AFState, AFBuildContext?>(
+    return StoreConnector<AFState, AFBuildContext<TStateView, TRouteParam>?>(
         converter: (store) {          
           final context = uiConfig.createContextForDiff(store as AFStore, screenId, wid, paramSource: paramSource, launchParam: launchParam);
           return context;
@@ -440,8 +434,62 @@ abstract class AFConnectedUIBase<TState extends AFComponentState, TTheme extends
           }
           final widgetResult = buildWithSPI(spi);
           return widgetResult;
-        }
+        },
+        onInit: onInitAfib,
+        onDispose: onDisposeAfib,
+        onInitialBuild: onInitialBuildAFib,
+        onWillChange: onWillChangeAFib,
+        onDidChange: onDidChangeAFib,
     );
+  }
+
+  void onInitAfib(Store<AFState> store) {
+    onInit(store);
+  }
+
+  void onDisposeAfib(Store<AFState> store) {
+    onDispose(store);
+  }
+
+  void onInitialBuildAFib(AFBuildContext<TStateView, TRouteParam>? context) {
+    if(context == null) {
+      return;
+    }
+
+    onInitialBuild(context);
+  }
+
+  void onWillChangeAFib(AFBuildContext<TStateView, TRouteParam>? previous, AFBuildContext<TStateView, TRouteParam>? next) {
+    if(previous == null || next == null) {
+      return;
+    }
+
+    onWillChange(previous, next);
+  }
+
+  void onDidChangeAFib(AFBuildContext<TStateView, TRouteParam>? previous, AFBuildContext<TStateView, TRouteParam>? next) {
+    if(previous == null || next == null) {
+      return;
+    }
+
+    onDidChange(previous, next);
+  }
+
+  void onInit(Store<AFState> store) {
+
+  }
+
+  void onDispose(Store<AFState> store) {
+    
+  }
+
+  void onInitialBuild(AFBuildContext<TStateView, TRouteParam> context) {
+  }
+
+  void onWillChange(AFBuildContext<TStateView, TRouteParam> previous, AFBuildContext<TStateView, TRouteParam> next) {
+  }
+
+  void onDidChange(AFBuildContext<TStateView, TRouteParam> previous, AFBuildContext<TStateView, TRouteParam> next) {
   }
 
   // Returns the root parent screen, searching up the hierarchy if necessary.
@@ -639,6 +687,10 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
 
   /// Shorthand for accessing data from the store
   TStateView get s { return stateView; }
+
+  AFScreenID get screenId {
+    return accessScreenId;
+  }
 
   AFScreenID get accessScreenId {
     return standard.screenId!;
@@ -934,11 +986,6 @@ class AFStateProgrammingInterface<TState extends AFComponentState, TBuildContext
 
   TState? get debugOnlyAppState {
     return context.debugOnlyPublicState?.components.findState<TState>();
-  }
-
-  TFunctionalTheme findTheme<TFunctionalTheme extends AFFunctionalTheme>(AFThemeID themeId) {
-    final themes = context.standard.themes;
-    return themes.findById(themeId) as TFunctionalTheme;
   }
 
 

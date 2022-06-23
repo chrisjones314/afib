@@ -408,7 +408,7 @@ class AFConfigurationItemOption extends AFConfigurationItem {
 class AFConfig {
   AFPrototypeID? startupWireframe;
   AFPrototypeID? startupScreenPrototype;
-  AFPrototypeID? startupWorkflowPrototype;
+  AFStateTestID? startupStateTestId;
   List<AFBaseTestID>? favoriteTestIds;
   bool isLibraryCommand = false;
   final Map<AFConfigurationItem, dynamic> values = <AFConfigurationItem, dynamic>{};
@@ -421,8 +421,8 @@ class AFConfig {
     startupScreenPrototype = id;
   }
 
-  void setStartupWorkflowPrototype(AFPrototypeID id) {
-    startupWorkflowPrototype = id;
+  void setStartupStateTest(AFStateTestID testId) {
+    startupStateTestId = testId;
   }
 
   void setIsLibraryCommand({required bool isLib}) {
@@ -433,19 +433,19 @@ class AFConfig {
     favoriteTestIds = testIds;
   }
 
-  AFPrototypeID get startupPrototypeId {
+  AFID get startupPrototypeId {
     final env = environment;
-    AFPrototypeID? proto;
+    AFID? proto;
     String? call;
-    if(env == AFEnvironment.wireframe) {
+    if(env == AFEnvironment.startupInWireframe) {
       proto = startupWireframe;
       call = "Wireframe";
-    } else if(env == AFEnvironment.screenPrototype) {
+    } else if(env == AFEnvironment.startupInScreenPrototype) {
       proto = startupScreenPrototype;
       call = "ScreenPrototype";
-    } else if(env == AFEnvironment.workflowPrototype) {
-      proto = startupWorkflowPrototype;
-      call = "WorkflowPrototype";
+    } else if(env == AFEnvironment.startupInStateTest) {
+      // we need to go through all the 
+      proto = startupStateTestId;
     } else { 
       throw AFException("Invalid environment $env for calling startPrototypeId");
     }
@@ -508,9 +508,9 @@ class AFConfig {
   bool get isPrototypeEnvironment {
       return ( 
         environment == AFEnvironment.prototype ||
-        environment == AFEnvironment.wireframe || 
-        environment == AFEnvironment.screenPrototype || 
-        environment == AFEnvironment.workflowPrototype
+        environment == AFEnvironment.startupInWireframe || 
+        environment == AFEnvironment.startupInScreenPrototype || 
+        environment == AFEnvironment.startupInStateTest
       );
   }
 

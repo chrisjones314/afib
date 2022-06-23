@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/flutter/ui/dialog/afui_standard_notification.dart';
 import 'package:afib/src/flutter/ui/screen/afui_demo_mode_transition_screen.dart';
+import 'package:afib/src/flutter/ui/screen/afui_prototype_loading_screen.dart';
+import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:overlay_support/overlay_support.dart';
@@ -95,6 +97,7 @@ mixin AFStandardAPIContextMixin implements AFDispatcher {
   //-------------------------------------------------------------------------------------
   // access...
   //-------------------------------------------------------------------------------------
+  /*
   TTheme accessTheme<TTheme extends AFFunctionalTheme>(AFThemeID themeId) {
     final theme = _publicState.themes.findById(themeId);
     if(theme == null) {
@@ -102,6 +105,7 @@ mixin AFStandardAPIContextMixin implements AFDispatcher {
     }
     return theme as TTheme;
   }
+  */
 
   TLPI accessLPI<TLPI extends AFLibraryProgrammingInterface>(AFLibraryProgrammingInterfaceID id) {
     final lpi = AFibF.g.createLPI(id, dispatcher, targetStore);
@@ -549,7 +553,22 @@ mixin AFContextShowMixin {
     }
 
     if(themeOrId is AFThemeID) {
-      theme = AFibF.g.internalOnlyActiveStore.state.public.themes.findById(themeOrId);
+      final themes = AFibF.g.internalOnlyActiveStore.state.public.themes;
+      final fundamentals = themes.fundamentals;
+      final standard = AFStandardBuildContextData(
+        screenId: AFUIScreenID.screenPrototypeLoading, 
+        context: AFibF.g.currentFlutterContext, 
+        dispatcher: dispatcher, 
+        config: AFPrototypeLoadingScreen.config, 
+        themes: themes);
+
+      final context = AFBuildContext<AFFlexibleStateView, AFRouteParamUnused>(
+        standard,
+        AFUIDefaultStateView.create(<String, Object>{}),
+        AFRouteParamUnused.unused,
+        null,
+      );
+      theme = AFibF.g.coreDefinitions.createFunctionalTheme(themeOrId, fundamentals, context);
     } 
 
     if(theme == null) {

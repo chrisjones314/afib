@@ -277,12 +277,12 @@ $optionsHeader
     defineTheme.replaceText(ctx, AFUISourceTemplateID.textThemeID, parentThemeID);
     fileDefineUI.addLinesAfter(ctx, AFCodeRegExp.startDefineThemes, defineTheme.lines);
     if(imports.isNotEmpty) {
-      fileDefineUI.addLinesBefore(ctx, AFCodeRegExp.startDefineUI, imports);
+      fileDefineUI.addLinesBefore(ctx, AFCodeRegExp.startDefineCore, imports);
       if(fromLib != null) {
         generator.addImportIDFile(ctx,
           libraryId: fromLib,
           to: fileDefineUI,
-          before: AFCodeRegExp.startDefineUI,
+          before: AFCodeRegExp.startDefineCore,
         );
       }
 
@@ -291,7 +291,7 @@ $optionsHeader
     generator.addImport(ctx, 
       importPath: fileTheme.importPathStatement, 
       to: fileDefineUI,
-      before: AFCodeRegExp.startDefineUI
+      before: AFCodeRegExp.startDefineCore
     );
 
     if(!isOverride) {
@@ -407,7 +407,7 @@ $optionsHeader
       generator.addImport(ctx, 
         importPath: screenFile.importPathStatement, 
         to: screenMapFile, 
-        before: AFCodeRegExp.startDefineUI
+        before: AFCodeRegExp.startDefineCore
       );            
     }
 

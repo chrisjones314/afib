@@ -100,10 +100,11 @@ class AFNavigateReplaceAllAction extends AFNavigateAction {
     return AFNavigateReplaceAllAction(param: param);
   }
 
-  AFNavigatePushAction toPush() {
+  AFNavigatePushAction castToPush() {
     return AFNavigatePushAction(
       id: id,
-      param: param
+      param: param,
+      children: children,
     );
   }
 }
@@ -119,6 +120,34 @@ class AFNavigatePushAction extends AFNavigateActionWithReturn {
     AFActionOnReturnDelegate? onReturn,
     AFCreateDefaultChildParamDelegate? createDefaultChildParam,
   }): super(id: id, param: param, children: children, onReturn: onReturn, createDefaultChildParam: createDefaultChildParam);
+
+  AFNavigateReplaceAllAction castToReplaceAll() {
+    return AFNavigateReplaceAllAction(
+      id: id,
+      param: param,
+      children: children,
+      createDefaultChildParam: this.createDefaultChildParam,
+    );
+  }
+
+  AFNavigatePopToAction castToPopToThenPush({
+    required AFScreenID popTo,
+  }) {
+    return AFNavigatePopToAction(
+      id: id,
+      popTo: popTo,
+      push: this,
+    );
+  }
+
+  AFNavigateReplaceAction castToReplace() {
+    return AFNavigateReplaceAction(
+      id: id,
+      param: param,
+      children: children,
+      createDefaultChildParam: this.createDefaultChildParam
+    );
+  }
 
 }
 

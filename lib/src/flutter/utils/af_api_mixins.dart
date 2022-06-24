@@ -286,7 +286,7 @@ mixin AFStandardAPIContextMixin implements AFDispatcher {
     // however, in this case, we need to manipualate the state in the demo app store.  So, we need to 
     // explicitly dispatch our nav into that store.
     final demoDispatcher = AFibF.g.internalOnlyDispatcher(AFConceptualStore.demoModeStore);
-    demoDispatcher.dispatch(AFUIDemoModeExitScreen.navigateReplaceAll());
+    demoDispatcher.dispatch(AFUIDemoModeExitScreen.navigatePush().castToReplaceAll());
     
     // wait for all navigation to complete, so that you don't have animations trying to 
     // reference screens that existed prior to demo-mode, then:
@@ -324,7 +324,7 @@ mixin AFStandardAPIContextMixin implements AFDispatcher {
     AFibF.g.setPreDemoModeRoute(route);
 
     // first, navigate to the entering/leaving demo model page.
-    navigateReplaceAll(AFUIDemoModeEnterScreen.navigateReplaceAll());
+    navigateReplaceAll(AFUIDemoModeEnterScreen.navigatePush().castToReplaceAll());
     
     // wait for all navigation to complete, so that you don't have animations trying to 
     // reference screens that existed prior to demo-mode, then:

@@ -56,8 +56,8 @@ class AFUIDemoModeEnterScreen extends AFUIDemoModeTransitionScreen {
     transitionTitle: "Entering"
   );
 
-  static AFNavigateReplaceAllAction navigateReplaceAll() {
-    return AFNavigateReplaceAllAction(
+  static AFNavigatePushAction navigatePush() {
+    return AFNavigatePushAction(
       id: AFUIScreenID.screenDemoModeEnter,
       param: AFRouteParamUnused.create(id: AFUIScreenID.screenDemoModeEnter),
     );
@@ -72,8 +72,8 @@ class AFUIDemoModeExitScreen extends AFUIDemoModeTransitionScreen {
     transitionTitle: "Exiting"
   );
 
-  static AFNavigateReplaceAllAction navigateReplaceAll() {
-    return AFNavigateReplaceAllAction(
+  static AFNavigatePushAction navigatePush() {
+    return AFNavigatePushAction(
       id: AFUIScreenID.screenDemoModeExit,
       param: AFRouteParamUnused.create(id: AFUIScreenID.screenDemoModeExit),
     );

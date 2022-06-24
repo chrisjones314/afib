@@ -221,6 +221,12 @@ mixin AFStandardAPIContextMixin implements AFDispatcher {
     dispatch(AFShutdownOngoingQueriesAction());
   }
 
+  void executeShutdownListenerQuery<TQuery extends AFAsyncListenerQuery>({ AFID? id }) {
+    assert(TQuery != AFAsyncListenerQuery);
+    dispatch(AFShutdownListenerQueryAction(AFObjectWithKey.toKey(TQuery, id)));
+  }
+
+
   void executeDeferredCallback(AFID uniqueQueryId, Duration duration, AFOnResponseDelegate<AFUnused> callback) {
     dispatch(AFDeferredSuccessQuery(uniqueQueryId, duration, callback));
   }
@@ -898,7 +904,7 @@ mixin AFContextShowMixin {
   /// method will be called to create it the very first time the drawer is shown.  Subsequently, it will
   /// use the param you pass to this function, or if you omit it, the value that is already in the global route pool.
   void showLeftSideDrawer({
-    required AFNavigatePushAction navigate
+    AFNavigatePushAction? navigate
   }) {
     showDrawerStatic(
       dispatch: this.dispatch,
@@ -910,9 +916,11 @@ mixin AFContextShowMixin {
   static void showDrawerStatic({
     required dynamic dispatch(dynamic action),
     BuildContext? flutterContext,    
-    required AFNavigatePushAction navigate
+    AFNavigatePushAction? navigate
   }) {
-    updateOptionalGlobalParam(dispatch, navigate);
+    if(navigate != null) {
+      updateOptionalGlobalParam(dispatch, navigate);
+    }
     final ctx = flutterContext;
     // this happens in state testing, where there is no BuildContext.
     if(ctx != null) {

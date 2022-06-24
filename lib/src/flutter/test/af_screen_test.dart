@@ -1481,12 +1481,14 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
 /// prototyping and testing.
 class AFConnectedWidgetPrototype extends AFWidgetPrototype {
   final AFRouteParam routeParam;
+  final List<AFRouteParam>? children;
   final AFTestTimeHandling timeHandling;
 
   AFConnectedWidgetPrototype({
     required AFPrototypeID id,
     required dynamic models,
     required this.routeParam,
+    this.children,
     required AFRenderConnectedChildDelegate render,
     required AFSingleScreenPrototypeBody body,
     required this.timeHandling,
@@ -1891,6 +1893,7 @@ class AFWidgetTests<TState> {
     required AFPrototypeID   id,
     required AFRenderConnectedChildDelegate render,
     dynamic models,
+    List<AFRouteParam>? children,
     required AFRouteParam routeParam,
     AFNavigatePushAction? navigate,
     AFTestTimeHandling timeHandling = AFTestTimeHandling.paused,
@@ -1900,6 +1903,7 @@ class AFWidgetTests<TState> {
       id: id,
       models: sv,
       routeParam: routeParam,
+      children: children,
       render: render,
       body: AFSingleScreenPrototypeBody(id),
       timeHandling: timeHandling,
@@ -2511,6 +2515,14 @@ class AFBaseTestDefinitionContext {
     return registry.find(testDataId) as TResult;
   }
 
+  AFTimeState currentTime() {
+    return registry.currentTime();
+  }
+
+  TResult find<TResult extends Object>(dynamic testDataId) {
+    return registry.find(testDataId) as TResult;
+  }
+
   /// Looks up the test data defined in your test_data.dart file for a particular
   /// test data id.
   T testData<T extends Object>(dynamic testDataId) {
@@ -2672,6 +2684,7 @@ class AFUIPrototypeDefinitionContext extends AFBaseTestDefinitionContext {
   AFSingleScreenPrototypeBody defineWidgetPrototype({
     required AFPrototypeID id,
     required AFRenderConnectedChildDelegate render,
+    List<AFRouteParam>? children,
     dynamic models,
     required AFRouteParam param,
   }) {
@@ -2680,6 +2693,7 @@ class AFUIPrototypeDefinitionContext extends AFBaseTestDefinitionContext {
       render: render,
       models: models,
       routeParam: param,
+      children: children,
     );
   }
 

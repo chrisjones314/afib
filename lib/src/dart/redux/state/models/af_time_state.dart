@@ -482,7 +482,7 @@ class AFTimeState {
 
   int get secondInDay {
     final now = currentPullTime;
-    final result = (now.hour*Duration.secondsPerMinute*Duration.minutesPerHour) + now.minute*Duration.secondsPerMinute + now.second;
+    final result = (now.hour*Duration.secondsPerMinute*Duration.minutesPerHour) + (now.minute*Duration.secondsPerMinute) + now.second;
     return result;
   }
 

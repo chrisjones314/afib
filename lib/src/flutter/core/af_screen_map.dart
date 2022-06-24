@@ -28,6 +28,10 @@ class AFScreenMap {
     return _startupScreenId;
   }
 
+  bool get hasStartupScreen {
+    return _startupScreenId != null;
+  }
+
   String get appInitialScreenId { 
     final startupId = _startupScreenId;
     if(startupId == null) throw AFException("Missing startup screen id");

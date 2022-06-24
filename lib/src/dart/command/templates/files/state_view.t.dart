@@ -72,9 +72,9 @@ class [!af_state_view_prefix]DialogConfig<TSPI extends AFDialogStateProgrammingI
 }
 
 //--------------------------------------------------------------------------------------
-class [!af_app_namespace(upper)][!af_state_view_prefix]WidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TRouteParam extends AFRouteParam> extends [!af_app_namespace(upper)]WidgetConfig<TSPI, [!af_state_view_name], TRouteParam> with [!af_state_view_name]ModelsMixin<TRouteParam> {
+class [!af_state_view_prefix]WidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TRouteParam extends AFRouteParam> extends [!af_app_namespace(upper)]WidgetConfig<TSPI, [!af_state_view_name], TRouteParam> with [!af_state_view_name]ModelsMixin<TRouteParam> {
 
-    [!af_app_namespace(upper)][!af_state_view_prefix]WidgetConfig({
+    [!af_state_view_prefix]WidgetConfig({
       required AFCreateWidgetSPIDelegate<TSPI, AFBuildContext<[!af_state_view_name], TRouteParam>, [!af_theme_type]> spiCreator,
       AFNavigateRoute? route
     }): super(
@@ -85,9 +85,9 @@ class [!af_app_namespace(upper)][!af_state_view_prefix]WidgetConfig<TSPI extends
 }
 
 //--------------------------------------------------------------------------------------
-class [!af_app_namespace(upper)][!af_state_view_prefix]BottomSheetConfig<TSPI extends AFBottomSheetStateProgrammingInterface, TRouteParam extends AFRouteParam> extends [!af_app_namespace(upper)]BottomSheetConfig<TSPI, [!af_state_view_name], TRouteParam> with [!af_state_view_name]ModelsMixin<TRouteParam> {
+class [!af_state_view_prefix]BottomSheetConfig<TSPI extends AFBottomSheetStateProgrammingInterface, TRouteParam extends AFRouteParam> extends [!af_app_namespace(upper)]BottomSheetConfig<TSPI, [!af_state_view_name], TRouteParam> with [!af_state_view_name]ModelsMixin<TRouteParam> {
 
-    [!af_app_namespace(upper)][!af_state_view_prefix]BottomSheetConfig({
+    [!af_state_view_prefix]BottomSheetConfig({
       required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<[!af_state_view_name], TRouteParam>, [!af_theme_type]> spiCreator,
     }): super(
       stateViewCreator: [!af_state_view_name].create,

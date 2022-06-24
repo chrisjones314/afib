@@ -33,6 +33,13 @@ class [!af_app_namespace(upper)]ScreenID extends AFScreenID {
   const [!af_app_namespace(upper)]ScreenID(String code) : super(code, [!af_app_namespace(upper)]LibraryID.id);
 }
 
+class [!af_app_namespace(upper)]DrawerID extends AFScreenID {
+
+
+  const [!af_app_namespace(upper)]DrawerID(String code) : super(code, [!af_app_namespace(upper)]LibraryID.id);
+}
+
+
 class [!af_app_namespace(upper)]WidgetID extends AFWidgetID {  
 
 

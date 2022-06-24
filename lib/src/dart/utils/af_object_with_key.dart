@@ -21,12 +21,16 @@ class AFObjectWithKey {
   });
   
   String get key {
+    return toKey(runtimeType, id);
+  }
+
+  static String toKey(Type type, AFID? id) {
     final sb = StringBuffer();
     final id2 = id;
     if(id2 != null) {
       sb.write(id2.code);
     } else {
-      sb.write(runtimeType.toString());
+      sb.write(type.toString());
     }
     return sb.toString();
   }

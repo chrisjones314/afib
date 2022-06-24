@@ -207,7 +207,7 @@ $optionsHeader
 
     AFGenerateQuerySubcommand.createQuery(
       ctx: ctx,
-      queryKind: AFGenerateQuerySubcommand.kindSimple,
+      querySuffix: AFGenerateQuerySubcommand.suffixQuery,
       queryName: generator.nameStartupQuery,
       usage: usage,
       args: createQueryArgs,

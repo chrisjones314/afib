@@ -40,15 +40,22 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
     if(screenId == AFUIScreenID.screenDemoModeEnter || screenId == AFUIScreenID.screenDemoModeExit) {
       paramSeg = AFRouteSegment.withParam(AFRouteParamUnused.unused, null, null);
     }
-
  
     if(paramSeg == null) {
       assert(false, "If you reached this in testing, you may not be on the screen you think you are on in your test scenario.");
       return null;
     }
+
+    var children = paramSeg.children;
+    // this is a child widget, propagate its parent's children down.
+    if(wid != AFUIWidgetID.unused) {
+      final parentSeg = findRouteSegment(store.state, screenId, AFUIWidgetID.unused, paramSource: AFWidgetParamSource.notApplicable, launchParam: null);
+      children = parentSeg?.children;      
+    }
+
     final param = paramSeg.param as TRouteParam;
     // load in the state view.
-    final stateModels = createStateViewAF(store.state, param, paramSeg.children);
+    final stateModels = createStateViewAF(store.state, param, children);
 
     // lookup all the themes
 
@@ -68,7 +75,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
     final modelMap = AFFlexibleStateView.createModels(models);
     final stateView = stateViewCreator(modelMap);
 
-    final context = createContext(standard, stateView, param, paramSeg.children);
+    final context = createContext(standard, stateView, param, children);
     return context;
   }
 
@@ -97,8 +104,12 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
       return null;
     }
     
-
-    final paramSeg = findRouteSegment(store.state, screenId, wid, paramSource: paramSource, launchParam: launchParam);
+    var paramSeg = findRouteSegment(store.state, screenId, wid, paramSource: paramSource, launchParam: launchParam);    
+    var children = paramSeg?.children;
+    if(wid != AFUIWidgetID.unused) {
+      final parentSeg = findRouteSegment(store.state, screenId, AFUIWidgetID.unused, paramSource: AFWidgetParamSource.notApplicable, launchParam: null);
+      children = parentSeg?.children;      
+    }
 
     final mainDispatcher = AFStoreDispatcher(store);
     final dispatcher = AFSingleScreenTestDispatcher(activeTestId, mainDispatcher, testContext);
@@ -117,9 +128,8 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
       models["AFTimeState"] = currentTime;
     }
     final stateView = this.stateViewCreator(models);
-
     final param = paramSeg?.param as TRouteParam;
-    return createContext(standard, stateView, param, paramSeg?.children);
+    return createContext(standard, stateView, param, children);
   }
 
   AFDispatcher createDispatcher(AFStore store) {

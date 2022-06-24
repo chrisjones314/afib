@@ -335,6 +335,9 @@ class AFCoreDefinitionContext {
   }
 
   void defineStartupScreen(AFScreenID screenId, AFCreateRouteParamDelegate createParam) {    
+    if(screenMap.hasStartupScreen) {
+      return;
+    }
     screenMap.registerStartupScreen(screenId, createParam);
   }
 
@@ -356,7 +359,7 @@ class AFCoreDefinitionContext {
 
 
   void defineTheme(AFThemeID id, { required AFCreateFunctionalThemeDelegate createTheme }) {
-    if(themeFactories.containsKey(id)) {
+  if(themeFactories.containsKey(id)) {
       return;
     }
     themeFactories[id] = createTheme;
@@ -433,17 +436,6 @@ class AFPluginExtensionContext {
       init(context);
     }
   }
-
-  /*
-  void initComponentStates(List<AFComponentState> componentStates) {
-    for(final initState in this.componentStateInitializers) {
-      final s = initState();
-      if(s != null) {
-        componentStates.add(s);
-      }
-    }
-  }
-  */
 
   void _verifyNotNull(dynamic item, String setterName) {
     if(item == null) {
@@ -602,6 +594,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
   }
 
   void initializeCore(AFCoreDefinitionContext context, Iterable<AFCoreLibraryExtensionContext> libraries) {
+
     for(final init in defineCore) {
       init(context);
     }
@@ -635,14 +628,15 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
   }
  
   void defineScreenMap(AFScreenMap screenMap, Iterable<AFCoreLibraryExtensionContext> libraries) {
-    for(final init in defineScreenMaps) {
-      init(screenMap);
-    }    
-
     for(final thirdParty in libraries) {
       for(final init in thirdParty.defineScreenMaps) {
         init(screenMap);
       }
     }
+
+    for(final init in defineScreenMaps) {
+      init(screenMap);
+    }    
+
   }
 }

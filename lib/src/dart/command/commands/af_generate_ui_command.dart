@@ -316,6 +316,8 @@ $optionsHeader
         break;
       }
     }
+        
+
     if(controlSettings == null) {
       throw AFCommandError(error: "$uiName must end with one of $controlKinds");
     }
@@ -323,6 +325,10 @@ $optionsHeader
     final ns = AFibD.config.appNamespace.toUpperCase();
     final generator = ctx.generator;
 
+    final minLength = ns.length + controlSettings.suffix.length;
+    if(uiName.length <= minLength) {
+      throw AFCommandError(error: "$uiName is too short.  It maybe the name of an existing default class.  Please differentiate it.");
+    }
 
     final screenIdType = "$ns${controlSettings.suffix}ID";
     final spiParentType = "$ns${controlSettings.suffix}SPI";

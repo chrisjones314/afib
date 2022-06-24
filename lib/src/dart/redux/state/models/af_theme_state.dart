@@ -33,6 +33,7 @@ class AFFundamentalDeviceTheme {
   final WindowPadding viewPadding;
   final Locale localeValue;
   final Size physicalSize;
+  final Size logicalSize;
   final double textScaleFactorValue;
   final double devicePixelRatio;
 
@@ -44,6 +45,7 @@ class AFFundamentalDeviceTheme {
     required this.viewPadding,
     required this.localeValue,
     required this.physicalSize,
+    required this.logicalSize,
     required this.textScaleFactorValue,
     required this.devicePixelRatio,
   });
@@ -57,8 +59,10 @@ class AFFundamentalDeviceTheme {
     final viewPadding = window?.viewPadding ?? WindowPadding.zero;
     final locale = window?.locale ?? Locale("en");
     final physicalSize = window?.physicalSize ?? (Size(1170, 2532));
+
     final textScaleFactor = window?.textScaleFactor ?? 1.0;
     final devicePixelRatio = window?.devicePixelRatio ?? 1.0;
+    final logicalSize = physicalSize / devicePixelRatio;
     return AFFundamentalDeviceTheme(
       brightnessValue: brightness,
       alwaysUse24HourFormatValue: alwaysUse24,
@@ -67,6 +71,7 @@ class AFFundamentalDeviceTheme {
       viewPadding: viewPadding,
       localeValue: locale,
       physicalSize: physicalSize,
+      logicalSize: logicalSize,
       textScaleFactorValue: textScaleFactor,
       devicePixelRatio: devicePixelRatio,
     );
@@ -276,9 +281,7 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     final map = <String, bool>{};
     for(final val in this.values.values) {
       final tag = val.id.libraryTag;
-      if(tag != null) {
-        map[tag] = true;
-      }
+      map[tag] = true;
     }
     final result = map.keys.toList();
     result.insert(0, AFUIThemeID.tagDevice);
@@ -2383,6 +2386,11 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   Size get devicePhysicalSize {
     return fundamentals.device.physicalSize;
   }
+
+  Size get deviceLogicalSize {
+    return fundamentals.device.logicalSize;
+  }
+
 
   /// The text scale factor for the device.
   double get deviceTextScaleFactor {

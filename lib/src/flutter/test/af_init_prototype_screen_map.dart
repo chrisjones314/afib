@@ -1,7 +1,6 @@
 
 import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
-import 'package:afib/src/dart/utils/af_config_entries.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
@@ -19,7 +18,6 @@ import 'package:afib/src/flutter/ui/screen/afui_prototype_wireframes_list_screen
 import 'package:afib/src/flutter/ui/screen/afui_state_test_list_screen.dart';
 
 void afInitPrototypeScreenMap(AFScreenMap screens) {
-  final enabledTests = AFibD.config.stringListFor(AFConfigEntries.testsEnabled);
   final config = AFibD.config;
   final env = config.environment;
   if(env == AFEnvironment.prototype) {

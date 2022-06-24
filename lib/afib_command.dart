@@ -19,5 +19,6 @@ export 'src/dart/redux/state/models/af_time_state.dart';
 export "src/dart/utils/af_config.dart";
 export 'src/dart/utils/af_config_entries.dart';
 export "src/dart/utils/af_dart_params.dart";
+export 'src/dart/utils/af_document_id_generator.dart';
 export "src/dart/utils/af_exception.dart"; // ok
 export 'src/dart/utils/af_id.dart';

@@ -75,7 +75,7 @@ $optionsHeader
       pathExtendFile: generator.pathInstallLibraryCore,
       startExtendRegex: AFCodeRegExp.startExtendLibraryUI,
       packageCode: packageCode,
-      extendType: "UI",
+      extendType: "Core",
     );
 
     generator.finalizeAndWriteFiles(ctx);

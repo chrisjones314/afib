@@ -497,6 +497,23 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
           if(attrVal is IconData) {
             return Icon(attrVal);
           }
+          if(attrVal is Color) {
+            return Row(
+              children: [
+                Container(
+                  margin: t.margin.r.standard,
+                  width: 15,
+                  height: 15,
+                  decoration: BoxDecoration(
+                    color: attrVal,
+                    border: Border.all(color: Colors.black),
+                  )
+                ),
+                Text(attrVal.value.toRadixString(16)),
+              ]
+            
+            );
+          }
           if(attrVal is bool) {
             return Row(children: [Switch(          
               value: attrVal,

@@ -378,7 +378,7 @@ mixin AFStandardAPIContextMixin implements AFDispatcher {
     AFibF.g.setPreDemoModeRoute(route);
 
     // first, navigate to the entering/leaving demo model page.
-    navigateReplaceAll(AFUIDemoModeEnterScreen.navigatePush().castToReplaceAll());
+    AFibF.g.internalOnlyDispatcher(AFConceptualStore.appStore).dispatch(AFUIDemoModeEnterScreen.navigatePush().castToReplaceAll());
     
     // wait for all navigation to complete, so that you don't have animations trying to 
     // reference screens that existed prior to demo-mode, then:

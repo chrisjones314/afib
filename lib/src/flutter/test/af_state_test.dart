@@ -10,7 +10,6 @@ import 'package:afib/src/dart/redux/queries/af_navigate_unimplemented_query.dart
 import 'package:afib/src/dart/redux/queries/af_time_update_listener_query.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
-import 'package:afib/src/dart/redux/state/models/af_app_platform_info_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_time_state.dart';

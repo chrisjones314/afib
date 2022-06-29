@@ -222,10 +222,24 @@ class AFibGlobalState {
     required this.activeConceptualStore,
   });
 
+  void _internalInitializeTestData() {
+    // the app may re-use library test data, so initialize that first.
+    final libraries = thirdPartyLibraries;
+    for(final thirdParty in libraries) {
+      thirdParty.test.initializeTestData(
+        testData: testData
+      );
+    }
+
+    appContext.test.initializeTestData(testData: testData);
+  }
+
   void initializeForDemoMode() {
     if(testData.isNotEmpty) {
       return;
     }
+
+    _internalInitializeTestData();
 
     appContext.test.initializeForDemoMode(
       testData: testData,
@@ -251,7 +265,9 @@ class AFibGlobalState {
       return;
     }
 
-    appContext.test.initialize(
+    _internalInitializeTestData();
+    
+    appContext.test.initializeTests(
       testData: testData, 
       unitTests: unitTests,
       stateTests: stateTests,
@@ -268,7 +284,7 @@ class AFibGlobalState {
     for(final thirdParty in libraries) {
       final holder = thirdParty.createScreenTestHolder();
       thirdPartyUITests[thirdParty.id] = holder;
-      thirdParty.test.initialize(
+      thirdParty.test.initializeTests(
         testData: testData,
         unitTests: holder.afUnitTests,
         stateTests: holder.afStateTests,
@@ -762,16 +778,20 @@ class AFibGlobalState {
   /// If you'd like to dispatch a startup action, see [AFAppExtensionContext.installCoreApp]
   /// or [AFAppExtensionContext.addStartupAction]
   void dispatchStartupQueries(AFDispatcher dispatcher) {
-    // this is the one from the app.
-    appContext.dispatchStartupQueries(dispatcher);
-
-    // these are any startup queries from the libraries
-    coreDefinitions.dispatchStartupQueries(dispatcher);
+    final queries = createStartupQueries();
+    for(final query in queries) {
+      dispatcher.dispatch(query);
+    }
   }
 
-  Iterable<AFAsyncQuery> createStartupQueries() {
+  List<AFAsyncQuery> createStartupQueries() {
+
     final factories2 = appContext.createStartupQueries;
     final result = <AFAsyncQuery>[];
+
+    // always do the package info query at startup.
+    result.add(AFAppPlatformInfoQuery());
+
     for(final factory in factories2) {
       result.add(factory());
     }
@@ -780,6 +800,7 @@ class AFibGlobalState {
     for(final factory in factories) {
       result.add(factory());
     }
+
 
     return result;
   }

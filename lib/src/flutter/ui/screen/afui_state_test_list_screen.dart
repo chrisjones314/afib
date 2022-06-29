@@ -158,7 +158,7 @@ class AFUIStateTestListScreen extends AFUIConnectedScreen<AFUIStateTestListScree
   }
 
   Widget _childTopTab(AFUIStateTestListScreenSPI spi, AFWidgetID thisView, String title) {
-    return spi.t.childTopTab(
+    return spi.t.childTopTabText(
       text: title,
       isSel: spi.activeView == thisView,
       onPressed: () => spi.onPressedView(thisView),

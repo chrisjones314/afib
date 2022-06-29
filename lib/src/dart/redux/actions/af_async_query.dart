@@ -18,7 +18,7 @@ import 'package:flutter/material.dart' as material;
 import 'package:logger/logger.dart';
 
 
-class AFQueryContext with AFContextShowMixin, AFStandardAPIContextMixin, AFNonUIAPIContextMixin {
+class AFQueryContext with AFContextShowMixin, AFStandardAPIContextMixin, AFNonUIAPIContextMixin, AFAccessStateSynchronouslyMixin {
   AFConceptualStore conceptualStore;
 
 
@@ -65,7 +65,7 @@ class AFStartQueryContext<TResponse> extends AFQueryContext {
 }
 
 
-class AFFinishQueryContext extends AFQueryContext with AFAccessStateSynchronouslyMixin {
+class AFFinishQueryContext extends AFQueryContext {
 
   AFFinishQueryContext({
     required AFConceptualStore conceptualStore,

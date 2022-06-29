@@ -664,6 +664,15 @@ class AFBuildStateViewContext<TState extends AFComponentState?, TRouteParam exte
     return stateApp;
   }
 
+  AFAppPlatformInfoState get accessPlatformInfo {
+    return statePublic.appPlatformInfo;
+  }
+
+  AFTimeState get accessCurrentTime {
+    return statePublic.time;
+  }
+
+
   TOtherState accessComponentState<TOtherState extends AFComponentState>() {
     return statePublic.components.findState<TOtherState>()!;
   }
@@ -802,7 +811,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     }
     standard.dispatcher.dispatch(action); 
   }
-
+  
   TChildRouteParam? accessChildParam<TChildRouteParam extends AFRouteParam>(AFWidgetID wid) {
     final childrenN = children;
     if(childrenN == null) {
@@ -951,6 +960,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
   }
 
 }
+
 
 @immutable
 class AFStateProgrammingInterface<TState extends AFComponentState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> {

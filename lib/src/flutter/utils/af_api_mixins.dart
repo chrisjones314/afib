@@ -58,6 +58,10 @@ mixin AFAccessStateSynchronouslyMixin {
     return accessPublicState.time;    
   }
 
+  AFAppPlatformInfoState get accessPlatformInfo {
+    return accessPublicState.appPlatformInfo;
+  }
+
   TState accessComponentState<TState extends AFComponentState>() {
     final result = accessPublicState.components.findState<TState>();
     return result!;
@@ -76,6 +80,56 @@ mixin AFAccessStateSynchronouslyMixin {
     final result = seg?.children?.findParamById(child);
     return result as TRouteParam?;
   }
+
+  /// Expectes to find exactly ione param of the specified type.
+  /// 
+  /// Searches the active screen in the hierarchy, the children of that screen, and any currently
+  /// showing UIs (dialogs, etc)
+  TRouteParam? accessActiveRouteParamOfType<TRouteParam extends AFRouteParam>() {
+    final found = accessActiveRouteParamsOfType<TRouteParam>();
+    assert(found.length < 2);
+    if(found.isEmpty) {
+      return null;
+    }
+    return found.first;
+  }
+
+  /// Find all route params that have the specified type.
+  /// 
+  /// Searches the active screen in the hierarchy, the children of that screen, and any currently
+  /// showing UIs (dialogs, etc)
+  List<TRouteParam> accessActiveRouteParamsOfType<TRouteParam extends AFRouteParam>() {
+    final route = accessPublicState.route;
+    final activeScreenId = route.activeScreenId;
+    final routeSeg = route.findParamFor(activeScreenId);
+    final result = <TRouteParam>[];
+    final screenParam = routeSeg?.param;
+    if(screenParam is TRouteParam) {
+      result.add(screenParam);
+    }
+
+    final children = routeSeg?.children;
+    if(children != null) {
+      for(final childSeg in children.values) {
+        final childParam = childSeg.param;
+        if(childParam is TRouteParam) {
+          result.add(childParam);
+        }
+      }
+    }
+
+    for(final showingScreen in route.showingScreens.values) {
+      final screenId = showingScreen.screenId;
+      final screenSeg = route.findGlobalParam(screenId);
+      final showParam = screenSeg?.param;
+      if(showParam is TRouteParam) {
+        result.add(showParam);
+      }
+    }
+
+    return result;
+  }
+
 
   TRouteParam? accessGlobalRouteParam<TRouteParam>(AFID id) {
     final seg = accessPublicState.route.findGlobalParam(id);
@@ -385,7 +439,9 @@ mixin AFContextShowMixin {
   
   AFDispatcher get dispatcher;
 
-  BuildContext? get flutterContext;
+  BuildContext? get flutterContext {
+    return AFibF.g.currentFlutterContext;
+  }
   
   void dispatch(dynamic action) {
     dispatcher.dispatch(action);

@@ -39,6 +39,18 @@ class [!af_app_namespace(upper)]DrawerID extends AFScreenID {
   const [!af_app_namespace(upper)]DrawerID(String code) : super(code, [!af_app_namespace(upper)]LibraryID.id);
 }
 
+class [!af_app_namespace(upper)]DialogID extends AFScreenID {
+
+
+  const [!af_app_namespace(upper)]DialogID(String code) : super(code, [!af_app_namespace(upper)]LibraryID.id);
+}
+
+
+class [!af_app_namespace(upper)]BottomSheetID extends AFScreenID {
+
+
+  const [!af_app_namespace(upper)]BottomSheetID(String code) : super(code, [!af_app_namespace(upper)]LibraryID.id);
+}
 
 class [!af_app_namespace(upper)]WidgetID extends AFWidgetID {  
 

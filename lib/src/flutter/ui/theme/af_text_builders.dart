@@ -44,7 +44,7 @@ class AFRichTextBuilder {
     spans.insert(idx, TextSpan(text: text, style: styleNormal, recognizer: onGesture));
   }
 
-  void writeTapable(dynamic idOrText, GestureRecognizer recognizer) {
+  void writeTapable(dynamic idOrText, GestureRecognizer? recognizer) {
     final text = theme.translate(idOrText);
     spans.add(TextSpan(text: text, style: styleTapable, recognizer: recognizer));
   }

@@ -1,3 +1,4 @@
+import 'package:afib/src/dart/redux/state/models/af_app_platform_info_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_query_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
@@ -28,6 +29,7 @@ class AFPublicState {
   final AFQueryState queries;
   final AFComponentStates components;
   final AFTimeState time;
+  final AFAppPlatformInfoState appPlatformInfo;
 
   AFPublicState({
     required this.conceptualStore,
@@ -36,6 +38,7 @@ class AFPublicState {
     required this.components,
     required this.queries,
     required this.time,
+    required this.appPlatformInfo,
   });
 
   T componentState<T extends AFComponentState>() {
@@ -60,6 +63,7 @@ class AFPublicState {
     AFComponentStates? components,
     AFQueryState? queries,
     AFTimeState? time,
+    AFAppPlatformInfoState? appPlatformInfo,
   }) {
     return AFPublicState(
       conceptualStore: this.conceptualStore,
@@ -67,7 +71,8 @@ class AFPublicState {
       themes: themes ?? this.themes,
       route: route ?? this.route,
       queries: queries ?? this.queries,
-      time: time ?? this.time
+      time: time ?? this.time,
+      appPlatformInfo: appPlatformInfo ?? this.appPlatformInfo
     );
   }
 }
@@ -114,6 +119,7 @@ class AFState {
         components: components,
         queries: AFQueryState.initialState(),
         time: AFTimeState.initialState(),
+        appPlatformInfo: AFAppPlatformInfoState.initialState(),
       ),
       private: AFPrivateState(
         testState: AFTestState.initial(),

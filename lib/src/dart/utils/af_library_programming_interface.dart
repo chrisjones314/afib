@@ -4,7 +4,7 @@ import 'package:afib/src/flutter/utils/af_api_mixins.dart';
 import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
 
-class AFCurrentStateContext with AFStandardAPIContextMixin, AFNonUIAPIContextMixin, AFAccessStateSynchronouslyMixin {
+class AFCurrentStateContext with AFStandardAPIContextMixin, AFNonUIAPIContextMixin, AFAccessStateSynchronouslyMixin, AFContextShowMixin {
   final AFDispatcher dispatcher;
   final AFConceptualStore targetStore;
 

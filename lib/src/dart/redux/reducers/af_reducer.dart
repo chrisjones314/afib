@@ -8,7 +8,7 @@ import 'package:afib/src/dart/redux/state/af_state.dart';
 /// The primary reducer for an AFib appliations state.  
 /// 
 /// It handles routing and a reset state action, but otherwise delegates to the 
-/// application state reducer specified in [AFApp.initialize]
+/// application state reducer specified in [AFApp.initializeTests]
 AFState afReducer(AFState state, dynamic action) {
 
   if(action is AFUpdateRootStateAction) {

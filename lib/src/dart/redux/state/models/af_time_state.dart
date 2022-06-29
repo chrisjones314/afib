@@ -175,6 +175,10 @@ class AFTimeState {
     );
   }
 
+  Duration get timeZoneOffset {
+    return AFibD.config.absoluteBaseDate.timeZoneOffset;
+  }
+
   AFTimeState reviseForTimeOnDay(
     int hour,
     int minute,

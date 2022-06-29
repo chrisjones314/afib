@@ -126,7 +126,7 @@ class AFUIPrototypeTestScreen extends AFUIConnectedScreen<AFUIPrototypeTestScree
   }
 
   Widget _childTopTab(AFUIPrototypeTestScreenSPI spi, AFUIType thisView, String title) {
-    return spi.t.childTopTab(
+    return spi.t.childTopTabText(
       text: title,
       isSel: spi.activeView == thisView,
       onPressed: () => spi.onPressedView(thisView),

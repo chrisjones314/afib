@@ -1,4 +1,5 @@
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
+import 'package:afib/src/dart/redux/state/models/af_app_platform_info_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:meta/meta.dart';
 
@@ -14,6 +15,11 @@ class AFResetToInitialStateAction {
 /// to revert to the initial application route.
 class AFResetToInitialRouteAction {
 
+}
+
+class AFUpdateAppPlatformInfoAction {
+  final AFAppPlatformInfoState appState;
+  AFUpdateAppPlatformInfoAction(this.appState);
 }
 
 /// Action used to update one or more of the root objects in the [AFAppState].

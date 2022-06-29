@@ -160,6 +160,8 @@ class AFUIThemeID extends AFThemeID {
 
   static const colorPrimaryDarker = AFUIThemeID("colorPrimaryDarker");
   static const colorPrimaryLighter = AFUIThemeID("colorPrimaryLighter");
+  static const colorAlert = AFUIThemeID("colorAlert");
+  static const colorOnAlert = AFUIThemeID("colorOnAlert");
 
 }
 

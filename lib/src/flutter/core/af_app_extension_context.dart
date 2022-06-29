@@ -208,9 +208,7 @@ class AFTestExtensionContext {
   void initializeForDemoMode({
     required AFDefineTestDataContext testData, 
     required AFStateTests stateTests,
-  }) {
-      _initTestData(testData);
-      
+  }) {      
       final stateTestDefineContext = AFStateTestDefinitionContext(
         tests: stateTests,
         testData: testData
@@ -218,8 +216,14 @@ class AFTestExtensionContext {
       _initStateTests(stateTestDefineContext);
   }
 
-  void initialize({
+  void initializeTestData({
     required AFDefineTestDataContext testData, 
+  }) {
+      _initTestData(testData);
+  }
+
+  void initializeTests({
+    required AFDefineTestDataContext testData,
     required AFUnitTests unitTests,
     required AFStateTests stateTests,
     required AFWidgetTests widgetTests,
@@ -229,9 +233,7 @@ class AFTestExtensionContext {
     required AFDialogTests dialogTests,
     required AFWorkflowStateTests workflowTests,
     required AFWireframes wireframes,
-  }) {
-      _initTestData(testData);
-      
+  }) {      
       final unitTestDefineContext = AFUnitTestDefinitionContext(
         tests: unitTests,
         testData: testData,
@@ -279,7 +281,8 @@ void afDefaultQueryErrorHandler(AFFinishQueryErrorContext context) {
   context.showDialogErrorText(
     themeOrId: AFUIThemeID.defaultTheme,
     buttonTitles: ["OK"],
-    title: msg
+    title: "Unexpected Internal Error",
+    body: msg,
   );
 
 }
@@ -380,6 +383,10 @@ class AFCoreDefinitionContext {
 
 
   void dispatchStartupQueries(AFDispatcher dispatcher) {
+    // always do the package info query at startup.
+    dispatcher.dispatch(AFAppPlatformInfoQuery());
+
+
     for(final creator in this.createStartupQueries) {
       final action = creator();
       dispatcher.dispatch(action);

@@ -10,6 +10,7 @@ import 'package:afib/src/dart/redux/queries/af_navigate_unimplemented_query.dart
 import 'package:afib/src/dart/redux/queries/af_time_update_listener_query.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
+import 'package:afib/src/dart/redux/state/models/af_app_platform_info_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
@@ -22,6 +23,7 @@ import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_stats.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
+import 'package:afib/src/flutter/utils/af_api_mixins.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
@@ -34,7 +36,7 @@ abstract class AFStateTestExecute extends AFBaseTestExecute {
   
 }
 
-class AFStateTestStateVerificationContext {
+class AFStateTestStateVerificationContext with AFAccessStateSynchronouslyMixin {
   final AFState afState;
   AFStateTestStateVerificationContext({
     required this.afState,
@@ -42,6 +44,10 @@ class AFStateTestStateVerificationContext {
 
   TAppState accessComponentState<TAppState extends AFComponentState>() {
     return _findComponentState<TAppState>(afState);
+  }
+
+  AFPublicState get accessPublicState {
+    return afState.public;
   }
 
   AFRouteState get route {

@@ -1646,6 +1646,16 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   //--------------------------------------------------------------------------------------
+  Color get colorAlert {
+    return fundamentals.findValue(AFUIThemeID.colorAlert) as Color? ?? colorPrimary;
+  }
+
+  //--------------------------------------------------------------------------------------
+  Color get colorOnAlert {
+    return fundamentals.findValue(AFUIThemeID.colorOnAlert) as Color? ?? colorPrimary;
+  }
+
+  //--------------------------------------------------------------------------------------
   Color get colorPrimaryDisabled {
     final result = Colors.grey[400];
     if(result == null) {
@@ -2041,7 +2051,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     );
   }
 
-  Widget childTopTab({
+  Widget childTopTabText({
     AFWidgetID? wid, 
     required String text,
     required bool isSel, 
@@ -2057,6 +2067,26 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
       key: keyForWID(wid),
       style: buttonStyle,
       child: childText(text, style: style),
+      onPressed: onPressed
+    );
+  }
+
+  Widget childTopTab({
+    AFWidgetID? wid, 
+    required Widget child,
+    required bool isSel, 
+    required AFPressedDelegate onPressed
+  }) {
+    final style = isSel ? styleOnPrimary.bodyText1 : styleOnPrimary.bodyText2;
+    final colorButton = isSel ? colorPrimaryDarker : colorPrimary;
+    final buttonStyle = TextButton.styleFrom(
+      backgroundColor: colorButton,
+      textStyle: style,
+    );
+    return TextButton(
+      key: keyForWID(wid),
+      style: buttonStyle,
+      child: child,
       onPressed: onPressed
     );
   }

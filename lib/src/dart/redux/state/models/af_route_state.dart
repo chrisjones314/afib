@@ -526,6 +526,15 @@ class AFRouteState {
     return screenHierarchy.hasStartupWrapper;
   }
 
+  String get simpleTextRoute {
+    final result = StringBuffer();
+    for(final item in screenHierarchy.active) {
+      result.write(item.screenId.toString());
+      result.write("/");
+    }
+    return result.toString();
+  }
+
   AFScreenID get activeScreenId {
     final last = screenHierarchy.last;
     return last.screenId;

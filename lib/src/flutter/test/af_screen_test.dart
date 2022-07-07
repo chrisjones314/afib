@@ -1563,6 +1563,8 @@ class AFDialogPrototype extends AFScreenLikePrototype {
         dispatch: dispatcher.dispatch,
         navigate: navigate,
         flutterContext: buildContext,
+        executeBefore: null,
+        executeDuring: null,
     );
    
     // instead, wait for the dialog to be displayed, then run the test.
@@ -1624,6 +1626,8 @@ class AFBottomSheetPrototype extends AFScreenLikePrototype {
         dispatch: dispatcher.dispatch,
         navigate: navigate,
         flutterContext: buildContext,
+        executeBefore: null,
+        executeDuring: null,
     );
    
     // instead, wait for the dialog to be displayed, then run the test.

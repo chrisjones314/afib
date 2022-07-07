@@ -239,6 +239,7 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textPackagePath = AFUISourceTemplateID("package_path");
   static const textStateViewName = AFUISourceTemplateID("state_view_name");
   static const textModelName = AFUISourceTemplateID("model_name");
+  static const textModelNameNoRoot = AFUISourceTemplateID("model_name_no_root");
   static const textQueryName = AFUISourceTemplateID("query_name");
   static const textStateType = AFUISourceTemplateID("state_type");
   static const textQueryType = AFUISourceTemplateID("query_type");

@@ -22,6 +22,7 @@ class AFCodeRegExp {
   static final startDefineLPI = RegExp(r"void\s+defineLibraryProgrammingInterfaces\(AFCoreDefinitionContext\s+context\)\s+{");
   static final startDeclareLPI = RegExp(r"class\s+.*LPI\s+extends\s+.*LPI\s+{");
   static final afTag = RegExp(r".*\[!af_.*\].*");
+  static final startImportLine = RegExp(r"import\s+.*;");
 
   static RegExp startUIID(String kind, String kindSuper) {
     return RegExp("class\\s+.*${kind}ID\\s+extends\\s+AF${kindSuper}ID\\s+{");

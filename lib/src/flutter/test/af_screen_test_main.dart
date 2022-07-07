@@ -191,6 +191,8 @@ Future<void> _afDialogTestMain(AFCommandOutput output, AFTestStats stats, Widget
         dispatch: dispatcher.dispatch,
         navigate: test.navigate,
         flutterContext: buildContext,
+        executeBefore: null,
+        executeDuring: null,
     );
   });
 }
@@ -211,6 +213,8 @@ Future<void> _afBottomSheetTestMain(AFCommandOutput output, AFTestStats stats, W
         dispatch: dispatcher.dispatch,
         navigate: test.navigate,
         flutterContext: buildContext,
+        executeBefore: null,
+        executeDuring: null,
     );
   });
 }

@@ -123,6 +123,10 @@ class AFCodeBuffer {
     _throwMissingMatchRegex(match);
   }
 
+  void addLineBeforeIndex(AFCommandContext context, int idx, String line) {
+    lines.insert(idx, line);
+  }
+
   void _throwMissingMatchRegex(RegExp match) {
     final location = projectPath == null ? "template" : projectPath?.join('/');
     throw AFCommandError(error: "Could not find regular expression $match in $location");

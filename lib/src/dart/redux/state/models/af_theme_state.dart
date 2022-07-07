@@ -51,17 +51,17 @@ class AFFundamentalDeviceTheme {
   });
 
   factory AFFundamentalDeviceTheme.create() {
-    final window = WidgetsBinding.instance?.window;
-    final brightness = window?.platformBrightness ?? Brightness.light;
-    final alwaysUse24 = window?.alwaysUse24HourFormat ?? false;
-    final padding = window?.padding ?? WindowPadding.zero;
-    final viewInsets = window?.viewInsets ?? WindowPadding.zero;
-    final viewPadding = window?.viewPadding ?? WindowPadding.zero;
-    final locale = window?.locale ?? Locale("en");
-    final physicalSize = window?.physicalSize ?? (Size(1170, 2532));
+    final window = WidgetsBinding.instance.window;
+    final brightness = window.platformBrightness;
+    final alwaysUse24 = window.alwaysUse24HourFormat;
+    final padding = window.padding;
+    final viewInsets = window.viewInsets;
+    final viewPadding = window.viewPadding;
+    final locale = window.locale;
+    final physicalSize = window.physicalSize;
 
-    final textScaleFactor = window?.textScaleFactor ?? 1.0;
-    final devicePixelRatio = window?.devicePixelRatio ?? 1.0;
+    final textScaleFactor = window.textScaleFactor;
+    final devicePixelRatio = window.devicePixelRatio;
     final logicalSize = physicalSize / devicePixelRatio;
     return AFFundamentalDeviceTheme(
       brightnessValue: brightness,
@@ -1614,6 +1614,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   /// A utility for creating a list of expansion panels in an expansion list.
   List<ExpansionPanel> childrenExpansionList() { return <ExpansionPanel>[]; }
 
+
   Color colorDarker(dynamic color, { int percent = 10 }) {
     final c = color(color);
     if(c == null) {
@@ -1635,27 +1636,34 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return fundamentals.colorPrimary;
   }
 
-  //--------------------------------------------------------------------------------------
   Color get colorPrimaryDarker {
     return fundamentals.findValue(AFUIThemeID.colorPrimaryDarker) as Color? ?? colorPrimary;
   }
 
-  //--------------------------------------------------------------------------------------
   Color get colorPrimaryLighter {
     return fundamentals.findValue(AFUIThemeID.colorPrimaryLighter) as Color? ?? colorPrimary;
   }
 
-  //--------------------------------------------------------------------------------------
   Color get colorAlert {
     return fundamentals.findValue(AFUIThemeID.colorAlert) as Color? ?? colorPrimary;
   }
 
-  //--------------------------------------------------------------------------------------
   Color get colorOnAlert {
     return fundamentals.findValue(AFUIThemeID.colorOnAlert) as Color? ?? colorPrimary;
   }
 
-  //--------------------------------------------------------------------------------------
+  Color get colorWhite {
+    return Colors.white;
+  }
+
+  Color get colorBlack {
+    return Colors.black;
+  }
+
+  Color colorGreyShade(int shade) {
+    return Colors.grey[shade] ?? Colors.grey;
+  }
+
   Color get colorPrimaryDisabled {
     final result = Colors.grey[400];
     if(result == null) {
@@ -2341,6 +2349,8 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     dynamic fontWeight,
     TextAlign? textAlign,
     TextOverflow? overflow,
+    int? maxLines,
+    bool? softWrap,
   }) {
     TextStyle? styleS;
     if(style != null) {
@@ -2362,6 +2372,8 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
       textAlign: textAlign,
       textScaleFactor: deviceTextScaleFactor,
       overflow: overflow,
+      maxLines: maxLines,
+      softWrap: softWrap,
     );
   }
 

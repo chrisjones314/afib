@@ -236,7 +236,7 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
 
 }
 
-class AFConsolidatedQueryEntry {
+class AFCompositeQueryEntry {
   static const int statusNone    = 0;
   static const int statusError   = 1;
   static const int statusSuccess = 2;
@@ -245,10 +245,10 @@ class AFConsolidatedQueryEntry {
   int status;
   dynamic result;
 
-  AFConsolidatedQueryEntry(this.query, this.status);
+  AFCompositeQueryEntry(this.query, this.status);
 
-  factory AFConsolidatedQueryEntry.createFrom(AFAsyncQuery query) {
-    return AFConsolidatedQueryEntry(query, statusNone);
+  factory AFCompositeQueryEntry.createFrom(AFAsyncQuery query) {
+    return AFCompositeQueryEntry(query, statusNone);
   }
 
   bool get isIncomplete { 
@@ -270,14 +270,14 @@ class AFConsolidatedQueryEntry {
   }
 }
 
-class AFConsolidatedQueryResponse {
-  final List<AFConsolidatedQueryEntry> responses;
+class AFCompositeQueryResponse {
+  final List<AFCompositeQueryEntry> responses;
 
-  AFConsolidatedQueryResponse(this.responses);
+  AFCompositeQueryResponse(this.responses);
 
-  factory AFConsolidatedQueryResponse.createFrom(List<AFAsyncQuery> queries) {
-    final list = queries.map( (query) => AFConsolidatedQueryEntry.createFrom(query));
-    return AFConsolidatedQueryResponse(List<AFConsolidatedQueryEntry>.of(list));
+  factory AFCompositeQueryResponse.createFrom(List<AFAsyncQuery> queries) {
+    final list = queries.map( (query) => AFCompositeQueryEntry.createFrom(query));
+    return AFCompositeQueryResponse(List<AFCompositeQueryEntry>.of(list));
   }
 
   bool get isComplete {
@@ -301,15 +301,15 @@ class AFConsolidatedQueryResponse {
   }
 }
 
-class AFConsolidatedQuery extends AFAsyncQuery<AFConsolidatedQueryResponse> {
+class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
   static const queryFailedCode = 792;
   static const queryFailedMessage = "At least one query in a consolidated query failed.";
 
-  final AFConsolidatedQueryResponse queryResponses;
+  final AFCompositeQueryResponse queryResponses;
 
-  AFConsolidatedQuery(this.queryResponses, {
+  AFCompositeQuery(this.queryResponses, {
     AFID? id, 
-    AFOnResponseDelegate<AFConsolidatedQueryResponse>? onSuccessDelegate, 
+    AFOnResponseDelegate<AFCompositeQueryResponse>? onSuccessDelegate, 
     AFOnErrorDelegate? onErrorDelegate,     
   }): super(id: id, onSuccessDelegate: onSuccessDelegate, onErrorDelegate: onErrorDelegate);
 
@@ -317,13 +317,13 @@ class AFConsolidatedQuery extends AFAsyncQuery<AFConsolidatedQueryResponse> {
     return <AFAsyncQuery>[];
   }
 
-  factory AFConsolidatedQuery.createFrom({
+  factory AFCompositeQuery.createFrom({
     required List<AFAsyncQuery> queries,
-    AFOnResponseDelegate<AFConsolidatedQueryResponse>? onSuccessDelegate,
+    AFOnResponseDelegate<AFCompositeQueryResponse>? onSuccessDelegate,
     AFOnErrorDelegate? onErrorDelegate
   }) {
-    final response = AFConsolidatedQueryResponse.createFrom(queries);
-    return AFConsolidatedQuery(response,
+    final response = AFCompositeQueryResponse.createFrom(queries);
+    return AFCompositeQuery(response,
       onSuccessDelegate: onSuccessDelegate,
       onErrorDelegate: onErrorDelegate
     );
@@ -388,7 +388,7 @@ class AFConsolidatedQuery extends AFAsyncQuery<AFConsolidatedQueryResponse> {
           );
           finishAsyncWithErrorAF(errorContext);
         } else {
-          final successContext = AFFinishQuerySuccessContext<AFConsolidatedQueryResponse>(
+          final successContext = AFFinishQuerySuccessContext<AFCompositeQueryResponse>(
             conceptualStore: conceptualStore,
             response: queryResponses
           );
@@ -398,7 +398,7 @@ class AFConsolidatedQuery extends AFAsyncQuery<AFConsolidatedQueryResponse> {
   }
 
   /// This function will not be called in this variant, so overriding it is useless.
-  void startAsync(AFStartQueryContext<AFConsolidatedQueryResponse> context) {
+  void startAsync(AFStartQueryContext<AFCompositeQueryResponse> context) {
     throw UnimplementedError();
   }
 
@@ -406,7 +406,7 @@ class AFConsolidatedQuery extends AFAsyncQuery<AFConsolidatedQueryResponse> {
   /// 
   /// You can override this in your own subclass if you want, but many uses cases 
   /// are adequately covered by passing onSuccessDelegate.
-  void finishAsyncWithResponse(AFFinishQuerySuccessContext<AFConsolidatedQueryResponse> response) {
+  void finishAsyncWithResponse(AFFinishQuerySuccessContext<AFCompositeQueryResponse> response) {
 
   }
 }

@@ -32,6 +32,46 @@ class AFDefineTestDataContext {
     testData[id] = data;
   }
 
+  List<TValue> defineIdentifierList<TValue>(Object id, List<String> listIds) {
+    assert(TValue != dynamic);
+    final result = <TValue>[];
+    for(final itemId in listIds) {
+      final found = find<TValue>(itemId);
+      assert(found != null);
+      result.add(found);
+    }
+  
+    define(id, result);
+    return result;
+  }
+
+  Map<String, TValue> defineIdentifierMap<TValue>(Object id, List<dynamic> list, {
+    String Function(TValue)? getId,
+  }) {
+    assert(TValue != dynamic);
+    final result = <String, TValue>{};
+    if(list is List<String>) {
+      for(final itemId in list) {
+        final found = find<TValue>(itemId);
+        assert(found != null);
+        result[itemId] = found;
+      }
+    } else {
+      for(final obj in list) {
+        String id;
+        if(getId != null) {
+          id = getId(obj);
+        } else {
+          id = obj.id;
+        }
+        result[id] = obj;
+      }
+    }
+    
+    define(id, result);
+    return result;
+  }
+
   AFTimeState currentTime() {
     var exists = testData[nowId];
     if(exists == null) {

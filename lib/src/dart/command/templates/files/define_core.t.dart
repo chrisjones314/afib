@@ -5,7 +5,6 @@ class AFDefineCoreT extends AFSourceTemplate {
 
   final String template = '''
 import 'package:afib/afib_flutter.dart';
-[!af_import_statements]
 
 void defineCore(AFCoreDefinitionContext context) {
   defineEventHandlers(context);

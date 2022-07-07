@@ -91,7 +91,7 @@ $optionsHeader
   }) {
     final generator = ctx.generator;
     final fileExtendBase = generator.modifyFile(ctx, pathExtendFile);
-    fileExtendBase.addLinesBefore(ctx, startExtendRegex, importCode.lines);
+    fileExtendBase.addImports(ctx, importCode.lines);
     
     final call = DeclareCallExtendT().toBuffer();
     call.replaceText(ctx, AFUISourceTemplateID.textPackageCode, packageCode);

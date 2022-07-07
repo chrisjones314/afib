@@ -9,6 +9,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:overlay_support/overlay_support.dart';
 
+abstract class AFExecuteBeforeInterface {
+  AFAsyncQuery? get executeBefore;
+}
+
+abstract class AFExecuteDuringInterface {
+  AFAsyncQuery? get executeDuring;
+}
+
+
 mixin AFNonUIAPIContextMixin implements AFDispatcher {
 
   AFDispatcher get dispatcher;
@@ -313,8 +322,7 @@ mixin AFStandardAPIContextMixin implements AFDispatcher {
     dispatch(query);
   }
 
-
-  void executeConsolidatedQuery(AFConsolidatedQuery query) {
+  void executeCompositeQuery(AFCompositeQuery query) {
     dispatch(query);
   }
 
@@ -476,13 +484,17 @@ mixin AFContextShowMixin {
     material.Color? barrierColor,
     bool useSafeArea = true,
     bool useRootNavigator = true,
-    material.RouteSettings? routeSettings
+    material.RouteSettings? routeSettings,
+    AFAsyncQuery? executeBefore,
+    AFAsyncQuery? executeDuring,
   }) async {
     showDialogStatic<TReturn>(
       flutterContext: flutterContext,
       dispatch: this.dispatch,
       navigate: navigate,
       onReturn: onReturn,
+      executeBefore: executeBefore,
+      executeDuring: executeDuring,
       barrierDismissible: barrierDismissible,
       barrierColor: barrierColor,
       useSafeArea: useSafeArea,
@@ -495,6 +507,8 @@ mixin AFContextShowMixin {
     required dynamic dispatch(dynamic action),
     required BuildContext? flutterContext,
     required AFNavigatePushAction navigate,
+    required AFAsyncQuery? executeBefore,
+    required AFAsyncQuery? executeDuring,
     AFReturnValueDelegate<TReturn>? onReturn,
     bool barrierDismissible = true,
     material.Color? barrierColor,
@@ -511,7 +525,7 @@ mixin AFContextShowMixin {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
 
-    dispatch(AFNavigateShowScreenBeginAction(verifiedScreenId, AFUIType.dialog));
+    dispatch(AFNavigateShowScreenBeginAction(verifiedScreenId, AFUIType.dialog, executeBefore, executeDuring));
 
     if(AFibD.config.isTestContext) {
        // Ugg, so the issue here is that flutter handles return values from a dialog,
@@ -829,6 +843,8 @@ mixin AFContextShowMixin {
     AFReturnValueDelegate<TReturn>? onReturn,
     material.Color? backgroundColor,
     double? elevation,
+    AFAsyncQuery? executeBefore,
+    AFAsyncQuery? executeDuring,
     material.ShapeBorder? shape,
     material.Clip? clipBehavior,
     material.Color? barrierColor,
@@ -843,6 +859,8 @@ mixin AFContextShowMixin {
       dispatch: dispatch, 
       navigate: navigate,
       onReturn: onReturn,
+      executeBefore: executeBefore,
+      executeDuring: executeDuring,
       flutterContext: flutterContext,
       backgroundColor: backgroundColor,
       elevation: elevation,
@@ -891,6 +909,8 @@ mixin AFContextShowMixin {
     required dynamic dispatch(dynamic action),
     BuildContext? flutterContext,    
     required AFNavigatePushAction navigate,
+    required AFAsyncQuery? executeBefore,
+    required AFAsyncQuery? executeDuring,
     AFReturnValueDelegate<TReturn>? onReturn,
     material.Color? backgroundColor,
     double? elevation,
@@ -912,7 +932,7 @@ mixin AFContextShowMixin {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
 
-    dispatch(AFNavigateShowScreenBeginAction(verifiedScreenId, AFUIType.bottomSheet));
+    dispatch(AFNavigateShowScreenBeginAction(verifiedScreenId, AFUIType.bottomSheet, executeBefore, executeDuring));
 
     final ctx = flutterContext;
     if(ctx != null) {

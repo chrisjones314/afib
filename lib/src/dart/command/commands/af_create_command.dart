@@ -143,7 +143,7 @@ $optionsHeader
     fileInstallUI.replaceTextLines(ctx, AFUISourceTemplateID.stmtIncludeInstallTest, includeBuffer.lines);
     fileInstallUI.replaceTemplate(ctx, AFUISourceTemplateID.stmtCallInstallTest, templateCall);
     
-    fileInstallUI.replaceText(ctx, AFUISourceTemplateID.textImportStatements, importCore);
+    fileInstallUI.addImports(ctx, [importCore]);
     
     generator.addExportsForFiles(ctx, args, [fileInstallUI]);
 
@@ -275,7 +275,7 @@ $optionsHeader
     imports.addLinesAtEnd(ctx, [
       "import 'package:[!af_package_path]/state/[!af_app_namespace]_state.dart';"
     ]);
-    fileDefineCore.replaceTextLines(ctx, AFUISourceTemplateID.textImportStatements, imports.lines);
+    fileDefineCore.addImports(ctx, imports.lines);
 
 
     final defineFundImpl = defineFundamentalImpl.toBuffer();

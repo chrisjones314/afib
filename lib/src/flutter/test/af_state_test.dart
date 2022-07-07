@@ -1165,8 +1165,8 @@ class AFStateTest extends AFScreenTestDescription {
         return;
       }
 
-      if(query is AFConsolidatedQuery) {
-        final successContext = AFFinishQuerySuccessContext<AFConsolidatedQueryResponse>(
+      if(query is AFCompositeQuery) {
+        final successContext = AFFinishQuerySuccessContext<AFCompositeQueryResponse>(
           conceptualStore: AFibF.g.activeConceptualStore,
           response: query.queryResponses
         );

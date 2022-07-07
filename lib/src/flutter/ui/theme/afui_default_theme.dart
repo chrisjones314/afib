@@ -34,6 +34,8 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     dynamic fontWeight,
     TextAlign? textAlign,
     TextOverflow? overflow,
+    bool? softWrap,
+    int? maxLines,
   }) {
     return super.childText(text,
       wid: wid,

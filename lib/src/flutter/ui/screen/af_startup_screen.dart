@@ -38,7 +38,7 @@ class _AFStartupScreenState extends State<AFStartupScreenWrapper> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance?.addObserver(AFibF.g.widgetsBindingObserver);
+    WidgetsBinding.instance.addObserver(AFibF.g.widgetsBindingObserver);
 
     final storeDisp = AFibF.g.internalOnlyActiveDispatcher;
     if(AFibD.config.requiresPrototypeData) {

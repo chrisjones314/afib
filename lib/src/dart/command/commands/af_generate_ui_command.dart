@@ -268,7 +268,7 @@ $optionsHeader
 
     fileTheme.replaceText(ctx, AFUISourceTemplateID.textThemeType, uiName);
     fileTheme.replaceText(ctx, AFUISourceTemplateID.textParentThemeType, parentTheme ?? "AFFunctionalTheme");
-    fileTheme.replaceTextLines(ctx, AFUISourceTemplateID.textImportStatements, imports);
+    fileTheme.addImports(ctx, imports);
 
     // add the line that installs it
     final fileDefineUI = generator.modifyFile(ctx, generator.pathDefineCore);
@@ -371,7 +371,7 @@ $optionsHeader
     screenFile.replaceText(ctx, AFUISourceTemplateID.textThemeType, theme);
     screenFile.replaceText(ctx, AFUISourceTemplateID.textStateViewPrefix, stateViewPrefix);
     screenFile.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
-    screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textImportStatements, imports);
+    screenFile.addImports(ctx, imports);
     screenFile.replaceTemplate(ctx, AFUISourceTemplateID.textBuildWithSPIImpl, buildWithSPI ?? controlSettings.implBuildWithSPI);
     final templateBody = buildBody ?? controlSettings.implBuildBody;
     final body = templateBody.toBuffer();
@@ -385,10 +385,7 @@ $optionsHeader
     routeParam.replaceText(ctx, AFUISourceTemplateID.textScreenIDType, screenIdType);
     routeParam.executeStandardReplacements(ctx);
     screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textRouteParamImpls, routeParam.lines);
-    
-
     screenFile.replaceTemplate(ctx, AFUISourceTemplateID.textScreenImpls, screenImpls);
-
     screenFile.replaceTemplate(ctx, AFUISourceTemplateID.textParamsConstructor, controlSettings.paramsConstructor);
     
     final templatePush = controlSettings.navigatePush.toBuffer();
@@ -396,9 +393,6 @@ $optionsHeader
     templatePush.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
 
     screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textNavigateMethods, templatePush.lines);
-
-
-
 
     // put the screen in the screen map
     if(controlSettings.kind != AFUIControlKind.widget) {

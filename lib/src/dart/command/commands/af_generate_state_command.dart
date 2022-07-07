@@ -209,14 +209,19 @@ $optionsHeader
       final accessFile = generator.modifyFile(ctx, pathStateViewAccess);
       final regexMixinStart = AFCodeRegExp.startMixinStateAccess;
       final declareAccess = DeclareModelAccessStatementT().toBuffer();
+      var identifierNoRoot = identifier;
+      if(identifierNoRoot.endsWith("Root")) {
+        identifierNoRoot = identifierNoRoot.substring(0, identifierNoRoot.length-4);
+      }
       declareAccess.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
+      declareAccess.replaceText(ctx, AFUISourceTemplateID.textModelNameNoRoot, identifierNoRoot);
       accessFile.addLinesAfter(ctx, regexMixinStart, declareAccess.lines);
 
       final declareImport = ImportFromPackage().toBuffer();
       declareImport.replaceText(ctx, AFUISourceTemplateID.textPackageName, AFibD.config.packageName);
       declareImport.replaceText(ctx, AFUISourceTemplateID.textPackagePath, modelFile.importPathStatement);
       
-      accessFile.addLinesBefore(ctx, regexMixinStart, declareImport.lines);
+      accessFile.addImports(ctx, declareImport.lines);
     }
 
     // export it
@@ -251,7 +256,7 @@ $optionsHeader
       generator.addImportsForPath(ctx, pathTheme, imports: imports, requireExists: false);    
     }
 
-    stateViewFile.replaceTextLines(ctx, AFUISourceTemplateID.textImportStatements, imports);
+    stateViewFile.addImports(ctx, imports);
 
     generator.addExportsForFiles(ctx, args, [
       stateViewFile

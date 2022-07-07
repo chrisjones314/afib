@@ -451,7 +451,7 @@ class AFCodeGenerator {
     final declareImport = ImportFromPackage().toBuffer();
     declareImport.replaceText(ctx, AFUISourceTemplateID.textPackageName, packageName ?? AFibD.config.packageName);
     declareImport.replaceText(ctx, AFUISourceTemplateID.textPackagePath, importPath);
-    to.addLinesBefore(ctx, before, declareImport.lines);
+    to.addImports(ctx, declareImport.lines);
 
   }
 

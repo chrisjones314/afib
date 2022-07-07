@@ -18,7 +18,7 @@ class AFQueryMiddleware implements MiddlewareClass<AFState>
         return;
       }
 
-      if(query is AFConsolidatedQuery) {
+      if(query is AFCompositeQuery) {
         for(final subQuery in query.allQueries) {
           _registerQuery(entry, subQuery, next);
         }

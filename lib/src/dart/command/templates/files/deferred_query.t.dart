@@ -4,7 +4,6 @@ class DeferredQueryT extends AFSourceTemplate {
 
   final String template = '''
 import 'package:afib/afib_flutter.dart';
-[!af_import_statements]
 
 class [!af_query_name]Query extends AFDeferredQuery {
   

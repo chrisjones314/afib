@@ -11,7 +11,6 @@ import 'package:afib/afib_flutter.dart';
 import 'package:[!af_package_path]/state/[!af_app_namespace]_state_model_access.dart';
 import 'package:[!af_package_path]/state/[!af_app_namespace]_state.dart';
 import 'package:[!af_package_path]/ui/[!af_app_namespace]_connected_base.dart';
-[!af_import_statements]
 
 //--------------------------------------------------------------------------------------
 class [!af_state_view_name] extends [!af_app_namespace(upper)]FlexibleStateView with [!af_app_namespace(upper)]StateModelAccess {

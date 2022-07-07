@@ -9,7 +9,7 @@ class AFGenerateQuerySubcommand extends AFGenerateSubcommand {
   static const suffixListenerQuery = "Listener$suffixQuery";
   static const suffixDeferredQuery = "Deferred$suffixQuery";
   static const argRootStateType = "root-state-type";
-  static const argResultModelType = "result-model";
+  static const argResultModelType = "result-type";
 
   AFGenerateQuerySubcommand();
   
@@ -120,7 +120,7 @@ $optionsHeader
     final modelFilePath = generator.pathModel(resultModelType);
     generator.addImportsForPath(ctx, modelFilePath, imports: imports);
 
-    queryFile.replaceTextLines(ctx, AFUISourceTemplateID.textImportStatements, imports);
+    queryFile.addImports(ctx, imports);
 
     final replaceCode = isListener || isDeferred ? DeclareQueryShutdownMethodT() : null;
     queryFile.replaceTextTemplate(ctx, AFUISourceTemplateID.textAdditionalMethods, replaceCode);

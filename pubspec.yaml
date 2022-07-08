@@ -12,14 +12,14 @@ dependencies:
   flutter:
     sdk: flutter
   redux: ^5.0.0
-  flutter_redux: ^0.8.2
+  flutter_redux: ^0.10.0
   intl: ^0.17.0
   colorize: ^3.0.0
   logger: ^1.1.0  
   package_info_plus: ^1.0.6
   quiver: ^3.0.1
   path: ^1.8.0
-  overlay_support: ^1.2.1
+  overlay_support: ^2.0.1
   stack_trace: ^1.10.0
   pubspec_parse: ^1.2.0
   args: ^2.3.0

@@ -11,7 +11,7 @@ import 'package:meta/meta.dart';
 class [!af_model_name] {
   [!af_model_name]();
 
-  factory [!af_model_name].initialValue() {
+  factory [!af_model_name].initialState() {
     return [!af_model_name]();
   }
 

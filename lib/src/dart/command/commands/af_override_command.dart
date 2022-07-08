@@ -52,6 +52,9 @@ $optionsHeader
     });
 
     final parentType = args[argParentType];
+    if(parentType == null) {
+      throwUsageError("You must specify --$argParentType");
+    }
 
     final generator = ctx.generator;
     if(uiName.endsWith(themeSuffix)) {

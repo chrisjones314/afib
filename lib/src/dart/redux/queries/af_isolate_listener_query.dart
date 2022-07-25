@@ -20,14 +20,14 @@ abstract class AFIsolateListenerQuery<TMessage> extends AFAsyncListenerQuery<TMe
 
   AFIsolateListenerQuery({
     AFID? id,
-    AFOnResponseDelegate<TMessage>? onSuccessDelegate,
-    AFOnErrorDelegate? onErrorDelegate,
-    AFPreExecuteResponseDelegate<TMessage>? onPreExecuteResponseDelegate
+    AFOnResponseDelegate<TMessage>? onSuccess,
+    AFOnErrorDelegate? onError,
+    AFPreExecuteResponseDelegate<TMessage>? onPreExecuteResponse
   }): super(
     id: id,
-    onSuccessDelegate: onSuccessDelegate,
-    onErrorDelegate: onErrorDelegate,
-    onPreExecuteResponseDelegate: onPreExecuteResponseDelegate,
+    onSuccess: onSuccess,
+    onError: onError,
+    onPreExecuteResponse: onPreExecuteResponse,
   );
 
   void runInIsolateInternal(SendPort sendPort) {

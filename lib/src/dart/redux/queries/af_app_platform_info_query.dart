@@ -9,10 +9,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 class AFAppPlatformInfoQuery extends AFAsyncQuery<AFAppPlatformInfoState> {
 
   AFAppPlatformInfoQuery({    
-    AFOnResponseDelegate<AFAppPlatformInfoState>? onSuccessDelegate,
-    AFPreExecuteResponseDelegate<AFAppPlatformInfoState>? onPreExecuteResponseDelegate,
+    AFOnResponseDelegate<AFAppPlatformInfoState>? onSuccess,
+    AFPreExecuteResponseDelegate<AFAppPlatformInfoState>? onPreExecuteResponse,
   }):
-    super(onSuccessDelegate: onSuccessDelegate, onPreExecuteResponseDelegate: onPreExecuteResponseDelegate);
+    super(onSuccess: onSuccess, onPreExecuteResponse: onPreExecuteResponse);
 
   @override
   void startAsync(AFStartQueryContext<AFAppPlatformInfoState> context) {

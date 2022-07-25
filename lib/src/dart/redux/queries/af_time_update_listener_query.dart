@@ -14,9 +14,9 @@ class AFTimeUpdateListenerQuery extends AFAsyncListenerQuery<AFTimeState> {
 
   AFTimeUpdateListenerQuery({
     required this.baseTime,
-    AFOnResponseDelegate<AFTimeState>? onSuccessDelegate
+    AFOnResponseDelegate<AFTimeState>? onSuccess
   }):
-    super(id: AFUIQueryID.time, onSuccessDelegate: onSuccessDelegate, onPreExecuteResponseDelegate: () => baseTime);
+    super(id: AFUIQueryID.time, onSuccess: onSuccess, onPreExecuteResponse: () => baseTime);
 
   @override
   void startAsync(AFStartQueryContext<AFTimeState> context) {

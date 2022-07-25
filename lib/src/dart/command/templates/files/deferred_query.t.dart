@@ -10,11 +10,11 @@ class [!af_query_name]Query extends AFDeferredQuery {
   [!af_query_name]Query({
     AFID? id,
     Duration duration = const Duration(milliseconds: 300),
-    AFOnResponseDelegate<AFUnused>? onSuccessDelegate,
+    AFOnResponseDelegate<AFUnused>? onSuccess,
   }): super(
     duration,
     id: id,
-    onSuccessDelegate: onSuccessDelegate,
+    onSuccess: onSuccess,
   );
   
   @override

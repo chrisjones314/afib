@@ -32,8 +32,8 @@ abstract class AFDeferredQuery extends AFAsyncQuery<AFUnused> implements AFTrack
 
   AFDeferredQuery(this.delay, {
     AFID? id, 
-    AFOnResponseDelegate<AFUnused>? onSuccessDelegate
-  }): super(id: id, onSuccessDelegate: onSuccessDelegate);
+    AFOnResponseDelegate<AFUnused>? onSuccess
+  }): super(id: id, onSuccess: onSuccess);
 
   /// Delays for [nextDelay] and then calls [finishAsyncWithResponse] with null as the value.
   /// 
@@ -106,9 +106,9 @@ abstract class AFPeriodicQuery extends AFAsyncQuery<AFUnused> implements AFTrack
   AFPeriodicQuery(this.delay, {
     this.executeImmediately = false,
     AFID? id, 
-    AFOnResponseDelegate<AFUnused>? onSuccessDelegate,
+    AFOnResponseDelegate<AFUnused>? onSuccess,
     this.keepGoing = true,
-  }): super(id: id, onSuccessDelegate: onSuccessDelegate);
+  }): super(id: id, onSuccess: onSuccess);
 
   /// Delays for [delay] and then calls [finishAsyncWithResponse] with null as the value.
   /// 
@@ -168,13 +168,13 @@ abstract class AFPeriodicQuery extends AFAsyncQuery<AFUnused> implements AFTrack
 
 }
 
-/// A deferred query which waits a specified duration, then calls its onSuccessDelegate,
+/// A deferred query which waits a specified duration, then calls its onSuccess,
 /// but does not otherwise do anything.
 class AFDeferredSuccessQuery extends AFDeferredQuery {
 
-  AFDeferredSuccessQuery(AFID id, Duration delayOnce, AFOnResponseDelegate<AFUnused> onSuccessDelegate): super(delayOnce, id: id, onSuccessDelegate: onSuccessDelegate);
+  AFDeferredSuccessQuery(AFID id, Duration delayOnce, AFOnResponseDelegate<AFUnused> onSuccess): super(delayOnce, id: id, onSuccess: onSuccess);
   Duration? finishAsyncExecute(AFFinishQuerySuccessContext<AFUnused> context) {
-    final onSuccessD = this.onSuccessDelegate;
+    final onSuccessD = this.onSuccess;
     if(onSuccessD != null) {
       onSuccessD(context);
     }

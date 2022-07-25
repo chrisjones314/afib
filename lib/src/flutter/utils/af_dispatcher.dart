@@ -29,7 +29,7 @@ class AFStoreDispatcher extends AFDispatcher {
       //
       if(query != null) {
         // create a composite query to execute the original query.
-        final composite = AFCompositeQuery.createFrom(queries: [query], onSuccessDelegate: (compositeSuccess) {
+        final composite = AFCompositeQuery.createFrom(queries: [query], onSuccess: (compositeSuccess) {
           // execute the original action after it finishes successfully, note that currently on error, we just drop
           // the original action.   I think that is fairly reasonable, as it is likely that an error will have been displayed
           // to the user, which implicitly explains why the action didn't have the intended effect.

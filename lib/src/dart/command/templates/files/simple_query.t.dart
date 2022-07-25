@@ -9,14 +9,14 @@ class [!af_query_name] extends [!af_query_type]<[!af_result_type]> {
   
   [!af_query_name]({
     AFID? id,
-    AFOnResponseDelegate<[!af_result_type]>? onSuccessDelegate,
-    AFOnErrorDelegate? onErrorDelegate,
-    AFPreExecuteResponseDelegate<[!af_result_type]>? onPreExecuteResponseDelegate
+    AFOnResponseDelegate<[!af_result_type]>? onSuccess,
+    AFOnErrorDelegate? onError,
+    AFPreExecuteResponseDelegate<[!af_result_type]>? onPreExecuteResponse
   }): super(
     id: id,
-    onSuccessDelegate: onSuccessDelegate,
-    onErrorDelegate: onErrorDelegate,
-    onPreExecuteResponseDelegate: onPreExecuteResponseDelegate,
+    onSuccess: onSuccess,
+    onError: onError,
+    onPreExecuteResponse: onPreExecuteResponse,
   );
   
   @override

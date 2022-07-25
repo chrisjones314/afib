@@ -99,10 +99,12 @@ abstract class AFDeferredQuery extends AFAsyncQuery<AFUnused> implements AFTrack
 /// A version of [AFAsyncQuery] for queries that should be run periodically in the background.  
 abstract class AFPeriodicQuery extends AFAsyncQuery<AFUnused> implements AFTrackedQuery {
   final Duration delay;
+  final bool executeImmediately;
   Timer? timer;
   bool keepGoing;
 
   AFPeriodicQuery(this.delay, {
+    this.executeImmediately = false,
     AFID? id, 
     AFOnResponseDelegate<AFUnused>? onSuccessDelegate,
     this.keepGoing = true,
@@ -116,6 +118,10 @@ abstract class AFPeriodicQuery extends AFAsyncQuery<AFUnused> implements AFTrack
   /// obsolete state by the time onResponse gets called.   Instead, you want to
   /// do your calculations on the state you are handed on [finishAsyncExecute]
   void startAsync(AFStartQueryContext<AFUnused> context) {
+    if(executeImmediately) {
+      AFibD.logQueryAF?.d("Executing immediately for deferred query $this");
+      context.onSuccess(AFUnused.unused);
+    }
     print("Starting period with delay $delay");
     timer = Timer.periodic(delay, (_) {
       AFibD.logQueryAF?.d("Executing finishAsyncExecute for deferred query $this");

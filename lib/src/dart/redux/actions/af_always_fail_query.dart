@@ -12,7 +12,7 @@ class AFAlwaysFailQuery extends AFAsyncQuery<String> {
   //------------------------------------------------------------------------
   @override
   void startAsync(AFStartQueryContext<String> context) {
-    context.onError(AFQueryError(message: message));
+    context.onError(AFQueryError.createMessage(message));
   }
 
   //------------------------------------------------------------------------

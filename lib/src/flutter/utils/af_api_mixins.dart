@@ -326,6 +326,11 @@ mixin AFStandardAPIContextMixin implements AFDispatcher {
     dispatch(query);
   }
 
+  void executeIsolateListenerQuery(AFIsolateListenerQuery query) {
+    dispatch(query);
+  }
+
+
   /// Dispatch an [AFAsyncListenerQuery], which establishes a channel that
   /// recieves results on an ongoing basis (e.g. via a websocket).
   /// 

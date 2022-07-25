@@ -2,24 +2,35 @@
 /// 
 /// However, you can also use your own error type if you prefer.
 class AFQueryError {
-  String? message;
-  int? code;
+  static const noMessage = "";
+  static const noCode = 0;
+
+  String message;
+  int code;
   dynamic custom;
 
   AFQueryError({
-    this.message, 
-    this.code, 
+    required this.message, 
+    required this.code, 
     this.custom});
+
+  factory AFQueryError.createMessage(String message) {
+    return AFQueryError(message: message, code: noCode);
+  }
+
+  factory AFQueryError.createCode(int code) {
+    return AFQueryError(message: noMessage, code: code);
+  }
 
   String toString() {
     final sb = StringBuffer();
-    if(code != null) {
+    if(code != noCode) {
       sb.write(code);
-      if(message != null) {
+      if(message != noMessage) {
         sb.write(": ");
       }
     }
-    if(message != null) {
+    if(message != noMessage) {
       sb.write(message);
     }
     return sb.toString();

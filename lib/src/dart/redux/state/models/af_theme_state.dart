@@ -2255,6 +2255,17 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     );
   }
 
+  Widget childMarginStandard({
+    AFWidgetID? wid, 
+    required Widget child,
+  }) {
+    return Container(
+      key: keyForWID(wid),
+      margin: margin.standard,
+      child: child
+    );
+  }
+
   Widget childPadding({
     AFWidgetID? wid, 
     required Widget child,

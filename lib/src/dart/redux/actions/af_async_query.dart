@@ -112,6 +112,14 @@ class AFFinishQueryErrorContext extends AFFinishQueryContext {
   AFQueryError get e {
     return error;
   }
+
+  int get code {
+    return error.code;
+  }
+
+  String? get message { 
+    return error.message;
+  }
 }
 
 /// Superclass for a kind of action that queries some data asynchronously, then knows
@@ -200,7 +208,9 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
   /// The default implementation calls the error handler passed in to 
   /// [installCoreLibrary] in extend_app.dart
   void finishAsyncWithError(AFFinishQueryErrorContext context) {
-    AFibF.g.finishAsyncWithError(context);
+    if(onErrorDelegate == null) {
+      AFibF.g.finishAsyncWithError(context);
+    }
   }
 
   /// Called at the start of an asynchronous process, starts the query using data from the
@@ -296,6 +306,14 @@ class AFCompositeQueryResponse {
       if(r.result is TResult) {
         results.add(r.result);
       }
+    }
+    return results;
+  }
+
+  List<dynamic> allResults() {
+    final results = <dynamic>[];
+    for(final r in responses) {
+      results.add(r.result);
     }
     return results;
   }

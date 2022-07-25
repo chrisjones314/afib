@@ -1012,7 +1012,7 @@ class AFStateTest extends AFScreenTestDescription {
   }): super(id, description, disabled) {
     currentStatements.owner = id;
     registerResult<AFAlwaysFailQuery>(AFAlwaysFailQuery, (context, query) {
-      query.testFinishAsyncWithError(context, AFQueryError(message: "Always fail in state test"));
+      query.testFinishAsyncWithError(context, AFQueryError.createMessage("Always fail in state test"));
     });
   }
 

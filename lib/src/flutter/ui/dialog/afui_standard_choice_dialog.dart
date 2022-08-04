@@ -80,13 +80,13 @@ class AFUIStandardChoiceDialog extends AFUIConnectedDialog<AFUIStandardChoiceDia
     final title = context.p.title;
     final body = context.p.body;
 
-    titleCols.add(t.childMargin(
+    titleCols.add(Expanded(child: t.childMargin(
       margin: t.margin.h.s3,
       child: title.toRichText(
         maxLines: 11,
         softWrap: true,
       )
-    ));
+    )));
 
     rows.add(Row(children: titleCols));
     if(body != null) {

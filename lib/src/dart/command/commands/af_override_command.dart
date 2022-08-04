@@ -41,7 +41,7 @@ $optionsHeader
 
   void execute(AFCommandContext ctx) {
     // first, determine the base path.
-    final unnamed = ctx.unnamedArguments;
+    final unnamed = ctx.rawArgs;
     if(unnamed == null || unnamed.length < 3) {
       throwUsageError("Expected at least three arguments");
     }

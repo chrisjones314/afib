@@ -19,6 +19,10 @@ enum AFTimeZone {
 }
 
 class AFTimeState {
+  static const todayText = "today";
+  static const tomorrowText = "tomorrow";
+  static const yesterdayText = "yesterday";
+  static const daysAgoText = "days ago";
   static const missingNowError = "You must start a AFTimeUpdateListenerQuery before attempting to access the time.";
   static const updateSpecificityOrder = [
     AFTimeStateUpdateSpecificity.day,
@@ -511,5 +515,33 @@ class AFTimeState {
       totalOffset -= an.timeZoneOffset;
     }
     return an.add(totalOffset);
+  }
+
+  String toStringDate({
+    required AFTimeState? currentTime,
+    required DateFormat dateFormat,
+    bool showTodayYesterday = true,
+    int daysAgoCount = 6,
+  }) {
+    if(currentTime != null && showTodayYesterday) {
+      final today = currentTime.absoluteDay;
+      final nDay = absoluteDay;
+      if(nDay == today) {
+        return todayText;
+      } else if(nDay == (today-1)) {
+        return yesterdayText;
+      } else if(nDay == (today+1)) {
+        return tomorrowText;
+      } 
+      
+      final elapsed = today - nDay;
+      if(elapsed <= daysAgoCount && nDay < today && nDay > today - 7) {
+        return "$elapsed days ago";
+      }
+    }
+
+    // otherwise, we need to convert it into a date.
+    var calculated = this.currentPullTime;
+    return dateFormat.format(calculated);    
   }
 }

@@ -206,7 +206,7 @@ $optionsHeader
 
   @override
   void execute(AFCommandContext ctx) {
-    final unnamed = ctx.unnamedArguments;
+    final unnamed = ctx.rawArgs;
     if(unnamed == null || unnamed.isEmpty) {
       throwUsageError("You must specify at least the screen name.");
     }

@@ -291,7 +291,7 @@ class AFCommandContext {
   void setCommandArgCount(int count) {
     commandArgCount = count;
   }
-  List<String>? get unnamedArguments {
+  List<String>? get rawArgs {
     return arguments.arguments.slice(commandArgCount);
   }
 

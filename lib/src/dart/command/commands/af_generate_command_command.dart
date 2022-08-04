@@ -29,7 +29,7 @@ $optionsHeader
 
   @override
   void execute(AFCommandContext ctx) {
-    final unnamed = ctx.unnamedArguments;
+    final unnamed = ctx.rawArgs;
     if(unnamed == null || unnamed.isEmpty) {
       throwUsageError("Expected one arguments");
     }

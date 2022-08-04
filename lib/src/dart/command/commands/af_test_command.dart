@@ -14,8 +14,8 @@ class AFTestCommand extends AFCommand {
   @override
   void execute(AFCommandContext ctx) {
     final config = AFibD.config;
-    AFConfigEntries.testsEnabled.setValue(config, ctx.unnamedArguments);
-    _updateRecentTests(config, ctx.unnamedArguments);
+    AFConfigEntries.testsEnabled.setValue(config, ctx.rawArgs);
+    _updateRecentTests(config, ctx.rawArgs);
 
 
     AFConfigCommand.updateConfig(ctx, config, [AFConfigEntries.testSize, AFConfigEntries.testOrientation], ctx.arguments);

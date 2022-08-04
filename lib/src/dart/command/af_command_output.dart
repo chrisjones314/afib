@@ -35,6 +35,11 @@ class AFCommandOutputColumn {
 class AFCommandOutput {
   int nIndent = 0;
   final cols = <AFCommandOutputColumn>[];
+  final bool colorize;
+
+  AFCommandOutput({
+    this.colorize = true,
+  });
 
   void indent() { nIndent++; }
   void outdent() { nIndent--; }
@@ -68,8 +73,119 @@ class AFCommandOutput {
     col.write(output);
   }
 
+  void writeTwoColumns({
+    required String col1,
+    required String col2, 
+    int width1 = 15,
+    int? width2,
+    Styles? color1 = Styles.GREEN,
+    Styles? color2,
+    AFOutputAlignment? align1 = AFOutputAlignment.alignRight,
+    AFOutputAlignment? align2 = AFOutputAlignment.alignLeft,
+  }) {
+    writeThreeColumns(
+      col1: col1, 
+      col2: col2,
+      width1: width1,
+      width2: width2,
+      color1: color1,
+      color2: color2,
+      align1: align1,
+      align2: align2,      
+    );
+  }
+
+  void writeTwoColumnsError({
+    String col1 = "error",
+    required String col2, 
+    int width1 = 15,
+    int? width2,
+    Styles? color1 = Styles.RED,
+    Styles? color2,
+    AFOutputAlignment? align1 = AFOutputAlignment.alignRight,
+    AFOutputAlignment? align2 = AFOutputAlignment.alignLeft,
+  }) {
+    writeThreeColumns(
+      col1: col1, 
+      col2: col2,
+      width1: width1,
+      width2: width2,
+      color1: color1,
+      color2: color2,
+      align1: align1,
+      align2: align2,      
+    );
+  }
+
+  void writeTwoColumnsWarning({
+    String col1 = "warning",
+    required String col2, 
+    int width1 = 15,
+    int? width2,
+    Styles? color1 = Styles.YELLOW,
+    Styles? color2,
+    AFOutputAlignment? align1 = AFOutputAlignment.alignRight,
+    AFOutputAlignment? align2 = AFOutputAlignment.alignLeft,
+  }) {
+    writeThreeColumns(
+      col1: col1, 
+      col2: col2,
+      width1: width1,
+      width2: width2,
+      color1: color1,
+      color2: color2,
+      align1: align1,
+      align2: align2,      
+    );
+  }
+
+
+  void writeThreeColumns({
+    required String col1,
+    required String col2, 
+    String? col3,
+    int width1 = 15,
+    int? width2,
+    int? width3,
+    Styles? color1 = Styles.GREEN,
+    Styles? color2,
+    Styles? color3,
+    AFOutputAlignment? align1 = AFOutputAlignment.alignRight,
+    AFOutputAlignment? align2 = AFOutputAlignment.alignLeft,
+    AFOutputAlignment? align3 = AFOutputAlignment.alignLeft,
+  }) {
+    startColumn(
+      alignment: align1,
+      width: width1,
+      color: color1);
+    write(col1);
+    startColumn(
+      alignment: align2,
+      width: width2,
+      color: color2,
+    );
+    write(col2);
+    if(col3 != null) {
+      startColumn(
+      alignment: align3,
+      width: width3,
+      color: color3,
+      );
+      write(col3);
+    }
+    endLine();
+  }
+
+  String _colorize(String value, Styles color) {
+    if(colorize) {
+      return Colorize(value).apply(color).toString();
+    } else {
+      return value;
+    }
+  }
+
   void writeErrorLine(String error) {
-    final out = Colorize("ERROR: ").apply(Styles.RED);
+    final out = _colorize("ERROR: ", Styles.RED);
     final result = StringBuffer();
     result.write(out);
     result.write(error);
@@ -95,7 +211,7 @@ class AFCommandOutput {
         _writeSpace(sb, req, fill: col.fill);
       }
 
-      final out = Colorize(col.content.toString()).apply(col.color);
+      final out = _colorize(col.content.toString(), col.color);
       sb.write(out);
       
       if(col.alignment == AFOutputAlignment.alignLeft) {

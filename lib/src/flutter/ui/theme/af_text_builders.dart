@@ -135,8 +135,8 @@ class AFRichTextBuilder {
   Widget toRichText({
     TextAlign textAlign = TextAlign.start,
     TextOverflow overflow = TextOverflow.clip,
-    int? maxLines,
-    bool softWrap = false,
+    int? maxLines = 10,
+    bool softWrap = true,
   }) {
     return RichText(
         key: AFFunctionalTheme.keyForWIDStatic(wid),

@@ -274,17 +274,13 @@ class AFTestExtensionContext {
 
 void afDefaultQueryErrorHandler(AFFinishQueryErrorContext context) {
   var msg = context.error.message;
-  assert(msg != null);
-  if(msg == null) {
-    msg = "";
-  }
   context.showDialogErrorText(
     themeOrId: AFUIThemeID.defaultTheme,
     buttonTitles: ["OK"],
     title: "Unexpected Internal Error",
     body: msg,
   );
-
+  
 }
 
 

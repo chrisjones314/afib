@@ -70,7 +70,7 @@ $optionsHeader
   @override
   void execute(AFCommandContext ctx) {    
 
-    final unnamed = ctx.unnamedArguments;
+    final unnamed = ctx.rawArgs;
     if(unnamed != null && unnamed.isNotEmpty) {
       throw AFCommandError(error: "The command has extra unrecognized arguments, did you forgot -- before an argument?");
     }

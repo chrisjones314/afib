@@ -34,8 +34,8 @@ class [!af_command_name] extends AFCommand {
   void execute(AFCommandContext context) {
     print("Executing \$name");
 
-    final unnamed = context.unnamedArguments;
-    if(unnamed == null || unnamed.isNotEmpty) {
+    final rawArgs = context.rawArgs;
+    if(rawArgs == null || rawArgs.isNotEmpty) {
       throwUsageError("Expected at least one arguments");
     }
 
@@ -43,7 +43,7 @@ class [!af_command_name] extends AFCommand {
     // see throwUsageError for detected errors.
 
     // parse arguments with default values as follows
-    final args = parseArguments(unnamed, defaults: {
+    final namedArgs = parseArguments(rawArgs, defaults: {
         "your-arg": "yourdefaultvalue"
     });
   }

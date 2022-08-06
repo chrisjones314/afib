@@ -48,7 +48,7 @@ $optionsHeader
   @override
   void execute(AFCommandContext ctx) {
     final unnamed = ctx.rawArgs;
-    if(unnamed == null || unnamed.isEmpty) {
+    if(unnamed.isEmpty) {
       throwUsageError("Expected at least one argument");
     }
 
@@ -60,7 +60,7 @@ $optionsHeader
       AFGenerateUISubcommand.argTheme: ctx.generator.nameDefaultTheme
     });
 
-    generateStateStatic(ctx, modelName, args);
+    generateStateStatic(ctx, modelName, args.named);
 
 
     // replace any default 

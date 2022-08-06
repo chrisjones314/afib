@@ -9,6 +9,7 @@ class AFCommandT extends AFSourceTemplate {
 import 'package:afib/afib_command.dart';
 
 class [!af_command_name] extends AFCommand {
+  static const argExample = "example";
 
   @override
   final name = "[!af_app_namespace]:[!af_command_name_short(snake)]";
@@ -19,33 +20,42 @@ class [!af_command_name] extends AFCommand {
   @override 
   String get usage {
     return \'\'\'
-  \$nameOfExecutable generate command YourCommand
+  \$nameOfExecutable \$name
 \$usageHeader
 
 \$descriptionHeader
   \$description
 
 \$optionsHeader
-  None
+  --\$argExample ExampleArgValue
 \'\'\';
   }
 
   @override
   void execute(AFCommandContext context) {
-    print("Executing \$name");
-
     final rawArgs = context.rawArgs;
-    if(rawArgs == null || rawArgs.isNotEmpty) {
-      throwUsageError("Expected at least one arguments");
-    }
-
-    // see superclass verify... methods for useful verifications,
-    // see throwUsageError for detected errors.
 
     // parse arguments with default values as follows
-    final namedArgs = parseArguments(rawArgs, defaults: {
-        "your-arg": "yourdefaultvalue"
+    final args = parseArguments(rawArgs, defaults: {
+        argExample: "yourdefaultvalue"
     });
+
+    // see superclass verify... methods for useful verifications,
+    // see throwUsageError for reporting errors.
+
+    final output = context.output;
+    final unnamed = args.unnamed;
+    final example = args.named[argExample];
+
+    output.writeTwoColumns(
+      col1: "named ",
+      col2: unnamed.join(', ')
+    );
+
+    output.writeTwoColumns(
+      col1: "unnamed ",
+      col2: "\$argExample -> \$example"
+    );
   }
 }
 ''';

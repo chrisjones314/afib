@@ -47,6 +47,17 @@ class AFItemWithNamespace {
 
 }
 
+class AFCommandArgumentsParsed {
+  static const argTrue = "true";
+  final List<String> unnamed;
+  final Map<String, String?> named;
+
+  AFCommandArgumentsParsed({
+    required this.unnamed,
+    required this.named,
+  });
+}
+
 /// Parent for commands executed through the afib command line app.
 abstract class AFCommand { 
   static const optionPrefix = "--";
@@ -96,7 +107,7 @@ abstract class AFCommand {
   }
 
   void finalize() {}
-  void execute(AFCommandContext ctx);
+  void execute(AFCommandContext context);
 
   bool errorIfNotProjectRoot(AFCommandContext ctx) {
     if(!AFProjectPaths.inRootOfAfibProject(ctx)) {
@@ -176,10 +187,36 @@ abstract class AFCommand {
     }
   }
 
-  Map<String, dynamic> parseArguments(List<String> source, {
-    required Map<String, dynamic> defaults
+  AFCommandArgumentsParsed parseArguments(List<String> source, {
+    required Map<String, String?> defaults
   }) {
+    final unnamed = <String>[];
+    final named = Map<String, String?>.from(defaults);
 
+    for(var i = 0; i < source.length; i++) {
+      final arg = source[i];
+      if(arg.startsWith(optionPrefix)) {
+        var argValue = AFCommandArgumentsParsed.argTrue;
+        if((i+1 < source.length)) {
+          final next = source[i+1];
+          if(!next.startsWith(optionPrefix)) {
+            argValue = next;
+            i++;
+          }
+        }
+        final argEntry = arg.substring(2);
+        named[argEntry] = argValue;
+      } else {
+        unnamed.add(arg);
+      }
+    }
+
+    return AFCommandArgumentsParsed(
+      named: named,
+      unnamed: unnamed,
+    );
+
+    /*
     final result = Map<String, dynamic>.from(defaults);
     result[argPrivate] = false;
     var startWith = 0;
@@ -207,6 +244,7 @@ abstract class AFCommand {
       }
     }
     return result;
+    */
   }
 
   void verifyDoesNotEndWith(String value, String excluded) {
@@ -291,7 +329,7 @@ class AFCommandContext {
   void setCommandArgCount(int count) {
     commandArgCount = count;
   }
-  List<String>? get rawArgs {
+  List<String> get rawArgs {
     return arguments.arguments.slice(commandArgCount);
   }
 

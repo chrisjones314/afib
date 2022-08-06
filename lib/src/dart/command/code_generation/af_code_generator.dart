@@ -794,7 +794,7 @@ class AFCodeGenerator {
       if(isUpper && i > 0) {
         final prevChar = convert[i-1];
         final prevIsUpper = prevChar == prevChar.toUpperCase();
-        final nextChar = (i+1 < convert.length) ? convert[i+1] : 'a';
+        final nextChar = (i+1 < convert.length) ? convert[i+1] : prevChar;
         final nextIsUpper = nextChar == nextChar.toUpperCase();
         if(!prevIsUpper || !nextIsUpper) {
           tokens.add(currentToken.toString());

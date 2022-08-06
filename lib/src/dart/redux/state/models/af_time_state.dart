@@ -541,7 +541,7 @@ class AFTimeState {
     }
 
     // otherwise, we need to convert it into a date.
-    var calculated = this.currentPullTime;
+    var calculated = currentPushTime;
     return dateFormat.format(calculated);    
   }
 }

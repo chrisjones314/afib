@@ -1033,7 +1033,7 @@ mixin AFContextShowMixin {
     updateOptionalGlobalParam(this.dispatch, navigate);
   }
 
-  static updateOptionalGlobalParam(dynamic Function(dynamic action) dispatch, AFNavigatePushAction navigate) {
+  static void updateOptionalGlobalParam(dynamic Function(dynamic action) dispatch, AFNavigatePushAction navigate) {
     dispatch(AFNavigateSetParamAction(
       param: navigate.param, route: AFNavigateRoute.routeGlobalPool
     ));    

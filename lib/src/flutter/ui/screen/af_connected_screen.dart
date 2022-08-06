@@ -877,6 +877,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
   /// and a dialog is not open, it will mess up the navigation state.
   void closeDialog(AFScreenID dialogId, dynamic returnValue) {
     final ctx = flutterContext;
+    // ignore: unused_local_variable
     final didNav = (ctx != null && AFibF.g.doMiddlewareNavigation( (navState) {
         material.Navigator.pop(ctx, returnValue); 
       }));

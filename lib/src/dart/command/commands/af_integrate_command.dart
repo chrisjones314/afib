@@ -30,7 +30,7 @@ $optionsHeader
   @override
   void execute(AFCommandContext ctx) {
     final unnamed = ctx.rawArgs;
-    if(unnamed == null || unnamed.length != 2) {
+    if(unnamed.length != 2) {
       throwUsageError("Please specify two arguments");
     }
 

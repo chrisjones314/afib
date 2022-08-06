@@ -42,7 +42,7 @@ $optionsHeader
   void execute(AFCommandContext ctx) {
     // first, determine the base path.
     final unnamed = ctx.rawArgs;
-    if(unnamed == null || unnamed.length < 3) {
+    if(unnamed.length < 3) {
       throwUsageError("Expected at least three arguments");
     }
 
@@ -51,7 +51,7 @@ $optionsHeader
       argParentType: null,
     });
 
-    final parentType = args[argParentType];
+    final parentType = args.named[argParentType];
     if(parentType == null) {
       throwUsageError("You must specify --$argParentType");
     }
@@ -67,7 +67,7 @@ $optionsHeader
       });
 
       final fromLib = generator.findLibraryForTypeWithPrefix(parentType);
-      AFGenerateUISubcommand.createTheme(ctx, uiName, args, 
+      AFGenerateUISubcommand.createTheme(ctx, uiName, args.named, 
         fullId: fullId,
         fromLib: fromLib,
       );

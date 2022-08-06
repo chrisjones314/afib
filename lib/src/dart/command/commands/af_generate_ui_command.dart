@@ -207,7 +207,7 @@ $optionsHeader
   @override
   void execute(AFCommandContext ctx) {
     final unnamed = ctx.rawArgs;
-    if(unnamed == null || unnamed.isEmpty) {
+    if(unnamed.isEmpty) {
       throwUsageError("You must specify at least the screen name.");
     }
 
@@ -224,9 +224,9 @@ $optionsHeader
     verifyNotOption(uiName);
 
     if(uiName.endsWith("Theme")) {
-      createTheme(ctx, uiName, args);
+      createTheme(ctx, uiName, args.named);
     } else {
-      createScreen(ctx, uiName, args);
+      createScreen(ctx, uiName, args.named);
     }
 
     // replace any default 

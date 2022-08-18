@@ -24,6 +24,15 @@ class AFCodeBuffer {
     required this.modified
   });
 
+
+  static String quoteIfNonNull(String? value) {
+    var result = "null";
+    if(value != null) {
+      result = '"$value"';
+    }
+    return result;
+  }
+
   factory AFCodeBuffer.empty() {
     return AFCodeBuffer(projectPath: null, lines: <String>[], modified: false);
   }
@@ -89,7 +98,7 @@ class AFCodeBuffer {
     lines.add(line);
   }
 
-  void appendEmptyLine() {
+  void appendLineEmpty() {
     modified = true;
     lines.add('');
   }

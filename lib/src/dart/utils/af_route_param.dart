@@ -55,6 +55,15 @@ class AFRouteParam {
   }
 }
 
+class AFRouteParamWithLocation extends AFRouteParam {
+  
+
+  AFRouteParamWithLocation({
+    required AFID screenId,
+  }): super(id: screenId);
+
+}
+
 /// Used internally in test cases where we need to substitute a different screen id,
 /// for the original screen id in a route param passed to a test.   You can call 
 /// unwrap to get the original route param of the correct type.

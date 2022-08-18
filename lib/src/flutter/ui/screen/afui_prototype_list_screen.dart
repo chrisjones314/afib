@@ -13,7 +13,7 @@ import 'package:flutter/widgets.dart';
 
 /// Parameter uses to filter the tests/protoypes shown on the screen.
 @immutable
-class AFUIPrototypeTestScreenParam extends AFRouteParam {
+class AFUIPrototypeTestScreenParam extends AFScreenRouteParam {
   final String? filter;
   final dynamic title;
   final AFUIType activeUIType;
@@ -24,7 +24,7 @@ class AFUIPrototypeTestScreenParam extends AFRouteParam {
     required this.title,
     required this.activeUIType,
     this.filter
-  }): super(id: AFUIScreenID.screenPrototypeListSingleScreen);
+  }): super(screenId: AFUIScreenID.screenPrototypeListSingleScreen);
 
 
   factory AFUIPrototypeTestScreenParam.createFromList({

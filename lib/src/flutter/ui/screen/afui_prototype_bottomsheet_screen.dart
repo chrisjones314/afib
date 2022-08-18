@@ -13,14 +13,14 @@ import 'package:flutter/material.dart';
 
 /// Parameter uses to filter the tests shown on the screen.
 @immutable
-class AFUIPrototypeBottomSheetRouteParam extends AFRouteParam {
+class AFUIPrototypeBottomSheetRouteParam extends AFScreenRouteParam {
   final AFBottomSheetPrototype test;
   final AFRouteParam? routeParam;
 
   AFUIPrototypeBottomSheetRouteParam({
     required this.test, 
     required this.routeParam
-  }): super(id: AFUIScreenID.screenPrototypeBottomSheet);
+  }): super(screenId: AFUIScreenID.screenPrototypeBottomSheet);
 
   AFUIPrototypeBottomSheetRouteParam copyWith({
     AFBottomSheetPrototype? test,

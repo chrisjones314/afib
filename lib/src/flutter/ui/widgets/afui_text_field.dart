@@ -75,8 +75,10 @@ class AFUITextField extends StatelessWidget {
       assert(controller == null && parentParam == null, errOnlyOneTextOwner);
       textController = controllers?.access(wid);
     } else if(parentParam != null) {
+      final flutterState = parentParam?.flutterState;
+      assert(flutterState != null, "If you pass in a parent param, it must be one of the AF...RouteParamWithFlutterState variants");
       assert(controller == null && controllers == null, errOnlyOneTextOwner);
-      textController = parentParam?.flutterState.textControllers?.access(wid);
+      textController = flutterState?.textControllers?.access(wid);
     } else {
       assert(false, "You must pass in controller, or controllers, or parentParam");
     }
@@ -101,7 +103,7 @@ class AFUITextField extends StatelessWidget {
       result = controllers?.access(wid);
     }
     if(result == null) {
-      result = parentParam?.flutterState.textControllers?.access(wid);
+      result = parentParam?.flutterState?.textControllers?.access(wid);
     }
     if(result == null) {
       throw AFException("Missing text controller for $wid");

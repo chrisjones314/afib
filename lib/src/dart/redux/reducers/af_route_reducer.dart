@@ -55,7 +55,7 @@ AFRouteState _navPopTo(AFRouteState state, AFNavigatePopToAction action) {
 
 //---------------------------------------------------------------------------
 AFRouteState _navSetParam(AFRouteState state, AFNavigateSetParamAction action) {
-  final screen = action.param.id;
+  final screen = action.param.screenId;
   return state.setParam(screen, action.param, action.route);
 }
 

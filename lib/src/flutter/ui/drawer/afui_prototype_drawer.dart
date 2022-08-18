@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 //--------------------------------------------------------------------------------------
-class AFUIPrototypeDrawerRouteParam extends AFRouteParam {
+class AFUIPrototypeDrawerRouteParam extends AFDrawerRouteParam {
   static const viewTime = 0;
   static const viewTheme = 1;
   static const viewTest  = 2;
@@ -36,7 +36,7 @@ class AFUIPrototypeDrawerRouteParam extends AFRouteParam {
     required this.timeText,
     required this.timeAdjustText,
     required this.textControllers,
-  }): super(id: AFUIScreenID.drawerPrototype);
+  }): super(screenId: AFUIScreenID.drawerPrototype);
 
   factory AFUIPrototypeDrawerRouteParam.createOncePerScreen(int view) {
     final themeExpanded = <String, bool>{};

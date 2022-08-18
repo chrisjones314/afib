@@ -1,5 +1,4 @@
 import 'package:afib/afui_id.dart';
-import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/models/afui_proto_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
@@ -81,12 +80,12 @@ abstract class AFUIScreenConfig<TSPI extends AFScreenStateProgrammingInterface, 
     AFUIScreenConfig({
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
       required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
-      AFNavigateRoute? route,
+      AFRouteLocation? route,
     }): super(
       themeId: AFUIThemeID.defaultTheme,
       stateViewCreator: stateViewCreator,
       spiCreator: spiCreator,
-      route: route ?? AFNavigateRoute.routeHierarchy,
+      route: route ?? AFRouteLocation.routeHierarchy,
     );
 }
 
@@ -95,7 +94,7 @@ abstract class AFUIDialogConfig<TSPI extends AFDialogStateProgrammingInterface, 
     AFUIDialogConfig({
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
       required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
-      AFNavigateRoute? route,
+      AFRouteLocation? route,
     }): super(
       themeId: AFUIThemeID.defaultTheme,
       stateViewCreator: stateViewCreator,
@@ -107,7 +106,7 @@ abstract class AFUIDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, 
     AFUIDrawerConfig({
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
       required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
-      AFNavigateRoute? route,
+      AFRouteLocation? route,
     }): super(
       themeId: AFUIThemeID.defaultTheme,
       stateViewCreator: stateViewCreator,
@@ -119,12 +118,12 @@ abstract class AFUIWidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, 
   AFUIWidgetConfig({
     required AFCreateStateViewDelegate<TStateView> stateViewCreator,
     required AFCreateWidgetSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
-    AFNavigateRoute? route,
+    AFRouteLocation? route,
   }): super(
     themeId: AFUIThemeID.defaultTheme,
     stateViewCreator: stateViewCreator,
     spiCreator: spiCreator,
-    route: route ?? AFNavigateRoute.routeHierarchy,
+    route: route ?? AFRouteLocation.routeHierarchy,
   );
 }
 

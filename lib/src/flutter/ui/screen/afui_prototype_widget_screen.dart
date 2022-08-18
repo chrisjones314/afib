@@ -11,14 +11,14 @@ import 'package:flutter/material.dart';
 
 /// Parameter uses to filter the tests shown on the screen.
 @immutable
-class AFUIPrototypeWidgetRouteParam extends AFRouteParam {
+class AFUIPrototypeWidgetRouteParam extends AFScreenRouteParam {
   final AFWidgetPrototype test;
   final AFRouteParam routeParam;
 
   AFUIPrototypeWidgetRouteParam({
     required this.test, 
     required this.routeParam
-  }): super(id: AFUIScreenID.screenPrototypeWidget);
+  }): super(screenId: AFUIScreenID.screenPrototypeWidget);
 
   AFUIPrototypeWidgetRouteParam copyWith({
     AFWidgetPrototype? test,
@@ -57,7 +57,7 @@ class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetS
     if(test is AFConnectedWidgetPrototype) {
       children = <AFRouteParam>[];
       children.add(test.routeParam);
-      wid = test.routeParam.id;
+      wid = test.routeParam.screenId;
       final testChildren = test.children;
       if(testChildren != null) {
         children.addAll(testChildren);
@@ -81,7 +81,7 @@ class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetS
     final context = spi.context;
     final test = context.p.test;
  
-    final sourceWidget = test.render(screenId, context.p.routeParam.id as AFWidgetID);
+    final sourceWidget = test.render(screenId, context.p.routeParam.screenId as AFWidgetID);
     return _createScaffold(spi, sourceWidget);
   }
 

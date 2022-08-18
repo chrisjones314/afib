@@ -14,7 +14,7 @@ enum AFUIStandardChoiceDialogIcon {
 
 //--------------------------------------------------------------------------------------
 @immutable
-class AFUIStandardChoiceDialogRouteParam extends AFRouteParam {
+class AFUIStandardChoiceDialogRouteParam extends AFDialogRouteParam {
   final AFUIStandardChoiceDialogIcon icon;
   final AFRichTextBuilder? body;
   final AFRichTextBuilder title;
@@ -26,7 +26,7 @@ class AFUIStandardChoiceDialogRouteParam extends AFRouteParam {
     required this.body,
     required this.title,
     required this.buttonTitles,
-  }): super(id: AFUIScreenID.dialogStandardChoice);
+  }): super(screenId: AFUIScreenID.dialogStandardChoice);
 }
 
 class AFUIStandardChoiceDialogSPI extends AFUIDialogSPI<AFUIDefaultStateView, AFUIStandardChoiceDialogRouteParam> {

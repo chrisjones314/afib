@@ -24,7 +24,7 @@ void afInitPrototypeScreenMap(AFScreenMap screens) {
     screens.registerStartupScreen(AFUIScreenID.screenPrototypeHome, () => AFUIPrototypeHomeScreenParam.createOncePerScreen());
   } else {
     assert(config.isPrototypeEnvironment);
-    screens.registerStartupScreen(AFUIScreenID.screenPrototypeLoading, () => AFRouteParam(id: AFUIScreenID.screenPrototypeLoading));
+    screens.registerStartupScreen(AFUIScreenID.screenPrototypeLoading, () => AFRouteParam(screenId: AFUIScreenID.screenPrototypeLoading, routeLocation: AFRouteLocation.routeHierarchy));
   }
 
   screens.registerScreen(AFUIScreenID.screenPrototypeHome, (_) => AFPrototypeHomeScreen());

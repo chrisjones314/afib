@@ -27,27 +27,13 @@ class AFNavigateAction extends AFActionWithKey implements AFExecuteBeforeInterfa
     required this.executeDuring,
   }): super(id: id);
 
-  AFScreenID get screenId { return param.id as AFScreenID; }
-}
-
-/// The two different 'route' types in AFib.
-enum AFNavigateRoute {
-  /// The primary hierarchical route, as you push screens using [AFNavigatePushAction],
-  /// this route gets longer/deeper.   As you pop them with [AFNavigatePopAction] it gets
-  /// shorter/shallower.
-  routeHierarchy,
-
-  /// The global pool just a pool of route paramaters organized by screen id.  This is used
-  /// for things like drawers that can be dragged onto the screen, dialogs and popups, and 
-  /// third party widgets that want to maintain a global root parameter across many different
-  /// screens.
-  routeGlobalPool, 
+  AFScreenID get screenId { return param.screenId as AFScreenID; }
 }
 
 /// Action that changes the data associated with the current screen, but 
 /// does not change the screen itself.
 class AFNavigateSetParamAction extends AFNavigateAction {
-  final AFNavigateRoute route;
+  final AFRouteLocation route;
   AFNavigateSetParamAction({
     AFID? id, 
     required AFRouteParam param,
@@ -242,7 +228,7 @@ class AFNavigatePopToAction extends AFNavigateActionWithReturnData {
 
 class AFNavigateAddChildParamAction extends AFNavigateAction {
   final AFScreenID screen;
-  final AFNavigateRoute route;
+  final AFRouteLocation route;
   AFNavigateAddChildParamAction({
     AFID? id, 
     required this.screen, 
@@ -254,7 +240,7 @@ class AFNavigateAddChildParamAction extends AFNavigateAction {
 class AFNavigateRemoveChildParamAction extends AFNavigateAction {
   final AFScreenID screen;
   final AFID widget;
-  final AFNavigateRoute route;
+  final AFRouteLocation route;
   AFNavigateRemoveChildParamAction({
     AFID? id, 
     required this.screen, 
@@ -283,7 +269,7 @@ class AFNavigateShowScreenEndAction extends AFNavigateAction {
 
 class AFNavigateSetChildParamAction extends AFNavigateAction {
   final AFScreenID screen;
-  final AFNavigateRoute route;
+  final AFRouteLocation route;
   final AFWidgetParamSource paramSource;
   AFNavigateSetChildParamAction({
     AFID? id, 

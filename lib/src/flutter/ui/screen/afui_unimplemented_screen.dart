@@ -5,12 +5,12 @@ import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
 import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:flutter/material.dart';
 
-class AFUIUnimplementedScreenRouteParam extends AFRouteParam {
+class AFUIUnimplementedScreenRouteParam extends AFScreenRouteParam {
   final String message;
 
   AFUIUnimplementedScreenRouteParam({
     required this.message,
-  }): super(id: AFUIScreenID.screenUnimplemented);
+  }): super(screenId: AFUIScreenID.screenUnimplemented);
 }
 
 

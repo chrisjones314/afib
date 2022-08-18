@@ -13,14 +13,14 @@ import 'package:flutter/material.dart';
 
 /// Parameter uses to filter the tests shown on the screen.
 @immutable
-class AFUIPrototypeDialogRouteParam extends AFRouteParam {
+class AFUIPrototypeDialogRouteParam extends AFScreenRouteParam {
   final AFDialogPrototype test;
   final AFRouteParam? routeParam;
 
   AFUIPrototypeDialogRouteParam({
     required this.test, 
     required this.routeParam
-  }): super(id: AFUIScreenID.screenPrototypeDialog);
+  }): super(screenId: AFUIScreenID.screenPrototypeDialog);
 
   AFUIPrototypeDialogRouteParam copyWith({
     AFDialogPrototype? test,

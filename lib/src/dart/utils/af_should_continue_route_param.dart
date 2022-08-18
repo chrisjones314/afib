@@ -7,19 +7,19 @@ enum AFShouldContinue {
   noCancel
 }
 
-class AFShouldContinueRouteParam extends AFRouteParam {
+class AFShouldContinueRouteParam extends AFDialogRouteParam {
   final AFShouldContinue shouldContinue;
 
   AFShouldContinueRouteParam({
     required AFID screenId,
     required this.shouldContinue,
-  }): super(id: screenId);
+  }): super(screenId: screenId);
 
   AFShouldContinueRouteParam copyWith({
     AFShouldContinue? shouldContinue
   }) {
     return AFShouldContinueRouteParam(
-      screenId: id, 
+      screenId: screenId, 
       shouldContinue: shouldContinue ?? this.shouldContinue
     );
   }

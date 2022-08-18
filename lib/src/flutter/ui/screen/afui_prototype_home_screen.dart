@@ -27,7 +27,7 @@ class AFScreenTestResultSummary {
 
 /// Parameter uses to filter the tests/protoypes shown on the screen.
 @immutable
-class AFUIPrototypeHomeScreenParam extends AFRouteParamWithFlutterState {
+class AFUIPrototypeHomeScreenParam extends AFScreenRouteParamWithFlutterState {
   static const filterTextId = 1;
   static const viewFilter = 1;
   static const viewResults = 2;
@@ -42,7 +42,7 @@ class AFUIPrototypeHomeScreenParam extends AFRouteParamWithFlutterState {
     required this.results,
     required this.view,
     required AFFlutterRouteParamState flutterState,
-  }): super(id: AFUIScreenID.screenPrototypeHome, flutterState: flutterState);
+  }): super(screenId: AFUIScreenID.screenPrototypeHome, flutterState: flutterState);
 
   AFUIPrototypeHomeScreenParam reviseFilter(String filter) {
     return copyWith(filter: filter);
@@ -74,7 +74,7 @@ class AFUIPrototypeHomeScreenParam extends AFRouteParamWithFlutterState {
       results: results ?? this.results,
       view: view ?? this.view,
       textControllers: this.textControllers,
-      flutterState: this.flutterState,
+      flutterState: this.flutterStateGuaranteed,
     );
   }
 
@@ -103,7 +103,7 @@ class AFPrototypeHomeScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIP
   }
 
   AFTextEditingController? get searchController {
-    final textControllers = context.p.flutterState.textControllers;
+    final textControllers = context.p.flutterStateGuaranteed.textControllers;
     final controller = textControllers?.access(AFUIWidgetID.editSearch);
     return controller;
   }

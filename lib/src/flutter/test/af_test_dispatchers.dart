@@ -2,6 +2,7 @@ import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_object_with_key.dart';
+import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_widget_screen.dart';
@@ -95,12 +96,10 @@ class AFWidgetScreenTestDispatcher extends AFScreenTestDispatcher {
   void dispatch(dynamic action) {
     if(action is AFNavigateSetChildParamAction) {
       final revisedParam = originalParam.copyWith(param: action.param);
-      super.dispatch(AFNavigateSetParamAction(param: revisedParam, route: AFNavigateRoute.routeHierarchy));
+      super.dispatch(AFNavigateSetParamAction(param: revisedParam, route: AFRouteLocation.routeHierarchy));
     } else { 
       super.dispatch(action);
     }
-
-
   }
 
 }

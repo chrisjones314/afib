@@ -105,7 +105,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
       spi.context.dispatch(AFNavigateSetParamAction(
         param: AFUIPrototypeDrawerRouteParam.createOncePerScreen(AFUIPrototypeDrawerRouteParam.viewTest),
         children: null,
-        route: AFNavigateRoute.routeGlobalPool
+        route: AFRouteLocation.routeGlobalPool
       ));
       spi.context.dispatch(AFUpdateActivePrototypeAction(prototypeId: prototype.id));
       prototype.startScreen(spi.context.d, spi.flutterContext, AFibF.g.testData);

@@ -28,11 +28,11 @@ mixin AFNonUIAPIContextMixin implements AFDispatcher {
 
   /// Dispatches an action that updates the route parameter for the specified screen.
   void updateHierarchyRouteParam(AFRouteParam param) {
-    dispatch(AFNavigateSetParamAction(param: param, route: AFNavigateRoute.routeHierarchy));
+    dispatch(AFNavigateSetParamAction(param: param, route: AFRouteLocation.routeHierarchy));
   }
 
   void updateGlobalRouteParam(AFRouteParam param) {
-    dispatch(AFNavigateSetParamAction(param: param, route: AFNavigateRoute.routeGlobalPool));
+    dispatch(AFNavigateSetParamAction(param: param, route: AFRouteLocation.routeGlobalPool));
   }
 
   void executeStartTimeListenerQuery(AFTimeState baseTime) {
@@ -43,7 +43,7 @@ mixin AFNonUIAPIContextMixin implements AFDispatcher {
   /// Dispatches an action that updates the route parameter for the specified screen.
   void updateChildRouteParam(AFScreenID screen, AFRouteParam param, { 
     AFWidgetParamSource paramSource = AFWidgetParamSource.child,
-    AFNavigateRoute route = AFNavigateRoute.routeHierarchy
+    AFRouteLocation route = AFRouteLocation.routeHierarchy
   }) {
     dispatch(AFNavigateSetChildParamAction(
       screen: screen,
@@ -521,7 +521,7 @@ mixin AFContextShowMixin {
     bool useRootNavigator = true,
     material.RouteSettings? routeSettings
   }) async {
-    final screenId = navigate.param.id as AFScreenID;
+    final screenId = navigate.param.screenId as AFScreenID;
     final verifiedScreenId = _nullCheckScreenId(screenId);
     updateOptionalGlobalParam(dispatch, navigate);
 
@@ -928,7 +928,7 @@ mixin AFContextShowMixin {
     bool enableDrag = true,
     material.RouteSettings? routeSettings,  
   }) async {
-    final screenId = navigate.param.id as AFScreenID;
+    final screenId = navigate.param.screenId as AFScreenID;
     final verifiedScreenId = _nullCheckScreenId(screenId);
     updateOptionalGlobalParam(dispatch, navigate);
 
@@ -1035,7 +1035,7 @@ mixin AFContextShowMixin {
 
   static void updateOptionalGlobalParam(dynamic Function(dynamic action) dispatch, AFNavigatePushAction navigate) {
     dispatch(AFNavigateSetParamAction(
-      param: navigate.param, route: AFNavigateRoute.routeGlobalPool
+      param: navigate.param, route: AFRouteLocation.routeGlobalPool
     ));    
   }
 }

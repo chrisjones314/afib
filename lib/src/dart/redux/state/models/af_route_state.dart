@@ -1,5 +1,4 @@
 import 'package:afib/afui_id.dart';
-import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
@@ -22,7 +21,12 @@ class AFRouteSegmentChildren {
   factory AFRouteSegmentChildren.fromList(List<AFRouteParam> children) {
     final result = <AFID, AFRouteSegment>{};
     for(final child in children) {
-      result[child.id] = AFRouteSegment(param: child, children: null, createDefaultChildParam: null);
+      AFID? wid = child.wid;
+      if(wid == null) {
+        wid = child.screenId;
+      }
+      
+      result[wid] = AFRouteSegment(param: child, children: null, createDefaultChildParam: null);
     }
     return AFRouteSegmentChildren(children: result);
   }
@@ -37,7 +41,11 @@ class AFRouteSegmentChildren {
 
   AFRouteSegmentChildren reviseAddChild(AFRouteParam param) {
     final revised = Map<AFID, AFRouteSegment>.from(children);
-    revised[param.id] = AFRouteSegment(param: param, children: null, createDefaultChildParam: null);
+    AFID? wid = param.wid;
+    if(wid == null) {
+      wid = param.screenId;
+    }
+    revised[wid] = AFRouteSegment(param: param, children: null, createDefaultChildParam: null);
     return AFRouteSegmentChildren(children: revised);
   }
 
@@ -49,7 +57,12 @@ class AFRouteSegmentChildren {
 
   AFRouteSegmentChildren reviseSetChild(AFRouteParam param) {
     final revised = Map<AFID, AFRouteSegment>.from(children);
-    revised[param.id] = AFRouteSegment(param: param, children: null, createDefaultChildParam: null);
+    AFID? wid = param.wid;
+    if(wid == null) {
+      wid = param.screenId;
+    }
+
+    revised[wid] = AFRouteSegment(param: param, children: null, createDefaultChildParam: null);
     return AFRouteSegmentChildren(children: revised);
   }
 
@@ -108,7 +121,7 @@ class AFRouteSegment {
   });
 
   AFScreenID get screen  {
-    return param.id as AFScreenID;
+    return param.screenId as AFScreenID;
   }
 
   AFRouteSegment? findChild(AFID wid) {
@@ -626,7 +639,7 @@ class AFRouteState {
   AFRouteState popAndPushNamed(AFRouteParam? param, List<AFRouteParam>? children, AFCreateDefaultChildParamDelegate? createDefaultChildParam) {
     assert(param != null);
     if(param != null) {
-      final screen = param.id as AFScreenID;
+      final screen = param.screenId as AFScreenID;
       AFibD.logRouteAF?.d("popAndPushNamed: $screen / $param");
       final revisedScreen = screenHierarchy.popAndPushNamed(screen, param, children, createDefaultChildParam);
       return _reviseScreen(revisedScreen);
@@ -686,8 +699,8 @@ class AFRouteState {
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteState setParam(AFID screen, AFRouteParam param, AFNavigateRoute route) {
-    if(route == AFNavigateRoute.routeHierarchy) {
+  AFRouteState setParam(AFID screen, AFRouteParam param, AFRouteLocation route) {
+    if(route == AFRouteLocation.routeHierarchy) {
       if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
         screen = AFUIScreenID.screenStartupWrapper;
       }
@@ -761,14 +774,17 @@ class AFRouteState {
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteState addChildParam(AFScreenID screen, AFNavigateRoute route, AFRouteParam param) {
-    final widget = param.id;
+  AFRouteState addChildParam(AFScreenID screen, AFRouteLocation route, AFRouteParam param) {
+    AFID? widget = param.wid;
+    if(widget == null) {
+      widget = param.screenId;
+    }
     AFibD.logRouteAF?.d("addConnectedChild $screen/$widget with $param");
     return _reviseParamWithChildren(screen, widget, route, param, (pwc) => pwc.reviseAddChild(param));
   }
 
   /// Removes the route parameter for the specified child widget from the screen.
-  AFRouteState removeChildParam(AFScreenID screen, AFID widget, AFNavigateRoute route) {
+  AFRouteState removeChildParam(AFScreenID screen, AFID widget, AFRouteLocation route) {
     AFibD.logRouteAF?.d("addConnectedChild $screen/$widget");
     return _reviseParamWithChildren(screen, widget, route, null, (pwc) => pwc.reviseRemoveChild(widget));
   }
@@ -828,16 +844,16 @@ class AFRouteState {
   }
 
 
-  AFRouteState setChildParam(AFScreenID screen, AFNavigateRoute route, AFRouteParam param, AFWidgetParamSource paramSource) {
-    final widget = param.id;
+  AFRouteState setChildParam(AFScreenID screen, AFRouteLocation route, AFRouteParam param, AFWidgetParamSource paramSource) {
+    final widget = param.screenId;
     if(paramSource == AFWidgetParamSource.parent) {
-      return setParam(screen, param, AFNavigateRoute.routeHierarchy);
+      return setParam(screen, param, AFRouteLocation.routeHierarchy);
     }
     AFibD.logRouteAF?.d("setConnectedChild $screen/$widget with $param");
     return _reviseParamWithChildren(screen, widget, route, param, (pwc) => pwc.reviseSetChild(param));
   }
 
-  AFRouteState _reviseParamWithChildren(AFScreenID screen, AFID? wid, AFNavigateRoute route, AFRouteParam? paramNew, AFRouteSegmentChildren Function(AFRouteSegmentChildren original) revise) { 
+  AFRouteState _reviseParamWithChildren(AFScreenID screen, AFID? wid, AFRouteLocation route, AFRouteParam? paramNew, AFRouteSegmentChildren Function(AFRouteSegmentChildren original) revise) { 
     final p = _findParamInHierOrPool(screen, route);
     if(p == null) {
       throw AFException("Could not find route parameter for screen $screen");
@@ -856,16 +872,16 @@ class AFRouteState {
     return _setParamInHierOrPool(screen, route, revisedSeg);
   }
 
-  AFRouteState _setParamInHierOrPool(AFScreenID screen, AFNavigateRoute route, AFRouteSegment revised) {
-    if(route == AFNavigateRoute.routeGlobalPool) {
+  AFRouteState _setParamInHierOrPool(AFScreenID screen, AFRouteLocation route, AFRouteSegment revised) {
+    if(route == AFRouteLocation.routeGlobalPool) {
       return setGlobalPoolParam(screen, revised);
     } else {
       return _reviseScreen(screenHierarchy.updateRouteSegment(screen, revised));    
     }
   }
 
-  AFRouteSegment? _findParamInHierOrPool(AFScreenID screen, AFNavigateRoute route) {
-    if(route == AFNavigateRoute.routeGlobalPool) {
+  AFRouteSegment? _findParamInHierOrPool(AFScreenID screen, AFRouteLocation route) {
+    if(route == AFRouteLocation.routeGlobalPool) {
       return globalPool[screen];
     } else { 
       return screenHierarchy.findSegmentFor(screen, includePrior: true);

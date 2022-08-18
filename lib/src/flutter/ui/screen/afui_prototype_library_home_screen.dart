@@ -13,10 +13,10 @@ import 'package:flutter/material.dart';
 
 /// Parameter uses to filter the tests shown on the screen.
 @immutable
-class AFUIPrototypeLibraryHomeParam extends AFRouteParam {
+class AFUIPrototypeLibraryHomeParam extends AFScreenRouteParam {
   final AFCoreLibraryExtensionContext libraryContext;
 
-  AFUIPrototypeLibraryHomeParam({required this.libraryContext}): super(id: AFUIScreenID.screenPrototypeLibraryHome);
+  AFUIPrototypeLibraryHomeParam({required this.libraryContext}): super(screenId: AFUIScreenID.screenPrototypeLibraryHome);
   
   factory AFUIPrototypeLibraryHomeParam.create(AFCoreLibraryExtensionContext context) {
     return AFUIPrototypeLibraryHomeParam(libraryContext: context);

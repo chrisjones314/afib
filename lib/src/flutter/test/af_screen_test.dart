@@ -1053,7 +1053,7 @@ class AFSingleScreenPrototypeBody {
 
       sectionGuard++;
       if(sectionGuard > 1) {
-        throw AFException("Test section ${sectionPrev.id} is missing an await!");
+        throw AFException("Test section ${sectionPrev.screenId} is missing an await!");
       }
       sectionPrev = section;
 
@@ -1405,7 +1405,7 @@ class AFSingleScreenPrototype extends AFScreenLikePrototype {
     d.dispatch(AFNavigateSetParamAction(
       param: navigate.param,
       children: navigate.children,
-      route: AFNavigateRoute.routeHierarchy
+      route: AFRouteLocation.routeHierarchy
     ));
   }
 
@@ -1504,7 +1504,7 @@ class AFConnectedWidgetPrototype extends AFWidgetPrototype {
   void onDrawerReset(AFDispatcher dispatcher) {
     dispatcher.dispatch(AFNavigateSetParamAction(
       param: AFUIPrototypeWidgetRouteParam(test: this, routeParam: this.routeParam),
-      route: AFNavigateRoute.routeHierarchy
+      route: AFRouteLocation.routeHierarchy
     ));
     final sv = AFibF.g.testData.resolveStateViewModels(this.models);
     dispatcher.dispatch(AFUpdatePrototypeScreenTestModelsAction(this.id, sv));
@@ -2223,7 +2223,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     if(screenTest != null) {
       screenId = screenTest.navigate.screenId;
       body = screenTest.body;
-      testId = body.id;
+      testId = body.screenId;
     } else {
       // this might be a re-usable screen test.
       var reusable = AFibF.g.screenTests.findReusable(screenTestId);

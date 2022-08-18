@@ -1,6 +1,5 @@
 
 import 'package:afib/afui_id.dart';
-import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/models/afui_proto_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
@@ -61,7 +60,7 @@ mixin AFUIDefaultStateViewModelsMixin<TRouteParam extends AFRouteParam> {
 class AFUIDefaultScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIScreenConfig<TSPI, AFUIDefaultStateView, TRouteParam> with AFUIDefaultStateViewModelsMixin<TRouteParam> {
   AFUIDefaultScreenConfig({
     required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
-    AFNavigateRoute? route
+    AFRouteLocation? route
   }): super(
     stateViewCreator: AFUIDefaultStateView.create,
     spiCreator: spiCreator,
@@ -73,7 +72,7 @@ class AFUIDefaultScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TR
 class AFUIDefaultDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIDrawerConfig<TSPI, AFUIDefaultStateView, TRouteParam> with AFUIDefaultStateViewModelsMixin<TRouteParam> {
   AFUIDefaultDrawerConfig({
     required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
-    AFNavigateRoute? route
+    AFRouteLocation? route
   }): super(
     stateViewCreator: AFUIDefaultStateView.create,
     spiCreator: spiCreator,
@@ -85,7 +84,7 @@ class AFUIDefaultDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TR
 class AFUIDefaultDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIDialogConfig<TSPI, AFUIDefaultStateView, TRouteParam> with AFUIDefaultStateViewModelsMixin<TRouteParam> {
   AFUIDefaultDialogConfig({
     required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
-    AFNavigateRoute? route
+    AFRouteLocation? route
   }): super(
     stateViewCreator: AFUIDefaultStateView.create,
     spiCreator: spiCreator,
@@ -98,7 +97,7 @@ class AFUIDefaultWidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TR
 
     AFUIDefaultWidgetConfig({
       required AFCreateWidgetSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
-      AFNavigateRoute? route
+      AFRouteLocation? route
     }): super(
       stateViewCreator: AFUIDefaultStateView.create,
       spiCreator: spiCreator,

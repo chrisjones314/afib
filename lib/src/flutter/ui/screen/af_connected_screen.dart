@@ -15,7 +15,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
   final AFThemeID themeId;
   final AFCreateStateViewDelegate<TStateView> stateViewCreator;
   final AFCreateWidgetSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator;
-  final AFNavigateRoute route;
+  final AFRouteLocation route;
   final AFUIType uiType;
 
   AFConnectedUIConfig({
@@ -141,11 +141,11 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
   }
 
   bool get isHierarchyRoute {
-    return route == AFNavigateRoute.routeHierarchy;
+    return route == AFRouteLocation.routeHierarchy;
   }
 
   bool get isGlobalRoute {
-    return route == AFNavigateRoute.routeGlobalPool;
+    return route == AFRouteLocation.routeGlobalPool;
   } 
 
   /// Find the route parameter for the specified named screen
@@ -266,7 +266,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
   }
 
   void updateRouteParam(AFBuildContext context, AFScreenID screenId, AFID? wid, TRouteParam revised, { required AFWidgetParamSource paramSource, AFID? id }) {
-    if(wid != null && route == AFNavigateRoute.routeHierarchy) {
+    if(wid != null && route == AFRouteLocation.routeHierarchy) {
       context.dispatch(AFNavigateSetChildParamAction(
         id: id,
         screen: screenId, 
@@ -321,14 +321,14 @@ abstract class AFScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TS
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
       required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
-      AFNavigateRoute? route,
+      AFRouteLocation? route,
       
     }): super(
       themeId: themeId,
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.screen,
       spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
-      route: route ?? AFNavigateRoute.routeHierarchy,
+      route: route ?? AFRouteLocation.routeHierarchy,
     );
 }
 
@@ -343,7 +343,7 @@ abstract class AFDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TS
       uiType: AFUIType.drawer,
       spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
       // has to be, because it can be dragged onto the screen dynamically.
-      route: AFNavigateRoute.routeGlobalPool,
+      route: AFRouteLocation.routeGlobalPool,
     );
 }
 
@@ -357,7 +357,7 @@ abstract class AFDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TS
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.dialog,
       spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
-      route: AFNavigateRoute.routeGlobalPool,
+      route: AFRouteLocation.routeGlobalPool,
     );
 }
 
@@ -371,7 +371,7 @@ abstract class AFBottomSheetConfig<TSPI extends AFBottomSheetStateProgrammingInt
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.bottomSheet,
       spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
-      route: AFNavigateRoute.routeGlobalPool,
+      route: AFRouteLocation.routeGlobalPool,
     );
 }
 
@@ -381,13 +381,13 @@ abstract class AFWidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TS
     required AFThemeID themeId,
     required AFCreateStateViewDelegate<TStateView> stateViewCreator,
     required AFCreateWidgetSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
-    AFNavigateRoute? route,
+    AFRouteLocation? route,
   }): super(
     themeId: themeId,
     stateViewCreator: stateViewCreator,
     uiType: AFUIType.widget,
     spiCreator: spiCreator,
-    route: route ?? AFNavigateRoute.routeHierarchy,
+    route: route ?? AFRouteLocation.routeHierarchy,
   );
 }
 
@@ -744,10 +744,9 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
 
   void updateTextField(AFWidgetID wid, String text) {
     final param = p;
-    if(param is! AFRouteParamWithFlutterState) {
-      throw AFException(AFStateProgrammingInterface.errFlutterStateRequired);
-    }
-    final controllers = param.flutterState.textControllers;
+    
+    final flutterState = param.flutterStatePrivate as AFFlutterRouteParamState?;
+    final controllers = flutterState?.textControllers;
     if(controllers == null) {
       throw AFException(AFStateProgrammingInterface.errNeedTextControllers);
     }

@@ -2337,10 +2337,10 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     AFRouteParamWithFlutterState? parentParam,
     required AFPressedDelegate onTap,
   }) {
-    assert(recognizers != null || parentParam != null, "You must specify either recognizers or parentParam");
+    assert(recognizers != null || parentParam?.flutterStatePrivate != null, "You must specify either recognizers or parentParam");
     assert(recognizers == null || parentParam == null, "You cannot specify both recognizers and parentParam");
     if(recognizers == null) {
-      recognizers = parentParam?.flutterState.tapRecognizers;
+      recognizers = parentParam?.flutterState?.tapRecognizers;
     }
 
     if(recognizers == null) {

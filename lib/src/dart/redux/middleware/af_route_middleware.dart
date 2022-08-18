@@ -39,7 +39,7 @@ String _screenIdToNavigatorName(AFID id) {
 void _navigatePushAction(Store<AFState> store, AFNavigatePushAction action, NextDispatcher next) {
 
   AFibF.g.doMiddlewareNavigation((navState) {
-    Future<dynamic> ret = navState.pushNamed(_screenIdToNavigatorName(action.param.id));
+    Future<dynamic> ret = navState.pushNamed(_screenIdToNavigatorName(action.param.screenId));
     final onReturn = action.onReturn;
     if(onReturn != null) {
       ret.then( (msg) {
@@ -97,7 +97,7 @@ void _navigatePopToAction(Store<AFState> store, AFNavigatePopToAction action, Ne
     for(var i = 0; i < popCountTo; i++) {
       navState.pop(action.returnData);
     }
-    final screenCode = action.push?.param.id.code;
+    final screenCode = action.push?.param.screenId.code;
     if(screenCode != null) {
       navState.pushNamed(screenCode);
     }
@@ -108,7 +108,7 @@ void _navigatePopToAction(Store<AFState> store, AFNavigatePopToAction action, Ne
 
 //---------------------------------------------------------------------------
 void _navigateReplaceAction(Store<AFState> store, AFNavigateReplaceAction action, NextDispatcher next) {
-  final screen = _screenIdToNavigatorName(action.param.id);
+  final screen = _screenIdToNavigatorName(action.param.screenId);
 
   // first, we do the navigation itself
   AFibF.g.doMiddlewareNavigation( (navState) {
@@ -124,7 +124,7 @@ void _navigateReplaceAction(Store<AFState> store, AFNavigateReplaceAction action
 
 //---------------------------------------------------------------------------
 void _navigateReplaceAllAction(Store<AFState> store, AFNavigateReplaceAllAction action, NextDispatcher next) {
-  final screen = _screenIdToNavigatorName(action.param.id);
+  final screen = _screenIdToNavigatorName(action.param.screenId);
   
   // In prototype mode, we don't want to remove any afib screens, so we need to remove only those screens
   // below test.

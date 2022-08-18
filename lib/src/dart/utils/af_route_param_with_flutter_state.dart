@@ -1,4 +1,3 @@
-
 import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
@@ -6,7 +5,7 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/utils/af_param_ui_state_holder.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class AFFlutterRouteParamState {
   final AFTextEditingControllers? textControllers;
@@ -30,24 +29,40 @@ class AFFlutterRouteParamState {
 }
 
 class AFRouteParamWithFlutterState extends AFRouteParam {
-  final AFFlutterRouteParamState flutterState;
 
   AFRouteParamWithFlutterState({
-    required AFID id,
-    required this.flutterState,
+    required AFID screenId,
+    required AFRouteLocation routeLocation,
+    AFFlutterRouteParamState? flutterState,
     AFTimeStateUpdateSpecificity? timeSpecificity,
-  }): super(id: id, timeSpecificity: timeSpecificity);
+    AFWidgetID? wid,
+  }): super(
+    screenId: screenId,
+    routeLocation: routeLocation,
+    timeSpecificity: timeSpecificity,
+    flutterStatePrivate: flutterState,
+    wid: wid,
+  );
 
-  void updateTextField(AFWidgetID wid, String text) {
-    final tc = flutterState.textControllers;
+   void updateTextField(AFWidgetID wid, String text) {
+    final tc = flutterStateGuaranteed.textControllers;
     if(tc == null) {
       throw AFException(AFStateProgrammingInterface.errNeedTextControllers);
     }
     tc.update(wid, text);
   }
 
+  AFFlutterRouteParamState? get flutterState {
+    return this.flutterStatePrivate as AFFlutterRouteParamState?;
+  }
+
+
+  AFFlutterRouteParamState get flutterStateGuaranteed {
+    return this.flutterStatePrivate as AFFlutterRouteParamState;
+  }
+
   AFTextEditingController? accessTextController(AFWidgetID wid) {
-    final tc = flutterState.textControllers;
+    final tc = flutterState?.textControllers;
     if(tc == null) {
       throw AFException(AFStateProgrammingInterface.errNeedTextControllers);
     }
@@ -55,7 +70,7 @@ class AFRouteParamWithFlutterState extends AFRouteParam {
   }
 
   TapGestureRecognizer accessTapRecognizer(AFWidgetID wid) {
-    final tc = flutterState.tapRecognizers;
+    final tc = flutterState?.tapRecognizers;
     if(tc == null) {
       throw AFException(AFStateProgrammingInterface.errNeedTapRecognizers);
     }
@@ -63,7 +78,7 @@ class AFRouteParamWithFlutterState extends AFRouteParam {
   }
 
   AFTapGestureRecognizersHolder? get accessTapRecognizers {
-    return flutterState.tapRecognizers;
+    return flutterState?.tapRecognizers;
   }
 
   String accessTextText(AFWidgetID wid) {
@@ -73,7 +88,7 @@ class AFRouteParamWithFlutterState extends AFRouteParam {
 
 
   ScrollController accessScrollController(AFWidgetID wid) {
-    final sc = flutterState.scrollControllers;
+    final sc = flutterState?.scrollControllers;
     if(sc == null) {
       throw AFException(AFStateProgrammingInterface.errNeedScrollControllers);
     }
@@ -82,7 +97,75 @@ class AFRouteParamWithFlutterState extends AFRouteParam {
 
   @override
   void dispose() {
-    flutterState.dispose();
+    flutterState?.dispose();
   }
-
+ 
 }
+
+class AFScreenRouteParamWithFlutterState extends AFRouteParamWithFlutterState  {
+  AFScreenRouteParamWithFlutterState({
+    required AFID screenId,
+    required AFFlutterRouteParamState flutterState,
+    AFTimeStateUpdateSpecificity? timeSpecificity,
+    AFRouteLocation routeLocation = AFRouteLocation.routeHierarchy,
+  }): super(
+    screenId: screenId,
+    routeLocation: routeLocation,
+    timeSpecificity: timeSpecificity,
+    flutterState: flutterState,
+  );
+}
+
+class AFBottomSheetRouteParamWithFlutterState extends AFRouteParamWithFlutterState {
+  AFBottomSheetRouteParamWithFlutterState({
+    required AFID screenId,
+    required AFFlutterRouteParamState flutterState,
+    AFTimeStateUpdateSpecificity? timeSpecificity    
+  }): super(
+    screenId: screenId,
+    flutterState: flutterState,
+    timeSpecificity: timeSpecificity,
+    routeLocation: AFRouteLocation.routeGlobalPool
+  );
+}
+
+class AFDialogRouteParamWithFlutterState extends AFRouteParamWithFlutterState {
+  AFDialogRouteParamWithFlutterState({
+    required AFID screenId,
+    required AFFlutterRouteParamState flutterState,
+  }): super(
+    screenId: screenId,
+    flutterState: flutterState,
+    routeLocation: AFRouteLocation.routeGlobalPool
+  );
+}
+
+class AFDrawerRouteParamWithFlutterState extends AFRouteParamWithFlutterState {
+  AFDrawerRouteParamWithFlutterState({
+    required AFID screenId,
+    required AFFlutterRouteParamState flutterState,
+  }): super(
+    screenId: screenId,
+    flutterState: flutterState,
+    routeLocation: AFRouteLocation.routeGlobalPool,
+  );
+}
+
+class AFWidgetRouteParamWithFlutterState extends AFRouteParamWithFlutterState {
+  AFWidgetRouteParamWithFlutterState({
+    required AFID screenId,
+    required AFRouteLocation routeLocation,
+    required AFWidgetID wid,
+    required AFFlutterRouteParamState flutterState,
+  }): super(
+    screenId: screenId,
+    routeLocation: routeLocation,
+    wid: wid,
+    flutterState: flutterState,
+  );
+
+  AFWidgetID get widGuaranteed {
+    return wid!;
+  }
+}
+

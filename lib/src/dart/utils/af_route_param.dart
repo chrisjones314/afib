@@ -3,6 +3,20 @@ import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:meta/meta.dart';
 
+/// The two different 'route' types in AFib.
+enum AFRouteLocation {
+  /// The primary hierarchical route, as you push screens using [AFNavigatePushAction],
+  /// this route gets longer/deeper.   As you pop them with [AFNavigatePopAction] it gets
+  /// shorter/shallower.
+  routeHierarchy,
+
+  /// The global pool just a pool of route paramaters organized by screen id.  This is used
+  /// for things like drawers that can be dragged onto the screen, dialogs and popups, and 
+  /// third party widgets that want to maintain a global root parameter across many different
+  /// screens.
+  routeGlobalPool, 
+}
+
 enum AFWidgetParamSource {
   parent,
   child,
@@ -10,18 +24,18 @@ enum AFWidgetParamSource {
   notApplicable
 }
 
-/// Can be used in cases where no route param is necessary
-
-/// Base class for transient data associated with an [AFScreen], and stored
-/// in the [AFRoute]
-@immutable
 class AFRouteParam {
-  // a screen or widget id this route parameter is associated with.
-  final AFID id;
+  final AFRouteLocation routeLocation;
+  final AFWidgetID? wid;
+  final Object? flutterStatePrivate;
+  final AFID screenId;
   final AFTimeStateUpdateSpecificity? timeSpecificity;
 
   const AFRouteParam({
-    required this.id,
+    required this.screenId,
+    required this.routeLocation,
+    this.wid,
+    this.flutterStatePrivate,
     this.timeSpecificity,
   });
 
@@ -37,15 +51,6 @@ class AFRouteParam {
     return this;
   }
 
-  /// Called when the param is permenantly destroyed.
-  /// 
-  /// This is used to that you can put things with persistent state,
-  /// like TapGestureRecognizer, in your route parameter, and then clean
-  /// it up when the screen goes away.
-  void dispose() {
-
-  }
-
   AFRouteParam? reviseForTime(AFTimeState timeState) {
     return null;
   }
@@ -53,15 +58,74 @@ class AFRouteParam {
   String toString() {
     return runtimeType.toString();
   }
+
+  void dispose() {}
+
 }
 
-class AFRouteParamWithLocation extends AFRouteParam {
-  
 
-  AFRouteParamWithLocation({
+class AFScreenRouteParam extends AFRouteParam {
+  AFScreenRouteParam({
     required AFID screenId,
-  }): super(id: screenId);
+    AFRouteLocation routeLocation = AFRouteLocation.routeHierarchy,
+    AFTimeStateUpdateSpecificity? timeSpecificity,
+  }): super(
+    screenId: screenId,
+    routeLocation: routeLocation,
+    timeSpecificity: timeSpecificity,
+    flutterStatePrivate: null,
+    wid: null,
+  );
+}
 
+class AFBottomSheetRouteParam extends AFScreenRouteParam {
+  AFBottomSheetRouteParam({
+    required AFID screenId,
+    AFTimeStateUpdateSpecificity? timeSpecificity,
+  }): super(
+    screenId: screenId,
+    routeLocation: AFRouteLocation.routeGlobalPool,
+    timeSpecificity: timeSpecificity,
+  );
+}
+
+class AFDialogRouteParam extends AFScreenRouteParam {
+  AFDialogRouteParam({
+    required AFID screenId,
+    AFTimeStateUpdateSpecificity? timeSpecificity    
+  }): super(
+    screenId: screenId,
+    routeLocation: AFRouteLocation.routeGlobalPool,
+    timeSpecificity: timeSpecificity,
+  );
+}
+
+
+class AFDrawerRouteParam extends AFScreenRouteParam {
+  AFDrawerRouteParam({
+    required AFID screenId,
+    AFTimeStateUpdateSpecificity? timeSpecificity    
+  }): super(
+    screenId: screenId,
+    routeLocation: AFRouteLocation.routeGlobalPool,
+    timeSpecificity: timeSpecificity,
+  );
+}
+
+class AFWidgetRouteParam extends AFRouteParam {
+  AFWidgetRouteParam({
+    required AFID screenId,
+    required AFRouteLocation routeLocation,
+    required AFWidgetID wid,
+  }): super(
+    screenId: screenId,
+    routeLocation: routeLocation,
+    wid: wid,
+  );
+
+  AFWidgetID get widGuaranteed {
+    return wid!;
+  }
 }
 
 /// Used internally in test cases where we need to substitute a different screen id,
@@ -74,7 +138,7 @@ class AFRouteParamWrapper extends AFRouteParam {
   AFRouteParamWrapper({
     required AFID screenId,
     required this.original,
-  }): super(id: screenId);
+  }): super(screenId: screenId, routeLocation: original.routeLocation);
   
   AFRouteParam unwrap() { return original; }
 }
@@ -83,7 +147,7 @@ class AFRouteParamWrapper extends AFRouteParam {
 class AFRouteParamUnused extends AFRouteParam {
   static const unused = AFRouteParamUnused(id: AFUIScreenID.unused);
 
-  const AFRouteParamUnused({ required AFID id} ): super(id: id);
+  const AFRouteParamUnused({ required AFID id} ): super(screenId: id, routeLocation: AFRouteLocation.routeGlobalPool, wid: null);
 
   factory AFRouteParamUnused.create({
     required AFID id

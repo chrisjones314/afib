@@ -11,10 +11,16 @@ import 'package:flutter_test/flutter_test.dart' as flutter_test;
 import 'package:logger/logger.dart';
 import 'package:stack_trace/stack_trace.dart';
 
+enum AFErrorLevel {
+  error,
+  warning,
+}
+
 class AFTestError {
+  final AFErrorLevel level;
   final AFID testID;
   final String description;
-  AFTestError(this.testID, this.description);
+  AFTestError(this.level, this.testID, this.description);
 
   String toString() {
     return description;
@@ -44,7 +50,6 @@ class AFTestErrors {
   void addError(AFTestError err) {
     _errors.add(err);
   }
-
 }
 
 
@@ -91,6 +96,9 @@ abstract class AFBaseTestExecute extends AFModelWithCustomID {
       current = AFTestErrors(currentSection);
       sectionErrors[curSect] = current;
     }    
+  }
+
+  void markDebugStopHereWarning() {
   }
 
   void markDisabled(AFScreenTestBody body) {
@@ -278,7 +286,12 @@ abstract class AFBaseTestExecute extends AFModelWithCustomID {
 
   void addError(String desc, int depth) {
     final err = AFBaseTestExecute.composeError(desc, depth);
-    errors.addError(AFTestError(testID, err));
+    errors.addError(AFTestError(AFErrorLevel.error, testID, err));
+  }
+
+  void addWarning(String desc) {
+    final err = AFBaseTestExecute.composeError(desc, 0);
+    errors.addError(AFTestError(AFErrorLevel.warning, testID, err));
   }
 
   static String composeError(String desc, int depth) {

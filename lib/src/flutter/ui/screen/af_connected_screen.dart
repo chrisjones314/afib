@@ -265,36 +265,13 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
     return spi;
   }
 
-  void updateRouteParam(AFBuildContext context, AFScreenID screenId, AFID? wid, TRouteParam revised, { required AFWidgetParamSource paramSource, AFID? id }) {
-    if(wid != null && route == AFRouteLocation.routeHierarchy) {
-      context.dispatch(AFNavigateSetChildParamAction(
-        id: id,
-        screen: screenId, 
-        param: revised,
-        route: route,
-        paramSource: paramSource,
-      ));
-    } else {
-      context.dispatch(AFNavigateSetParamAction(param: revised, route: route));
-    }
+  void updateRouteParam(AFBuildContext context, AFRouteParam revised, { required AFWidgetParamSource paramSource, AFID? id }) {
+    context.dispatch(AFNavigateSetParamAction(param: revised));
   }
-
-  void updateChildRouteParam<TChildRouteParam extends AFRouteParam>(AFBuildContext context, AFScreenID screenId, TChildRouteParam revised, { AFID? id }) {
-    context.dispatch(AFNavigateSetChildParamAction(
-      id: id,
-      screen: screenId,
-      param: revised,
-      route: route,
-      paramSource: AFWidgetParamSource.child
-    ));
-  }
-
-  void updateAddChildParam<TChildRouteParam extends AFRouteParam>(AFBuildContext context, AFScreenID screenId, TChildRouteParam revised, { AFID? id }) {
+  void updateAddChildParam<TChildRouteParam extends AFRouteParam>(AFBuildContext context, TChildRouteParam revised, { AFID? id }) {
     context.dispatch(AFNavigateAddChildParamAction(
       id: id,
-      screen: screenId,
       param: revised,
-      route: route
     ));
   }
 
@@ -717,17 +694,13 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
 
   void updateRouteParam(AFRouteParam param) {
     final config = standard.config;
-    config.updateRouteParam(this, accessScreenId, null, param, paramSource: AFWidgetParamSource.child);
+    config.updateRouteParam(this, param, paramSource: AFWidgetParamSource.child);
   }
 
-  void updateChildRouteParam(AFRouteParam revised) {
-    final config = standard.config;
-    config.updateChildRouteParam(this, accessScreenId, revised);
-  }
 
   void updateAddChildRouteParam(AFRouteParam revised) {
     final config = standard.config;
-    config.updateAddChildParam(this, accessScreenId, revised);
+    config.updateAddChildParam(this, revised);
   }
 
   void updateRemoveChildRouteParam(AFWidgetID wid) {
@@ -1076,12 +1049,6 @@ class AFWidgetStateProgrammingInterface<TState extends AFComponentState, TBuildC
     AFWidgetParamSource paramSource,
     TTheme theme,
   ): super(context, screenId, theme, paramSource);
-
-  void updateRouteParam(AFRouteParam param) {
-    final config = context.standard.config;
-    config.updateRouteParam(context, screenId, wid, param, paramSource: paramSource);
-  }
-
 }
 
 class AFBuilder<TSPI extends AFStateProgrammingInterface> extends StatelessWidget {

@@ -28,28 +28,21 @@ mixin AFNonUIAPIContextMixin implements AFDispatcher {
 
   /// Dispatches an action that updates the route parameter for the specified screen.
   void updateHierarchyRouteParam(AFRouteParam param) {
-    dispatch(AFNavigateSetParamAction(param: param, route: AFRouteLocation.routeHierarchy));
+    dispatch(AFNavigateSetParamAction(param: param));
   }
 
   void updateGlobalRouteParam(AFRouteParam param) {
-    dispatch(AFNavigateSetParamAction(param: param, route: AFRouteLocation.routeGlobalPool));
+    dispatch(AFNavigateSetParamAction(param: param));
   }
 
   void executeStartTimeListenerQuery(AFTimeState baseTime) {
     dispatch(AFTimeUpdateListenerQuery(baseTime: baseTime));
   }
 
-
   /// Dispatches an action that updates the route parameter for the specified screen.
-  void updateChildRouteParam(AFScreenID screen, AFRouteParam param, { 
-    AFWidgetParamSource paramSource = AFWidgetParamSource.child,
-    AFRouteLocation route = AFRouteLocation.routeHierarchy
-  }) {
-    dispatch(AFNavigateSetChildParamAction(
-      screen: screen,
+  void updateRouteParam(AFRouteParam param) {
+    dispatch(AFNavigateSetParamAction(
       param: param, 
-      route: route,
-      paramSource: paramSource
     ));
   }
 }
@@ -1035,7 +1028,7 @@ mixin AFContextShowMixin {
 
   static void updateOptionalGlobalParam(dynamic Function(dynamic action) dispatch, AFNavigatePushAction navigate) {
     dispatch(AFNavigateSetParamAction(
-      param: navigate.param, route: AFRouteLocation.routeGlobalPool
+      param: navigate.param
     ));    
   }
 }

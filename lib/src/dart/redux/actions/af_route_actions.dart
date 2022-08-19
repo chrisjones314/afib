@@ -27,17 +27,15 @@ class AFNavigateAction extends AFActionWithKey implements AFExecuteBeforeInterfa
     required this.executeDuring,
   }): super(id: id);
 
-  AFScreenID get screenId { return param.screenId as AFScreenID; }
+  AFScreenID get screenId { return param.screenId; }
 }
 
 /// Action that changes the data associated with the current screen, but 
 /// does not change the screen itself.
 class AFNavigateSetParamAction extends AFNavigateAction {
-  final AFRouteLocation route;
   AFNavigateSetParamAction({
     AFID? id, 
     required AFRouteParam param,
-    required this.route,
     List<AFRouteParam>? children,
   }): super(id: id, param: param, children: children, executeBefore: null, executeDuring: null);
 }
@@ -225,15 +223,10 @@ class AFNavigatePopToAction extends AFNavigateActionWithReturnData {
   );
 }
 
-
 class AFNavigateAddChildParamAction extends AFNavigateAction {
-  final AFScreenID screen;
-  final AFRouteLocation route;
   AFNavigateAddChildParamAction({
     AFID? id, 
-    required this.screen, 
     required AFRouteParam param, 
-    required this.route,
   }): super(id: id, param: param, children: null, executeBefore: null, executeDuring: null);
 }
 
@@ -265,19 +258,6 @@ class AFNavigateShowScreenEndAction extends AFNavigateAction {
     final AFScreenID screen;
     AFNavigateShowScreenEndAction(this.screen): super(
       children: null, param: AFRouteParamUnused.unused, executeBefore: null, executeDuring: null);
-}
-
-class AFNavigateSetChildParamAction extends AFNavigateAction {
-  final AFScreenID screen;
-  final AFRouteLocation route;
-  final AFWidgetParamSource paramSource;
-  AFNavigateSetChildParamAction({
-    AFID? id, 
-    required this.screen, 
-    required this.route,
-    required AFRouteParam param,
-    required this.paramSource,
-  }): super(id: id, param: param, children: null, executeBefore: null, executeDuring: null); 
 }
 
 class AFUpdateTimeRouteParametersAction {

@@ -13,7 +13,6 @@ final routeReducer = combineReducers<AFRouteState>([
   TypedReducer<AFRouteState, AFNavigatePopToAction>(_navPopTo),
   TypedReducer<AFRouteState, AFNavigateSetParamAction>(_navSetParam),
   TypedReducer<AFRouteState, AFNavigateExitTestAction>(_navExitTest),
-  TypedReducer<AFRouteState, AFNavigateSetChildParamAction>(_navSetChildParam),
   TypedReducer<AFRouteState, AFNavigateAddChildParamAction>(_navAddChildParam),
   TypedReducer<AFRouteState, AFNavigateRemoveChildParamAction>(_navRemoveChildParam),
   TypedReducer<AFRouteState, AFResetToInitialRouteAction>(_resetToInitialRoute),
@@ -55,23 +54,20 @@ AFRouteState _navPopTo(AFRouteState state, AFNavigatePopToAction action) {
 
 //---------------------------------------------------------------------------
 AFRouteState _navSetParam(AFRouteState state, AFNavigateSetParamAction action) {
-  final screen = action.param.screenId;
-  return state.setParam(screen, action.param, action.route);
-}
-
-//---------------------------------------------------------------------------
-AFRouteState _navSetChildParam(AFRouteState state, AFNavigateSetChildParamAction action) {
-  return state.setChildParam(action.screen, action.route, action.param, action.paramSource);
+  return state.setParam(action.param);
 }
 
 //---------------------------------------------------------------------------
 AFRouteState _navAddChildParam(AFRouteState state, AFNavigateAddChildParamAction action) {
-  return state.addChildParam(action.screen, action.route, action.param);
+  return state.addChildParam(action.param);
 }
 
 //---------------------------------------------------------------------------
 AFRouteState _navRemoveChildParam(AFRouteState state, AFNavigateRemoveChildParamAction action) {
-  return state.removeChildParam(action.screen, action.widget, action.route);
+  return state.removeChildParam(
+    screenId: action.screen, 
+    wid: action.widget, 
+    routeLocation: action.route);
 }
 
 //---------------------------------------------------------------------------

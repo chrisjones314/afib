@@ -484,13 +484,8 @@ class AFUIVerifyContext {
       return act.param is TRouteParam;
     });
 
-    final childCandidates = actions.whereType<AFNavigateSetChildParamAction>();
-    final correctChildTypes = childCandidates.where((act) {
-      return act.param is TRouteParam;
-    });
     
     final result = correctTypes.map((x) => x.param as TRouteParam ).toList();
-    result.addAll(correctChildTypes.map((x) => x.param as TRouteParam));
     return result;
   }
 
@@ -1404,8 +1399,7 @@ class AFSingleScreenPrototype extends AFScreenLikePrototype {
     final d = AFSingleScreenTestDispatcher(testId, dispatcher, null);
     d.dispatch(AFNavigateSetParamAction(
       param: navigate.param,
-      children: navigate.children,
-      route: AFRouteLocation.routeHierarchy
+      children: navigate.children
     ));
   }
 
@@ -1504,7 +1498,6 @@ class AFConnectedWidgetPrototype extends AFWidgetPrototype {
   void onDrawerReset(AFDispatcher dispatcher) {
     dispatcher.dispatch(AFNavigateSetParamAction(
       param: AFUIPrototypeWidgetRouteParam(test: this, routeParam: this.routeParam),
-      route: AFRouteLocation.routeHierarchy
     ));
     final sv = AFibF.g.testData.resolveStateViewModels(this.models);
     dispatcher.dispatch(AFUpdatePrototypeScreenTestModelsAction(this.id, sv));

@@ -253,6 +253,7 @@ class _AFStateTestDebugStopHereStatement extends _AFStateTestExecutionStatement 
   
   @override
   _AFStateTestExecutionNext execute(AFStateTestContext context, {required bool verify}) {
+    context.addError("Test contains an executeDebugStopHereStatement", 0);
     return _AFStateTestExecutionNext.stop;
   }
 
@@ -510,7 +511,6 @@ mixin AFExecuteWidgetMixin {
   }
 
   AFStateTestWidgetContext<TSPIWidget> _createWidgetContextWithLaunchParam<TSPIWidget extends AFStateProgrammingInterface>(AFRouteParam launchParam, AFWidgetConfig config, AFRouteLocation parentRoute) { 
-    //store.dispatch(AFNavigateSetChildParamAction(screen: screenCtx.screenId, route: parentRoute, param: launchParam, paramSource: AFWidgetParamSource.child));
     return AFStateTestWidgetContext<TSPIWidget>(widgetConfig: config, wid: launchParam.wid as AFWidgetID, screenContext: screenContext, paramSource: AFWidgetParamSource.child, launchParam: launchParam);
   }  
 
@@ -1315,7 +1315,7 @@ class AFStateTest extends AFScreenTestDescription {
         }
       }
     } on AFExceptionStopHere {
-      // nothing to do, just stop.
+      context.addError("Test contains an executeDebugStopHere() statement.", 0);
     }
 
   }

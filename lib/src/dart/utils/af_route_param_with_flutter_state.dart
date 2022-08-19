@@ -31,7 +31,7 @@ class AFFlutterRouteParamState {
 class AFRouteParamWithFlutterState extends AFRouteParam {
 
   AFRouteParamWithFlutterState({
-    required AFID screenId,
+    required AFScreenID screenId,
     required AFRouteLocation routeLocation,
     AFFlutterRouteParamState? flutterState,
     AFTimeStateUpdateSpecificity? timeSpecificity,
@@ -104,7 +104,7 @@ class AFRouteParamWithFlutterState extends AFRouteParam {
 
 class AFScreenRouteParamWithFlutterState extends AFRouteParamWithFlutterState  {
   AFScreenRouteParamWithFlutterState({
-    required AFID screenId,
+    required AFScreenID screenId,
     required AFFlutterRouteParamState flutterState,
     AFTimeStateUpdateSpecificity? timeSpecificity,
     AFRouteLocation routeLocation = AFRouteLocation.routeHierarchy,
@@ -118,7 +118,7 @@ class AFScreenRouteParamWithFlutterState extends AFRouteParamWithFlutterState  {
 
 class AFBottomSheetRouteParamWithFlutterState extends AFRouteParamWithFlutterState {
   AFBottomSheetRouteParamWithFlutterState({
-    required AFID screenId,
+    required AFScreenID screenId,
     required AFFlutterRouteParamState flutterState,
     AFTimeStateUpdateSpecificity? timeSpecificity    
   }): super(
@@ -131,7 +131,7 @@ class AFBottomSheetRouteParamWithFlutterState extends AFRouteParamWithFlutterSta
 
 class AFDialogRouteParamWithFlutterState extends AFRouteParamWithFlutterState {
   AFDialogRouteParamWithFlutterState({
-    required AFID screenId,
+    required AFScreenID screenId,
     required AFFlutterRouteParamState flutterState,
   }): super(
     screenId: screenId,
@@ -142,7 +142,7 @@ class AFDialogRouteParamWithFlutterState extends AFRouteParamWithFlutterState {
 
 class AFDrawerRouteParamWithFlutterState extends AFRouteParamWithFlutterState {
   AFDrawerRouteParamWithFlutterState({
-    required AFID screenId,
+    required AFScreenID screenId,
     required AFFlutterRouteParamState flutterState,
   }): super(
     screenId: screenId,
@@ -153,7 +153,7 @@ class AFDrawerRouteParamWithFlutterState extends AFRouteParamWithFlutterState {
 
 class AFWidgetRouteParamWithFlutterState extends AFRouteParamWithFlutterState {
   AFWidgetRouteParamWithFlutterState({
-    required AFID screenId,
+    required AFScreenID screenId,
     required AFRouteLocation routeLocation,
     required AFWidgetID wid,
     required AFFlutterRouteParamState flutterState,

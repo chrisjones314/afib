@@ -11,7 +11,7 @@ class AFShouldContinueRouteParam extends AFDialogRouteParam {
   final AFShouldContinue shouldContinue;
 
   AFShouldContinueRouteParam({
-    required AFID screenId,
+    required AFScreenID screenId,
     required this.shouldContinue,
   }): super(screenId: screenId);
 

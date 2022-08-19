@@ -46,8 +46,7 @@ class AFStartSpecificPrototypeQuery extends AFDeferredQuery {
     }
     context.dispatch(AFNavigateSetParamAction(
       param: AFUIPrototypeDrawerRouteParam.createOncePerScreen(AFUIPrototypeDrawerRouteParam.viewTest),
-      children: null,
-      route: AFRouteLocation.routeGlobalPool
+      children: null
     ));
     context.dispatch(AFUpdateActivePrototypeAction(prototypeId: prototype.id));
     prototype.startScreen(context.dispatcher, null, AFibF.g.testData);

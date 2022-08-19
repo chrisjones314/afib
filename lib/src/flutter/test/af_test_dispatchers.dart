@@ -2,7 +2,6 @@ import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_object_with_key.dart';
-import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_widget_screen.dart';
@@ -54,7 +53,6 @@ abstract class AFScreenTestDispatcher extends AFTestDispatcher {
     if(isTestAct) {
       main.dispatch(action);
     } else if(action is AFNavigateSetParamAction || 
-      action is AFNavigateSetChildParamAction ||
       action is AFNavigateAddChildParamAction ||
       action is AFNavigateRemoveChildParamAction ||
       //action is AFNavigateSortConnectedChildrenAction ||
@@ -94,12 +92,7 @@ class AFWidgetScreenTestDispatcher extends AFScreenTestDispatcher {
 
   @override
   void dispatch(dynamic action) {
-    if(action is AFNavigateSetChildParamAction) {
-      final revisedParam = originalParam.copyWith(param: action.param);
-      super.dispatch(AFNavigateSetParamAction(param: revisedParam, route: AFRouteLocation.routeHierarchy));
-    } else { 
-      super.dispatch(action);
-    }
+    super.dispatch(action);
   }
 
 }

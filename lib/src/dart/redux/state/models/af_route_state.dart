@@ -121,7 +121,7 @@ class AFRouteSegment {
   });
 
   AFScreenID get screen  {
-    return param.screenId as AFScreenID;
+    return param.screenId;
   }
 
   AFRouteSegment? findChild(AFID wid) {
@@ -639,7 +639,7 @@ class AFRouteState {
   AFRouteState popAndPushNamed(AFRouteParam? param, List<AFRouteParam>? children, AFCreateDefaultChildParamDelegate? createDefaultChildParam) {
     assert(param != null);
     if(param != null) {
-      final screen = param.screenId as AFScreenID;
+      final screen = param.screenId;
       AFibD.logRouteAF?.d("popAndPushNamed: $screen / $param");
       final revisedScreen = screenHierarchy.popAndPushNamed(screen, param, children, createDefaultChildParam);
       return _reviseScreen(revisedScreen);
@@ -699,7 +699,13 @@ class AFRouteState {
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteState setParam(AFID screen, AFRouteParam param, AFRouteLocation route) {
+  AFRouteState setParam(AFRouteParam param) {
+    if(param.hasChildWID) { 
+      return setChildParam(param, AFWidgetParamSource.child);
+    }
+  
+    var screen = param.screenId;
+    var route = param.routeLocation;
     if(route == AFRouteLocation.routeHierarchy) {
       if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
         screen = AFUIScreenID.screenStartupWrapper;
@@ -774,20 +780,27 @@ class AFRouteState {
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteState addChildParam(AFScreenID screen, AFRouteLocation route, AFRouteParam param) {
+  AFRouteState addChildParam(AFRouteParam param) {
     AFID? widget = param.wid;
     if(widget == null) {
       widget = param.screenId;
     }
+    final screen = param.screenId;
+    final route = param.routeLocation;
     AFibD.logRouteAF?.d("addConnectedChild $screen/$widget with $param");
     return _reviseParamWithChildren(screen, widget, route, param, (pwc) => pwc.reviseAddChild(param));
   }
 
   /// Removes the route parameter for the specified child widget from the screen.
-  AFRouteState removeChildParam(AFScreenID screen, AFID widget, AFRouteLocation route) {
-    AFibD.logRouteAF?.d("addConnectedChild $screen/$widget");
-    return _reviseParamWithChildren(screen, widget, route, null, (pwc) => pwc.reviseRemoveChild(widget));
+  AFRouteState removeChildParam({
+    required AFScreenID screenId, 
+    required AFID wid, 
+    required AFRouteLocation routeLocation
+  }) {
+    AFibD.logRouteAF?.d("addConnectedChild $screenId/$wid");
+    return _reviseParamWithChildren(screenId, wid, routeLocation, null, (pwc) => pwc.reviseRemoveChild(wid));
   }
+
 
   Iterable<AFRouteStateShowScreen> get activeShowingScreens {
     return showingScreens.values.where((ss) => ss.screenId != AFUIScreenID.unused);
@@ -844,11 +857,13 @@ class AFRouteState {
   }
 
 
-  AFRouteState setChildParam(AFScreenID screen, AFRouteLocation route, AFRouteParam param, AFWidgetParamSource paramSource) {
-    final widget = param.screenId;
+  AFRouteState setChildParam(AFRouteParam param, AFWidgetParamSource paramSource) {
     if(paramSource == AFWidgetParamSource.parent) {
-      return setParam(screen, param, AFRouteLocation.routeHierarchy);
+      return setParam(param);
     }
+    final widget = param.wid;
+    final screen = param.screenId;
+    final route = param.routeLocation;
     AFibD.logRouteAF?.d("setConnectedChild $screen/$widget with $param");
     return _reviseParamWithChildren(screen, widget, route, param, (pwc) => pwc.reviseSetChild(param));
   }

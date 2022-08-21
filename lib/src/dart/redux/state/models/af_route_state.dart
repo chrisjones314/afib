@@ -21,7 +21,7 @@ class AFRouteSegmentChildren {
     final result = <AFID, AFRouteSegment>{};
     for(final child in children) {
       AFID wid = child.wid;
-      if(wid == AFUIWidgetID.useScreenParam) {
+      if(wid.isKindOf(AFUIWidgetID.useScreenParam)) {
         wid = child.screenId;
       }
       
@@ -41,7 +41,7 @@ class AFRouteSegmentChildren {
   AFRouteSegmentChildren reviseAddChild(AFRouteParam param) {
     final revised = Map<AFID, AFRouteSegment>.from(children);
     AFID? wid = param.wid;
-    if(wid == AFUIWidgetID.useScreenParam) {
+    if(wid.isKindOf(AFUIWidgetID.useScreenParam)) {
       wid = param.screenId;
     }
     revised[wid] = AFRouteSegment(param: param, children: null, createDefaultChildParam: null);
@@ -57,7 +57,7 @@ class AFRouteSegmentChildren {
   AFRouteSegmentChildren reviseSetChild(AFRouteParam param) {
     final revised = Map<AFID, AFRouteSegment>.from(children);
     AFID? wid = param.wid;
-    if(wid == AFUIWidgetID.useScreenParam) {
+    if(wid.isKindOf(AFUIWidgetID.useScreenParam)) {
       wid = param.screenId;
     }
 
@@ -777,7 +777,7 @@ class AFRouteState {
   /// in the route.
   AFRouteState addChildParam(AFRouteParam param) {
     AFID? widget = param.wid;
-    if(widget == AFUIWidgetID.useScreenParam) {
+    if(widget.isKindOf(AFUIWidgetID.useScreenParam)) {
       widget = param.screenId;
     }
     final screen = param.screenId;

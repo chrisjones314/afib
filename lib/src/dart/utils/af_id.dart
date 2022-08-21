@@ -28,6 +28,10 @@ class AFID {
     return "${lib.codeId}_${prefix}_$codeId";
   }
 
+  static Never throwLibNotNull() {
+    throw AFException("Library cannot be null");
+  }
+
   @override
   String toString() {
     return code;
@@ -70,16 +74,41 @@ class AFID {
     return wi[n] as TItem;
   }
 
+  static TItem with3<TItem extends AFID>({
+    required AFLibraryID? library, 
+    required String codeId, 
+    required TItem Function(String, AFLibraryID, List<Object>) creator,     
+    required Object? first, 
+    Object? second, 
+    Object? third,
+  }) {
+    final key = StringBuffer(codeId);
+    final items = <Object>[];
+    if(first != null) {
+      key.write("_$first");
+      items.add(first);
+    }
+
+    if(second != null) {
+      key.write("_$second");
+      items.add(second);
+    }
+    if(third != null) {
+      key.write("_$third");
+      items.add(third);
+    }
+    final lib = library;
+    if(lib == null) throwLibNotNull();
+    return creator(key.toString(), lib, items);
+  }
+
+
   int get hashCode {
     return code.hashCode;
   }
 
   int get withCount {
     return withItems?.length ?? 0;
-  }
-
-  Never throwLibNotNull() {
-    throw AFException("Library cannot be null");
   }
 
   bool endsWith(String ends) {
@@ -97,28 +126,28 @@ class AFTranslationID extends AFID {
   /// word/value order for different locales.
   AFTranslationID insert1(dynamic value) {
     final lib = library;
-    if(lib == null) throwLibNotNull(); 
+    if(lib == null) AFID.throwLibNotNull(); 
     return AFTranslationID(codeId, lib, values: [value]);
   }
 
   /// See [insert1]
   AFTranslationID insert2(dynamic v1, dynamic v2) {
     final lib = library;
-    if(lib == null) throwLibNotNull(); 
+    if(lib == null) AFID.throwLibNotNull(); 
     return AFTranslationID(codeId, lib, values: [v1, v2]);
   }
 
   /// See [insert1]
   AFTranslationID insert3(dynamic v1, dynamic v2, dynamic v3) {
     final lib = library;
-    if(lib == null) throwLibNotNull(); 
+    if(lib == null) AFID.throwLibNotNull(); 
     return AFTranslationID(codeId, lib, values: [v1, v2, v3]);
   }
 
   /// See [insert1]
   AFTranslationID insertN(List<dynamic> values) {
     final lib = library;
-    if(lib == null) throwLibNotNull(); 
+    if(lib == null) AFID.throwLibNotNull(); 
     return AFTranslationID(codeId, lib, values: values);
   }
 
@@ -138,7 +167,11 @@ class AFIDWithTag extends AFID {
 }
 
 class AFScreenID extends AFID {
-  const AFScreenID(String code, AFLibraryID library) : super("screen", code, library);
+  const AFScreenID(String code, AFLibraryID library, { List<Object>? withItems }) : super("screen", code, library, withItems: withItems);
+
+  factory AFScreenID.create(String code, AFLibraryID library, List<Object>? withItems) {
+    return AFScreenID(code, library, withItems: withItems);
+  }
 }
 
 class AFLibraryID extends AFID {
@@ -154,6 +187,10 @@ class AFWidgetID extends AFID {
     List<Object>? withItems,
   }) : super("wid", code, library, withItems: withItems);
 
+  factory AFWidgetID.create(String code, AFLibraryID library, List<Object>? withItems) {
+    return AFWidgetID(code, library, withItems: withItems);
+  }
+
   AFWidgetID with1(Object? item) {
     return with3(item, null, null);
   }
@@ -163,30 +200,19 @@ class AFWidgetID extends AFID {
   }
 
   AFWidgetID with3(Object? first, Object? second, Object? third) {
-    final key = StringBuffer(code);
-    final items = <Object>[];
-    if(first != null) {
-      key.write("_$first");
-      items.add(first);
-    }
-    if(second != null) {
-      key.write("_$second");
-      items.add(second);
-    }
-    if(third != null) {
-      key.write("_$third");
-      items.add(third);
-    }
-    final lib = library;
-    if(lib == null) throwLibNotNull();
-    return AFWidgetID(key.toString(), lib, withItems: items);
+    return AFID.with3(
+      library: library, 
+      codeId: codeId, 
+      first: first, 
+      second: second,
+      third: third,
+      creator: AFWidgetID.create
+    );
   }
-
-  
 }
 
 class AFBaseTestID extends AFID {
-  const AFBaseTestID(String prefix, String code, AFLibraryID library) : super(prefix, code, library);
+  const AFBaseTestID(String prefix, String code, AFLibraryID library, { List<Object>? withItems }) : super(prefix, code, library, withItems: withItems);
 }
 
 class AFFromStringTestID extends AFBaseTestID {
@@ -217,12 +243,19 @@ class AFScreenTestID extends AFBaseTestID {
 
 class AFPrototypeID extends AFBaseTestID {
   static const prototypePrefix = "pr";
-  const AFPrototypeID(String code, AFLibraryID library) : super(prototypePrefix, code, library);
+  const AFPrototypeID(String code, AFLibraryID library, { List<Object>? withItems }) : super(prototypePrefix, code, library, withItems: withItems);
 
-  AFPrototypeID with1(dynamic item) {
-    final lib = library;
-    if(lib == null) throwLibNotNull();
-    return AFPrototypeID("${code}_${item.toString()}", lib);
+  factory AFPrototypeID.create(String code, AFLibraryID library, List<Object>? withItems) {
+    return AFPrototypeID(code, library, withItems: withItems);
+  }
+
+  AFPrototypeID with1(Object first) {
+    return AFID.with3<AFPrototypeID>(
+      library: library, 
+      codeId: codeId, 
+      first: first, 
+      creator: AFPrototypeID.create,
+    );
   }
 
 }

@@ -58,7 +58,7 @@ class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetS
       children = <AFRouteParam>[];
       children.add(test.routeParam);
       final childWid = test.routeParam.wid;
-      if(childWid != AFUIWidgetID.useScreenParam) {
+      if(!childWid.isKindOf(AFUIWidgetID.useScreenParam)) {
         wid = childWid;
       }
       final testChildren = test.children;

@@ -1,3 +1,4 @@
+import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
@@ -33,9 +34,9 @@ class AFRouteParamWithFlutterState extends AFRouteParam {
   AFRouteParamWithFlutterState({
     required AFScreenID screenId,
     required AFRouteLocation routeLocation,
+    required AFWidgetID wid,
     AFFlutterRouteParamState? flutterState,
     AFTimeStateUpdateSpecificity? timeSpecificity,
-    AFWidgetID? wid,
   }): super(
     screenId: screenId,
     routeLocation: routeLocation,
@@ -107,16 +108,18 @@ class AFScreenRouteParamWithFlutterState extends AFRouteParamWithFlutterState  {
     required AFScreenID screenId,
     required AFFlutterRouteParamState flutterState,
     AFTimeStateUpdateSpecificity? timeSpecificity,
-    AFRouteLocation routeLocation = AFRouteLocation.routeHierarchy,
+    AFRouteLocation routeLocation = AFRouteLocation.screenHierarchy,
   }): super(
     screenId: screenId,
+    wid: AFUIWidgetID.useScreenParam,
     routeLocation: routeLocation,
     timeSpecificity: timeSpecificity,
     flutterState: flutterState,
+    
   );
 }
 
-class AFBottomSheetRouteParamWithFlutterState extends AFRouteParamWithFlutterState {
+class AFBottomSheetRouteParamWithFlutterState extends AFScreenRouteParamWithFlutterState {
   AFBottomSheetRouteParamWithFlutterState({
     required AFScreenID screenId,
     required AFFlutterRouteParamState flutterState,
@@ -125,29 +128,29 @@ class AFBottomSheetRouteParamWithFlutterState extends AFRouteParamWithFlutterSta
     screenId: screenId,
     flutterState: flutterState,
     timeSpecificity: timeSpecificity,
-    routeLocation: AFRouteLocation.routeGlobalPool
+    routeLocation: AFRouteLocation.globalPool
   );
 }
 
-class AFDialogRouteParamWithFlutterState extends AFRouteParamWithFlutterState {
+class AFDialogRouteParamWithFlutterState extends AFScreenRouteParamWithFlutterState {
   AFDialogRouteParamWithFlutterState({
     required AFScreenID screenId,
     required AFFlutterRouteParamState flutterState,
   }): super(
     screenId: screenId,
     flutterState: flutterState,
-    routeLocation: AFRouteLocation.routeGlobalPool
+    routeLocation: AFRouteLocation.globalPool
   );
 }
 
-class AFDrawerRouteParamWithFlutterState extends AFRouteParamWithFlutterState {
+class AFDrawerRouteParamWithFlutterState extends AFScreenRouteParamWithFlutterState {
   AFDrawerRouteParamWithFlutterState({
     required AFScreenID screenId,
     required AFFlutterRouteParamState flutterState,
   }): super(
     screenId: screenId,
     flutterState: flutterState,
-    routeLocation: AFRouteLocation.routeGlobalPool,
+    routeLocation: AFRouteLocation.globalPool,
   );
 }
 
@@ -163,9 +166,5 @@ class AFWidgetRouteParamWithFlutterState extends AFRouteParamWithFlutterState {
     wid: wid,
     flutterState: flutterState,
   );
-
-  AFWidgetID get widGuaranteed {
-    return wid!;
-  }
 }
 

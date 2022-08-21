@@ -48,7 +48,7 @@ class AFUIWidgetID extends AFWidgetID {
   static const cardRelease = AFUIWidgetID("cardRelease");
   static const viewParent = AFUIWidgetID("viewParent");
   static const viewDepth = AFUIWidgetID("viewDepth");
-  static const useParentParam = AFUIWidgetID("useParentParam");
+  static const useScreenParam = AFUIWidgetID("useScreenParam");
 
   static const cardWireframes = AFUIWidgetID("cardWireframes");
 

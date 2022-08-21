@@ -496,7 +496,7 @@ mixin AFExecuteWidgetMixin {
   }
 
   void executeWidgetUseLaunchParam<TSPIWidget extends AFStateProgrammingInterface>(AFRouteParam launchParam, AFWidgetConfig config, AFStateTestWidgetHandlerDelegate<TSPIWidget> delegate, {
-    AFRouteLocation parentRoute = AFRouteLocation.routeHierarchy
+    AFRouteLocation parentRoute = AFRouteLocation.screenHierarchy
   }) {
     final widgetContext = _createWidgetContextWithLaunchParam<TSPIWidget>(launchParam, config, parentRoute);
     // in this scenario, we need to install the paramter in the state, so that it can be referenced in the future.
@@ -504,14 +504,14 @@ mixin AFExecuteWidgetMixin {
   }
 
   void executeWidgetUseLaunchParamAndExecute<TSPIWidget extends AFStateProgrammingInterface>(AFRouteParam launchParam, AFWidgetConfig config, AFStateTestExecute e, AFStateTestWidgetWithExecuteHandlerDelegate<TSPIWidget> delegate, {
-    AFRouteLocation parentRoute = AFRouteLocation.routeHierarchy
+    AFRouteLocation parentRoute = AFRouteLocation.screenHierarchy
   }) {
     final widgetContext = _createWidgetContextWithLaunchParam<TSPIWidget>(launchParam, config, parentRoute);
     return delegate(e, widgetContext);
   }
 
   AFStateTestWidgetContext<TSPIWidget> _createWidgetContextWithLaunchParam<TSPIWidget extends AFStateProgrammingInterface>(AFRouteParam launchParam, AFWidgetConfig config, AFRouteLocation parentRoute) { 
-    return AFStateTestWidgetContext<TSPIWidget>(widgetConfig: config, wid: launchParam.wid as AFWidgetID, screenContext: screenContext, paramSource: AFWidgetParamSource.child, launchParam: launchParam);
+    return AFStateTestWidgetContext<TSPIWidget>(widgetConfig: config, wid: launchParam.wid, screenContext: screenContext, paramSource: AFWidgetParamSource.child, launchParam: launchParam);
   }  
 
   void executeWidgetUseParentParam<TSPIWidget extends AFStateProgrammingInterface>(AFWidgetID wid, AFWidgetConfig config, AFStateTestWidgetHandlerDelegate<TSPIWidget> delegate) {

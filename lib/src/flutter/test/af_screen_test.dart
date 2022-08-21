@@ -1496,11 +1496,14 @@ class AFConnectedWidgetPrototype extends AFWidgetPrototype {
   }
 
   void onDrawerReset(AFDispatcher dispatcher) {
+    assert(false);
+    /*
     dispatcher.dispatch(AFNavigateSetParamAction(
       param: AFUIPrototypeWidgetRouteParam(test: this, routeParam: this.routeParam),
     ));
     final sv = AFibF.g.testData.resolveStateViewModels(this.models);
     dispatcher.dispatch(AFUpdatePrototypeScreenTestModelsAction(this.id, sv));
+    */
   }
 
 }

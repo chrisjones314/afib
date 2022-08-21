@@ -13,20 +13,20 @@ import 'package:flutter/material.dart';
 @immutable
 class AFUIPrototypeWidgetRouteParam extends AFScreenRouteParam {
   final AFWidgetPrototype test;
-  final AFRouteParam routeParam;
+  final AFWidgetID wid;
 
   AFUIPrototypeWidgetRouteParam({
     required this.test, 
-    required this.routeParam
+    required this.wid,
   }): super(screenId: AFUIScreenID.screenPrototypeWidget);
 
   AFUIPrototypeWidgetRouteParam copyWith({
     AFWidgetPrototype? test,
-    AFRouteParam? param
+    AFWidgetID? wid,
   }) {
     return AFUIPrototypeWidgetRouteParam(
       test: test ?? this.test,
-      routeParam: param ?? this.routeParam
+      wid: wid ?? this.wid,
     );
   }
 }
@@ -52,12 +52,15 @@ class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetS
 
   static AFNavigatePushAction navigatePush(AFWidgetPrototype test, {AFID? id}) {
     List<AFRouteParam>? children;
-    AFID wid = AFUIScreenID.screenPrototypeWidget;
+    AFWidgetID wid = AFUIWidgetID.widgetPrototypeTest;
 
     if(test is AFConnectedWidgetPrototype) {
       children = <AFRouteParam>[];
       children.add(test.routeParam);
-      wid = test.routeParam.screenId;
+      final childWid = test.routeParam.wid;
+      if(childWid != AFUIWidgetID.useScreenParam) {
+        wid = childWid;
+      }
       final testChildren = test.children;
       if(testChildren != null) {
         children.addAll(testChildren);
@@ -66,7 +69,7 @@ class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetS
 
     return AFNavigatePushAction(
       id: id,
-      param: AFUIPrototypeWidgetRouteParam(test: test, routeParam: AFRouteParamUnused.create(id: wid)),
+      param: AFUIPrototypeWidgetRouteParam(test: test, wid: wid),
       children: children,
     );
   }
@@ -81,7 +84,7 @@ class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetS
     final context = spi.context;
     final test = context.p.test;
  
-    final sourceWidget = test.render(screenId, context.p.routeParam.screenId as AFWidgetID);
+    final sourceWidget = test.render(screenId, context.p.wid);
     return _createScaffold(spi, sourceWidget);
   }
 

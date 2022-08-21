@@ -8,13 +8,13 @@ enum AFRouteLocation {
   /// The primary hierarchical route, as you push screens using [AFNavigatePushAction],
   /// this route gets longer/deeper.   As you pop them with [AFNavigatePopAction] it gets
   /// shorter/shallower.
-  routeHierarchy,
+  screenHierarchy,
 
   /// The global pool just a pool of route paramaters organized by screen id.  This is used
   /// for things like drawers that can be dragged onto the screen, dialogs and popups, and 
   /// third party widgets that want to maintain a global root parameter across many different
   /// screens.
-  routeGlobalPool, 
+  globalPool, 
 }
 
 enum AFWidgetParamSource {
@@ -26,7 +26,7 @@ enum AFWidgetParamSource {
 
 class AFRouteParam {
   final AFRouteLocation routeLocation;
-  final AFWidgetID? wid;
+  final AFWidgetID wid;
   final Object? flutterStatePrivate;
   final AFScreenID screenId;
   final AFTimeStateUpdateSpecificity? timeSpecificity;
@@ -34,13 +34,13 @@ class AFRouteParam {
   const AFRouteParam({
     required this.screenId,
     required this.routeLocation,
-    this.wid,
+    required this.wid,
     this.flutterStatePrivate,
     this.timeSpecificity,
   });
 
   bool get hasChildWID {
-    return wid != null && wid != AFUIWidgetID.useParentParam;
+    return wid != AFUIWidgetID.useScreenParam;
   }
 
   bool matchesScreen(AFID screen) {
@@ -71,14 +71,14 @@ class AFRouteParam {
 class AFScreenRouteParam extends AFRouteParam {
   AFScreenRouteParam({
     required AFScreenID screenId,
-    AFRouteLocation routeLocation = AFRouteLocation.routeHierarchy,
+    AFRouteLocation routeLocation = AFRouteLocation.screenHierarchy,
     AFTimeStateUpdateSpecificity? timeSpecificity,
   }): super(
     screenId: screenId,
     routeLocation: routeLocation,
     timeSpecificity: timeSpecificity,
     flutterStatePrivate: null,
-    wid: null,
+    wid: AFUIWidgetID.useScreenParam,
   );
 }
 
@@ -88,7 +88,7 @@ class AFBottomSheetRouteParam extends AFScreenRouteParam {
     AFTimeStateUpdateSpecificity? timeSpecificity,
   }): super(
     screenId: screenId,
-    routeLocation: AFRouteLocation.routeGlobalPool,
+    routeLocation: AFRouteLocation.globalPool,
     timeSpecificity: timeSpecificity,
   );
 }
@@ -99,7 +99,7 @@ class AFDialogRouteParam extends AFScreenRouteParam {
     AFTimeStateUpdateSpecificity? timeSpecificity    
   }): super(
     screenId: screenId,
-    routeLocation: AFRouteLocation.routeGlobalPool,
+    routeLocation: AFRouteLocation.globalPool,
     timeSpecificity: timeSpecificity,
   );
 }
@@ -111,7 +111,7 @@ class AFDrawerRouteParam extends AFScreenRouteParam {
     AFTimeStateUpdateSpecificity? timeSpecificity    
   }): super(
     screenId: screenId,
-    routeLocation: AFRouteLocation.routeGlobalPool,
+    routeLocation: AFRouteLocation.globalPool,
     timeSpecificity: timeSpecificity,
   );
 }
@@ -126,10 +126,6 @@ class AFWidgetRouteParam extends AFRouteParam {
     routeLocation: routeLocation,
     wid: wid,
   );
-
-  AFWidgetID get widGuaranteed {
-    return wid!;
-  }
 }
 
 /// Used internally in test cases where we need to substitute a different screen id,
@@ -142,7 +138,7 @@ class AFRouteParamWrapper extends AFRouteParam {
   AFRouteParamWrapper({
     required AFScreenID screenId,
     required this.original,
-  }): super(screenId: screenId, routeLocation: original.routeLocation);
+  }): super(screenId: screenId, routeLocation: original.routeLocation, wid: AFUIWidgetID.useScreenParam);
   
   AFRouteParam unwrap() { return original; }
 }
@@ -150,8 +146,7 @@ class AFRouteParamWrapper extends AFRouteParam {
 
 class AFRouteParamUnused extends AFRouteParam {
   static const unused = AFRouteParamUnused(id: AFUIScreenID.unused);
-
-  const AFRouteParamUnused({ required AFScreenID id} ): super(screenId: id, routeLocation: AFRouteLocation.routeGlobalPool, wid: null);
+  const AFRouteParamUnused({ required AFScreenID id} ): super(screenId: id, routeLocation: AFRouteLocation.globalPool, wid: AFUIWidgetID.useScreenParam);
 
   factory AFRouteParamUnused.create({
     required AFScreenID id

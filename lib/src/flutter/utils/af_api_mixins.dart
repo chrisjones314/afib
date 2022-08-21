@@ -514,7 +514,7 @@ mixin AFContextShowMixin {
     bool useRootNavigator = true,
     material.RouteSettings? routeSettings
   }) async {
-    final screenId = navigate.param.screenId as AFScreenID;
+    final screenId = navigate.param.screenId;
     final verifiedScreenId = _nullCheckScreenId(screenId);
     updateOptionalGlobalParam(dispatch, navigate);
 
@@ -921,7 +921,7 @@ mixin AFContextShowMixin {
     bool enableDrag = true,
     material.RouteSettings? routeSettings,  
   }) async {
-    final screenId = navigate.param.screenId as AFScreenID;
+    final screenId = navigate.param.screenId;
     final verifiedScreenId = _nullCheckScreenId(screenId);
     updateOptionalGlobalParam(dispatch, navigate);
 

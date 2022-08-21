@@ -85,7 +85,7 @@ abstract class AFUIScreenConfig<TSPI extends AFScreenStateProgrammingInterface, 
       themeId: AFUIThemeID.defaultTheme,
       stateViewCreator: stateViewCreator,
       spiCreator: spiCreator,
-      route: route ?? AFRouteLocation.routeHierarchy,
+      route: route ?? AFRouteLocation.screenHierarchy,
     );
 }
 
@@ -123,7 +123,7 @@ abstract class AFUIWidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, 
     themeId: AFUIThemeID.defaultTheme,
     stateViewCreator: stateViewCreator,
     spiCreator: spiCreator,
-    route: route ?? AFRouteLocation.routeHierarchy,
+    route: route ?? AFRouteLocation.screenHierarchy,
   );
 }
 

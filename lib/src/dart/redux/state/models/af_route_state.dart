@@ -5,7 +5,6 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:afib/src/flutter/ui/screen/afui_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:meta/meta.dart';
 
@@ -21,8 +20,8 @@ class AFRouteSegmentChildren {
   factory AFRouteSegmentChildren.fromList(List<AFRouteParam> children) {
     final result = <AFID, AFRouteSegment>{};
     for(final child in children) {
-      AFID? wid = child.wid;
-      if(wid == null) {
+      AFID wid = child.wid;
+      if(wid == AFUIWidgetID.useScreenParam) {
         wid = child.screenId;
       }
       
@@ -42,7 +41,7 @@ class AFRouteSegmentChildren {
   AFRouteSegmentChildren reviseAddChild(AFRouteParam param) {
     final revised = Map<AFID, AFRouteSegment>.from(children);
     AFID? wid = param.wid;
-    if(wid == null) {
+    if(wid == AFUIWidgetID.useScreenParam) {
       wid = param.screenId;
     }
     revised[wid] = AFRouteSegment(param: param, children: null, createDefaultChildParam: null);
@@ -58,7 +57,7 @@ class AFRouteSegmentChildren {
   AFRouteSegmentChildren reviseSetChild(AFRouteParam param) {
     final revised = Map<AFID, AFRouteSegment>.from(children);
     AFID? wid = param.wid;
-    if(wid == null) {
+    if(wid == AFUIWidgetID.useScreenParam) {
       wid = param.screenId;
     }
 
@@ -141,15 +140,11 @@ class AFRouteSegment {
     final testParam = this.param;
     if(param != null && AFibD.config.isTestContext) {
       /*
-      if( testParam is AFPrototypeSingleScreenRouteParam && param is! AFPrototypeSingleScreenRouteParam) {
-        final fixup = testParam.copyWith(param: param);
-        param = fixup;
-      }
-      */
       if(testParam is AFUIPrototypeWidgetRouteParam && param is! AFUIPrototypeWidgetRouteParam) {
         final fixup = testParam.copyWith(param: param);
         param = fixup;
       }
+      */
     }
     return AFRouteSegment(
       param: param ?? this.param,
@@ -706,7 +701,7 @@ class AFRouteState {
   
     var screen = param.screenId;
     var route = param.routeLocation;
-    if(route == AFRouteLocation.routeHierarchy) {
+    if(route == AFRouteLocation.screenHierarchy) {
       if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
         screen = AFUIScreenID.screenStartupWrapper;
       }
@@ -782,7 +777,7 @@ class AFRouteState {
   /// in the route.
   AFRouteState addChildParam(AFRouteParam param) {
     AFID? widget = param.wid;
-    if(widget == null) {
+    if(widget == AFUIWidgetID.useScreenParam) {
       widget = param.screenId;
     }
     final screen = param.screenId;
@@ -888,7 +883,7 @@ class AFRouteState {
   }
 
   AFRouteState _setParamInHierOrPool(AFScreenID screen, AFRouteLocation route, AFRouteSegment revised) {
-    if(route == AFRouteLocation.routeGlobalPool) {
+    if(route == AFRouteLocation.globalPool) {
       return setGlobalPoolParam(screen, revised);
     } else {
       return _reviseScreen(screenHierarchy.updateRouteSegment(screen, revised));    
@@ -896,7 +891,7 @@ class AFRouteState {
   }
 
   AFRouteSegment? _findParamInHierOrPool(AFScreenID screen, AFRouteLocation route) {
-    if(route == AFRouteLocation.routeGlobalPool) {
+    if(route == AFRouteLocation.globalPool) {
       return globalPool[screen];
     } else { 
       return screenHierarchy.findSegmentFor(screen, includePrior: true);

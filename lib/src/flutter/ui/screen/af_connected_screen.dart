@@ -141,11 +141,11 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
   }
 
   bool get isHierarchyRoute {
-    return route == AFRouteLocation.routeHierarchy;
+    return route == AFRouteLocation.screenHierarchy;
   }
 
   bool get isGlobalRoute {
-    return route == AFRouteLocation.routeGlobalPool;
+    return route == AFRouteLocation.globalPool;
   } 
 
   /// Find the route parameter for the specified named screen
@@ -305,7 +305,7 @@ abstract class AFScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TS
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.screen,
       spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
-      route: route ?? AFRouteLocation.routeHierarchy,
+      route: route ?? AFRouteLocation.screenHierarchy,
     );
 }
 
@@ -320,7 +320,7 @@ abstract class AFDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TS
       uiType: AFUIType.drawer,
       spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
       // has to be, because it can be dragged onto the screen dynamically.
-      route: AFRouteLocation.routeGlobalPool,
+      route: AFRouteLocation.globalPool,
     );
 }
 
@@ -334,7 +334,7 @@ abstract class AFDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TS
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.dialog,
       spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
-      route: AFRouteLocation.routeGlobalPool,
+      route: AFRouteLocation.globalPool,
     );
 }
 
@@ -348,7 +348,7 @@ abstract class AFBottomSheetConfig<TSPI extends AFBottomSheetStateProgrammingInt
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.bottomSheet,
       spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
-      route: AFRouteLocation.routeGlobalPool,
+      route: AFRouteLocation.globalPool,
     );
 }
 
@@ -364,7 +364,7 @@ abstract class AFWidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TS
     stateViewCreator: stateViewCreator,
     uiType: AFUIType.widget,
     spiCreator: spiCreator,
-    route: route ?? AFRouteLocation.routeHierarchy,
+    route: route ?? AFRouteLocation.screenHierarchy,
   );
 }
 

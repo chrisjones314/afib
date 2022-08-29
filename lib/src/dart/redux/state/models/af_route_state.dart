@@ -5,6 +5,7 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:meta/meta.dart';
 
@@ -61,7 +62,14 @@ class AFRouteSegmentChildren {
       wid = param.screenId;
     }
 
-    revised[wid] = AFRouteSegment(param: param, children: null, createDefaultChildParam: null);
+    final existing = revised[wid];
+    var merged = param;
+    final existingParam = existing?.param;
+    if(existingParam != null) {
+      merged = param.mergeOnWrite(existingParam);
+    } 
+
+    revised[wid] = AFRouteSegment(param: merged, children: null, createDefaultChildParam: null);
     return AFRouteSegmentChildren(children: revised);
   }
 
@@ -369,23 +377,6 @@ class AFRouteStateSegments {
     return popN(popCount, null);
   }
 
-  /*
-  /// Replaces the data on the current leaf element without changing the segments
-  /// in the route.
-  AFRouteStateSegments updateRouteParam(AFScreenID screen, AFRouteParam param) {
-    final revised = copyActive();
-    for(var i = revised.length - 1; i >= 0; i--) {
-      final seg = revised[i];
-      if(seg.matchesScreen(screen)) {
-        revised[i] = seg.copyWith(param: param);
-        break;
-      }
-    }
-
-    return copyWith(active: revised);
-  }
-  */
-
   AFRouteStateSegments updateRouteSegment(AFID screen, AFRouteSegment revisedSeg) {
     final revised = copyActive();
     for(var i = revised.length - 1; i >= 0; i--) {
@@ -578,6 +569,50 @@ class AFRouteState {
     return screenHierarchy.popCountToScreen(screen);
   }
 
+  AFRouteSegment? findRouteParamInHierarchy({
+    required AFScreenID screenId,
+    required AFWidgetID wid,
+    bool includePrior = true,
+  }) {
+    final parentSeg = screenHierarchy.findSegmentFor(screenId, includePrior: includePrior);
+    return _findChildIfApplicable(parentSeg: parentSeg, wid: wid);
+  }
+
+  AFRouteSegment? findRouteParamInGlobalPool({
+    required AFScreenID screenId,
+    required AFWidgetID wid,
+  }) {
+    final parentSeg = globalPool[screenId];
+    return _findChildIfApplicable(parentSeg: parentSeg, wid: wid);
+  }
+
+  AFRouteSegment? _findChildIfApplicable({
+    required AFRouteSegment? parentSeg,
+    required AFWidgetID wid,
+  }) {
+    if(parentSeg == null) {
+      return null;
+    }
+
+    if(wid == AFUIWidgetID.useScreenParam) {
+      return parentSeg;
+    }
+
+    return parentSeg.findChild(wid);
+  }
+
+  AFRouteSegment? findRouteParamFull({
+    required AFScreenID screenId,
+    required AFWidgetID wid,
+    required AFRouteLocation routeLocation,
+  }) {
+    if(routeLocation == AFRouteLocation.screenHierarchy) {
+      return findRouteParamInHierarchy(screenId: screenId, wid: wid);
+    } else {
+      return findRouteParamInGlobalPool(screenId: screenId, wid: wid);
+    }
+  }
+
   /// Finds the data associated with the specified [screen] in the current route.
   /// 
   /// If [includePrior] is true, it will also include the most recent final segment
@@ -688,17 +723,43 @@ class AFRouteState {
       assert(false, "Please make sure all your UI tests for dialogs close the dialog at the end of the test.");
     }
 
-
     return _reviseScreen(screenHierarchy.exitTest());
+  }
+
+  AFRouteState updateRouteParamWithExistingOrDefault(AFRouteParamUseExistingOrDefault param, AFConnectedUIConfig? uiConfig) {
+    // first, see if it exists
+    final seg = this.findRouteParamFull(screenId: param.screenId, routeLocation: param.routeLocation, wid: param.wid);
+    if(seg != null) {
+      // it already exists, so nothing to do to the state
+      return this;
+    }
+
+    // if it doens't already exist, then the UI config must have a way to create a default value.
+    final create = uiConfig?.createDefaultRouteParam;
+    if(create == null) {
+      assert(false, "If you are using AFRouteParamUseExistingOrDefault, and there is no existing value, you must specify a createDefaultRouteParam delegate in our AFConnectedUIConfig declaration.");
+      return this;
+    }
+
+    final defaultParam = create(param, AFibF.g.internalOnlyActiveStore.state.public);
+    return updateRouteParam(defaultParam, uiConfig);    
   }
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteState setParam(AFRouteParam param) {
-    if(param.hasChildWID) { 
-      return setChildParam(param, AFWidgetParamSource.child);
+  AFRouteState updateRouteParam(AFRouteParam param, AFConnectedUIConfig? uiConfig) {
+    // in this case, we obviously don't want to set this value as the param. Instead,
+    // we want to verify that it already exists, or else create it using the uiConfig's default
+    // method.
+    if(param is AFRouteParamUseExistingOrDefault) {
+      return updateRouteParamWithExistingOrDefault(param, uiConfig);
     }
-  
+
+    if(param.hasChildWID) { 
+      return setChildParam(param, AFWidgetParamSource.child, uiConfig);
+    }
+
+
     var screen = param.screenId;
     var route = param.routeLocation;
     if(route == AFRouteLocation.screenHierarchy) {
@@ -710,14 +771,16 @@ class AFRouteState {
       if(seg == null) {
         throw AFException("No route segment for screen $screen");
       }
-      final revisedSeg = seg.copyWith(param: param);      
+      final merged = param.mergeOnWrite(seg.param);
+      final revisedSeg = seg.copyWith(param: merged);      
       return _reviseScreen(screenHierarchy.updateRouteSegment(screen, revisedSeg));
     } else {
       var globalSeg = globalPool[screen];
       if(globalSeg == null) {
         globalSeg = AFRouteSegment(param: param, children: null, createDefaultChildParam: null);
       } else {
-        globalSeg = globalSeg.copyWith(param: param);
+        final merged = param.mergeOnWrite(globalSeg.param);
+        globalSeg = globalSeg.copyWith(param: merged);
       }
 
       return setGlobalPoolParam(screen, globalSeg);
@@ -852,9 +915,9 @@ class AFRouteState {
   }
 
 
-  AFRouteState setChildParam(AFRouteParam param, AFWidgetParamSource paramSource) {
+  AFRouteState setChildParam(AFRouteParam param, AFWidgetParamSource paramSource, AFConnectedUIConfig? uiConfig) {
     if(paramSource == AFWidgetParamSource.parent) {
-      return setParam(param);
+      return updateRouteParam(param, uiConfig);
     }
     final widget = param.wid;
     final screen = param.screenId;

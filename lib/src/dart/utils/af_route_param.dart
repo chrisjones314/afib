@@ -34,7 +34,7 @@ class AFRouteParam {
   const AFRouteParam({
     required this.screenId,
     required this.routeLocation,
-    required this.wid,
+    this.wid = AFUIWidgetID.useScreenParam,
     this.flutterStatePrivate,
     this.timeSpecificity,
   });
@@ -65,6 +65,13 @@ class AFRouteParam {
 
   void dispose() {}
 
+  /// Provides an opportunity to merge this new param with an old param when you 
+  /// update a route parameter that already exists.
+  /// 
+  /// By default, just returns this, meaning that writes are just straight replacements.
+  AFRouteParam mergeOnWrite(AFRouteParam oldParam) {
+    return this;
+  }
 }
 
 
@@ -154,6 +161,49 @@ class AFRouteParamUnused extends AFRouteParam {
     return AFRouteParamUnused(id: id);
   }
 }
+
+class AFRouteParamUseExistingOrDefault extends AFRouteParam {
+  const AFRouteParamUseExistingOrDefault({ 
+    required AFScreenID screenId,
+     required AFRouteLocation routeLocation,
+     AFWidgetID wid = AFUIWidgetID.useScreenParam,
+  } ): super(screenId: screenId, routeLocation: routeLocation, wid: wid);
+
+  factory AFRouteParamUseExistingOrDefault.createForScreen({
+    required AFScreenID screenId,
+     AFRouteLocation routeLocation = AFRouteLocation.globalPool,
+  }) {
+    return AFRouteParamUseExistingOrDefault(screenId: screenId, routeLocation: routeLocation);
+  }
+
+  factory AFRouteParamUseExistingOrDefault.createForWidget({
+    required AFScreenID screenId,
+    required AFWidgetID wid,
+    required AFRouteLocation routeLocation,    
+  }) {
+    return AFRouteParamUseExistingOrDefault(screenId: screenId, routeLocation: routeLocation, wid: wid);
+  }
+
+  factory AFRouteParamUseExistingOrDefault.createForDrawer({
+    required AFScreenID screenId,
+  }) {
+    return AFRouteParamUseExistingOrDefault(screenId: screenId, routeLocation: AFRouteLocation.globalPool);
+  }
+
+  factory AFRouteParamUseExistingOrDefault.createForBottomSheet({
+    required AFScreenID screenId,
+  }) {
+    return AFRouteParamUseExistingOrDefault(screenId: screenId, routeLocation: AFRouteLocation.globalPool);
+  }
+
+  factory AFRouteParamUseExistingOrDefault.createForDialog({
+    required AFScreenID screenId,
+  }) {
+    return AFRouteParamUseExistingOrDefault(screenId: screenId, routeLocation: AFRouteLocation.globalPool);
+  }
+
+}
+
 
 class AFRouteParamChild {
   final AFID wid;

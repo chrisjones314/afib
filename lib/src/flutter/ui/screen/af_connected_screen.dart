@@ -17,16 +17,18 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
   final AFCreateWidgetSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator;
   final AFRouteLocation route;
   final AFUIType uiType;
+  final AFCreateDefaultRouteParamDelegate? createDefaultRouteParam;
 
   AFConnectedUIConfig({
     required this.themeId,
     required this.stateViewCreator,
     required this.spiCreator,
     required this.route,
-    required this.uiType
+    required this.uiType,
+    this.createDefaultRouteParam,
   });
 
-  AFBuildContext<TStateView, TRouteParam>? createContextForDiff(AFStore store, AFScreenID screenId, AFID wid, { required AFWidgetParamSource paramSource, required TRouteParam? launchParam }) {
+  AFBuildContext<TStateView, TRouteParam>? createContextForDiff(AFStore store, AFScreenID screenId, AFWidgetID wid, { required AFWidgetParamSource paramSource, required TRouteParam? launchParam }) {
     if(AFibD.config.isTestContext) {
       final testContext = _createTestContext(store, screenId, wid, paramSource: paramSource, launchParam: launchParam);
       if(testContext != null) {
@@ -34,6 +36,17 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
       }
     }
     var paramSeg = findRouteSegment(store.state, screenId, wid, paramSource: paramSource, launchParam: launchParam);
+
+    /// drawers can be dragged onto the screen spontaneously, without any kind of navigation.   In that case, we need to 
+    /// dynamically create a launch param
+    if(paramSeg == null) {
+      final createDefault = createDefaultRouteParam;
+      if(createDefault != null) {
+        final source = AFRouteParamUseExistingOrDefault(screenId: screenId, wid: wid, routeLocation: route);
+        launchParam = createDefault(source, store.state.public) as TRouteParam?;
+        paramSeg = findRouteSegment(store.state, screenId, wid, paramSource: paramSource, launchParam: launchParam);
+      }
+    }
 
     // this is a super weird case where we are transitioning between the demo mode store and the real store,
     // with different route states in each one.
@@ -266,7 +279,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
   }
 
   void updateRouteParam(AFBuildContext context, AFRouteParam revised, { required AFWidgetParamSource paramSource, AFID? id }) {
-    context.dispatch(AFNavigateSetParamAction(param: revised));
+    context.dispatch(AFNavigateSetParamAction(param: revised, uiConfig: this));
   }
   void updateAddChildParam<TChildRouteParam extends AFRouteParam>(AFBuildContext context, TChildRouteParam revised, { AFID? id }) {
     context.dispatch(AFNavigateAddChildParamAction(
@@ -314,6 +327,7 @@ abstract class AFDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TS
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
       required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
+      AFCreateDefaultRouteParamDelegate? createDefaultRouteParam
     }): super(
       themeId: themeId,
       stateViewCreator: stateViewCreator,
@@ -321,6 +335,7 @@ abstract class AFDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TS
       spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
       // has to be, because it can be dragged onto the screen dynamically.
       route: AFRouteLocation.globalPool,
+      createDefaultRouteParam: createDefaultRouteParam,
     );
 }
 
@@ -329,12 +344,14 @@ abstract class AFDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TS
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
       required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
+      AFCreateDefaultRouteParamDelegate? createDefaultRouteParam
     }): super(
       themeId: themeId,
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.dialog,
       spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
       route: AFRouteLocation.globalPool,
+      createDefaultRouteParam: createDefaultRouteParam,
     );
 }
 
@@ -343,12 +360,14 @@ abstract class AFBottomSheetConfig<TSPI extends AFBottomSheetStateProgrammingInt
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
       required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
+      AFCreateDefaultRouteParamDelegate? createDefaultRouteParam
     }): super(
       themeId: themeId,
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.bottomSheet,
       spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
       route: AFRouteLocation.globalPool,
+      createDefaultRouteParam: createDefaultRouteParam,
     );
 }
 
@@ -557,8 +576,7 @@ abstract class AFConnectedDrawer<TState extends AFComponentState, TTheme extends
   AFConnectedDrawer({
     required AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> config,
     required AFScreenID screenId,
-    required TRouteParam launchParam,
-  }): super(config: config, screenId: screenId, launchParam: launchParam);
+  }): super(config: config, screenId: screenId, launchParam: null);
 
   /*
   /// Look for this screens route parameter in the global pool, 

@@ -2143,7 +2143,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     if(activeTestId != null) {
       final test = AFibF.g.findScreenTestById(activeTestId);
       if(test != null && test.testDrawerSide == testDrawerSide && !AFibF.g.isDemoMode) {
-        return AFUIPrototypeDrawer(launchParam: AFUIPrototypeDrawerRouteParam.createOncePerScreen(AFUIPrototypeDrawerRouteParam.viewTest));
+        return AFUIPrototypeDrawer();
       }
     }
     return drawer;

@@ -18,6 +18,7 @@ class AFNavigateAction extends AFActionWithKey implements AFExecuteBeforeInterfa
   final List<AFRouteParam>? children;
   final AFAsyncQuery? executeBefore;
   final AFAsyncQuery? executeDuring;
+  final AFConnectedUIConfig? uiConfig;
 
   AFNavigateAction({
     AFID? id,
@@ -25,6 +26,7 @@ class AFNavigateAction extends AFActionWithKey implements AFExecuteBeforeInterfa
     required this.children,
     required this.executeBefore,
     required this.executeDuring,
+    this.uiConfig,
   }): super(id: id);
 
   AFScreenID get screenId { return param.screenId; }
@@ -37,7 +39,15 @@ class AFNavigateSetParamAction extends AFNavigateAction {
     AFID? id, 
     required AFRouteParam param,
     List<AFRouteParam>? children,
-  }): super(id: id, param: param, children: children, executeBefore: null, executeDuring: null);
+    AFConnectedUIConfig? uiConfig,
+  }): super(
+    id: id, 
+    param: param, 
+    children: children, 
+    executeBefore: null, 
+    executeDuring: null,
+    uiConfig: uiConfig,
+  );
 }
 
 class AFNavigateActionWithReturn extends AFNavigateAction {
@@ -51,7 +61,15 @@ class AFNavigateActionWithReturn extends AFNavigateAction {
     this.createDefaultChildParam,
     AFAsyncQuery? executeBefore,
     AFAsyncQuery? executeDuring,
-  }): super(id: id, param: param, children: children, executeBefore: executeBefore, executeDuring: executeDuring);
+    AFConnectedUIConfig? uiConfig,
+  }): super(
+    id: id, 
+    param: param, 
+    children: children, 
+    executeBefore: executeBefore, 
+    executeDuring: executeDuring,
+    uiConfig: uiConfig,
+    );
 }
 
 /// Action that replaces the current leaf screen with a new screen.
@@ -118,8 +136,17 @@ class AFNavigatePushAction extends AFNavigateActionWithReturn {
     AFCreateDefaultChildParamDelegate? createDefaultChildParam,
     AFAsyncQuery? executeBefore,
     AFAsyncQuery? executeDuring,
-
-  }): super(id: id, param: param, children: children, onReturn: onReturn, createDefaultChildParam: createDefaultChildParam, executeBefore: executeBefore, executeDuring: executeDuring);
+    AFConnectedUIConfig? uiConfig,
+  }): super(
+    id: id, 
+    param: param, 
+    children: children, 
+    onReturn: onReturn, 
+    createDefaultChildParam: createDefaultChildParam, 
+    executeBefore: executeBefore, 
+    executeDuring: executeDuring,
+    uiConfig: uiConfig,
+  );
 
   AFNavigateReplaceAllAction castToReplaceAll() {
     return AFNavigateReplaceAllAction(

@@ -448,11 +448,13 @@ abstract class AFAsyncListenerQuery<TResponse> extends AFAsyncQuery<TResponse> i
     shutdown();
   }
 
-  /// Returns the new query, causing any existing query to be shutdown and replaced with the new one
-  AFTrackedQuery? mergeWith(AFTrackedQuery newQuery) {
-    return newQuery;
+  /// Provides an opportunity to merge this new query with an old query when you 
+  /// start a query and a previous version of it already exists in the state.
+  /// 
+  /// By default, just returns this, meaning that writes are just straight replacements.
+  AFTrackedQuery? mergeOnWrite(AFTrackedQuery oldQuery) {
+    return this;
   }
-
 
   void shutdown();
 }

@@ -54,7 +54,7 @@ AFRouteState _navPopTo(AFRouteState state, AFNavigatePopToAction action) {
 
 //---------------------------------------------------------------------------
 AFRouteState _navSetParam(AFRouteState state, AFNavigateSetParamAction action) {
-  return state.setParam(action.param);
+  return state.updateRouteParam(action.param, action.uiConfig);
 }
 
 //---------------------------------------------------------------------------

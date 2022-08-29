@@ -78,7 +78,7 @@ class AFQueryMiddleware implements MiddlewareClass<AFState>
       return query as AFTrackedQuery;
     }
 
-    final merged = existing.mergeWith(newTracked);
+    final merged = newTracked.mergeOnWrite(existing);
     if(merged == existing) {
       return null;
     }

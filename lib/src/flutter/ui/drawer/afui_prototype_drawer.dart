@@ -194,12 +194,11 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
   static final timeFormat = DateFormat('Hms');
   static final config = AFUIDefaultDrawerConfig<AFUIPrototypeDrawerSPI, AFUIPrototypeDrawerRouteParam> (
     spiCreator: AFUIPrototypeDrawerSPI.create,
+    createDefaultRouteParam: (source, pubState) => AFUIPrototypeDrawerRouteParam.createOncePerScreen(AFUIPrototypeDrawerRouteParam.viewTest)
   );
 
   //--------------------------------------------------------------------------------------
-  AFUIPrototypeDrawer({
-    required AFUIPrototypeDrawerRouteParam launchParam
-  }): super(screenId: AFUIScreenID.drawerPrototype, config: config, launchParam: launchParam);
+  AFUIPrototypeDrawer(): super(screenId: AFUIScreenID.drawerPrototype, config: config);
 
   //--------------------------------------------------------------------------------------
   AFScreenID? get primaryScreenId {

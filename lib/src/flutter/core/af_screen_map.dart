@@ -113,7 +113,7 @@ class AFScreenMap {
   bool _isValidDrawerBuilder(AFConnectedUIBuilderDelegate screenBuilder) {
     final screen = screenBuilder(null);
     assert(screen is AFConnectedDrawer);
-    assert(screen.launchParam != null, "You must specify a launch parameter for a drawer, since it can be dragged onto the screen spontaneously.");
+    //assert(screen.launchParam != null, "You must specify a launch parameter for a drawer, since it can be dragged onto the screen spontaneously.");
     return true;
   }
 

@@ -167,11 +167,23 @@ class AFIDWithTag extends AFID {
 }
 
 class AFScreenID extends AFID {
-  const AFScreenID(String code, AFLibraryID library, { List<Object>? withItems }) : super("screen", code, library, withItems: withItems);
+  const AFScreenID(String code, AFLibraryID library, { String prefix = "screen", List<Object>? withItems }) : super(prefix, code, library, withItems: withItems);
 
   factory AFScreenID.create(String code, AFLibraryID library, List<Object>? withItems) {
     return AFScreenID(code, library, withItems: withItems);
   }
+}
+
+class AFDialogID extends AFScreenID {
+  const AFDialogID(String code, AFLibraryID library): super(code, library, prefix: "dialog");
+}
+
+class AFDrawerID extends AFScreenID {
+  const AFDrawerID(String code, AFLibraryID library): super(code, library, prefix: "drawer");
+}
+
+class AFBottomSheetID extends AFScreenID {
+  const AFBottomSheetID(String code, AFLibraryID library): super(code, library, prefix: "bottomsheet");
 }
 
 class AFLibraryID extends AFID {

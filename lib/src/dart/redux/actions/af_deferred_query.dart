@@ -19,7 +19,7 @@ abstract class AFTrackedQuery {
   /// 
   /// This method can return just the new query, just the original query, or some
   /// merged version of the combined queries.
-  AFTrackedQuery? mergeWith(AFTrackedQuery newQuery);
+  AFTrackedQuery? mergeOnWrite(AFTrackedQuery newQuery);
   
   /// Called when this query terminates.
   void shutdown();
@@ -67,7 +67,7 @@ abstract class AFDeferredQuery extends AFAsyncQuery<AFUnused> implements AFTrack
   }
 
   /// Returns the new query, causing any existing query to be shutdown and replaced with the new one
-  AFTrackedQuery? mergeWith(AFTrackedQuery newQuery) {
+  AFTrackedQuery? mergeOnWrite(AFTrackedQuery newQuery) {
     return newQuery;
   }
 
@@ -150,7 +150,7 @@ abstract class AFPeriodicQuery extends AFAsyncQuery<AFUnused> implements AFTrack
   }
 
   /// Returns the new query, causing any existing query to be shutdown and replaced with the new one
-  AFTrackedQuery? mergeWith(AFTrackedQuery newQuery) {
+  AFTrackedQuery? mergeOnWrite(AFTrackedQuery newQuery) {
     return newQuery;
   }
 
@@ -182,7 +182,7 @@ class AFDeferredSuccessQuery extends AFDeferredQuery {
   }
 
   /// Returns the existing query, dropping the new query.
-  AFTrackedQuery mergeWith(AFTrackedQuery newQuery) {
+  AFTrackedQuery mergeOnWrite(AFTrackedQuery newQuery) {
     return this;
   }
 

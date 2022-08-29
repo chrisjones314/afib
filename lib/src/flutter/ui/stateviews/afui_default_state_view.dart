@@ -72,11 +72,13 @@ class AFUIDefaultScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TR
 class AFUIDefaultDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIDrawerConfig<TSPI, AFUIDefaultStateView, TRouteParam> with AFUIDefaultStateViewModelsMixin<TRouteParam> {
   AFUIDefaultDrawerConfig({
     required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
-    AFRouteLocation? route
+    AFRouteLocation? route,
+    AFCreateDefaultRouteParamDelegate? createDefaultRouteParam
   }): super(
     stateViewCreator: AFUIDefaultStateView.create,
     spiCreator: spiCreator,
     route: route,
+    createDefaultRouteParam: createDefaultRouteParam,
   );
 }
 
@@ -84,7 +86,7 @@ class AFUIDefaultDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TR
 class AFUIDefaultDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIDialogConfig<TSPI, AFUIDefaultStateView, TRouteParam> with AFUIDefaultStateViewModelsMixin<TRouteParam> {
   AFUIDefaultDialogConfig({
     required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
-    AFRouteLocation? route
+    AFRouteLocation? route,
   }): super(
     stateViewCreator: AFUIDefaultStateView.create,
     spiCreator: spiCreator,

@@ -7,6 +7,7 @@ import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
+import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 
 //---------------------------------------------------------------------------
@@ -39,12 +40,18 @@ String _screenIdToNavigatorName(AFID id) {
 void _navigatePushAction(Store<AFState> store, AFNavigatePushAction action, NextDispatcher next) {
 
   AFibF.g.doMiddlewareNavigation((navState) {
-    Future<dynamic> ret = navState.pushNamed(_screenIdToNavigatorName(action.param.screenId));
-    final onReturn = action.onReturn;
-    if(onReturn != null) {
-      ret.then( (msg) {
-        onReturn(msg);
-      });
+    final transition = action.transitionsBuilder;
+    if(transition == null) {
+      Future<dynamic> ret = navState.pushNamed(_screenIdToNavigatorName(action.param.screenId));
+      final onReturn = action.onReturn;
+      if(onReturn != null) {
+        ret.then( (msg) {
+          onReturn(msg);
+        });
+      }
+    } else {
+      final pageBuilder = _createPageRouteBuilder(action, transition);
+      navState.push(pageBuilder);
     }
   });
   next(action);
@@ -121,6 +128,20 @@ void _navigateReplaceAction(Store<AFState> store, AFNavigateReplaceAction action
 }
 
 
+//---------------------------------------------------------------------------
+PageRouteBuilder _createPageRouteBuilder(AFNavigateAction action, RouteTransitionsBuilder transition) {
+  return PageRouteBuilder(
+    pageBuilder: ((context, animation, secondaryAnimation) {
+      // we need to lookup the builder in the screen map
+      final screenBuilder = AFibF.g.screenMap.findBy(action.param.screenId);
+      if(screenBuilder == null) {
+        throw AFException("Missing screen builder for screen ${action.param.screenId}");
+      }
+      return screenBuilder(context);
+    }),
+    transitionsBuilder: transition,
+  );
+}
 
 //---------------------------------------------------------------------------
 void _navigateReplaceAllAction(Store<AFState> store, AFNavigateReplaceAllAction action, NextDispatcher next) {
@@ -134,7 +155,13 @@ void _navigateReplaceAllAction(Store<AFState> store, AFNavigateReplaceAllAction 
     for(var i = 0; i < popCount - 1; i++) {
       navState.pop();
     }
-    navState.popAndPushNamed(screen);
+    final transition = action.transitionsBuilder;
+    if(transition == null) {
+      navState.popAndPushNamed(screen);
+    } else {
+      final pageBuilder = _createPageRouteBuilder(action, transition);
+      navState.pushReplacement(pageBuilder);
+    }
   });
 
 

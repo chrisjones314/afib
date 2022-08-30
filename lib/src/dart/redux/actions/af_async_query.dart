@@ -129,6 +129,7 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
   final AFOnResponseDelegate<TResponse>? onSuccess;
   final AFOnErrorDelegate? onError;
   final AFPreExecuteResponseDelegate<TResponse>? onPreExecuteResponse;
+  int? lastStart;
 
   AFAsyncQuery({
     AFID? id, 
@@ -143,8 +144,13 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
     conceptualStore = target;
   }
 
+  int currentMillis() {
+    return DateTime.now().millisecondsSinceEpoch;
+  }
+
   /// Called internally when redux middleware begins processing a query.
   void startAsyncAF(AFDispatcher dispatcher, AFStore store, { void Function(dynamic)? onResponseExtra, void Function(dynamic)? onErrorExtra }) {
+    lastStart = currentMillis();
     final startContext = AFStartQueryContext<TResponse>(
       conceptualStore: conceptualStore,
       onSuccess: (response) { 
@@ -189,6 +195,12 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
   void finishAsyncWithResponseAF(AFFinishQuerySuccessContext<TResponse> context) {
     finishAsyncWithResponse(context);
     final onSuccessD = onSuccess;
+    final lastS = lastStart;
+    if(lastS != null) {
+      final elapsed = currentMillis() - lastS;
+      AFibD.logQueryAF?.d("Query $this completed in ${elapsed}ms");
+    }
+
 
     // finishAsyncWithResponse might have updated the state.
     if(onSuccessD != null) {
@@ -373,7 +385,7 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
 
   void startAsyncAF(AFDispatcher dispatcher, AFStore store, { Function(dynamic)? onResponseExtra, Function(dynamic)? onErrorExtra }) {
       final completer = Completer<bool>();
-
+      lastStart = currentMillis();
       // start all the queries asynchronously.
       for(final queryResponse in queryResponses.responses) {
         final query = queryResponse.query;

@@ -28,7 +28,7 @@ class AFUIDefaultStateView extends AFUIFlexibleStateView with AFUIStateModelAcce
 mixin AFUIDefaultStateViewModelsMixin<TRouteParam extends AFRouteParam> {
 
   //--------------------------------------------------------------------------------------
-  Iterable<Object?> createStateModels(AFBuildStateViewContext<AFUIState, TRouteParam> context) {
+  List<Object?> createStateModels(AFBuildStateViewContext<AFUIState, TRouteParam> context) {
     final result = <Object?>[]; 
     result.addAll(context.stateApp.allModels);
     final time = context.statePublic.time;

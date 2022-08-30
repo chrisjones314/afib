@@ -207,3 +207,5 @@ typedef AFAccessCurrentStateDelegate = void Function(AFCurrentStateContext);
 typedef AFMergePublicStateDelegate = AFPublicState Function(AFPublicState realState, AFPublicState testState);
 
 typedef AFCreateDefaultRouteParamDelegate = AFRouteParam Function(AFRouteParamUseExistingOrDefault source, AFPublicState publicState);
+
+typedef AFAddScreenSpecificModelsDelegate = void Function(AFBuildStateViewContext config, List<Object?> destination);

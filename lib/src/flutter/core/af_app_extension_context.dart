@@ -340,20 +340,20 @@ class AFCoreDefinitionContext {
     screenMap.registerStartupScreen(screenId, createParam);
   }
 
-  void defineScreen(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
-    screenMap.registerScreen(screenKey, screenBuilder);
+  void defineScreen(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder, AFScreenConfig config) {
+    screenMap.registerScreen(screenKey, screenBuilder, config);
   }
 
-  void defineDrawer(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
-    screenMap.registerDrawer(screenKey, screenBuilder);
+  void defineDrawer(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder, AFDrawerConfig config) {
+    screenMap.registerDrawer(screenKey, screenBuilder, config);
   }
 
-  void defineDialog(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
-    screenMap.registerDialog(screenKey, screenBuilder);
+  void defineDialog(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder, AFDialogConfig config) {
+    screenMap.registerDialog(screenKey, screenBuilder, config);
   }
 
-  void defineBottomSheet(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
-    screenMap.registerBottomSheet(screenKey, screenBuilder);
+  void defineBottomSheet(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder, AFBottomSheetConfig config) {
+    screenMap.registerBottomSheet(screenKey, screenBuilder, config);
   }
 
 

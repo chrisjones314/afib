@@ -27,16 +27,16 @@ void afInitPrototypeScreenMap(AFScreenMap screens) {
     screens.registerStartupScreen(AFUIScreenID.screenPrototypeLoading, () => AFRouteParam(screenId: AFUIScreenID.screenPrototypeLoading, wid: AFUIWidgetID.useScreenParam, routeLocation: AFRouteLocation.screenHierarchy));
   }
 
-  screens.registerScreen(AFUIScreenID.screenPrototypeHome, (_) => AFPrototypeHomeScreen());
-  screens.registerScreen(AFUIScreenID.screenPrototypeLoading, (_) => AFPrototypeLoadingScreen());
-  screens.registerScreen(AFUIScreenID.screenPrototypeListSingleScreen, (_) => AFUIPrototypeTestScreen());
-  screens.registerScreen(AFUIScreenID.screenStateTestListScreen, (_) => AFUIStateTestListScreen());
-  screens.registerScreen(AFUIScreenID.screenPrototypeWidget, (_) => AFUIPrototypeWidgetScreen());
-  screens.registerScreen(AFUIScreenID.screenPrototypeLibraryList, (_) => AFUIPrototypeLibraryListScreen());
-  screens.registerScreen(AFUIScreenID.screenPrototypeLibraryHome, (_) => AFUIPrototypeLibraryHomeScreen());
-  screens.registerScreen(AFUIScreenID.screenPrototypeWireframesList, (_) => AFUIPrototypeWireframesListScreen());
-  screens.registerScreen(AFUIScreenID.screenPrototypeWaiting, (_) => AFUIPrototypeWaitingScreen());
-  screens.registerScreen(AFUIScreenID.screenPrototypeDialog, (_) => AFUIPrototypeDialogScreen());
-  screens.registerScreen(AFUIScreenID.screenPrototypeBottomSheet, (_) => AFUIPrototypeBottomSheetScreen());
-  screens.registerScreen(AFUIScreenID.screenPrototypeDrawer, (_) => AFUIPrototypeDrawerScreen());
+  screens.registerScreen(AFUIScreenID.screenPrototypeHome, (_) => AFPrototypeHomeScreen(), AFPrototypeHomeScreen.config);
+  screens.registerScreen(AFUIScreenID.screenPrototypeLoading, (_) => AFPrototypeLoadingScreen(), AFPrototypeLoadingScreen.config);
+  screens.registerScreen(AFUIScreenID.screenPrototypeListSingleScreen, (_) => AFUIPrototypeTestScreen(), AFUIPrototypeTestScreen.config);
+  screens.registerScreen(AFUIScreenID.screenStateTestListScreen, (_) => AFUIStateTestListScreen(), AFUIStateTestListScreen.config);
+  screens.registerScreen(AFUIScreenID.screenPrototypeWidget, (_) => AFUIPrototypeWidgetScreen(), AFUIPrototypeWidgetScreen.config);
+  screens.registerScreen(AFUIScreenID.screenPrototypeLibraryList, (_) => AFUIPrototypeLibraryListScreen(), AFUIPrototypeLibraryListScreen.config);
+  screens.registerScreen(AFUIScreenID.screenPrototypeLibraryHome, (_) => AFUIPrototypeLibraryHomeScreen(), AFUIPrototypeLibraryHomeScreen.config);
+  screens.registerScreen(AFUIScreenID.screenPrototypeWireframesList, (_) => AFUIPrototypeWireframesListScreen(), AFUIPrototypeWireframesListScreen.config);
+  screens.registerScreen(AFUIScreenID.screenPrototypeWaiting, (_) => AFUIPrototypeWaitingScreen(), AFUIPrototypeWaitingScreen.config);
+  screens.registerScreen(AFUIScreenID.screenPrototypeDialog, (_) => AFUIPrototypeDialogScreen(), AFUIPrototypeDialogScreen.config);
+  screens.registerScreen(AFUIScreenID.screenPrototypeBottomSheet, (_) => AFUIPrototypeBottomSheetScreen(), AFUIPrototypeBottomSheetScreen.config);
+  screens.registerScreen(AFUIScreenID.screenPrototypeDrawer, (_) => AFUIPrototypeDrawerScreen(), AFUIPrototypeDrawerScreen.config);
 }

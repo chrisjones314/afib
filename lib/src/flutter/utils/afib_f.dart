@@ -309,9 +309,9 @@ class AFibGlobalState {
 
   void initialize() {
     final libraries = thirdPartyLibraries;
-    screenMap.registerDialog(AFUIScreenID.dialogStandardChoice, (_) => AFUIStandardChoiceDialog());
-    screenMap.registerScreen(AFUIScreenID.screenDemoModeEnter, (_) => AFUIDemoModeEnterScreen());
-    screenMap.registerScreen(AFUIScreenID.screenDemoModeExit, (_) => AFUIDemoModeExitScreen());
+    screenMap.registerDialog(AFUIScreenID.dialogStandardChoice, (_) => AFUIStandardChoiceDialog(), AFUIStandardChoiceDialog.config);
+    screenMap.registerScreen(AFUIScreenID.screenDemoModeEnter, (_) => AFUIDemoModeEnterScreen(), AFUIDemoModeTransitionScreen.config);
+    screenMap.registerScreen(AFUIScreenID.screenDemoModeExit, (_) => AFUIDemoModeExitScreen(), AFUIDemoModeTransitionScreen.config);
     appContext.defineScreenMap(screenMap, libraries);
 
     appContext.initializeCore(coreDefinitions, libraries);

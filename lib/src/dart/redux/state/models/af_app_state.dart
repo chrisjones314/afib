@@ -1,5 +1,8 @@
+import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_object_with_key.dart';
+import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:meta/meta.dart';
@@ -42,6 +45,15 @@ class AFModelWithCustomID {
       return o.key;
     }
 
+    if(o is AFRouteParam) {
+      final wid = o.wid;
+      if(wid == AFUIWidgetID.useScreenParam) {
+        return o.screenId.toString();
+      } else {
+        return wid.toString();
+      }
+    }
+
     return o.runtimeType.toString();
   }
 
@@ -59,6 +71,11 @@ abstract class AFStateModelAccess {
   T? findTypeOrNull<T extends Object>();
   T findId<T extends Object>(String id);
   T? findIdOrNull<T extends Object>(String id);
+  TRouteParam findScreenParam<TRouteParam extends AFRouteParam>(AFScreenID screenId);
+  TRouteParam? findScreenParamOrNull<TRouteParam extends AFRouteParam>(AFScreenID screenId);
+  TRouteParam findChildWidgetParam<TRouteParam extends AFRouteParam>(AFWidgetID widgetId);
+  TRouteParam? findChildWidgetParamOrNull<TRouteParam extends AFRouteParam>(AFWidgetID widgetId);
+
   Iterable<Object> get allModels;
 }
 
@@ -150,6 +167,26 @@ abstract class AFComponentState extends AFStateModelAccess {
   T? findModelWithCustomKeyOrNull<T extends Object?>(String key) {
     final result = models[key] as T?;
     return result;
+  }
+
+  TRouteParam findScreenParam<TRouteParam extends AFRouteParam>(AFScreenID screenId) {
+    final key = screenId.toString();
+    return models[key] as TRouteParam;
+  }
+
+  TRouteParam? findScreenParamOrNull<TRouteParam extends AFRouteParam>(AFScreenID screenId) {
+    final key = screenId.toString();
+    return models[key] as TRouteParam;
+  }
+
+  TRouteParam findChildWidgetParam<TRouteParam extends AFRouteParam>(AFWidgetID widgetId) {
+    final key = widgetId.toString();
+    return models[key] as TRouteParam;
+  }
+
+  TRouteParam? findChildWidgetParamOrNull<TRouteParam extends AFRouteParam>(AFWidgetID widgetId) {
+    final key = widgetId.toString();
+    return models[key] as TRouteParam?;
   }
 
   AFComponentState mergeWith(AFComponentState other) {

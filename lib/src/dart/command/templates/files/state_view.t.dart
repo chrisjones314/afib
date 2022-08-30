@@ -30,7 +30,7 @@ class [!af_state_view_name] extends [!af_app_namespace(upper)]FlexibleStateView 
 mixin [!af_state_view_name]ModelsMixin<TRouteParam extends AFRouteParam> {
 
   //--------------------------------------------------------------------------------------
-  Iterable<Object?> createStateModels(AFBuildStateViewContext<[!af_app_namespace(upper)]State, TRouteParam> context) {
+  List<Object?> createStateModels(AFBuildStateViewContext<[!af_app_namespace(upper)]State, TRouteParam> context) {
     final state = context.stateApp;
     return state.allModels;
   }

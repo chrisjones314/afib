@@ -18,6 +18,7 @@ class AFScreenMap {
   AFScreenID? _startupScreenId;
   final Map<AFScreenID, AFConnectedUIBuilderDelegate> _screens = <AFScreenID, AFConnectedUIBuilderDelegate>{};
   final Map<AFWidgetID, AFConnectedUIBuilderDelegate> _widgets = <AFWidgetID, AFConnectedUIBuilderDelegate>{};
+  final Map<AFScreenID, AFConnectedUIConfig> _screenConfigs = <AFScreenID, AFConnectedUIConfig>{};
 
   AFScreenMap();
 
@@ -49,6 +50,10 @@ class AFScreenMap {
 
   WidgetBuilder? findBy(AFScreenID id) {
     return _screens[id];
+  }
+
+  AFConnectedUIConfig? findUIConfig(AFScreenID id) {
+    return _screenConfigs[id];
   }
 
   AFConnectedUIBase createInstance(AFScreenID id, BuildContext? buildContext) {
@@ -84,24 +89,28 @@ class AFScreenMap {
   }
   /// Call [registerScreen] multiple times to specify the relationship between 
   /// [screenKey] and screens built by the [WidgetBuilder]
-  void registerScreen(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
+  void registerScreen(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder, AFScreenConfig config) {
     assert(_isValidBuilder<AFConnectedScreen>(screenBuilder));
     _screens[screenKey] = screenBuilder;
+    _screenConfigs[screenKey] = config;
   }
 
-  void registerDrawer(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
+  void registerDrawer(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder, AFDrawerConfig config) {
     assert(_isValidDrawerBuilder(screenBuilder));
     _screens[screenKey] = screenBuilder;
+    _screenConfigs[screenKey] = config;
   }
 
-  void registerDialog(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
+  void registerDialog(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder, AFDialogConfig config) {
     assert(_isValidBuilder<AFConnectedDialog>(screenBuilder));
     _screens[screenKey] = screenBuilder;
+    _screenConfigs[screenKey] = config;
   }
 
-  void registerBottomSheet(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder) {
+  void registerBottomSheet(AFScreenID screenKey, AFConnectedUIBuilderDelegate screenBuilder, AFBottomSheetConfig config) {
     assert(_isValidBuilder<AFConnectedBottomSheet>(screenBuilder));
     _screens[screenKey] = screenBuilder;
+    _screenConfigs[screenKey] = config;
   }
 
   bool _isValidBuilder<TScreen extends AFConnectedUIBase>(AFConnectedUIBuilderDelegate screenBuilder) {

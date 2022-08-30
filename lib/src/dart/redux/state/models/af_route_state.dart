@@ -5,7 +5,6 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:meta/meta.dart';
 
@@ -145,15 +144,6 @@ class AFRouteSegment {
     AFRouteSegmentChildren? children,
     AFCreateDefaultChildParamDelegate? createDefaultChildParam,
   }) {
-    final testParam = this.param;
-    if(param != null && AFibD.config.isTestContext) {
-      /*
-      if(testParam is AFUIPrototypeWidgetRouteParam && param is! AFUIPrototypeWidgetRouteParam) {
-        final fixup = testParam.copyWith(param: param);
-        param = fixup;
-      }
-      */
-    }
     return AFRouteSegment(
       param: param ?? this.param,
       children: children ?? this.children,
@@ -679,8 +669,18 @@ class AFRouteState {
 
   /// Adds a new screen/data below the current screen in the route.
   AFRouteState pushNamed(AFRouteParam param, List<AFRouteParam>? children, AFCreateDefaultChildParamDelegate? createDefaultChildParam) {
+    var routeState = this;
+    if(param is AFRouteParamUseExistingOrDefault) {
+      assert(param.routeLocation == AFRouteLocation.globalPool, "You can only AFRouteParamUseExistingOrDefault for a global screen.");
+
+      // first, revise it with the default.
+      routeState = updateRouteParamWithExistingOrDefault(param);
+
+      // then, revise the route parameter 
+    }
+
     AFibD.logRouteAF?.d("pushNamed: $param");
-    return _reviseScreen(screenHierarchy.pushNamed(param, children, createDefaultChildParam));
+    return routeState._reviseScreen(screenHierarchy.pushNamed(param, children, createDefaultChildParam));
   }
 
   /// 
@@ -726,13 +726,15 @@ class AFRouteState {
     return _reviseScreen(screenHierarchy.exitTest());
   }
 
-  AFRouteState updateRouteParamWithExistingOrDefault(AFRouteParamUseExistingOrDefault param, AFConnectedUIConfig? uiConfig) {
+  AFRouteState updateRouteParamWithExistingOrDefault(AFRouteParamUseExistingOrDefault param) {
     // first, see if it exists
     final seg = this.findRouteParamFull(screenId: param.screenId, routeLocation: param.routeLocation, wid: param.wid);
     if(seg != null) {
       // it already exists, so nothing to do to the state
       return this;
     }
+
+    final uiConfig = AFibF.g.screenMap.findUIConfig(param.screenId);
 
     // if it doens't already exist, then the UI config must have a way to create a default value.
     final create = uiConfig?.createDefaultRouteParam;
@@ -742,21 +744,21 @@ class AFRouteState {
     }
 
     final defaultParam = create(param, AFibF.g.internalOnlyActiveStore.state.public);
-    return updateRouteParam(defaultParam, uiConfig);    
+    return updateRouteParam(defaultParam);    
   }
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteState updateRouteParam(AFRouteParam param, AFConnectedUIConfig? uiConfig) {
+  AFRouteState updateRouteParam(AFRouteParam param) {
     // in this case, we obviously don't want to set this value as the param. Instead,
     // we want to verify that it already exists, or else create it using the uiConfig's default
     // method.
     if(param is AFRouteParamUseExistingOrDefault) {
-      return updateRouteParamWithExistingOrDefault(param, uiConfig);
+      return updateRouteParamWithExistingOrDefault(param);
     }
 
     if(param.hasChildWID) { 
-      return setChildParam(param, AFWidgetParamSource.child, uiConfig);
+      return setChildParam(param, AFWidgetParamSource.child);
     }
 
 
@@ -915,9 +917,9 @@ class AFRouteState {
   }
 
 
-  AFRouteState setChildParam(AFRouteParam param, AFWidgetParamSource paramSource, AFConnectedUIConfig? uiConfig) {
+  AFRouteState setChildParam(AFRouteParam param, AFWidgetParamSource paramSource) {
     if(paramSource == AFWidgetParamSource.parent) {
-      return updateRouteParam(param, uiConfig);
+      return updateRouteParam(param);
     }
     final widget = param.wid;
     final screen = param.screenId;

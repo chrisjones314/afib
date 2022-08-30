@@ -17,7 +17,6 @@ class AFNavigateAction extends AFActionWithKey implements AFExecuteBeforeInterfa
   final List<AFRouteParam>? children;
   final AFAsyncQuery? executeBefore;
   final AFAsyncQuery? executeDuring;
-  final AFConnectedUIConfig? uiConfig;
   final RouteTransitionsBuilder? transitionsBuilder;
 
   AFNavigateAction({
@@ -26,9 +25,7 @@ class AFNavigateAction extends AFActionWithKey implements AFExecuteBeforeInterfa
     required this.children,
     required this.executeBefore,
     required this.executeDuring,
-    required this.transitionsBuilder,
-    this.uiConfig,
-    
+    required this.transitionsBuilder,    
   }): super(id: id);
 
   AFScreenID get screenId { return param.screenId; }
@@ -41,14 +38,12 @@ class AFNavigateSetParamAction extends AFNavigateAction {
     AFID? id, 
     required AFRouteParam param,
     List<AFRouteParam>? children,
-    AFConnectedUIConfig? uiConfig,
   }): super(
     id: id, 
     param: param, 
     children: children, 
     executeBefore: null, 
     executeDuring: null,
-    uiConfig: uiConfig,
     transitionsBuilder: null,
   );
 }
@@ -64,7 +59,6 @@ class AFNavigateActionWithReturn extends AFNavigateAction {
     this.createDefaultChildParam,
     AFAsyncQuery? executeBefore,
     AFAsyncQuery? executeDuring,
-    AFConnectedUIConfig? uiConfig,
     RouteTransitionsBuilder? transitionsBuilder,
   }): super(
     id: id, 
@@ -72,7 +66,6 @@ class AFNavigateActionWithReturn extends AFNavigateAction {
     children: children, 
     executeBefore: executeBefore, 
     executeDuring: executeDuring,
-    uiConfig: uiConfig,
     transitionsBuilder: transitionsBuilder
     );
 }
@@ -172,7 +165,6 @@ class AFNavigatePushAction extends AFNavigateActionWithReturn {
     AFCreateDefaultChildParamDelegate? createDefaultChildParam,
     AFAsyncQuery? executeBefore,
     AFAsyncQuery? executeDuring,
-    AFConnectedUIConfig? uiConfig,
     RouteTransitionsBuilder? transitionsBuilder,
   }): super(
     id: id, 
@@ -182,7 +174,6 @@ class AFNavigatePushAction extends AFNavigateActionWithReturn {
     createDefaultChildParam: createDefaultChildParam, 
     executeBefore: executeBefore, 
     executeDuring: executeDuring,
-    uiConfig: uiConfig,
     transitionsBuilder: transitionsBuilder,
   );
 

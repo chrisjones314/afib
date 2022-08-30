@@ -382,6 +382,7 @@ $optionsHeader
     final routeParam = routeParamTemplate.toBuffer();
     routeParam.replaceText(ctx, AFUISourceTemplateID.textScreenName, uiName);
     routeParam.replaceText(ctx, AFUISourceTemplateID.textScreenID, screenId);
+    routeParam.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
     routeParam.replaceText(ctx, AFUISourceTemplateID.textScreenIDType, screenIdType);
     routeParam.executeStandardReplacements(ctx);
     screenFile.replaceTextLines(ctx, AFUISourceTemplateID.textRouteParamImpls, routeParam.lines);

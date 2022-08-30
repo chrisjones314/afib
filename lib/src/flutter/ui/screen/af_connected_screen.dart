@@ -18,6 +18,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
   final AFRouteLocation route;
   final AFUIType uiType;
   final AFCreateDefaultRouteParamDelegate? createDefaultRouteParam;
+  final AFAddScreenSpecificModelsDelegate? addModelsToStateView;
 
   AFConnectedUIConfig({
     required this.themeId,
@@ -26,7 +27,12 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
     required this.route,
     required this.uiType,
     this.createDefaultRouteParam,
+    required this.addModelsToStateView,
   });
+
+  void addScreenSpecificModels(List<Object?> models) {
+
+  }
 
   AFBuildContext<TStateView, TRouteParam>? createContextForDiff(AFStore store, AFScreenID screenId, AFWidgetID wid, { required AFWidgetParamSource paramSource, required TRouteParam? launchParam }) {
     if(AFibD.config.isTestContext) {
@@ -258,7 +264,12 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
       throw AFException("Root application state $TState cannot be null");
     }
     final stateViewCtx = AFBuildStateViewContext<TState, TRouteParam>(stateApp: stateApp, routeParam: param, statePublic: public, children: children, private: state.private);
-    return createStateModels(stateViewCtx);
+    final result = createStateModels(stateViewCtx);
+    final addModels = addModelsToStateView;
+    if(addModels != null) {
+      addModels(stateViewCtx, result);
+    }
+    return result;
   }
 
   TSPI createSPI(BuildContext? buildContext, AFBuildContext dataContext, AFScreenID parentScreenId, AFWidgetID wid, AFWidgetParamSource paramSource) {
@@ -279,7 +290,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
   }
 
   void updateRouteParam(AFBuildContext context, AFRouteParam revised, { required AFWidgetParamSource paramSource, AFID? id }) {
-    context.dispatch(AFNavigateSetParamAction(param: revised, uiConfig: this));
+    context.dispatch(AFNavigateSetParamAction(param: revised));
   }
   void updateAddChildParam<TChildRouteParam extends AFRouteParam>(AFBuildContext context, TChildRouteParam revised, { AFID? id }) {
     context.dispatch(AFNavigateAddChildParamAction(
@@ -303,7 +314,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
     }
   }
 
-  Iterable<Object?> createStateModels(AFBuildStateViewContext<TState, TRouteParam> routeParam);
+  List<Object?> createStateModels(AFBuildStateViewContext<TState, TRouteParam> routeParam);
 }
 
 abstract class AFScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> {
@@ -312,13 +323,16 @@ abstract class AFScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TS
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
       required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
       AFRouteLocation? route,
-      
+      AFAddScreenSpecificModelsDelegate? addModelsToStateView,
+      AFCreateDefaultRouteParamDelegate? createDefaultRouteParam,
     }): super(
       themeId: themeId,
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.screen,
       spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
       route: route ?? AFRouteLocation.screenHierarchy,
+      addModelsToStateView: addModelsToStateView,
+      createDefaultRouteParam: createDefaultRouteParam,
     );
 }
 
@@ -327,7 +341,8 @@ abstract class AFDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TS
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
       required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
-      AFCreateDefaultRouteParamDelegate? createDefaultRouteParam
+      AFCreateDefaultRouteParamDelegate? createDefaultRouteParam,
+      AFAddScreenSpecificModelsDelegate? addModelsToStateView,
     }): super(
       themeId: themeId,
       stateViewCreator: stateViewCreator,
@@ -336,6 +351,7 @@ abstract class AFDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TS
       // has to be, because it can be dragged onto the screen dynamically.
       route: AFRouteLocation.globalPool,
       createDefaultRouteParam: createDefaultRouteParam,
+      addModelsToStateView: addModelsToStateView,
     );
 }
 
@@ -344,7 +360,8 @@ abstract class AFDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TS
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
       required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
-      AFCreateDefaultRouteParamDelegate? createDefaultRouteParam
+      AFCreateDefaultRouteParamDelegate? createDefaultRouteParam,
+      AFAddScreenSpecificModelsDelegate? addModelsToStateView,
     }): super(
       themeId: themeId,
       stateViewCreator: stateViewCreator,
@@ -352,6 +369,7 @@ abstract class AFDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TS
       spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
       route: AFRouteLocation.globalPool,
       createDefaultRouteParam: createDefaultRouteParam,
+      addModelsToStateView: addModelsToStateView,
     );
 }
 
@@ -360,7 +378,8 @@ abstract class AFBottomSheetConfig<TSPI extends AFBottomSheetStateProgrammingInt
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
       required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
-      AFCreateDefaultRouteParamDelegate? createDefaultRouteParam
+      AFCreateDefaultRouteParamDelegate? createDefaultRouteParam,
+      AFAddScreenSpecificModelsDelegate? addModelsToStateView,
     }): super(
       themeId: themeId,
       stateViewCreator: stateViewCreator,
@@ -368,6 +387,7 @@ abstract class AFBottomSheetConfig<TSPI extends AFBottomSheetStateProgrammingInt
       spiCreator: (context, theme, screenId, wid, paramSource) => spiCreator(context, theme, screenId),
       route: AFRouteLocation.globalPool,
       createDefaultRouteParam: createDefaultRouteParam,
+      addModelsToStateView: addModelsToStateView,
     );
 }
 
@@ -378,12 +398,14 @@ abstract class AFWidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TS
     required AFCreateStateViewDelegate<TStateView> stateViewCreator,
     required AFCreateWidgetSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
     AFRouteLocation? route,
+    AFAddScreenSpecificModelsDelegate? addModelsToStateView,
   }): super(
     themeId: themeId,
     stateViewCreator: stateViewCreator,
     uiType: AFUIType.widget,
     spiCreator: spiCreator,
     route: route ?? AFRouteLocation.screenHierarchy,
+    addModelsToStateView: addModelsToStateView,
   );
 }
 

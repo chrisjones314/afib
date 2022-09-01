@@ -11,6 +11,7 @@ import 'package:logger/logger.dart';
 import 'package:quiver/core.dart';
 import 'package:redux/redux.dart';
 
+
 abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> {
   final AFThemeID themeId;
   final AFCreateStateViewDelegate<TStateView> stateViewCreator;
@@ -34,14 +35,27 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
 
   }
 
-  AFBuildContext<TStateView, TRouteParam>? createContextForDiff(AFStore store, AFScreenID screenId, AFWidgetID wid, { required AFWidgetParamSource paramSource, required TRouteParam? launchParam }) {
+  AFBuildContext<TStateView, TRouteParam>? createContextForDiff(AFStore store, AFScreenID screenId, AFWidgetID wid, { required AFWidgetParamSource paramSource, required AFRouteParam? launchParam }) {
+    TRouteParam? actualLaunchParam;
+    if(launchParam is TRouteParam) {
+      actualLaunchParam = launchParam;
+    } else if(launchParam is AFRouteParamUseExistingOrDefault) {
+      final foundSeg = store.state.public.route.findRouteParamFull(screenId: launchParam.screenId, wid: launchParam.wid, routeLocation: launchParam.routeLocation);
+      final foundParam = foundSeg?.param;
+      if(foundParam != null && foundParam is TRouteParam) {
+        actualLaunchParam = foundParam;
+      } else {
+        throw AFException("Invalid type ${foundParam?.runtimeType} for route param, expected $TRouteParam");
+      }
+    }
+
     if(AFibD.config.isTestContext) {
-      final testContext = _createTestContext(store, screenId, wid, paramSource: paramSource, launchParam: launchParam);
+      final testContext = _createTestContext(store, screenId, wid, paramSource: paramSource, launchParam: actualLaunchParam);
       if(testContext != null) {
         return testContext;
       }
     }
-    var paramSeg = findRouteSegment(store.state, screenId, wid, paramSource: paramSource, launchParam: launchParam);
+    var paramSeg = findRouteSegment(store.state, screenId, wid, paramSource: paramSource, launchParam: actualLaunchParam);
 
     /// drawers can be dragged onto the screen spontaneously, without any kind of navigation.   In that case, we need to 
     /// dynamically create a launch param
@@ -50,7 +64,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
       if(createDefault != null) {
         final source = AFRouteParamUseExistingOrDefault(screenId: screenId, wid: wid, routeLocation: route);
         launchParam = createDefault(source, store.state.public) as TRouteParam?;
-        paramSeg = findRouteSegment(store.state, screenId, wid, paramSource: paramSource, launchParam: launchParam);
+        paramSeg = findRouteSegment(store.state, screenId, wid, paramSource: paramSource, launchParam: actualLaunchParam);
       }
     }
 
@@ -423,7 +437,7 @@ abstract class AFConnectedUIBase<TState extends AFComponentState, TTheme extends
   final AFScreenID screenId;
   final AFWidgetID wid;
   final AFWidgetParamSource paramSource;
-  final TRouteParam? launchParam;
+  final AFRouteParam? launchParam;
     
   //--------------------------------------------------------------------------------------
   AFConnectedUIBase({
@@ -438,7 +452,7 @@ abstract class AFConnectedUIBase<TState extends AFComponentState, TTheme extends
   @override
   material.Widget build(material.BuildContext context) {
     return StoreConnector<AFState, AFBuildContext<TStateView, TRouteParam>?>(
-        converter: (store) {          
+        converter: (store) {    
           final context = uiConfig.createContextForDiff(store as AFStore, screenId, wid, paramSource: paramSource, launchParam: launchParam);
           return context;
         },
@@ -573,12 +587,12 @@ abstract class AFConnectedScreen<TState extends AFComponentState, TTheme extends
 }
 
 abstract class AFConnectedWidget<TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> extends AFConnectedUIBase<TState, TTheme, TStateView, TRouteParam, TSPI> { 
-  
+
   AFConnectedWidget({
     required AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> uiConfig,
     required AFScreenID screenId,
     required AFWidgetID wid,
-    required TRouteParam? launchParam,
+    required AFRouteParam? launchParam,
     AFWidgetParamSource paramSource = AFWidgetParamSource.child,
   }): super(uiConfig: uiConfig, screenId: screenId, wid: wid, paramSource: paramSource, launchParam: launchParam);
 

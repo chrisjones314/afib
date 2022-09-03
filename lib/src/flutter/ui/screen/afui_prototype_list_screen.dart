@@ -7,7 +7,6 @@ import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
-import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -51,10 +50,10 @@ class AFUIPrototypeTestScreenParam extends AFScreenRouteParam {
 
 
 class AFUIPrototypeTestScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> {
-  AFUIPrototypeTestScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
+  AFUIPrototypeTestScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> context, AFStandardSPIData standard): super(context, standard);
   
-  factory AFUIPrototypeTestScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
-    return AFUIPrototypeTestScreenSPI(context, screenId, theme,
+  factory AFUIPrototypeTestScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> context, AFStandardSPIData standard) {
+    return AFUIPrototypeTestScreenSPI(context, standard,
     );
   }
 
@@ -98,7 +97,7 @@ class AFUIPrototypeTestScreen extends AFUIConnectedScreen<AFUIPrototypeTestScree
 
   static AFNavigatePushAction navigatePush(List<AFScreenPrototype> tests, dynamic title) {
     return AFNavigatePushAction(
-      param: AFUIPrototypeTestScreenParam.createFromList(title: title, tests: tests));
+      launchParam: AFUIPrototypeTestScreenParam.createFromList(title: title, tests: tests));
   }
 
   @override

@@ -246,7 +246,7 @@ Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, 
       AFUpdateActivePrototypeAction(prototypeId: test.id),
       AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: stateViews),
       AFNavigatePushAction(
-        param: test.navigate.param,
+        launchParam: test.navigate.param,
         children: test.navigate.children,
         createDefaultChildParam: test.navigate.createDefaultChildParam,
       )

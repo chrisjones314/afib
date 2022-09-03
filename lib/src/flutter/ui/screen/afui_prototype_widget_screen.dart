@@ -6,7 +6,6 @@ import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
-import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:flutter/material.dart';
 
 /// Parameter uses to filter the tests shown on the screen.
@@ -32,10 +31,10 @@ class AFUIPrototypeWidgetRouteParam extends AFScreenRouteParam {
 }
 
 class AFUIPrototypeWidgetScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> {
-  AFUIPrototypeWidgetScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
+  AFUIPrototypeWidgetScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> context, AFStandardSPIData standard): super(context, standard);
   
-  factory AFUIPrototypeWidgetScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
-    return AFUIPrototypeWidgetScreenSPI(context, screenId, theme,
+  factory AFUIPrototypeWidgetScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> context, AFStandardSPIData standard) {
+    return AFUIPrototypeWidgetScreenSPI(context, standard,
     );
   }
 }
@@ -69,7 +68,7 @@ class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetS
 
     return AFNavigatePushAction(
       id: id,
-      param: AFUIPrototypeWidgetRouteParam(test: test, wid: wid),
+      launchParam: AFUIPrototypeWidgetRouteParam(test: test, wid: wid),
       children: children,
     );
   }

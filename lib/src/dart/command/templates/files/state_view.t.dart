@@ -74,7 +74,7 @@ class [!af_state_view_prefix]DialogConfig<TSPI extends AFDialogStateProgrammingI
 class [!af_state_view_prefix]WidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TRouteParam extends AFRouteParam> extends [!af_app_namespace(upper)]WidgetConfig<TSPI, [!af_state_view_name], TRouteParam> with [!af_state_view_name]ModelsMixin<TRouteParam> {
 
     [!af_state_view_prefix]WidgetConfig({
-      required AFCreateWidgetSPIDelegate<TSPI, AFBuildContext<[!af_state_view_name], TRouteParam>, [!af_theme_type]> spiCreator,
+      required AFCreateSPIDelegate<TSPI, AFBuildContext<[!af_state_view_name], TRouteParam>, [!af_theme_type]> spiCreator,
       AFNavigateRoute? route
     }): super(
       stateViewCreator: [!af_state_view_name].create,

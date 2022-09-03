@@ -6,15 +6,14 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
-import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:flutter/material.dart';
 
 
 class AFUIDemoModeTransitionScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFRouteParamUnused> {
-  AFUIDemoModeTransitionScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
+  AFUIDemoModeTransitionScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard): super(context, standard);
   
-  factory AFUIDemoModeTransitionScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFUIDefaultTheme theme, AFScreenID screenId) {
-    return AFUIDemoModeTransitionScreenSPI(context, screenId, theme,
+  factory AFUIDemoModeTransitionScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard) {
+    return AFUIDemoModeTransitionScreenSPI(context, standard,
     );
   }
 }
@@ -59,7 +58,7 @@ class AFUIDemoModeEnterScreen extends AFUIDemoModeTransitionScreen {
   static AFNavigatePushAction navigatePush() {
     return AFNavigatePushAction(
       id: AFUIScreenID.screenDemoModeEnter,
-      param: AFRouteParamUnused.create(id: AFUIScreenID.screenDemoModeEnter),
+      launchParam: AFRouteParamUnused.unused,
     );
   }
 }
@@ -75,7 +74,7 @@ class AFUIDemoModeExitScreen extends AFUIDemoModeTransitionScreen {
   static AFNavigatePushAction navigatePush() {
     return AFNavigatePushAction(
       id: AFUIScreenID.screenDemoModeExit,
-      param: AFRouteParamUnused.create(id: AFUIScreenID.screenDemoModeExit),
+      launchParam: AFRouteParamUnused.unused,
     );
   }
 }

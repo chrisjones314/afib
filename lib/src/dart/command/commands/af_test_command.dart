@@ -11,6 +11,21 @@ class AFTestCommand extends AFCommand {
   final name = "test";
   final description = "Run tests, you can specify any prototype name, test name, or any of the values for afib.dart help config's --tests-enabled option";
 
+
+  String get usage {
+    return '''
+$usageHeader
+  $nameOfExecutable test [${AFConfigEntries.testsEnabled.argumentHelpShort}]
+
+$descriptionHeader
+  $description
+
+$optionsHeader
+  ${AFConfigEntries.testsEnabled.argumentHelp}
+  
+''';
+  }
+
   @override
   void execute(AFCommandContext ctx) {
     final config = AFibD.config;

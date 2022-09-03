@@ -204,6 +204,16 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
     ));
   }
 
+  String get argumentHelpShort {
+    final choicesText = choices.map((c) => c.textValue);
+    return choicesText.join("|");
+  }
+
+  String get argumentHelp {
+    final choicesText = choices.map((c) => "  ${c.textValue} - ${c.help}");
+    return choicesText.join("\n");
+  }
+
   void addArguments(args.ArgParser argParser) {
     var allowed;
     var allowedHelp;

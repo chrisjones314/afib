@@ -512,9 +512,9 @@ class AFibGlobalState {
       return factory(id, context);
   }
 
-  AFCreateWidgetSPIDelegate<TSPI, TBuildContext, TTheme>? findSPICreatorOverride<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme>() {
+  AFCreateSPIDelegate<TSPI, TBuildContext, TTheme>? findSPICreatorOverride<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme>() {
     final found = coreDefinitions.spiOverrides[TSPI];
-    return found as AFCreateWidgetSPIDelegate<TSPI, TBuildContext, TTheme>?;    
+    return found as AFCreateSPIDelegate<TSPI, TBuildContext, TTheme>?;    
   }
 
   void testOnlySimulateCloseDialogOrSheet<TResult>(AFScreenID screenId, TResult result) {

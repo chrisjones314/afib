@@ -1387,7 +1387,7 @@ class AFSingleScreenPrototype extends AFScreenLikePrototype {
       models: actualModels, 
     ));
     dispatcher.dispatch(AFNavigatePushAction(
-      param: rp,
+      launchParam: rp,
       children: navigate.children,
       createDefaultChildParam: navigate.createDefaultChildParam,
     ));
@@ -1451,7 +1451,7 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
     final rp = registry.find(rpp);
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, 
       models: actualModels, 
-      navigate: AFNavigatePushAction(param: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
+      navigate: AFNavigatePushAction(launchParam: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
     ));
     dispatcher.dispatch(AFUIPrototypeWidgetScreen.navigatePush(this, id: this.id));    
   }
@@ -1492,7 +1492,7 @@ class AFConnectedWidgetPrototype extends AFWidgetPrototype {
   List<AFScreenTestDescription> get reusableTests { return  List<AFScreenTestDescription>.from(body.reusableTests); }
   List<AFScreenTestDescription> get regressionTests { return  List<AFScreenTestDescription>.from(body.regressionTests); }
   AFNavigatePushAction get navigate { 
-    return AFNavigatePushAction(param: AFRouteParamWrapper(original: routeParam, screenId: AFUIScreenID.screenPrototypeWidget));
+    return AFNavigatePushAction(launchParam: AFRouteParamWrapper(original: routeParam, screenId: AFUIScreenID.screenPrototypeWidget));
   }
 
   void onDrawerReset(AFDispatcher dispatcher) {
@@ -1536,7 +1536,7 @@ class AFDialogPrototype extends AFScreenLikePrototype {
     final rp = registry.find(rpp);
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, 
       models: actualModels, 
-      navigate: AFNavigatePushAction(param: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
+      navigate: AFNavigatePushAction(launchParam: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
     ));
     dispatcher.dispatch(AFUIPrototypeDialogScreen.navigatePush(this, id: this.id));    
   }
@@ -1600,7 +1600,7 @@ class AFBottomSheetPrototype extends AFScreenLikePrototype {
     final rp = registry.find(rpp);
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, 
       models: actualModels, 
-      navigate: AFNavigatePushAction(param: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
+      navigate: AFNavigatePushAction(launchParam: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
     ));
     dispatcher.dispatch(AFUIPrototypeBottomSheetScreen.navigatePush(this, id: this.id));    
   }
@@ -1663,7 +1663,7 @@ class AFDrawerPrototype extends AFScreenLikePrototype {
     final rp = registry.find(rpp);
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(this, 
       models: actualModels, 
-      navigate: AFNavigatePushAction(param: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
+      navigate: AFNavigatePushAction(launchParam: AFRouteParamWrapper(screenId: AFUIScreenID.screenPrototypeWidget, original: rp)),
     ));
     dispatcher.dispatch(AFUIPrototypeDrawerScreen.navigatePush(this, id: this.id));    
   }
@@ -1725,7 +1725,7 @@ class AFWorkflowStatePrototype extends AFScreenPrototype {
 
   dynamic get models { return null; }
   dynamic get routeParam { return null; }
-  AFNavigatePushAction get navigate { return AFNavigatePushAction(param: AFRouteParamUnused.unused); }
+  AFNavigatePushAction get navigate { return AFNavigatePushAction(launchParam: AFRouteParamUnused.unused); }
 
   void openTestDrawer(AFScreenTestID id) {
     body.openTestDrawer(id);
@@ -1751,7 +1751,7 @@ class AFWorkflowStatePrototype extends AFScreenPrototype {
 
     final screenMap = AFibF.g.screenMap;
     dispatcher.dispatch(AFNavigatePushAction(
-      param: screenMap.trueCreateStartupScreenParam!.call()
+      launchParam: screenMap.trueCreateStartupScreenParam!.call()
     ));
     dispatcher.dispatch(AFStartPrototypeScreenTestAction(test, navigate: test.navigate));
 

@@ -11,24 +11,24 @@ import 'package:[!af_package_path]/ui/themes/[!af_app_namespace]_default_theme.d
 
 // a default screen programming interface while we transition to this new model.
 class [!af_app_namespace(upper)]ScreenSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFScreenStateProgrammingInterface<[!af_app_namespace(upper)]State, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> {
-  [!af_app_namespace(upper)]ScreenSPI(AFBuildContext<TStateView, TRouteParam> context, AFScreenID screenId, [!af_app_namespace(upper)]DefaultTheme theme): super(context, screenId, theme);
+  [!af_app_namespace(upper)]ScreenSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
 }
 
 class [!af_app_namespace(upper)]DialogSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFDialogStateProgrammingInterface<[!af_app_namespace(upper)]State, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> {
-  [!af_app_namespace(upper)]DialogSPI(AFBuildContext<TStateView, TRouteParam> context, AFScreenID screenId, [!af_app_namespace(upper)]DefaultTheme theme): super(context, screenId, theme);
+  [!af_app_namespace(upper)]DialogSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
 }
 
 class [!af_app_namespace(upper)]DrawerSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFDrawerStateProgrammingInterface<[!af_app_namespace(upper)]State, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> {
-  [!af_app_namespace(upper)]DrawerSPI(AFBuildContext<TStateView, TRouteParam> context, AFScreenID screenId, [!af_app_namespace(upper)]DefaultTheme theme): super(context, screenId, theme);
+  [!af_app_namespace(upper)]DrawerSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
 }
 
 class [!af_app_namespace(upper)]BottomSheetSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFBottomSheetStateProgrammingInterface<[!af_app_namespace(upper)]State, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> {
-  [!af_app_namespace(upper)]BottomSheetSPI(AFBuildContext<TStateView, TRouteParam> context, AFScreenID screenId, [!af_app_namespace(upper)]DefaultTheme theme): super(context, screenId, theme);
+  [!af_app_namespace(upper)]BottomSheetSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
 }
 
 // a default screen programming interface while we transition to this new model.
 class [!af_app_namespace(upper)]WidgetSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFWidgetStateProgrammingInterface<[!af_app_namespace(upper)]State, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> {
-  [!af_app_namespace(upper)]WidgetSPI(AFBuildContext<TStateView, TRouteParam> context, AFScreenID screenId, AFID wid, AFWidgetParamSource paramSource, [!af_app_namespace(upper)]DefaultTheme theme): super(context, screenId, wid, paramSource, theme);
+  [!af_app_namespace(upper)]WidgetSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
 }
 
 class [!af_app_namespace(upper)]FlexibleStateView extends AFFlexibleStateView  {
@@ -73,15 +73,13 @@ abstract class [!af_app_namespace(upper)]ConnectedBottomSheet<TSPI extends AFBot
 abstract class [!af_app_namespace(upper)]ConnectedWidget<TSPI extends AFWidgetStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedWidget<[!af_app_namespace(upper)]State, [!af_app_namespace(upper)]DefaultTheme, TStateView, TRouteParam, TSPI> {
   [!af_app_namespace(upper)]ConnectedWidget({
     required AFConnectedUIConfig<[!af_app_namespace(upper)]State, [!af_app_namespace(upper)]DefaultTheme, TStateView, TRouteParam, TSPI> uiConfig,
-    required AFScreenID screenId,
-    required AFWidgetID wid,
-    TRouteParam? launchParam,
-    AFWidgetParamSource paramSource = AFWidgetParamSource.child,
+    AFScreenID? screenIdOverride,
+    AFWidgetID? widOverride,
+    required AFRouteParam launchParam,
   }): super(
     uiConfig: uiConfig,
-    screenId: screenId,
-    wid: wid,
-    paramSource: paramSource,
+    screenIdOverride: screenIdOverride, 
+    widOverride: widOverride,
     launchParam: launchParam,
   );
 }
@@ -152,7 +150,7 @@ abstract class [!af_app_namespace(upper)]BottomSheetConfig<TSPI extends AFBottom
 abstract class [!af_app_namespace(upper)]WidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFWidgetConfig<TSPI, [!af_app_namespace(upper)]State, [!af_app_namespace(upper)]DefaultTheme, TStateView, TRouteParam> {
   [!af_app_namespace(upper)]WidgetConfig({
     required AFCreateStateViewDelegate<TStateView> stateViewCreator,
-    required AFCreateWidgetSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> spiCreator,
+    required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> spiCreator,
     AFNavigateRoute? route,
   }): super(
     themeId: [!af_app_namespace(upper)]ThemeID.defaultTheme,

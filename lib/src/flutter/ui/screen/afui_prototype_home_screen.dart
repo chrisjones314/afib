@@ -9,7 +9,6 @@ import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_library_list_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_state_test_list_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
-import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:afib/src/flutter/utils/af_param_ui_state_holder.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
@@ -85,10 +84,10 @@ class AFUIPrototypeHomeScreenParam extends AFScreenRouteParamWithFlutterState {
 }
 
 class AFPrototypeHomeScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeHomeScreenParam> {
-  AFPrototypeHomeScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeHomeScreenParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
+  AFPrototypeHomeScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeHomeScreenParam> context, AFStandardSPIData standard): super(context, standard);
   
-  factory AFPrototypeHomeScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeHomeScreenParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
-    return AFPrototypeHomeScreenSPI(context, screenId, theme,
+  factory AFPrototypeHomeScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeHomeScreenParam> context, AFStandardSPIData standard) {
+    return AFPrototypeHomeScreenSPI(context, standard,
     );
   }
 

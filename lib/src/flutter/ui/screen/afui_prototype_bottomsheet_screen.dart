@@ -7,7 +7,6 @@ import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
-import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 
@@ -34,10 +33,10 @@ class AFUIPrototypeBottomSheetRouteParam extends AFScreenRouteParam {
 }
 
 class AFUIPrototypeBottomSheetScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeBottomSheetRouteParam> {
-  AFUIPrototypeBottomSheetScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeBottomSheetRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
+  AFUIPrototypeBottomSheetScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeBottomSheetRouteParam> context, AFStandardSPIData standard): super(context, standard);
   
-  factory AFUIPrototypeBottomSheetScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeBottomSheetRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
-    return AFUIPrototypeBottomSheetScreenSPI(context, screenId, theme,
+  factory AFUIPrototypeBottomSheetScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeBottomSheetRouteParam> context, AFStandardSPIData standard) {
+    return AFUIPrototypeBottomSheetScreenSPI(context, standard,
     );
   }
 }
@@ -55,7 +54,7 @@ class AFUIPrototypeBottomSheetScreen extends AFUIConnectedScreen<AFUIPrototypeBo
   static AFNavigateAction navigatePush(AFBottomSheetPrototype test, {AFID? id}) {
     return AFNavigatePushAction(
       id: id,
-      param: AFUIPrototypeBottomSheetRouteParam(test: test, routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeBottomSheet)),
+      launchParam: AFUIPrototypeBottomSheetRouteParam(test: test, routeParam: AFRouteParamUnused.unused),
     );
   }
 

@@ -190,9 +190,7 @@ typedef AFStateTestScreenBuildContextDelegate<TSPI extends AFStateProgrammingInt
 
 typedef AFStateTestScreenBuildWithExecuteContextDelegate<TSPI extends AFStateProgrammingInterface> = void Function(AFStateTestExecute e, TSPI spi);
 
-typedef AFCreateScreenSPIDelegate<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> = TSPI Function(TBuildContext context, TTheme theme, AFScreenID screenId);
-
-typedef AFCreateWidgetSPIDelegate<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> = TSPI Function(TBuildContext context, TTheme theme, AFScreenID screenId, AFWidgetID wid, AFWidgetParamSource paramSource);
+typedef AFCreateSPIDelegate<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> = TSPI Function(TBuildContext context, AFStandardSPIData standard);
 
 typedef AFCreateConnectedWidgetDelegate = AFConnectedUIBase Function(AFConnectedUIBase parent, AFWidgetID wid, { required bool useParentParam });
 
@@ -206,6 +204,6 @@ typedef AFAccessCurrentStateDelegate = void Function(AFCurrentStateContext);
 
 typedef AFMergePublicStateDelegate = AFPublicState Function(AFPublicState realState, AFPublicState testState);
 
-typedef AFCreateDefaultRouteParamDelegate = AFRouteParam Function(AFRouteParamUseExistingOrDefault source, AFPublicState publicState);
+typedef AFCreateDefaultRouteParamDelegate = AFRouteParam Function(AFRouteParamRef source, AFPublicState publicState);
 
 typedef AFAddScreenSpecificModelsDelegate = void Function(AFBuildStateViewContext config, List<Object?> destination);

@@ -7,10 +7,10 @@ class DeclareSPIT extends AFSourceTemplate {
 
 @immutable
 class [!af_screen_name]SPI extends [!af_spi_parent_type]<[!af_state_view_type], [!af_screen_name]RouteParam> {
-  [!af_screen_name]SPI(AFBuildContext<[!af_state_view_type], [!af_screen_name]RouteParam> context, AFScreenID screenId, [!af_theme_type] theme): super(context, screenId, theme, );
+  [!af_screen_name]SPI(AFBuildContext<[!af_state_view_type], [!af_screen_name]RouteParam> context, AFStandardSPIData standard): super(context, standard);
   
-  factory [!af_screen_name]SPI.create(AFBuildContext<[!af_state_view_type], [!af_screen_name]RouteParam> context, [!af_theme_type] theme, AFScreenID screenId, ) {
-    return [!af_screen_name]SPI(context, screenId, theme,
+  factory [!af_screen_name]SPI.create(AFBuildContext<[!af_state_view_type], [!af_screen_name]RouteParam> context, AFStandardSPIData standard) {
+    return [!af_screen_name]SPI(context, standard,
     );
   }
 

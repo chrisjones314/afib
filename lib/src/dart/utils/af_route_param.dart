@@ -17,13 +17,6 @@ enum AFRouteLocation {
   globalPool, 
 }
 
-enum AFWidgetParamSource {
-  parent,
-  child,
-  global,
-  notApplicable
-}
-
 class AFRouteParam {
   final AFRouteLocation routeLocation;
   final AFWidgetID wid;
@@ -152,54 +145,66 @@ class AFRouteParamWrapper extends AFRouteParam {
 
 
 class AFRouteParamUnused extends AFRouteParam {
-  static const unused = AFRouteParamUnused(id: AFUIScreenID.unused);
-  const AFRouteParamUnused({ required AFScreenID id} ): super(screenId: id, routeLocation: AFRouteLocation.globalPool, wid: AFUIWidgetID.useScreenParam);
+  static const unused = AFRouteParamUnused(screenId: AFUIScreenID.unused, routeLocation: AFRouteLocation.globalPool, wid: AFUIWidgetID.useScreenParam);
+  const AFRouteParamUnused({ 
+    required AFScreenID screenId, 
+    required AFWidgetID wid, 
+    required AFRouteLocation routeLocation 
+  }): super(
+    screenId: screenId, 
+    wid: wid,
+    routeLocation: routeLocation
+  );
 
-  factory AFRouteParamUnused.create({
-    required AFScreenID id
-  }) {
-    return AFRouteParamUnused(id: id);
-  }
 }
 
-class AFRouteParamUseExistingOrDefault extends AFRouteParam {
-  const AFRouteParamUseExistingOrDefault({ 
+class AFRouteParamRef extends AFRouteParam {
+  const AFRouteParamRef({ 
     required AFScreenID screenId,
      required AFRouteLocation routeLocation,
      AFWidgetID wid = AFUIWidgetID.useScreenParam,
   } ): super(screenId: screenId, routeLocation: routeLocation, wid: wid);
 
-  factory AFRouteParamUseExistingOrDefault.createForScreen({
+  factory AFRouteParamRef.forScreen({
     required AFScreenID screenId,
-     AFRouteLocation routeLocation = AFRouteLocation.globalPool,
+    AFRouteLocation routeLocation = AFRouteLocation.globalPool,
   }) {
-    return AFRouteParamUseExistingOrDefault(screenId: screenId, routeLocation: routeLocation);
+    return AFRouteParamRef(screenId: screenId, routeLocation: routeLocation);
   }
 
-  factory AFRouteParamUseExistingOrDefault.createForWidget({
+  factory AFRouteParamRef.forWidgetTest({
+    required AFWidgetID wid,
+  }) {
+    return AFRouteParamRef(screenId: AFUIScreenID.screenPrototypeWidget, routeLocation: AFRouteLocation.screenHierarchy, wid: wid);
+  }
+
+  /*
+  factory AFRouteParamRef.createForWidget({
     required AFScreenID screenId,
     required AFWidgetID wid,
     required AFRouteLocation routeLocation,    
   }) {
-    return AFRouteParamUseExistingOrDefault(screenId: screenId, routeLocation: routeLocation, wid: wid);
+    return AFRouteParamRef(screenId: screenId, routeLocation: routeLocation, wid: wid);
   }
+  */
 
-  factory AFRouteParamUseExistingOrDefault.createForDrawer({
+
+  factory AFRouteParamRef.forDrawer({
     required AFScreenID screenId,
   }) {
-    return AFRouteParamUseExistingOrDefault(screenId: screenId, routeLocation: AFRouteLocation.globalPool);
+    return AFRouteParamRef(screenId: screenId, routeLocation: AFRouteLocation.globalPool);
   }
 
-  factory AFRouteParamUseExistingOrDefault.createForBottomSheet({
+  factory AFRouteParamRef.forBottomSheet({
     required AFScreenID screenId,
   }) {
-    return AFRouteParamUseExistingOrDefault(screenId: screenId, routeLocation: AFRouteLocation.globalPool);
+    return AFRouteParamRef(screenId: screenId, routeLocation: AFRouteLocation.globalPool);
   }
 
-  factory AFRouteParamUseExistingOrDefault.createForDialog({
+  factory AFRouteParamRef.forDialog({
     required AFScreenID screenId,
   }) {
-    return AFRouteParamUseExistingOrDefault(screenId: screenId, routeLocation: AFRouteLocation.globalPool);
+    return AFRouteParamRef(screenId: screenId, routeLocation: AFRouteLocation.globalPool);
   }
 
 }

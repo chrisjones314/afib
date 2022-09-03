@@ -75,7 +75,7 @@ class AFNavigateReplaceAction extends AFNavigateAction {
   final AFCreateDefaultChildParamDelegate? createDefaultChildParam;
   AFNavigateReplaceAction({
     AFID? id, 
-    required AFRouteParam param,
+    required AFRouteParam launchParam,
     List<AFRouteParam>? children,
     this.createDefaultChildParam,
     AFAsyncQuery? executeBefore,
@@ -83,7 +83,7 @@ class AFNavigateReplaceAction extends AFNavigateAction {
     RouteTransitionsBuilder? transitionsBuilder,
   }): super(
     id: id, 
-    param: param, 
+    param: launchParam, 
     children: children, 
     executeBefore: executeBefore, 
     executeDuring: executeDuring,
@@ -121,7 +121,7 @@ class AFNavigateReplaceAllAction extends AFNavigateAction {
   final AFCreateDefaultChildParamDelegate? createDefaultChildParam;
   AFNavigateReplaceAllAction({
     AFID? id, 
-    required AFRouteParam param,
+    required AFRouteParam launchParam,
     List<AFRouteParam>? children,
     this.createDefaultChildParam,
     AFAsyncQuery? executeBefore,
@@ -129,7 +129,7 @@ class AFNavigateReplaceAllAction extends AFNavigateAction {
     RouteTransitionsBuilder? transitionsBuilder,
   }): super(
     id: id, 
-    param: param, 
+    param: launchParam, 
     children: children, 
     executeBefore: executeBefore, 
     executeDuring: executeDuring,
@@ -137,13 +137,13 @@ class AFNavigateReplaceAllAction extends AFNavigateAction {
   );
 
   factory AFNavigateReplaceAllAction.toStartupScreen({required AFRouteParam param}) {
-    return AFNavigateReplaceAllAction(param: param);
+    return AFNavigateReplaceAllAction(launchParam: param);
   }
 
   AFNavigatePushAction castToPush() {
     return AFNavigatePushAction(
       id: id,
-      param: param,
+      launchParam: param,
       children: children,
       createDefaultChildParam: createDefaultChildParam,
       executeBefore: executeBefore,
@@ -159,7 +159,7 @@ class AFNavigateReplaceAllAction extends AFNavigateAction {
 class AFNavigatePushAction extends AFNavigateActionWithReturn {
   AFNavigatePushAction({
     AFID? id, 
-    required AFRouteParam param, 
+    required AFRouteParam launchParam, 
     List<AFRouteParam>? children,
     AFActionOnReturnDelegate? onReturn,
     AFCreateDefaultChildParamDelegate? createDefaultChildParam,
@@ -168,7 +168,7 @@ class AFNavigatePushAction extends AFNavigateActionWithReturn {
     RouteTransitionsBuilder? transitionsBuilder,
   }): super(
     id: id, 
-    param: param, 
+    param: launchParam, 
     children: children, 
     onReturn: onReturn, 
     createDefaultChildParam: createDefaultChildParam, 
@@ -180,7 +180,7 @@ class AFNavigatePushAction extends AFNavigateActionWithReturn {
   AFNavigateReplaceAllAction castToReplaceAll() {
     return AFNavigateReplaceAllAction(
       id: id,
-      param: param,
+      launchParam: param,
       children: children,
       createDefaultChildParam: this.createDefaultChildParam,
       executeBefore: executeBefore,
@@ -202,7 +202,7 @@ class AFNavigatePushAction extends AFNavigateActionWithReturn {
   AFNavigateReplaceAction castToReplace() {
     return AFNavigateReplaceAction(
       id: id,
-      param: param,
+      launchParam: param,
       children: children,
       createDefaultChildParam: this.createDefaultChildParam,
       executeBefore: executeBefore,

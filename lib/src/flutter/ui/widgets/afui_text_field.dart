@@ -4,14 +4,13 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
-import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:flutter/material.dart';
 
 //--------------------------------------------------------------------------------------
 class AFUITextFieldSPI extends AFUIWidgetSPI<AFUIDefaultStateView, AFRouteParamUnused> {
-  AFUITextFieldSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFScreenID screenId, AFID wid, AFUIDefaultTheme theme, AFWidgetParamSource paramSource): super(context, screenId, wid, paramSource, theme);
-  factory AFUITextFieldSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> ctx, AFUIDefaultTheme theme, AFScreenID screenId, AFID wid, AFWidgetParamSource paramSource) {
-    return AFUITextFieldSPI(ctx, screenId, wid, theme, paramSource);
+  AFUITextFieldSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard): super(context, standard);
+factory AFUITextFieldSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard) {
+    return AFUITextFieldSPI(context, standard);
   }
 
 }

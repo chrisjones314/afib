@@ -1,7 +1,6 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
-import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:flutter/material.dart';
 
 enum AFUIStandardChoiceDialogIcon {
@@ -30,10 +29,10 @@ class AFUIStandardChoiceDialogRouteParam extends AFDialogRouteParam {
 }
 
 class AFUIStandardChoiceDialogSPI extends AFUIDialogSPI<AFUIDefaultStateView, AFUIStandardChoiceDialogRouteParam> {
-  AFUIStandardChoiceDialogSPI(AFBuildContext<AFUIDefaultStateView, AFUIStandardChoiceDialogRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme);
+  AFUIStandardChoiceDialogSPI(AFBuildContext<AFUIDefaultStateView, AFUIStandardChoiceDialogRouteParam> context, AFStandardSPIData standard): super(context, standard);
   
-  factory AFUIStandardChoiceDialogSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIStandardChoiceDialogRouteParam> ctx, AFUIDefaultTheme theme, AFScreenID screenId) {
-    return AFUIStandardChoiceDialogSPI(ctx, screenId, theme);
+  factory AFUIStandardChoiceDialogSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIStandardChoiceDialogRouteParam> context, AFStandardSPIData standard) {
+    return AFUIStandardChoiceDialogSPI(context, standard);
   }    
 }
 
@@ -55,7 +54,7 @@ class AFUIStandardChoiceDialog extends AFUIConnectedDialog<AFUIStandardChoiceDia
     required List<String> buttonTitles
   }) {
     return AFNavigatePushAction(
-      param: AFUIStandardChoiceDialogRouteParam(
+      launchParam: AFUIStandardChoiceDialogRouteParam(
         title: title,
         body: body,
         icon: icon,

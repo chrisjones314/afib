@@ -285,7 +285,7 @@ void afDefaultQueryErrorHandler(AFFinishQueryErrorContext context) {
 
 
 class AFCoreDefinitionContext {
-  final spiOverrides = <Type, AFCreateWidgetSPIDelegate>{};
+  final spiOverrides = <Type, AFCreateSPIDelegate>{};
   final lpiFactories = <AFLibraryProgrammingInterfaceID, AFCreateLibraryProgrammingInterfaceDelegate>{};
   final themeFactories = <AFThemeID, AFCreateFunctionalThemeDelegate>{};
   final AFScreenMap screenMap = AFScreenMap();
@@ -316,9 +316,9 @@ class AFCoreDefinitionContext {
     errorListeners.add(onError);
   }
 
-  void defineScreenSPIOverride<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme>({ required AFCreateScreenSPIDelegate<TSPI, TBuildContext, TTheme> createSPI }) {
-    spiOverrides[TSPI] = ((context, theme, screenId, wid, paramSource) {
-      return createSPI(context as TBuildContext, theme as TTheme, screenId);
+  void defineScreenSPIOverride<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme>({ required AFCreateSPIDelegate<TSPI, TBuildContext, TTheme> createSPI }) {
+    spiOverrides[TSPI] = ((context, standard) {
+      return createSPI(context as TBuildContext, standard);
     });
   }
 

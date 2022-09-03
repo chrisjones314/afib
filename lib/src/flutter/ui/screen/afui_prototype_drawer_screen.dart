@@ -7,7 +7,6 @@ import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
-import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 
@@ -34,10 +33,10 @@ class AFUIPrototypeDrawerScreenRouteParam extends AFScreenRouteParam {
 }
 
 class AFUIPrototypeDrawerScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeDrawerScreenRouteParam> {
-  AFUIPrototypeDrawerScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerScreenRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
+  AFUIPrototypeDrawerScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerScreenRouteParam> context, AFStandardSPIData standard): super(context, standard);
   
-  factory AFUIPrototypeDrawerScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerScreenRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
-    return AFUIPrototypeDrawerScreenSPI(context, screenId, theme,
+  factory AFUIPrototypeDrawerScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerScreenRouteParam> context, AFStandardSPIData standard) {
+    return AFUIPrototypeDrawerScreenSPI(context, standard,
     );
   }
 }
@@ -55,7 +54,7 @@ class AFUIPrototypeDrawerScreen extends AFUIConnectedScreen<AFUIPrototypeDrawerS
   static AFNavigateAction navigatePush(AFDrawerPrototype test, {AFID? id}) {
     return AFNavigatePushAction(
       id: id,
-      param: AFUIPrototypeDrawerScreenRouteParam(test: test, routeParam: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeDrawer)),
+      launchParam: AFUIPrototypeDrawerScreenRouteParam(test: test, routeParam: AFRouteParamUnused.unused),
     );
   }
 

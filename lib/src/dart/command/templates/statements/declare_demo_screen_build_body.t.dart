@@ -5,9 +5,7 @@ class DeclareDemoScreenBuildBodyT extends AFSourceTemplate {
     final t = spi.t;
     final rows = t.column();
 
-    rows.add(AFUIWelcomeWidget(
-      screenId: screenId,
-    ));
+    rows.add(AFUIWelcomeWidget());
 
     rows.add(_buildIncrementCard(spi));
 

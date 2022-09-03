@@ -2,22 +2,20 @@
 
 import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
-import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
-import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 
 class AFUIPrototypeWireframesListScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFRouteParam> {
-  AFUIPrototypeWireframesListScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
+  AFUIPrototypeWireframesListScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard): super(context, standard );
   
-  factory AFUIPrototypeWireframesListScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
-    return AFUIPrototypeWireframesListScreenSPI(context, screenId, theme,
+  factory AFUIPrototypeWireframesListScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard) {
+    return AFUIPrototypeWireframesListScreenSPI(context, standard,
     );
   }
 
@@ -35,7 +33,7 @@ class AFUIPrototypeWireframesListScreen extends AFUIConnectedScreen<AFUIPrototyp
 
   static AFNavigatePushAction navigatePush() {
     return AFNavigatePushAction(
-      param: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeWireframesList)
+      launchParam: AFRouteParamUnused.unused
     );
   }
 

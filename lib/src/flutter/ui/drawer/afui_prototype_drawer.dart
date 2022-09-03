@@ -13,7 +13,6 @@ import 'package:afib/src/flutter/test/af_screen_test.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
-import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:afib/src/flutter/utils/af_param_ui_state_holder.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -91,10 +90,10 @@ class AFUIPrototypeDrawerRouteParam extends AFDrawerRouteParam {
 
 class AFUIPrototypeDrawerSPI extends AFUIDrawerSPI<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> {
 
-  AFUIPrototypeDrawerSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme);
+  AFUIPrototypeDrawerSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> context, AFStandardSPIData standard): super(context, standard);
   
-  factory AFUIPrototypeDrawerSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
-    return AFUIPrototypeDrawerSPI(context, screenId, theme);
+  factory AFUIPrototypeDrawerSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> context, AFStandardSPIData standard) {
+    return AFUIPrototypeDrawerSPI(context, standard);
   }
 
   void onTapAddDuration() {

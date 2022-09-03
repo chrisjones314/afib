@@ -496,12 +496,18 @@ class AFRouteState {
     screen.add(AFRouteSegment.withParam(routeParamFactory(), null, null));
     final screenSegs = AFRouteStateSegments(active: screen, prior: emptySegments);
     final globalPool = <AFScreenID, AFRouteSegment>{};
+    globalPool[AFUIScreenID.unused] = AFRouteSegment(param: AFRouteParamUnused.unused, children: null, createDefaultChildParam: null);
     return AFRouteState(screenHierarchy: screenSegs, globalPool: globalPool, timeLastUpdate: AFTimeState.createNow(), showingScreens: <AFUIType, AFRouteStateShowScreen>{});
   }
 
   bool isActiveScreen(AFScreenID screen) {
     var last = screenHierarchy.last;
     return last.matchesScreen(screen);
+  }
+
+  AFRouteSegment findUnusedParam() {
+    final result = findRouteParamFull(screenId: AFUIScreenID.unused, wid: AFUIWidgetID.useScreenParam, routeLocation: AFRouteLocation.globalPool);
+    return result!;
   }
 
   /// Used internally to convert a test route, which has the prototype screens at its base, into 
@@ -670,7 +676,7 @@ class AFRouteState {
   /// Adds a new screen/data below the current screen in the route.
   AFRouteState pushNamed(AFRouteParam param, List<AFRouteParam>? children, AFCreateDefaultChildParamDelegate? createDefaultChildParam) {
     var routeState = this;
-    if(param is AFRouteParamUseExistingOrDefault) {
+    if(param is AFRouteParamRef) {
       assert(param.routeLocation == AFRouteLocation.globalPool, "You can only AFRouteParamUseExistingOrDefault for a global screen.");
 
       // first, revise it with the default.
@@ -726,7 +732,7 @@ class AFRouteState {
     return _reviseScreen(screenHierarchy.exitTest());
   }
 
-  AFRouteState updateRouteParamWithExistingOrDefault(AFRouteParamUseExistingOrDefault param) {
+  AFRouteState updateRouteParamWithExistingOrDefault(AFRouteParamRef param) {
     // first, see if it exists
     final seg = this.findRouteParamFull(screenId: param.screenId, routeLocation: param.routeLocation, wid: param.wid);
     if(seg != null) {
@@ -753,12 +759,12 @@ class AFRouteState {
     // in this case, we obviously don't want to set this value as the param. Instead,
     // we want to verify that it already exists, or else create it using the uiConfig's default
     // method.
-    if(param is AFRouteParamUseExistingOrDefault) {
+    if(param is AFRouteParamRef) {
       return updateRouteParamWithExistingOrDefault(param);
     }
 
     if(param.hasChildWID) { 
-      return setChildParam(param, AFWidgetParamSource.child);
+      return setChildParam(param);
     }
 
 
@@ -917,8 +923,8 @@ class AFRouteState {
   }
 
 
-  AFRouteState setChildParam(AFRouteParam param, AFWidgetParamSource paramSource) {
-    if(paramSource == AFWidgetParamSource.parent) {
+  AFRouteState setChildParam(AFRouteParam param) {
+    if(param.wid == AFUIWidgetID.useScreenParam) {
       return updateRouteParam(param);
     }
     final widget = param.wid;
@@ -990,9 +996,15 @@ class AFRouteState {
     AFTimeState? timeLastUpdate,
     Map<AFUIType,  AFRouteStateShowScreen>? showScreen,
   }) {
+    var gp = globalPool ?? this.globalPool;
+    if(!gp.containsKey(AFUIScreenID.unused)) {
+      gp = Map<AFID, AFRouteSegment>.from(gp);
+      gp[AFUIScreenID.unused] = AFRouteSegment(param: AFRouteParamUnused.unused, children: null, createDefaultChildParam: null);
+    }
+
     final revised = AFRouteState(
       screenHierarchy: screenSegs ?? this.screenHierarchy,
-      globalPool: globalPool ?? this.globalPool,
+      globalPool: gp,
       timeLastUpdate: timeLastUpdate ?? this.timeLastUpdate,
       showingScreens: showScreen ?? this.showingScreens,
     );

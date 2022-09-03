@@ -2,7 +2,6 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
-import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:flutter/material.dart';
 
 class AFUIUnimplementedScreenRouteParam extends AFScreenRouteParam {
@@ -15,10 +14,10 @@ class AFUIUnimplementedScreenRouteParam extends AFScreenRouteParam {
 
 
 class AFUIUnimplementedScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIUnimplementedScreenRouteParam> {
-  AFUIUnimplementedScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIUnimplementedScreenRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
+  AFUIUnimplementedScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIUnimplementedScreenRouteParam> context, AFStandardSPIData standard): super(context, standard, );
   
-  factory AFUIUnimplementedScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIUnimplementedScreenRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
-    return AFUIUnimplementedScreenSPI(context, screenId, theme,
+  factory AFUIUnimplementedScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIUnimplementedScreenRouteParam> context, AFStandardSPIData standard) {
+    return AFUIUnimplementedScreenSPI(context, standard,
     );
   }
 
@@ -38,7 +37,7 @@ class AFUIUnimplementedScreen extends AFUIConnectedScreen<AFUIUnimplementedScree
   AFUIUnimplementedScreen(): super(screenId: AFUIScreenID.screenUnimplemented, config: config);
 
   static AFNavigatePushAction navigatePush(String message) {
-    return AFNavigatePushAction(param: AFUIUnimplementedScreenRouteParam(message: message));
+    return AFNavigatePushAction(launchParam: AFUIUnimplementedScreenRouteParam(message: message));
   }
 
   @override

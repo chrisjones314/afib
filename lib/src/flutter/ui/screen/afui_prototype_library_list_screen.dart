@@ -2,21 +2,19 @@
 
 import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
-import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_library_home_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
-import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 
 class AFUIPrototypeLibraryListScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFRouteParam> {
-  AFUIPrototypeLibraryListScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFScreenID screenId, AFUIDefaultTheme theme): super(context, screenId, theme, );
+  AFUIPrototypeLibraryListScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard): super(context, standard);
   
-  factory AFUIPrototypeLibraryListScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFUIDefaultTheme theme, AFScreenID screenId) {
-    return AFUIPrototypeLibraryListScreenSPI(context, screenId, theme,
+  factory AFUIPrototypeLibraryListScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard) {
+    return AFUIPrototypeLibraryListScreenSPI(context, standard,
     );
   }
 
@@ -35,7 +33,7 @@ class AFUIPrototypeLibraryListScreen extends AFUIConnectedScreen<AFUIPrototypeLi
 
   static AFNavigatePushAction navigatePush() {
     return AFNavigatePushAction(
-      param: AFRouteParamUnused.create(id: AFUIScreenID.screenPrototypeLibraryList));
+      launchParam: AFRouteParamUnused.unused);
   }
 
   @override

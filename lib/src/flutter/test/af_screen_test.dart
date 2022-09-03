@@ -2080,14 +2080,14 @@ class AFSingleScreenTests<TState> {
   /// test for the screen.
   AFSingleScreenPrototypeBody addPrototype({
     required AFPrototypeID   id,
-    required dynamic models,
+    required dynamic stateView,
     required AFNavigatePushAction navigate,
     required AFTestTimeHandling timeHandling
   }) {
 
     final instance = AFSingleScreenPrototype(
       id: id,
-      models: models,
+      models: stateView,
       navigate: navigate,
       body: AFSingleScreenPrototypeBody(id, screenId: navigate.screenId),
       timeHandling: timeHandling
@@ -2616,15 +2616,15 @@ class AFUIPrototypeDefinitionContext extends AFBaseTestDefinitionContext {
   /// screen view state/route param state.
   AFSingleScreenPrototypeBody defineScreenPrototype({
     required AFPrototypeID   id,
-    required Object? models,
+    required Object? stateView,
     required AFNavigatePushAction navigate,
     AFTestTimeHandling timeHandling = AFTestTimeHandling.paused,
     String? title,
   }) {
-    final modelsActual = models ?? <Object>[];
+    final stateViewActual = stateView ?? <Object>[];
     return screenTests.addPrototype(
       id: id,
-      models: modelsActual,
+      stateView: stateViewActual,
       navigate: navigate,
       timeHandling: timeHandling,
     );
@@ -2685,14 +2685,14 @@ class AFUIPrototypeDefinitionContext extends AFBaseTestDefinitionContext {
     required AFPrototypeID id,
     required AFRenderConnectedChildDelegate render,
     List<AFRouteParam>? children,
-    dynamic models,
-    required AFRouteParam param,
+    dynamic stateView,
+    required AFRouteParam launchParam,
   }) {
     return widgetTests.addConnectedPrototype(
       id: id,
       render: render,
-      models: models,
-      routeParam: param,
+      models: stateView,
+      routeParam: launchParam,
       children: children,
     );
   }

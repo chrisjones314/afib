@@ -1278,12 +1278,12 @@ abstract class AFScreenPrototype {
   AFNavigatePushAction get navigate;
   List<String> paramDescriptions(AFScreenTestID id) { return <String>[]; }
   List<AFScreenTestID> get sectionIds { return <AFScreenTestID>[]; }
-  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? models });
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? stateView });
   Future<void> run(AFScreenTestContext context, { Function onEnd});
   void onDrawerReset(AFDispatcher dispatcher);
   Future<void> onDrawerRun(AFBuildContext context, AFScreenTestContextSimulator? prevContext, AFSingleScreenTestState state, AFScreenTestID testId, Function onEnd);
   void openTestDrawer(AFScreenTestID id);
-  dynamic get models;
+  dynamic get stateView;
   bool get isTestDrawerEnd { return testDrawerSide == testDrawerSideEnd; }
   bool get isTestDrawerBegin { return testDrawerSide == testDrawerSideBegin; }
 
@@ -1297,13 +1297,13 @@ abstract class AFScreenPrototype {
     }
 
     final testContext = AFScreenTestContextSimulator(dispatcher, this.id, runNumber, idSelected);
-    dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(testContext, navigate: navigate, models: this.models, timeHandling: this.timeHandling));
+    dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(testContext, navigate: navigate, models: this.stateView, timeHandling: this.timeHandling));
     return testContext;
   }
 }
 
 abstract class AFScreenLikePrototype extends AFScreenPrototype {
-  dynamic models;
+  dynamic stateView;
   final AFSingleScreenPrototypeBody body;
   //final AFConnectedScreenWithoutRoute screen;
   final AFNavigatePushAction navigate;
@@ -1311,7 +1311,7 @@ abstract class AFScreenLikePrototype extends AFScreenPrototype {
 
   AFScreenLikePrototype({
     required AFPrototypeID id,
-    required this.models,
+    required this.stateView,
     required this.navigate,
     required this.body,
     required this.timeHandling,
@@ -1353,22 +1353,23 @@ class AFSingleScreenPrototype extends AFScreenLikePrototype {
 
   AFSingleScreenPrototype({
     required AFPrototypeID id,
-    required dynamic models,
+    required dynamic stateView,
     required AFNavigatePushAction navigate,
     required AFSingleScreenPrototypeBody body,
     required AFTestTimeHandling timeHandling,
   }): super(
     id: id,
-    models: models,
+    stateView: stateView,
     navigate: navigate,
     body: body,
     uiType: AFUIType.screen,
-    timeHandling: timeHandling);
+    timeHandling: timeHandling
+  );
 
 
   @override
-  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? models }) {
-    final ms = models ?? this.models;
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? stateView }) {
+    final ms = stateView ?? this.stateView;
     final rvp = routeParam ?? this.navigate.param;
     final actualModels = registry.resolveStateViewModels(ms);
     final rp = registry.find(rvp);
@@ -1405,7 +1406,7 @@ class AFSingleScreenPrototype extends AFScreenLikePrototype {
 
   void onDrawerReset(AFDispatcher dispatcher) {
     AFSingleScreenPrototype.resetTestParam(dispatcher, this.id, this.navigate);
-    final sv = AFibF.g.testData.resolveStateViewModels(this.models);
+    final sv = AFibF.g.testData.resolveStateViewModels(this.stateView);
     dispatcher.dispatch(AFUpdatePrototypeScreenTestModelsAction(this.id, sv));
   }
 
@@ -1413,7 +1414,7 @@ class AFSingleScreenPrototype extends AFScreenLikePrototype {
 
 
 abstract class AFWidgetPrototype extends AFScreenPrototype {
-  final dynamic models;
+  final dynamic stateView;
   final AFSingleScreenPrototypeBody body;
   final AFRenderConnectedChildDelegate render;
   final AFCreateWidgetWrapperDelegate? createWidgetWrapperDelegate;
@@ -1421,7 +1422,7 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
   AFWidgetPrototype({
     required AFPrototypeID id,
     required this.body,
-    required this.models,
+    required this.stateView,
     required this.render,
     this.createWidgetWrapperDelegate,
     String? title
@@ -1443,8 +1444,8 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
     return body;
   }
 
-  void startScreen(AFDispatcher dispatcher,  BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? models }) {
-    final ms = models ?? this.models;
+  void startScreen(AFDispatcher dispatcher,  BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? stateView }) {
+    final ms = stateView ?? this.stateView;
     final rpp = routeParam ?? this.navigate.param;
 
     final actualModels = registry.find(ms);
@@ -1486,7 +1487,7 @@ class AFConnectedWidgetPrototype extends AFWidgetPrototype {
     required AFRenderConnectedChildDelegate render,
     required AFSingleScreenPrototypeBody body,
     required this.timeHandling,
-  }): super(id: id, body: body, models: models, render: render);
+  }): super(id: id, body: body, stateView: models, render: render);
 
   List<AFScreenTestDescription> get smokeTests { return List<AFScreenTestDescription>.from(body.smokeTests); }
   List<AFScreenTestDescription> get reusableTests { return  List<AFScreenTestDescription>.from(body.reusableTests); }
@@ -1519,7 +1520,7 @@ class AFDialogPrototype extends AFScreenLikePrototype {
     required AFTestTimeHandling timeHandling,
   }): super(
     id: id,
-    models: models,
+    stateView: models,
     navigate: navigate,
     body: body,
     timeHandling: timeHandling, uiType: AFUIType.dialog);
@@ -1528,8 +1529,8 @@ class AFDialogPrototype extends AFScreenLikePrototype {
     return AFUIScreenID.screenPrototypeDialog;
   }
 
-  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? models }) {
-    final ms = models ?? this.models;
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? stateView }) {
+    final ms = stateView ?? this.stateView;
     final rpp = routeParam ?? this.navigate.param;
 
     final actualModels = registry.find(ms);
@@ -1581,7 +1582,7 @@ class AFBottomSheetPrototype extends AFScreenLikePrototype {
     required AFTestTimeHandling timeHandling,
   }): super(
     id: id,
-    models: models,
+    stateView: models,
     navigate: navigate,
     body: body,
     timeHandling: timeHandling,
@@ -1592,8 +1593,8 @@ class AFBottomSheetPrototype extends AFScreenLikePrototype {
     return AFUIScreenID.screenPrototypeBottomSheet;
   }
 
-  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? models }) {
-    final ms = models ?? this.models;
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? stateView }) {
+    final ms = stateView ?? this.stateView;
     final rpp = routeParam ?? this.navigate.param;
 
     final actualModels = registry.find(ms);
@@ -1644,7 +1645,7 @@ class AFDrawerPrototype extends AFScreenLikePrototype {
     required AFTestTimeHandling timeHandling,
   }): super(
     id: id,
-    models: models,
+    stateView: models,
     navigate: navigate,
     body: body,
     timeHandling: timeHandling,
@@ -1655,8 +1656,8 @@ class AFDrawerPrototype extends AFScreenLikePrototype {
     return AFUIScreenID.screenPrototypeDrawer;
   }
 
-  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? models }) {
-    final ms = models ?? this.models;
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? stateView }) {
+    final ms = stateView ?? this.stateView;
     final rpp = routeParam ?? this.navigate.param;
 
     final actualModels = registry.find(ms);
@@ -1723,7 +1724,7 @@ class AFWorkflowStatePrototype extends AFScreenPrototype {
     return actualDisplayId ?? id;
   }
 
-  dynamic get models { return null; }
+  dynamic get stateView { return null; }
   dynamic get routeParam { return null; }
   AFNavigatePushAction get navigate { return AFNavigatePushAction(launchParam: AFRouteParamUnused.unused); }
 
@@ -1741,7 +1742,7 @@ class AFWorkflowStatePrototype extends AFScreenPrototype {
     return AFibF.g.screenTests;
   }
 
-  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? models }) {
+  void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? stateView }) {
     initializeMultiscreenPrototype(dispatcher, this);
   }
 
@@ -2087,7 +2088,7 @@ class AFSingleScreenTests<TState> {
 
     final instance = AFSingleScreenPrototype(
       id: id,
-      models: stateView,
+      stateView: stateView,
       navigate: navigate,
       body: AFSingleScreenPrototypeBody(id, screenId: navigate.screenId),
       timeHandling: timeHandling
@@ -2513,6 +2514,16 @@ class AFBaseTestDefinitionContext {
 
   TResult td2<TResult extends Object>(dynamic testDataId) {
     return registry.find(testDataId) as TResult;
+  }
+
+  // DOC_TODO: This is a way to create a state view in a UI test so you can 
+  // use it in navigatePush as well as passing it as the stateView param.
+  TStateView createStateView<TStateView extends AFFlexibleStateView>({
+    required dynamic stateView,
+    required AFCreateStateViewDelegate<TStateView> creator,
+  }) {
+    final models = registry.resolveStateViewModels(stateView);
+    return creator(models);
   }
 
   AFTimeState currentTime() {

@@ -78,7 +78,7 @@ class AFWireframeExecutionContext<TStateView extends AFFlexibleStateView> {
     final dispatcher = AFibF.g.internalOnlyActiveDispatcher;
     assert(test != null);
     if(test != null) {
-      test.startScreen(dispatcher, spi.context.flutterContext, wireframe.testData, routeParam: routeParam, models: models);
+      test.startScreen(dispatcher, spi.context.flutterContext, wireframe.testData, routeParam: routeParam, stateView: models);
     }
   }
 

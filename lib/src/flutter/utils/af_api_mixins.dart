@@ -69,16 +69,27 @@ mixin AFAccessStateSynchronouslyMixin {
     return result!;
   }
 
-  AFRouteSegment? accessRouteSegment(AFScreenID screen) {
-    return accessPublicState.route.findParamFor(screen);
+  AFRouteSegment? accessScreenRouteSegment(AFScreenID screen, {
+    AFRouteLocation routeLocation = AFRouteLocation.screenHierarchy,
+  }) {
+    return accessPublicState.route.findRouteParamFull(
+      screenId: screen,
+      wid: AFUIWidgetID.useScreenParam,
+      routeLocation: routeLocation
+    );
   }
 
-  TRouteParam? accessRouteParam<TRouteParam extends AFRouteParam>(AFScreenID screen) {
-    final seg = accessRouteSegment(screen);
+  TRouteParam? accessScreenRouteParam<TRouteParam extends AFRouteParam>(AFScreenID screen, {
+    AFRouteLocation routeLocation = AFRouteLocation.screenHierarchy,
+  }) {
+    final seg = accessScreenRouteSegment(screen, routeLocation: routeLocation);
     return seg?.param as TRouteParam?;
   }
-  TRouteParam? accessChildRouteParam<TRouteParam extends AFRouteParam>(AFScreenID screen, AFID child) {
-    final seg = accessRouteSegment(screen);
+
+  TRouteParam? accessWidgetRouteParam<TRouteParam extends AFRouteParam>(AFScreenID screen, AFWidgetID child, {
+    AFRouteLocation routeLocation = AFRouteLocation.screenHierarchy,
+  }) {
+    final seg = accessScreenRouteSegment(screen, routeLocation: routeLocation);
     final result = seg?.children?.findParamById(child);
     return result as TRouteParam?;
   }
@@ -87,8 +98,10 @@ mixin AFAccessStateSynchronouslyMixin {
   /// 
   /// Searches the active screen in the hierarchy, the children of that screen, and any currently
   /// showing UIs (dialogs, etc)
-  TRouteParam? accessActiveRouteParamOfType<TRouteParam extends AFRouteParam>() {
-    final found = accessActiveRouteParamsOfType<TRouteParam>();
+  TRouteParam? accessActiveRouteParamOfType<TRouteParam extends AFRouteParam>({
+    AFRouteLocation routeLocation = AFRouteLocation.screenHierarchy
+  }) {
+    final found = accessActiveRouteParamsOfType<TRouteParam>(routeLocation: routeLocation);
     assert(found.length < 2);
     if(found.isEmpty) {
       return null;
@@ -100,10 +113,16 @@ mixin AFAccessStateSynchronouslyMixin {
   /// 
   /// Searches the active screen in the hierarchy, the children of that screen, and any currently
   /// showing UIs (dialogs, etc)
-  List<TRouteParam> accessActiveRouteParamsOfType<TRouteParam extends AFRouteParam>() {
+  List<TRouteParam> accessActiveRouteParamsOfType<TRouteParam extends AFRouteParam>({
+    AFRouteLocation routeLocation = AFRouteLocation.screenHierarchy
+  }) {
     final route = accessPublicState.route;
     final activeScreenId = route.activeScreenId;
-    final routeSeg = route.findParamFor(activeScreenId);
+    final routeSeg = route.findRouteParamFull(
+      screenId: activeScreenId,
+      routeLocation: routeLocation,
+      wid: AFUIWidgetID.useScreenParam
+    );
     final result = <TRouteParam>[];
     final screenParam = routeSeg?.param;
     if(screenParam is TRouteParam) {

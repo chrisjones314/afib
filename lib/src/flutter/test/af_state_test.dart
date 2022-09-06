@@ -136,7 +136,9 @@ class AFStateTestContextForScreen extends AFStateTestContext {
     required AFScreenID screenId,
     required AFConnectedUIConfig screenConfig,
   }) {
-    return AFStateTestScreenContextForScreen<TSPI>(screenId: screenId, screenConfig: screenConfig);
+    return AFStateTestScreenContextForScreen<TSPI>(
+      screenId: screenId, 
+      screenConfig: screenConfig);
   }
 }
 

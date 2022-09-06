@@ -601,37 +601,29 @@ class AFRouteState {
     required AFScreenID screenId,
     required AFWidgetID wid,
     required AFRouteLocation routeLocation,
+    bool includePrior = true
   }) {
+    /// Ugggh.  So, it would be really nice if we could trust the route location here.
+    /// Howver, if you try to chase the routeLocation all the way back to AFConnectedScreen.createContextForDiff, you'll
+    /// find that you would need to pass in the routeLocation to the screen constructor.  That requires you to declare
+    /// whether the screen's parameter lives in the hierarchy or the screen when the screen is declared.
+    /// I think it is better that it just works this way, where a screen could live in the hierarchy or in the global pool,
+    /// depending on where you choose to put the route parameter.
+    /// 
+    /// It is confusing if you have a duplicate screen in both the global pool and the hierarchy, however.
+    if(globalPool.containsKey(screenId)) {
+      return globalPool[screenId];
+    }
+
+    if(hasStartupWrapper && screenId == AFibF.g.screenMap.startupScreenId) {
+      screenId = AFUIScreenID.screenStartupWrapper;
+    }
+
     if(routeLocation == AFRouteLocation.screenHierarchy) {
-      return findRouteParamInHierarchy(screenId: screenId, wid: wid);
+      return findRouteParamInHierarchy(screenId: screenId, wid: wid, includePrior: includePrior);
     } else {
       return findRouteParamInGlobalPool(screenId: screenId, wid: wid);
     }
-  }
-
-  /// Finds the data associated with the specified [screen] in the current route.
-  /// 
-  /// If [includePrior] is true, it will also include the most recent final segment
-  /// in the search.  This is useful when the final segement has been popped off the route,
-  /// but still needs to be included in the search.
-  AFRouteSegment? findParamFor(AFID screen, { bool includePrior = true }) {
-    final gp = globalPool;
-    if(gp.containsKey(screen)) {
-      return gp[screen];
-    }
-    if(hasStartupWrapper && screen == AFibF.g.screenMap.startupScreenId) {
-      screen = AFUIScreenID.screenStartupWrapper;
-    }
-    final seg = screenHierarchy.findSegmentFor(screen as AFScreenID, includePrior: includePrior);
-    return seg; //?.param.paramFor(screen);
-  }
-
-  AFRouteSegment? findChildParamFor(AFID screen, AFWidgetID wid, { bool includePrior = true }) {
-    final screenSeg = findParamFor(screen, includePrior: includePrior);
-    if(screenSeg == null) {
-      return null;
-    }
-    return screenSeg.findChild(wid);
   }
 
   /// Finds a drawer param for the drawer with the specified screen id. 
@@ -646,19 +638,6 @@ class AFRouteState {
     final seg = screenHierarchy.findSegmentFor(screen, includePrior: includePrior);
     return (seg != null);
   }
-
-  /// Returns the list of screen names, from the root to the leaf.
-  /*
-  String fullPath() { 
-
-    final buffer = StringBuffer();
-    for(final item in route) {
-      buffer.write("/");
-      buffer.write(item.screen);
-    }
-    return buffer.toString();
-  }
-  */
 
   /// Removes the current leaf from the route, and adds the specified screen
   /// and data in its place.

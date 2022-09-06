@@ -123,11 +123,11 @@ Future<void> _afStandardScreenTestMain(
       final dispatcher = AFSingleScreenTestDispatcher(prototype.id, storeDispatcher, null);
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, prototype.id, output, localStats);
       storeDispatcher.dispatch(AFResetToInitialStateAction());
-      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, models: prototype.models, navigate: prototype.navigate, timeHandling: prototype.timeHandling));
+      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, models: prototype.stateView, navigate: prototype.navigate, timeHandling: prototype.timeHandling));
       dispatcher.setContext(context);
       simpleContexts.add(context);
       if(prototype.timeHandling == AFTestTimeHandling.running) {
-        final resolvedModels = AFibF.g.testData.resolveStateViewModels(prototype.models);
+        final resolvedModels = AFibF.g.testData.resolveStateViewModels(prototype.stateView);
         final baseTime = resolvedModels["AFTimeState"] as AFTimeState?;
         if(baseTime == null) {
           throw AFException("If you set runTime to true in a screen or widget test, one of your models must be an AFTimeState");
@@ -169,7 +169,7 @@ Future<void> _afWidgetTestMain(AFCommandOutput output, AFTestStats stats, Widget
   return _afStandardScreenTestMain(output, stats, tester, app, AFibF.g.widgetTests.all, "Widget", createPush: (test) {
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
-      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models),
+      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.stateView),
       AFUIPrototypeWidgetScreen.navigatePush(test as AFWidgetPrototype)
     ];
   });
@@ -179,7 +179,7 @@ Future<void> _afDialogTestMain(AFCommandOutput output, AFTestStats stats, Widget
   return _afStandardScreenTestMain(output, stats, tester, app, AFibF.g.dialogTests.all, "Dialog", createPush: (test) {
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
-      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models),
+      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.stateView),
       AFUIPrototypeDialogScreen.navigatePush(test as AFDialogPrototype)
     ];
   }, showItem: (dispatcher, test) async {
@@ -201,7 +201,7 @@ Future<void> _afBottomSheetTestMain(AFCommandOutput output, AFTestStats stats, W
   return _afStandardScreenTestMain(output, stats, tester, app, AFibF.g.bottomSheetTests.all, "BottomSheet", createPush: (test) {
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
-      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models),
+      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.stateView),
       AFUIPrototypeBottomSheetScreen.navigatePush(test as AFBottomSheetPrototype)
     ];
   }, showItem: (dispatcher, test) async {
@@ -223,7 +223,7 @@ Future<void> _afDrawerTestMain(AFCommandOutput output, AFTestStats stats, Widget
   return _afStandardScreenTestMain(output, stats, tester, app, AFibF.g.drawerTests.all, "Drawer", createPush: (test) {
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
-      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.models),
+      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.stateView),
       AFUIPrototypeDrawerScreen.navigatePush(test as AFDrawerPrototype)
     ];
   }, showItem: (dispatcher, test) async {
@@ -241,7 +241,7 @@ Future<void> _afDrawerTestMain(AFCommandOutput output, AFTestStats stats, Widget
 
 Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
   return _afStandardScreenTestMain(output, stats, tester, app, AFibF.g.screenTests.all, "Single-Screen", createPush: (test) {
-    final stateViews = AFibF.g.testData.resolveStateViewModels(test.models);
+    final stateViews = AFibF.g.testData.resolveStateViewModels(test.stateView);
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
       AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: stateViews),

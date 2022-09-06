@@ -112,11 +112,11 @@ class AFUIPrototypeTestScreen extends AFUIConnectedScreen<AFUIPrototypeTestScree
     final t = spi.t;
     final cols = t.row();
     
-    cols.add(_childTopTab(spi, AFUIType.screen, "Scre"));
-    cols.add(_childTopTab(spi, AFUIType.dialog, "Dial"));
-    cols.add(_childTopTab(spi, AFUIType.bottomSheet, "Bot"));
-    cols.add(_childTopTab(spi, AFUIType.drawer, "Dra"));
-    cols.add(_childTopTab(spi, AFUIType.widget, "Wid"));
+    cols.add(_childTopTab(spi, AFUIType.screen, "Scr", "Screens"));
+    cols.add(_childTopTab(spi, AFUIType.dialog, "Dial", "Dialogs"));
+    cols.add(_childTopTab(spi, AFUIType.bottomSheet, "Bot", "Bottomsheets"));
+    cols.add(_childTopTab(spi, AFUIType.drawer, "Dra", "Drawers"));
+    cols.add(_childTopTab(spi, AFUIType.widget, "Wid", "Widgets"));
 
     return t.childMargin(
       margin: t.margin.smaller,
@@ -124,10 +124,11 @@ class AFUIPrototypeTestScreen extends AFUIConnectedScreen<AFUIPrototypeTestScree
     );
   }
 
-  Widget _childTopTab(AFUIPrototypeTestScreenSPI spi, AFUIType thisView, String title) {
+  Widget _childTopTab(AFUIPrototypeTestScreenSPI spi, AFUIType thisView, String titleShort, String titleFull) {
+    final isSel = spi.activeView == thisView;
     return spi.t.childTopTabText(
-      text: title,
-      isSel: spi.activeView == thisView,
+      text: isSel ? titleFull : titleShort,
+      isSel: isSel,
       onPressed: () => spi.onPressedView(thisView),
     );
   }

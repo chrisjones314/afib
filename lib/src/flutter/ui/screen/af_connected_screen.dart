@@ -124,7 +124,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
     return context;
   }
 
-  AFBuildContext<TStateView, TRouteParam>? _createTestContext(AFStore store, AFScreenID screenId, AFID wid, { required TRouteParam? launchParam }) {
+  AFBuildContext<TStateView, TRouteParam>? _createTestContext(AFStore store, AFScreenID screenId, AFWidgetID wid, { required TRouteParam? launchParam }) {
     // find the test state.
     if(AFibF.g.testOnlyIsInWorkflowTest || AFStateTestContext.currentTest != null || AFibF.g.demoModeTest != null) {
       return null;
@@ -194,7 +194,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
   } 
 
   /// Find the route parameter for the specified named screen
-  AFRouteSegment? findRouteSegment(AFState state, AFScreenID parentScreen, AFID wid, { required TRouteParam? launchParam }) {
+  AFRouteSegment? findRouteSegment(AFState state, AFScreenID parentScreen, AFWidgetID wid, { required TRouteParam? launchParam }) {
     final route = state.public.route;
     if(launchParam != null) {
       if(launchParam is AFRouteParamRef) {
@@ -231,7 +231,12 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
   AFRouteSegment? _findScreenHierarchyRouteSegment(AFState state, AFRouteState route, AFScreenID screenId, {
     required TRouteParam? launchParam,
   }) {
-      var seg = route.findParamFor(screenId, includePrior: true);
+      var seg = route.findRouteParamFull(
+        screenId: screenId, 
+        wid: AFUIWidgetID.useScreenParam,
+        routeLocation: AFRouteLocation.screenHierarchy,
+        includePrior: true
+      );
       if(seg == null) {
         seg = _createDefaultRouteSegment(newParam: null, launchParam: launchParam);
       }
@@ -260,7 +265,11 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
   AFRouteSegment? _findWidgetHierarchyRouteSegment(AFState state, AFRouteState route, AFScreenID screenId, AFID wid, { 
     required TRouteParam? launchParam 
   }) {
-      final paramParent = route.findParamFor(screenId);
+      final paramParent = route.findRouteParamFull(
+        screenId: screenId,
+        routeLocation: AFRouteLocation.screenHierarchy,
+        wid: AFUIWidgetID.useScreenParam
+      );
       assert(paramParent != null);
       if(paramParent == null) {
         return null;

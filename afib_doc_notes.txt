@@ -1,0 +1,7 @@
+AFib Documentation Notes
+
+Gotchas
+-------
+1. If you have duplicate screen ids in the global pool and the screen heirarchy, you are going to get the global pool version.
+2. You cannot have duplicate screen ids in the hierarchy itself.
+

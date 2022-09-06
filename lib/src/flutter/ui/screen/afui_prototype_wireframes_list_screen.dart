@@ -54,7 +54,7 @@ class AFUIPrototypeWireframesListScreen extends AFUIConnectedScreen<AFUIPrototyp
       final test = AFSingleScreenPrototype(
         id: wireframe.id,
         navigate: wireframe.navigate,
-        models: wireframe.models,
+        stateView: wireframe.models,
         body: body,
         timeHandling: AFTestTimeHandling.running
       );

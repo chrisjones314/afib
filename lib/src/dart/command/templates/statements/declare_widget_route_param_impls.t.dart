@@ -4,16 +4,19 @@ class DeclareWidgetRouteParamImplsT extends AFSourceTemplate {
   final String template = '''
   [!af_screen_name]RouteParam({
     required AFScreenID screenId,
-    required AFWidgetID wid
-  }): super(screenId: screenId, wid: wid);
+    required AFWidgetID wid,
+    required AFRouteLocation routeLocation,
+  }): super(screenId: screenId, wid: wid, routeLocation: routeLocation);
 
   factory [!af_screen_name]RouteParam.create({
     required AFScreenID screenId,
     required AFWidgetID wid,
+    required AFRouteLocation routeLocation,
   }) {
     return [!af_screen_name]RouteParam(
       screenId: screenId,
       wid: wid,
+      routeLocation: routeLocation,
     );
   }
 
@@ -21,6 +24,7 @@ class DeclareWidgetRouteParamImplsT extends AFSourceTemplate {
     return [!af_screen_name]RouteParam(
       screenId: screenId,
       wid: wid,
+      routeLocation: routeLocation,
     );
   }
 ''';  

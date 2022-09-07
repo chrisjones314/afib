@@ -83,7 +83,7 @@ class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetS
     final context = spi.context;
     final test = context.p.test;
  
-    final sourceWidget = test.render(screenId, context.p.wid);
+    final sourceWidget = test.render(context.p);
     return _createScaffold(spi, sourceWidget);
   }
 

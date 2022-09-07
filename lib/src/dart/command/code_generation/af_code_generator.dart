@@ -417,13 +417,11 @@ class AFCodeGenerator {
   void addImportIDFile(AFCommandContext ctx, {
     required AFLibraryID libraryId,
     required AFGeneratedFile to,
-    required RegExp before,
   }) {
       addImport(ctx,
         packageName: libraryId.name, 
         importPath: "${libraryId.codeId}_id.dart",
         to: to,
-        before: before,
       );
 
   }
@@ -431,13 +429,11 @@ class AFCodeGenerator {
   void addImportFlutterFile(AFCommandContext ctx, {
     required AFLibraryID libraryId,
     required AFGeneratedFile to,
-    required RegExp before,
   }) {
       addImport(ctx,
         packageName: libraryId.name, 
         importPath: "${libraryId.codeId}_flutter.dart",
         to: to,
-        before: before,
       );
 
   }
@@ -445,7 +441,6 @@ class AFCodeGenerator {
   void addImport(AFCommandContext ctx, {
     required String importPath,
     required AFGeneratedFile to,
-    required RegExp before,
     String? packageName
   }) {
     final declareImport = ImportFromPackage().toBuffer();

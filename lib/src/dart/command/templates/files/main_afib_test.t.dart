@@ -10,12 +10,9 @@ class AFMainAFibTestT extends AFSourceTemplate {
 import 'package:afib/afib_flutter.dart';
 import 'package:[!af_package_name]/[!af_app_namespace]_id.dart';
 import 'package:[!af_package_path]/initialization/create_dart_params.dart';
-import 'package:[!af_package_path]/initialization/install/install_app.dart';
 import 'package:[!af_package_path]/initialization/install/install_base.dart';
 import 'package:[!af_package_path]/initialization/install/install_base_library.dart';
 import 'package:[!af_package_path]/initialization/install/install_test.dart';
-import 'package:[!af_package_path]/initialization/install/install_ui_library.dart';
-import 'package:[!af_package_path]/state/[!af_app_namespace]_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 //------------------------------------------------------------------------------
@@ -36,8 +33,7 @@ void main() async {
             paramsDart: paramsDart,
             installBase: installBase, 
             installBaseLibrary: installBaseLibrary, 
-            [!af_install_app_param],
-            installCoreLibrary: installCoreLibrary, 
+            [!af_install_app_param],            
             installTest: installTest,
             widgetTester: tester
           );

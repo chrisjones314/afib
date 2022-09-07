@@ -58,8 +58,7 @@ abstract class [!af_app_namespace(upper)]ConnectedDrawer<TSPI extends AFScreenSt
   [!af_app_namespace(upper)]ConnectedDrawer({
     required AFConnectedUIConfig<[!af_app_namespace(upper)]State, [!af_app_namespace(upper)]DefaultTheme, TStateView, TRouteParam, TSPI> uiConfig,
     required AFScreenID screenId,
-    required TRouteParam launchParam,
-  }): super(config: uiConfig, screenId: screenId, launchParam: launchParam);
+  }): super(config: uiConfig, screenId: screenId);
 }
 
 abstract class [!af_app_namespace(upper)]ConnectedBottomSheet<TSPI extends AFBottomSheetStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedBottomSheet<[!af_app_namespace(upper)]State, [!af_app_namespace(upper)]DefaultTheme, TStateView, TRouteParam, TSPI> {
@@ -87,15 +86,13 @@ abstract class [!af_app_namespace(upper)]ConnectedWidget<TSPI extends AFWidgetSt
 abstract class [!af_app_namespace(upper)]ScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFScreenConfig<TSPI, [!af_app_namespace(upper)]State, [!af_app_namespace(upper)]DefaultTheme, TStateView, TRouteParam> {
     [!af_app_namespace(upper)]ScreenConfig({
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
-      required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> spiCreator,
-      AFNavigateRoute? route,
+      required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> spiCreator,
       AFAddScreenSpecificModelsDelegate? addModelsToStateView,      
       AFCreateDefaultRouteParamDelegate? createDefaultRouteParam,
     }): super(
       themeId: [!af_app_namespace(upper)]ThemeID.defaultTheme,
       stateViewCreator: stateViewCreator,
       spiCreator: spiCreator,
-      route: route ?? AFNavigateRoute.routeHierarchy,
       addModelsToStateView: addModelsToStateView,
       createDefaultRouteParam: createDefaultRouteParam,
     );
@@ -104,9 +101,9 @@ abstract class [!af_app_namespace(upper)]ScreenConfig<TSPI extends AFScreenState
 abstract class [!af_app_namespace(upper)]DrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFDrawerConfig<TSPI, [!af_app_namespace(upper)]State, [!af_app_namespace(upper)]DefaultTheme, TStateView, TRouteParam> {
     [!af_app_namespace(upper)]DrawerConfig({
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
-      required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> spiCreator,
+      required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> spiCreator,
       AFAddScreenSpecificModelsDelegate? addModelsToStateView,      
-      AFCreateDefaultRouteParamDelegate? createDefaultRouteParam,
+      required AFCreateDefaultRouteParamDelegate createDefaultRouteParam,
     }): super(
       themeId: [!af_app_namespace(upper)]ThemeID.defaultTheme,
       stateViewCreator: stateViewCreator,
@@ -119,8 +116,7 @@ abstract class [!af_app_namespace(upper)]DrawerConfig<TSPI extends AFDrawerState
 abstract class [!af_app_namespace(upper)]DialogConfig<TSPI extends AFDialogStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFDialogConfig<TSPI, [!af_app_namespace(upper)]State, [!af_app_namespace(upper)]DefaultTheme, TStateView, TRouteParam> {
     [!af_app_namespace(upper)]DialogConfig({
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
-      required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> spiCreator,
-      AFNavigateRoute? route,
+      required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> spiCreator,
       AFAddScreenSpecificModelsDelegate? addModelsToStateView,      
       AFCreateDefaultRouteParamDelegate? createDefaultRouteParam,
     }): super(
@@ -135,7 +131,7 @@ abstract class [!af_app_namespace(upper)]DialogConfig<TSPI extends AFDialogState
 abstract class [!af_app_namespace(upper)]BottomSheetConfig<TSPI extends AFBottomSheetStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFBottomSheetConfig<TSPI, [!af_app_namespace(upper)]State, [!af_app_namespace(upper)]DefaultTheme, TStateView, TRouteParam> {
   [!af_app_namespace(upper)]BottomSheetConfig({
     required AFCreateStateViewDelegate<TStateView> stateViewCreator,
-    required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> spiCreator,
+    required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> spiCreator,
     AFAddScreenSpecificModelsDelegate? addModelsToStateView,      
     AFCreateDefaultRouteParamDelegate? createDefaultRouteParam,
   }): super(
@@ -151,12 +147,10 @@ abstract class [!af_app_namespace(upper)]WidgetConfig<TSPI extends AFWidgetState
   [!af_app_namespace(upper)]WidgetConfig({
     required AFCreateStateViewDelegate<TStateView> stateViewCreator,
     required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, [!af_app_namespace(upper)]DefaultTheme> spiCreator,
-    AFNavigateRoute? route,
   }): super(
     themeId: [!af_app_namespace(upper)]ThemeID.defaultTheme,
     stateViewCreator: stateViewCreator,
     spiCreator: spiCreator,
-    route: route ?? AFNavigateRoute.routeHierarchy,
   );
 }
 ''';

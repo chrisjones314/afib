@@ -1,5 +1,10 @@
 AFib Documentation Notes
 
+Minutea
+-------
+1. How to do a widget ui test with child parameters (or just a UI test in general)
+
+
 Gotchas
 -------
 1. If you have duplicate screen ids in the global pool and the screen heirarchy, you are going to get the global pool version.

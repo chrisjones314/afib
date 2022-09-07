@@ -28,7 +28,6 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
   final AFThemeID themeId;
   final AFCreateStateViewDelegate<TStateView> stateViewCreator;
   final AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator;
-  final AFRouteLocation route;
   final AFUIType uiType;
   final AFCreateDefaultRouteParamDelegate? createDefaultRouteParam;
   final AFAddScreenSpecificModelsDelegate? addModelsToStateView;
@@ -37,7 +36,6 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
     required this.themeId,
     required this.stateViewCreator,
     required this.spiCreator,
-    required this.route,
     required this.uiType,
     this.createDefaultRouteParam,
     required this.addModelsToStateView,
@@ -74,7 +72,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
     if(paramSeg == null) {
       final createDefault = createDefaultRouteParam;
       if(createDefault != null) {
-        final source = AFRouteParamRef(screenId: screenId, wid: wid, routeLocation: route);
+        final source = AFRouteParamRef(screenId: screenId, wid: wid, routeLocation: AFRouteLocation.globalPool);
         launchParam = createDefault(source, store.state.public) as TRouteParam?;
         paramSeg = findRouteSegment(store.state, screenId, wid, launchParam: actualLaunchParam);
       }
@@ -87,7 +85,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
     }
  
     if(paramSeg == null) {
-      assert(false, "If you reached this in testing, you may not be on the screen you think you are on in your test scenario.");
+      assert(false, "No route param was found for ${this.runtimeType}.  If you reached this in testing, you may not be on the screen you think you are on in your test scenario.");
       return null;
     }
 
@@ -185,14 +183,6 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
     return AFBuildContext<TStateView, TRouteParam>(standard, stateView, param, children);
   }
 
-  bool get isHierarchyRoute {
-    return route == AFRouteLocation.screenHierarchy;
-  }
-
-  bool get isGlobalRoute {
-    return route == AFRouteLocation.globalPool;
-  } 
-
   /// Find the route parameter for the specified named screen
   AFRouteSegment? findRouteSegment(AFState state, AFScreenID parentScreen, AFWidgetID wid, { required TRouteParam? launchParam }) {
     final route = state.public.route;
@@ -207,43 +197,25 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
       return route.findUnusedParam();
     }
 
-    if(isHierarchyRoute) {
-      return _findHierarchyRouteSegment(state, route, parentScreen, wid, launchParam: launchParam);
-    } else {
-      assert(isGlobalRoute);
-      return _findGlobalRouteSegment(route, parentScreen, wid, launchParam: launchParam);
+    var seg = route.findRouteParamFull(
+      screenId: parentScreen, 
+      wid: wid,
+      routeLocation: AFRouteLocation.screenHierarchy,
+      includePrior: true
+    );
+    if(seg == null) {
+      seg = _createDefaultRouteSegment(screenId: parentScreen, newParam: null, launchParam: launchParam);
     }
+    return seg;    
   }
 
   TStateView createStateView(Map<String, Object> models) {
     return stateViewCreator(models);
   }
 
-  AFRouteSegment? _findGlobalRouteSegment(AFRouteState route, AFScreenID parentScreen, AFID wid, { required TRouteParam? launchParam }) {
-    final idLookup = wid == AFUIWidgetID.useScreenParam ? parentScreen : wid;
-    var seg = route.findGlobalParam(idLookup);
-    if(seg == null) {
-      seg = _createDefaultRouteSegment(newParam: null, launchParam: launchParam);
-    }
-    return seg;
-  }
-
-  AFRouteSegment? _findScreenHierarchyRouteSegment(AFState state, AFRouteState route, AFScreenID screenId, {
-    required TRouteParam? launchParam,
-  }) {
-      var seg = route.findRouteParamFull(
-        screenId: screenId, 
-        wid: AFUIWidgetID.useScreenParam,
-        routeLocation: AFRouteLocation.screenHierarchy,
-        includePrior: true
-      );
-      if(seg == null) {
-        seg = _createDefaultRouteSegment(newParam: null, launchParam: launchParam);
-      }
-      return seg;
-  }
 
   AFRouteSegment? _createDefaultRouteSegment({
+    required AFScreenID screenId,
     required TRouteParam? newParam,
     required TRouteParam? launchParam,
   }) {
@@ -256,12 +228,28 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
     } 
 
     if(actualParam == null) {
-      return null;
+      // in general, don't create the default parameter dynamically, as there is really no reasons to, but
+      // for drawers, which can be dragged onto the screen, it is necessary.
+      if(this is AFDrawerConfig) {
+        final createDefault = this.createDefaultRouteParam;
+        if(createDefault != null) {
+          actualParam = createDefault(AFRouteParamRef(
+            screenId: screenId,
+            wid: AFUIWidgetID.useScreenParam,
+            routeLocation: AFRouteLocation.screenHierarchy,
+          ), AFibF.g.internalOnlyActiveStore.state.public);
+        }
+      } 
+
+      if(actualParam == null) {
+        return null;
+      }
     }
 
     return AFRouteSegment(param: actualParam, children: null, createDefaultChildParam: null);
   }
 
+  /*
   AFRouteSegment? _findWidgetHierarchyRouteSegment(AFState state, AFRouteState route, AFScreenID screenId, AFID wid, { 
     required TRouteParam? launchParam 
   }) {
@@ -291,15 +279,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
       return seg;
 
   }
-
-  AFRouteSegment? _findHierarchyRouteSegment(AFState state, AFRouteState route, AFScreenID screenId, AFID wid, { required TRouteParam? launchParam }) {
-    if(wid == AFUIWidgetID.useScreenParam) {
-      return _findScreenHierarchyRouteSegment(state, route, screenId, launchParam: launchParam);
-    } else {
-      return _findWidgetHierarchyRouteSegment(state, route, screenId, wid, launchParam: launchParam);
-    }
-
-  }
+  */
 
   Iterable<Object?> createStateViewAF(AFState state, TRouteParam param, AFRouteSegmentChildren? children) {
     final public = state.public;
@@ -349,7 +329,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
     ));
   }
 
-  void updateRemoveChildParam(AFBuildContext context, AFScreenID screenId, AFID wid, { AFID? id }) {
+  void updateRemoveChildParam(AFBuildContext context, AFScreenID screenId, AFID wid, AFRouteLocation route, { AFID? id }) {
     context.dispatch(AFNavigateRemoveChildParamAction(
       screen: screenId,
       route: route,
@@ -372,7 +352,6 @@ abstract class AFScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TS
       required AFThemeID themeId,
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
       required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, TTheme> spiCreator,
-      AFRouteLocation? route,
       AFAddScreenSpecificModelsDelegate? addModelsToStateView,
       AFCreateDefaultRouteParamDelegate? createDefaultRouteParam,
     }): super(
@@ -380,7 +359,6 @@ abstract class AFScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TS
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.screen,
       spiCreator: spiCreator,
-      route: route ?? AFRouteLocation.screenHierarchy,
       addModelsToStateView: addModelsToStateView,
       createDefaultRouteParam: createDefaultRouteParam,
     );
@@ -398,8 +376,6 @@ abstract class AFDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TS
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.drawer,
       spiCreator: spiCreator,
-      // has to be, because it can be dragged onto the screen dynamically.
-      route: AFRouteLocation.globalPool,
       createDefaultRouteParam: createDefaultRouteParam,
       addModelsToStateView: addModelsToStateView,
     );
@@ -417,7 +393,6 @@ abstract class AFDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TS
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.dialog,
       spiCreator: spiCreator,
-      route: AFRouteLocation.globalPool,
       createDefaultRouteParam: createDefaultRouteParam,
       addModelsToStateView: addModelsToStateView,
     );
@@ -435,7 +410,6 @@ abstract class AFBottomSheetConfig<TSPI extends AFBottomSheetStateProgrammingInt
       stateViewCreator: stateViewCreator,
       uiType: AFUIType.bottomSheet,
       spiCreator: spiCreator,
-      route: AFRouteLocation.globalPool,
       createDefaultRouteParam: createDefaultRouteParam,
       addModelsToStateView: addModelsToStateView,
     );
@@ -454,7 +428,6 @@ abstract class AFWidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TS
     stateViewCreator: stateViewCreator,
     uiType: AFUIType.widget,
     spiCreator: spiCreator,
-    route: route ?? AFRouteLocation.screenHierarchy,
     addModelsToStateView: addModelsToStateView,
   );
 }
@@ -799,9 +772,9 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     config.updateAddChildParam(this, revised);
   }
 
-  void updateRemoveChildRouteParam(AFWidgetID wid) {
+  void updateRemoveChildRouteParam(AFWidgetID wid, { AFRouteLocation routeLocation = AFRouteLocation.screenHierarchy }) {
     final config = standard.config;
-    config.updateRemoveChildParam(this, accessScreenId, wid);
+    config.updateRemoveChildParam(this, accessScreenId, wid, routeLocation);
   }
 
   void closeBottomSheetFromScreen(AFScreenID sheetId, dynamic result) {

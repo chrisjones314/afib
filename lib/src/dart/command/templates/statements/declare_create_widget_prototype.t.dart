@@ -5,11 +5,10 @@ class DeclareCreateWidgetPrototypeT extends AFSourceTemplate {
   var prototype = context.define[!af_control_type_suffix]Prototype(
     id: [!af_app_namespace(upper)]PrototypeID.[!af_screen_test_id],
     stateView: [!af_app_namespace(upper)]TestDataID.[!af_full_test_data_id],
-    launchParam: [!af_screen_name]RouteParam.create(id: [!af_app_namespace(upper)]WidgetID.[!af_screen_id]),
-    render: (screenId, wid) {
+    createLaunchParam: (screenId, wid, routeLocation) => [!af_screen_name]RouteParam.create(screenId: screenId, wid: wid, routeLocation: routeLocation),
+    render: (launchParam) {
       return [!af_screen_name](
-        screenId: screenId, 
-        wid: wid
+        launchParam: launchParam
       );
     },
   );

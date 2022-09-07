@@ -77,12 +77,10 @@ abstract class AFUIScreenConfig<TSPI extends AFScreenStateProgrammingInterface, 
     AFUIScreenConfig({
       required AFCreateStateViewDelegate<TStateView> stateViewCreator,
       required AFCreateSPIDelegate<TSPI, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
-      AFRouteLocation? route,
     }): super(
       themeId: AFUIThemeID.defaultTheme,
       stateViewCreator: stateViewCreator,
       spiCreator: spiCreator,
-      route: route ?? AFRouteLocation.screenHierarchy,
     );
 }
 

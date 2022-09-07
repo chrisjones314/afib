@@ -99,7 +99,6 @@ $optionsHeader
       generator.addImportFlutterFile(ctx, 
         libraryId: fromLib, 
         to: lpiFile,
-        before: AFCodeRegExp.startDeclareLPI,
       );
     }    
 
@@ -125,14 +124,12 @@ $optionsHeader
     generator.addImport(ctx,
       importPath: lpiFile.importPathStatement, 
       to: definesFile, 
-      before: AFCodeRegExp.startDefineCore,
     );
 
     if(isOverride && fromLib != null) {
       generator.addImportIDFile(ctx,
         libraryId: fromLib,
         to: definesFile,
-        before: AFCodeRegExp.startDefineCore,
       );
     }
 
@@ -158,7 +155,6 @@ $optionsHeader
       generator.addImport(ctx,
         importPath: modelFile.importPathStatement,
         to: stateFile,
-        before: AFCodeRegExp.startDefineStateClass
       );
 
       // add its initial value to the state
@@ -187,7 +183,6 @@ $optionsHeader
         generator.addImport(ctx, 
           importPath: modelFile.importPathStatement, 
           to: testDataFile, 
-          before: AFCodeRegExp.startDefineTestData
         );
         
         // finally, add the id we are using.

@@ -32,41 +32,49 @@ mixin [!af_state_view_name]ModelsMixin<TRouteParam extends AFRouteParam> {
   //--------------------------------------------------------------------------------------
   List<Object?> createStateModels(AFBuildStateViewContext<[!af_app_namespace(upper)]State, TRouteParam> context) {
     final state = context.stateApp;
-    return state.allModels;
+    return state.allModels.toList();
   }
 }
 
 //--------------------------------------------------------------------------------------
 class [!af_state_view_prefix]ScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TRouteParam extends AFRouteParam> extends [!af_app_namespace(upper)]ScreenConfig<TSPI, [!af_state_view_name], TRouteParam> with [!af_state_view_name]ModelsMixin<TRouteParam> {
   [!af_state_view_prefix]ScreenConfig({
-    required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<[!af_state_view_name], TRouteParam>, [!af_theme_type]> spiCreator,
-    AFNavigateRoute? route
+    required AFCreateSPIDelegate<TSPI, AFBuildContext<[!af_state_view_name], TRouteParam>, [!af_theme_type]> spiCreator,
+    AFCreateDefaultRouteParamDelegate? createDefaultRouteParam,
+    AFAddScreenSpecificModelsDelegate? addModelsToStateView,
   }): super(
     stateViewCreator: [!af_state_view_name].create,
     spiCreator: spiCreator,
-    route: route,
+    createDefaultRouteParam: createDefaultRouteParam,
+    addModelsToStateView: addModelsToStateView,
   );
 }
 
 //--------------------------------------------------------------------------------------
 class [!af_state_view_prefix]DrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TRouteParam extends AFRouteParam> extends [!af_app_namespace(upper)]DrawerConfig<TSPI, [!af_state_view_name], TRouteParam> with [!af_state_view_name]ModelsMixin<TRouteParam> {
   [!af_state_view_prefix]DrawerConfig({
-    required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<[!af_state_view_name], TRouteParam>, [!af_theme_type]> spiCreator,
+    required AFCreateSPIDelegate<TSPI, AFBuildContext<[!af_state_view_name], TRouteParam>, [!af_theme_type]> spiCreator,
+    required AFCreateDefaultRouteParamDelegate createDefaultRouteParam,
+    AFAddScreenSpecificModelsDelegate? addModelsToStateView,
   }): super(
     stateViewCreator: [!af_state_view_name].create,
     spiCreator: spiCreator,
+    createDefaultRouteParam: createDefaultRouteParam,
+    addModelsToStateView: addModelsToStateView,
   );
 }
 
 //--------------------------------------------------------------------------------------
 class [!af_state_view_prefix]DialogConfig<TSPI extends AFDialogStateProgrammingInterface, TRouteParam extends AFRouteParam> extends [!af_app_namespace(upper)]DialogConfig<TSPI, [!af_state_view_name], TRouteParam> with [!af_state_view_name]ModelsMixin<TRouteParam> {
   [!af_state_view_prefix]DialogConfig({
-    required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<[!af_state_view_name], TRouteParam>, [!af_theme_type]> spiCreator,
-    AFNavigateRoute? route
+    required AFCreateSPIDelegate<TSPI, AFBuildContext<[!af_state_view_name], TRouteParam>, [!af_theme_type]> spiCreator,
+    AFCreateDefaultRouteParamDelegate? createDefaultRouteParam,
+    AFAddScreenSpecificModelsDelegate? addModelsToStateView,
   }): super(
     stateViewCreator: [!af_state_view_name].create,
     spiCreator: spiCreator,
-    route: route,
+    createDefaultRouteParam: createDefaultRouteParam,
+    addModelsToStateView: addModelsToStateView,
   );
 }
 
@@ -75,11 +83,9 @@ class [!af_state_view_prefix]WidgetConfig<TSPI extends AFWidgetStateProgrammingI
 
     [!af_state_view_prefix]WidgetConfig({
       required AFCreateSPIDelegate<TSPI, AFBuildContext<[!af_state_view_name], TRouteParam>, [!af_theme_type]> spiCreator,
-      AFNavigateRoute? route
     }): super(
       stateViewCreator: [!af_state_view_name].create,
       spiCreator: spiCreator,
-      route: route,
     );
 }
 
@@ -87,10 +93,14 @@ class [!af_state_view_prefix]WidgetConfig<TSPI extends AFWidgetStateProgrammingI
 class [!af_state_view_prefix]BottomSheetConfig<TSPI extends AFBottomSheetStateProgrammingInterface, TRouteParam extends AFRouteParam> extends [!af_app_namespace(upper)]BottomSheetConfig<TSPI, [!af_state_view_name], TRouteParam> with [!af_state_view_name]ModelsMixin<TRouteParam> {
 
     [!af_state_view_prefix]BottomSheetConfig({
-      required AFCreateScreenSPIDelegate<TSPI, AFBuildContext<[!af_state_view_name], TRouteParam>, [!af_theme_type]> spiCreator,
+      required AFCreateSPIDelegate<TSPI, AFBuildContext<[!af_state_view_name], TRouteParam>, [!af_theme_type]> spiCreator,
+      AFCreateDefaultRouteParamDelegate? createDefaultRouteParam,
+      AFAddScreenSpecificModelsDelegate? addModelsToStateView,
     }): super(
       stateViewCreator: [!af_state_view_name].create,
       spiCreator: spiCreator,
+      createDefaultRouteParam: createDefaultRouteParam,
+      addModelsToStateView: addModelsToStateView,
     );
 }
 ''';

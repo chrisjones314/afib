@@ -60,11 +60,9 @@ mixin AFUIDefaultStateViewModelsMixin<TRouteParam extends AFRouteParam> {
 class AFUIDefaultScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIScreenConfig<TSPI, AFUIDefaultStateView, TRouteParam> with AFUIDefaultStateViewModelsMixin<TRouteParam> {
   AFUIDefaultScreenConfig({
     required AFCreateSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
-    AFRouteLocation? route
   }): super(
     stateViewCreator: AFUIDefaultStateView.create,
     spiCreator: spiCreator,
-    route: route,
   );
 }
 

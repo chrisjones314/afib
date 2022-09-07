@@ -49,8 +49,8 @@ $optionsHeader
     final fileExtend = generator.modifyFile(ctx, generator.pathExtendCommand);
     generator.addImport(ctx, 
       importPath: fileCommand.importPathStatement, 
-      to: fileExtend, 
-      before: AFCodeRegExp.startExtendCommand);
+      to: fileExtend
+    );
 
 
     final declareDefine = DeclareDefineCommandT().toBuffer();

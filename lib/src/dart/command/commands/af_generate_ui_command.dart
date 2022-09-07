@@ -28,7 +28,6 @@ import 'package:afib/src/dart/command/templates/statements/declare_widget_build_
 import 'package:afib/src/dart/command/templates/statements/declare_widget_impls_super.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_widget_params_constructor.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_widget_route_param_impls.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_widget_spi.t.dart';
 import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
@@ -170,7 +169,7 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       paramsConstructor: DeclareWidgetParamsConstructorT(),
       routeParamImpls: DeclareWidgetRouteParamImplsT(),
       navigatePush: DeclareEmptyStatementT(),
-      spi: DeclareWidgetSPIT(),
+      spi: DeclareSPIT(),
       stateTestShortcut: DeclareStateTestWidgetShortcutT(),
       createPrototype: DeclareCreateWidgetPrototypeT(),
     ),
@@ -282,7 +281,6 @@ $optionsHeader
         generator.addImportIDFile(ctx,
           libraryId: fromLib,
           to: fileDefineUI,
-          before: AFCodeRegExp.startDefineCore,
         );
       }
 
@@ -291,7 +289,6 @@ $optionsHeader
     generator.addImport(ctx, 
       importPath: fileTheme.importPathStatement, 
       to: fileDefineUI,
-      before: AFCodeRegExp.startDefineCore
     );
 
     if(!isOverride) {
@@ -408,7 +405,6 @@ $optionsHeader
       generator.addImport(ctx, 
         importPath: screenFile.importPathStatement, 
         to: screenMapFile, 
-        before: AFCodeRegExp.startDefineCore
       );            
     }
 
@@ -425,7 +421,6 @@ $optionsHeader
     generator.addImport(ctx,
       importPath: screenFile.importPathStatement, 
       to: shortcutsFile,
-      before: AFCodeRegExp.startShortcutsClass
     );
 
     // add exports for files
@@ -450,7 +445,6 @@ $optionsHeader
       generator.addImport(ctx,
         importPath: screenFile.importPathStatement,
         to: screenTestFile,
-        before: AFCodeRegExp.startDefineScreenTestFunction
       );
 
       final protoName = "${uiName}InitialPrototype";
@@ -465,7 +459,6 @@ $optionsHeader
       generator.addImport(ctx,
         importPath: screenTestFile.importPathStatement,
         to: screenTestsFile,
-        before: AFCodeRegExp.startDefineScreenTestsFunction
       );
 
       final callFunction = DeclareCallDefineScreenTest().toBuffer();

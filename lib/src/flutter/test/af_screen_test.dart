@@ -28,7 +28,7 @@ enum AFTestTimeHandling {
   paused
 }
 
-
+typedef AFCreateWidgetLaunchParamDelegate = AFRouteParam Function(AFScreenID screenId, AFWidgetID wid, AFRouteLocation routeLocation);
 typedef AFTestScreenExecuteDelegate = Future<void> Function(AFScreenTestExecute ste);
 typedef AFVerifyReturnValueDelegate = void Function(Object? value);
 
@@ -2697,8 +2697,9 @@ class AFUIPrototypeDefinitionContext extends AFBaseTestDefinitionContext {
     required AFRenderConnectedChildDelegate render,
     List<AFRouteParam>? children,
     dynamic stateView,
-    required AFRouteParam launchParam,
+    required AFCreateWidgetLaunchParamDelegate createLaunchParam,
   }) {
+    final launchParam = createLaunchParam(AFUIScreenID.screenPrototypeWidget, AFUIWidgetID.widgetPrototypeTest, AFRouteLocation.screenHierarchy);
     return widgetTests.addConnectedPrototype(
       id: id,
       render: render,

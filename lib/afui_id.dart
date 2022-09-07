@@ -200,6 +200,7 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const fileExtendApp = AFUISourceTemplateID("file_extend_app");
   static const fileExtendAppUILibrary = AFUISourceTemplateID("file_extend_app_ui_library");
   static const fileExtendAppStateLibrary = AFUISourceTemplateID("file_extend_app_state_library");
+  static const fileExtendCoreLibraryApp = AFUISourceTemplateID("file_extend_core_library_app");
   static const fileExtendTest = AFUISourceTemplateID("file_extend_test");
   static const fileDefaultTheme = AFUISourceTemplateID("file_default_theme");
   static const fileDefineUI = AFUISourceTemplateID("file_define_ui");
@@ -255,7 +256,7 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textExtendKind = AFUISourceTemplateID("extend_kind");
   static const textTestID = AFUISourceTemplateID("test_id");
   static const textLibKind = AFUISourceTemplateID("lib_kind");
-  static const textExtendAppParam = AFUISourceTemplateID("extend_app_param");
+  static const textInstallAppParam = AFUISourceTemplateID("install_app_param");
   static const textFundamentalThemeInit = AFUISourceTemplateID("fundamental_theme_init");
   static const textLPIType = AFUISourceTemplateID("lpi_type");
   static const textLPIParentType = AFUISourceTemplateID("lpi_parent_type");

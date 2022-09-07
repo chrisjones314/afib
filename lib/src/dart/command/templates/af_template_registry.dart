@@ -26,6 +26,7 @@ import 'package:afib/src/dart/command/templates/files/id.t.dart';
 import 'package:afib/src/dart/command/templates/files/install_base.t.dart';
 import 'package:afib/src/dart/command/templates/files/install_core.t.dart';
 import 'package:afib/src/dart/command/templates/files/install_core_library.t.dart';
+import 'package:afib/src/dart/command/templates/files/install_core_library_app.t.dart';
 import 'package:afib/src/dart/command/templates/files/install_library_command.t.dart';
 import 'package:afib/src/dart/command/templates/files/install_library_core.t.dart';
 import 'package:afib/src/dart/command/templates/files/install_test.t.dart';
@@ -87,6 +88,7 @@ class AFTemplateRegistry {
     register(AFUISourceTemplateID.fileExtendApp, AFExtendAppT());
     register(AFUISourceTemplateID.fileExtendAppUILibrary, AFInstallUILibraryT());
     register(AFUISourceTemplateID.fileExtendAppStateLibrary, AFInstallStateLibraryT());
+    register(AFUISourceTemplateID.fileExtendCoreLibraryApp, AFInstallCoreLibraryAppT());
     
     register(AFUISourceTemplateID.fileDefaultTheme, AFThemeT());
     register(AFUISourceTemplateID.fileExtendTest, AFExtendTestT());

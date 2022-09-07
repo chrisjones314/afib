@@ -158,7 +158,7 @@ typedef AFCreateDynamicDelegate = dynamic Function();
 
 typedef AFReturnValueDelegate<TReturn extends Object?> = void Function(TReturn? param);
 
-typedef AFRenderConnectedChildDelegate = Widget Function(AFScreenID screenId, AFWidgetID wid);
+typedef AFRenderConnectedChildDelegate = Widget Function(AFRouteParam launchParam);
 
 typedef AFRenderEmbeddedChildDelegate = Widget Function();
 

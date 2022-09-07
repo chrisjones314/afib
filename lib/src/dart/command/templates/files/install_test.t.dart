@@ -13,7 +13,7 @@ import 'package:[!af_package_path]/test/wireframes.dart';
 
 void installTest(AFTestExtensionContext context) {
 
-    context.initializeTests(
+    context.installTests(
       defineTestData: defineTestData,
       defineUnitTests: defineUnitTests,
       defineStateTests: defineStateTests,

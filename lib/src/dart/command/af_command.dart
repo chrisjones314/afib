@@ -477,13 +477,16 @@ Available Commands
   }
 }
 
-class AFCommandHelp extends AFCommand {
+class AFHelpCommand extends AFCommand {
   final name = "help";
   final description = "Show help for other commands";
   
   
   final usage = "afib help <command> [<subcommand>]";
 
+  bool errorIfNotProjectRoot(AFCommandContext ctx) {
+    return true;
+  }
 
   void printFullUsage(AFCommandContext ctx) {
     final result = StringBuffer('''
@@ -554,6 +557,7 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
     }
 
     void registerBootstrapCommands() {
+      defineCommand(AFHelpCommand());
       defineCommand(AFVersionCommand());
       defineCommand(AFCreateAppCommand());
 
@@ -565,7 +569,7 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
       defineCommand(AFConfigCommand());
       defineCommand(AFGenerateParentCommand());
       defineCommand(AFTestCommand());
-      defineCommand(AFCommandHelp());
+      defineCommand(AFHelpCommand());
       defineCommand(AFInstallCommand());
       defineCommand(AFOverrideCommand());
 

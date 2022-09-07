@@ -43,8 +43,8 @@ $optionsHeader
   
   yourpackage - the full identifier for your package, all lowercase.   This is the value from your pubspec.yaml's
     name field, which should be in the folder you are running this command from. 
-  YPC - a 2-5 digit the code/prefix for your app, all uppercase.  For example, for the AFib Signin library this is AFSI (
-    note that you should not prefix yours with AF)
+  YPC - a lowercase 2-5 digit the code/prefix for your app, all uppercase.  For example, for the AFib Signin library this is afsi, in the app 'Dinner Familias this is 'df' (
+    note that you should not prefix yours with 'af')
 ''';
   }
 
@@ -220,8 +220,16 @@ $optionsHeader
     generator.renameExistingFileToOld(ctx, generator.pathOriginalWidgetTest);
     final fileMain = createStandardFile(ctx, generator.pathMainAFibTest, AFUISourceTemplateID.fileMainAFibTest);
     fileMain.replaceText(ctx, AFUISourceTemplateID.textLibKind, libKind);
-    final appParam = libKind == "App" ? "extendApp: extendApp" : "extendUI: extendUI";
-    fileMain.replaceText(ctx, AFUISourceTemplateID.textExtendAppParam, appParam);
+    final isApp = libKind == "App" ;
+    final appParam = isApp ? "installCoreApp: installCoreApp" : "installCoreLibrary: installCoreLibrary,";
+    if(isApp) {
+      generator.addImport(ctx, 
+        importPath: generator.importStatementPath(generator.pathInstallCoreApp), 
+        to: fileMain, 
+      );
+    }
+
+    fileMain.replaceText(ctx, AFUISourceTemplateID.textInstallAppParam, appParam);
 
     createStandardFile(ctx, generator.pathTestData, AFUISourceTemplateID.fileTestData);
     createStandardFile(ctx, generator.pathStateTestShortcutsFile, AFUISourceTemplateID.fileStateTestShortcuts);
@@ -242,8 +250,12 @@ $optionsHeader
   void _createMainFiles(AFCommandContext ctx, AFUISourceTemplateID mainTemplate) {
     final generator = ctx.generator;
     generator.renameExistingFileToOld(ctx, generator.pathMain);
-    createStandardFile(ctx, generator.pathMain, mainTemplate);
+    final mainFile = createStandardFile(ctx, generator.pathMain, mainTemplate);
     createStandardFile(ctx, generator.pathApp, AFUISourceTemplateID.fileApp);
+    generator.addImport(ctx, 
+      importPath: generator.importStatementPath(generator.pathInstallLibraryCore), 
+      to: mainFile
+    );
   }
 
   void _createInitializationFiles(AFCommandContext ctx, String libKind, { 
@@ -256,11 +268,11 @@ $optionsHeader
 
     final generator = ctx.generator;
     final fileDefineCore = createStandardFile(ctx, generator.pathDefineCore, AFUISourceTemplateID.fileDefineUI);
-    fileDefineCore.replaceText(ctx, AFUISourceTemplateID.textLibKind, libKind);
     final declareUIFn = includeUI ? DeclareUIFunctionsT() : DeclareEmptyStatementT();
     final callUIFn = includeUI ? CallUIFunctionsT() : DeclareEmptyStatementT();
     fileDefineCore.replaceTemplate(ctx, AFUISourceTemplateID.stmtDeclareUIFunctions, declareUIFn);
     fileDefineCore.replaceTemplate(ctx, AFUISourceTemplateID.stmtCallUIFunctions, callUIFn);
+    fileDefineCore.replaceText(ctx, AFUISourceTemplateID.textLibKind, libKind);
 
     final imports = AFCodeBuffer.empty();
 
@@ -296,6 +308,9 @@ $optionsHeader
     final pathAppCore = isApp ? generator.pathInstallCoreApp : generator.pathInstallLibraryCore;
     createStandardFile(ctx, generator.pathInstallLibraryCommand, AFUISourceTemplateID.fileExtendCommandLibrary);
     createStandardFile(ctx, generator.pathExtendApplication, AFUISourceTemplateID.fileExtendApplication);
+    if(isApp) {
+      createStandardFile(ctx, generator.pathInstallLibraryCore, AFUISourceTemplateID.fileExtendCoreLibraryApp);
+    }
     if(!includeUI) {
       createStandardFile(ctx, generator.pathInstallLibraryCore, AFUISourceTemplateID.fileExtendLibrary);
     }

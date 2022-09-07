@@ -4,6 +4,7 @@ import 'package:afib/src/dart/command/af_source_template.dart';
 class AFDefineCoreT extends AFSourceTemplate {
 
   final String template = '''
+import 'package:flutter/material.dart';
 import 'package:afib/afib_flutter.dart';
 
 void defineCore(AFCoreDefinitionContext context) {

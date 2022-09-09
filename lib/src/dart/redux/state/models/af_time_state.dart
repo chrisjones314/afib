@@ -375,20 +375,40 @@ class AFTimeState {
     return copyWith(updateSpecificity: specificity);
   }
 
+  int get absoluteHourForDay {
+    final diff = currentPushTime.difference(absoluteBaseDate);
+    var hours = diff.inDays;
+    hours *= 24;
+    return hours;
+  }
+
+  int get absoluteMinuteForDay {
+    var absMin = absoluteHourForDay * 60;
+    return absMin;
+  }
+
   int get absoluteSecond {
-    return absoluteDuration.inSeconds;
+    var absSec = absoluteMinute * 60;
+    absSec += currentPushTime.second;
+    return absSec;
   }
 
   int get absoluteMinute {
-    return absoluteDuration.inMinutes;
+    var absMin = absoluteMinuteForDay;
+    absMin += (60*currentPushTime.hour);
+    absMin += currentPushTime.minute;
+    return absMin;
   }
 
   int get absoluteHour {
-    return absoluteDuration.inHours;
+    var absHour = absoluteHourForDay;
+    absHour += currentPushTime.hour;
+    return absHour;
   }
 
   int get absoluteDay  {
-    return absoluteDuration.inDays;
+    final diff = currentPushTime.difference(absoluteBaseDate);
+    return diff.inDays;
   }
 
   int get absoluteMonth {
@@ -405,6 +425,8 @@ class AFTimeState {
   Duration get absoluteDuration {
     final abd = absoluteBaseDate;
     final dur = currentPushTime.difference(abd);
+
+
     return dur;
   }
 

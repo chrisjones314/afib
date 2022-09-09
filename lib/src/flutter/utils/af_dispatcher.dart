@@ -24,12 +24,11 @@ class AFStoreDispatcher extends AFDispatcher {
   dynamic dispatch(dynamic action) {  
 
     if(action is AFExecuteBeforeInterface) {
-      final query = action.executeBefore;
+      final queryBefore = action.executeBefore;
 
-      //
-      if(query != null) {
+      if(queryBefore != null) {
         // create a composite query to execute the original query.
-        final composite = AFCompositeQuery.createFrom(queries: [query], onSuccess: (compositeSuccess) {
+        final composite = AFCompositeQuery.createFrom(queries: [queryBefore], onSuccess: (compositeSuccess) {
           // execute the original action after it finishes successfully, note that currently on error, we just drop
           // the original action.   I think that is fairly reasonable, as it is likely that an error will have been displayed
           // to the user, which implicitly explains why the action didn't have the intended effect.
@@ -40,7 +39,6 @@ class AFStoreDispatcher extends AFDispatcher {
         store.dispatch(composite);
         return;
       }
-
     }
 
     if(action is AFExecuteDuringInterface) {

@@ -1,5 +1,31 @@
 AFib Documentation Notes
 
+
+State
+-----
+Creating state, and how best to model it (keep it flat)
+
+Navigation
+----------
+1. Various ways to reference route params, including AFRouteParamRef
+2. Ability to do executeBefore or executeDuring queries
+
+Queries
+-------
+1. Startup sequence
+2. Composite Query
+
+
+
+Time
+----
+1. Talk about the conceptual model of time (e.g. it assumes hours are always 60 minutes, etc)
+
+Tips & Tricks
+-------------
+1. Use flag values rather than null, both to avoid null-checks and to make copy-with easier
+
+
 Minutea
 -------
 1. How to do a widget ui test with child parameters (or just a UI test in general)

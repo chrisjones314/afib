@@ -1,26 +1,125 @@
 AFib Documentation Notes
 
-Test Change
+Getting Started
+---------------
+AFib Bootstrap - creating a new flutter project, then running bootstrap, choosing a project code.
+Running in the emulator
+Recommend: VS Code
+Switching between prototype mode and debug mode
+    -- accessing the prototype drawer
+Recommend; Start in Prototype mode
+
+============
+Prototyping
+===========
+
+Generating UI
+-------------
+Tips and Tricks: Coorelation of generation commands and folder structure
+Generating a screen
+    -- drawer
+    -- dialog
+    -- bottom sheet
+    -- widget - just a short mention
+Appendix 1 Reference: Getting started with UI layout
 
 State
 -----
+Core idea state -> f(route param, state view) -> UI
+Route parameters - screen hierarchy and global
+Application State - flexible state
+State Views
+Initial Mention of SPIs
 Creating state, and how best to model it (keep it flat)
+Using copy with and revise convention
+
+UI Prototypes
+-------------
+How the UI prototype feeds the route param and state view into the UI
+Accessing the state view and route parameter when rendering
+Updating the route paramter
+Intro to themes
+    -typeahead
+
+Deubgging and Logging
+---------------------
+Deugging in VS Code
+Turning on logging
+Accessing logging in code
+
+Wireframes
+----------
+Creating a wireframe
+Instrumenting wireframe events
+Implementing wireframe events
+Starting directly into a wireframe
+
+==========
+Production
+==========
+
+Queries
+-------
+0. Idea of a query (notion of state, and outside world)
+1. Startup sequence
+2. Composite Query
 
 Navigation
 ----------
 1. Various ways to reference route params, including AFRouteParamRef
 2. Ability to do executeBefore or executeDuring queries
 
-Queries
--------
-1. Startup sequence
-2. Composite Query
+Child Widgets
+-------------
+1. Creating them
+2. Using them
+3. Specifying a child parameter
 
+State Tests
+-----------
+1. Getting started
+2. State test extensions
+3. Specifying query responses
 
+Third Party Components
+----------------------
+1. Examples and uses
+2. Integrating a third party component
+3. Reference to appendix on creating
+4. Overrides
+ -- LPIs
+ -- Themese
+5. Adding 3rd party data to a state view
+
+UI Testing
+----------
+Using it effectively
+
+================
+Useful Utilities
+================
 
 Time
 ----
 1. Talk about the conceptual model of time (e.g. it assumes hours are always 60 minutes, etc)
+
+Custom Commanda
+---------------
+
+Error Handling
+--------------
+
+Global Query Handler
+--------------------
+
+=====================================
+Appendix 1; Getting started with dart
+=====================================
+
+
+=================================================
+Appendix 2; Getting Started with Flutter UI Layout
+==================================================
 
 Tips & Tricks
 -------------

@@ -34,10 +34,12 @@ class AFNavigateAction extends AFActionWithKey implements AFExecuteBeforeInterfa
 /// Action that changes the data associated with the current screen, but 
 /// does not change the screen itself.
 class AFNavigateSetParamAction extends AFNavigateAction {
+  final AFCreateDefaultChildParamDelegate? createDefaultChildParam;
   AFNavigateSetParamAction({
     AFID? id, 
     required AFRouteParam param,
     List<AFRouteParam>? children,
+    this.createDefaultChildParam,
   }): super(
     id: id, 
     param: param, 

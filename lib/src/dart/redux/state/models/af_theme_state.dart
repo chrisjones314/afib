@@ -2099,11 +2099,14 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     );
   }
 
-  Widget childTopTabContainer({required List<Widget> children}) {
+  Widget childTopTabContainer({required List<Widget> children,
+    Color? color,
+    BorderRadius? borderRadius,
+  }) {
     return Container(
       decoration: BoxDecoration(
-        color: colorPrimary,
-          borderRadius: borderRadius.standard,
+        color: color ?? colorPrimary,
+          borderRadius: borderRadius ?? this.borderRadius.standard,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,

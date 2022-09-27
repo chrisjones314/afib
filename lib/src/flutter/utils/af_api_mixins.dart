@@ -1048,6 +1048,8 @@ mixin AFContextShowMixin {
   static void updateOptionalGlobalParam(dynamic Function(dynamic action) dispatch, AFNavigatePushAction navigate) {
     dispatch(AFNavigateSetParamAction(
       param: navigate.param,
+      children: navigate.children,
+      createDefaultChildParam: navigate.createDefaultChildParam,
     ));    
   }
 }

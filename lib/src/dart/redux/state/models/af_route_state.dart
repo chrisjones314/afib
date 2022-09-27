@@ -138,6 +138,12 @@ class AFRouteSegment {
     return copyWith(children: children);
   }
 
+  AFRouteSegment reviseChild(AFRouteParam child) {
+    var source = children ?? AFRouteSegmentChildren.create();
+    final revisedChildren = source.reviseSetChild(child);
+    return reviseChildren(revisedChildren);
+  }
+
   AFRouteSegment copyWith({
     AFScreenID? screen,
     AFRouteParam? param,
@@ -604,15 +610,21 @@ class AFRouteState {
     bool includePrior = true
   }) {
     /// Ugggh.  So, it would be really nice if we could trust the route location here.
-    /// Howver, if you try to chase the routeLocation all the way back to AFConnectedScreen.createContextForDiff, you'll
+    /// However, if you try to chase the routeLocation all the way back to AFConnectedScreen.createContextForDiff, you'll
     /// find that you would need to pass in the routeLocation to the screen constructor.  That requires you to declare
-    /// whether the screen's parameter lives in the hierarchy or the screen when the screen is declared.
+    /// whether the screen's parameter lives in the hierarchy or the global pool when the screen is declared.
     /// I think it is better that it just works this way, where a screen could live in the hierarchy or in the global pool,
     /// depending on where you choose to put the route parameter.
     /// 
     /// It is confusing if you have a duplicate screen in both the global pool and the hierarchy, however.
-    if(globalPool.containsKey(screenId)) {
-      return globalPool[screenId];
+    final globalSeg = globalPool[screenId];
+
+    if(globalSeg != null) {
+   if(wid == AFUIWidgetID.useScreenParam) {
+        return globalSeg;
+      }
+
+      return globalSeg.findChild(wid);
     }
 
     if(hasStartupWrapper && screenId == AFibF.g.screenMap.startupScreenId) {
@@ -729,12 +741,12 @@ class AFRouteState {
     }
 
     final defaultParam = create(param, AFibF.g.internalOnlyActiveStore.state.public);
-    return updateRouteParam(defaultParam);    
+    return updateRouteParam(defaultParam, null, null);    
   }
 
   /// Replaces the data on the current leaf element without changing the segments
   /// in the route.
-  AFRouteState updateRouteParam(AFRouteParam param) {
+  AFRouteState updateRouteParam(AFRouteParam param, List<AFRouteParam>? children, AFCreateDefaultChildParamDelegate? createDefaultChildParam) {
     // in this case, we obviously don't want to set this value as the param. Instead,
     // we want to verify that it already exists, or else create it using the uiConfig's default
     // method.
@@ -764,10 +776,15 @@ class AFRouteState {
     } else {
       var globalSeg = globalPool[screen];
       if(globalSeg == null) {
-        globalSeg = AFRouteSegment(param: param, children: null, createDefaultChildParam: null);
+        globalSeg = AFRouteSegment.withParam(param, children, createDefaultChildParam);
       } else {
-        final merged = param.mergeOnWrite(globalSeg.param);
-        globalSeg = globalSeg.copyWith(param: merged);
+         final merged = param.mergeOnWrite(globalSeg.param);
+        if(param.wid == AFUIWidgetID.useScreenParam) {
+          final childSegs = children != null ? AFRouteSegmentChildren.fromList(children) : null;
+          globalSeg = globalSeg.copyWith(param: merged, children: childSegs);
+        } else {
+          globalSeg = globalSeg.reviseChild(merged);
+        }
       }
 
       return setGlobalPoolParam(screen, globalSeg);
@@ -904,7 +921,7 @@ class AFRouteState {
 
   AFRouteState setChildParam(AFRouteParam param) {
     if(param.wid == AFUIWidgetID.useScreenParam) {
-      return updateRouteParam(param);
+      return updateRouteParam(param, null, null);
     }
     final widget = param.wid;
     final screen = param.screenId;

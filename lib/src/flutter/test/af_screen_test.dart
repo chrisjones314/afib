@@ -2645,12 +2645,12 @@ class AFUIPrototypeDefinitionContext extends AFBaseTestDefinitionContext {
   /// screen view state/route param state.
   AFSingleScreenPrototypeBody defineDialogPrototype({
     required AFPrototypeID   id,
-    required Object? models,
+    required Object? stateView,
     required AFNavigatePushAction navigate,
     AFTestTimeHandling timeHandling = AFTestTimeHandling.paused,
     String? title,
   }) {
-    final modelsActual = models ?? <Object>[];
+    final modelsActual = stateView ?? <Object>[];
     return dialogTests.addConnectedPrototype(
       id: id,
       models: modelsActual,

@@ -87,6 +87,11 @@ class AFRouteParamWithFlutterState extends AFRouteParam {
     return controller?.text ?? "";
   }
 
+  FocusNode? accessFocusNode(AFWidgetID wid) {
+    final node = flutterState?.focusNodes?.access(wid);
+    return node;
+  }
+
 
   ScrollController accessScrollController(AFWidgetID wid) {
     final sc = flutterState?.scrollControllers;

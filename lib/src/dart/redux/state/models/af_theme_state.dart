@@ -2302,6 +2302,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     bool autofocus = false,
     int? minLines,
     int maxLines = 1,
+    FocusNode? focusNode,
     InputDecoration? decoration,
     bool autocorrect = true,
     TextAlign textAlign = TextAlign.start,
@@ -2315,7 +2316,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
       wid: wid,
       enabled: enabled,
       style: style,
-      
+      focusNode: focusNode,
       controller: controller,
       controllers: controllers,
       parentParam: parentParam,

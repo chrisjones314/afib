@@ -344,6 +344,7 @@ $optionsHeader
     if(pathStateView != null) {
       generator.addImportsForPath(ctx, pathStateView, imports: imports);
     }
+
     final pathTheme = generator.pathTheme(theme, isCustomParent: false);
     if(pathTheme != null) {
       generator.addImportsForPath(ctx, pathTheme, imports: imports);    

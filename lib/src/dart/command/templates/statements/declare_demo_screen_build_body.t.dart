@@ -7,7 +7,8 @@ class DeclareDemoScreenBuildBodyT extends AFSourceTemplate {
 
     rows.add(AFUIWelcomeWidget());
 
-    rows.add(_buildIncrementCard(spi));
+    rows.add(_buildIncrementParamCard(spi));
+    rows.add(_buildIncrementStateCard(spi));
 
     return ListView(
       children: rows

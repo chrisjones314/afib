@@ -9,7 +9,7 @@
       "type": "dart",
       "request": "launch",
       "program": "/Users/chrisjones/projects/afib/afib/bin/afib_bootstrap.dart",
-      "cwd": "/Users/chrisjones/projects/afib/examples/hellocounter3",
+      "cwd": "/Users/chrisjones/projects/afib/temp/hellocounter",
     },
     {
       "name": "Flutter",

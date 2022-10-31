@@ -178,6 +178,7 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const fileScreen = AFUISourceTemplateID("file_screen");
   static const fileAppcodeAFib = AFUISourceTemplateID("appcode_afib");
   static const fileModel = AFUISourceTemplateID("file_model");
+  static const fileModelStartupExample = AFUISourceTemplateID("file_model_startup_example");
   static const fileStateView = AFUISourceTemplateID("file_state_view");
   static const fileSimpleQuery = AFUISourceTemplateID("file_simple_query");
   static const fileDeferredQuery = AFUISourceTemplateID("file_deferred_query");

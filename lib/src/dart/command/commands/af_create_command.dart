@@ -108,7 +108,6 @@ $optionsHeader
     if(kind != kindStateLibrary) {
       final mainTemplateId = isApp ? AFUISourceTemplateID.fileMain : AFUISourceTemplateID.fileMainUILibrary;
       _createMainFiles(ctx, mainTemplateId);
-
       _createUIFiles(ctx, packageName, libKind, );
     }
 
@@ -195,6 +194,10 @@ $optionsHeader
     
     if(kind != kindStateLibrary) {
       AFGenerateStateSubcommand.generateStateStatic(ctx, ctx.generator.nameDefaultStateView, args);
+    }
+
+    if(kind == kindApp) {
+      AFGenerateStateSubcommand.generateStateStatic(ctx, AFGenerateStateSubcommand.nameCountInStateRoot, args);
     }
   }
 

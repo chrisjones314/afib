@@ -16,6 +16,7 @@ import 'package:afib/src/dart/command/templates/statements/import_statements.t.d
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 class AFGenerateStateSubcommand extends AFGenerateSubcommand {
+  static const nameCountInStateRoot = "CountInStateRoot";
 
   AFGenerateStateSubcommand();
   
@@ -61,7 +62,6 @@ $optionsHeader
     });
 
     generateStateStatic(ctx, modelName, args.named);
-
 
     // replace any default 
     ctx.generator.finalizeAndWriteFiles(ctx);
@@ -145,7 +145,11 @@ $optionsHeader
     final generator = ctx.generator;
     final isRoot = identifier.endsWith(AFCodeGenerator.rootSuffix);
     final modelPath = generator.pathModel(identifier);
-    final modelFile = generator.createFile(ctx, modelPath, AFUISourceTemplateID.fileModel);
+    var fileModel = AFUISourceTemplateID.fileModel;
+    if(identifier == nameCountInStateRoot) {
+      fileModel = AFUISourceTemplateID.fileModelStartupExample;
+    }
+    final modelFile = generator.createFile(ctx, modelPath, fileModel);
     modelFile.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
 
     if(isRoot) {

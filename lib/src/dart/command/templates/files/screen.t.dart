@@ -8,6 +8,7 @@ class AFScreenT extends AFSourceTemplate {
 import 'package:afib/afib_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:[!af_package_name]/[!af_app_namespace]_id.dart';
+import 'package:[!af_package_name]/state/[!af_app_namespace]_state.dart';
 
 [!af_declare_route_param]
 

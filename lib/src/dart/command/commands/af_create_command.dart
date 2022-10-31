@@ -105,6 +105,12 @@ $optionsHeader
     if(kind != kindStateLibrary) {
       _createTestFiles(ctx, libKind);
     }
+
+    // this has to be created after the test data is created, because it modifies the test data file.
+    if(kind == kindApp) {
+      AFGenerateStateSubcommand.generateStateStatic(ctx, AFGenerateStateSubcommand.nameCountInStateRoot, {});
+    }
+
     if(kind != kindStateLibrary) {
       final mainTemplateId = isApp ? AFUISourceTemplateID.fileMain : AFUISourceTemplateID.fileMainUILibrary;
       _createMainFiles(ctx, mainTemplateId);
@@ -167,7 +173,7 @@ $optionsHeader
       AFCommand.argPrivate: false,
     };
 
-    AFGenerateUISubcommand.createScreen(ctx, "StartupScreen", args,
+    AFGenerateUISubcommand.createScreen(ctx, AFGenerateUISubcommand.nameStartupScreen, args,
       buildWithSPI: DeclareScreenBuildWithSPINoBackImplT(),
       buildBody: DeclareDemoScreenBuildBodyT(),
       spiImpls: DeclareDemoScreenSPIImplsT(),
@@ -194,10 +200,6 @@ $optionsHeader
     
     if(kind != kindStateLibrary) {
       AFGenerateStateSubcommand.generateStateStatic(ctx, ctx.generator.nameDefaultStateView, args);
-    }
-
-    if(kind == kindApp) {
-      AFGenerateStateSubcommand.generateStateStatic(ctx, AFGenerateStateSubcommand.nameCountInStateRoot, args);
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
+import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
@@ -30,10 +31,21 @@ class AFSingleScreenTestState {
     return copyWith(models: data);
   }
 
+  AFSingleScreenTestState reviseUpdateModels(List<Object> toIntegrate) {
+    final revised = Map<String, Object>.from(models ?? <String, Object>{});
+    for(final item in toIntegrate) {
+      final itemId = AFModelWithCustomID.stateKeyFor(item);
+      revised[itemId] = item;
+    }
+    return copyWith(models: revised);
+  }
+
+
   AFSingleScreenTestState incrementPassCount() {
     final revisedPass = pass+1;
     return copyWith(pass: revisedPass);
   }
+  
 
   AFSingleScreenTestState addError(String err) {
     final revised = List<String>.from(errors);
@@ -220,6 +232,24 @@ class AFTestState {
     } else {
       revisedStates[testId] = currentState.reviseModels(models);
 
+    }
+    return copyWith(
+      testStates: revisedStates
+    );
+  }
+
+  AFTestState updateTestState(List<Object> toIntegrate) {
+    final testId = activePrototypeId;
+    if(testId == null) {
+      assert(false, "No active prototype");
+      return this;
+    }
+    final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
+    final currentState = revisedStates[testId];
+    if(currentState == null) {
+      throw AFException("Internal error, calling updateStateView when there is no test state for $activePrototypeId");
+    } else {
+      revisedStates[testId] = currentState.reviseUpdateModels(toIntegrate);
     }
     return copyWith(
       testStates: revisedStates

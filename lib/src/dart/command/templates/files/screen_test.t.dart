@@ -5,6 +5,7 @@ class AFScreenTestT extends AFSourceTemplate {
   final String template = '''
 import 'package:afib/afib_flutter.dart';
 import 'package:[!af_package_name]/[!af_app_namespace]_id.dart';
+import 'package:flutter_test/flutter_test.dart' as ft;
 
 void define[!af_screen_name]Prototypes(AFUIPrototypeDefinitionContext context) {
   _define[!af_screen_name]PrototypeInitial(context);
@@ -15,6 +16,7 @@ void _define[!af_screen_name]PrototypeInitial(AFUIPrototypeDefinitionContext con
 
   prototype.defineSmokeTest( 
     body: (e) async {
+      [!af_declare_smoke_test_impl]
   });
 }
 ''';

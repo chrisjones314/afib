@@ -226,6 +226,7 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textScreenName = AFUISourceTemplateID("screen_name");
   static const textNavigateMethods = AFUISourceTemplateID("navigate_methods");
   static const textScreenID = AFUISourceTemplateID("screen_id");
+  static const declareSmokeTestImpl = AFUISourceTemplateID("declare_smoke_test_impl");
   static const textScreenIDType = AFUISourceTemplateID("screen_id_type");
   static const textSPIParentType = AFUISourceTemplateID("spi_parent_type");
   static const textThemeType = AFUISourceTemplateID("theme_type");

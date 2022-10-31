@@ -714,6 +714,20 @@ class AFCodeGenerator {
     return "${value[0].toLowerCase()}${value.substring(1)}";
   }
 
+  String declareUIIDDirect(AFCommandContext ctx, String idName, AFUIControlSettings control) {
+    final idPath = pathIdFile;
+    final idFile = loadFile(ctx, idPath);
+    final declareId = DeclareIDStatementT().toBuffer();
+
+    declareId.replaceText(ctx, AFUISourceTemplateID.textScreenID, idName);
+    declareId.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, control.suffix);
+
+    declareId.executeStandardReplacements(ctx);
+    final suffixSuper = control.kind == AFUIControlKind.widget ? "Widget" : "Screen";
+    final after = AFCodeRegExp.startUIID(control.suffix, suffixSuper);
+    idFile.addLinesAfter(ctx, after, declareId.lines);
+    return idName;
+  }
 
   String declareUIID(AFCommandContext ctx, String screenName, AFUIControlSettings control) {  
     final suffixSuper = control.kind == AFUIControlKind.widget ? "Widget" : "Screen";

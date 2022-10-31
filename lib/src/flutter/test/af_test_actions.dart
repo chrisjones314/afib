@@ -51,11 +51,20 @@ class AFStartWireframeAction {
   });
 }
 
-/// Update the 'store based' data for a prototype screen.
+/// Update the 'store based' data for a prototype screen.  Updates all the models.
 class AFUpdatePrototypeScreenTestModelsAction {
   AFBaseTestID testId;
   dynamic models;
   AFUpdatePrototypeScreenTestModelsAction(this.testId, this.models);
+}
+
+/// Updates the state for a prototype screen.   
+///
+/// Integrates changes to the specified models, but does not replace all of them.
+class AFUpdateTestStateAction {
+  List<Object> toIntegrate;
+  AFUpdateTestStateAction(this.toIntegrate);
+
 }
 
 class AFPrototypeScreenTestIncrementPassCount {

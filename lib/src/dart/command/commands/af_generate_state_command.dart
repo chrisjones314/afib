@@ -152,6 +152,8 @@ $optionsHeader
     final modelFile = generator.createFile(ctx, modelPath, fileModel);
     modelFile.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
 
+    final isStartupExample = identifier == AFGenerateStateSubcommand.nameCountInStateRoot;
+
     if(isRoot) {
       // add it to the root application state
       final pathState = generator.pathAppState;
@@ -176,7 +178,11 @@ $optionsHeader
         final testDataFile = generator.modifyFile(ctx, generator.pathTestData);
         testDataFile.addLinesAfter(ctx, AFCodeRegExp.startDefineTestData, declareCallDefineTest.lines);
 
-        final declareDefineTestData  = DeclareDefineDefineTestDataT().toBuffer();
+        var declareDefineTestData  = DeclareDefineDefineTestDataT().toBuffer();
+        if(isStartupExample) {
+          declareDefineTestData = DeclareDefineDefineTestDataStartupExampleT().toBuffer();
+        }
+
         declareDefineTestData.replaceText(ctx, AFUISourceTemplateID.textModelName, identifier);
         declareDefineTestData.executeStandardReplacements(ctx);
 

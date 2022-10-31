@@ -14,9 +14,7 @@ class DeclareDemoScreenRouteParamImplsT extends AFSourceTemplate {
     return StartupScreenRouteParam(clickCount: 0);
   }
 
-  StartupScreenRouteParam reviseIncrementClickCount() {
-    return copyWith(clickCount: clickCount+1);
-  }
+  StartupScreenRouteParam reviseIncrementClickCount() => copyWith(clickCount: clickCount+1);
 
   StartupScreenRouteParam copyWith({
     int? clickCount

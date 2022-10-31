@@ -22,6 +22,7 @@ import 'package:afib/src/dart/command/templates/statements/declare_spi.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_spi_on_pressed_closed.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_spi_on_tap_close.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_standard_route_param_impls.t.dart';
+import 'package:afib/src/dart/command/templates/statements/declare_startup_screen_test_impl.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_state_test_screen_shortcut.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_state_test_widget_shortcut.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_widget_build_body.t.dart';
@@ -86,6 +87,9 @@ class AFUIControlSettings {
 }
 
 class AFGenerateUISubcommand extends AFGenerateSubcommand {
+  static const nameStartupScreen = "StartupScreen";
+  static const nameButtonIncrementRouteParam = "buttonIncrementRouteParam";
+  static const nameTextCountRouteParam = "textCountRouteParam";
   static const argRouteParam = "routeParam";
   static const argStateView = "state-view";
   static const argTheme = "theme";
@@ -97,6 +101,22 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
   static const drawerSuffix = "Drawer";
   static const dialogSuffix = "Dialog";
   static const widgetSuffix = "Widget";
+  static final controlSettingsWidget = AFUIControlSettings(
+      kind: AFUIControlKind.widget, 
+      suffix: widgetSuffix, 
+      path: AFCodeGenerator.widgetsPath,
+      implBuildWithSPI: DeclareNoScaffoldBuildWithSPIImplT(),
+      implBuildBody: DeclareWidgetBuildBodyImplT(),
+      implsSPI: DeclareEmptyStatementT(),
+      implsSuper: DeclareWidgetImplsSuperT(),
+      paramsConstructor: DeclareWidgetParamsConstructorT(),
+      routeParamImpls: DeclareWidgetRouteParamImplsT(),
+      navigatePush: DeclareEmptyStatementT(),
+      spi: DeclareSPIT(),
+      stateTestShortcut: DeclareStateTestWidgetShortcutT(),
+      createPrototype: DeclareCreateWidgetPrototypeT(),
+    );
+
   static final controlKinds = [
     AFUIControlSettings(
       kind: AFUIControlKind.screen, 
@@ -158,21 +178,7 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       stateTestShortcut: DeclareStateTestScreenShortcutT(),
       createPrototype: DeclareCreateScreenPrototypeT(),
     ),
-    AFUIControlSettings(
-      kind: AFUIControlKind.widget, 
-      suffix: widgetSuffix, 
-      path: AFCodeGenerator.widgetsPath,
-      implBuildWithSPI: DeclareNoScaffoldBuildWithSPIImplT(),
-      implBuildBody: DeclareWidgetBuildBodyImplT(),
-      implsSPI: DeclareEmptyStatementT(),
-      implsSuper: DeclareWidgetImplsSuperT(),
-      paramsConstructor: DeclareWidgetParamsConstructorT(),
-      routeParamImpls: DeclareWidgetRouteParamImplsT(),
-      navigatePush: DeclareEmptyStatementT(),
-      spi: DeclareSPIT(),
-      stateTestShortcut: DeclareStateTestWidgetShortcutT(),
-      createPrototype: DeclareCreateWidgetPrototypeT(),
-    ),
+    controlSettingsWidget,
   ];
 
   AFGenerateUISubcommand();
@@ -425,10 +431,14 @@ $optionsHeader
     );
 
     // add exports for files
-    if(uiName != "StartupScreen") {
+    final isStartupScreen = uiName == AFGenerateUISubcommand.nameStartupScreen;
+    if(isStartupScreen) {
       generator.addExportsForFiles(ctx, args, [
         screenFile
       ]);
+
+      generator.declareUIIDDirect(ctx, AFGenerateUISubcommand.nameButtonIncrementRouteParam, controlSettingsWidget);
+      generator.declareUIIDDirect(ctx, AFGenerateUISubcommand.nameTextCountRouteParam, controlSettingsWidget);      
     }
 
     final generatePrototypes = AFibD.config.generateUIPrototypes;
@@ -441,6 +451,11 @@ $optionsHeader
       screenTestFile.replaceText(ctx, AFUISourceTemplateID.textFullTestDataID, generator.stateFullLoginID);
       screenTestFile.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
       screenTestFile.replaceText(ctx, AFUISourceTemplateID.textScreenID, screenId);
+      AFSourceTemplate templateUITestImpl = DeclareEmptyStatementT();
+      if(isStartupScreen) {
+        templateUITestImpl = DeclareStartupScreenTestImplT();
+      }
+      screenTestFile.replaceTemplate(ctx, AFUISourceTemplateID.declareSmokeTestImpl, templateUITestImpl);
 
       screenTestFile.executeStandardReplacements(ctx);
       generator.addImport(ctx,

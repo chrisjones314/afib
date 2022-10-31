@@ -9,3 +9,14 @@ void _define[!af_model_name](AFDefineTestDataContext context) {
 
   ''';
 }
+
+
+class DeclareDefineDefineTestDataStartupExampleT extends AFSourceTemplate {
+  final String template = '''
+
+void _define[!af_model_name](AFDefineTestDataContext context) {
+  context.define([!af_app_namespace(upper)]TestDataID.stateFullLogin[!af_model_name], [!af_model_name](count: 7));
+}
+
+  ''';
+}

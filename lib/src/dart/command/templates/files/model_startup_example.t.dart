@@ -18,9 +18,7 @@ class [!af_model_name] {
     return [!af_model_name](count: 0);
   }
 
-  CountInStateRoot reviseIncrementCount() {
-    return copyWith(count: count+1);
-  }
+  CountInStateRoot reviseIncrementCount() => copyWith(count: count+1);
 
   [!af_model_name] copyWith({
     int? count

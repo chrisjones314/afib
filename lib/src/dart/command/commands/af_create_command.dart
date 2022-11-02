@@ -393,6 +393,10 @@ $optionsHeader
     generator.ensureFolderExists(AFCodeGenerator.stateViewsPath);
 
     generator.ensureFolderExists(AFCodeGenerator.queryPath);
+    generator.ensureFolderExists(AFCodeGenerator.querySimplePath);
+    generator.ensureFolderExists(AFCodeGenerator.queryDeferredPath);
+    generator.ensureFolderExists(AFCodeGenerator.queryListenerPath);
+    generator.ensureFolderExists(AFCodeGenerator.queryIsolatePath);
     
     generator.ensureFolderExists(AFCodeGenerator.lpisOverridePath);
     generator.ensureFolderExists(AFCodeGenerator.overrideThemesPath);

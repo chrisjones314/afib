@@ -8,6 +8,7 @@ import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_buffer.dart';
 import 'package:afib/src/dart/command/code_generation/af_generated_file.dart';
+import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_export_statement.t.dart';
@@ -52,6 +53,10 @@ class AFCodeGenerator {
   static const stateTestsFolder = "state_tests";
   static const unitTestsFolder = "unit_tests";
   static const wireframesFolder = "wireframes";
+  static const simpleFolder = "simple";
+  static const deferredFolder = "deferred";
+  static const listenerFolder = "listener";
+  static const isolateFolder = "isolate";
 
   static const testAFibPath = [testFolder, afibFolder];
   static const screensPath = [libFolder, uiFolder, screensFolder];
@@ -69,6 +74,10 @@ class AFCodeGenerator {
   static const rootsPath = [libFolder, stateFolder, rootFolder];
   static const statePath = [libFolder, stateFolder];
   static const queryPath = [libFolder, queryFolder];
+  static const querySimplePath = [libFolder, queryFolder, simpleFolder];
+  static const queryDeferredPath = [libFolder, queryFolder, deferredFolder];
+  static const queryListenerPath = [libFolder, queryFolder, listenerFolder];
+  static const queryIsolatePath = [libFolder, queryFolder, isolateFolder];
   static const commandPath = [libFolder, commandFolder];
   static const initializationPath = [libFolder, initializationFolder];
   static const libPath = [libFolder];
@@ -146,7 +155,15 @@ class AFCodeGenerator {
 
   List<String> pathQuery(String modelName) {
     final filename = "${convertMixedToSnake(modelName)}.dart";
-    return _createPath(queryPath, filename);
+    var path = querySimplePath;
+    if(modelName.endsWith(AFGenerateQuerySubcommand.suffixDeferredQuery)) {
+      path = queryDeferredPath;
+    } else if(modelName.endsWith((AFGenerateQuerySubcommand.suffixListenerQuery))) {
+      path = queryListenerPath;
+    } else if(modelName.endsWith(AFGenerateQuerySubcommand.suffixIsolateQuery)) {
+      path = queryIsolatePath;
+    } 
+    return _createPath(path, filename);
   }
 
   List<String>? pathStateView(String stateViewName) {

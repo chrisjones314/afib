@@ -30,6 +30,7 @@ import 'package:afib/src/dart/command/templates/files/install_core_library_app.t
 import 'package:afib/src/dart/command/templates/files/install_library_command.t.dart';
 import 'package:afib/src/dart/command/templates/files/install_library_core.t.dart';
 import 'package:afib/src/dart/command/templates/files/install_test.t.dart';
+import 'package:afib/src/dart/command/templates/files/isolate_query.t.dart';
 import 'package:afib/src/dart/command/templates/files/lib_exports.t.dart';
 import 'package:afib/src/dart/command/templates/files/lpi.t.dart';
 import 'package:afib/src/dart/command/templates/files/main.t.dart';
@@ -71,6 +72,7 @@ class AFTemplateRegistry {
     register(AFUISourceTemplateID.stmtDeclareStateView, DeclareStateViewT());
     register(AFUISourceTemplateID.fileSimpleQuery, SimpleQueryT());
     register(AFUISourceTemplateID.fileDeferredQuery, DeferredQueryT());
+    register(AFUISourceTemplateID.fileIsolateQuery, IsolateQueryT());
     register(AFUISourceTemplateID.fileExtendBase, AFExtendBaseT());
     register(AFUISourceTemplateID.fileExtendBaseLibrary, AFExtendLibraryBaseT());
     register(AFUISourceTemplateID.fileExtendCommand, AFExtendCommandT());

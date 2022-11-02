@@ -8,6 +8,7 @@ class AFGenerateQuerySubcommand extends AFGenerateSubcommand {
   static const suffixQuery = "Query";
   static const suffixListenerQuery = "Listener$suffixQuery";
   static const suffixDeferredQuery = "Deferred$suffixQuery";
+  static const suffixIsolateQuery = "Isolate$suffixQuery";
   static const argRootStateType = "root-state-type";
   static const argResultModelType = "result-type";
 
@@ -31,6 +32,7 @@ $optionsHeader
   $suffixQuery - A simple query that reads/writes a value and then completes,
   $suffixListenerQuery - A query that listens for repeated updates which are pushed in from the outside world
   $suffixDeferredQuery - A query that waits for a duration and then executes, used for deferred calculation
+  $suffixIsolateQuery - A query that runs in a different thread
 
   --$argResultModelType - The model object that will be returned by the asynchronous operation for integration
     into your state.   This is unnecessary for deferred queries, which do not have a result type.
@@ -63,6 +65,8 @@ $optionsHeader
       querySuffix = suffixListenerQuery;
     } else if(queryName.endsWith(suffixDeferredQuery)) {
       querySuffix = suffixDeferredQuery;
+    } else if(queryName.endsWith(suffixIsolateQuery)) {
+      querySuffix = suffixIsolateQuery;
     }
 
     createQuery(
@@ -92,6 +96,7 @@ $optionsHeader
     var queryType = "AFAsyncQuery";
     final isListener = querySuffix == suffixListenerQuery;
     final isDeferred = querySuffix == suffixDeferredQuery;
+    final isIsolate  = querySuffix == suffixIsolateQuery;
     if(!isDeferred && resultModelType.isEmpty) {
       AFCommand.throwUsageErrorStatic("Please specify a result model type using --$argResultModelType", usage);
     }
@@ -99,6 +104,8 @@ $optionsHeader
       queryType = "AFAsyncListenerQuery";
     } else if(isDeferred) {
       fileKind = AFUISourceTemplateID.fileDeferredQuery;
+    } else if(isIsolate) {
+      fileKind = AFUISourceTemplateID.fileIsolateQuery;
     }
     
     // create a screen name

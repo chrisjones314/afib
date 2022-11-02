@@ -182,6 +182,7 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const fileStateView = AFUISourceTemplateID("file_state_view");
   static const fileSimpleQuery = AFUISourceTemplateID("file_simple_query");
   static const fileDeferredQuery = AFUISourceTemplateID("file_deferred_query");
+  static const fileIsolateQuery = AFUISourceTemplateID("file_isolate_query");
   static const fileExtendBase = AFUISourceTemplateID("file_extend_base");
   static const fileExtendBaseLibrary = AFUISourceTemplateID("file_extend_base_third_party");
   static const fileExtendCommand = AFUISourceTemplateID("file_extend_command");

@@ -291,5 +291,20 @@ class AFThemeID extends AFID {
 }
 
 class AFSourceTemplateID extends AFID {
-  const AFSourceTemplateID(String code, AFLibraryID library): super(null, code, library);
+  const AFSourceTemplateID(String code, AFLibraryID library,  { List<Object>? withItems }): super(null, code, library, withItems: withItems);
+
+  factory AFSourceTemplateID.create(String code, AFLibraryID library, List<Object>? withItems) {
+    return AFSourceTemplateID(code, library, withItems: withItems);
+  }
+
+
+  AFSourceTemplateID with1(Object first) {
+    return AFID.with3<AFSourceTemplateID>(
+      library: library, 
+      codeId: codeId, 
+      first: first, 
+      creator: AFSourceTemplateID.create,
+    );
+  }
+
 }

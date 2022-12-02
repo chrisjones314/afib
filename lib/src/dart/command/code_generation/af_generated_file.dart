@@ -9,12 +9,14 @@ import 'package:afib/src/dart/command/code_generation/af_code_generator.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:colorize/colorize.dart';
+import 'package:path/path.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 
 enum AFGeneratedFileAction {
   create,
   modify,
-  overwrite
+  overwrite,
+  skip
 }
 
 /// A file that is in the process of being generated or modified.
@@ -44,14 +46,51 @@ class AFGeneratedFile {
   }
 
   factory AFGeneratedFile.fromTemplate({
+    required AFCommandContext context,
     required List<String> projectPath,
     required AFSourceTemplate template,
     required AFGeneratedFileAction action
   }) {
+
+    // see if an override exists, if it does, use it.
+    var effective = template.toBuffer(context);
+    var effectivePath = projectPath;
+    if(template is AFFileSourceTemplate) {
+      final originalPath = template.templatePath;
+
+      // this is the command-line override, which switches the template path dynamically.
+      final overridePath = context.findOverrideTemplate(originalPath);
+      final hasOverride = overridePath != originalPath;
+      if(hasOverride) {
+        effectivePath = AFProjectPaths.generateFolderFor(overridePath);
+      }
+
+      if(AFProjectPaths.generateFileExists(overridePath)) {
+        action = AFGeneratedFileAction.skip;
+      }
+
+
+      // if there is an override for that path on the filesystem, use it.
+      if(AFProjectPaths.generateFileExists(overridePath)) {
+        effective = AFCodeBuffer.fromGeneratePath(overridePath);
+      } else {
+        // if the path changed, and the override path is not on the filesystem, see if it 
+        // is one of our predefined paths.
+        if(hasOverride) {
+          final overrideTemplate = context.findEmbeddedTemplate(overridePath);
+          if(overrideTemplate == null) {
+            throw AFException("The override ${joinAll(overridePath)} was not found on the file system, or in the AFTemplateRegistry, for ${joinAll(originalPath)}");
+          }
+          effective = overrideTemplate.toBuffer(context);
+        }
+      }
+
+    }
+
     return AFGeneratedFile(
-      projectPath: projectPath,
+      projectPath: effectivePath,
       action: action,
-      buffer: template.toBuffer()
+      buffer: effective,
     );
   }
 
@@ -162,6 +201,10 @@ class AFGeneratedFile {
     }
   }
 
+  void performInsertions(AFCommandContext context, AFSourceTemplateInsertions insertions) {
+    buffer.performInsertions(context, insertions);
+  }
+
   /// Replaces all instances of the specified id with 
   /// the specified value.
   /// 
@@ -179,7 +222,7 @@ class AFGeneratedFile {
     if(template == null) {
       buffer.replaceText(context, id, "");
     } else {
-      replaceTextLines(context, id, template.toBuffer().lines);
+      replaceTextLines(context, id, template.toBuffer(context).lines);
     }
   }
 
@@ -232,6 +275,8 @@ class AFGeneratedFile {
       }
     } else if(action == AFGeneratedFileAction.overwrite) {
       text = "overwrite";
+    } else if(action == AFGeneratedFileAction.skip) {
+      text = "skip";
     }
     
     output.write("$text ");

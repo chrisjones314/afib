@@ -422,7 +422,7 @@ class AFCodeGenerator {
 
    bool addImportsForPath(AFCommandContext ctx, List<String> projectPath, { required List<String> imports, bool requireExists = true }) {
     if(!requireExists || fileExists(projectPath)) {
-      final template = ImportFromPackage().toBuffer();
+      final template = ImportFromPackage().toBuffer(ctx);
       template.replaceText(ctx, AFUISourceTemplateID.textPackageName, AFibD.config.packageName);
       template.replaceText(ctx, AFUISourceTemplateID.textPackagePath, importStatementPath(projectPath));
       imports.addAll(template.lines);
@@ -460,7 +460,7 @@ class AFCodeGenerator {
     required AFGeneratedFile to,
     String? packageName
   }) {
-    final declareImport = ImportFromPackage().toBuffer();
+    final declareImport = ImportFromPackage().toBuffer(ctx);
     declareImport.replaceText(ctx, AFUISourceTemplateID.textPackageName, packageName ?? AFibD.config.packageName);
     declareImport.replaceText(ctx, AFUISourceTemplateID.textPackagePath, importPath);
     to.addImports(ctx, declareImport.lines);
@@ -512,7 +512,7 @@ class AFCodeGenerator {
     final pathExports = toPath ?? pathFlutterExportsFile;
     final fileExports = modifyFile(context, pathExports);
     for(final exportFile in files) {
-      final decl = DeclareExportStatementT().toBuffer();
+      final decl = DeclareExportStatementT().toBuffer(context);
       decl.replaceText(context, AFUISourceTemplateID.textFileRelativePath, importPathStatementStatic(exportFile.projectPath));
       fileExports.addLinesAtEnd(context, decl.lines);
     }
@@ -582,6 +582,10 @@ class AFCodeGenerator {
   }
 
   void finalizeAndWriteFiles(AFCommandContext context) {
+    if(!context.isRootCommand) {
+      return;
+    }
+
     for(final original in renamed.keys) {
       final revised = renamed[original];
       if(revised == null) {
@@ -622,7 +626,7 @@ class AFCodeGenerator {
     for(final file in files) {
       file.executeStandardReplacements(context);
       final afTag = file.findFirstAFTag();
-      if(afTag != null) {
+      if(afTag != null && !context.isExportTemplates) {
         throw AFException("Internal error: $afTag [!af... tag still present in ${file.projectPath.join('/')}");
       }
 
@@ -659,12 +663,26 @@ class AFCodeGenerator {
   }
 
   /// Used for generated files which always get overwritten.
-  AFGeneratedFile overwriteFile(AFCommandContext context, List<String> projectPath, dynamic templateOrId) {
-    return _createFile(context, projectPath, templateOrId, AFGeneratedFileAction.overwrite);    
+  AFGeneratedFile overwriteFile(AFCommandContext context, List<String> projectPath, dynamic templateOrId, {
+    Map<AFSourceTemplateInsertion, AFSourceTemplate>? insertions,
+  }) {
+    final generated = _createFile(context, projectPath, templateOrId, AFGeneratedFileAction.overwrite);    
+    if(insertions != null && !context.isExportTemplates) {
+      final insert = AFSourceTemplateInsertions(insertions: insertions);
+      generated.performInsertions(context, insert);
+    }
+    return generated;
   }
 
-  AFGeneratedFile createFile(AFCommandContext context, List<String> projectPath, dynamic templateOrId) {    
-    return _createFile(context, projectPath, templateOrId, AFGeneratedFileAction.create);
+  AFGeneratedFile createFile(AFCommandContext context, List<String> projectPath, dynamic templateOrId, {
+    AFSourceTemplateInsertions? insertions,
+  }) {
+    // if we are generating templates, then generate it at the     
+    final generated = _createFile(context, projectPath, templateOrId, AFGeneratedFileAction.create);
+    if(insertions != null && !context.isExportTemplates) {
+      generated.performInsertions(context, insertions);
+    }
+    return generated;
   }
 
   AFGeneratedFile _modifyFile(AFCommandContext context, List<String> projectPath) {
@@ -697,16 +715,24 @@ class AFCodeGenerator {
     }
 
     AFGeneratedFile generated;
-    if(template != null) {
-      generated = AFGeneratedFile.fromTemplate(projectPath: projectPath, template: template, action: action);
+    if(context.isExportTemplates) {
+      if(templateOrId is! AFFileSourceTemplate) {
+        throw AFException("Expected AFFileSourceTemplate");
+      }
+
+      generated = templateOrId.createGeneratedTemplate(context);
+    } else if(template != null) {
+      generated = AFGeneratedFile.fromTemplate(context: context, projectPath: projectPath, template: template, action: action);
     } else if(templateOrId is AFCodeBuffer) {
       generated = AFGeneratedFile.fromBuffer(projectPath: projectPath, buffer: templateOrId, action: action);
     } else {
       throw AFException("Could not find template with id $templateOrId");
     }
 
+    
+
     created[projectPath.join('/')] = generated;
-    generated.resolveTemplateReferences(context: context);
+    //generated.resolveTemplateReferences(context: context);
     return generated;
   }
 
@@ -734,7 +760,7 @@ class AFCodeGenerator {
   String declareUIIDDirect(AFCommandContext ctx, String idName, AFUIControlSettings control) {
     final idPath = pathIdFile;
     final idFile = loadFile(ctx, idPath);
-    final declareId = DeclareIDStatementT().toBuffer();
+    final declareId = DeclareIDStatementT().toBuffer(ctx);
 
     declareId.replaceText(ctx, AFUISourceTemplateID.textScreenID, idName);
     declareId.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, control.suffix);
@@ -773,7 +799,7 @@ class AFCodeGenerator {
     final root = removeSuffix(name, suffix);
     final screenId = toCamelCase(root);
     
-    final declareId = DeclareIDStatementT().toBuffer();
+    final declareId = DeclareIDStatementT().toBuffer(ctx);
     declareId.replaceText(ctx, AFUISourceTemplateID.textScreenName, name);
     declareId.replaceText(ctx, AFUISourceTemplateID.textScreenID, screenId);
     declareId.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, suffix);
@@ -816,7 +842,7 @@ class AFCodeGenerator {
 
     for(var i = 0; i < convert.length; i++) {
       final currentChar = convert[i];
-      final isUpper = currentChar == currentChar.toUpperCase();
+      final isUpper = int.tryParse(currentChar) == null && currentChar == currentChar.toUpperCase();
       if(isUpper && i > 0) {
         final prevChar = convert[i-1];
         final prevIsUpper = prevChar == prevChar.toUpperCase();

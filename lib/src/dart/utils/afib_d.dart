@@ -1,9 +1,5 @@
-import 'package:afib/src/dart/command/af_command_enums.dart';
+import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
-import 'package:afib/src/dart/utils/af_config.dart';
-import 'package:afib/src/dart/utils/af_config_entries.dart';
-import 'package:afib/src/dart/utils/af_dart_params.dart';
-import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/utils/af_log_printer.dart';
 import 'package:collection/collection.dart';
 import 'package:logger/logger.dart';
@@ -14,7 +10,8 @@ class AFibD<AppState> {
     static final standardSizes = <String, AFFormFactorSize>{};
     static final libraries = <AFLibraryID>[];
     static final logs = <String, Logger>{};
-
+    static final codeGenerationOverrides = <AFSourceTemplateInsertion, Object>{};
+    
     /// Register an entry in the configuration file.
     static void registerConfigEntry(AFConfigurationItem entry) {
       configEntries.add(entry);
@@ -69,6 +66,7 @@ class AFibD<AppState> {
       registerConfigEntry(AFConfigEntries.testOrientation);
       registerConfigEntry(AFConfigEntries.widgetTesterContext);
       registerConfigEntry(AFConfigEntries.generateBeginnerComments);
+      registerConfigEntry(AFConfigEntries.generatedFileHeader);
       registerConfigEntry(AFConfigEntries.generateUIPrototypes);
 
     }

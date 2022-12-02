@@ -23,14 +23,14 @@ class DeclareDemoScreenScreenImplsT extends AFSourceTemplate {
 
     rows.add(t.childText(
       spi.clickCountParam.toString(),
-      wid: HCWidgetID.textCountRouteParam,
+      wid: [!af_app_namespace(upper)]WidgetID.textCountRouteParam,
       style: t.styleOnCard.headline2
     ));
 
     rows.add(t.childMargin(
       margin: t.margin.b.biggest,
       child: t.childButtonPrimaryText(
-        wid: HCWidgetID.buttonIncrementRouteParam,
+        wid: [!af_app_namespace(upper)]WidgetID.buttonIncrementRouteParam,
         text: "Increment Route Parameter Count", 
         onPressed: spi.onIncrementParamCount
       )

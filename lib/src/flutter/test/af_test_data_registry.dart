@@ -25,11 +25,12 @@ class AFDefineTestDataContext {
 
 
 
-  void define(dynamic id, dynamic data) {
+  TData define<TData>(dynamic id, TData data) { 
     if(testData.containsKey(id)) {
       assert(false, "You should not redefine a of the existing id $id in the test data");
     }
     testData[id] = data;
+    return data;
   }
 
   List<TValue> defineIdentifierList<TValue>(Object id, List<String> listIds) {

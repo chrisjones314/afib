@@ -16,6 +16,7 @@ class AFProjectPaths {
   static const testFolder = 'test';
   static const afibFolder = 'afib';
   static const srcFolder = 'src';
+  static const folderCount = 'count';
   static const initializationFolder = 'initialization';
   static const libPath = [libFolder];
   static const initializationPath = [libFolder, initializationFolder];
@@ -26,8 +27,38 @@ class AFProjectPaths {
   static const afTestPath = [testFolder, afibFolder, afTestFile];
   static const afTestConfigFile = "afib_test_config.g.dart";
   static const afTestConfigPath = [testFolder, afibFolder, afTestConfigFile];
+  static const generateFolder = "generate";
+  static const folderCore = "core";
+  static const folderExample = "example";
+  static const pathGenerateCore = [generateFolder, folderCore];
+  static const pathGenerateExample = [generateFolder, folderExample];
 
   static List<String>? extraParentFolder;
+
+  static List<String> generateFolderFor(List<String> subpath) {
+    final result = subpath.toList();
+    result.insert(0, generateFolder);
+    final idxLast = result.length - 1;
+    final file = result[idxLast];
+    final fileWithExtension = "$file.t_dart";
+    result[idxLast] = fileWithExtension;
+    return result;
+  }
+
+  static String generatePathFor(List<String> projectPath) {
+    final subpath = generateFolderFor(projectPath);
+    final current = Directory.current;      
+    final projectRoot = split(current.path);
+    final projectRootFolders = List<String>.from(projectRoot);
+    projectRootFolders.addAll(subpath);
+    return joinAll(projectRootFolders);
+  }
+
+  static bool generateFileExists(List<String> relativePath) {
+    final fullPath = generateFolderFor(relativePath);
+    final path = fullPathFor(fullPath);
+    return pathExists(path);
+  }
 
   static bool projectFileExists(List<String> relativePath) {
     final path = fullPathFor(relativePath);
@@ -121,7 +152,7 @@ class AFProjectPaths {
     if(!AFProjectPaths.projectFileExists(AFProjectPaths.pubspecPath)) {
       return false;
     }
-    if(!AFProjectPaths.projectFileExists(ctx.generator.pathAfibConfig)) {
+    if(ctx.isRootCommand && !AFProjectPaths.projectFileExists(ctx.generator.pathAfibConfig)) {
       return false;
     }
 

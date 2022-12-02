@@ -22,7 +22,6 @@ class AFConfigEntryEnvironment extends AFConfigurationItemOptionChoice {
     addChoice(textValue: "workflowPrototype", help: "Startup in the terminal state of a state test, specified by AFConfig.setStartupStateTest $specificItemConfigLocation", runtimeValue: AFEnvironment.startupInStateTest);
     addChoice(textValue: "startupInScreenPrototype", help: "Startup in a specific screen prototype specified by AFConfig.setStartupScreenPrototype $specificItemConfigLocation", runtimeValue: AFEnvironment.startupInScreenPrototype);
     addChoice(textValue: "test", help: "Used internally when command-line tests are executing, not usually explicitly used by developers", runtimeValue: AFEnvironment.test);
-
   }
 
   void setValueWithString(AFConfig dest, String value) {

@@ -77,7 +77,7 @@ class AFFormFactorSize {
   });
 
   String get dimensionsText {
-    return "$width x $height";
+    return "$width w x $height h";
   }
 
   String summaryText() {

@@ -2484,17 +2484,17 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
   
   /// Returns a unique key for the specified widget.
-  Key? keyForWID(AFID? wid) {
+  LocalKey? keyForWID(AFID? wid) {
     return keyForWIDStatic(wid);
   }
 
-  static Key? keyForWIDStatic(AFID? wid) {
+  static LocalKey? keyForWIDStatic(AFID? wid) {
     if(wid == null) { return null; }
-    return Key(wid.code);
+    return ValueKey<String>(wid.code);
   }
 
     /// Returns a unique key for the specified widget.
-  Key keyForWIDNotNull(AFID wid) {
+  LocalKey keyForWIDNotNull(AFID wid) {
     var result = keyForWIDStatic(wid);
     return result!;
   }

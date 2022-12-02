@@ -9,10 +9,21 @@ class AFArgs {
   List<String> args;
   AFArgs(this.args);
 
+  AFArgs reviseAddArg(String arg) {
+    final revised = args.toList();
+    revised.add(arg);
+    return AFArgs(revised);
+  }
+
   // create args that are modifiable.
   factory AFArgs.create(List<String> args) {
     return AFArgs(List<String>.of(args));
   }
+
+  factory AFArgs.createFromString(String arguments) {
+    return AFArgs(parseArgs(arguments));
+  }
+
 
   /// The name of the command that was executed.
   String get command {
@@ -47,9 +58,13 @@ class AFArgs {
     final colorized = Colorize(result.toString()).apply(Styles.YELLOW);    
     print(colorized);
 
-    final parsed = revised.trim().split(RegExp(r"[ \t]"));
+    final parsed = parseArgs(revised);
     args = <String>[];
     args.addAll(parsed);
+  }
+
+  static List<String> parseArgs(String revised) {
+    return revised.trim().split(RegExp(r"[ \t]"));
   }
 
   /// The nth space-separated argument (not including the command itself)

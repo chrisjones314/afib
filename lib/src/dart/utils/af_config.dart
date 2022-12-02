@@ -90,6 +90,9 @@ abstract class AFConfigurationItem {
       return null;
     }
     if(val is String) {
+      if(val.contains("\n")) {
+        return "'''\n$val'''";
+      }
       return "\"$val\"";
     }
     if(val is List) {
@@ -269,6 +272,38 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
   }
 }
 
+
+class AFConfigurationItemString extends AFConfigurationItem {
+
+  AFConfigurationItemString({ 
+    required AFLibraryID libraryId,
+    required String name, 
+    required int validContexts, 
+    required double ordinal, 
+    required String defaultValue, 
+    required String help 
+  }): super(
+    libraryId: libraryId,
+    name: name, 
+    defaultValue: defaultValue, 
+    validContexts: validContexts, 
+    ordinal: ordinal, 
+    help: help
+  );
+
+   void addArguments(args.ArgParser argParser) {
+    argParser.addOption(name, help: help);
+   }
+
+  String? validate(dynamic value) {
+    return null;
+  }
+
+
+  void setValue(AFConfig dest, dynamic value) {
+    dest.putInternal(this, value);
+  } 
+}
 
 
 class AFConfigurationItemTrueFalse extends AFConfigurationItemOptionChoice {
@@ -472,6 +507,10 @@ class AFConfig {
 
   String get packageName { 
     return stringFor(AFConfigEntries.packageName);
+  }
+
+  String get fileHeader { 
+    return stringFor(AFConfigEntries.generatedFileHeader);
   }
 
   List<String> get recentTests {

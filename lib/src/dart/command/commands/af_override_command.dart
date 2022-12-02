@@ -1,7 +1,8 @@
-import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/command/af_command.dart';
+import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
+import 'package:afib/src/dart/command/templates/core/lpi.t.dart';
 
 /// Parent for commands executed through the afib command line app.
 class AFOverrideCommand extends AFCommand { 
@@ -83,17 +84,18 @@ $optionsHeader
       generator.finalizeAndWriteFiles(ctx);
   }
 
-  void _generateLPIOverride(AFCommandContext ctx, String identifier, String parentType) {
-    final generator = ctx.generator;
+  void _generateLPIOverride(AFCommandContext context, String identifier, String parentType) {
+    final generator = context.generator;
 
     // create the LPI file itself.
     final lpiPath = generator.pathLPI(identifier, isOverride: true);
-    final lpiFile = generator.createFile(ctx, lpiPath, AFUISourceTemplateID.fileLPI);
-    lpiFile.replaceText(ctx, AFUISourceTemplateID.textLPIType, identifier);
+    context.createFile(lpiPath, LPIT(), insertions: {
+      AFSourceTemplate.insertMainTypeInsertion: identifier,
+    });
 
     final lib = generator.findLibraryForTypeWithPrefix(parentType);
     final fullId = generator.deriveFullLibraryIDFromType(parentType, lpiSuffix, typeKind: "LibraryProgrammingInterface");
-    AFGenerateStateSubcommand.generateLPIStatic(ctx, identifier, <String, dynamic>{}, 
+    AFGenerateStateSubcommand.generateLPIStatic(context, identifier, <String, dynamic>{}, 
       fullId: fullId,
       fromLib: lib,
       parentType: parentType,

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_create_command.dart';
@@ -14,6 +16,7 @@ import 'package:afib/src/dart/command/templates/af_template_registry.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:args/args.dart' as args;
 import 'package:collection/collection.dart';
+import 'package:path/path.dart';
 
 class AFItemWithNamespace {
   /// The namespace used to differentiate third party commands.
@@ -298,18 +301,113 @@ Available subcommands
 }
 
 class AFCommandContext {
+  final List<AFCommandContext> parents;
   final AFCommandAppExtensionContext definitions;
   final AFCommandOutput output;
   final AFCodeGenerator generator;
   final args.ArgResults arguments;
+  final AFSourceTemplateInsertions? coreInsertions;
+
   int commandArgCount = 1;
 
   AFCommandContext({
+    required this.parents,
     required this.output, 
     required this.definitions,
     required this.generator,
     required this.arguments,
+    this.coreInsertions,
   });
+
+  bool get isRootCommand => parents.isEmpty;
+
+  factory AFCommandContext.withArguments({
+    required AFCommandAppExtensionContext definitions,
+    required AFCommandOutput output,
+    required AFCodeGenerator generator,
+    required AFArgs arguments,
+    required AFSourceTemplateInsertions? coreInsertions,
+    List<AFCommandContext>? parents
+  }) {
+    final parsed = args.ArgParser.allowAnything();
+    final argsParsed = parsed.parse(arguments.args);
+    return AFCommandContext(
+      parents: parents ?? <AFCommandContext>[],
+      output: output, 
+      definitions: definitions, 
+      generator: generator, 
+      arguments: argsParsed,
+      coreInsertions: coreInsertions
+    );
+  }
+
+  AFCommandContext reviseWithArguments({
+    required AFSourceTemplateInsertions? insertions,
+    required AFArgs arguments,
+  }) {
+    final revisedParents = parents.toList();
+    revisedParents.add(this);
+    var revisedArgs = arguments;
+    if(isExportTemplates) {
+      revisedArgs = revisedArgs.reviseAddArg("--${AFGenerateSubcommand.argExportTemplatesFlag}");
+    }
+
+    return AFCommandContext.withArguments(
+      parents: revisedParents,
+      output: this.output,
+      definitions: this.definitions,
+      generator: this.generator,
+      arguments: revisedArgs,
+      coreInsertions: insertions,   
+    );
+  }
+
+  void startRoot() {
+    if(!isRootCommand) {
+      return;
+    } 
+
+    if(isExportTemplates) {
+      output.writeTwoColumns(col1: "detected ", col2: "--export-templates");
+    }
+
+    var override = findArgument(AFGenerateSubcommand.argOverrideTemplatesFlag);
+    if(override != null) {
+      output.writeTwoColumns(col1: "detected ", col2: "--template-overrides: $override");
+    }
+  }
+
+  AFCodeBuffer createSnippet(
+    AFSourceTemplate source, {
+      AFSourceTemplateInsertions? extend,
+      Map<AFSourceTemplateInsertion, Object>? insertions
+    }
+  ) {
+    var fullInsert = this.coreInsertions;
+    if(insertions != null) {
+      fullInsert = fullInsert?.reviseAugment(insertions);
+    }
+    if(extend != null) {
+      fullInsert = fullInsert?.reviseAugment(extend.insertions);
+    }
+    return source.toBuffer(this, insertions: fullInsert?.insertions);
+  }
+
+  AFGeneratedFile createFile(
+    List<String> projectPath,
+    AFFileSourceTemplate template, { 
+      AFSourceTemplateInsertions? extend,
+      Map<AFSourceTemplateInsertion, Object>? insertions 
+    })  {
+    var fullInsert = this.coreInsertions;
+    if(insertions != null) {
+      fullInsert = fullInsert?.reviseAugment(insertions);
+    }
+    if(extend != null) {
+      fullInsert = fullInsert?.reviseAugment(extend.insertions);
+    }
+    return generator.createFile(this, projectPath, template, insertions: fullInsert);
+  }
 
   Object? findArgument(String key) {
     final args = arguments.rest;
@@ -324,6 +422,41 @@ class AFCommandContext {
       }
     }
     return null;
+  }
+
+  bool get isExportTemplates {
+    return findArgument(AFGenerateSubcommand.argExportTemplatesFlag) != null;
+  }
+
+  List<String> findOverrideTemplate(List<String> sourceTemplate) {
+    var override = findArgument(AFGenerateSubcommand.argOverrideTemplatesFlag);
+    if(override == null || override is! String) {
+      return sourceTemplate;
+    }
+
+    final sourcePath = joinAll(sourceTemplate);
+
+    override = override.replaceAll('"', "");
+    override = override.replaceAll(".tdart", "");
+
+    final overrides = override.split(",");
+    for(final overrideAssign in overrides) {
+      final assign = overrideAssign.split("=");
+      if(assign.length != 2) {
+        throw AFException("Expected $overrideAssign to have the form a=b");
+      }
+      final left = assign[0];
+      final right = assign[1];
+      if(left == sourcePath) {
+        output.writeTwoColumns(col1: "override ", col2: "$left -> $right");
+        return right.split(Platform.pathSeparator);
+      }
+    }
+    return sourceTemplate;
+  }
+
+  AFFileSourceTemplate? findEmbeddedTemplate(List<String> path) {
+    return this.definitions.templates.findEmbeddedTemplate(path);
   }
 
   void setCommandArgCount(int count) {
@@ -359,19 +492,15 @@ class AFCommandLibraryExtensionContext extends AFBaseExtensionContext {
 
   /// Used to register a new root level command 
   /// command line.
-  void defineCommand(AFCommand command) {
-    commands.addCommand(command);
+  AFCommand defineCommand(AFCommand command, { bool hidden = false }) {
+    if(hidden) {
+      commands.addHiddenCommand(command);
+    } else {
+      commands.addCommand(command);
+    }
+    return command;
   }
-
   
-
-  // Used to register a subcommand of afib.dart generate...
-  void registerGenerateSubcommand(AFGenerateSubcommand generate) {
-    final cmd = findCommandByType<AFGenerateParentCommand>();
-    if(cmd == null) return;
-    cmd.addSubcommand(generate);
-  }
-
   AFCommand? findCommandByType<T extends AFCommand>() {
     final result = commands.all.firstWhereOrNull((c) => c is T);
     return result;
@@ -400,6 +529,7 @@ class AFCommandLibraryExtensionContext extends AFBaseExtensionContext {
 
 class AFCommandRunner {
   List<AFCommand> commands = <AFCommand>[];
+  List<AFCommand> commandsHidden = <AFCommand>[];
   final String name;
   final String description;
   AFCommandRunner(this.name, this.description);
@@ -469,12 +599,21 @@ Available Commands
   }
 
   AFCommand? findByName(String name) {
-    return commands.firstWhereOrNull((c) => c.name == name);
+    var result = commands.firstWhereOrNull((c) => c.name == name);
+    if(result == null) {
+      result = commandsHidden.firstWhereOrNull((c) => c.name == name);
+    }
+    return result;
   }
 
   void addCommand(AFCommand command) {
     commands.add(command);
   }
+
+  void addHiddenCommand(AFCommand command) {
+    commandsHidden.add(command);
+  }
+
 }
 
 class AFHelpCommand extends AFCommand {
@@ -556,26 +695,30 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
       }
     }
 
+
     void registerBootstrapCommands() {
       defineCommand(AFHelpCommand());
       defineCommand(AFVersionCommand());
       defineCommand(AFCreateAppCommand());
-
+      _defineGenerateCommand(hidden: true);
     }
 
 
     void registerStandardCommands() {
       //register(AFVersionCommand());
       defineCommand(AFConfigCommand());
-      defineCommand(AFGenerateParentCommand());
+      _defineGenerateCommand(hidden: false);
       defineCommand(AFTestCommand());
       defineCommand(AFHelpCommand());
       defineCommand(AFInstallCommand());
       defineCommand(AFOverrideCommand());
+    }
 
-      registerGenerateSubcommand(AFGenerateUISubcommand());
-      registerGenerateSubcommand(AFGenerateStateSubcommand());
-      registerGenerateSubcommand(AFGenerateQuerySubcommand());
-      registerGenerateSubcommand(AFGenerateCommandSubcommand());
+    void _defineGenerateCommand({ required bool hidden }) {
+      final generateCmd = defineCommand(AFGenerateParentCommand(), hidden: hidden);
+      generateCmd.addSubcommand(AFGenerateUISubcommand());
+      generateCmd.addSubcommand(AFGenerateStateSubcommand());
+      generateCmd.addSubcommand(AFGenerateQuerySubcommand());
+      generateCmd.addSubcommand(AFGenerateCommandSubcommand());      
     }
 }

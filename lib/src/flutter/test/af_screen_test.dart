@@ -2677,12 +2677,12 @@ class AFUIPrototypeDefinitionContext extends AFBaseTestDefinitionContext {
 
   AFSingleScreenPrototypeBody defineDrawerPrototype({
     required AFPrototypeID   id,
-    required Object? models,
+    required Object? stateView,
     required AFNavigatePushAction navigate,
     AFTestTimeHandling timeHandling = AFTestTimeHandling.paused,
     String? title,
   }) {
-    final modelsActual = models ?? <Object>[];
+    final modelsActual = stateView ?? <Object>[];
     return drawerTests.addConnectedPrototype(
       id: id,
       models: modelsActual,

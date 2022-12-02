@@ -42,11 +42,11 @@ $optionsHeader
     final generator = ctx.generator;
 
     // create a package import for this 
-    final importFlutter = ImportFromPackage().toBuffer();
+    final importFlutter = ImportFromPackage().toBuffer(ctx);
     importFlutter.replaceText(ctx, AFUISourceTemplateID.textPackageName, packageName);
     importFlutter.replaceText(ctx, AFUISourceTemplateID.textPackagePath, "${packageCode}_flutter.dart");
 
-    final importCommand = ImportFromPackage().toBuffer();
+    final importCommand = ImportFromPackage().toBuffer(ctx);
     importCommand.replaceText(ctx, AFUISourceTemplateID.textPackageName, packageName);
     importCommand.replaceText(ctx, AFUISourceTemplateID.textPackagePath, "${packageCode}_command.dart");
 
@@ -93,7 +93,7 @@ $optionsHeader
     final fileExtendBase = generator.modifyFile(ctx, pathExtendFile);
     fileExtendBase.addImports(ctx, importCode.lines);
     
-    final call = DeclareCallExtendT().toBuffer();
+    final call = DeclareCallExtendT().toBuffer(ctx);
     call.replaceText(ctx, AFUISourceTemplateID.textPackageCode, packageCode);
     call.replaceText(ctx, AFUISourceTemplateID.textExtendKind, extendType);
     fileExtendBase.addLinesAfter(ctx, startExtendRegex, call.lines);

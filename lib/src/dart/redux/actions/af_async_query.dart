@@ -5,6 +5,7 @@ import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
+import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
@@ -438,6 +439,13 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
   /// are adequately covered by passing onSuccess.
   void finishAsyncWithResponse(AFFinishQuerySuccessContext<AFCompositeQueryResponse> response) {
 
+  }
+
+  /// A utility for throwing unimplemented in your startAsync method before you have implemented it.
+  /// 
+  /// Provides a nice error message
+  Never throwUnimplemented() {
+    throw AFException("The query $runtimeType is not implemented in debug/production, fill in startAsync");
   }
 }
 

@@ -10,7 +10,7 @@ class DeclareConfigEntriesT extends AFDynamicSourceTemplate {
 
   DeclareConfigEntriesT(this.source, this.entries);
     
-  List<String> createLinesWithOptions(AFCommandContext context, List<String> options) {
+  List<String> createLinesWithOptions(AFCommandContext context, List<String> options, String indent) {
     final afibConfig = AFibD.config;
     final scope = this.entries ?? afibConfig.all;
     final sorted = scope.toList();

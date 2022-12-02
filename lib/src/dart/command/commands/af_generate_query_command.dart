@@ -2,6 +2,7 @@
 
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
+import 'package:afib/src/dart/command/templates/core/queries_t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_query_shutdown_method.t.dart';
 
 class AFGenerateQuerySubcommand extends AFGenerateSubcommand {
@@ -37,6 +38,8 @@ $optionsHeader
   --$argResultModelType - The model object that will be returned by the asynchronous operation for integration
     into your state.   This is unnecessary for deferred queries, which do not have a result type.
   --$argRootStateType [YourRootState] - the name of the root state this query updates, defaults to your root state
+  --$argExportTemplatesHelp
+  --$argOverrideTemplatesHelp
 
   ${AFCommand.argPrivateOptionHelp}
 
@@ -44,18 +47,20 @@ $optionsHeader
   }
 
   @override
-  void execute(AFCommandContext ctx) {
-    final unnamed = ctx.rawArgs;
+  void execute(AFCommandContext context) {
+    final unnamed = context.rawArgs;
     if(unnamed.isEmpty ) {
       throwUsageError("Expected at least one argument");
     }
 
     final queryName = unnamed[0];
-    final generator = ctx.generator;
+    final generator = context.generator;
 
     final args = parseArguments(unnamed, defaults: {
       argResultModelType: "",
       argRootStateType: generator.nameRootState,
+      argExportTemplates: "",
+      argOverrideTemplates: "",
     });
 
     verifyMixedCase(queryName, "query name");
@@ -69,68 +74,79 @@ $optionsHeader
       querySuffix = suffixIsolateQuery;
     }
 
+    final coreInsertions = AFSourceTemplateInsertions.createCore(context);
+
     createQuery(
-      ctx: ctx,
+      context: context,
+      insertions: coreInsertions,
       querySuffix: querySuffix,
-      queryName: queryName,
+      queryType: queryName,
       args: args.named,
       usage: usage,
     );
         
     // replace any default 
-    ctx.generator.finalizeAndWriteFiles(ctx);
+    context.generator.finalizeAndWriteFiles(context);
 
   }
 
   static void createQuery({
-    required AFCommandContext ctx,
+    required AFCommandContext context,
+    required AFSourceTemplateInsertions insertions,
     required String querySuffix,
-    required String queryName,
+    required String queryType,
     required Map<String, dynamic> args,
     required String usage,
   }) {
     final rootStateType = args[argRootStateType];
-    final resultModelType = args[argResultModelType];
+    final resultType = args[argResultModelType];
 
-    var fileKind = AFUISourceTemplateID.fileSimpleQuery;
-    var queryType = "AFAsyncQuery";
+    AFSourceTemplate queryTemplate = SimpleQueryT.base();
+    var queryParentType = "AFAsyncQuery";
     final isListener = querySuffix == suffixListenerQuery;
     final isDeferred = querySuffix == suffixDeferredQuery;
     final isIsolate  = querySuffix == suffixIsolateQuery;
-    if(!isDeferred && resultModelType.isEmpty) {
+    if(!isDeferred && resultType.isEmpty) {
       AFCommand.throwUsageErrorStatic("Please specify a result model type using --$argResultModelType", usage);
     }
     if(isListener) {
-      queryType = "AFAsyncListenerQuery";
+      queryParentType = "AFAsyncListenerQuery";
     } else if(isDeferred) {
-      fileKind = AFUISourceTemplateID.fileDeferredQuery;
+      queryTemplate = DeferredQueryT.base();
     } else if(isIsolate) {
-      fileKind = AFUISourceTemplateID.fileIsolateQuery;
+      queryTemplate = IsolateQueryT.base();
+    }
+
+    AFSourceTemplate additionalMethods = AFSourceTemplate.empty;
+    if(isListener || isDeferred) {
+      additionalMethods = DeclareQueryShutdownMethodT();
     }
     
-    // create a screen name
-    final generator = ctx.generator;
-    final queryPath = generator.pathQuery(queryName);
-    final queryFile = generator.createFile(ctx, queryPath, fileKind);
+    var queryInsertions = SimpleQueryT.augmentInsertions(
+      parent: insertions,
+      queryType: queryType,
+      resultType: resultType,
+      queryParentType: queryParentType,
+      additionalMethods: additionalMethods,
+    );
 
-    queryFile.replaceText(ctx, AFUISourceTemplateID.textQueryName, queryName);
-    queryFile.replaceText(ctx, AFUISourceTemplateID.textResultType, resultModelType);
-    queryFile.replaceText(ctx, AFUISourceTemplateID.textStateType, rootStateType);
-    queryFile.replaceText(ctx, AFUISourceTemplateID.textQueryType, queryType);
+
+    // create a screen name
+    final generator = context.generator;
+    final queryPath = generator.pathQuery(queryType);
+    final queryFile = generator.createFile(context, queryPath, queryTemplate, insertions: queryInsertions);    
     
     final imports = <String>[];
     // see if the state file exists
     final stateFilePath = generator.pathRootState(rootStateType);
-    generator.addImportsForPath(ctx, stateFilePath, imports: imports, requireExists: false);
+    generator.addImportsForPath(context, stateFilePath, imports: imports, requireExists: false);
     
     // if the result exists in the models area
-    final modelFilePath = generator.pathModel(resultModelType);
-    generator.addImportsForPath(ctx, modelFilePath, imports: imports);
+    final modelFilePath = generator.pathModel(resultType);
+    generator.addImportsForPath(context, modelFilePath, imports: imports);
 
-    queryFile.addImports(ctx, imports);
+    queryFile.addImports(context, imports);
 
-    final replaceCode = isListener || isDeferred ? DeclareQueryShutdownMethodT() : null;
-    queryFile.replaceTextTemplate(ctx, AFUISourceTemplateID.textAdditionalMethods, replaceCode);
   }
 
 }

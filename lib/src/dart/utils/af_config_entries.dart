@@ -56,6 +56,15 @@ class AFConfigEntries {
     help: "Set to false if you do not want a ui prototype to be automatically added when you create a new ui element", 
     defaultValue: true);
 
+  static final generatedFileHeader = AFConfigurationItemString(
+    libraryId: AFUILibraryID.id,
+    name: "generated-file-header", 
+    validContexts: AFConfigurationItem.validContextsAllButNew,
+    ordinal: 350.0,
+    help: "A comment to place at the top of generated dart files.", 
+    defaultValue: ""
+  );
+
 
   /// Used to specify the year from which [AFTimeState] 'absolute' values are measured.
   ///
@@ -97,7 +106,7 @@ class AFConfigEntries {
     name: "app-namespace", 
     help: "A short identifier which is unique to your app, many files and classes are prefixed with these characters, so changing it later is not advised", 
     validContexts: AFConfigurationItem.validContextsNewProjectAndConfig,
-    ordinal: 700.0,
+    ordinal: 120.0,
     minChars: 2, 
     maxChars: 4,
     options: AFConfigurationItemOption.optionLowercase | AFConfigurationItemOption.optionIdentifier
@@ -115,7 +124,7 @@ class AFConfigEntries {
     name: "package-name", 
     help: "The name of your application package", 
     validContexts: AFConfigurationItem.validContextsNewProjectAndConfig,
-    ordinal: 710.0,
+    ordinal: 130.0,
     minChars: 4, 
     maxChars: 40,
     options: AFConfigurationItemOption.optionLowercase | AFConfigurationItemOption.optionIdentifier

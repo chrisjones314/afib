@@ -170,50 +170,16 @@ class AFUIThemeID extends AFThemeID {
 class AFUISourceTemplateID extends AFSourceTemplateID {
   const AFUISourceTemplateID(String code) : super(code, AFUILibraryID.id);
 
+  static const tbd = AFUISourceTemplateID("tbd");
+  static const simpleQuery = AFUISourceTemplateID("simpleQuery");
   static const stmtIncludeInstallTest = AFUISourceTemplateID("include_install_tests");
   static const stmtCallInstallTest = AFUISourceTemplateID("call_install_tests");
-  static const fileConfig = AFUISourceTemplateID("config");
   static const fileTestConfig = AFUISourceTemplateID("test_config");
   static const fileScreenTest = AFUISourceTemplateID("screen_test");
-  static const fileScreen = AFUISourceTemplateID("file_screen");
-  static const fileAppcodeAFib = AFUISourceTemplateID("appcode_afib");
-  static const fileModel = AFUISourceTemplateID("file_model");
   static const fileModelStartupExample = AFUISourceTemplateID("file_model_startup_example");
-  static const fileStateView = AFUISourceTemplateID("file_state_view");
-  static const fileSimpleQuery = AFUISourceTemplateID("file_simple_query");
-  static const fileDeferredQuery = AFUISourceTemplateID("file_deferred_query");
-  static const fileIsolateQuery = AFUISourceTemplateID("file_isolate_query");
-  static const fileExtendBase = AFUISourceTemplateID("file_extend_base");
   static const fileExtendBaseLibrary = AFUISourceTemplateID("file_extend_base_third_party");
-  static const fileExtendCommand = AFUISourceTemplateID("file_extend_command");
-  static const fileExtendCommandLibrary = AFUISourceTemplateID("file_extend_command_third_party");
-  static const fileCreateDartParams = AFUISourceTemplateID("file_create_dart_params");
-  static const fileExtendLibrary = AFUISourceTemplateID("file_extend_third_party");
-  static const fileExtendApplication = AFUISourceTemplateID("file_extend_application");
-  static const fileMain = AFUISourceTemplateID("file_main");
-  static const fileMainUILibrary = AFUISourceTemplateID("file_main_ui_library");
-  static const fileApp = AFUISourceTemplateID("file_app");
-  static const fileAppcodeID = AFUISourceTemplateID("file_appcode_id");
-  static const fileEnvironment = AFUISourceTemplateID("file_enviroment");
-  static const fileStateModelAccess = AFUISourceTemplateID("file_state_model_access");
-  static const fileState = AFUISourceTemplateID("file_state");
-  static const fileMainAFibTest = AFUISourceTemplateID("file_main_afib_test");
-  static const fileConnectedBase = AFUISourceTemplateID("file_connected_base");
-  static const fileExtendApp = AFUISourceTemplateID("file_extend_app");
-  static const fileExtendAppUILibrary = AFUISourceTemplateID("file_extend_app_ui_library");
-  static const fileExtendAppStateLibrary = AFUISourceTemplateID("file_extend_app_state_library");
-  static const fileExtendCoreLibraryApp = AFUISourceTemplateID("file_extend_core_library_app");
-  static const fileExtendTest = AFUISourceTemplateID("file_extend_test");
   static const fileDefaultTheme = AFUISourceTemplateID("file_default_theme");
-  static const fileDefineUI = AFUISourceTemplateID("file_define_ui");
-  static const fileDefineTests = AFUISourceTemplateID("file_define_tests");
-  static const fileTestData = AFUISourceTemplateID("file_test_data");
-  static const fileStateTestShortcuts = AFUISourceTemplateID("file_state_test_shortcuts");
   static const fileCommand = AFUISourceTemplateID("file_command");
-  static const fileLibExports = AFUISourceTemplateID("file_lib_exports");
-  static const fileInstallCore = AFUISourceTemplateID("file_install_ui");
-  static const fileInstallCommand = AFUISourceTemplateID("file_install_command");
-  static const fileLPI = AFUISourceTemplateID("file_lpi");
   
   static const stmtDeclareID = AFUISourceTemplateID("declare_id");
   static const stmtDeclareRouteParam = AFUISourceTemplateID("declare_route_param");
@@ -282,7 +248,6 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const commentBuildWithSPI = AFUISourceTemplateID("comment_build_with_spi");
   static const commentBuildBody = AFUISourceTemplateID("comment_build_body");
 
-  static const dynConfigEntries = AFUISourceTemplateID("config_entries"); 
 }
 
 class AFUIPrototypeID extends AFPrototypeID {

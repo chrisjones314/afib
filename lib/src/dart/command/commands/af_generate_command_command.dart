@@ -53,7 +53,7 @@ $optionsHeader
     );
 
 
-    final declareDefine = DeclareDefineCommandT().toBuffer();
+    final declareDefine = DeclareDefineCommandT().toBuffer(ctx);
     declareDefine.replaceText(ctx, AFUISourceTemplateID.textCommandName, commandName);
     fileExtend.addLinesAfter(ctx, AFCodeRegExp.startExtendCommand, declareDefine.lines);
         

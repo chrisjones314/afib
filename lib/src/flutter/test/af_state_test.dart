@@ -5,10 +5,12 @@ import 'package:afib/src/dart/redux/actions/af_always_fail_query.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/actions/af_query_actions.dart';
+import 'package:afib/src/dart/redux/queries/af_app_platform_info_query.dart';
 import 'package:afib/src/dart/redux/queries/af_navigate_unimplemented_query.dart';
 import 'package:afib/src/dart/redux/queries/af_time_update_listener_query.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
+import 'package:afib/src/dart/redux/state/models/af_app_platform_info_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
@@ -71,6 +73,7 @@ abstract class AFStateTestContext extends AFStateTestExecute {
   static AFStateTestContext? currentTest;
   final bool isTrueTestContext;
   final AFConceptualStore targetStore;
+  static int simulatedGlobalUniqueId = 1000;
   
   AFStateTestContext(this.test, { required this.isTrueTestContext, required this.targetStore } );
 
@@ -82,6 +85,11 @@ abstract class AFStateTestContext extends AFStateTestExecute {
 
   AFStore get store {
     return AFibF.g.internalOnlyStore(targetStore);
+  }
+
+  int nextGlobalUniqueId() {
+    simulatedGlobalUniqueId++;
+    return simulatedGlobalUniqueId;
   }
 
   AFDispatcher get dispatcher {
@@ -168,6 +176,8 @@ class AFStateTests {
     }
     tests.add(test);
     final defContext = AFSpecificStateTestDefinitionContext(definitions, test);
+    defContext.defineQueryResponseFixed<AFAppPlatformInfoQuery>(AFAppPlatformInfoState.initialState());
+
     body(defContext);
   }
 

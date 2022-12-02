@@ -3,7 +3,6 @@ import 'package:afib/src/dart/command/commands/af_typedefs_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:args/args.dart' as args;
 
 /// Initialize commands that are used only from the afib command
 /// line app itself (e.g. new).
@@ -24,7 +23,7 @@ void afRegisterBootstrapCommands(AFCommandAppExtensionContext definitions) {
 
 /// Used to initialize and execute commands available via afib_bootstrap
 Future<void> afBootstrapCommandMain(AFDartParams paramsD, AFArgs args) async {
-  await _afCommandMain(paramsD, args.args, "afib_bootstrap", "Command used to create new afib projects", null, null, [
+  await _afCommandMain(paramsD, args, "afib_bootstrap", "Command used to create new afib projects", null, null, [
     afRegisterBootstrapCommands
   ], null);
 }
@@ -42,7 +41,7 @@ Future<void> afAppCommandMain({
   required AFExtendBaseDelegate installBaseLibrary, 
   required AFExtendCommandsLibraryDelegate installCommandLibrary
 }) async {
-  await _afCommandMain(paramsDart, args.args, "afib", "App-specific afib command", installBase, installBaseLibrary, [
+  await _afCommandMain(paramsDart, args, "afib", "App-specific afib command", installBase, installBaseLibrary, [
     afRegisterAppCommands,
     installCommand
   ], installCommandLibrary);
@@ -57,13 +56,13 @@ Future<void> afLibraryCommandMain({
   required AFExtendCommandsLibraryDelegate installCommandLibrary
 }) async {
   AFibD.config.setIsLibraryCommand(isLib: true);
-  await _afCommandMain(paramsDart, args.args, "afib", "App-specific afib command", installBase, installBaseLibrary, [
+  await _afCommandMain(paramsDart, args, "afib", "App-specific afib command", installBase, installBaseLibrary, [
     afRegisterAppCommands,
     installCommand,
   ], installCommandLibrary);
 }
 
-Future<void> _afCommandMain(AFDartParams paramsD, List<String> argsIn, String cmdName, String cmdDescription, AFExtendBaseDelegate? initBase, AFExtendBaseDelegate? initBaseLibrary, List<AFExtendCommandsDelegate> inits, AFExtendCommandsLibraryDelegate? initExtend) async {
+Future<void> _afCommandMain(AFDartParams paramsD, AFArgs argsIn, String cmdName, String cmdDescription, AFExtendBaseDelegate? initBase, AFExtendBaseDelegate? initBaseLibrary, List<AFExtendCommandsDelegate> inits, AFExtendCommandsLibraryDelegate? initExtend) async {
   final definitions = AFCommandAppExtensionContext(paramsD: paramsD, commands: AFCommandRunner(cmdName, cmdDescription));
   final baseContext = AFBaseExtensionContext();
 
@@ -84,24 +83,15 @@ Future<void> _afCommandMain(AFDartParams paramsD, List<String> argsIn, String cm
     initExtend(definitions);
   }
 
-  final parsed = args.ArgParser.allowAnything();
-  final arguments = parsed.parse(argsIn);
-
-  final ctx = AFCommandContext(
+  final context = AFCommandContext.withArguments(
     output: AFCommandOutput(),
     definitions: definitions,
     generator: AFCodeGenerator(definitions: definitions),
-    arguments: arguments,
+    arguments: argsIn,
+    coreInsertions: null,
   );
-  
-  /*
-  final afibConfig = AFConfig();
-  if(paramsD != null) {
-    final configCmd = commands.findConfigCommand();
-    configCmd.initAfibDefaults(afibConfig);
-    paramsD.initAfib(afibConfig);
-  }
-  */
 
-  await definitions.execute(ctx);
+  context.startRoot();
+  
+  await definitions.execute(context);
 }

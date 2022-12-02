@@ -39,10 +39,10 @@ class DeclareDemoScreenSPIImplsT extends AFSourceTemplate {
     /// state, so if you have nested data structures you will need to chase changes up your 
     /// hierarchy until you get to a root object in your state.
     /// 
-    /// Specifying <HCState> as a type parameter is necessary because third parties can also 
+    /// Specifying <[!af_app_namespace(upper)]State> as a type parameter is necessary because third parties can also 
     /// contribute state, so you need to say which component's state you are updating.
     final revised = context.s.countInState.reviseIncrementCount();
-    context.updateComponentRootStateOne<HCState>(revised);
+    context.updateComponentRootStateOne<[!af_app_namespace(upper)]State>(revised);
   }
 ''';
 }

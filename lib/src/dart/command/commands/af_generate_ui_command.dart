@@ -356,16 +356,6 @@ $optionsHeader
       ScreenT.insertStateViewPrefix: stateViewPrefix,
     });
 
-    /*
-    screenFile.replaceText(context, AFUISourceTemplateID.textScreenID, screenId);
-    screenFile.replaceText(context, AFUISourceTemplateID.textScreenIDType, screenIdType);
-    screenFile.replaceText(context, AFUISourceTemplateID.textSPIParentType, spiParentType);
-    screenFile.replaceText(context, AFUISourceTemplateID.textThemeType, theme);
-
-    final templateSPIImpls = spiImpls?.toBuffer(context) ?? controlSettings.implsSPI.toBuffer(context);
-    templateSPI.replaceTextLines(context, AFUISourceTemplateID.textSPIImpls, templateSPIImpls.lines);
-    screenFile.replaceTextLines(context, AFUISourceTemplateID.stmtDeclareSPI, templateSPI.lines);
-    */
 
     final routeParamTemplate = routeParamImpls ?? controlSettings.routeParamImpls;
     final routeParamSnippet = context.createSnippet(routeParamTemplate, extend: screenInsertions);

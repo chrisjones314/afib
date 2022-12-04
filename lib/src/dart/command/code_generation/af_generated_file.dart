@@ -61,7 +61,7 @@ class AFGeneratedFile {
       // this is the command-line override, which switches the template path dynamically.
       final overridePath = context.findOverrideTemplate(originalPath);
       final hasOverride = overridePath != originalPath;
-      if(hasOverride) {
+      if(context.isExportTemplates) {
         effectivePath = AFProjectPaths.generateFolderFor(overridePath);
       }
 

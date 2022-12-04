@@ -362,19 +362,37 @@ class AFCommandContext {
     );
   }
 
-  void startRoot() {
-    if(!isRootCommand) {
-      return;
-    } 
-
-    if(isExportTemplates) {
-      output.writeTwoColumns(col1: "detected ", col2: "--export-templates");
+  void startCommand() {
+    if(isRootCommand && isExportTemplates) {
+      output.writeTwoColumns(col1: "detected ", col2: "--${AFGenerateSubcommand.argExportTemplatesFlag}");
     }
 
-    var override = findArgument(AFGenerateSubcommand.argOverrideTemplatesFlag);
+    var override = findArgument(AFGenerateSubcommand.argOverrideTemplatesFlag) as String?;
     if(override != null) {
-      output.writeTwoColumns(col1: "detected ", col2: "--template-overrides: $override");
+      output.writeTwoColumns(col1: "detected ", col2: "--${AFGenerateSubcommand.argOverrideTemplatesFlag}: $override");
+
+      final overrides = _parseOverrides(override);
+      for(final overrideSource in overrides.keys) {
+        if(!_templateExists(overrideSource)) {
+          throw AFException("The source template $overrideSource was not found on the filesystem or embedded");
+        }
+        final overrideDest = overrides[overrideSource];
+        if(overrideDest == null) {
+          continue;
+        }
+        if(!_templateExists(overrideDest))  {
+          throw AFException("The override template $overrideDest was not found on the filesystem or embedded.");
+        }
+      }
+      
     }
+  }
+
+  bool _templateExists(String path) {
+    final overridePath = path.split("/");
+    final embedded = findEmbeddedTemplate(overridePath);
+    final found = (embedded != null || AFProjectPaths.generateFileExists(overridePath));
+    return found;
   }
 
   AFCodeBuffer createSnippet(
@@ -428,17 +446,11 @@ class AFCommandContext {
     return findArgument(AFGenerateSubcommand.argExportTemplatesFlag) != null;
   }
 
-  List<String> findOverrideTemplate(List<String> sourceTemplate) {
-    var override = findArgument(AFGenerateSubcommand.argOverrideTemplatesFlag);
-    if(override == null || override is! String) {
-      return sourceTemplate;
-    }
-
-    final sourcePath = joinAll(sourceTemplate);
-
+  Map<String, String> _parseOverrides(String override) {
     override = override.replaceAll('"', "");
     override = override.replaceAll(".tdart", "");
 
+    final result = <String, String>{};
     final overrides = override.split(",");
     for(final overrideAssign in overrides) {
       final assign = overrideAssign.split("=");
@@ -447,12 +459,24 @@ class AFCommandContext {
       }
       final left = assign[0];
       final right = assign[1];
-      if(left == sourcePath) {
-        output.writeTwoColumns(col1: "override ", col2: "$left -> $right");
-        return right.split(Platform.pathSeparator);
-      }
+      result[left] = right;
     }
-    return sourceTemplate;
+    return result; 
+  }
+
+  List<String> findOverrideTemplate(List<String> sourceTemplate) {
+    var override = findArgument(AFGenerateSubcommand.argOverrideTemplatesFlag);
+    if(override == null || override is! String) {
+      return sourceTemplate;
+    }
+
+    final sourcePath = joinAll(sourceTemplate);
+    final found = _parseOverrides(override);
+    final result = found[sourcePath];
+    if(result == null) {
+      return sourceTemplate;
+    }
+    return result.split("/");
   }
 
   AFFileSourceTemplate? findEmbeddedTemplate(List<String> path) {

@@ -42,17 +42,21 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 class AFCreateCommandContext {
   final AFCommandContext command;
   final String kind;
+  final AFCodeBuffer projectStyle;
   final AFSourceTemplateInsertions insertions;
+  
 
   AFCreateCommandContext({
     required this.command,
     required this.kind,
     required this.insertions,
+    required this.projectStyle,
   });
   
   factory AFCreateCommandContext.create({
     required AFCommandContext command,
     required String kind,
+    required String projectStyle,
   }) {
      final coreInsertions = AFSourceTemplateInsertions.createCore(command);
 
@@ -60,7 +64,18 @@ class AFCreateCommandContext {
         AFSourceTemplate.insertLibKindInsertion: kind == AFCreateAppCommand.kindApp ? "App" : "Library"
       });
 
-     return AFCreateCommandContext(command: command, kind: kind, insertions: insertions);
+      final ps = command.definitions.templates.findEmbeddedTemplate([AFProjectPaths.folderProjectStyles, projectStyle]);
+      if(ps == null) {
+        throw AFException("The project style $projectStyle was not found");
+      }
+
+      final buffer = ps.toBuffer(command);
+
+     return AFCreateCommandContext(command: command, kind: kind, insertions: insertions, projectStyle: buffer);
+  }
+
+  List<String> get projectStyleLines {
+    return projectStyle.lines;
   }
 
   bool get includeUI => !isStateLibrary;
@@ -77,6 +92,8 @@ class AFCreateCommandContext {
       insertions: insertions, 
       arguments: AFArgs.createFromString(cmd)
     );
+
+    revisedCommand.startCommand();
 
     command.definitions.execute(revisedCommand);
   }
@@ -100,6 +117,9 @@ class AFCreateAppCommand extends AFCommand {
   static const kindApp = "app";
   static const kindUILibrary = "ui_library";
   static const kindStateLibrary = "state_library";
+  static const argProjectStyle = "project-style";
+  static const projectStyleMinimal = "minimal";
+  static const projectStyleStartHere = "start-here";
 
   final String name = "create";
   final String description = "Install afib framework support into an existing flutter app project";
@@ -121,6 +141,11 @@ $optionsHeader
     name field, which should be in the folder you are running this command from. 
   YPC - a lowercase 2-5 digit the code/prefix for your app, all uppercase.  For example, for the AFib Signin library this is afsi, in the app 'Dinner Familias this is 'df' (
     note that you should not prefix yours with 'af')
+  $argProjectStyle - a string specifying the project style to use, currently:
+    minimal - minimal project style
+    start-here - a simple example demonstrating many of AFib's core features and referenced in the evaluation video and documentation.
+    or, you can define your own project styles.
+
   ${AFGenerateSubcommand.argExportTemplatesHelpStatic}
 ''';
   }
@@ -147,6 +172,17 @@ $optionsHeader
     final packageName = args[2];
     final packageCode = args[3];
 
+    final unnamed = ctx.rawArgs;
+    final parsed = parseArguments(unnamed, defaults: {
+      argProjectStyle: "",
+    });
+
+    final projectStyle = parsed.named[argProjectStyle];
+
+    if(projectStyle == null || projectStyle.isEmpty) {
+      throwUsageError("You must specify --$argProjectStyle");
+    }
+
     verifyAllLowercase(packageCode);
     verifyAllLowercase(packageName);
     AFibD.registerGlobals();
@@ -157,9 +193,11 @@ $optionsHeader
 
     final context = AFCreateCommandContext.create(
       command: ctx, 
-      kind: kind
+      kind: kind,
+      projectStyle: projectStyle,
     );
 
+    context.output.writeTwoColumns(col1: "creating ", col2: "project-style=$projectStyle");
 
     final generator = ctx.generator;
     _verifyPubspec(ctx, packageName);
@@ -190,7 +228,17 @@ $optionsHeader
       _createInstallFiles(context, kind);
     }
 
+    _executeProjectStyle(context);
+
     generator.finalizeAndWriteFiles(ctx);
+  }
+
+  void _executeProjectStyle(AFCreateCommandContext context) {
+    final lines = context.projectStyleLines;
+    for(final line in lines) {
+      context.output.writeTwoColumns(col1: "execute ", col2: "$line");
+      context.executeSubCommand(line);
+    }
   }
 
   void _createInstallFiles(AFCreateCommandContext context, String kind) {

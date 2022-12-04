@@ -91,7 +91,7 @@ Future<void> _afCommandMain(AFDartParams paramsD, AFArgs argsIn, String cmdName,
     coreInsertions: null,
   );
 
-  context.startRoot();
+  context.startCommand();
   
   await definitions.execute(context);
 }

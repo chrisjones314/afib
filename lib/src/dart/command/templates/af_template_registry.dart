@@ -23,6 +23,8 @@ import 'package:afib/src/dart/command/templates/files/model_startup_example.t.da
 import 'package:afib/src/dart/command/templates/core/screen.t.dart';
 import 'package:afib/src/dart/command/templates/files/screen_test.t.dart';
 import 'package:afib/src/dart/command/templates/core/theme.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/minimal.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start-here.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_id_statement.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_route_param.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_state_view.t.dart';
@@ -39,6 +41,9 @@ class AFTemplateRegistry {
   final fileTemplates = <String, AFFileSourceTemplate>{};
   
   AFTemplateRegistry() {
+    registerFile(MinimalT());
+    registerFile(StartHereT());
+
     registerFile(SimpleQueryT.base());
     registerFile(DeferredQueryT.base());
     registerFile(IsolateQueryT.base());

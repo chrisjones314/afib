@@ -8,7 +8,6 @@ class SimpleQueryT extends AFFileSourceTemplate {
 
   SimpleQueryT({
     required List<String> templatePath,
-    required String filePath,
     AFSourceTemplate? insertExtraImports,
     AFSourceTemplate? insertMemberVariables,
     AFSourceTemplate? insertConstructorParams,
@@ -18,7 +17,6 @@ class SimpleQueryT extends AFFileSourceTemplate {
     AFSourceTemplate? insertSuperParams
   }): super(
     templatePath: templatePath,
-    filePath: filePath,
     embeddedInsertions: AFSourceTemplateInsertions(
       insertions: <AFSourceTemplateInsertion, Object>{
         AFSourceTemplate.insertExtraImportsInsertion: insertExtraImports ?? AFSourceTemplate.empty,
@@ -33,7 +31,7 @@ class SimpleQueryT extends AFFileSourceTemplate {
   );
 
   factory SimpleQueryT.base() {
-     return SimpleQueryT(filePath: "", templatePath: const <String>[AFProjectPaths.folderCore, "query_simple"]);
+     return SimpleQueryT(templatePath: const <String>[AFProjectPaths.folderCore, "query_simple"]);
   }
 
   AFSourceTemplateInsertion get insertQueryType => AFSourceTemplate.insertMainTypeInsertion;
@@ -108,7 +106,6 @@ class DeferredQueryT extends SimpleQueryT {
 
   DeferredQueryT({
     required List<String> templatePath,
-    required String filePath,
     AFSourceTemplate? insertMemberVariables,
     AFSourceTemplate? insertStartImpl,
     AFSourceTemplate? insertConstructorParams,
@@ -116,7 +113,6 @@ class DeferredQueryT extends SimpleQueryT {
     AFSourceTemplate? insertAdditionalMethods,
   }): super(
     templatePath: templatePath,
-    filePath: filePath,
     insertMemberVariables: insertMemberVariables,
     insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
@@ -126,7 +122,6 @@ class DeferredQueryT extends SimpleQueryT {
 
   factory DeferredQueryT.base() {
      return DeferredQueryT(
-      filePath: "", 
       templatePath: const <String>[AFProjectPaths.folderCore, "query_deferred"],
 
     );
@@ -165,7 +160,6 @@ class IsolateQueryT extends SimpleQueryT {
 
   IsolateQueryT({
     required List<String> templatePath,
-    required String filePath,
     AFSourceTemplate? insertMemberVariables,
     AFSourceTemplate? insertConstructorParams,
     AFSourceTemplate? insertStartImpl,
@@ -173,7 +167,6 @@ class IsolateQueryT extends SimpleQueryT {
     AFSourceTemplate? insertAdditionalMethods,
   }): super(
     templatePath: templatePath,
-    filePath: filePath,
     insertMemberVariables: insertMemberVariables,
     insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
@@ -183,7 +176,6 @@ class IsolateQueryT extends SimpleQueryT {
 
   factory IsolateQueryT.base() {
      return IsolateQueryT(
-      filePath: "", 
       templatePath: const <String>[AFProjectPaths.folderCore, "query_isolate"],
     );
   }

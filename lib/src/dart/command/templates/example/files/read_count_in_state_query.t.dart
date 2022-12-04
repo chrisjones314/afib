@@ -64,7 +64,6 @@ class ReadCountInStateQuery extends SimpleQueryT {
     required AFSourceTemplate insertFinishImpl,
   }): super(
     templatePath: const [AFProjectPaths.folderExample, AFProjectPaths.folderCount, "query_read_count_in_state"],
-    filePath: "",
     insertExtraImports: insertExtraImports,
     insertMemberVariables: insertMemberVariables,
     insertConstructorParams: insertConstructorParams,

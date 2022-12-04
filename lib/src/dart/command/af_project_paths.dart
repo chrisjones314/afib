@@ -18,6 +18,7 @@ class AFProjectPaths {
   static const srcFolder = 'src';
   static const folderCount = 'count';
   static const initializationFolder = 'initialization';
+  static const folderProjectStyles = "project_styles";
   static const libPath = [libFolder];
   static const initializationPath = [libFolder, initializationFolder];
   static const pubspecPath = [pubspecFile];

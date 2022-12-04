@@ -63,6 +63,7 @@ $optionsHeader
     final configFile = generator.overwriteFile(ctx, projectPath, ConfigT(), insertions: {
         ConfigT.insertConfigEntries: DeclareConfigEntriesT(AFibD.config, AFibD.configEntries)
     });
+    
   }
 
   @override

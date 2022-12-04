@@ -204,11 +204,9 @@ abstract class AFFileSourceTemplate extends AFSourceTemplate {
   static const templatePathExample = "examples";
   
   final List<String> templatePath;
-  final String filePath;
 
   const AFFileSourceTemplate({
     required this.templatePath,
-    this.filePath = "",
     AFSourceTemplateInsertions? embeddedInsertions, 
   }): super(embeddedInsertions: embeddedInsertions);
 
@@ -220,6 +218,13 @@ abstract class AFFileSourceTemplate extends AFSourceTemplate {
   }
 }
 
+abstract class AFProjectStyleSourceTemplate extends AFFileSourceTemplate {
+  const AFProjectStyleSourceTemplate({
+    required List<String> templatePath,
+    AFSourceTemplateInsertions? embeddedInsertions, 
+  }): super(templatePath: templatePath, embeddedInsertions: embeddedInsertions);
+}
+
 abstract class AFSourceTemplateComment extends AFSourceTemplate {
   AFSourceTemplateComment(): super(role: AFSourceTemplateRole.comment);
 }
@@ -227,5 +232,15 @@ abstract class AFSourceTemplateComment extends AFSourceTemplate {
 abstract class AFDynamicSourceTemplate extends AFSourceTemplate {
 
   final template = "";
+  
+  @override
+  AFCodeBuffer toBuffer(AFCommandContext context, { Map<AFSourceTemplateInsertion, Object>? insertions }) {
+    final lines = createLinesWithOptions(context, <String>[], "");
+    final result = AFCodeBuffer.empty();
+    result.addLinesAtEnd(context, lines);
+    return result;
+  }
+
+
   List<String> createLinesWithOptions(AFCommandContext context, List<String> options, String indent);
 }

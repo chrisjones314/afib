@@ -7,16 +7,15 @@ import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/core/files/lpi.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/state_view.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_initial_state_model_function.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_call_define_test_data.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_test_data.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_define_lpi.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_initial_value.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_lpi_id_statement.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_model_access_statement.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_reference_test_data.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_test_id.t.dart';
-import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_from_package.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_initial_state_model_function.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_define_test_data.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_define_lpi.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_invoke_initial_state.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_lpi_id.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_model_accessor.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_find_test_data.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 class AFGenerateStateSubcommand extends AFGenerateSubcommand {
@@ -112,9 +111,9 @@ $optionsHeader
 
     // create an ID for the LPI
     if(!isOverride) {
-      final declareId = DeclareLPIIDStatementT().toBuffer(context);
-      declareId.replaceText(context, AFUISourceTemplateID.textLPIID, idIdentifier);
-      declareId.executeStandardReplacements(context);
+      final declareId = context.createSnippet(SnippetDeclareLPIIDT(), insertions: {
+        SnippetCallDefineLPIT.insertLPIID: idIdentifier,
+      });
       final idFile = generator.modifyFile(context,  generator.pathIdFile);
       final kind = "LibraryProgrammingInterface";
       final after = AFCodeRegExp.startUIID(kind, kind);
@@ -123,9 +122,10 @@ $optionsHeader
 
     // register the LPI
     final definesFile = generator.modifyFile(context, generator.pathDefineCore);
-    final defineLPI = DeclareDefineLPIT().toBuffer(context);
-    defineLPI.replaceText(context, AFUISourceTemplateID.textLPIType, identifier);
-    defineLPI.replaceText(context, AFUISourceTemplateID.textLPIID, fullId ?? "${generator.appNamespaceUpper}LibraryProgrammingInterfaceID.$idIdentifier");
+    final defineLPI = context.createSnippet(SnippetCallDefineLPIT(), insertions: {
+      SnippetCallDefineLPIT.insertLPIID: identifier,
+      SnippetCallDefineLPIT.insertLPIType: fullId ?? "${generator.appNamespaceUpper}LibraryProgrammingInterfaceID.$idIdentifier",
+    });
     definesFile.addLinesAfter(context, AFCodeRegExp.startDefineLPI, defineLPI.lines);
     generator.addImport(context,
       importPath: lpiFile.importPathStatement, 
@@ -151,8 +151,18 @@ $optionsHeader
     final generator = context.generator;
     final isRoot = identifier.endsWith(AFCodeGenerator.rootSuffix);
     final modelPath = generator.pathModel(identifier);
-    final modelFile = context.createFile(modelPath, ModelT.core(), insertions: {
+    var identifierNoRoot = identifier;
+    if(identifierNoRoot.endsWith("Root")) {
+      identifierNoRoot = identifierNoRoot.substring(0, identifierNoRoot.length-4);
+    }
+
+    final modelInsertions = context.coreInsertions?.reviseAugment({
       AFSourceTemplate.insertMainTypeInsertion: identifier,
+      AFSourceTemplate.insertMainTypeNoRootInsertion: identifierNoRoot,
+    });
+
+
+    final modelFile = context.createFile(modelPath, ModelT.core(), extend: modelInsertions, insertions: {
       AFSourceTemplate.insertAdditionalMethodsInsertion: isRoot ? SnippetInitialStateModelFunctionT() : AFSourceTemplate.empty,
     });
 
@@ -166,25 +176,22 @@ $optionsHeader
       );
 
       // add its initial value to the state
-      final declareInitialValue = DeclareInitialValueT().toBuffer(context);
-      declareInitialValue.replaceText(context, AFUISourceTemplateID.textModelName, identifier);
+      final declareInitialValue = context.createSnippet(SnippetInvokeInitialStateT(), extend: modelInsertions);
       stateFile.addLinesAfter(context, AFCodeRegExp.startReturnInitialState, declareInitialValue.lines);
 
       // this can be missing 
       if(generator.fileExists(generator.pathTestData)) {
         // add an initial test-data value
         // first, create a subprocedure for defining that kind of test data.
-        final declareCallDefineTest = DeclareCallDefineTestDataT().toBuffer(context);
-        declareCallDefineTest.replaceText(context, AFUISourceTemplateID.textModelName, identifier);
+        final declareCallDefineTest = context.createSnippet(SnippetCallDefineTestDataT(), insertions: {
+          AFSourceTemplate.insertMainTypeInsertion: identifier,
+        });
         
         final testDataFile = generator.modifyFile(context, generator.pathTestData);
         testDataFile.addLinesAfter(context, AFCodeRegExp.startDefineTestData, declareCallDefineTest.lines);
 
-        var declareDefineTestData = context.createSnippet(SnippetDefineTestDataT.core(), insertions: {
-          SnippetDefineTestDataT.insertModelName: identifier,
-        });
+        var declareDefineTestData = context.createSnippet(SnippetDefineTestDataT.core(), extend: modelInsertions);
         
-
         // then, declare the function that we just called.
         testDataFile.addLinesAtEnd(context, declareDefineTestData.lines);
 
@@ -197,9 +204,7 @@ $optionsHeader
         context.createDeclareId("${generator.appNamespaceUpper}TestDataID.stateFullLogin$identifier");
 
         // then, add in the new test data to the full signed in state.
-        final declareInitTestData = DeclareReferenceTestDataT().toBuffer(context);
-        declareInitTestData.replaceText(context, AFUISourceTemplateID.textModelName, identifier);
-        declareInitTestData.executeStandardReplacements(context);
+        final declareInitTestData = context.createSnippet(SnippetCallFindTestDataT(), extend: modelInsertions);
         testDataFile.addLinesAfter(context, AFCodeRegExp.startDeclareTestData, declareInitTestData.lines);
       }
 
@@ -207,18 +212,12 @@ $optionsHeader
       final pathStateViewAccess = generator.pathStateViewAccess();
       final accessFile = generator.modifyFile(context, pathStateViewAccess);
       final regexMixinStart = AFCodeRegExp.startMixinStateAccess;
-      final declareAccess = DeclareModelAccessStatementT().toBuffer(context);
-      var identifierNoRoot = identifier;
-      if(identifierNoRoot.endsWith("Root")) {
-        identifierNoRoot = identifierNoRoot.substring(0, identifierNoRoot.length-4);
-      }
-      declareAccess.replaceText(context, AFUISourceTemplateID.textModelName, identifier);
-      declareAccess.replaceText(context, AFUISourceTemplateID.textModelNameNoRoot, identifierNoRoot);
+      final declareAccess = context.createSnippet(SnippetDeclareModelAccessorT(), extend: modelInsertions);
       accessFile.addLinesAfter(context, regexMixinStart, declareAccess.lines);
 
-      final declareImport = ImportFromPackage().toBuffer(context);
-      declareImport.replaceText(context, AFUISourceTemplateID.textPackageName, AFibD.config.packageName);
-      declareImport.replaceText(context, AFUISourceTemplateID.textPackagePath, modelFile.importPathStatement);
+      final declareImport = SnippetImportFromPackageT().toBuffer(context, insertions: {
+        AFSourceTemplate.insertPackagePathInsertion: modelFile.importPathStatement
+      });
       
       accessFile.addImports(context, declareImport.lines);
     }

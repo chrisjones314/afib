@@ -1,14 +1,13 @@
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 
-class InsertInitialState extends AFSourceTemplate {
+class SnippetInitialState extends AFSourceTemplate {
 
-  String get template => "${SnippetDefineTestDataT.insertModelName}.initialState()";
+  String get template => "$insertMainType.initialState()";
 
 }
 
 class SnippetDefineTestDataT extends AFSnippetSourceTemplate {
-  static const insertModelName = AFSourceTemplateInsertion("model_name");
   static const insertModelDeclaration = AFSourceTemplateInsertion("model_declaration");
   static const insertModelCall = AFSourceTemplateInsertion("model_call");
 
@@ -28,16 +27,16 @@ class SnippetDefineTestDataT extends AFSnippetSourceTemplate {
       templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         SnippetDefineTestDataT.insertModelDeclaration: AFSourceTemplate.empty,
-        SnippetDefineTestDataT.insertModelCall: InsertInitialState(),
+        SnippetDefineTestDataT.insertModelCall: SnippetInitialState(),
       })
     );
   }
 
   String get template => '''
-void _define$insertModelName(AFDefineTestDataContext context) {
+void _define$insertMainType(AFDefineTestDataContext context) {
   $insertModelDeclaration
 
-  context.define([!af_app_namespace(upper)]TestDataID.stateFullLogin$insertModelName, $insertModelCall);
+  context.define(${insertAppNamespaceUpper}TestDataID.stateFullLogin$insertMainType, $insertModelCall);
 }
 
   ''';

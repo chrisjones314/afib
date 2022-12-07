@@ -3,7 +3,8 @@
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_define_command.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/command.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_define_command.t.dart';
 
 class AFGenerateCommandSubcommand extends AFGenerateSubcommand {
   AFGenerateCommandSubcommand();
@@ -28,36 +29,37 @@ $optionsHeader
   }
 
   @override
-  void execute(AFCommandContext ctx) {
-    final unnamed = ctx.rawArgs;
+  void execute(AFCommandContext context) {
+    final unnamed = context.rawArgs;
     if(unnamed.isEmpty) {
       throwUsageError("Expected one arguments");
     }
 
     final commandName = unnamed[0];
     verifyEndsWith(commandName, "Command");
-    final generator = ctx.generator;
+    final generator = context.generator;
 
     final commandNameShort = generator.removeSuffix(commandName, "Command");
 
     // generate the command file itself.
-    final fileCommand = createStandardFile(ctx, generator.pathCommand(commandName), AFUISourceTemplateID.fileCommand);
-    fileCommand.replaceText(ctx, AFUISourceTemplateID.textCommandName, commandName);
-    fileCommand.replaceText(ctx, AFUISourceTemplateID.textCommandNameShort, commandNameShort);
+    final fileCommand = context.createFile(generator.pathCommand(commandName), CommandT(), insertions: {
+      CommandT.insertCommandName: commandName,
+      CommandT.insertCommandNameShort: commandNameShort,
+    });
 
     // register it 
-    final fileExtend = generator.modifyFile(ctx, generator.pathExtendCommand);
-    generator.addImport(ctx, 
+    final fileExtend = generator.modifyFile(context, generator.pathExtendCommand);
+    generator.addImport(context, 
       importPath: fileCommand.importPathStatement, 
       to: fileExtend
     );
 
-
-    final declareDefine = DeclareDefineCommandT().toBuffer(ctx);
-    declareDefine.replaceText(ctx, AFUISourceTemplateID.textCommandName, commandName);
-    fileExtend.addLinesAfter(ctx, AFCodeRegExp.startExtendCommand, declareDefine.lines);
+    final declareDefine = context.createSnippet(SnippetCallDefineCommandT(), insertions: {
+      CommandT.insertCommandName: commandName,
+    });
+    fileExtend.addLinesAfter(context, AFCodeRegExp.startExtendCommand, declareDefine.lines);
         
     // replace any default 
-    generator.finalizeAndWriteFiles(ctx);
+    generator.finalizeAndWriteFiles(context);
   }
 }

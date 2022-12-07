@@ -1,8 +1,8 @@
 
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_call_extend.t.dart';
-import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_from_package.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_install.t.dart';
 
 class AFInstallCommand extends AFCommand { 
   final name = "install";
@@ -42,13 +42,15 @@ $optionsHeader
     final generator = ctx.generator;
 
     // create a package import for this 
-    final importFlutter = ImportFromPackage().toBuffer(ctx);
-    importFlutter.replaceText(ctx, AFUISourceTemplateID.textPackageName, packageName);
-    importFlutter.replaceText(ctx, AFUISourceTemplateID.textPackagePath, "${packageCode}_flutter.dart");
+    final importFlutter = SnippetImportFromPackageT().toBuffer(ctx, insertions: {
+      AFSourceTemplate.insertPackageNameInsertion: packageName,
+      AFSourceTemplate.insertPackagePathInsertion: "${packageCode}_flutter.dart",
+    });
 
-    final importCommand = ImportFromPackage().toBuffer(ctx);
-    importCommand.replaceText(ctx, AFUISourceTemplateID.textPackageName, packageName);
-    importCommand.replaceText(ctx, AFUISourceTemplateID.textPackagePath, "${packageCode}_command.dart");
+    final importCommand = SnippetImportFromPackageT().toBuffer(ctx, insertions: {
+      AFSourceTemplate.insertPackageNameInsertion: packageName,
+      AFSourceTemplate.insertPackagePathInsertion: "${packageCode}_command.dart",
+    });
 
     // extend base
     _extendFile(ctx, 
@@ -56,7 +58,7 @@ $optionsHeader
       pathExtendFile: generator.pathInstallLibraryBase,
       startExtendRegex: AFCodeRegExp.startExtendLibraryBase,
       packageCode: packageCode,
-      extendType: "Base",
+      installKind: "Base",
     );
 
     // extend command
@@ -65,7 +67,7 @@ $optionsHeader
       pathExtendFile: generator.pathInstallLibraryCommand,
       startExtendRegex: AFCodeRegExp.startExtendLibraryCommand,
       packageCode: packageCode,
-      extendType: "Command",
+      installKind: "Command",
     );
 
 
@@ -75,7 +77,7 @@ $optionsHeader
       pathExtendFile: generator.pathInstallLibraryCore,
       startExtendRegex: AFCodeRegExp.startExtendLibraryUI,
       packageCode: packageCode,
-      extendType: "Core",
+      installKind: "Core",
     );
 
     generator.finalizeAndWriteFiles(ctx);
@@ -87,15 +89,16 @@ $optionsHeader
     required List<String> pathExtendFile,
     required RegExp startExtendRegex,
     required String packageCode,
-    required String extendType,
+    required String installKind,
   }) {
     final generator = ctx.generator;
     final fileExtendBase = generator.modifyFile(ctx, pathExtendFile);
     fileExtendBase.addImports(ctx, importCode.lines);
     
-    final call = DeclareCallExtendT().toBuffer(ctx);
-    call.replaceText(ctx, AFUISourceTemplateID.textPackageCode, packageCode);
-    call.replaceText(ctx, AFUISourceTemplateID.textExtendKind, extendType);
+    final call = ctx.createSnippet(SnippetCallInstallT(), insertions: {
+      SnippetCallInstallT.insertPackageCode: packageCode,
+      SnippetCallInstallT.insertInstallKind: installKind,
+    });
     fileExtendBase.addLinesAfter(ctx, startExtendRegex, call.lines);
   }
 

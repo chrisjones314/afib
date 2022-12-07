@@ -174,19 +174,8 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const simpleQuery = AFUISourceTemplateID("simpleQuery");
   static const stmtIncludeInstallTest = AFUISourceTemplateID("include_install_tests");
   static const stmtCallInstallTest = AFUISourceTemplateID("call_install_tests");
-  static const fileTestConfig = AFUISourceTemplateID("test_config");
-  static const fileScreenTest = AFUISourceTemplateID("screen_test");
-  static const fileModelStartupExample = AFUISourceTemplateID("file_model_startup_example");
   static const fileExtendBaseLibrary = AFUISourceTemplateID("file_extend_base_third_party");
   static const fileDefaultTheme = AFUISourceTemplateID("file_default_theme");
-  static const fileCommand = AFUISourceTemplateID("file_command");
-  
-  static const stmtDeclareID = AFUISourceTemplateID("declare_id");
-  static const stmtDeclareRouteParam = AFUISourceTemplateID("declare_route_param");
-  static const stmtDeclareStateView = AFUISourceTemplateID("declare_state_view");
-  static const stmtDeclareSPI = AFUISourceTemplateID("declare_spi");
-  static const stmtDeclareUIFunctions = AFUISourceTemplateID("declare_ui_functions");
-  static const stmtCallUIFunctions = AFUISourceTemplateID("call_ui_functions");
 
 
   static const textDeclareCreatePrototype = AFUISourceTemplateID("declare_create_prototype");

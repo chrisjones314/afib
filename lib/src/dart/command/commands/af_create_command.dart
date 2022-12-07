@@ -31,12 +31,12 @@ import 'package:afib/src/dart/command/templates/core/files/main_ui_library.t.dar
 import 'package:afib/src/dart/command/templates/core/files/state_model_access.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/state_test_shortcuts.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/test_data.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_install_tests.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_fundamental_theme_init.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_fundamental_theme_init_ui_library.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_call_install_tests.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_empty_statement.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_include_install_tests.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_prototype_environmentcontent.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_empty_statement.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_include_install_tests.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_prototype_environment_impl.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 class AFCreateCommandContext {
@@ -278,8 +278,8 @@ $optionsHeader
     // create the file and add it to the ui exports
     final fileInstallUI = context.createFile(generator.pathInstall, LibraryInstallCoreT());
     final includeUI = kind != kindStateLibrary;
-    final templateInclude = includeUI ? DeclareIncludeInstallTestsT() : AFSourceTemplate.empty;
-    final templateCall = includeUI ? DeclareCallInstallTestsT() : AFSourceTemplate.empty;
+    final templateInclude = includeUI ? SnippetImportInstallTestsT() : AFSourceTemplate.empty;
+    final templateCall = includeUI ? SnippetCallInstallTestT() : AFSourceTemplate.empty;
     final cmdContext = context.command;
     final includeBuffer = templateInclude.toBuffer(cmdContext);
     final appSuffix = kind == kindApp ? "app" : "library";
@@ -426,7 +426,7 @@ $optionsHeader
     }
 
     _createEnvironmentFile(context, "Debug", null);
-    _createEnvironmentFile(context, "Prototype", DeclarePrototypeEnvironmentContentT());
+    _createEnvironmentFile(context, "Prototype", SnippetPrototypeEnvironmentImplT());
     _createEnvironmentFile(context, "Test", null);
     _createEnvironmentFile(context, "Production", null);
     context.createFile(generator.pathCreateDartParams, CreateDartParamsT());
@@ -472,7 +472,7 @@ $optionsHeader
   AFGeneratedFile _createEnvironmentFile(AFCreateCommandContext context, String suffix, AFSourceTemplate? body) {
     final result = context.createFile(context.generator.pathEnvironment(suffix), ConfigureEnvironmentT(), insertions: {
       ConfigureEnvironmentT.insertEnvironmentName: suffix,
-      ConfigureEnvironmentT.insertConfigureBody: body ?? DeclareEmptyStatementT()
+      ConfigureEnvironmentT.insertConfigureBody: body ?? SnippetEmptyStatementT()
     });
 
     return result;

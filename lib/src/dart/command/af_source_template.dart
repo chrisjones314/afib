@@ -2,7 +2,7 @@ import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_buffer.dart';
 import 'package:afib/src/dart/command/code_generation/af_generated_file.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_empty_statement.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_empty_statement.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart';
@@ -111,6 +111,21 @@ class AFSourceTemplateInsertions {
     }
     return AFSourceTemplateInsertions(insertions: revised);
   }
+
+  AFSourceTemplateInsertions reviseOverwrite(
+    Map<AFSourceTemplateInsertion, Object> added
+  ) {
+    final revised = Map<AFSourceTemplateInsertion, Object>.from(insertions);
+    for(final key in added.keys) {
+      final value = added[key];
+      if(value == null) {
+        continue;
+      }
+      revised[key] = value;
+    }
+    return AFSourceTemplateInsertions(insertions: revised);
+  }
+
 }
 
 /// A source of template source code. 
@@ -136,8 +151,9 @@ abstract class AFSourceTemplate {
   static const insertCopyWithCallInsertion = AFSourceTemplateInsertion("copy_with_constructor_call");
   static const insertCreateParamsInsertion = AFSourceTemplateInsertion("create_params");
   static const insertCreateParamsCallInsertion = AFSourceTemplateInsertion("create_params_call");
+  static const insertMainTypeNoRootInsertion = AFSourceTemplateInsertion("main_type_no_root");
 
-  static const empty = DeclareEmptyStatementT();
+  static const empty = SnippetEmptyStatementT();
   final AFSourceTemplateRole role;
   final AFSourceTemplateInsertions? embeddedInsertions; 
   
@@ -149,7 +165,7 @@ abstract class AFSourceTemplate {
   AFSourceTemplateInsertion get insertAppNamespace { return AFSourceTemplate.insertAppNamespaceInsertion; }
   AFSourceTemplateInsertion get insertAppNamespaceUpper { return AFSourceTemplate.insertAppNamespaceInsertion.upper; }
   AFSourceTemplateInsertion get insertStateType { return AFSourceTemplate.insertStateTypeInsertion; }
-  AFSourceTemplateInsertion get insertPackagePath { return AFSourceTemplate.insertPackageNameInsertion; }
+  AFSourceTemplateInsertion get insertPackagePath { return AFSourceTemplate.insertPackagePathInsertion; }
   AFSourceTemplateInsertion get insertPackageName { return AFSourceTemplate.insertPackageNameInsertion; }
   AFSourceTemplateInsertion get insertFileHeader { return AFSourceTemplate.insertFileHeaderInsertion; }
   AFSourceTemplateInsertion get insertConstructorParams { return AFSourceTemplate.insertConstructorParamsInsertion; }
@@ -159,6 +175,7 @@ abstract class AFSourceTemplate {
   AFSourceTemplateInsertion get insertExtraImports { return AFSourceTemplate.insertExtraImportsInsertion; }
   AFSourceTemplateInsertion get insertLibKind { return AFSourceTemplate.insertLibKindInsertion; }
   AFSourceTemplateInsertion get insertMainType { return AFSourceTemplate.insertMainTypeInsertion; }
+  AFSourceTemplateInsertion get insertMainTypeNoRoot { return AFSourceTemplate.insertMainTypeNoRootInsertion; }
   AFSourceTemplateInsertion get insertMainParentType { return AFSourceTemplate.insertMainParentTypeInsertion; }
   AFSourceTemplateInsertion get insertCopyWithParams { return AFSourceTemplate.insertCopyWithParamsInsertion; }
   AFSourceTemplateInsertion get insertCopyWithConstructorCall { return AFSourceTemplate.insertCopyWithCallInsertion; }

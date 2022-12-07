@@ -1,5 +1,6 @@
 import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
+import 'package:afib/src/dart/command/templates/core/files/command.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/command_afib.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/install_base.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/install_library_base.t.dart';
@@ -7,7 +8,6 @@ import 'package:afib/src/dart/command/templates/core/files/library_exports.t.dar
 import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/theme.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/declare_id_statement.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_spi.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_test_data.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_drawer_build_body.t.dart';
@@ -16,29 +16,25 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_extra_impo
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_navigate_push.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_additional_methods.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_build_with_spi_impl.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_smoke_test_impl.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_standard_route_param.t.dart';
-import 'package:afib/src/dart/command/templates/example/start_here/files/model_count_history_entry.t.dart';
-import 'package:afib/src/dart/command/templates/example/start_here/files/model_count_history_root.t.dart';
-import 'package:afib/src/dart/command/templates/example/start_here/files/model_referenced_user.t.dart';
-import 'package:afib/src/dart/command/templates/example/start_here/files/model_referenced_users_root.t.dart';
-import 'package:afib/src/dart/command/templates/example/start_here/files/model_user_credential_root.t.dart';
-import 'package:afib/src/dart/command/templates/example/start_here/files/query_read_count_in_state.t.dart';
-import 'package:afib/src/dart/command/templates/example/start_here/files/query_read_referenced_user.t.dart';
-import 'package:afib/src/dart/command/templates/example/start_here/files/query_start_here_startup.t.dart';
-import 'package:afib/src/dart/command/templates/example/start_here/files/query_write_count_history_entry.t.dart';
-import 'package:afib/src/dart/command/templates/example/start_here/files/start_here_theme.t.dart';
-import 'package:afib/src/dart/command/templates/example/start_here/snippets/snippet_define_user_credential_root_test_data.t.dart';
-import 'package:afib/src/dart/command/templates/example/start_here/snippets/snippets_counter_management_screen.t.dart';
-import 'package:afib/src/dart/command/templates/example/start_here/snippets/snippets_signed_in_drawer.t.dart';
-import 'package:afib/src/dart/command/templates/example/start_here/snippets/snippets_startup_screen.t.dart';
-import 'package:afib/src/dart/command/templates/files/afib_test_config.t.dart';
-import 'package:afib/src/dart/command/templates/files/command.t.dart';
-import 'package:afib/src/dart/command/templates/files/model_startup_example.t.dart';
-import 'package:afib/src/dart/command/templates/files/screen_test.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/minimal.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/start-here.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_route_param.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_state_view.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start_here/files/model_count_history_entry.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start_here/files/model_count_history_root.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start_here/files/model_referenced_user.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start_here/files/model_referenced_users_root.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start_here/files/model_user_credential_root.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start_here/files/query_read_count_in_state.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start_here/files/query_read_referenced_user.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start_here/files/query_start_here_startup.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start_here/files/query_write_count_history_entry.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start_here/files/start_here_theme.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start_here/snippets/snippet_counter_management_smoke_test.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start_here/snippets/snippet_define_user_credential_root_test_data.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start_here/snippets/snippets_counter_management_screen.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start_here/snippets/snippets_signed_in_drawer.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/start_here/snippets/snippets_startup_screen.t.dart';
 import 'package:path/path.dart';
 
 
@@ -64,6 +60,7 @@ class AFTemplateRegistry {
     registerFile(LibraryExportsT());
     registerFile(InstallBaseT());
     registerFile(ThemeT.core());
+    registerFile(CommandT());
 
     registerSnippet(SnippetDefineTestDataT.core());
     registerSnippet(SnippetStandardRouteParamT.core());
@@ -76,6 +73,7 @@ class AFTemplateRegistry {
     registerSnippet(SnippetNavigatePushT.core());
     registerSnippet(SnippetExtraImportsT.core());
     registerSnippet(SnippetDrawerBuildBodyT());
+    registerSnippet(SnippetSmokeTestImplT());
 
     // start-here example
     registerFile(StartHereThemeT.example());
@@ -106,22 +104,14 @@ class AFTemplateRegistry {
     registerSnippet(SnippetCounterManagementScreenAdditionalMethodsT());
     registerSnippet(SnippetCounterManagementScreenRouteParamT.example());
     registerSnippet(SnippetCounterManagementScreenNavigatePushT.example());
+    registerSnippet(SnippetCounterManagementSmokeTest());
 
     registerSnippet(SnippetSignedInDrawerExtraImportsT.example());
     registerSnippet(SnippetSignedInDrawerSPIT.example());
     registerSnippet(SnippetSignedInDrawerBuildWithSPIImplT());
     registerSnippet(SnippetSignedInDrawerBuildBodyT());
 
-
-    register(AFUISourceTemplateID.fileModelStartupExample, AFModelStartupExampleT());
-    register(AFUISourceTemplateID.fileTestConfig, AFTestConfigT());
-    register(AFUISourceTemplateID.fileScreenTest, AFScreenTestT());
-    register(AFUISourceTemplateID.stmtDeclareID, DeclareIDStatementT());
-    register(AFUISourceTemplateID.stmtDeclareRouteParam, DeclareRouteParamT());
-    register(AFUISourceTemplateID.stmtDeclareStateView, DeclareStateViewT());
-    register(AFUISourceTemplateID.fileExtendBaseLibrary, InstallLibraryBaseT());
-    
-    register(AFUISourceTemplateID.fileCommand, AFCommandT());
+    register(AFUISourceTemplateID.fileExtendBaseLibrary, InstallLibraryBaseT());    
   }  
 
   AFFileSourceTemplate? findEmbeddedTemplateFile(List<String> path) {

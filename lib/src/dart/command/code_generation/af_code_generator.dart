@@ -11,9 +11,9 @@ import 'package:afib/src/dart/command/code_generation/af_generated_file.dart';
 import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_export_statement.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/declare_id_statement.t.dart';
-import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_id_statement.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_from_package.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_export_statement.t.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
@@ -422,9 +422,9 @@ class AFCodeGenerator {
 
    bool addImportsForPath(AFCommandContext ctx, List<String> projectPath, { required List<String> imports, bool requireExists = true }) {
     if(!requireExists || fileExists(projectPath)) {
-      final template = ImportFromPackage().toBuffer(ctx);
-      template.replaceText(ctx, AFUISourceTemplateID.textPackageName, AFibD.config.packageName);
-      template.replaceText(ctx, AFUISourceTemplateID.textPackagePath, importStatementPath(projectPath));
+      final template = ctx.createSnippet(SnippetImportFromPackageT(), insertions: {
+        AFSourceTemplate.insertPackagePathInsertion: importStatementPath(projectPath),
+      });
       imports.addAll(template.lines);
       return true;
     } 
@@ -460,11 +460,11 @@ class AFCodeGenerator {
     required AFGeneratedFile to,
     String? packageName
   }) {
-    final declareImport = ImportFromPackage().toBuffer(ctx);
-    declareImport.replaceText(ctx, AFUISourceTemplateID.textPackageName, packageName ?? AFibD.config.packageName);
-    declareImport.replaceText(ctx, AFUISourceTemplateID.textPackagePath, importPath);
+    final declareImport = SnippetImportFromPackageT().toBuffer(ctx, insertions: {
+      AFSourceTemplate.insertPackageNameInsertion: packageName ?? AFibD.config.packageName,
+      AFSourceTemplate.insertPackagePathInsertion: importPath,
+    });
     to.addImports(ctx, declareImport.lines);
-
   }
 
   String deriveFullLibraryIDFromType(String parentType, String suffix, {
@@ -512,8 +512,9 @@ class AFCodeGenerator {
     final pathExports = toPath ?? pathFlutterExportsFile;
     final fileExports = modifyFile(context, pathExports);
     for(final exportFile in files) {
-      final decl = DeclareExportStatementT().toBuffer(context);
-      decl.replaceText(context, AFUISourceTemplateID.textFileRelativePath, importPathStatementStatic(exportFile.projectPath));
+      final decl = context.createSnippet(SnippetExportStatementT(), insertions: {
+        SnippetExportStatementT.insertPath: importPathStatementStatic(exportFile.projectPath),
+      });
       fileExports.addLinesAtEnd(context, decl.lines);
     }
   }
@@ -777,7 +778,7 @@ class AFCodeGenerator {
   String declareUIIDDirect(AFCommandContext ctx, String idName, AFUIControlSettings control) {
     final idPath = pathIdFile;
     final idFile = loadFile(ctx, idPath);
-    final declareId = DeclareIDStatementT().toBuffer(ctx);
+    final declareId = SnippetIDStatementT().toBuffer(ctx);
 
     declareId.replaceText(ctx, AFUISourceTemplateID.textScreenID, idName);
     declareId.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, control.suffix);
@@ -816,7 +817,7 @@ class AFCodeGenerator {
     final root = removeSuffix(name, suffix);
     final screenId = toCamelCase(root);
     
-    final declareId = DeclareIDStatementT().toBuffer(ctx);
+    final declareId = SnippetIDStatementT().toBuffer(ctx);
     declareId.replaceText(ctx, AFUISourceTemplateID.textScreenName, name);
     declareId.replaceText(ctx, AFUISourceTemplateID.textScreenID, screenId);
     declareId.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, suffix);

@@ -441,11 +441,11 @@ class AFCommandContext {
     }
   ) {
     var fullInsert = this.coreInsertions;
-    if(insertions != null) {
-      fullInsert = fullInsert?.reviseAugment(insertions);
-    }
     if(extend != null) {
-      fullInsert = fullInsert?.reviseAugment(extend.insertions);
+      fullInsert = fullInsert?.reviseOverwrite(extend.insertions);
+    }
+    if(insertions != null) {
+      fullInsert = fullInsert?.reviseOverwrite(insertions);
     }
 
     if(source is! AFSourceTemplate) {

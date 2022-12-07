@@ -2,35 +2,36 @@ import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/screen_test.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/theme.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/declare_spi_on_tap_close.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_bottom_sheet_build_body.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_create_screen_prototype.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_spi.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_drawer_build_body.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_drawer_extra_config_params.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_empty_screen_build_body_impl.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_extra_imports.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_from_package.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_navigate_push.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_no_scaffold_build_with_spi.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_route_param.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_additional_methods.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_build_with_spi_impl.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_impls_super.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_smoke_test_impl.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_spi_on_tap_close.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_standard_route_param.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_bottom_sheet_build_body.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_call_define_screen_test.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_create_screen_prototype.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_create_widget_prototype.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_define_theme.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_dialog_build_body.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_screen_map_entry.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_spi_on_pressed_closed.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_startup_screen_test_impl.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_state_test_screen_shortcut.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_state_test_widget_shortcut.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_widget_build_body.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_widget_impls_super.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_widget_params_constructor.t.dart';
-import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_widget_params_constructor.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_define_screen_test.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_create_widget_prototype.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_theme.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_dialog_build_body.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_screen_map_entry.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_spi_on_pressed_closed.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_state_test_screen_shortcut.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_state_test_widget_shortcut.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_widget_build_body.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_widget_impls_super.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 enum AFUIControlKind {
@@ -111,15 +112,15 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       suffix: widgetSuffix, 
       path: AFCodeGenerator.widgetsPath,
       implBuildWithSPI: SnippetNoScaffoldBuildWithSPIImplT(),
-      implBuildBody: DeclareWidgetBuildBodyImplT(),
+      implBuildBody: SnippetWidgetBuildBodyT(),
       implsSPI: AFSourceTemplate.empty,
-      implsSuper: DeclareWidgetImplsSuperT(),
-      paramsConstructor: DeclareWidgetParamsConstructorT(),
+      implsSuper: SnippetWidgetImplsSuperT(),
+      paramsConstructor: SnippetWidgetParamsConstructorT(),
       routeParamImpls: SnippetRouteParamT(),
       navigatePush: AFSourceTemplate.empty,
       spi: SnippetDeclareSPIT.core(),
-      stateTestShortcut: DeclareStateTestWidgetShortcutT(),
-      createPrototype: DeclareCreateWidgetPrototypeT(),
+      stateTestShortcut: SnippetStateTestWidgetShortcutT(),
+      createPrototype: SnippetCreateWidgetPrototypeT(),
       screenAdditionalMethods: SnippetScreenAdditionalMethodsT(),
       extraConfigParams: AFSourceTemplate.empty,
     );
@@ -137,8 +138,8 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       routeParamImpls: SnippetStandardRouteParamT.core(),
       navigatePush: SnippetNavigatePushT.core(),
       spi: SnippetDeclareSPIT.core(),
-      stateTestShortcut: DeclareStateTestScreenShortcutT(),
-      createPrototype: DeclareCreateScreenPrototypeT.noPushParams(),
+      stateTestShortcut: SnippetStateTestScreenShortcutT(),
+      createPrototype: SnippetCreateScreenPrototypeT.noPushParams(),
       screenAdditionalMethods: SnippetScreenAdditionalMethodsT(),
       extraConfigParams: AFSourceTemplate.empty,
     ),
@@ -147,15 +148,15 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       suffix: bottomSheetSuffix, 
       path: AFCodeGenerator.bottomSheetsPath,
       implBuildWithSPI: SnippetNoScaffoldBuildWithSPIImplT(),
-      implBuildBody: DeclareBottomSheetBuildBodyImplT(),
-      implsSPI: DeclareSPIOnPressedCloseImplT(),
+      implBuildBody: SnippetBottomSheetBuildBodyT(),
+      implsSPI: SnippetSPIOnPressedCloseImplT(),
       implsSuper: SnippetScreenImplsSuperT(),
       paramsConstructor: AFSourceTemplate.empty,
       routeParamImpls: SnippetStandardRouteParamT.core(),
       navigatePush: SnippetNavigatePushT.core(),
       spi: SnippetDeclareSPIT.core(),
-      stateTestShortcut: DeclareStateTestScreenShortcutT(),
-      createPrototype: DeclareCreateScreenPrototypeT.noPushParams(),
+      stateTestShortcut: SnippetStateTestScreenShortcutT(),
+      createPrototype: SnippetCreateScreenPrototypeT.noPushParams(),
       screenAdditionalMethods: SnippetScreenAdditionalMethodsT(),
       extraConfigParams: AFSourceTemplate.empty,
     ),
@@ -171,8 +172,8 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       routeParamImpls: SnippetStandardRouteParamT.core(),
       navigatePush: SnippetNavigatePushT.core(),
       spi: SnippetDeclareSPIT.core(),
-      stateTestShortcut: DeclareStateTestScreenShortcutT(),
-      createPrototype: DeclareCreateScreenPrototypeT.noPushParams(),
+      stateTestShortcut: SnippetStateTestScreenShortcutT(),
+      createPrototype: SnippetCreateScreenPrototypeT.noPushParams(),
       screenAdditionalMethods: SnippetScreenAdditionalMethodsT(),
       extraConfigParams: SnippetDrawerExtraConfigParamsT(),
     ),
@@ -181,15 +182,15 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       suffix: dialogSuffix, 
       path: AFCodeGenerator.dialogsPath,
       implBuildWithSPI: SnippetNoScaffoldBuildWithSPIImplT(),
-      implBuildBody: DeclareDialogBuildBodyImplT(),
-      implsSPI: DeclareSPIOnPressedCloseImplT(),
+      implBuildBody: SnippetDialogBuildBodyT(),
+      implsSPI: SnippetSPIOnPressedCloseImplT(),
       implsSuper: SnippetScreenImplsSuperT(),
       paramsConstructor: AFSourceTemplate.empty,
       routeParamImpls: SnippetStandardRouteParamT.core(),
       navigatePush: SnippetNavigatePushT.core(),
       spi: SnippetDeclareSPIT.core(),
-      stateTestShortcut: DeclareStateTestScreenShortcutT(),
-      createPrototype: DeclareCreateScreenPrototypeT.noPushParams(),
+      stateTestShortcut: SnippetStateTestScreenShortcutT(),
+      createPrototype: SnippetCreateScreenPrototypeT.noPushParams(),
       screenAdditionalMethods: SnippetScreenAdditionalMethodsT(),
       extraConfigParams: AFSourceTemplate.empty,
     ),
@@ -283,9 +284,10 @@ $optionsHeader
     final imports = <String>[];
     if(isCustomParent && fromLib != null) {
       var parentThemePackage = fromLib.name;
-      final import = ImportFromPackage().toBuffer(context);
-      import.replaceText(context, AFUISourceTemplateID.textPackageName, parentThemePackage);
-      import.replaceText(context, AFUISourceTemplateID.textPackagePath, "${fromLib.codeId}_flutter.dart");
+      final import = SnippetImportFromPackageT().toBuffer(context, insertions: {
+        AFSourceTemplate.insertPackageNameInsertion: parentThemePackage,
+        AFSourceTemplate.insertPackagePathInsertion: "${fromLib.codeId}_flutter.dart"
+      });
       imports.addAll(import.lines);      
     }
 
@@ -293,9 +295,10 @@ $optionsHeader
 
     // add the line that installs it
     final fileDefineUI = generator.modifyFile(context, generator.pathDefineCore);
-    final defineTheme = DeclareDefineThemeT().toBuffer(context);
-    defineTheme.replaceText(context, AFUISourceTemplateID.textThemeType, uiName);
-    defineTheme.replaceText(context, AFUISourceTemplateID.textThemeID, parentThemeID);
+    final defineTheme = context.createSnippet(SnippetCallDefineThemeT(), insertions: {
+      SnippetCallDefineThemeT.insertThemeID: parentThemeID,
+      SnippetCallDefineThemeT.insertThemeType: uiName,
+    });
     fileDefineUI.addLinesAfter(context, AFCodeRegExp.startDefineThemes, defineTheme.lines);
     if(imports.isNotEmpty) {
       fileDefineUI.addLinesBefore(context, AFCodeRegExp.startDefineCore, imports);
@@ -424,11 +427,8 @@ $optionsHeader
     
     // put the screen in the screen map
     if(controlSettings.kind != AFUIControlKind.widget) {
-      final declareScreenInMap = DeclareRegisterScreenMapT().toBuffer(context);
-      declareScreenInMap.replaceText(context, AFUISourceTemplateID.textScreenName, uiName);
-      declareScreenInMap.replaceText(context, AFUISourceTemplateID.textScreenID, screenId);
-      declareScreenInMap.replaceText(context, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
-      declareScreenInMap.executeStandardReplacements(context);
+      final declareScreenInMap = context.createSnippet(SnippetDefineScreenMapEntryT(), extend: screenInsertions);
+
       final screenMapPath = generator.pathDefineCore;
       final screenMapFile = generator.modifyFile(context, screenMapPath);
       screenMapFile.addLinesAfter(context, AFCodeRegExp.startScreenMap, declareScreenInMap.lines);
@@ -440,11 +440,7 @@ $optionsHeader
 
     // create a state test shortcut declaration function.
     final createShortcut = controlSettings.stateTestShortcut as AFSourceTemplate;
-    final shortcut = createShortcut.toBuffer(context);
-    shortcut.replaceText(context, AFUISourceTemplateID.textScreenName, uiName);
-    shortcut.replaceText(context, AFUISourceTemplateID.textScreenID, screenId);
-    shortcut.replaceText(context, AFUISourceTemplateID.textScreenIDType, screenIdType);
-    shortcut.replaceText(context, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
+    final shortcut = context.createSnippet(createShortcut, extend: screenInsertions);
     final shortcutsFile = generator.modifyFile(context, generator.pathStateTestShortcutsFile);
     shortcutsFile.addLinesAfter(context, AFCodeRegExp.startShortcutsClass, shortcut.lines);
 
@@ -467,30 +463,26 @@ $optionsHeader
 
     final generatePrototypes = AFibD.config.generateUIPrototypes;
     if(generatePrototypes) {
-      // create a new screen test files
-      final pathScreenTest = generator.pathScreenTest(uiName, controlSettings);
-      final screenTestFile = generator.createFile(context, pathScreenTest, AFUISourceTemplateID.fileScreenTest);
-      final createProto = createPrototype ?? controlSettings.createPrototype;
-      screenTestFile.replaceTemplate(context, AFUISourceTemplateID.textDeclareCreatePrototype, createProto as AFSourceTemplate);
-      screenTestFile.replaceText(context, AFUISourceTemplateID.textScreenName, uiName);
-      screenTestFile.replaceText(context, AFUISourceTemplateID.textFullTestDataID, generator.stateFullLoginID);
-      screenTestFile.replaceText(context, AFUISourceTemplateID.textControlTypeSuffix, controlSettings.suffix);
-      screenTestFile.replaceText(context, AFUISourceTemplateID.textScreenID, screenId);
-      AFSourceTemplate templateUITestImpl = AFSourceTemplate.empty;
-      if(isStartupScreen) {
-        templateUITestImpl = DeclareStartupScreenTestImplT();
-      }
-      screenTestFile.replaceTemplate(context, AFUISourceTemplateID.declareSmokeTestImpl, templateUITestImpl);
+      final smokeTestImpl = context.createSnippet(SnippetSmokeTestImplT());
 
-      screenTestFile.executeStandardReplacements(context);
+      // create a new screen test files
+      final protoName = "${uiName}InitialPrototype";
+      final protoId = generator.declarePrototypeID(context, protoName);
+      final pathScreenTest = generator.pathScreenTest(uiName, controlSettings);
+      final createProto = createPrototype ?? controlSettings.createPrototype;
+      final screenTestFile = context.createFile(pathScreenTest, ScreenTestT.core(), insertions: {
+          AFSourceTemplate.insertMainTypeInsertion: uiName,
+          ScreenT.insertScreenID: protoId,
+          ScreenT.insertControlTypeSuffix: controlSettings.suffix,
+          ScreenTestT.insertDeclarePrototype: createProto,
+          ScreenTestT.insertSmokeTestImpl: smokeTestImpl,
+          SnippetCreateScreenPrototypeT.insertFullTestDataID: generator.stateFullLoginID,
+      });
+
       generator.addImport(context,
         importPath: screenFile.importPathStatement,
         to: screenTestFile,
       );
-
-      final protoName = "${uiName}InitialPrototype";
-      final protoId = generator.declarePrototypeID(context, protoName);
-      screenTestFile.replaceText(context, AFUISourceTemplateID.textScreenTestID, protoId);
 
       // add in a link to the defining function to the main tests file.
       final pathScreenTests = generator.pathScreenTests;
@@ -502,8 +494,7 @@ $optionsHeader
         to: screenTestsFile,
       );
 
-      final callFunction = DeclareCallDefineScreenTest().toBuffer(context);
-      callFunction.replaceText(context, AFUISourceTemplateID.textScreenName, uiName);
+      final callFunction = context.createSnippet(SnippetCallDefineScreenTest(), extend: screenInsertions);
       screenTestsFile.addLinesAfter(context, AFCodeRegExp.startDefineScreenTestsFunction, callFunction.lines);
     }
 

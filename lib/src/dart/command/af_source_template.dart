@@ -132,6 +132,10 @@ abstract class AFSourceTemplate {
   static const insertLibKindInsertion = AFSourceTemplateInsertion("lib_kind");
   static const insertMainTypeInsertion = AFSourceTemplateInsertion("main_type");
   static const insertMainParentTypeInsertion = AFSourceTemplateInsertion("main_parent_type");
+  static const insertCopyWithParamsInsertion = AFSourceTemplateInsertion("copy_with_params");
+  static const insertCopyWithCallInsertion = AFSourceTemplateInsertion("copy_with_constructor_call");
+  static const insertCreateParamsInsertion = AFSourceTemplateInsertion("create_params");
+  static const insertCreateParamsCallInsertion = AFSourceTemplateInsertion("create_params_call");
 
   static const empty = DeclareEmptyStatementT();
   final AFSourceTemplateRole role;
@@ -156,6 +160,10 @@ abstract class AFSourceTemplate {
   AFSourceTemplateInsertion get insertLibKind { return AFSourceTemplate.insertLibKindInsertion; }
   AFSourceTemplateInsertion get insertMainType { return AFSourceTemplate.insertMainTypeInsertion; }
   AFSourceTemplateInsertion get insertMainParentType { return AFSourceTemplate.insertMainParentTypeInsertion; }
+  AFSourceTemplateInsertion get insertCopyWithParams { return AFSourceTemplate.insertCopyWithParamsInsertion; }
+  AFSourceTemplateInsertion get insertCopyWithConstructorCall { return AFSourceTemplate.insertCopyWithCallInsertion; }
+  AFSourceTemplateInsertion get insertCreateParams { return AFSourceTemplate.insertCreateParamsInsertion; }
+  AFSourceTemplateInsertion get insertCreateParamsCall { return AFSourceTemplate.insertCreateParamsCallInsertion; }
 
   bool get isComment { return role == AFSourceTemplateRole.comment; }
   bool get isCode { return role == AFSourceTemplateRole.code; }
@@ -182,35 +190,73 @@ abstract class AFSourceTemplate {
     return buffer;
   }
 
-  List<String> createLinesWithOptions(AFCommandContext context, List<String> options, String indent) {
+  List<String> createLinesWithOptions(AFCommandContext context, List<String> options) {
     final buffer = toBuffer(context);
     return buffer.lines;
   }
 
 }
 
-abstract class AFSnippetSourceTemplate extends AFSourceTemplate {  
+abstract class AFPathSourceTemplate extends AFSourceTemplate {
 
-  const AFSnippetSourceTemplate({
-    AFSourceTemplateInsertions? embeddedInsertions, 
-  }): super(embeddedInsertions: embeddedInsertions);
+  final List<String> templateFolder;
+  final String templateFileId;
 
-
-}
-
-
-abstract class AFFileSourceTemplate extends AFSourceTemplate {
-  static const templatePathCore = "core";
-  static const templatePathExample = "examples";
-  
-  final List<String> templatePath;
-
-  const AFFileSourceTemplate({
-    required this.templatePath,
+  const AFPathSourceTemplate({
+    required this.templateFolder,
+    required this.templateFileId,
     AFSourceTemplateInsertions? embeddedInsertions, 
   }): super(embeddedInsertions: embeddedInsertions);
 
   String get templateId => joinAll(templatePath);
+
+  List<String> get templatePath {
+    final result = templateFolder.toList();
+    result.add(templateFileId);
+    return result;
+  }
+}
+
+abstract class AFSnippetSourceTemplate extends AFPathSourceTemplate {  
+
+  const AFSnippetSourceTemplate({
+    required List<String> templateFolder,
+    required String templateFileId,
+    AFSourceTemplateInsertions? embeddedInsertions, 
+  }): super(
+    templateFileId: templateFileId,
+    templateFolder: templateFolder,
+    embeddedInsertions: embeddedInsertions
+  );
+}
+
+abstract class AFCoreSnippetSourceTemplate extends AFSnippetSourceTemplate {  
+
+  const AFCoreSnippetSourceTemplate({
+    String templateFileId = "TODO",
+    AFSourceTemplateInsertions? embeddedInsertions, 
+  }): super(
+    templateFileId: templateFileId,
+    templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
+    embeddedInsertions: embeddedInsertions
+  );
+}
+
+
+abstract class AFFileSourceTemplate extends AFPathSourceTemplate {
+  static const templatePathCore = "core";
+  static const templatePathExample = "examples";
+  
+  const AFFileSourceTemplate({
+    required List<String> templateFolder,
+    required String templateFileId,
+    AFSourceTemplateInsertions? embeddedInsertions, 
+  }): super(
+    templateFileId: templateFileId,
+    templateFolder: templateFolder,
+    embeddedInsertions: embeddedInsertions
+  );
+
 
   AFGeneratedFile createGeneratedTemplate(AFCommandContext context) {
     final relativePath = AFProjectPaths.generateFolderFor(templatePath);
@@ -218,11 +264,29 @@ abstract class AFFileSourceTemplate extends AFSourceTemplate {
   }
 }
 
+abstract class AFCoreFileSourceTemplate extends AFFileSourceTemplate {
+
+ const AFCoreFileSourceTemplate({
+    required String templateFileId,
+    AFSourceTemplateInsertions? embeddedInsertions, 
+  }): super(
+    templateFileId: templateFileId,
+    templateFolder: AFProjectPaths.pathGenerateCoreFiles,
+    embeddedInsertions: embeddedInsertions,
+  );
+
+}
+
+
 abstract class AFProjectStyleSourceTemplate extends AFFileSourceTemplate {
   const AFProjectStyleSourceTemplate({
-    required List<String> templatePath,
+    required String templateFileId,
     AFSourceTemplateInsertions? embeddedInsertions, 
-  }): super(templatePath: templatePath, embeddedInsertions: embeddedInsertions);
+  }): super(
+    templateFileId: templateFileId,
+    templateFolder: AFProjectPaths.pathProjectStyles,
+    embeddedInsertions: embeddedInsertions
+  );
 }
 
 abstract class AFSourceTemplateComment extends AFSourceTemplate {
@@ -235,12 +299,12 @@ abstract class AFDynamicSourceTemplate extends AFSourceTemplate {
   
   @override
   AFCodeBuffer toBuffer(AFCommandContext context, { Map<AFSourceTemplateInsertion, Object>? insertions }) {
-    final lines = createLinesWithOptions(context, <String>[], "");
+    final lines = createLinesWithOptions(context, <String>[]);
     final result = AFCodeBuffer.empty();
     result.addLinesAtEnd(context, lines);
     return result;
   }
 
 
-  List<String> createLinesWithOptions(AFCommandContext context, List<String> options, String indent);
+  List<String> createLinesWithOptions(AFCommandContext context, List<String> options);
 }

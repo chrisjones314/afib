@@ -16,7 +16,8 @@ enum AFGeneratedFileAction {
   create,
   modify,
   overwrite,
-  skip
+  skip,
+  projectStyle,
 }
 
 /// A file that is in the process of being generated or modified.
@@ -77,7 +78,7 @@ class AFGeneratedFile {
         // if the path changed, and the override path is not on the filesystem, see if it 
         // is one of our predefined paths.
         if(hasOverride) {
-          final overrideTemplate = context.findEmbeddedTemplate(overridePath);
+          final overrideTemplate = context.findEmbeddedTemplateFile(overridePath);
           if(overrideTemplate == null) {
             throw AFException("The override ${joinAll(overridePath)} was not found on the file system, or in the AFTemplateRegistry, for ${joinAll(originalPath)}");
           }
@@ -163,6 +164,14 @@ class AFGeneratedFile {
     }
   }
 
+  void addLinesAfterIdx(AFCommandContext context, int idx, List<String> lines, {
+    bool preventDuplicates = true
+  }) {
+    if(!preventDuplicates || !isDuplicateDeclaration(context, lines)) {  
+      buffer.addLinesAfterIdx(context, idx, lines);
+    }
+  }
+
   void addLinesAtEnd(AFCommandContext context, List<String> lines, {
     bool preventDuplicates = true
   }) {
@@ -170,6 +179,11 @@ class AFGeneratedFile {
       buffer.addLinesAtEnd(context, lines);
     }
   }
+
+  int firstLineContaining(AFCommandContext context, RegExp match) {
+    return buffer.firstLineContaining(context, match);
+  }
+
 
   bool isDuplicateDeclaration(AFCommandContext context, List<String> lines) {
     if(lines.isEmpty) {
@@ -248,7 +262,7 @@ class AFGeneratedFile {
     // make sure the folder exists before we write a file.
     AFProjectPaths.ensureFolderExistsForFile(projectPath);
 
-    _writeAction(output);
+    _writeAction(context);
     output.startColumn(
       alignment: AFOutputAlignment.alignLeft
     );
@@ -260,7 +274,8 @@ class AFGeneratedFile {
     f.writeAsStringSync(buffer.toString());
   }
 
-  void _writeAction(AFCommandOutput output) {
+  void _writeAction(AFCommandContext context) {
+    final output = context.output;
     final color = (action == AFGeneratedFileAction.create) ? Styles.GREEN : Styles.YELLOW;
     output.startColumn(
       alignment: AFOutputAlignment.alignRight,
@@ -277,6 +292,8 @@ class AFGeneratedFile {
       text = "overwrite";
     } else if(action == AFGeneratedFileAction.skip) {
       text = "skip";
+    } else if(action == AFGeneratedFileAction.projectStyle) {
+      text = context.isExportTemplates ? "create" : "read";
     }
     
     output.write("$text ");

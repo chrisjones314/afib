@@ -4,18 +4,18 @@ import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
-import 'package:afib/src/dart/command/templates/core/lpi.t.dart';
-import 'package:afib/src/dart/command/templates/core/model.t.dart';
-import 'package:afib/src/dart/command/templates/core/state_view.t.dart';
-import 'package:afib/src/dart/command/templates/snippets/snippet_initial_state_model_function.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/lpi.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/state_view.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_initial_state_model_function.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_call_define_test_data.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_define_define_test_data.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_test_data.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_define_lpi.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_initial_value.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_lpi_id_statement.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_model_access_statement.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_reference_test_data.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_test_id.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_test_id.t.dart';
 import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
@@ -151,8 +151,8 @@ $optionsHeader
     final generator = context.generator;
     final isRoot = identifier.endsWith(AFCodeGenerator.rootSuffix);
     final modelPath = generator.pathModel(identifier);
-    final modelFile = context.createFile(modelPath, ModelT(), insertions: {
-      ModelT.insertModelName: identifier,
+    final modelFile = context.createFile(modelPath, ModelT.core(), insertions: {
+      AFSourceTemplate.insertMainTypeInsertion: identifier,
       AFSourceTemplate.insertAdditionalMethodsInsertion: isRoot ? SnippetInitialStateModelFunctionT() : AFSourceTemplate.empty,
     });
 
@@ -180,10 +180,10 @@ $optionsHeader
         final testDataFile = generator.modifyFile(context, generator.pathTestData);
         testDataFile.addLinesAfter(context, AFCodeRegExp.startDefineTestData, declareCallDefineTest.lines);
 
-        var declareDefineTestData  = DeclareDefineDefineTestDataT().toBuffer(context);
-
-        declareDefineTestData.replaceText(context, AFUISourceTemplateID.textModelName, identifier);
-        declareDefineTestData.executeStandardReplacements(context);
+        var declareDefineTestData = context.createSnippet(SnippetDefineTestDataT.core(), insertions: {
+          SnippetDefineTestDataT.insertModelName: identifier,
+        });
+        
 
         // then, declare the function that we just called.
         testDataFile.addLinesAtEnd(context, declareDefineTestData.lines);
@@ -194,12 +194,7 @@ $optionsHeader
           to: testDataFile, 
         );
         
-        // finally, add the id we are using.
-        final declareTestID = DeclareTestIDT().toBuffer(context);
-        declareTestID.replaceText(context, AFUISourceTemplateID.textTestID, "stateFullLogin$identifier");
-
-        final idFile = generator.modifyFile(context, generator.pathIdFile);
-        idFile.addLinesAfter(context, AFCodeRegExp.startDeclareTestDataID, declareTestID.lines);
+        context.createDeclareId("${generator.appNamespaceUpper}TestDataID.stateFullLogin$identifier");
 
         // then, add in the new test data to the full signed in state.
         final declareInitTestData = DeclareReferenceTestDataT().toBuffer(context);

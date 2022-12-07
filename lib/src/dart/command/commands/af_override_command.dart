@@ -2,7 +2,7 @@ import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
-import 'package:afib/src/dart/command/templates/core/lpi.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/lpi.t.dart';
 
 /// Parent for commands executed through the afib command line app.
 class AFOverrideCommand extends AFCommand { 

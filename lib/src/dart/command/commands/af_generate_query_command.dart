@@ -2,7 +2,7 @@
 
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
-import 'package:afib/src/dart/command/templates/core/queries_t.dart';
+import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_query_shutdown_method.t.dart';
 
 class AFGenerateQuerySubcommand extends AFGenerateSubcommand {
@@ -101,7 +101,7 @@ $optionsHeader
     final rootStateType = args[argRootStateType];
     final resultType = args[argResultModelType];
 
-    AFSourceTemplate queryTemplate = SimpleQueryT.base();
+    AFSourceTemplate queryTemplate = SimpleQueryT.core();
     var queryParentType = "AFAsyncQuery";
     final isListener = querySuffix == suffixListenerQuery;
     final isDeferred = querySuffix == suffixDeferredQuery;
@@ -112,9 +112,9 @@ $optionsHeader
     if(isListener) {
       queryParentType = "AFAsyncListenerQuery";
     } else if(isDeferred) {
-      queryTemplate = DeferredQueryT.base();
+      queryTemplate = DeferredQueryT.core();
     } else if(isIsolate) {
-      queryTemplate = IsolateQueryT.base();
+      queryTemplate = IsolateQueryT.core();
     }
 
     AFSourceTemplate additionalMethods = AFSourceTemplate.empty;

@@ -12,7 +12,7 @@ import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_export_statement.t.dart';
-import 'package:afib/src/dart/command/templates/statements/declare_id_statement.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/declare_id_statement.t.dart';
 import 'package:afib/src/dart/command/templates/statements/import_statements.t.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
@@ -591,6 +591,11 @@ class AFCodeGenerator {
       if(revised == null) {
         continue;
       }
+
+      if(context.isExportTemplates) {
+        continue;
+      }
+
       final output = context.output;
       outputThreeColumns(context, "rename ", AFProjectPaths.relativePathFor(original), "-> ${AFProjectPaths.relativePathFor(revised)}");
       output.endLine();
@@ -685,6 +690,18 @@ class AFCodeGenerator {
     return generated;
   }
 
+  AFGeneratedFile readProjectStyle(AFCommandContext context, List<String> projectPath, dynamic templateOrId, {
+    AFSourceTemplateInsertions? insertions,
+  }) {
+    // if we are generating templates, then generate it at the     
+    final generated = _createFile(context, projectPath, templateOrId, AFGeneratedFileAction.projectStyle);
+    if(insertions != null && !context.isExportTemplates) {
+      generated.performInsertions(context, insertions);
+    }
+    return generated;
+  }
+
+
   AFGeneratedFile _modifyFile(AFCommandContext context, List<String> projectPath) {
     return loadFile(context, projectPath);
   }
@@ -729,10 +746,10 @@ class AFCodeGenerator {
       throw AFException("Could not find template with id $templateOrId");
     }
 
-    
-
-    created[projectPath.join('/')] = generated;
-    //generated.resolveTemplateReferences(context: context);
+    final generatedPath = projectPath.join('/');
+    if(action != AFGeneratedFileAction.projectStyle || context.isExportTemplates) {
+      created[generatedPath] = generated;
+    }
     return generated;
   }
 

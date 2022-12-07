@@ -153,16 +153,28 @@ class AFCodeBuffer {
     lines.add('');
   }
 
-  void addLinesAfter(AFCommandContext context, RegExp match, List<String> toInsert) {
-    modified = true;
+  int firstLineContaining(AFCommandContext context, RegExp match) {
     for(var i = 0; i < lines.length; i++) {
       final line = lines[i];
       if(line.contains(match)) {
-        lines.insertAll(i+1, toInsert);
-        return;
+        return i;
       }
     }
-    _throwMissingMatchRegex(match);    
+    return -1;
+  }
+
+  void addLinesAfter(AFCommandContext context, RegExp match, List<String> toInsert) {
+    modified = true;
+    final idx = firstLineContaining(context, match);
+    if(idx < 0) {
+      _throwMissingMatchRegex(match);    
+    } else {
+      lines.insertAll(idx+1, toInsert);
+    }    
+  }
+
+  void addLinesAfterIdx(AFCommandContext context, int idx, List<String> toInsert) {
+    lines.insertAll(idx+1, toInsert);
   }
 
   void addLinesAtEnd(AFCommandContext context, List<String> toInsert) {
@@ -172,14 +184,12 @@ class AFCodeBuffer {
 
   void addLinesBefore(AFCommandContext context, RegExp match, List<String> toInsert) {
     modified = true;
-    for(var i = 0; i < lines.length; i++) {
-      final line = lines[i];
-      if(line.contains(match)) {
-        lines.insertAll(i-1, toInsert);
-        return;
-      }
-    }
-    _throwMissingMatchRegex(match);
+    final idx = firstLineContaining(context, match);
+    if(idx < 0) {
+      _throwMissingMatchRegex(match);
+    } else {
+      lines.insertAll(idx-1, toInsert);
+    }    
   }
 
   void addLineBeforeIndex(AFCommandContext context, int idx, String line) {
@@ -195,12 +205,8 @@ class AFCodeBuffer {
     /// go through all lines, looking for the id.
     final idCode = id.toString();
     for(var i = 0; i < lines.length; i++) {
-      replaceInLine(context, i, idCode, (ctx, options, indent) {
-        final result = <String>[];
-        for(final lineInsert in linesIn) {
-          result.add("$indent$lineInsert");
-        } 
-        return result;
+      replaceInLine(context, i, idCode, (ctx, options) {
+        return linesIn;
       });
     }
 
@@ -216,8 +222,12 @@ class AFCodeBuffer {
     /// go through all lines, looking for the id.
     final idCode = id.toString();
     for(var i = 0; i < lines.length; i++) {
-      replaceInLine(context, i, idCode, (ctx, options, indent) {
+      replaceInLine(context, i, idCode, (ctx, options) {
         var result = value;
+        if(result.contains("\n")) {
+          final lines = result.split("\n");
+          return lines;
+        }
         if(options.isEmpty) {
 
         }
@@ -239,12 +249,12 @@ class AFCodeBuffer {
           throw AFCommandError(error: "Unknown option '$options' in tag $idCode");
         }
 
-        return ["$indent$result"];
+        return ["$result"];
       });
     }
   }
 
-  void replaceAllWithOptions(AFCommandContext context, dynamic id, List<String> Function(AFCommandContext context, List<String> options, String indent) createValue) {
+  void replaceAllWithOptions(AFCommandContext context, dynamic id, List<String> Function(AFCommandContext context, List<String> options) createValue) {
     final idCode = id.toString();
     for(var i = 0; i < lines.length; i++) {
       replaceInLine(context, i, idCode, createValue);
@@ -252,22 +262,22 @@ class AFCodeBuffer {
   }
 
 
-  void replaceInLine(AFCommandContext context, int lineIdx, String code, List<String> Function(AFCommandContext context, List<String> options, String indent) createValue) {
+  void replaceInLine(AFCommandContext context, int lineIdx, String code, List<String> Function(AFCommandContext context, List<String> options) createValue) {
     modified = true;
     final lineStart = lines[lineIdx];
     final codeStart = "$startCode$code";
     var curStart = lineStart.lastIndexOf(codeStart);
     while(curStart >= 0) {
-      final charNext = lineStart[curStart+codeStart.length];
+      final lineCur = lines[lineIdx];
+      final charNext = lineCur[curStart+codeStart.length];
       if(charNext != "]" && charNext != "(") {
         if(curStart > 0) {
-          curStart = lines[lineIdx].lastIndexOf(codeStart, curStart-1);
+          curStart = lineCur.lastIndexOf(codeStart, curStart-1);
         } else {
           curStart = -1;
         }
         continue;
       }
-      final lineCur = lines[lineIdx];
       var curEnd = lineCur.indexOf(endCode, curStart);
       if(curEnd < 0) {
         throw AFCommandError(error: "Found $codeStart but failed to find matching $endCode");
@@ -284,23 +294,53 @@ class AFCodeBuffer {
         options.addAll(optionsList);
       }
 
-      final prefixTo = lineStart.substring(0, curStart);
-      var indent = "";
-      var replaceStart = curStart;
-      if(prefixTo.isNotEmpty && prefixTo.trim().isEmpty) {
-        indent = prefixTo;
-        replaceStart = 0;
+      // new algorithm.
+      // a: Find the indent always.
+      final indentBuf = StringBuffer();
+      var idxIndent = 0;
+      while(idxIndent < lineStart.length) {
+        final val = lineStart[idxIndent++];
+        if(val.trim().isEmpty) {
+          indentBuf.write(val);
+        } else {
+          break;
+        }
       }
 
-      final value = createValue(context, options, indent);
-      if(value.length == 1) {
-        lines[lineIdx] = lineCur.replaceRange(replaceStart, curEnd+1, value[0]);
-      } else {
-        lines.removeAt(lineIdx);
-        lines.insertAll(lineIdx, value);
+      final indent = indentBuf.toString();
+      final textBefore = lineCur.substring(idxIndent-1, curStart);
+      final textAfter = lineCur.substring(curEnd+1);
+      final isSingleLineInsert = textBefore.isNotEmpty && textAfter.isNotEmpty;
+      var internalIndent = "";
+      if(isSingleLineInsert) {
+        internalIndent = "  ";
+      }
+
+      // b, this no longer does the indentation
+      final value = createValue(context, options);
+      final insertLines = <String>[];
+      if(value.isEmpty) {
+        insertLines.add("$indent$textBefore$textAfter");
+      }
+      for(var i = 0; i < value.length; i++) {
+        final lineInsert = value[i];
+        if(i == 0) {
+          var suffix = "";
+          if(value.length == 1) {
+            suffix = textAfter;
+          }
+          insertLines.add("$indent$textBefore$lineInsert$suffix");
+        } else if(i == (value.length - 1)) {
+          insertLines.add("$indent$lineInsert$textAfter");
+        } else {
+          insertLines.add("$indent$internalIndent$lineInsert");
+        }
       }
       
-      curStart = lines[lineIdx].lastIndexOf(codeStart);
+      lines.removeAt(lineIdx);
+      lines.insertAll(lineIdx, insertLines);
+      
+      curStart = lineIdx < lines.length ? lines[lineIdx].lastIndexOf(codeStart) : -1;
     }
   }
 

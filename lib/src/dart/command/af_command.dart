@@ -5,6 +5,7 @@ import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_create_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_id_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
@@ -17,6 +18,8 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:args/args.dart' as args;
 import 'package:collection/collection.dart';
 import 'package:path/path.dart';
+
+import 'templates/core/snippets/snippet_declare_test_id.t.dart';
 
 class AFItemWithNamespace {
   /// The namespace used to differentiate third party commands.
@@ -390,13 +393,49 @@ class AFCommandContext {
 
   bool _templateExists(String path) {
     final overridePath = path.split("/");
-    final embedded = findEmbeddedTemplate(overridePath);
-    final found = (embedded != null || AFProjectPaths.generateFileExists(overridePath));
+    final embedded = findEmbeddedTemplateFile(overridePath);
+    final snippet = findEmbeddedTemplateSnippet(overridePath);
+    final found = (embedded != null || snippet != null || AFProjectPaths.generateFileExists(overridePath));
     return found;
   }
 
+  void createDeclareId(String id) {
+    final splitVals = id.split(".");
+    if(splitVals.length != 2) {
+      throw AFException("Expected IDClass.idName, found $id");
+    }
+    final clz = splitVals[0];
+    final identifier = splitVals[1];
+
+    final idFile = generator.modifyFile(this, generator.pathIdFile);
+    final regexClz = RegExp("class\\s+$clz");
+    final idxOpenClass = idFile.firstLineContaining(this, regexClz);
+    if(idxOpenClass < 0) {
+      throw AFException("Could not find $regexClz in id file");
+    }
+
+    final lineOpen = idFile.buffer.lines[idxOpenClass];
+    final isClassDecl = lineOpen.contains("extends");
+    var lines = <String>[];
+    if(isClassDecl) {
+      // finally, add the id we are using.
+      final declareTestID = SnippetDeclareClassTestIDT().toBuffer(this, insertions: {
+        SnippetDeclareClassTestIDT.insertTestId: identifier,
+        SnippetDeclareClassTestIDT.insertClassId: clz,
+      });
+      lines = declareTestID.lines;
+    } else {
+      final declareTestID = SnippetDeclareStringTestIDT().toBuffer(this, insertions: {
+        SnippetDeclareStringTestIDT.insertTestId: identifier,
+      });
+      lines = declareTestID.lines;
+    }  
+    
+    idFile.addLinesAfterIdx(this, idxOpenClass, lines);
+  }
+
   AFCodeBuffer createSnippet(
-    AFSourceTemplate source, {
+    Object source, {
       AFSourceTemplateInsertions? extend,
       Map<AFSourceTemplateInsertion, Object>? insertions
     }
@@ -408,7 +447,36 @@ class AFCommandContext {
     if(extend != null) {
       fullInsert = fullInsert?.reviseAugment(extend.insertions);
     }
-    return source.toBuffer(this, insertions: fullInsert?.insertions);
+
+    if(source is! AFSourceTemplate) {
+      throw AFException("Expected AFSnippetSourceTemplate");
+    }
+
+    var effective = source.toBuffer(this, insertions: fullInsert?.insertions);
+
+   if(source is AFSnippetSourceTemplate) {
+      // see if the source is overridden
+    final originalPath = source.templatePath;
+    final overridePath = this.findOverrideTemplate(originalPath);
+    final hasOverride = overridePath != originalPath;
+      if(hasOverride) {
+        if(AFProjectPaths.generateFileExists(overridePath)) {
+          effective = AFCodeBuffer.fromGeneratePath(overridePath);
+        } else {
+          // if the path changed, and the override path is not on the filesystem, see if it 
+          // is one of our predefined paths.
+          if(hasOverride) {
+            final overrideTemplate = findEmbeddedTemplateSnippet(overridePath);
+            if(overrideTemplate == null) {
+              throw AFException("The override ${joinAll(overridePath)} was not found on the file system, or in the AFTemplateRegistry, for ${joinAll(originalPath)}");
+            }
+            effective = overrideTemplate.toBuffer(this, insertions: fullInsert?.insertions);
+          }
+        }
+      }
+   }
+
+    return effective;
   }
 
   AFGeneratedFile createFile(
@@ -425,6 +493,24 @@ class AFCommandContext {
       fullInsert = fullInsert?.reviseAugment(extend.insertions);
     }
     return generator.createFile(this, projectPath, template, insertions: fullInsert);
+  }
+
+  AFGeneratedFile readProjectStyle(
+    List<String> projectPath, { 
+      AFSourceTemplateInsertions? extend,
+      Map<AFSourceTemplateInsertion, Object>? insertions 
+    })  {
+    var fullInsert = this.coreInsertions ?? AFSourceTemplateInsertions(insertions: {});
+    if(insertions != null) {
+      fullInsert = fullInsert.reviseAugment(insertions);
+    }
+    if(extend != null) {
+      fullInsert = fullInsert.reviseAugment(extend.insertions);
+    }
+    
+    // we need to find the template for this path.
+    final template = generator.definitions.templates.findEmbeddedTemplateFile(projectPath);
+    return generator.readProjectStyle(this, projectPath, template, insertions: fullInsert);
   }
 
   Object? findArgument(String key) {
@@ -479,8 +565,12 @@ class AFCommandContext {
     return result.split("/");
   }
 
-  AFFileSourceTemplate? findEmbeddedTemplate(List<String> path) {
-    return this.definitions.templates.findEmbeddedTemplate(path);
+  AFFileSourceTemplate? findEmbeddedTemplateFile(List<String> path) {
+    return this.definitions.templates.findEmbeddedTemplateFile(path);
+  }
+
+  AFSnippetSourceTemplate? findEmbeddedTemplateSnippet(List<String> path) {
+    return this.definitions.templates.findEmbeddedTemplateSnippet(path);
   }
 
   void setCommandArgCount(int count) {
@@ -744,5 +834,6 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
       generateCmd.addSubcommand(AFGenerateStateSubcommand());
       generateCmd.addSubcommand(AFGenerateQuerySubcommand());
       generateCmd.addSubcommand(AFGenerateCommandSubcommand());      
+      generateCmd.addSubcommand(AFGenerateIDSubcommand());
     }
 }

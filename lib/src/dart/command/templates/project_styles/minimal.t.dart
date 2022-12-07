@@ -1,11 +1,10 @@
-import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/commands/af_create_command.dart';
 
-class MinimalT extends AFFileSourceTemplate {
+class MinimalT extends AFProjectStyleSourceTemplate {
 
   MinimalT(): super(
-    templatePath: const <String>[AFProjectPaths.folderProjectStyles, AFCreateAppCommand.projectStyleMinimal],
+    templateFileId: AFCreateAppCommand.projectStyleMinimal,
   );
 
   String get template => '''

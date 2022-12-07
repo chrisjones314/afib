@@ -2,7 +2,7 @@
 
 import 'package:afib/src/dart/command/af_source_template.dart';
 
-class DeclareBottomSheetBuildBodyImplT extends AFSourceTemplate {
+class DeclareBottomSheetBuildBodyImplT extends AFCoreSnippetSourceTemplate {
   final String template = '''
     final t = spi.t;
     final rows = t.column();

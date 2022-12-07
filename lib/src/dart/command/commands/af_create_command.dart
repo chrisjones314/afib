@@ -4,35 +4,35 @@ import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
-import 'package:afib/src/dart/command/templates/core/app.t.dart';
-import 'package:afib/src/dart/command/templates/core/app_state.t.dart';
-import 'package:afib/src/dart/command/templates/core/command_afib.t.dart';
-import 'package:afib/src/dart/command/templates/core/configure_application.t.dart';
-import 'package:afib/src/dart/command/templates/core/configure_environment.t.dart';
-import 'package:afib/src/dart/command/templates/core/connected_base.t.dart';
-import 'package:afib/src/dart/command/templates/core/create_dart_params.t.dart';
-import 'package:afib/src/dart/command/templates/core/define_core.t.dart';
-import 'package:afib/src/dart/command/templates/core/define_tests.t.dart';
-import 'package:afib/src/dart/command/templates/core/id.t.dart';
-import 'package:afib/src/dart/command/templates/core/install_base.t.dart';
-import 'package:afib/src/dart/command/templates/core/install_command.t.dart';
-import 'package:afib/src/dart/command/templates/core/install_core.t.dart';
-import 'package:afib/src/dart/command/templates/core/install_core_app.t.dart';
-import 'package:afib/src/dart/command/templates/core/install_core_library.t.dart';
-import 'package:afib/src/dart/command/templates/core/install_core_library_app.t.dart';
-import 'package:afib/src/dart/command/templates/core/install_library_base.t.dart';
-import 'package:afib/src/dart/command/templates/core/install_library_command.t.dart';
-import 'package:afib/src/dart/command/templates/core/install_test.t.dart';
-import 'package:afib/src/dart/command/templates/core/library_exports.t.dart';
-import 'package:afib/src/dart/command/templates/core/library_install_command.t.dart';
-import 'package:afib/src/dart/command/templates/core/main.t.dart';
-import 'package:afib/src/dart/command/templates/core/main_afib_test.t.dart';
-import 'package:afib/src/dart/command/templates/core/main_ui_library.t.dart';
-import 'package:afib/src/dart/command/templates/core/state_model_access.t.dart';
-import 'package:afib/src/dart/command/templates/core/state_test_shortcuts.t.dart';
-import 'package:afib/src/dart/command/templates/core/test_data.t.dart';
-import 'package:afib/src/dart/command/templates/snippets/snippet_fundamental_theme_init.t.dart';
-import 'package:afib/src/dart/command/templates/snippets/snippet_fundamental_theme_init_ui_library.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/app.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/app_state.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/command_afib.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/configure_application.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/configure_environment.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/connected_base.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/create_dart_params.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/define_core.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/define_tests.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/id.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/install_base.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/install_command.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/install_core.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/install_core_app.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/install_core_library.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/install_core_library_app.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/install_library_base.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/install_library_command.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/install_test.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/library_exports.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/library_install_command.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/main.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/main_afib_test.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/main_ui_library.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/state_model_access.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/state_test_shortcuts.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/test_data.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_fundamental_theme_init.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_fundamental_theme_init_ui_library.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_call_install_tests.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_empty_statement.t.dart';
 import 'package:afib/src/dart/command/templates/statements/declare_include_install_tests.t.dart';
@@ -64,18 +64,43 @@ class AFCreateCommandContext {
         AFSourceTemplate.insertLibKindInsertion: kind == AFCreateAppCommand.kindApp ? "App" : "Library"
       });
 
-      final ps = command.definitions.templates.findEmbeddedTemplate([AFProjectPaths.folderProjectStyles, projectStyle]);
-      if(ps == null) {
-        throw AFException("The project style $projectStyle was not found");
-      }
+      final stylePath = AFProjectPaths.pathProjectStyles.toList();
+      stylePath.add(projectStyle);
 
-      final buffer = ps.toBuffer(command);
-
-     return AFCreateCommandContext(command: command, kind: kind, insertions: insertions, projectStyle: buffer);
+     final fileProjectStyle = command.readProjectStyle(stylePath, insertions: insertions.insertions);
+     return AFCreateCommandContext(command: command, kind: kind, insertions: insertions, projectStyle: fileProjectStyle.buffer);
   }
 
   List<String> get projectStyleLines {
-    return projectStyle.lines;
+
+    final rawLines = projectStyle.lines;
+    final result = <String>[];
+    var idxLine = 0;
+    while(idxLine < rawLines.length) {
+      var rawLine = rawLines[idxLine].trim();
+      if(rawLine.endsWith("+")) {
+        rawLine = rawLine.substring(0, rawLine.length-1).trim();
+      }
+      idxLine++;
+      final compressed = StringBuffer();
+      var lineNext = (idxLine < rawLines.length) ? rawLines[idxLine].trim() : "";
+      while(lineNext.startsWith("+")) {
+        final add = lineNext.substring(1);
+        if(compressed.isNotEmpty) {
+          compressed.write(",");
+        }
+        compressed.write(add);
+        idxLine++;
+        lineNext = (idxLine < rawLines.length) ? rawLines[idxLine].trim() : "";
+      }
+      
+      if(compressed.isNotEmpty) {
+        rawLine = '$rawLine "$compressed"';
+      }
+      result.add(rawLine);
+    }
+
+    return result;
   }
 
   bool get includeUI => !isStateLibrary;
@@ -217,7 +242,6 @@ $optionsHeader
     if(!context.isStateLibrary) {
       _createTestFiles(context);
     }
-
 
     if(!context.isStateLibrary) {
       _createMainFiles(context);

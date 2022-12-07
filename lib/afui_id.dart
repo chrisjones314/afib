@@ -240,14 +240,6 @@ class AFUISourceTemplateID extends AFSourceTemplateID {
   static const textRouteParamImpls = AFUISourceTemplateID("route_param_impls");
   static const textCommandName = AFUISourceTemplateID("command_name");
   static const textCommandNameShort = AFUISourceTemplateID("command_name_short");
-
-  static const commentSPIIntro = AFUISourceTemplateID("comment_spi_intro");
-  static const commentRouteParamIntro = AFUISourceTemplateID("comment_route_param_intro");
-  static const commentConfigDecl = AFUISourceTemplateID("comment_config_decl");
-  static const commentNavigatePush = AFUISourceTemplateID("comment_navigate_push");
-  static const commentBuildWithSPI = AFUISourceTemplateID("comment_build_with_spi");
-  static const commentBuildBody = AFUISourceTemplateID("comment_build_body");
-
 }
 
 class AFUIPrototypeID extends AFPrototypeID {

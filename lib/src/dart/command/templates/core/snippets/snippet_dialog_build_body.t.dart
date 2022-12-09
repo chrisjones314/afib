@@ -12,7 +12,7 @@ class SnippetDialogBuildBodyT extends AFCoreSnippetSourceTemplate {
     ));
 
     rows.add(t.childButtonPrimaryText(
-      key: t.keyForWID(${insertAppNamespaceUpper}WidgetID.buttonClose),
+      key: t.keyForWID(${insertAppNamespaceUpper}WidgetID.standardClose),
       text: "Close", 
       onPressed: spi.onPressedClose
     ));

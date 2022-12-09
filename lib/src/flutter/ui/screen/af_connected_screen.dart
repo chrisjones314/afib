@@ -85,7 +85,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
     }
  
     if(paramSeg == null) {
-      assert(false, "No route param was found for ${this.runtimeType}.  If you reached this in testing, you may not be on the screen you think you are on in your test scenario.");
+      assert(false, "No route param was found for ${this.runtimeType}.  If you reached this in testing, you may not be on the screen you think you are on in your test scenario.  You might have forgotten to navigate to the screen.  Or, you might have failed to close a dialog/bottomsheet/drawer in a test that displays one, which can lead to this error.");
       return null;
     }
 

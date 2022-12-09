@@ -14,6 +14,6 @@ class SnippetSmokeTestImplRequireCloseT extends AFCoreSnippetSourceTemplate {
   String get template => '''
 /// IMPORTANT: Failing to close your dialog/bottomsheet/drawer at the end of your test
 /// will leave it open, and will lead to confusing errors in command-line UI tests.
-await e.applyTap(${insertAppNamespaceUpper}WidgetID.tileClose);
+await e.applyTap(${insertAppNamespaceUpper}WidgetID.standardClose);
 ''';
 }

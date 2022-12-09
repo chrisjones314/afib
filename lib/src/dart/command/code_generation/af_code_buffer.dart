@@ -7,6 +7,7 @@ import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_generator.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
+import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 /// Used to insert code at a particular point in a file.
@@ -16,12 +17,15 @@ class AFCodeBuffer {
 
   final List<String>? projectPath;
   final List<String> lines;
+  final List<String> extraImports;
   bool modified;
 
   AFCodeBuffer({
     required this.projectPath,
     required this.lines,
-    required this.modified
+    required this.modified,
+    required this.extraImports,
+
   });
 
 
@@ -34,7 +38,7 @@ class AFCodeBuffer {
   }
 
   factory AFCodeBuffer.empty() {
-    return AFCodeBuffer(projectPath: null, lines: <String>[], modified: false);
+    return AFCodeBuffer(projectPath: null, lines: <String>[], modified: false, extraImports: <String>[]);
   }
 
   factory AFCodeBuffer.fromPath(List<String> projectPath) {
@@ -60,7 +64,7 @@ class AFCodeBuffer {
 
     final ls = LineSplitter();
     final lines = ls.convert(file.readAsStringSync());    
-    return AFCodeBuffer(projectPath: projectPath, lines: lines, modified: false);    
+    return AFCodeBuffer(projectPath: projectPath, lines: lines, modified: false, extraImports: <String>[]);    
   }
 
 
@@ -68,7 +72,8 @@ class AFCodeBuffer {
   factory AFCodeBuffer.fromTemplate(AFSourceTemplate template) {
     final ls = LineSplitter();
     final lines = ls.convert(template.template);    
-    return AFCodeBuffer(projectPath: null, lines: lines, modified: true);
+    final extraImports = template.extraImports;
+    return AFCodeBuffer(projectPath: null, lines: lines, modified: true, extraImports: extraImports);
   }
 
   String? findFirstAFTag() {
@@ -103,12 +108,6 @@ class AFCodeBuffer {
     }
   }
 
-  void executeStandardReplacements(AFCommandContext context) {
-    replaceText(context, AFUISourceTemplateID.textAppNamespace, AFibD.config.appNamespace);
-    replaceText(context, AFUISourceTemplateID.textPackageName, AFibD.config.packageName);
-    replaceText(context, AFUISourceTemplateID.textPackagePath, context.generator.packagePath(AFibD.config.packageName));
-  }
-
   bool containsInsertionPoint(String insertionPoint) {
     for(final line in lines) {
       if(line.contains(insertionPoint)) {
@@ -118,10 +117,48 @@ class AFCodeBuffer {
     return false;
   }
 
+  AFCodeBuffer _buildExtraImportsFor(AFCommandContext context, AFSourceTemplateInsertions insertions, Object? value) {
+    AFCodeBuffer? buffer;
+    if(value == null) {
+      buffer = AFCodeBuffer.empty();
+    } else if(value is AFSourceTemplate) {
+      buffer = value.toBuffer(context);
+    } else if(value is AFCodeBuffer) {
+      buffer = value;
+    } else if(value is String) {
+      buffer = AFCodeBuffer.empty();
+      buffer.addLinesAtEnd(context, [value]);
+    }
+
+    if(buffer == null) {
+      throw AFException("Unexpected value type");
+    }
+    
+    for(final insert in insertions.insertions.values) {
+      if(insert is AFSourceTemplate) {
+        final extra = insert.extraImports;
+        if(extra.isNotEmpty) {
+          buffer.addLinesAtEnd(context, extra);
+        }
+      } else if(insert is AFCodeBuffer) {
+        final extra = insert.extraImports;
+        if(extra.isNotEmpty) {
+          buffer.addLinesAtEnd(context, extra);
+        }        
+      }
+    }
+
+    return buffer;
+  }
+
   void performInsertions(AFCommandContext context, AFSourceTemplateInsertions insertions) {
     // first, insert all the source templates.
     for(final key in insertions.keys) {
-      final value = insertions.valueFor(key);
+      var value = insertions.valueFor(key);
+      if(key == AFSourceTemplate.insertExtraImportsInsertion) {
+        value = _buildExtraImportsFor(context, insertions, value);
+      }
+
       final insertion = key.insertionPoint;
       if (value is AFSourceTemplate) {
         if(containsInsertionPoint(insertion)) {

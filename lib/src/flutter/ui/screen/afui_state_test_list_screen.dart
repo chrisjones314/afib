@@ -68,17 +68,8 @@ class AFUIStateTestListScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFU
   }
 
   Map<String, List<AFScreenPrototype>> get activeTestGroups {
-    final av = activeView;
-    if(av == AFUIWidgetID.viewParent) {
-      final result = _activeGroups;
-      result.remove(rootParentName);
-      return result;
-    } else {
-      final result = _activeGroups;
-      result.removeWhere((key, value) => key != rootParentName);
-      return result;
-    }
-
+    final result = _activeGroups;
+    return result;
   }
 
   Map<String, List<AFScreenPrototype>> get _activeGroups {
@@ -169,7 +160,7 @@ class AFUIStateTestListScreen extends AFUIConnectedScreen<AFUIStateTestListScree
     final t = spi.t;
     final context = spi.context;
 
-    final header = _buildHeader(spi);
+    //final header = _buildHeader(spi);
     final rows = t.column();
 
     final groups = spi.activeTestGroups;
@@ -196,8 +187,8 @@ class AFUIStateTestListScreen extends AFUIConnectedScreen<AFUIStateTestListScree
     return t.childTopBottomHostedControls(
       context.c, 
       main,
-      topControls: header,
-      topHeight: 60.0
+      topControls: null,
+      topHeight: 0.0
     );
   }
 

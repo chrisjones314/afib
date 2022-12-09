@@ -118,10 +118,6 @@ class AFGeneratedFile {
     return Pubspec.parse(buffer.toString());
   }
 
-  void executeStandardReplacements(AFCommandContext context) {
-    buffer.executeStandardReplacements(context);
-  }
-
   void addImports(AFCommandContext context, List<String> imports, {
     bool preventDuplicates = true
   }) {

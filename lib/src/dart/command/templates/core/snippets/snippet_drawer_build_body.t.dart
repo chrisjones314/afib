@@ -19,7 +19,7 @@ class SnippetDrawerBuildBodyT extends AFCoreSnippetSourceTemplate {
     );
 
     rows.add(ListTile(
-      key: null,
+      key: t.keyForWID(${insertAppNamespaceUpper}WidgetID.buttonClose),
       leading: Icon(Icons.close),
       title: Text('Close'),
       onTap: spi.onTapClose,

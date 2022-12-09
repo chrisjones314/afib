@@ -83,12 +83,17 @@ Future<void> _afCommandMain(AFDartParams paramsD, AFArgs argsIn, String cmdName,
     initExtend(definitions);
   }
 
+  final generator = AFCodeGenerator(definitions: definitions);
+  final packagePath = generator.packagePath(AFibD.config.packageName);
+  final coreInsertions = AFSourceTemplateInsertions.createCore(packagePath: packagePath);
+
   final context = AFCommandContext.withArguments(
     output: AFCommandOutput(),
     definitions: definitions,
-    generator: AFCodeGenerator(definitions: definitions),
+    generator: generator,
     arguments: argsIn,
-    coreInsertions: null,
+    packagePath: packagePath,
+    coreInsertions: coreInsertions,
   );
 
   context.startCommand();

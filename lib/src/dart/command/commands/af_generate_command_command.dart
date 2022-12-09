@@ -24,7 +24,8 @@ $descriptionHeader
   $description
 
 $optionsHeader
-  None
+  --$argExportTemplatesHelp
+  --$argOverrideTemplatesHelp
 ''';
   }
 

@@ -4,6 +4,7 @@ import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/core/af_screen_map.dart';
+import 'package:afib/src/flutter/ui/drawer/afui_prototype_drawer.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_bottomsheet_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_dialog_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_drawer_screen.dart';
@@ -39,4 +40,5 @@ void afInitPrototypeScreenMap(AFScreenMap screens) {
   screens.registerScreen(AFUIScreenID.screenPrototypeDialog, (_) => AFUIPrototypeDialogScreen(), AFUIPrototypeDialogScreen.config);
   screens.registerScreen(AFUIScreenID.screenPrototypeBottomSheet, (_) => AFUIPrototypeBottomSheetScreen(), AFUIPrototypeBottomSheetScreen.config);
   screens.registerScreen(AFUIScreenID.screenPrototypeDrawer, (_) => AFUIPrototypeDrawerScreen(), AFUIPrototypeDrawerScreen.config);
+  screens.registerDrawer(AFUIScreenID.drawerPrototype, (_) => AFUIPrototypeDrawer(), AFUIPrototypeDrawer.config);
 }

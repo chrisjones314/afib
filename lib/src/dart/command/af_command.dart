@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
@@ -8,18 +7,18 @@ import 'package:afib/src/dart/command/commands/af_generate_command_command.dart'
 import 'package:afib/src/dart/command/commands/af_generate_id_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/commands/af_integrate_command.dart';
 import 'package:afib/src/dart/command/commands/af_override_command.dart';
 import 'package:afib/src/dart/command/commands/af_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/command/templates/af_template_registry.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_test_id.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:args/args.dart' as args;
 import 'package:collection/collection.dart';
 import 'package:path/path.dart';
-
-import 'templates/core/snippets/snippet_declare_test_id.t.dart';
 
 class AFItemWithNamespace {
   /// The namespace used to differentiate third party commands.
@@ -62,6 +61,33 @@ class AFCommandArgumentsParsed {
     required this.unnamed,
     required this.named,
   });
+
+  factory AFCommandArgumentsParsed.empty() {
+    return AFCommandArgumentsParsed(unnamed: <String>[], named: <String, String>{});
+  }
+
+  String get accessUnnamedFirst => unnamed.first;
+  String get accessUnnamedSecond => unnamed[1];
+  String get accessUnnamedThird => unnamed[2];
+  String accessNamed(String name) {
+    final result = named[name];
+    if(result == null) {
+      throw AFException("Missing parameter --$name");
+    }
+    return result;
+  }
+
+  void setIfNull(String name, String value) {
+    if(accessNamed(name) == null) {
+      named[name] = value;
+    }
+  }
+
+  bool accessNamedFlag(String name) {
+    return accessNamed(name) == argTrue;
+  }
+
+
 }
 
 /// Parent for commands executed through the afib command line app.
@@ -193,65 +219,7 @@ abstract class AFCommand {
     }
   }
 
-  AFCommandArgumentsParsed parseArguments(List<String> source, {
-    required Map<String, String?> defaults
-  }) {
-    final unnamed = <String>[];
-    final named = Map<String, String?>.from(defaults);
 
-    for(var i = 0; i < source.length; i++) {
-      final arg = source[i];
-      if(arg.startsWith(optionPrefix)) {
-        var argValue = AFCommandArgumentsParsed.argTrue;
-        if((i+1 < source.length)) {
-          final next = source[i+1];
-          if(!next.startsWith(optionPrefix)) {
-            argValue = next;
-            i++;
-          }
-        }
-        final argEntry = arg.substring(2);
-        named[argEntry] = argValue;
-      } else {
-        unnamed.add(arg);
-      }
-    }
-
-    return AFCommandArgumentsParsed(
-      named: named,
-      unnamed: unnamed,
-    );
-
-    /*
-    final result = Map<String, dynamic>.from(defaults);
-    result[argPrivate] = false;
-    var startWith = 0;
-    while(startWith < source.length) {
-      final arg = source[startWith];
-      if(arg.startsWith(optionPrefix)) {
-        break;
-      }
-      startWith++;
-    }
-
-    var i = startWith;
-    while(i < source.length) {
-      final value = source[i];
-      final valueNext = source.length > (i+1) ? source[i+1] : null; 
-      i++;
-      if(value.startsWith(optionPrefix)) {
-        final key = value.substring(2);
-        if(valueNext == null || valueNext.startsWith(optionPrefix)) {
-          result[key] = true;
-        } else {
-          result[key] = valueNext;
-          i++;
-        }        
-      }
-    }
-    return result;
-    */
-  }
 
   void verifyDoesNotEndWith(String value, String excluded) {
     if(value.endsWith(excluded)) {
@@ -272,13 +240,6 @@ abstract class AFCommand {
     msg.write(")");
     throwUsageError(msg.toString());
   }
-
-  AFGeneratedFile createStandardFile(AFCommandContext ctx, List<String> path, AFUISourceTemplateID templateId) {
-    final appCommandFile = ctx.generator.createFile(ctx, path, templateId);
-    appCommandFile.executeStandardReplacements(ctx);
-    return appCommandFile;
-  }
-
 }
 
 abstract class AFCommandGroup extends AFCommand {
@@ -309,7 +270,8 @@ class AFCommandContext {
   final AFCommandOutput output;
   final AFCodeGenerator generator;
   final args.ArgResults arguments;
-  final AFSourceTemplateInsertions? coreInsertions;
+  String packagePath;
+  AFSourceTemplateInsertions coreInsertions;
 
   int commandArgCount = 1;
 
@@ -319,17 +281,71 @@ class AFCommandContext {
     required this.definitions,
     required this.generator,
     required this.arguments,
-    this.coreInsertions,
+    required this.packagePath,
+    required this.coreInsertions,
   });
 
   bool get isRootCommand => parents.isEmpty;
+
+  AFCommandArgumentsParsed parseArguments({
+    required AFCommand command,
+    required int unnamedCount,
+    required Map<String, String?> named
+  }) {
+    final unnamed = <String>[];
+    final allNamed = Map<String, String?>.from(named);
+    allNamed[AFCommand.argPrivate] = "false";
+    allNamed[AFGenerateSubcommand.argExportTemplatesFlag] = "";
+    allNamed[AFGenerateSubcommand.argOverrideTemplatesFlag] = "";
+
+    final foundNamed = Map<String, String?>.from(named);
+    foundNamed[AFCommand.argPrivate] = "false";
+    final source = rawArgs;
+
+    for(var i = 0; i < source.length; i++) {
+      final arg = source[i];
+      if(arg.startsWith(AFCommand.optionPrefix)) {
+        var argValue = AFCommandArgumentsParsed.argTrue;
+        if((i+1 < source.length)) {
+          final next = source[i+1];
+          if(!next.startsWith(AFCommand.optionPrefix)) {
+            argValue = next;
+            i++;
+          }
+        }
+        final argEntry = arg.substring(2);
+        foundNamed[argEntry] = argValue;
+      } else {
+        unnamed.add(arg);
+      }
+    }
+
+    final parsedArguments = AFCommandArgumentsParsed(
+      named: foundNamed,
+      unnamed: unnamed,
+    );
+
+    if(unnamed.length != unnamedCount) {
+      command.throwUsageError("Expected $unnamedCount unnamed arguments, but found ${unnamed.length}");
+    }
+
+    for(final foundKey in foundNamed.keys) {
+      if(!allNamed.containsKey(foundKey)) {
+        command.throwUsageError("Found unexpected option --$foundKey");
+      }
+    }
+
+    return parsedArguments;
+  }
+
 
   factory AFCommandContext.withArguments({
     required AFCommandAppExtensionContext definitions,
     required AFCommandOutput output,
     required AFCodeGenerator generator,
+    required String packagePath,
     required AFArgs arguments,
-    required AFSourceTemplateInsertions? coreInsertions,
+    required AFSourceTemplateInsertions coreInsertions,
     List<AFCommandContext>? parents
   }) {
     final parsed = args.ArgParser.allowAnything();
@@ -337,6 +353,7 @@ class AFCommandContext {
     return AFCommandContext(
       parents: parents ?? <AFCommandContext>[],
       output: output, 
+      packagePath: packagePath,
       definitions: definitions, 
       generator: generator, 
       arguments: argsParsed,
@@ -344,8 +361,13 @@ class AFCommandContext {
     );
   }
 
+  void setCoreInsertions(AFSourceTemplateInsertions insertions, { required String packagePath }) {
+    coreInsertions = insertions;
+    this.packagePath = packagePath;
+  }
+
   AFCommandContext reviseWithArguments({
-    required AFSourceTemplateInsertions? insertions,
+    required AFSourceTemplateInsertions insertions,
     required AFArgs arguments,
   }) {
     final revisedParents = parents.toList();
@@ -357,6 +379,7 @@ class AFCommandContext {
 
     return AFCommandContext.withArguments(
       parents: revisedParents,
+      packagePath: packagePath,
       output: this.output,
       definitions: this.definitions,
       generator: this.generator,
@@ -442,17 +465,17 @@ class AFCommandContext {
   ) {
     var fullInsert = this.coreInsertions;
     if(extend != null) {
-      fullInsert = fullInsert?.reviseOverwrite(extend.insertions);
+      fullInsert = fullInsert.reviseOverwrite(extend.insertions);
     }
     if(insertions != null) {
-      fullInsert = fullInsert?.reviseOverwrite(insertions);
+      fullInsert = fullInsert.reviseOverwrite(insertions);
     }
 
     if(source is! AFSourceTemplate) {
       throw AFException("Expected AFSnippetSourceTemplate");
     }
 
-    var effective = source.toBuffer(this, insertions: fullInsert?.insertions);
+    var effective = source.toBuffer(this, insertions: fullInsert.insertions);
 
    if(source is AFSnippetSourceTemplate) {
       // see if the source is overridden
@@ -470,7 +493,7 @@ class AFCommandContext {
             if(overrideTemplate == null) {
               throw AFException("The override ${joinAll(overridePath)} was not found on the file system, or in the AFTemplateRegistry, for ${joinAll(originalPath)}");
             }
-            effective = overrideTemplate.toBuffer(this, insertions: fullInsert?.insertions);
+            effective = overrideTemplate.toBuffer(this, insertions: fullInsert.insertions);
           }
         }
       }
@@ -487,11 +510,12 @@ class AFCommandContext {
     })  {
     var fullInsert = this.coreInsertions;
     if(insertions != null) {
-      fullInsert = fullInsert?.reviseAugment(insertions);
+      fullInsert = fullInsert.reviseAugment(insertions);
     }
     if(extend != null) {
-      fullInsert = fullInsert?.reviseAugment(extend.insertions);
+      fullInsert = fullInsert.reviseAugment(extend.insertions);
     }
+
     return generator.createFile(this, projectPath, template, insertions: fullInsert);
   }
 
@@ -500,7 +524,7 @@ class AFCommandContext {
       AFSourceTemplateInsertions? extend,
       Map<AFSourceTemplateInsertion, Object>? insertions 
     })  {
-    var fullInsert = this.coreInsertions ?? AFSourceTemplateInsertions(insertions: {});
+    var fullInsert = this.coreInsertions;
     if(insertions != null) {
       fullInsert = fullInsert.reviseAugment(insertions);
     }
@@ -834,6 +858,8 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
       generateCmd.addSubcommand(AFGenerateStateSubcommand());
       generateCmd.addSubcommand(AFGenerateQuerySubcommand());
       generateCmd.addSubcommand(AFGenerateCommandSubcommand());      
+      generateCmd.addSubcommand(AFGenerateTestSubcommand());
       generateCmd.addSubcommand(AFGenerateIDSubcommand());
+
     }
 }

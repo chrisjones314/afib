@@ -13,6 +13,7 @@ class SnippetBottomSheetBuildBodyT extends AFCoreSnippetSourceTemplate {
     ));
 
     rows.add(t.childButtonPrimaryText(
+      key: t.keyForWID(${insertAppNamespaceUpper}WidgetID.buttonClose),
       text: "Close", 
       onPressed: spi.onPressedClose
     ));

@@ -18,6 +18,7 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_add
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_build_with_spi_impl.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_smoke_test_impl.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_standard_route_param.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_state_test_impl.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/minimal.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/start-here.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/start_here/files/model_count_history_entry.t.dart';
@@ -36,6 +37,12 @@ import 'package:afib/src/dart/command/templates/project_styles/start_here/snippe
 import 'package:afib/src/dart/command/templates/project_styles/start_here/snippets/snippets_signed_in_drawer.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/start_here/snippets/snippets_startup_screen.t.dart';
 import 'package:path/path.dart';
+
+import 'project_styles/start_here/snippets/snippet_define_count_history_root_test_data.t.dart';
+import 'project_styles/start_here/snippets/snippet_define_referenced_users_root_test_data.t.dart';
+import 'project_styles/start_here/snippets/snippet_home_screen_smoke_test.t.dart';
+import 'project_styles/start_here/snippets/snippet_startup_state_test.t.dart';
+import 'project_styles/start_here/snippets/snippets_home_page_screen.t.dart';
 
 
 /// A registry of source code templates umodel in code generation.
@@ -74,6 +81,7 @@ class AFTemplateRegistry {
     registerSnippet(SnippetExtraImportsT.core());
     registerSnippet(SnippetDrawerBuildBodyT());
     registerSnippet(SnippetSmokeTestImplT());
+    registerSnippet(SnippetStateTestImplT());
 
     // start-here example
     registerFile(StartHereThemeT.example());
@@ -88,14 +96,18 @@ class AFTemplateRegistry {
     registerFile(QueryStartHereStartupT.example());
     registerFile(StartHereThemeT.example());
 
-    registerSnippet(SnippetStartupScreenExtraImports.example());
-    registerSnippet(SnippetDefineUserCredentialRootTestDataT.example());
-    registerSnippet(SnippetStartupScreenSPIT.example());
     registerSnippet(SnippetStartupScreenBuildWithSPIImplT());
     registerSnippet(SnippetStartupScreenBuildBodyT());
-    registerSnippet(SnippetStartupScreenAdditionalMethodsT());
-    registerSnippet(SnippetStartupScreenRouteParamT.example());
-    registerSnippet(SnippetStartupScreenNavigatePushT.example());
+
+    registerSnippet(SnippetDefineUserCredentialRootTestDataT.example());
+    registerSnippet(SnippetHomePageScreenExtraImports.example());
+    registerSnippet(SnippetHomePageScreenSPIT.example());
+    registerSnippet(SnippetHomePageScreenBuildWithSPIImplT());
+    registerSnippet(SnippetHomePageScreenBuildBodyT());
+    registerSnippet(SnippetHomePageScreenAdditionalMethodsT());
+    registerSnippet(SnippetHomePageScreenRouteParamT.example());
+    registerSnippet(SnippetHomePageScreenNavigatePushT.example());
+    registerSnippet(SnippetHomeScreenSmokeTest());
 
     registerSnippet(SnippetCounterManagementScreenExtraImportsT.example());
     registerSnippet(SnippetCounterManagementScreenSPIT.example());
@@ -111,7 +123,9 @@ class AFTemplateRegistry {
     registerSnippet(SnippetSignedInDrawerBuildWithSPIImplT());
     registerSnippet(SnippetSignedInDrawerBuildBodyT());
 
-    register(AFUISourceTemplateID.fileExtendBaseLibrary, InstallLibraryBaseT());    
+    registerSnippet(SnippetStartupStateTestT());
+    registerSnippet(SnippetDefineCountHistoryRootTestDataT.example());
+    registerSnippet(SnippetDefineReferencedUsersRootTestDataT.example());
   }  
 
   AFFileSourceTemplate? findEmbeddedTemplateFile(List<String> path) {

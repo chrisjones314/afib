@@ -24,6 +24,10 @@ class AFCodeRegExp {
   static final afTag = RegExp(r".*\[!af_.*\].*");
   static final startImportLine = RegExp(r"import\s+.*;");
 
+  static RegExp startDefineTestsFunction(String suffix) {
+    return RegExp("void\\s+define${suffix}s\\(AF${suffix}DefinitionContext\\s+context\\)\\s+{");
+  }
+
   static RegExp startUIID(String kind, String kindSuper) {
     return RegExp("class\\s+.*${kind}ID\\s+extends\\s+AF${kindSuper}ID\\s+{");
   }

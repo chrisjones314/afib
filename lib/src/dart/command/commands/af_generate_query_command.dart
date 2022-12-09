@@ -48,20 +48,22 @@ $optionsHeader
 
   @override
   void execute(AFCommandContext context) {
-    final unnamed = context.rawArgs;
-    if(unnamed.isEmpty ) {
-      throwUsageError("Expected at least one argument");
-    }
-
-    final queryName = unnamed[0];
     final generator = context.generator;
 
-    final args = parseArguments(unnamed, defaults: {
-      argResultModelType: "",
-      argRootStateType: generator.nameRootState,
-      argExportTemplates: "",
-      argOverrideTemplates: "",
-    });
+    final args = context.parseArguments(
+      command: this,
+      unnamedCount: 1,
+      named: {
+        argResultModelType: "",
+        argRootStateType: generator.nameRootState,
+        argExportTemplates: "",
+        argOverrideTemplates: "",
+        argExportTemplates: "false",
+        argOverrideTemplates: "",
+      }
+    );
+
+    final queryName = args.accessUnnamedFirst;
 
     verifyMixedCase(queryName, "query name");
     verifyEndsWith(queryName, suffixQuery);
@@ -74,11 +76,8 @@ $optionsHeader
       querySuffix = suffixIsolateQuery;
     }
 
-    final coreInsertions = AFSourceTemplateInsertions.createCore(context);
-
     createQuery(
       context: context,
-      insertions: coreInsertions,
       querySuffix: querySuffix,
       queryType: queryName,
       args: args.named,
@@ -92,7 +91,6 @@ $optionsHeader
 
   static void createQuery({
     required AFCommandContext context,
-    required AFSourceTemplateInsertions insertions,
     required String querySuffix,
     required String queryType,
     required Map<String, dynamic> args,
@@ -123,7 +121,7 @@ $optionsHeader
     }
     
     var queryInsertions = SimpleQueryT.augmentInsertions(
-      parent: insertions,
+      parent: context.coreInsertions,
       queryType: queryType,
       resultType: resultType,
       queryParentType: queryParentType,

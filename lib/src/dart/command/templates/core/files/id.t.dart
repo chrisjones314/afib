@@ -51,6 +51,7 @@ class ${insertAppNamespaceUpper}BottomSheetID extends AFScreenID {
 }
 
 class ${insertAppNamespaceUpper}WidgetID extends AFWidgetID {  
+  static const standardClose = ${insertAppNamespaceUpper}WidgetID("standardClose");
 
 
   const ${insertAppNamespaceUpper}WidgetID(String code) : super(code, ${insertAppNamespaceUpper}LibraryID.id);
@@ -65,6 +66,13 @@ class ${insertAppNamespaceUpper}LibraryProgrammingInterfaceID extends AFLibraryP
 class ${insertAppNamespaceUpper}TestDataID {
   static const ${insertAppNamespace}StateFullLogin = "${insertAppNamespace}StateFullLogin";
 }
+
+class ${insertAppNamespaceUpper}UnitTestID extends AFStateTestID {
+
+
+  const ${insertAppNamespaceUpper}UnitTestID(String code): super(code, ${insertAppNamespaceUpper}LibraryID.id); 
+}
+
 
 class ${insertAppNamespaceUpper}StateTestID extends AFStateTestID {
 

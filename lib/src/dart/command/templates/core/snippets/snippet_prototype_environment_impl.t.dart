@@ -10,7 +10,7 @@ class SnippetPrototypeEnvironmentImplT extends AFSourceTemplate {
 
 
   // use this, plus AFEnvironment.screenPrototype to startup directly into a screen prototype.
-  // config.setStartupScreenPrototype(DFPrototypeID.searchScreenInitial);
+  // config.setStartupScreenPrototype(${insertAppNamespaceUpper}PrototypeID.searchScreenInitial);
 
   // use this to configure your favorite tests on the prototype home screen
   config.setFavoriteTests([

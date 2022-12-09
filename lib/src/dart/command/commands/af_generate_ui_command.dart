@@ -5,8 +5,13 @@ import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/screen_test.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/theme.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_bottom_sheet_build_body.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_define_screen_test.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_create_screen_prototype.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_create_widget_prototype.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_spi.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_screen_map_entry.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_theme.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_dialog_build_body.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_drawer_build_body.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_drawer_extra_config_params.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_empty_screen_build_body_impl.t.dart';
@@ -14,24 +19,19 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_extra_impo
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_from_package.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_navigate_push.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_no_scaffold_build_with_spi.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_route_param.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_additional_methods.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_build_with_spi_impl.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_impls_super.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_smoke_test_impl.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_spi_on_pressed_closed.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_spi_on_tap_close.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_standard_route_param.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_widget_params_constructor.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_define_screen_test.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_create_widget_prototype.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_theme.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_dialog_build_body.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_screen_map_entry.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_spi_on_pressed_closed.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_state_test_screen_shortcut.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_state_test_widget_shortcut.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_widget_build_body.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_widget_impls_super.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_widget_params_constructor.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_widget_route_param.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 enum AFUIControlKind {
@@ -58,6 +58,7 @@ class AFUIControlSettings {
   final Object createPrototype;
   final Object screenAdditionalMethods;
   final Object extraConfigParams;
+  final Object smokeTestImpl;
 
   const AFUIControlSettings({
     required this.kind,
@@ -75,6 +76,8 @@ class AFUIControlSettings {
     required this.stateTestShortcut,
     required this.createPrototype,
     required this.extraConfigParams,
+    required this.smokeTestImpl,
+
   });
 
   bool matchesName(String uiName) {
@@ -116,13 +119,14 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       implsSPI: AFSourceTemplate.empty,
       implsSuper: SnippetWidgetImplsSuperT(),
       paramsConstructor: SnippetWidgetParamsConstructorT(),
-      routeParamImpls: SnippetRouteParamT(),
+      routeParamImpls: SnippetWidgetRouteParamT(),
       navigatePush: AFSourceTemplate.empty,
       spi: SnippetDeclareSPIT.core(),
       stateTestShortcut: SnippetStateTestWidgetShortcutT(),
       createPrototype: SnippetCreateWidgetPrototypeT(),
       screenAdditionalMethods: SnippetScreenAdditionalMethodsT(),
       extraConfigParams: AFSourceTemplate.empty,
+      smokeTestImpl: SnippetSmokeTestImplT()
     );
 
   static final controlKinds = [
@@ -142,6 +146,7 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       createPrototype: SnippetCreateScreenPrototypeT.noPushParams(),
       screenAdditionalMethods: SnippetScreenAdditionalMethodsT(),
       extraConfigParams: AFSourceTemplate.empty,
+      smokeTestImpl: SnippetSmokeTestImplT(),
     ),
     AFUIControlSettings(
       kind: AFUIControlKind.bottomSheet, 
@@ -159,6 +164,7 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       createPrototype: SnippetCreateScreenPrototypeT.noPushParams(),
       screenAdditionalMethods: SnippetScreenAdditionalMethodsT(),
       extraConfigParams: AFSourceTemplate.empty,
+      smokeTestImpl: SnippetSmokeTestImplRequireCloseT()
     ),
     AFUIControlSettings(
       kind: AFUIControlKind.drawer, 
@@ -176,6 +182,7 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       createPrototype: SnippetCreateScreenPrototypeT.noPushParams(),
       screenAdditionalMethods: SnippetScreenAdditionalMethodsT(),
       extraConfigParams: SnippetDrawerExtraConfigParamsT(),
+      smokeTestImpl: SnippetSmokeTestImplRequireCloseT()
     ),
     AFUIControlSettings(
       kind: AFUIControlKind.dialog, 
@@ -193,6 +200,7 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       createPrototype: SnippetCreateScreenPrototypeT.noPushParams(),
       screenAdditionalMethods: SnippetScreenAdditionalMethodsT(),
       extraConfigParams: AFSourceTemplate.empty,
+      smokeTestImpl: SnippetSmokeTestImplRequireCloseT()
     ),
     controlSettingsWidget,
   ];
@@ -220,6 +228,8 @@ $optionsHeader
   --$argStateView YourStateView - the state view to use, falls back to your default state view
   --$argTheme YourTheme - the theme to use, falls back to your default theme, NOT used when creating themes
 
+  --$argExportTemplatesHelp
+  --$argOverrideTemplatesHelp
   ${AFCommand.argPrivateOptionHelp}
   
 ''';
@@ -227,27 +237,28 @@ $optionsHeader
 
   @override
   void execute(AFCommandContext context) {
-    final unnamed = context.rawArgs;
-    if(unnamed.isEmpty) {
-      throwUsageError("You must specify at least the screen name.");
-    }
 
-    final uiName = unnamed[0];
     final generator = context.generator;
-    final args = parseArguments(unnamed, defaults: {
-      argStateView: generator.nameDefaultStateView,
-      argTheme: generator.nameDefaultTheme,
-      argParentTheme: generator.nameDefaultParentTheme,
-      argParentThemeID: generator.nameDefaultParentThemeID
-    });
+    final args = context.parseArguments(
+      command: this, 
+      unnamedCount: 1, 
+      named: {
+        argStateView: generator.nameDefaultStateView,
+        argTheme: generator.nameDefaultTheme,
+        argParentTheme: generator.nameDefaultParentTheme,
+        argParentThemeID: generator.nameDefaultParentThemeID        
+      }
+    );
 
+
+    final uiName = args.accessUnnamedFirst;
     verifyMixedCase(uiName, "ui name");
     verifyNotOption(uiName);
 
     if(uiName.endsWith("Theme")) {
-      createTheme(context, uiName, args.named);
+      createTheme(context, uiName, args);
     } else {
-      createScreen(context, uiName, args.named);
+      createScreen(context, uiName, args);
     }
 
     // replace any default 
@@ -255,13 +266,13 @@ $optionsHeader
 
   }
 
-  static AFGeneratedFile createTheme(AFCommandContext context, String uiName, Map<String, dynamic> args, {
+  static AFGeneratedFile createTheme(AFCommandContext context, String uiName, AFCommandArgumentsParsed args, {
     String? fullId,
     AFLibraryID? fromLib,
   }) {
     final generator = context.generator;
-    final parentTheme = args[argParentTheme];
-    final String parentThemeID = args[argParentThemeID];
+    final parentTheme = args.accessNamed(argParentTheme);
+    final parentThemeID = args.accessNamed(argParentThemeID);
     final isCustomParent = parentTheme != generator.nameDefaultParentTheme;
 
     final isOverride = fullId != null;
@@ -279,7 +290,7 @@ $optionsHeader
     // create the theme file itself.
     final fileTheme = context.createFile(pathTheme, ThemeT.core(), insertions: {
       AFSourceTemplate.insertMainTypeInsertion: uiName,
-      AFSourceTemplate.insertMainParentTypeInsertion: parentTheme ?? "AFFunctionalTheme"
+      AFSourceTemplate.insertMainParentTypeInsertion: parentTheme
     });
     final imports = <String>[];
     if(isCustomParent && fromLib != null) {
@@ -323,7 +334,7 @@ $optionsHeader
     return fileTheme;
   }
 
-  static AFGeneratedFile createScreen(AFCommandContext context, String uiName, Map<String, dynamic> args, {
+  static AFGeneratedFile createScreen(AFCommandContext context, String uiName, AFCommandArgumentsParsed args, {
     AFSourceTemplate? buildWithSPI,
     AFSourceTemplate? buildBody,
     AFSourceTemplate? spiImpls,
@@ -360,13 +371,13 @@ $optionsHeader
     // create a screen name
     final projectPath = generator.pathUI(uiName, controlSettings);
     final imports = <String>[];
-    final stateView = args[argStateView];
-    final theme = args[argTheme];
+    final stateView = args.accessNamed(argStateView);
+    final theme = args.accessNamed(argTheme);
     final stateViewPrefix = generator.removeSuffix(stateView, "StateView");
 
     final screenId = generator.declareUIID(context, uiName, controlSettings);
 
-    final screenInsertions = context.coreInsertions?.reviseAugment({
+    final screenInsertions = context.coreInsertions.reviseAugment({
       ScreenT.insertScreenID: screenId,
       ScreenT.insertScreenIDType: screenIdType,
       ScreenT.insertControlTypeSuffix: controlSettings.suffix,
@@ -463,7 +474,7 @@ $optionsHeader
 
     final generatePrototypes = AFibD.config.generateUIPrototypes;
     if(generatePrototypes) {
-      final smokeTestImpl = context.createSnippet(SnippetSmokeTestImplT());
+      final smokeTestImpl = context.createSnippet(controlSettings.smokeTestImpl);
 
       // create a new screen test files
       final protoName = "${uiName}InitialPrototype";
@@ -471,6 +482,7 @@ $optionsHeader
       final pathScreenTest = generator.pathScreenTest(uiName, controlSettings);
       final createProto = createPrototype ?? controlSettings.createPrototype;
       final screenTestFile = context.createFile(pathScreenTest, ScreenTestT.core(), insertions: {
+          AFSourceTemplate.insertExtraImportsInsertion: "",
           AFSourceTemplate.insertMainTypeInsertion: uiName,
           ScreenT.insertScreenID: protoId,
           ScreenT.insertControlTypeSuffix: controlSettings.suffix,

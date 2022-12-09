@@ -81,13 +81,13 @@ class AFSourceTemplateInsertions {
     return insertions[key];
   }
 
-  factory AFSourceTemplateInsertions.createCore(AFCommandContext context) {
+  factory AFSourceTemplateInsertions.createCore({ required String packagePath }) {
     final appNamespace = AFibD.config.appNamespace;
     final appNamespaceUpper = appNamespace.toUpperCase();
     final insertions = <AFSourceTemplateInsertion, Object>{
       AFSourceTemplate.insertAppNamespaceInsertion: appNamespace,
       AFSourceTemplate.insertPackageNameInsertion: AFibD.config.packageName,
-      AFSourceTemplate.insertPackagePathInsertion: context.generator.packagePath(AFibD.config.packageName),
+      AFSourceTemplate.insertPackagePathInsertion: packagePath,
       AFSourceTemplate.insertStateTypeInsertion: "${appNamespaceUpper}State",
       AFSourceTemplate.insertFileHeaderInsertion: AFibD.config.fileHeader,
     };
@@ -161,6 +161,10 @@ abstract class AFSourceTemplate {
     this.role = AFSourceTemplateRole.code,
     this.embeddedInsertions,
   });
+
+  List<String> get extraImports {
+    return <String>[];
+  }
 
   AFSourceTemplateInsertion get insertAppNamespace { return AFSourceTemplate.insertAppNamespaceInsertion; }
   AFSourceTemplateInsertion get insertAppNamespaceUpper { return AFSourceTemplate.insertAppNamespaceInsertion.upper; }

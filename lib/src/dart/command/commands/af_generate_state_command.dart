@@ -7,16 +7,15 @@ import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/core/files/lpi.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/state_view.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_define_lpi.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_define_test_data.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_find_test_data.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_lpi_id.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_model_accessor.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_test_data.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_from_package.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_initial_state_model_function.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_define_test_data.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_define_lpi.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_invoke_initial_state.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_lpi_id.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_model_accessor.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_find_test_data.t.dart';
-import 'package:afib/src/dart/utils/afib_d.dart';
 
 class AFGenerateStateSubcommand extends AFGenerateSubcommand {
   static const nameCountInStateRoot = "CountInStateRoot";
@@ -43,6 +42,8 @@ $descriptionHeader
 
 $optionsHeader
   --${AFGenerateUISubcommand.argTheme} The type of the theme to use, defaults to your default theme
+  --$argExportTemplatesHelp
+  --$argOverrideTemplatesHelp
   ${AFCommand.argPrivateOptionHelp}    
 ''';
   }
@@ -51,27 +52,26 @@ $optionsHeader
 
   @override
   void execute(AFCommandContext ctx) {
-    final unnamed = ctx.rawArgs;
-    if(unnamed.isEmpty) {
-      throwUsageError("Expected at least one argument");
-    }
 
-    final modelName = unnamed[0];
+    final args = ctx.parseArguments(
+      command: this, 
+      unnamedCount: 1, 
+      named: {
+        AFGenerateUISubcommand.argTheme: ctx.generator.nameDefaultTheme
+      }
+    );
+
+    final modelName = args.accessUnnamedFirst;
 
     verifyMixedCase(modelName, "model name");
-
-    final args = parseArguments(unnamed, defaults: {
-      AFGenerateUISubcommand.argTheme: ctx.generator.nameDefaultTheme
-    });
-
-    generateStateStatic(ctx, modelName, args.named);
+    generateStateStatic(ctx, modelName, args);
 
     // replace any default 
     ctx.generator.finalizeAndWriteFiles(ctx);
 
   }
 
-  static void generateStateStatic(AFCommandContext ctx, String identifier, Map<String, dynamic> args) {
+  static void generateStateStatic(AFCommandContext ctx, String identifier, AFCommandArgumentsParsed args) {
     if(identifier.endsWith(AFCodeGenerator.lpiSuffix)) {
       generateLPIStatic(ctx, identifier, args);
     } else if(identifier.endsWith(AFCodeGenerator.stateViewSuffix)) {
@@ -81,7 +81,7 @@ $optionsHeader
     }
   }
 
-  static void generateLPIStatic(AFCommandContext context, String identifier, Map<String, dynamic> args, {
+  static void generateLPIStatic(AFCommandContext context, String identifier, AFCommandArgumentsParsed args, {
     String? fullId, 
     AFLibraryID? fromLib,
     String parentType = "AFLibraryProgrammingInterface"
@@ -145,7 +145,7 @@ $optionsHeader
   }
 
   
-  static void _generateModelStatic(AFCommandContext context, String identifier, Map<String, dynamic> args) {
+  static void _generateModelStatic(AFCommandContext context, String identifier, AFCommandArgumentsParsed args) {
     
     // generate the model file itself.
     final generator = context.generator;
@@ -156,7 +156,7 @@ $optionsHeader
       identifierNoRoot = identifierNoRoot.substring(0, identifierNoRoot.length-4);
     }
 
-    final modelInsertions = context.coreInsertions?.reviseAugment({
+    final modelInsertions = context.coreInsertions.reviseAugment({
       AFSourceTemplate.insertMainTypeInsertion: identifier,
       AFSourceTemplate.insertMainTypeNoRootInsertion: identifierNoRoot,
     });
@@ -194,6 +194,7 @@ $optionsHeader
         
         // then, declare the function that we just called.
         testDataFile.addLinesAtEnd(context, declareDefineTestData.lines);
+        testDataFile.addImports(context, declareDefineTestData.extraImports);
 
         // need to import the model itself.
         generator.addImport(context, 
@@ -202,6 +203,7 @@ $optionsHeader
         );
         
         context.createDeclareId("${generator.appNamespaceUpper}TestDataID.stateFullLogin$identifier");
+
 
         // then, add in the new test data to the full signed in state.
         final declareInitTestData = context.createSnippet(SnippetCallFindTestDataT(), extend: modelInsertions);
@@ -229,7 +231,7 @@ $optionsHeader
 
   }
 
-  static void _generateStateViewStatic(AFCommandContext context, String identifier, Map<String, dynamic> args) {
+  static void _generateStateViewStatic(AFCommandContext context, String identifier, AFCommandArgumentsParsed args) {
     final generator = context.generator;
     if(!identifier.startsWith(generator.appNamespaceUpper)) {
       throw AFCommandError(error: "$identifier must begin with ${generator.appNamespaceUpper}");
@@ -240,7 +242,7 @@ $optionsHeader
     if(stateViewPath == null) {
       throw AFCommandError(error: "Invalid identifier $identifier");
     }
-    final theme = args[AFGenerateUISubcommand.argTheme];
+    final theme = args.accessNamed(AFGenerateUISubcommand.argTheme);
     final stateViewFile = context.createFile(stateViewPath, StateViewT(), insertions: {
       AFSourceTemplate.insertMainTypeInsertion: identifier,
       StateViewT.insertThemeType: theme,

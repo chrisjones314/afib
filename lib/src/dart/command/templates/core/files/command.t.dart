@@ -24,7 +24,8 @@ class $insertCommandName extends AFCommand {
   @override 
   String get usage {
     return \'\'\'
-  \$nameOfExecutable \$name
+  \$nameOfExecutable \$name YourValue [options]
+
 \$usageHeader
 
 \$descriptionHeader
@@ -37,27 +38,30 @@ class $insertCommandName extends AFCommand {
 
   @override
   void execute(AFCommandContext context) {
-    final rawArgs = context.rawArgs;
 
     // parse arguments with default values as follows
-    final args = parseArguments(rawArgs, defaults: {
+    final args = context.parseArguments(
+      command: this,
+      unnamedCount: 1,
+      named: {
         argExample: "yourdefaultvalue"
-    });
+      }
+    );
 
     // see superclass verify... methods for useful verifications,
     // see throwUsageError for reporting errors.
 
     final output = context.output;
-    final unnamed = args.unnamed;
-    final example = args.named[argExample];
-
-    output.writeTwoColumns(
-      col1: "named ",
-      col2: unnamed.join(', ')
-    );
+    final unnamed = args.accessUnnamedFirst;
+    final example = args.accessNamed(argExample);
 
     output.writeTwoColumns(
       col1: "unnamed ",
+      col2: unnamed,
+    );
+
+    output.writeTwoColumns(
+      col1: "named ",
       col2: "\$argExample -> \$example"
     );
   }

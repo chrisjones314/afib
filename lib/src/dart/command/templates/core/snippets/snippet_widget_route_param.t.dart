@@ -1,31 +1,36 @@
 import 'package:afib/src/dart/command/af_source_template.dart';
+import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
 
-class SnippetRouteParamT extends AFCoreSnippetSourceTemplate {
-  final String template = '''
-  [!af_screen_name]RouteParam({
+class SnippetWidgetRouteParamT extends AFCoreSnippetSourceTemplate {
+  
+  String get template => '''
+class ${insertMainType}RouteParam extends AF${ScreenT.insertControlTypeSuffix}RouteParam {
+  
+  ${insertMainType}RouteParam({
     required AFScreenID screenId,
     required AFWidgetID wid,
     required AFRouteLocation routeLocation,
   }): super(screenId: screenId, wid: wid, routeLocation: routeLocation);
 
-  factory [!af_screen_name]RouteParam.create({
+  factory${insertMainType}RouteParam.create({
     required AFScreenID screenId,
     required AFWidgetID wid,
     required AFRouteLocation routeLocation,
   }) {
-    return [!af_screen_name]RouteParam(
+    return${insertMainType}RouteParam(
       screenId: screenId,
       wid: wid,
       routeLocation: routeLocation,
     );
   }
 
-  [!af_screen_name]RouteParam copyWith() {
-    return [!af_screen_name]RouteParam(
+  ${insertMainType}RouteParam copyWith() {
+    return${insertMainType}RouteParam(
       screenId: screenId,
       wid: wid,
       routeLocation: routeLocation,
     );
   }
+}
 ''';  
 }

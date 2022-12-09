@@ -32,9 +32,9 @@ import 'package:afib/src/dart/command/templates/core/files/state_model_access.t.
 import 'package:afib/src/dart/command/templates/core/files/state_test_shortcuts.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/test_data.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_install_tests.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_empty_statement.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_fundamental_theme_init.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_fundamental_theme_init_ui_library.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_empty_statement.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_include_install_tests.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_prototype_environment_impl.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
@@ -58,7 +58,8 @@ class AFCreateCommandContext {
     required String kind,
     required String projectStyle,
   }) {
-     final coreInsertions = AFSourceTemplateInsertions.createCore(command);
+      final packagePath = command.generator.packagePath(AFibD.config.packageName);
+     final coreInsertions = AFSourceTemplateInsertions.createCore(packagePath: packagePath);
 
       final insertions = coreInsertions.reviseAugment({
         AFSourceTemplate.insertLibKindInsertion: kind == AFCreateAppCommand.kindApp ? "App" : "Library"
@@ -66,6 +67,8 @@ class AFCreateCommandContext {
 
       final stylePath = AFProjectPaths.pathProjectStyles.toList();
       stylePath.add(projectStyle);
+
+      command.setCoreInsertions(coreInsertions, packagePath: packagePath);
 
      final fileProjectStyle = command.readProjectStyle(stylePath, insertions: insertions.insertions);
      return AFCreateCommandContext(command: command, kind: kind, insertions: insertions, projectStyle: fileProjectStyle.buffer);
@@ -184,25 +187,20 @@ $optionsHeader
   }
 
   void execute(AFCommandContext ctx) {
-    // first, determine the base path.
-    final args = ctx.arguments.rest;
-    if(args.length < 4) {
-      throwUsageError("Expected at leat four arguments");
-    }
-
-    final kind = args[1];
+    final args = ctx.parseArguments(
+      command: this,
+      unnamedCount: 3,
+      named: {
+      argProjectStyle: "",
+    });
+    final kind = args.accessUnnamedFirst;
     verifyOneOf(kind, [kindApp, kindUILibrary, kindStateLibrary]);
 
     AFibD.config.setIsLibraryCommand(isLib: kind != kindApp);
-    final packageName = args[2];
-    final packageCode = args[3];
+    final packageName = args.accessUnnamedSecond;
+    final packageCode = args.accessUnnamedThird;
 
-    final unnamed = ctx.rawArgs;
-    final parsed = parseArguments(unnamed, defaults: {
-      argProjectStyle: "",
-    });
-
-    final projectStyle = parsed.named[argProjectStyle];
+    final projectStyle = args.accessNamed(argProjectStyle);
 
     if(projectStyle == null || projectStyle.isEmpty) {
       throwUsageError("You must specify --$argProjectStyle");
@@ -249,7 +247,7 @@ $optionsHeader
     }
 
     if(!context.isApp) {
-      _createInstallFiles(context, kind);
+      _createInstallFiles(context, kind, args);
     }
 
     _executeProjectStyle(context);
@@ -265,29 +263,28 @@ $optionsHeader
     }
   }
 
-  void _createInstallFiles(AFCreateCommandContext context, String kind) {
+  void _createInstallFiles(AFCreateCommandContext context, String kind, AFCommandArgumentsParsed args) {
     final generator = context.generator;
-    final args = {
-      AFCommand.argPrivate: false
-    };
 
     // create the file and add it to the command exports.
     final fileInstallCommand = context.createFile(generator.pathInstallCommand, LibraryInstallCommandT());    
     generator.addExportsForFiles(context.command, args, [fileInstallCommand], toPath: generator.pathCommandExportsFile);
 
     // create the file and add it to the ui exports
-    final fileInstallUI = context.createFile(generator.pathInstall, LibraryInstallCoreT());
     final includeUI = kind != kindStateLibrary;
     final templateInclude = includeUI ? SnippetImportInstallTestsT() : AFSourceTemplate.empty;
     final templateCall = includeUI ? SnippetCallInstallTestT() : AFSourceTemplate.empty;
     final cmdContext = context.command;
     final includeBuffer = templateInclude.toBuffer(cmdContext);
     final appSuffix = kind == kindApp ? "app" : "library";
-    final importCore = "import 'package:[!af_package_path]/initialization/install/install_core_$appSuffix.dart';";
+    final importCore = "import 'package:${AFSourceTemplate.insertPackagePathInsertion}/initialization/install/install_core_$appSuffix.dart';";
+
     includeBuffer.addLinesAtEnd(cmdContext, [importCore]);
 
-    fileInstallUI.replaceTextLines(cmdContext, AFUISourceTemplateID.stmtIncludeInstallTest, includeBuffer.lines);
-    fileInstallUI.replaceTemplate(cmdContext, AFUISourceTemplateID.stmtCallInstallTest, templateCall);
+    final fileInstallUI = context.createFile(generator.pathInstall, LibraryInstallCoreT(), insertions: {
+      LibraryInstallCoreT.insertIncludeInstallTests: includeBuffer.lines,
+      LibraryInstallCoreT.insertCallInstallTests: templateCall,
+    });
     
     fileInstallUI.addImports(cmdContext, [importCore]);
     

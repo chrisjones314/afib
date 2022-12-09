@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_error.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
@@ -11,9 +10,10 @@ import 'package:afib/src/dart/command/code_generation/af_generated_file.dart';
 import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
+import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_export_statement.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_id_statement.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_from_package.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_export_statement.t.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
@@ -24,6 +24,8 @@ class AFCodeGenerator {
   static const rootSuffix = "Root";
   static const stateViewSuffix = "StateView";
   static const lpiSuffix = "LPI";
+  static const unitTestSuffix = "UnitTest";
+  static const stateTestSuffix = "StateTest";
 
   static const afibConfigFile = "afib.g.dart";
   static const libFolder = "lib";
@@ -123,6 +125,19 @@ class AFCodeGenerator {
 
   List<String> get pathDefineCore { 
     return _createPath(initializationPath, "${appNamespace}_define_core.dart");
+  }
+
+  List<String> pathTests(String suffix) { 
+    final suffixSnake = convertMixedToSnake("${suffix}s");
+    return _createPath(testPath, "$suffixSnake.dart");
+  }
+
+  List<String> pathTest(String testName, String suffix) { 
+    final filename = "${convertMixedToSnake(testName)}.dart";
+    final suffixSnake = convertMixedToSnake("${suffix}s");
+    final fullPath = testPath.toList();
+    fullPath.add(suffixSnake);
+    return _createPath(fullPath, filename);
   }
 
   List<String> get pathStateTestShortcutsFile {
@@ -498,10 +513,10 @@ class AFCodeGenerator {
     throw AFCommandError(error: "Expected $parentType to start with a valid library prefix: ${libs.map((l) => l.codeId.toUpperCase())}");
   }
 
-  void addExportsForFiles(AFCommandContext context, Map<String, dynamic> args, List<AFGeneratedFile> files, {
+  void addExportsForFiles(AFCommandContext context, AFCommandArgumentsParsed args, List<AFGeneratedFile> files, {
     List<String>? toPath,
   }) {
-    final isPrivate = args[AFCommand.argPrivate];
+    final isPrivate = args.accessNamedFlag(AFCommand.argPrivate);
     if(isPrivate != null && isPrivate) {
       return;
     }
@@ -630,7 +645,11 @@ class AFCodeGenerator {
 
   void _validateNoAFTags(AFCommandContext context, Iterable<AFGeneratedFile> files) {
     for(final file in files) {
-      file.executeStandardReplacements(context);
+      final ci = context.coreInsertions;
+      if(!context.isExportTemplates) {
+        file.performInsertions(context, ci);
+      }
+
       final afTag = file.findFirstAFTag();
       if(afTag != null && !context.isExportTemplates) {
         throw AFException("Internal error: $afTag [!af... tag still present in ${file.projectPath.join('/')}");
@@ -775,18 +794,17 @@ class AFCodeGenerator {
     return "${value[0].toLowerCase()}${value.substring(1)}";
   }
 
-  String declareUIIDDirect(AFCommandContext ctx, String idName, AFUIControlSettings control) {
+  String declareUIIDDirect(AFCommandContext context, String idName, AFUIControlSettings control) {
     final idPath = pathIdFile;
-    final idFile = loadFile(ctx, idPath);
-    final declareId = SnippetIDStatementT().toBuffer(ctx);
+    final idFile = loadFile(context, idPath);
+    final declareId = context.createSnippet(SnippetIDStatementT(), insertions: {
+      ScreenT.insertScreenID: idName,
+      ScreenT.insertControlTypeSuffix: control.suffix,
+    });
 
-    declareId.replaceText(ctx, AFUISourceTemplateID.textScreenID, idName);
-    declareId.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, control.suffix);
-
-    declareId.executeStandardReplacements(ctx);
     final suffixSuper = control.kind == AFUIControlKind.widget ? "Widget" : "Screen";
     final after = AFCodeRegExp.startUIID(control.suffix, suffixSuper);
-    idFile.addLinesAfter(ctx, after, declareId.lines);
+    idFile.addLinesAfter(context, after, declareId.lines);
     return idName;
   }
 
@@ -807,22 +825,22 @@ class AFCodeGenerator {
     );    
   }
 
-  String _declareID(AFCommandContext ctx, {
+  String _declareID(AFCommandContext context, {
     required String name,
     required String suffix,
     required RegExp after,
   }) {
     final idPath = pathIdFile;
-    final idFile = loadFile(ctx, idPath);
+    final idFile = loadFile(context, idPath);
     final root = removeSuffix(name, suffix);
     final screenId = toCamelCase(root);
     
-    final declareId = SnippetIDStatementT().toBuffer(ctx);
-    declareId.replaceText(ctx, AFUISourceTemplateID.textScreenName, name);
-    declareId.replaceText(ctx, AFUISourceTemplateID.textScreenID, screenId);
-    declareId.replaceText(ctx, AFUISourceTemplateID.textControlTypeSuffix, suffix);
-    declareId.executeStandardReplacements(ctx);
-    idFile.addLinesAfter(ctx, after, declareId.lines);
+    final declareId = context.createSnippet(SnippetIDStatementT(), insertions: {
+      ScreenT.insertScreenID: screenId,
+      ScreenT.insertControlTypeSuffix: suffix,
+      AFSourceTemplate.insertMainTypeInsertion: name,      
+    });
+    idFile.addLinesAfter(context, after, declareId.lines);
     return screenId;    
   }
 

@@ -22,6 +22,7 @@ class ScreenTestT extends AFCoreFileSourceTemplate {
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackageName/${insertAppNamespace}_id.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
+$insertExtraImports
 
 void define${insertMainType}Prototypes(AFUIPrototypeDefinitionContext context) {
   _define${insertMainType}PrototypeInitial(context);

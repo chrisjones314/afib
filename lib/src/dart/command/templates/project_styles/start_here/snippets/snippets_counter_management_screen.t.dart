@@ -119,6 +119,7 @@ Widget _buildIncrementStateCard(CounterManagementScreenSPI spi) {
 
   rows.add(t.childSingleRowButton(
     button: t.childButtonPrimaryText(
+      wid: ${insertAppNamespaceUpper}WidgetID.buttonSaveTransientCount,
       text: "Save Transient Count in History", 
       onPressed: spi.onPressedPersistTransientCount
     )

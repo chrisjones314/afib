@@ -42,17 +42,18 @@ $optionsHeader
 
   void execute(AFCommandContext ctx) {
     // first, determine the base path.
-    final unnamed = ctx.rawArgs;
-    if(unnamed.length < 3) {
-      throwUsageError("Expected at least three arguments");
-    }
+    final args = ctx.parseArguments(
+      command: this, 
+      unnamedCount: 1, 
+      named: {
+        argParentType: null,
+        AFGenerateUISubcommand.argParentTheme: null,
+        AFGenerateUISubcommand.argParentThemeID: null,
+      }
+    );
 
-    final uiName = unnamed[0];
-    final args = parseArguments(unnamed, defaults: {
-      argParentType: null,
-    });
-
-    final parentType = args.named[argParentType];
+    final uiName = args.accessUnnamedFirst;
+    final parentType = args.accessNamed(argParentType);
     if(parentType == null) {
       throwUsageError("You must specify --$argParentType");
     }
@@ -62,13 +63,11 @@ $optionsHeader
       
       final fullId = generator.deriveFullLibraryIDFromType(parentType, themeSuffix);
 
-      final args = parseArguments(unnamed, defaults: {
-        AFGenerateUISubcommand.argParentTheme: parentType,
-        AFGenerateUISubcommand.argParentThemeID: fullId
-      });
-
+      args.setIfNull(AFGenerateUISubcommand.argParentTheme, parentType);
+      args.setIfNull(AFGenerateUISubcommand.argParentThemeID, fullId);
+        
       final fromLib = generator.findLibraryForTypeWithPrefix(parentType);
-      AFGenerateUISubcommand.createTheme(ctx, uiName, args.named, 
+      AFGenerateUISubcommand.createTheme(ctx, uiName, args, 
         fullId: fullId,
         fromLib: fromLib,
       );
@@ -95,7 +94,7 @@ $optionsHeader
 
     final lib = generator.findLibraryForTypeWithPrefix(parentType);
     final fullId = generator.deriveFullLibraryIDFromType(parentType, lpiSuffix, typeKind: "LibraryProgrammingInterface");
-    AFGenerateStateSubcommand.generateLPIStatic(context, identifier, <String, dynamic>{}, 
+    AFGenerateStateSubcommand.generateLPIStatic(context, identifier, AFCommandArgumentsParsed.empty(), 
       fullId: fullId,
       fromLib: lib,
       parentType: parentType,

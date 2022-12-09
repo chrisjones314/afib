@@ -15,6 +15,10 @@ final userCred = UserCredentialRoot(
   userId: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris,
   token: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris,
 );
+
+// feel its a little less confusing if the example state test refers to a more natural ID.
+context.define(HCTestDataID.userCredentialChris, userCred);
+
 ''',
         SnippetDefineTestDataT.insertModelCall: "userCred"
       }

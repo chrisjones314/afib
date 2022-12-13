@@ -2561,7 +2561,7 @@ class AFUnitTestDefinitionContext extends AFBaseTestDefinitionContext {
     required AFDefineTestDataContext testData
   }): super(testData);
 
-  void addTest(AFBaseTestID id, AFUnitTestBodyExecuteDelegate fnTest) {
+  void defineTest(AFBaseTestID id, AFUnitTestBodyExecuteDelegate fnTest) {
     tests.addTest(id, fnTest);
   }
 }

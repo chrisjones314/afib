@@ -4,7 +4,7 @@ import 'package:afib/src/dart/command/commands/af_create_command.dart';
 class StartHereT extends AFProjectStyleSourceTemplate {
 
   StartHereT(): super(
-    templateFileId: AFCreateAppCommand.projectStyleStartHere,
+    templateFileId: AFCreateAppCommand.projectStyleEvalDemo,
   );
 
   String get template => '''
@@ -60,7 +60,9 @@ generate ui SignedInDrawer --override-templates +
   +core/snippets/drawer_build_body=project_styles/start_here/snippets/signed_in_drawer_build_body
 generate test StartupUnitTest
 generate test StartupStateTest --override-templates +
-  +core/snippets/state_test_impl=/project_styles/start_here/snippets/startup_state_test
+  +core/snippets/state_test_impl=project_styles/start_here/snippets/startup_state_test
+generate test InitialWireframe --initial-screen HomePageScreen --override-templates +
+  +core/snippets/wireframe_body=project_styles/start_here/snippets/initial_wireframe_body
 ''';
 
 }

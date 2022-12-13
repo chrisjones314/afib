@@ -31,7 +31,7 @@ class AFStartSpecificPrototypeQuery extends AFDeferredQuery {
     final test = AFSingleScreenPrototype(
       id: wireframe.id,
       navigate: wireframe.navigate,
-      stateView: wireframe.models,
+      stateView: wireframe.stateView,
       body: body,
       timeHandling: AFTestTimeHandling.running
     );

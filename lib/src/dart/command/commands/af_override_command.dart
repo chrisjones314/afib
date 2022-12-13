@@ -34,13 +34,13 @@ $optionsHeader
 
   AFOverrideCommand();
 
-  void run(AFCommandContext ctx) {
+  Future<void> run(AFCommandContext ctx) async {
     // override this to avoid 'error not in root of project'
-    execute(ctx);
+    await execute(ctx);
   }
 
-
-  void execute(AFCommandContext ctx) {
+  @override
+  Future<void> execute(AFCommandContext ctx) async {
     // first, determine the base path.
     final args = ctx.parseArguments(
       command: this, 

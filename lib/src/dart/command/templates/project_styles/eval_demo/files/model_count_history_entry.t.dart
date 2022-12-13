@@ -1,5 +1,5 @@
 import 'package:afib/src/dart/command/af_source_template.dart';
-import 'package:afib/src/dart/command/templates/project_styles/start_here/files/model_example_start_here.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/model_example_start_here.t.dart';
 
 class ModelCountHistoryEntryT extends ModelExampleStartHereT {
   
@@ -34,10 +34,11 @@ count: count ?? this.count,
       AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 factory CountHistoryEntry.createNew({
   required int count,
+  String idPrefix = "count_entry",
 }) {
   return CountHistoryEntry(
     // this just creates a flag value that we can tell is not a valid persistent id.
-    id: AFDocumentIDGenerator.createNewId("count_entry"),
+    id: AFDocumentIDGenerator.createNewId(idPrefix),
     count: count
   );
 }

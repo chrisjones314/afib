@@ -1,6 +1,7 @@
 import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
+import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
@@ -179,14 +180,20 @@ class AFTestState {
 
     final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
     final testId = AFUIScreenTestID.wireframe;
-    final models = AFibF.g.testData.resolveStateViewModels(wireframe.models);
+    final models = AFibF.g.testData.resolveStateViewModels(wireframe.stateView);
+    final now = AFTimeState.createNow();
+    final timeStateKey = AFModelWithCustomID.stateKeyFor(now);
+    if(!models.containsKey(timeStateKey)) {
+      models[timeStateKey] = now;
+    }
+
     final currentState = revisedStates[testId] ?? AFSingleScreenTestState(
       testId: AFUIScreenTestID.wireframe,
       models: models,
       pass: 0, 
       errors: <String>[],
       navigate: AFNavigatePushAction(launchParam: AFRouteParamUnused.unused),
-      timeHandling: AFTestTimeHandling.running,
+      timeHandling: wireframe.timeHandling,
     );
     revisedStates[testId] = currentState.reviseModels(models);
     return copyWith(

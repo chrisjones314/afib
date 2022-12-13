@@ -191,7 +191,7 @@ void _navigateWireframe(Store<AFState> store, AFWireframeEventAction action, Nex
   final wireframe = testStateSource.activeWireframe;
   if(wireframe != null) {
     final testState = testStateSource.findState(AFUIScreenTestID.wireframe);
-    wireframe.onEvent(action.spi, action.screen, action.widget, action.eventParam, testState?.models ?? <String, Object>{});
+    wireframe.onEvent(action.screen, action.widget, action.eventParam, action.stateView, action.onSuccess);
   }
   next(action);
 }

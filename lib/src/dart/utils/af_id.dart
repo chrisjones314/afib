@@ -253,9 +253,10 @@ class AFScreenTestID extends AFBaseTestID {
   const AFScreenTestID(String code, AFLibraryID library) : super(screenTestPrefix, code, library);
 }
 
+
 class AFPrototypeID extends AFBaseTestID {
   static const prototypePrefix = "pr";
-  const AFPrototypeID(String code, AFLibraryID library, { List<Object>? withItems }) : super(prototypePrefix, code, library, withItems: withItems);
+  const AFPrototypeID(String code, AFLibraryID library, { List<Object>? withItems, String? prefix }) : super(prefix ?? prototypePrefix, code, library, withItems: withItems);
 
   factory AFPrototypeID.create(String code, AFLibraryID library, List<Object>? withItems) {
     return AFPrototypeID(code, library, withItems: withItems);
@@ -270,6 +271,11 @@ class AFPrototypeID extends AFBaseTestID {
     );
   }
 
+}
+
+class AFWireframeID extends AFPrototypeID {
+  static const wireframePrefix = "wireframe";
+  const AFWireframeID(String code, AFLibraryID library) : super(code, library, prefix: wireframePrefix);
 }
 
 class AFQueryTestID extends AFID {

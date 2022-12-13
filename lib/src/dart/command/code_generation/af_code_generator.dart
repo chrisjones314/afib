@@ -26,6 +26,7 @@ class AFCodeGenerator {
   static const lpiSuffix = "LPI";
   static const unitTestSuffix = "UnitTest";
   static const stateTestSuffix = "StateTest";
+  static const wireframeSuffix = "Wireframe";
 
   static const afibConfigFile = "afib.g.dart";
   static const libFolder = "lib";

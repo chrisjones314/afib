@@ -125,13 +125,13 @@ abstract class AFCommand {
   /// 
   /// [afibConfig] contains only the values from initialization/afib.g.dart, which can be 
   /// manipulated from the command line.
-  void run(AFCommandContext ctx) {
+  Future<void> run(AFCommandContext ctx) async {
     // make sure we are in the project root.
     if(!errorIfNotProjectRoot(ctx)) {
       return;
     }
 
-    execute(ctx);
+    await execute(ctx);
   }
 
   void addSubcommand(AFCommand cmd) {
@@ -139,7 +139,7 @@ abstract class AFCommand {
   }
 
   void finalize() {}
-  void execute(AFCommandContext context);
+  Future<void> execute(AFCommandContext context);
 
   bool errorIfNotProjectRoot(AFCommandContext ctx) {
     if(!AFProjectPaths.inRootOfAfibProject(ctx)) {
@@ -676,7 +676,7 @@ class AFCommandRunner {
     return commands;
   }
 
-  void run(AFCommandContext ctx) {
+  Future<void> run(AFCommandContext ctx) async {
     final args = ctx.arguments.arguments;
     if(args.isEmpty) {
       printUsage();
@@ -705,7 +705,7 @@ class AFCommandRunner {
       subcommand.run(ctx);
     } else {
       ctx.setCommandArgCount(1);
-      command.run(ctx);
+      await command.run(ctx);
     }
   }
 
@@ -780,7 +780,8 @@ Available commands:
     print(result.toString());
   }
 
-  void execute(AFCommandContext ctx) {
+  @override
+  Future<void> execute(AFCommandContext ctx) async {
     final args = ctx.arguments.arguments;
     if(args.length < 2) {
       printFullUsage(ctx);
@@ -823,8 +824,11 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
     Future<void> execute(AFCommandContext context) async {
       final output = context.output;
       try {
-        commands.run(context);
+        await commands.run(context);
       } on AFCommandError catch(e) {
+        if(!context.isRootCommand) {
+          throw AFCommandError(error: e.error, usage: e.usage);
+        }
         final usage = e.usage;
         if(usage != null && usage.isNotEmpty) {
           output.writeLine(usage);

@@ -1,3 +1,4 @@
+import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
@@ -334,16 +335,19 @@ class AFUpdateTimeRouteParametersAction {
 }
 
 class AFWireframeEventAction {
-  final AFStateProgrammingInterface spi;
   final AFScreenID screen;
   final AFID widget;
   final dynamic eventParam;
+  final AFFlexibleStateView? stateView;
+  final AFPressedDelegate? onSuccess;
 
   AFWireframeEventAction({
-    required this.spi,
     required this.screen,
     required this.widget,
+    required this.stateView,
+    required this.onSuccess,
     this.eventParam,
+    
   });
 }
 

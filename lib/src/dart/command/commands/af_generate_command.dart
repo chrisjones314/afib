@@ -7,7 +7,7 @@ class AFGenerateParentCommand extends AFCommandGroup {
   
 
   @override
-  void execute(AFCommandContext ctx) {
+  Future<void> execute(AFCommandContext ctx) async {
 
   }
 }

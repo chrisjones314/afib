@@ -244,16 +244,21 @@ void onPressedIncrementTransientCount() {
 
 void onPressedPersistTransientCount() {
 
+  context.executeWireframeEvent(${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.buttonSaveTransientCount, context.p, onSuccess: _onClearClickCount);
+
   // execute the query which writes it to the history, and 
   context.executeQuery(WriteCountHistoryEntryQuery(entry: CountHistoryEntry.createNew(count: context.p.clickCount), onSuccess: (successCtx) {
-    
-    // then, clear the transient click count.
-    final revisedClear = context.p.reviseClearClickCount();
-    context.updateRouteParam(revisedClear);
-
+    _onClearClickCount();
   }));
 
 }
+
+void _onClearClickCount() {
+  // then, clear the transient click count.
+  final revisedClear = context.p.reviseClearClickCount();
+  context.updateRouteParam(revisedClear);
+}
+
 '''
     });
     return SnippetDeclareSPIT(

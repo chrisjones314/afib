@@ -730,7 +730,7 @@ class AFBuildStateViewContext<TState extends AFComponentState?, TRouteParam exte
 /// screen data and param to many functions, to make things more concise.  
 /// 
 /// The framework cannot pass you this itself because 
-class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> with AFContextShowMixin, AFStandardAPIContextMixin {
+class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> with AFContextShowMixin, AFStandardAPIContextMixin, AFStandardNavigateMixin {
   AFStandardBuildContextData standard;
   TStateView stateView;
   TRouteParam routeParam;
@@ -795,15 +795,18 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     controllers.update(wid, text);
   }
 
-  void executeWireframeEvent(AFStateProgrammingInterface spi, AFID widget, Object? eventData) {
+  void executeWireframeEvent(AFID widget, Object? eventData, {
+    AFPressedDelegate? onSuccess,
+  }) {
     if(!AFibD.config.isPrototypeMode || AFibF.g.internalOnlyActiveStore.state.private.testState.activeWireframe == null) {
       return;
     }
     dispatch(AFWireframeEventAction(
-      spi: spi,
       screen: accessScreenId,
       widget: widget,
-      eventParam: eventData
+      eventParam: eventData,
+      stateView: stateView,
+      onSuccess: onSuccess,
     ));
   }
 
@@ -835,14 +838,23 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
   /// Dispatch an action or query.
   void dispatch(dynamic action) {
 
-    if(_isInWireframe) {
+    final wireframe = activeWireframe;
+    if(wireframe != null) {
       if(action is AFNavigateAction) {
-        if(action is AFNavigatePopAction || 
+        final isNavigate = (action is AFNavigatePopAction || 
            action is AFNavigatePushAction || 
            action is AFNavigatePopNAction || 
            action is AFNavigatePopToAction || 
            action is AFNavigateReplaceAction || 
-           action is AFNavigateReplaceAllAction) {
+           action is AFNavigateReplaceAllAction);
+
+        // the default test dispatcher won't do this, so we need to go direct to the real dispatcher.
+        if(isNavigate && wireframe.enableUINavigation) {
+          AFibF.g.internalOnlyActiveDispatcher.dispatch(action);
+          return;
+        }
+
+        if(isNavigate) {
           return;
         }
       }
@@ -889,13 +901,12 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     return result;
   }
 
-  bool get _isInWireframe {
+  AFWireframe? get activeWireframe {
     if(!AFibD.config.isTestContext) {
-      return false;
+      return null;
     }
-    return AFibF.g.internalOnlyActiveStore.state.private.testState.activeWireframe != null;
+    return AFibF.g.internalOnlyActiveStore.state.private.testState.activeWireframe;
   }
-
 
   /// Called to close a drawer.
   /// 

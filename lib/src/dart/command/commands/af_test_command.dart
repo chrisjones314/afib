@@ -27,7 +27,7 @@ $optionsHeader
   }
 
   @override
-  void execute(AFCommandContext ctx) {
+  Future<void> execute(AFCommandContext ctx) async {
     final config = AFibD.config;
     AFConfigEntries.testsEnabled.setValue(config, ctx.rawArgs);
     _updateRecentTests(config, ctx.rawArgs);

@@ -156,6 +156,14 @@ class AFRouteParamUnused extends AFRouteParam {
     routeLocation: routeLocation
   );
 
+  factory AFRouteParamUnused.forScreen(AFScreenID screenId) {
+    return AFRouteParamUnused(
+      screenId: screenId,
+      wid: AFUIWidgetID.useScreenParam,
+      routeLocation: AFRouteLocation.screenHierarchy,
+    );
+  }
+
 }
 
 class AFRouteParamRef extends AFRouteParam {
@@ -165,11 +173,19 @@ class AFRouteParamRef extends AFRouteParam {
      AFWidgetID wid = AFUIWidgetID.useScreenParam,
   } ): super(screenId: screenId, routeLocation: routeLocation, wid: wid);
 
-  factory AFRouteParamRef.forScreen({
-    required AFScreenID screenId,
-    AFRouteLocation routeLocation = AFRouteLocation.globalPool,
+  factory AFRouteParamRef.forScreen(
+    AFScreenID screenId, {
+    AFRouteLocation routeLocation = AFRouteLocation.screenHierarchy,
   }) {
     return AFRouteParamRef(screenId: screenId, routeLocation: routeLocation);
+  }
+
+  factory AFRouteParamRef.forWidget({
+    required AFScreenID screenId,
+    required AFWidgetID wid,
+    AFRouteLocation routeLocation = AFRouteLocation.screenHierarchy,
+  }) {
+    return AFRouteParamRef(screenId: screenId, wid: wid, routeLocation: routeLocation);
   }
 
   factory AFRouteParamRef.forWidgetTest({

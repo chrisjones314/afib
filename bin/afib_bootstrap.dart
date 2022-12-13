@@ -6,7 +6,7 @@ void main(List<String> argsIn) {
   final emptyParams = AFDartParams.createEmpty();
   final argsFull = AFArgs.create(argsIn);
   
-  argsFull.setDebugArgs("create app hellocounter2 hc --project-style start-here");
+  argsFull.setDebugArgs("create app hellocounter2 hc --project-style eval-demo");
   //argsFull.setDebugArgs("create state_library afib_firebase affb");
 
   afBootstrapCommandMain(emptyParams, argsFull);

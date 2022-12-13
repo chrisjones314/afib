@@ -31,9 +31,9 @@ import 'package:$insertPackagePath/${insertAppNamespace}_id.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
 $insertExtraImports
 
-void define${insertTestName}Test(AFUnitTestDefinitionContext definitions) {
+void define${insertTestName}UnitTest(AFUnitTestDefinitionContext definitions) {
 
-  definitions.addTest(${insertAppNamespaceUpper}UnitTestID.${insertTestName.camel}, (e) {
+  definitions.defineTest(${insertAppNamespaceUpper}UnitTestID.${insertTestName.camel}, (e) {
     $insertUnitTestCode
   });
 

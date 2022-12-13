@@ -5,13 +5,17 @@ import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/core/files/state_test.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/unit_test.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/wireframe.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_unit_test.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_state_test_impl.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_unit_test_impl.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_wireframe_body.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_wireframe_impl.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
 class AFGenerateTestSubcommand extends AFGenerateSubcommand {
   static const argExtendTest = 'extend-test';
+  static const argInitialScreen = 'initial-screen';
 
   AFGenerateTestSubcommand();
   
@@ -30,23 +34,27 @@ $usageHeader
 $descriptionHeader
   If your identifier ends with ${AFCodeGenerator.unitTestSuffix}, creates a new unit test.
   If your identifier ends with ${AFCodeGenerator.stateTestSuffix}, creates a new state test.
+  If your identifier ends with ${AFCodeGenerator.wireframeSuffix}, creates a new wireframe
 
 $optionsHeader
   --$argExtendTest - (optional) For state test, the fully qualified ID of the state test you are extending, eg. ${AFibD.config.appNamespace.toUpperCase()}StateTestID.yourParent
+  --$argInitialScreen - For wireframes, the class name of the initial screen to load.
   --$argExportTemplatesHelp
   --$argOverrideTemplatesHelp
+  
   ${AFCommand.argPrivateOptionHelp}    
 ''';
   }
 
   @override
-  void execute(AFCommandContext context) {
+  Future<void> execute(AFCommandContext context) async {
 
     final args = context.parseArguments(
       command: this, 
       unnamedCount: 1, 
       named: {
         argExtendTest: "null",
+        argInitialScreen: "",
       }
     );
 
@@ -65,6 +73,8 @@ $optionsHeader
       generateUnitTest(ctx, identifier, args);
     } else if(identifier.endsWith(AFCodeGenerator.stateTestSuffix)) {
       generateStateTest(ctx, identifier, args);
+    } else if(identifier.endsWith(AFCodeGenerator.wireframeSuffix)) {
+      generateWireframe(ctx, identifier, args);
     } else {
       throw AFException("Epected $identifier to end with ${AFCodeGenerator.stateTestSuffix} or ${AFCodeGenerator.unitTestSuffix}");
     }
@@ -74,6 +84,8 @@ $optionsHeader
     required String suffix,
     required AFFileSourceTemplate testFile,
     required AFCodeBuffer unitTestImpl,
+    String initialScreen = "",
+    Object? additionalMethods,
   }) {
     final generator = context.generator;
     final identifierShort = generator.removeSuffix(identifier, suffix);
@@ -86,6 +98,8 @@ $optionsHeader
       UnitTestT.insertTestName: identifierShort,
       UnitTestT.insertUnitTestCode: unitTestImpl,
       StateTestT.insertExtendTestId: extendTest,
+      SnippetWireframeImplT.insertInitialScreen: initialScreen,
+      AFSourceTemplate.insertAdditionalMethodsInsertion: additionalMethods ?? AFSourceTemplate.empty,
     });
 
     // create the id.
@@ -95,6 +109,7 @@ $optionsHeader
     final unitTestsFile = generator.modifyFile(context, generator.pathTests(suffix));
     final callUnitTest = context.createSnippet(SnippetCallUnitTestT(), insertions: {
       SnippetCallUnitTestT.insertTestName: identifierShort,
+      SnippetCallUnitTestT.insertTestSuffix: suffix,
     });
 
     unitTestsFile.addLinesAfter(context, AFCodeRegExp.startDefineTestsFunction(suffix), callUnitTest.lines);
@@ -104,6 +119,30 @@ $optionsHeader
     );
 
     return unitTestFile;
+  }
+
+
+  static void generateWireframe(AFCommandContext context, String identifier, AFCommandArgumentsParsed args) {
+
+    final initialScreen = args.accessNamed(argInitialScreen);
+    if(initialScreen.isEmpty) {
+      throw AFCommandError(error: "You must specify --$argInitialScreen");
+    }
+    final unitTestImpl = context.createSnippet(SnippetWireframeImplT(), insertions: {
+      SnippetWireframeImplT.insertInitialScreen: initialScreen
+    });
+
+    final wireframeBody = context.createSnippet(SnippetWireframeBodyT());
+    
+    // create the test file.
+    _generateTest(context, identifier, args, 
+      suffix: AFCodeGenerator.wireframeSuffix,
+      testFile: WireframeT.core(),
+      unitTestImpl: unitTestImpl,
+      initialScreen: initialScreen,
+      additionalMethods: wireframeBody,
+    );
+
   }
 
 

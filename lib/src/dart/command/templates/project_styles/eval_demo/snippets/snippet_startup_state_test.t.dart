@@ -31,7 +31,7 @@ testContext.defineQueryResponseDynamic<WriteCountHistoryEntryQuery>(body: (conte
     final entry = query.entry;
     CountHistoryEntry result;
     if(AFDocumentIDGenerator.isNewId(entry.id)) {
-      result = entry.copyWith(id: AFDocumentIDGenerator.createTestIdIncreasing("count_history_entry"));
+      result = entry.copyWith(id: AFDocumentIDGenerator.createTestIdIncreasing("count_statetest"));
     } else {
       result = entry.copyWith();
     }

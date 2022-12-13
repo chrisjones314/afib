@@ -1,5 +1,5 @@
 import 'package:afib/src/dart/command/af_source_template.dart';
-import 'package:afib/src/dart/command/templates/project_styles/start_here/files/model_example_start_here.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/model_example_start_here.t.dart';
 
 class ModelReferencedUsersRootT extends ModelExampleStartHereT {
   

@@ -115,7 +115,7 @@ class AFCreateCommandContext {
     return isLibrary ? "Library" : "App";
   }
 
-  void executeSubCommand(String cmd) {
+  Future<void> executeSubCommand(String cmd) async {
     final revisedCommand = command.reviseWithArguments(
       insertions: insertions, 
       arguments: AFArgs.createFromString(cmd)
@@ -123,7 +123,7 @@ class AFCreateCommandContext {
 
     revisedCommand.startCommand();
 
-    command.definitions.execute(revisedCommand);
+    await command.definitions.execute(revisedCommand);
   }
 
   AFCodeGenerator get generator => command.generator;
@@ -147,7 +147,7 @@ class AFCreateAppCommand extends AFCommand {
   static const kindStateLibrary = "state_library";
   static const argProjectStyle = "project-style";
   static const projectStyleMinimal = "minimal";
-  static const projectStyleStartHere = "start-here";
+  static const projectStyleEvalDemo = "eval-demo";
 
   final String name = "create";
   final String description = "Install afib framework support into an existing flutter app project";
@@ -170,8 +170,8 @@ $optionsHeader
   YPC - a lowercase 2-5 digit the code/prefix for your app, all uppercase.  For example, for the AFib Signin library this is afsi, in the app 'Dinner Familias this is 'df' (
     note that you should not prefix yours with 'af')
   $argProjectStyle - a string specifying the project style to use, currently:
-    minimal - minimal project style
-    start-here - a simple example demonstrating many of AFib's core features and referenced in the evaluation video and documentation.
+    $projectStyleMinimal - minimal project style
+    $projectStyleEvalDemo - a simple example demonstrating many of AFib's core features and referenced in the evaluation video and documentation.
     or, you can define your own project styles.
 
   ${AFGenerateSubcommand.argExportTemplatesHelpStatic}
@@ -181,12 +181,12 @@ $optionsHeader
 
   AFCreateAppCommand();
 
-  void run(AFCommandContext ctx) {
+  Future<void> run(AFCommandContext ctx) async {
     // override this to avoid 'error not in root of project'
-    execute(ctx);
+    await execute(ctx);
   }
 
-  void execute(AFCommandContext ctx) {
+  Future<void> execute(AFCommandContext ctx) async {
     final args = ctx.parseArguments(
       command: this,
       unnamedCount: 3,
@@ -235,31 +235,31 @@ $optionsHeader
 
     _createInitializationFiles(context);
 
-    _createQueryFiles(context);
-    _createStateFiles(context);
+    await _createQueryFiles(context);
+    await _createStateFiles(context);
     if(!context.isStateLibrary) {
       _createTestFiles(context);
     }
 
     if(!context.isStateLibrary) {
       _createMainFiles(context);
-      _createUIFiles(context);
+      await _createUIFiles(context);
     }
 
     if(!context.isApp) {
       _createInstallFiles(context, kind, args);
     }
 
-    _executeProjectStyle(context);
+    await _executeProjectStyle(context);
 
     generator.finalizeAndWriteFiles(ctx);
   }
 
-  void _executeProjectStyle(AFCreateCommandContext context) {
+  Future<void> _executeProjectStyle(AFCreateCommandContext context) async {
     final lines = context.projectStyleLines;
     for(final line in lines) {
       context.output.writeTwoColumns(col1: "execute ", col2: "$line");
-      context.executeSubCommand(line);
+      await context.executeSubCommand(line);
     }
   }
 
@@ -292,12 +292,12 @@ $optionsHeader
 
   }
 
-  void _createUIFiles(AFCreateCommandContext context) {
+  Future<void> _createUIFiles(AFCreateCommandContext context) async {
     final generator = context.generator;
     context.createFile(generator.pathConnectedBaseFile, ConnectedBaseT());
 
-    context.executeSubCommand("generate ui ${generator.appNamespaceUpper}DefaultTheme --${AFGenerateUISubcommand.argParentTheme} ${generator.nameDefaultParentTheme} --${AFGenerateUISubcommand.argParentThemeID} ${generator.nameDefaultParentThemeID}");
-    context.executeSubCommand("generate ui ${AFGenerateUISubcommand.nameStartupScreen}");
+    await context.executeSubCommand("generate ui ${generator.appNamespaceUpper}DefaultTheme --${AFGenerateUISubcommand.argParentTheme} ${generator.nameDefaultParentTheme} --${AFGenerateUISubcommand.argParentThemeID} ${generator.nameDefaultParentThemeID}");
+    await context.executeSubCommand("generate ui ${AFGenerateUISubcommand.nameStartupScreen}");
   }
 
   void _createLibExportsFiles(AFCreateCommandContext context) {
@@ -306,19 +306,19 @@ $optionsHeader
     context.createFile(generator.pathCommandExportsFile, LibraryExportsT());
   }
 
-  void _createStateFiles(AFCreateCommandContext context) {
+  Future<void> _createStateFiles(AFCreateCommandContext context) async {
     final generator = context.generator;
 
     context.createFile(generator.pathStateModelAccess, StateModelAccessT());
     context.createFile(generator.pathAppState, AppStateT());
     
     if(!context.isStateLibrary) {
-      context.executeSubCommand("generate state ${generator.nameDefaultStateView} --${AFGenerateUISubcommand.argTheme} ${generator.nameDefaultTheme}");
+      await context.executeSubCommand("generate state ${generator.nameDefaultStateView} --${AFGenerateUISubcommand.argTheme} ${generator.nameDefaultTheme}");
     }
   }
 
-  void _createQueryFiles(AFCreateCommandContext context) {
-    context.executeSubCommand("generate query ${context.generator.nameStartupQuery} --${AFGenerateQuerySubcommand.argResultModelType} AFUnused");
+  Future<void> _createQueryFiles(AFCreateCommandContext context) async {
+    await context.executeSubCommand("generate query ${context.generator.nameStartupQuery} --${AFGenerateQuerySubcommand.argResultModelType} AFUnused");
   }
 
   void _createTestFiles(AFCreateCommandContext context) {

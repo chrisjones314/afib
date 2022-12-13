@@ -30,7 +30,7 @@ $optionsHeader
   }
 
   @override
-  void execute(AFCommandContext context) {
+  Future<void> execute(AFCommandContext context) async {
     final unnamed = context.rawArgs;
     if(unnamed.isEmpty) {
       throwUsageError("Expected one arguments");

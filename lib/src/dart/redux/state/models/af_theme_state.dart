@@ -2850,7 +2850,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
         onPressed: () async {
           if(shouldContinueCheck == null || await shouldContinueCheck() == AFShouldContinue.yesContinue) {
             spi.context.navigatePop(worksInSingleScreenTest: worksInSingleScreenTest);
-            spi.context.executeWireframeEvent(spi, wid, null);
+            spi.context.executeWireframeEvent(wid, null);
           } 
         }
     );

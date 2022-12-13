@@ -33,7 +33,7 @@ class AFUIPrototypeWireframesListScreen extends AFUIConnectedScreen<AFUIPrototyp
 
   static AFNavigatePushAction navigatePush() {
     return AFNavigatePushAction(
-      launchParam: AFRouteParamUnused.unused
+      launchParam: AFRouteParamUnused.forScreen(AFUIScreenID.screenPrototypeWireframesList)
     );
   }
 
@@ -54,9 +54,9 @@ class AFUIPrototypeWireframesListScreen extends AFUIConnectedScreen<AFUIPrototyp
       final test = AFSingleScreenPrototype(
         id: wireframe.id,
         navigate: wireframe.navigate,
-        stateView: wireframe.models,
+        stateView: wireframe.stateView,
         body: body,
-        timeHandling: AFTestTimeHandling.running
+        timeHandling: wireframe.timeHandling,
       );
 
       rowsCard.add(

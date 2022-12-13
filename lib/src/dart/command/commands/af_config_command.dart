@@ -67,7 +67,7 @@ $optionsHeader
   }
 
   @override
-  void execute(AFCommandContext ctx) {    
+  Future<void> execute(AFCommandContext ctx) async {    
 
     final unnamed = ctx.rawArgs;
     if(unnamed.isNotEmpty) {

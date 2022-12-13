@@ -51,33 +51,33 @@ $optionsHeader
   
 
   @override
-  void execute(AFCommandContext ctx) {
+  Future<void> execute(AFCommandContext context) async {
 
-    final args = ctx.parseArguments(
+    final args = context.parseArguments(
       command: this, 
       unnamedCount: 1, 
       named: {
-        AFGenerateUISubcommand.argTheme: ctx.generator.nameDefaultTheme
+        AFGenerateUISubcommand.argTheme: context.generator.nameDefaultTheme
       }
     );
 
     final modelName = args.accessUnnamedFirst;
 
     verifyMixedCase(modelName, "model name");
-    generateStateStatic(ctx, modelName, args);
+    generateStateStatic(context, modelName, args);
 
     // replace any default 
-    ctx.generator.finalizeAndWriteFiles(ctx);
+    context.generator.finalizeAndWriteFiles(context);
 
   }
 
-  static void generateStateStatic(AFCommandContext ctx, String identifier, AFCommandArgumentsParsed args) {
+  static void generateStateStatic(AFCommandContext context, String identifier, AFCommandArgumentsParsed args) {
     if(identifier.endsWith(AFCodeGenerator.lpiSuffix)) {
-      generateLPIStatic(ctx, identifier, args);
+      generateLPIStatic(context, identifier, args);
     } else if(identifier.endsWith(AFCodeGenerator.stateViewSuffix)) {
-      _generateStateViewStatic(ctx, identifier, args);
+      _generateStateViewStatic(context, identifier, args);
     } else {
-      _generateModelStatic(ctx, identifier, args);    
+      _generateModelStatic(context, identifier, args);    
     }
   }
 

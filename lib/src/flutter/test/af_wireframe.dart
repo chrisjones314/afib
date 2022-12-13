@@ -1,6 +1,7 @@
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
+import 'package:afib/src/flutter/utils/af_api_mixins.dart';
 import 'package:logger/logger.dart';
 
 class AFWireframes {
@@ -18,134 +19,132 @@ class AFWireframes {
     }
     throw AFException("Unknown wireframe $id");
   }
-}
+} 
 
-class AFWireframeExecutionContext<TStateView extends AFFlexibleStateView> {
-  final AFStateProgrammingInterface spi;
+class AFWireframeExecutionContext with AFStandardNavigateMixin {
   final AFScreenID screen;
   final AFID widget;
   final dynamic eventParam;
   final AFWireframe wireframe;
-  Map<String, Object> models;
-  TStateView stateView;
-  final AFCreateStateViewDelegate<TStateView> stateViewCreator;
-
+  final AFFlexibleStateView? stateView;
 
   AFWireframeExecutionContext({
-    required this.spi,
     required this.screen,
     required this.widget,
     required this.eventParam,
     required this.wireframe,
-    required this.models,
     required this.stateView,
-    required this.stateViewCreator,
   });
-
-  TStateView get s { 
-    return stateView;
-  }
 
   bool isScreen(AFScreenID screenId) {
     return this.screen == screenId;
   }
 
-  TResult getEventParam<TResult>() {
+  bool isScreenAndWidget(AFScreenID screenId, AFWidgetID widgetId) {
+    return isScreen(screenId) && isWidget(widgetId);
+  }
+
+  TResult accessEventParam<TResult>() {
     return eventParam as TResult;
+  }
+
+  TStateView accessStateView<TStateView extends AFFlexibleStateView>() {
+    final sv = stateView;
+    if(sv is TStateView) {
+      return sv;
+    }
+    throw AFException("Currently, you can only access the kind of state view that caused the event");
   }
 
   bool isWidget(AFWidgetID widgetId) {
     return this.widget == widgetId;
   }
 
+  /*
   void navigatePop() {
     _dispatch(AFNavigatePopAction());
     _dispatch(AFStartWireframePopTestAction());
   }
+  */
 
-  void updateModel(dynamic source) {
-    updateModels([source]);
+  void updateStateViewRootOne(Object source) {
+    updateStateViewRootN([source]);
   }
 
-  void updateModels(dynamic sourceModels) {
-    final resolved = wireframe.testData.resolveStateViewModels(sourceModels);
-    models = AFComponentState.integrate(models, resolved.values);
-    stateView = stateViewCreator(models);
+  void updateStateViewRootN(List<Object> source) {
+    final sv = AFibF.g.testData.resolveStateViewModels(source);
+    dispatch(AFUpdatePrototypeScreenTestModelsAction(AFUIScreenTestID.wireframe, sv));
   }
 
-  void navigateTo(AFPrototypeID testId, { AFRouteParam? routeParam, List<Object>? models }) {
-    final test = AFibF.g.findScreenTestById(testId);
-    final dispatcher = AFibF.g.internalOnlyActiveDispatcher;
-    assert(test != null);
-    if(test != null) {
-      test.startScreen(dispatcher, spi.context.flutterContext, wireframe.testData, routeParam: routeParam, stateView: models);
-    }
-  }
 
   dynamic td(dynamic id) {
     return wireframe.testData.find(id);
   }
 
-  void _dispatch(dynamic action) {
+  void dispatch(dynamic action) {
     AFibF.g.internalOnlyActiveDispatcher.dispatch(action);
   }
 }
 
-class AFWireframe<TStateView extends AFFlexibleStateView> {
-  final AFPrototypeID id;
+class AFWireframe {
+  final AFWireframeID id;
   final AFNavigatePushAction navigate;
-  final AFWireframeExecutionDelegate<TStateView> body;
+  final AFWireframeExecutionDelegate body;
   final AFDefineTestDataContext testData;
-  final dynamic models;
-  final AFCreateStateViewDelegate<TStateView> stateViewCreator;
+  final dynamic stateView;
+  final bool enableUINavigation;
+  final AFTestTimeHandling timeHandling;
 
   AFWireframe({
     required this.id,
     required this.navigate, 
     required this.body,
     required this.testData,
-    required this.models,
-    required this.stateViewCreator,
+    required this.stateView,
+    required this.enableUINavigation,
+    required this.timeHandling,
   });
 
   factory AFWireframe.create({
-    required AFPrototypeID id,
+    required AFWireframeID id,
     required AFNavigatePushAction navigate,
     required AFWireframeExecutionDelegate body,
     required dynamic models,
-    required AFCreateStateViewDelegate<TStateView> stateViewCreator,
+    required AFTestTimeHandling timeHandling,
+    bool enableUINavigation = true,
   }) {
     final testData = AFibF.g.testData;
-    return AFWireframe<TStateView>(id: id, navigate: navigate, body: body, testData: testData, models: models, stateViewCreator: stateViewCreator);
+    return AFWireframe(
+      id: id, 
+      navigate: navigate, 
+      body: body, 
+      testData: testData, 
+      stateView: models, 
+      enableUINavigation: enableUINavigation,
+      timeHandling: timeHandling,
+    );
   }
 
 
-  void onEvent(AFStateProgrammingInterface spi, AFScreenID screen, AFID widget, dynamic param, Map<String, Object> models) {
-    final modelsCopy = Map<String, Object>.from(models);
-    final stateViewOrig = stateViewCreator(modelsCopy);
+  void onEvent(AFScreenID screen, AFID widget, dynamic param, AFFlexibleStateView? stateView, AFPressedDelegate? onSuccess) {
     final context = AFWireframeExecutionContext(
-      spi: spi,
       screen: screen,
       widget: widget,
       eventParam: param,
       wireframe: this,
-      models: modelsCopy,
-      stateView: stateViewOrig,
-      stateViewCreator: this.stateViewCreator
+      stateView: stateView
     );
 
-    body(context);
-
-    // if the state view changed, then we need to update the models
-    // in the test data state.
-    if(stateViewOrig != context.stateView) {
-      AFibF.g.internalOnlyActiveStore.dispatch(AFUpdatePrototypeScreenTestModelsAction(
-        AFUIScreenTestID.wireframe,
-        context.models 
-      ));
+    final handled = body(context);
+    if(!handled && !enableUINavigation) {
+      if(context.isWidget(AFUIWidgetID.buttonBack)) {
+        context.navigatePop();
+      }
     }
 
-
+    if(onSuccess != null) {
+      onSuccess();
+    }
   }
 }
 
@@ -159,20 +158,22 @@ class AFWireframeDefinitionContext {
   });
 
 
-  AFWireframe defineWireframe<TStateView extends AFFlexibleStateView>({
-    required AFPrototypeID id,
+  AFWireframe defineWireframe({
+    required AFWireframeID id,
     required AFNavigatePushAction navigate,
-    required AFWireframeExecutionDelegate<TStateView> body,
-    required dynamic models,
-    required AFCreateStateViewDelegate<TStateView> stateViewCreator,
+    required AFWireframeExecutionDelegate body,
+    required Object stateView,
+    bool enableUINavigation = true,
+    required AFTestTimeHandling timeHandling,
   }) {
-    final wf = AFWireframe<TStateView>(
+    final wf = AFWireframe(
       id: id,
       navigate: navigate, 
       body: body,
       testData: AFibF.g.testData,
-      models: models,
-      stateViewCreator: stateViewCreator,
+      stateView: stateView,
+      enableUINavigation: enableUINavigation,
+      timeHandling: timeHandling,
     );
     wireframes.add(wf);
     return wf;

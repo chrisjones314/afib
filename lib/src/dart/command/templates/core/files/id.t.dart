@@ -92,6 +92,13 @@ class ${insertAppNamespaceUpper}PrototypeID extends AFPrototypeID {
   const ${insertAppNamespaceUpper}PrototypeID(String code): super(code, ${insertAppNamespaceUpper}LibraryID.id); 
 }
 
+class ${insertAppNamespaceUpper}WireframeID extends AFWireframeID {
+
+
+  const ${insertAppNamespaceUpper}WireframeID(String code): super(code, ${insertAppNamespaceUpper}LibraryID.id); 
+}
+
+
 ''';
 
 }

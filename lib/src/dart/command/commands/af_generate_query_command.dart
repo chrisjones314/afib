@@ -47,7 +47,7 @@ $optionsHeader
   }
 
   @override
-  void execute(AFCommandContext context) {
+  Future<void> execute(AFCommandContext context) async {
     final generator = context.generator;
 
     final args = context.parseArguments(

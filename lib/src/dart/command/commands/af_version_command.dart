@@ -8,7 +8,8 @@ class AFVersionCommand extends AFCommand {
 
   AFVersionCommand();
 
-  void execute(AFCommandContext ctx) {
-    ctx.output.writeLine("Afib 0.0.10");
+  @override
+  Future<void> execute(AFCommandContext context) async {
+    context.output.writeLine("Afib 0.0.10");
   }
 }

@@ -79,13 +79,20 @@ mixin AFAccessStateSynchronouslyMixin {
     );
   }
 
-  TRouteParam? accessScreenRouteParam<TRouteParam extends AFRouteParam>(AFScreenID screen, {
-    AFRouteLocation routeLocation = AFRouteLocation.screenHierarchy,
-  }) {
-    final seg = accessScreenRouteSegment(screen, routeLocation: routeLocation);
+  AFRouteSegment? accessRouteParamSegment(AFRouteParamRef ref) {
+    return accessPublicState.route.findRouteParamFull(
+      screenId: ref.screenId,
+      wid: ref.wid,
+      routeLocation: ref.routeLocation
+    );
+  }
+
+  TRouteParam? accessRouteParam<TRouteParam extends AFRouteParam>(AFRouteParamRef ref) {
+    final seg = accessRouteParamSegment(ref);
     return seg?.param as TRouteParam?;
   }
 
+  /*  
   TRouteParam? accessWidgetRouteParam<TRouteParam extends AFRouteParam>(AFScreenID screen, AFWidgetID child, {
     AFRouteLocation routeLocation = AFRouteLocation.screenHierarchy,
   }) {
@@ -93,6 +100,7 @@ mixin AFAccessStateSynchronouslyMixin {
     final result = seg?.children?.findParamById(child);
     return result as TRouteParam?;
   }
+  */
 
   /// Expectes to find exactly ione param of the specified type.
   /// 
@@ -158,6 +166,55 @@ mixin AFAccessStateSynchronouslyMixin {
     return param;
   }
 
+}
+
+mixin AFStandardNavigateMixin implements AFDispatcher {
+  void navigatePop({
+    bool worksInSingleScreenTest = false,
+  }) {
+    dispatch(AFNavigatePopAction(worksInSingleScreenTest: worksInSingleScreenTest));
+  }
+
+  void navigatePush(
+    AFNavigatePushAction action
+  ) {
+    dispatch(action);
+  }
+
+  void navigateReplaceCurrent(
+    AFNavigateReplaceAction action,
+  ) {
+    dispatch(action);
+  }
+
+  void navigateReplaceAll(
+    AFNavigateReplaceAllAction action
+  ) {
+    dispatch(action);
+  }
+
+  void navigateToUnimplementedScreen(String message) {
+    dispatch(AFNavigateUnimplementedQuery(message));
+  }
+
+  void navigatePopN({ 
+    required int popCount,
+  }) {
+    dispatch(AFNavigatePopNAction(popCount: popCount));
+  }
+
+  void navigatePopTo(
+    AFNavigatePopToAction popTo
+  )  {
+    dispatch((popTo));
+  }
+
+  void navigatePopToAndPush({
+    required AFScreenID popTo,
+    required AFNavigatePushAction push
+  }) {
+    dispatch(AFNavigatePopToAction(popTo: popTo, push: push));
+  }
 }
 
 mixin AFStandardAPIContextMixin implements AFDispatcher {
@@ -238,52 +295,6 @@ mixin AFStandardAPIContextMixin implements AFDispatcher {
   // navigate...
   //-------------------------------------------------------------------------------------
 
-  void navigatePop({
-    bool worksInSingleScreenTest = false,
-  }) {
-    dispatch(AFNavigatePopAction(worksInSingleScreenTest: worksInSingleScreenTest));
-  }
-
-  void navigatePush(
-    AFNavigatePushAction action
-  ) {
-    dispatch(action);
-  }
-
-  void navigateReplaceCurrent(
-    AFNavigateReplaceAction action,
-  ) {
-    dispatch(action);
-  }
-
-  void navigateReplaceAll(
-    AFNavigateReplaceAllAction action
-  ) {
-    dispatch(action);
-  }
-
-  void navigateToUnimplementedScreen(String message) {
-    dispatch(AFNavigateUnimplementedQuery(message));
-  }
-
-  void navigatePopN({ 
-    required int popCount,
-  }) {
-    dispatch(AFNavigatePopNAction(popCount: popCount));
-  }
-
-  void navigatePopTo(
-    AFNavigatePopToAction popTo
-  )  {
-    dispatch((popTo));
-  }
-
-  void navigatePopToAndPush({
-    required AFScreenID popTo,
-    required AFNavigatePushAction push
-  }) {
-    dispatch(AFNavigatePopToAction(popTo: popTo, push: push));
-  }
 
   /// A utility which dispatches an asynchronous query.
   void executeQuery(AFAsyncQuery query) {

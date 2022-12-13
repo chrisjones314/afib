@@ -117,6 +117,34 @@ class AFCodeBuffer {
     return false;
   }
 
+  void fixupImports() {
+    
+    final allImports = <String>[];
+    var lineIdx = 0;
+    while(lineIdx < lines.length) {
+      final line = lines[lineIdx++];
+      if(line.startsWith("import")) {
+        final parsedLines = line.split("\n");
+        allImports.addAll(parsedLines);
+        continue;
+      } else if(line.trim().isEmpty) {
+        continue;
+      }
+      else {
+        break;
+      }
+    }
+
+    if(allImports.isEmpty) {
+      return;
+    }
+
+    allImports.sort();
+    allImports.add("");
+    lines.removeRange(0, lineIdx-1);
+    lines.insertAll(0, allImports);
+  }
+
   AFCodeBuffer _buildExtraImportsFor(AFCommandContext context, AFSourceTemplateInsertions insertions, Object? value) {
     AFCodeBuffer? buffer;
     if(value == null) {

@@ -7,7 +7,10 @@ import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_buffer.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_generator.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_from_package.t.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
+import 'package:afib/src/dart/utils/af_id.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:colorize/colorize.dart';
 import 'package:path/path.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
@@ -118,7 +121,32 @@ class AFGeneratedFile {
     return Pubspec.parse(buffer.toString());
   }
 
-  void addImports(AFCommandContext context, List<String> imports, {
+  void importFile(AFCommandContext context, AFGeneratedFile file, { String? packageName }) {
+    importProjectPathString(context, file.importPathStatement, packageName: packageName);
+  }
+
+  void importIDFile(AFCommandContext context, AFLibraryID libraryId) {
+    importProjectPathString(context, "${libraryId.codeId}_id.dart", packageName: libraryId.name);
+  }
+
+  void importFlutterFile(AFCommandContext context, AFLibraryID libraryId) {            
+    importProjectPathString(context, "${libraryId.codeId}_flutter.dart", packageName: libraryId.name);
+  }
+
+  void importProjectPath(AFCommandContext context, List<String> importPath, { String? packageName }) {
+    final path = AFCodeGenerator.importPathStatementStatic(importPath);
+    importProjectPathString(context, path, packageName: packageName);
+  }
+  
+  void importProjectPathString(AFCommandContext context, String importPath, { String? packageName }) {
+    final declareImport = SnippetImportFromPackageT().toBuffer(context, insertions: {
+      AFSourceTemplate.insertPackageNameInsertion: packageName ?? AFibD.config.packageName,
+      AFSourceTemplate.insertPackagePathInsertion: importPath,
+    });
+    importAll(context, declareImport.lines);
+  }
+
+  void importAll(AFCommandContext context, List<String> imports, {
     bool preventDuplicates = true
   }) {
     // find the insertion point.
@@ -266,6 +294,11 @@ class AFGeneratedFile {
     output.endLine();
 
     final path = AFProjectPaths.fullPathFor(this.projectPath);
+
+    // fix up any imports, sorting them and removing excess spaces.
+    buffer.fixupImports();
+
+
     final f = File(path);
     f.writeAsStringSync(buffer.toString());
   }

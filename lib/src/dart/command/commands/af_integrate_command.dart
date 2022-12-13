@@ -93,7 +93,7 @@ $optionsHeader
   }) {
     final generator = ctx.generator;
     final fileExtendBase = generator.modifyFile(ctx, pathExtendFile);
-    fileExtendBase.addImports(ctx, importCode.lines);
+    fileExtendBase.importAll(ctx, importCode.lines);
     
     final call = ctx.createSnippet(SnippetCallInstallT(), insertions: {
       SnippetCallInstallT.insertPackageCode: packageCode,

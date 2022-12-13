@@ -113,10 +113,7 @@ $optionsHeader
     });
 
     unitTestsFile.addLinesAfter(context, AFCodeRegExp.startDefineTestsFunction(suffix), callUnitTest.lines);
-    generator.addImport(context,
-      importPath: unitTestFile.importPathStatement, 
-      to: unitTestsFile, 
-    );
+    unitTestsFile.importFile(context, unitTestFile);
 
     return unitTestFile;
   }

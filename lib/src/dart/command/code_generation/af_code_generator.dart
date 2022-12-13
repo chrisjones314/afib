@@ -436,6 +436,7 @@ class AFCodeGenerator {
     return importPathStatementStatic(projectPath);
   }
 
+  /*
    bool addImportsForPath(AFCommandContext ctx, List<String> projectPath, { required List<String> imports, bool requireExists = true }) {
     if(!requireExists || fileExists(projectPath)) {
       final template = ctx.createSnippet(SnippetImportFromPackageT(), insertions: {
@@ -446,42 +447,7 @@ class AFCodeGenerator {
     } 
     return false;
   }
-
-  void addImportIDFile(AFCommandContext ctx, {
-    required AFLibraryID libraryId,
-    required AFGeneratedFile to,
-  }) {
-      addImport(ctx,
-        packageName: libraryId.name, 
-        importPath: "${libraryId.codeId}_id.dart",
-        to: to,
-      );
-
-  }
-
-  void addImportFlutterFile(AFCommandContext ctx, {
-    required AFLibraryID libraryId,
-    required AFGeneratedFile to,
-  }) {
-      addImport(ctx,
-        packageName: libraryId.name, 
-        importPath: "${libraryId.codeId}_flutter.dart",
-        to: to,
-      );
-
-  }
-
-  void addImport(AFCommandContext ctx, {
-    required String importPath,
-    required AFGeneratedFile to,
-    String? packageName
-  }) {
-    final declareImport = SnippetImportFromPackageT().toBuffer(ctx, insertions: {
-      AFSourceTemplate.insertPackageNameInsertion: packageName ?? AFibD.config.packageName,
-      AFSourceTemplate.insertPackagePathInsertion: importPath,
-    });
-    to.addImports(ctx, declareImport.lines);
-  }
+  */
 
   String deriveFullLibraryIDFromType(String parentType, String suffix, {
     String? typeKind

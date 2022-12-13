@@ -50,10 +50,7 @@ $optionsHeader
 
     // register it 
     final fileExtend = generator.modifyFile(context, generator.pathExtendCommand);
-    generator.addImport(context, 
-      importPath: fileCommand.importPathStatement, 
-      to: fileExtend
-    );
+    fileExtend.importFile(context, fileCommand);
 
     final declareDefine = context.createSnippet(SnippetCallDefineCommandT(), insertions: {
       CommandT.insertCommandName: commandName,

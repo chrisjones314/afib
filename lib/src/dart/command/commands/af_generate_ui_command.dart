@@ -302,7 +302,7 @@ $optionsHeader
       imports.addAll(import.lines);      
     }
 
-    fileTheme.addImports(context, imports);
+    fileTheme.importAll(context, imports);
 
     // add the line that installs it
     final fileDefineUI = generator.modifyFile(context, generator.pathDefineCore);
@@ -314,18 +314,12 @@ $optionsHeader
     if(imports.isNotEmpty) {
       fileDefineUI.addLinesBefore(context, AFCodeRegExp.startDefineCore, imports);
       if(fromLib != null) {
-        generator.addImportIDFile(context,
-          libraryId: fromLib,
-          to: fileDefineUI,
-        );
+        fileDefineUI.importIDFile(context, fromLib);
       }
 
     }
 
-    generator.addImport(context, 
-      importPath: fileTheme.importPathStatement, 
-      to: fileDefineUI,
-    );
+    fileDefineUI.importFile(context, fileTheme);
 
     if(!isOverride) {
       generator.addExportsForFiles(context, args, [fileTheme]);
@@ -370,7 +364,6 @@ $optionsHeader
 
     // create a screen name
     final projectPath = generator.pathUI(uiName, controlSettings);
-    final imports = <String>[];
     final stateView = args.accessNamed(argStateView);
     final theme = args.accessNamed(argTheme);
     final stateViewPrefix = generator.removeSuffix(stateView, "StateView");
@@ -423,18 +416,16 @@ $optionsHeader
       AFSourceTemplate.insertAdditionalMethodsInsertion: screenImplsSnippet,
     });
 
-    generator.addImportsForPath(context, generator.pathConnectedBaseFile, imports: imports);
+    screenFile.importProjectPath(context, generator.pathConnectedBaseFile);
     final pathStateView = generator.pathStateView(stateView);
     if(pathStateView != null) {
-      generator.addImportsForPath(context, pathStateView, imports: imports);
+      screenFile.importProjectPath(context, pathStateView);
     }
 
     final pathTheme = generator.pathTheme(theme, isCustomParent: false);
     if(pathTheme != null) {
-      generator.addImportsForPath(context, pathTheme, imports: imports);    
+      screenFile.importProjectPath(context, pathTheme);    
     }
-
-    screenFile.addImports(context, imports);
     
     // put the screen in the screen map
     if(controlSettings.kind != AFUIControlKind.widget) {
@@ -443,10 +434,7 @@ $optionsHeader
       final screenMapPath = generator.pathDefineCore;
       final screenMapFile = generator.modifyFile(context, screenMapPath);
       screenMapFile.addLinesAfter(context, AFCodeRegExp.startScreenMap, declareScreenInMap.lines);
-      generator.addImport(context, 
-        importPath: screenFile.importPathStatement, 
-        to: screenMapFile, 
-      );            
+      screenMapFile.importFile(context, screenFile);
     }
 
     // create a state test shortcut declaration function.
@@ -456,10 +444,7 @@ $optionsHeader
     shortcutsFile.addLinesAfter(context, AFCodeRegExp.startShortcutsClass, shortcut.lines);
 
     // import the screen to the state test shortcuts.
-    generator.addImport(context,
-      importPath: screenFile.importPathStatement, 
-      to: shortcutsFile,
-    );
+    shortcutsFile.importFile(context, screenFile);
 
     // add exports for files
     final isStartupScreen = uiName == AFGenerateUISubcommand.nameStartupScreen;
@@ -491,20 +476,14 @@ $optionsHeader
           SnippetCreateScreenPrototypeT.insertFullTestDataID: generator.stateFullLoginID,
       });
 
-      generator.addImport(context,
-        importPath: screenFile.importPathStatement,
-        to: screenTestFile,
-      );
+      screenTestFile.importFile(context, screenFile);
 
       // add in a link to the defining function to the main tests file.
       final pathScreenTests = generator.pathScreenTests;
       final screenTestsFile = generator.modifyFile(context, pathScreenTests);
 
       // add the imports
-      generator.addImport(context,
-        importPath: screenTestFile.importPathStatement,
-        to: screenTestsFile,
-      );
+      screenTestsFile.importFile(context, screenTestFile);
 
       final callFunction = context.createSnippet(SnippetCallDefineScreenTest(), extend: screenInsertions);
       screenTestsFile.addLinesAfter(context, AFCodeRegExp.startDefineScreenTestsFunction, callFunction.lines);

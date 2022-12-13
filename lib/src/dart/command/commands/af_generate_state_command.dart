@@ -101,10 +101,7 @@ $optionsHeader
     });
 
     if(fromLib != null) {
-      generator.addImportFlutterFile(context, 
-        libraryId: fromLib, 
-        to: lpiFile,
-      );
+      lpiFile.importFlutterFile(context, fromLib);
     }    
 
     final idIdentifier = generator.removeSuffixAndCamel(generator.removePrefix(identifier, generator.appNamespaceUpper), "LPI");
@@ -127,16 +124,10 @@ $optionsHeader
       SnippetCallDefineLPIT.insertLPIType: fullId ?? "${generator.appNamespaceUpper}LibraryProgrammingInterfaceID.$idIdentifier",
     });
     definesFile.addLinesAfter(context, AFCodeRegExp.startDefineLPI, defineLPI.lines);
-    generator.addImport(context,
-      importPath: lpiFile.importPathStatement, 
-      to: definesFile, 
-    );
+    definesFile.importFile(context, lpiFile);
 
     if(isOverride && fromLib != null) {
-      generator.addImportIDFile(context,
-        libraryId: fromLib,
-        to: definesFile,
-      );
+      definesFile.importIDFile(context, fromLib);
     }
 
     if(!isOverride) {
@@ -170,10 +161,7 @@ $optionsHeader
       // add it to the root application state
       final pathState = generator.pathAppState;
       final stateFile = generator.modifyFile(context, pathState);
-      generator.addImport(context,
-        importPath: modelFile.importPathStatement,
-        to: stateFile,
-      );
+      stateFile.importFile(context, modelFile);
 
       // add its initial value to the state
       final declareInitialValue = context.createSnippet(SnippetInvokeInitialStateT(), extend: modelInsertions);
@@ -194,13 +182,10 @@ $optionsHeader
         
         // then, declare the function that we just called.
         testDataFile.addLinesAtEnd(context, declareDefineTestData.lines);
-        testDataFile.addImports(context, declareDefineTestData.extraImports);
+        testDataFile.importAll(context, declareDefineTestData.extraImports);
 
         // need to import the model itself.
-        generator.addImport(context, 
-          importPath: modelFile.importPathStatement, 
-          to: testDataFile, 
-        );
+        testDataFile.importFile(context, modelFile);
         
         context.createDeclareId("${generator.appNamespaceUpper}TestDataID.stateFullLogin$identifier");
 
@@ -221,7 +206,7 @@ $optionsHeader
         AFSourceTemplate.insertPackagePathInsertion: modelFile.importPathStatement
       });
       
-      accessFile.addImports(context, declareImport.lines);
+      accessFile.importAll(context, declareImport.lines);
     }
 
     // export it
@@ -249,14 +234,11 @@ $optionsHeader
       StateViewT.insertStateViewPrefix: generator.removeSuffix(identifier, AFCodeGenerator.stateViewSuffix)
     });
 
-    final imports = <String>[];
     // if we can find the specified theme, then we need to import it.
     final pathTheme = generator.pathTheme(theme, isCustomParent: false);
     if(pathTheme != null) {
-      generator.addImportsForPath(context, pathTheme, imports: imports, requireExists: false);    
+      stateViewFile.importProjectPath(context, pathTheme);
     }
-
-    stateViewFile.addImports(context, imports);
 
     generator.addExportsForFiles(context, args, [
       stateViewFile

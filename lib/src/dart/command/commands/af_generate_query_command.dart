@@ -134,17 +134,13 @@ $optionsHeader
     final queryPath = generator.pathQuery(queryType);
     final queryFile = generator.createFile(context, queryPath, queryTemplate, insertions: queryInsertions);    
     
-    final imports = <String>[];
     // see if the state file exists
     final stateFilePath = generator.pathRootState(rootStateType);
-    generator.addImportsForPath(context, stateFilePath, imports: imports, requireExists: false);
+    queryFile.importProjectPath(context, stateFilePath);
     
     // if the result exists in the models area
     final modelFilePath = generator.pathModel(resultType);
-    generator.addImportsForPath(context, modelFilePath, imports: imports);
-
-    queryFile.addImports(context, imports);
-
+    queryFile.importProjectPath(context, modelFilePath);
   }
 
 }

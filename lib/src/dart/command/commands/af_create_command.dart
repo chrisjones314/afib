@@ -286,7 +286,7 @@ $optionsHeader
       LibraryInstallCoreT.insertCallInstallTests: templateCall,
     });
     
-    fileInstallUI.addImports(cmdContext, [importCore]);
+    fileInstallUI.importAll(cmdContext, [importCore]);
     
     generator.addExportsForFiles(cmdContext, args, [fileInstallUI]);
 
@@ -331,10 +331,7 @@ $optionsHeader
 
     });
     if(context.isApp) {
-      generator.addImport(context.command, 
-        importPath: generator.importStatementPath(generator.pathInstallCoreApp), 
-        to: fileMain, 
-      );
+      fileMain.importProjectPathString(context.command, generator.importStatementPath(generator.pathInstallCoreApp));
     }
 
     context.createFile(generator.pathTestData, TestDataT());
@@ -361,10 +358,7 @@ $optionsHeader
 
     final mainFile = context.createFile(generator.pathMain, mainTemplate);
     context.createFile(generator.pathApp, AppT());
-    generator.addImport(context.command, 
-      importPath: generator.importStatementPath(generator.pathInstallLibraryCore), 
-      to: mainFile
-    );
+    mainFile.importProjectPathString(context.command, generator.importStatementPath(generator.pathInstallLibraryCore));
   }
 
   void _createInitializationFiles(AFCreateCommandContext context) {
@@ -394,7 +388,7 @@ $optionsHeader
     imports.addLinesAtEnd(context.command, [
       "import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';"
     ]);
-    fileDefineCore.addImports(context.command, imports.lines);
+    fileDefineCore.importAll(context.command, imports.lines);
 
     context.createFile(generator.pathInstallBase, InstallBaseT());
     context.createFile(generator.pathInstallLibraryBase, InstallLibraryBaseT());

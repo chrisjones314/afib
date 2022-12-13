@@ -1,12 +1,4 @@
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
-import 'package:afib/src/dart/redux/actions/af_async_query.dart';
-import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
-import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
-import 'package:afib/src/dart/utils/af_id.dart';
-import 'package:afib/src/dart/utils/af_route_param.dart';
-import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
-import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/utils/af_api_mixins.dart';
 import 'package:flutter/widgets.dart';
 

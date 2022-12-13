@@ -11,7 +11,7 @@ class AFQueryError {
 
   AFQueryError({
     required this.message, 
-    required this.code, 
+    this.code = 100, 
     this.custom});
 
   factory AFQueryError.createMessage(String message) {

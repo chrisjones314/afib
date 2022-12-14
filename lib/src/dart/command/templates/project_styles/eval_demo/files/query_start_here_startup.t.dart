@@ -26,13 +26,9 @@ class QueryStartHereStartupT extends QueryExampleStartHereT {
       insertExtraImports: '''
 import 'dart:async';
 import 'package:afib/afib_flutter.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/read_count_in_state_query.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/read_referenced_user_query.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_credential_root.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplate.insertAppNamespaceInsertion}_id.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/home_page_screen.dart';
+import 'package:sqlite3/sqlite3.dart' as sql;
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/check_signin_query.dart';
 ''',
       insertMemberVariables: AFSourceTemplate.empty,
       insertConstructorParams: AFSourceTemplate.empty,
@@ -52,7 +48,7 @@ context.onSuccess(AFUnused.unused);
 context.executeQuery(CheckSigninQuery());
 ''',
       insertAdditionalMethods: '''
-  void _establishSchema(Database db) {
+  void _establishSchema(sql.Database db) {
 db.execute(\'''CREATE TABLE IF NOT EXISTS \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableCountHistory} (
   \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colId} INTEGER PRIMARY KEY,
   \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colUserId} INTEGER NOT NULL,

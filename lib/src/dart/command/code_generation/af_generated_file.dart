@@ -298,7 +298,6 @@ class AFGeneratedFile {
     // fix up any imports, sorting them and removing excess spaces.
     buffer.fixupImports();
 
-
     final f = File(path);
     f.writeAsStringSync(buffer.toString());
   }

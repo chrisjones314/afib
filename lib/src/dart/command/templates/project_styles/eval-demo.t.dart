@@ -34,7 +34,9 @@ generate state ReferencedUser --override-templates "core/files/model=project_sty
 generate query ReadCountHistoryQuery --result-type CountHistoryRoot --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_read_count_history"
 generate query ReadReferencedUserQuery --result-type ReferencedUser --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_read_referenced_user"
 generate query WriteCountHistoryEntryQuery --result-type CountHistoryEntry --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_write_count_history_entry"
-generate query StartupQuery --result-type UserCredentialRoot --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_startup"
+generate query StartupQuery --result-type AFUnused --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_startup"
+generate query ResetHistoryQuery --result-type CountHistoryRoot --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_reset_history"
+generate query CheckSigninQuery --result-type UserCredentialRoot --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_check_signin"
 generate ui StartupScreen --override-templates +
   +core/snippets/screen_build_with_spi_impl=project_styles/eval_demo/snippets/startup_screen_build_with_spi
   +core/snippets/minimal_screen_build_body_impl=project_styles/eval_demo/snippets/startup_screen_build_body
@@ -66,7 +68,7 @@ generate test StartupStateTest --override-templates +
   +core/snippets/state_test_impl=project_styles/eval_demo/snippets/startup_state_test
 generate test InitialWireframe --initial-screen HomePageScreen --override-templates +
   +core/snippets/wireframe_body=project_styles/eval_demo/snippets/initial_wireframe_body
-generate custom ${insertAppNamespaceUpper}SqliteDB --custom-path state/db --override-templates "core/files/custom=project_styles/eval_demo/files/sqlite_db"
+generate custom ${insertAppNamespaceUpper}SqliteDB --path lib/state/db --override-templates "core/files/custom=project_styles/eval_demo/files/sqlite_db"
 ''';
 
 }

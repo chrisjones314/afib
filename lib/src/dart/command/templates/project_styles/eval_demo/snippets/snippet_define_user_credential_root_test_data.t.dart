@@ -13,7 +13,7 @@ class SnippetDefineUserCredentialRootTestDataT {
         SnippetDefineTestDataT.insertModelDeclaration: '''
 final userCred = UserCredentialRoot(
   userId: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris,
-  token: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris,
+  token: "--",
 );
 
 // feel its a little less confusing if the example state test refers to a more natural ID.

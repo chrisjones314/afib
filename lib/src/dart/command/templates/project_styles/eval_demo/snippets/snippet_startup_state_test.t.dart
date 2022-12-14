@@ -10,20 +10,26 @@ class SnippetStartupStateTestT extends AFSnippetSourceTemplate {
   @override
   List<String> get extraImports {
     return [
-"import 'package:$insertPackagePath/query/simple/read_count_in_state_query.dart';",
+"import 'package:$insertPackagePath/query/simple/read_count_history_query.dart';",
 "import 'package:$insertPackagePath/query/simple/read_referenced_user_query.dart';",
 "import 'package:$insertPackagePath/query/simple/startup_query.dart';",
+"import 'package:$insertPackagePath/query/simple/check_signin_query.dart';",
 "import 'package:$insertPackagePath/query/simple/write_count_history_entry_query.dart';",
 "import 'package:$insertPackagePath/state/models/count_history_entry.dart';",
 "import 'package:$insertPackagePath/test/${insertAppNamespace}_state_test_shortcuts.dart';",
+"import 'package:$insertPackagePath/query/simple/reset_history_query.dart';",
+"import 'package:$insertPackagePath/state/root/count_history_root.dart';",
+
     ];
   }
 
   @override
   String get template => '''
-testContext.defineQueryResponseFixed<StartupQuery>(${insertAppNamespaceUpper}TestDataID.userCredentialChris);
+testContext.defineQueryResponseUnused<StartupQuery>();
+testContext.defineQueryResponseFixed<CheckSigninQuery>(${insertAppNamespaceUpper}TestDataID.userCredentialChris);
 testContext.defineQueryResponseFixed<ReadReferencedUserQuery>(${insertAppNamespaceUpper}TestDataID.referencedUserChris);
-testContext.defineQueryResponseFixed<ReadCountInStateQuery>(${insertAppNamespaceUpper}TestDataID.countHistoryChris);
+testContext.defineQueryResponseFixed<ReadCountHistoryQuery>(${insertAppNamespaceUpper}TestDataID.countHistoryChris);
+testContext.defineQueryResponseFixed<ResetHistoryQuery>(CountHistoryRoot.initialState());
 testContext.defineQueryResponseDynamic<WriteCountHistoryEntryQuery>(body: (context, query) {
     final entry = query.entry;
     CountHistoryEntry result;

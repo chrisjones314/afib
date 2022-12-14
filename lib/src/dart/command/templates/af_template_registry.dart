@@ -26,10 +26,13 @@ import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/m
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/model_referenced_user.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/model_referenced_users_root.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/model_user_credential_root.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/query_check_signin.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/query_read_count_history.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/query_read_referenced_user.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/query_reset_history.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/query_start_here_startup.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/query_write_count_history_entry.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/sqlite_db.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/start_here_theme.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippets/snippet_counter_management_smoke_test.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippets/snippet_define_count_history_root_test_data.t.dart';
@@ -44,8 +47,6 @@ import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippet
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippets/snippets_startup_screen.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/minimal.t.dart';
 import 'package:path/path.dart';
-
-import 'project_styles/eval_demo/files/sqlite_db.t.dart';
 
 
 /// A registry of source code templates umodel in code generation.
@@ -102,6 +103,8 @@ class AFTemplateRegistry {
     registerFile(QueryStartHereStartupT.example());
     registerFile(StartHereThemeT.example());
     registerFile(SqliteDBT.example());
+    registerFile(QueryResetHistoryT.example());
+    registerFile(QueryCheckSigninT.example());
 
     registerSnippet(SnippetStartupScreenBuildWithSPIImplT());
     registerSnippet(SnippetStartupScreenBuildBodyT());

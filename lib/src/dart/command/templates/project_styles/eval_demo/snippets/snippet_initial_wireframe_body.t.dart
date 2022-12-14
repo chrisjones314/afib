@@ -24,7 +24,11 @@ bool _executeHandleEvent${UnitTestT.insertTestName}Wireframe(AFWireframeExecutio
     final param = context.accessEventParam<CounterManagementScreenRouteParam>();
     final countHistory = stateView.countHistory;
     final revised = countHistory.reviseAddEntry(
-      CountHistoryEntry.createNew(count: param.clickCount, idPrefix: "count_wireframe")
+      CountHistoryEntry.createNew(
+        count: param.clickCount, 
+        userId: stateView.userCredential.userId,
+        idPrefix: "count_wireframe"
+      )
     );
     context.updateStateViewRootOne(revised);
     return true;

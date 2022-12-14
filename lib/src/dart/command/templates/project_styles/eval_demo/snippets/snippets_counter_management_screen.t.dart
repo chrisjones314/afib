@@ -256,8 +256,13 @@ void onPressedPersistTransientCount() {
 
   context.executeWireframeEvent(${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.buttonSaveTransientCount, context.p, onSuccess: _onClearClickCount);
 
+  final entry = CountHistoryEntry.createNew(
+    userId: context.s.userCredential.userId,
+    count: context.p.clickCount
+  );
+
   // execute the query which writes it to the history, and 
-  context.executeQuery(WriteCountHistoryEntryQuery(entry: CountHistoryEntry.createNew(count: context.p.clickCount), onSuccess: (successCtx) {
+  context.executeQuery(WriteCountHistoryEntryQuery(entry: entry, onSuccess: (successCtx) {
     _onClearClickCount();
   }));
 

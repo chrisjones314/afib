@@ -3,8 +3,6 @@
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/templates/core/files/custom.t.dart';
-import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_query_shutdown_method.t.dart';
 
 class AFGenerateCustomSubcommand extends AFGenerateSubcommand {
   static const argPath = "path";
@@ -25,7 +23,7 @@ $descriptionHeader
   $description
 
 $optionsHeader
-  --$argPath - The relative path in the project (e.g. state/db)
+  --$argPath - The relative path in the project (e.g. lib/state/db), it should include lib (if you want it), and should omit the filename, which is generated from YourMainType
   --$argExportTemplatesHelp
   --$argOverrideTemplatesHelp
 
@@ -57,6 +55,7 @@ $optionsHeader
     }
 
     final projectPath = path.split("/");
+    projectPath.add("${AFCodeGenerator.convertMixedToSnake(mainType)}.dart");
 
     // create the snippet, which is overriden.
     context.createFile(projectPath, CustomT.core(), insertions: {

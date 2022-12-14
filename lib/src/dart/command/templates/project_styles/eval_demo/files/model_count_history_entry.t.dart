@@ -14,7 +14,7 @@ class ModelCountHistoryEntryT extends ModelExampleStartHereT {
     return ModelCountHistoryEntryT(embeddedInsertions: AFSourceTemplateInsertions(insertions: {
       AFSourceTemplate.insertExtraImportsInsertion: '''
 import 'package:afib/afib_command.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}_example/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
 ''',
       AFSourceTemplate.insertMemberVariablesInsertion: '''
 final String id;
@@ -51,9 +51,9 @@ factory CountHistoryEntry.createNew({
 }
 
 factory CountHistoryEntry.fromDB(Map<String, dynamic> cols) {
-  final id = cols[TDLESqliteDB.colId].toString();
-  final userId = cols[TDLESqliteDB.colUserId];
-  final count = cols[TDLESqliteDB.colCount];
+  final id = cols[${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colId].toString();
+  final userId = cols[${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colUserId];
+  final count = cols[${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colCount];
   return CountHistoryEntry(id: id, userId: userId.toString(), count: count);
 }
 

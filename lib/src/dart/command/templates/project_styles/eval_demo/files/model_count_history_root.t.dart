@@ -14,7 +14,10 @@ class ModelCountHistoryRootT extends ModelExampleStartHereT {
   factory ModelCountHistoryRootT.example() {
     return ModelCountHistoryRootT(embeddedInsertions: AFSourceTemplateInsertions(insertions: {
       AFSourceTemplate.insertExtraImportsInsertion: '''
+import 'package:afib/afib_flutter.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/count_history_entry.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
+import 'package:sqlite3/sqlite3.dart' as sql;
 ''',
       AFSourceTemplate.insertMemberVariablesInsertion: '''
   final Map<String, CountHistoryEntry> history;
@@ -35,6 +38,26 @@ int get totalCount {
     result += entry.count;
   }
   return result;
+}
+
+static CountHistoryRoot fromDB(sql.ResultSet results) {
+  final history = <String, CountHistoryEntry>{};
+
+  for(final row in results) {
+    final entries = row.toTableColumnMap();
+    if(entries == null) {
+      throw AFException("No table column map?");
+    }
+    final values = entries[${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableCountHistory];
+    if(values == null) {
+      throw AFException("No users table?");
+    }
+
+    final entry = CountHistoryEntry.fromDB(values);
+    history[entry.id] = entry;
+  }
+
+  return CountHistoryRoot(history: history);
 }
 
 factory CountHistoryRoot.initialState() {

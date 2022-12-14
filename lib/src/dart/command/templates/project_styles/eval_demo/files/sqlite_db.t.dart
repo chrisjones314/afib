@@ -35,7 +35,7 @@ class ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB {
     required this.db
   });
 
-  static Future<Database> accessDB() async {
+  static Future<sql.Database> accessDB() async {
     final result = await ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.access();
     return result.db;
   }

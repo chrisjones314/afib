@@ -11,8 +11,8 @@ class SnippetDefineCountHistoryRootTestDataT extends SnippetDefineTestDataT {
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         SnippetDefineTestDataT.insertModelDeclaration: '''
 final countChris = CountHistoryRoot.fromList([
-  CountHistoryEntry(id: "__test_1", count: 4),
-  CountHistoryEntry(id: "__test_2", count: 3),
+  CountHistoryEntry(id: "__test_1", userId: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris, count: 4),
+  CountHistoryEntry(id: "__test_2", userId: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris, count: 3),
 ]);
 
 // feel its a little less confusing if the example state test refers to a more natural ID.

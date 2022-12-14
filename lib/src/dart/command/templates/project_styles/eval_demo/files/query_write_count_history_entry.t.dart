@@ -26,6 +26,7 @@ class QueryWriteCountHistoryEntryT extends QueryExampleStartHereT {
 import 'dart:async';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplate.insertAppNamespaceInsertion}_id.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
 ''',
       insertMemberVariables: '''
 static int simulatedStaticId = 10;
@@ -33,21 +34,16 @@ final CountHistoryEntry entry;
 ''',
       insertConstructorParams: 'required this.entry,',
       insertStartImpl: '''
-// see StartupQuery for why you would never hard code test data into startAsync in a 
-// real app.  This is an ideosyncracy of this particular example app.
-Timer(const Duration(milliseconds: 500), () {
-  // we need to artificially create an id.
-  if(AFDocumentIDGenerator.isNewId(entry.id)) {
-    final revisedEntry = entry.reviseId("_from_startAsync_\$simulatedStaticId");
-    simulatedStaticId++;
-    context.onSuccess(revisedEntry);
-  }
-});    
+final db = await ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.accessDB();
+final uid = int.tryParse(entry.userId);
+db.select("INSERT INTO \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableCountHistory} (\${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colUserId}, \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colCount}) VALUES (?, ?)", [uid, entry.count]);
+final revised = entry.reviseId(db.lastInsertRowId.toString());
+context.onSuccess(revised);
 ''',
       insertFinishImpl: '''
 final entry = context.r;
-final tdleState = context.accessComponentState<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>();
-final history = tdleState.countHistory;
+final ${AFSourceTemplate.insertAppNamespaceInsertion}State = context.accessComponentState<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>();
+final history = ${AFSourceTemplate.insertAppNamespaceInsertion}State.countHistory;
 final revised = history.reviseAddEntry(entry);
 context.updateComponentRootStateOne<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>(revised);
 ''',

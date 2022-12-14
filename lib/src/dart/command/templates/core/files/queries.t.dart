@@ -93,7 +93,7 @@ class $insertQueryType extends $insertQueryParentType<$insertResultType> {
   );
   
   @override
-  void startAsync(AFStartQueryContext<$insertResultType> context) {
+  void startAsync(AFStartQueryContext<$insertResultType> context) async {
     $insertStartImpl
   }
 

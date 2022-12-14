@@ -14,6 +14,8 @@ class SnippetInitialWireframeBodyT extends AFSnippetSourceTemplate {
       "import 'package:$insertPackagePath/ui/screens/counter_management_screen.dart';",
       "import 'package:$insertPackagePath/state/stateviews/${insertAppNamespace}_default_state_view.dart';",
       "import 'package:$insertPackagePath/state/models/count_history_entry.dart';",
+      "import 'package:$insertPackagePath/state/root/count_history_root.dart';",
+
   ];
   
   String get template => '''
@@ -32,7 +34,10 @@ bool _executeHandleEvent${UnitTestT.insertTestName}Wireframe(AFWireframeExecutio
     );
     context.updateStateViewRootOne(revised);
     return true;
-  } 
+  }  else if(context.isScreenAndWidget(${AFSourceTemplate.insertAppNamespaceInsertion.upper}ScreenID.counterManagement, ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.buttonResetHistory)) {
+    context.updateStateViewRootOne(CountHistoryRoot.initialState());
+    return true;
+  }
   return false;
 }
 ''';

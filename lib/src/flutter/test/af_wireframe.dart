@@ -73,6 +73,19 @@ class AFWireframeExecutionContext with AFStandardNavigateMixin {
 
   void updateStateViewRootN(List<Object> source) {
     final sv = AFibF.g.testData.resolveStateViewModels(source);
+
+    // preserve what already exists.
+    final models = stateView?.models;
+    if(models != null) {
+      for(final key in models.keys) {
+        if(!sv.containsKey(key)) {
+          final model = models[key];
+          if(model != null) {
+            sv[key] = model;
+          }
+        }
+      }
+    }
     dispatch(AFUpdatePrototypeScreenTestModelsAction(AFUIScreenTestID.wireframe, sv));
   }
 

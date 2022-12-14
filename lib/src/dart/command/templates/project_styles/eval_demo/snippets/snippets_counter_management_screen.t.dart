@@ -269,6 +269,7 @@ void onPressedPersistTransientCount() {
 }
 
 void onPressedResetHistory() {
+  context.executeWireframeEvent(${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.buttonResetHistory, context.p);
   context.executeQuery(ResetHistoryQuery(userId: context.s.userCredential.userId));
 }
 

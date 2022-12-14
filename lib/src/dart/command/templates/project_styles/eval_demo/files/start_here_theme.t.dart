@@ -9,7 +9,7 @@ class StartHereThemeT {
   static ThemeT example() {
     return ThemeT(
       templateFileId: "start_here_theme",
-      templateFolder: AFProjectPaths.pathGenerateExampleStartHereFiles,
+      templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoFiles,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 Widget childCaptionSimulatedLatency() {

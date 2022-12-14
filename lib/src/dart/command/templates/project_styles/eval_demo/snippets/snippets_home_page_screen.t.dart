@@ -11,7 +11,7 @@ class SnippetHomePageScreenExtraImports {
   static SnippetExtraImportsT example() {
     return SnippetExtraImportsT(
       templateFileId: "home_page_screen_extra_imports",    
-      templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+      templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertExtraImportsInsertion: '''
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/counter_management_screen.dart';
@@ -28,7 +28,7 @@ class SnippetHomePageScreenRouteParamT {
   static SnippetStandardRouteParamT example() {
     return SnippetStandardRouteParamT(
       templateFileId: "home_page_screen_route_param",
-      templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+      templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertMemberVariablesInsertion: '''
 static const stanzas = <String>[
@@ -73,7 +73,7 @@ class SnippetHomePageScreenNavigatePushT {
   static SnippetNavigatePushT example() {
     return SnippetNavigatePushT(
       templateFileId: "home_page_screen_navigate_push",
-      templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+      templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         SnippetNavigatePushT.insertParamDecl: '{ int lineNumber = 0 }',
         SnippetNavigatePushT.insertParamCall: 'lineNumber: lineNumber,',
@@ -85,7 +85,7 @@ class SnippetHomePageScreenNavigatePushT {
 class SnippetHomePageScreenAdditionalMethodsT extends AFSnippetSourceTemplate {
   SnippetHomePageScreenAdditionalMethodsT(): super(
     templateFileId: "home_page_screen_additional_methods",
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
   String get template => '''
@@ -137,7 +137,7 @@ Widget _buildStanzasCard(HomePageScreenSPI spi) {
 class SnippetHomePageScreenBuildBodyT extends AFSnippetSourceTemplate {
   SnippetHomePageScreenBuildBodyT(): super(
     templateFileId: "home_page_screen_build_body",
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
   String get template => '''
@@ -157,7 +157,7 @@ class SnippetHomePageScreenBuildBodyT extends AFSnippetSourceTemplate {
 class SnippetHomePageScreenBuildWithSPIImplT extends AFSnippetSourceTemplate {
   SnippetHomePageScreenBuildWithSPIImplT(): super(
     templateFileId: "home_page_screen_build_with_spi",
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
   String get template => '''
@@ -215,7 +215,7 @@ void onPressedIHaveNoObjection() {
     });
     return SnippetDeclareSPIT(
       templateFileId: "home_page_screen_spi",    
-      templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+      templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: ei,
     );
   }

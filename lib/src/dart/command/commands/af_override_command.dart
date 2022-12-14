@@ -46,7 +46,7 @@ $optionsHeader
       command: this, 
       unnamedCount: 1, 
       named: {
-        argParentType: null,
+        argParentType: "",
         AFGenerateUISubcommand.argParentTheme: null,
         AFGenerateUISubcommand.argParentThemeID: null,
       }
@@ -54,7 +54,7 @@ $optionsHeader
 
     final uiName = args.accessUnnamedFirst;
     final parentType = args.accessNamed(argParentType);
-    if(parentType == null) {
+    if(parentType.isEmpty) {
       throwUsageError("You must specify --$argParentType");
     }
 

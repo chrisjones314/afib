@@ -1,13 +1,10 @@
-
-
 import 'package:afib/afib_command.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_test_data.dart';
 
 class SnippetStartupStateTestT extends AFSnippetSourceTemplate {
 
   SnippetStartupStateTestT(): super(
     templateFileId: 'startup_state_test',
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
 
   @override

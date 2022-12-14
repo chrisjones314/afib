@@ -6,7 +6,7 @@ class SnippetCounterManagementSmokeTest extends AFSnippetSourceTemplate {
 
   SnippetCounterManagementSmokeTest(): super(
     templateFileId: "counter_management_smoke_test",
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
 
   @override

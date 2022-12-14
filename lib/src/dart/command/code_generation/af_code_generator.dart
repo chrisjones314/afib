@@ -13,7 +13,6 @@ import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_export_statement.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_id_statement.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_from_package.t.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';

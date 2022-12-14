@@ -32,13 +32,13 @@ class AFProjectPaths {
   static const folderCore = "core";
   static const folderExample = "example";
   static const folderFiles = "files";
-  static const folderStartHere = "start_here";
+  static const folderEvalDemo = "eval_demo";
   static const folderSnippets = "snippets";
   static const pathGenerateCoreFiles = [folderCore, folderFiles];
   static const pathGenerateCoreSnippets = [folderCore, folderSnippets];
   static const pathGenerateExample = [folderExample];
-  static const pathGenerateExampleStartHereFiles = [folderProjectStyles, folderStartHere, folderFiles];
-  static const pathGenerateExampleStartHereSnippets = [folderProjectStyles, folderStartHere, folderSnippets];
+  static const pathGenerateExampleEvalDemoFiles = [folderProjectStyles, folderEvalDemo, folderFiles];
+  static const pathGenerateExampleEvalDemoSnippets = [folderProjectStyles, folderEvalDemo, folderSnippets];
   static const pathProjectStyles = [folderProjectStyles];
 
   static List<String>? extraParentFolder;

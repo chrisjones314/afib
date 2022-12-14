@@ -2,8 +2,6 @@
 
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
-import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_query_shutdown_method.t.dart';
 
 class AFGenerateIDSubcommand extends AFGenerateSubcommand {
 

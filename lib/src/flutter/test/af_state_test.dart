@@ -18,6 +18,7 @@ import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
+import 'package:afib/src/dart/utils/af_unused.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
 import 'package:afib/src/flutter/test/af_screen_test.dart';
@@ -467,6 +468,7 @@ class _AFStateRegisterSpecialResultStatement<TQuery extends AFAsyncQuery> extend
     return _AFStateRegisterSpecialResultStatement(querySpecifier,_AFStateRegisterSpecialResultKind.resultNone);
   }
 
+
   factory _AFStateRegisterSpecialResultStatement.resultLive(Object querySpecifier) {
     return _AFStateRegisterSpecialResultStatement(querySpecifier,_AFStateRegisterSpecialResultKind.resultLive);
   }
@@ -831,6 +833,12 @@ class AFSpecificStateTestDefinitionContext {
     assert(TQuery != AFAsyncQuery, errSpecifyTypeParameter);
     test.defineQueryResponseNone<TQuery>(querySpecifier ?? TQuery, definitions);
   }
+
+  void defineQueryResponseUnused<TQuery extends AFAsyncQuery>({ Object? querySpecifier }) {
+    assert(TQuery != AFAsyncQuery, errSpecifyTypeParameter);
+    test.defineQueryResponse<TQuery>(querySpecifier ?? TQuery, definitions, AFUnused.unused);
+  }
+
 
   void defineQueryResponseNull<TQuery extends AFAsyncQuery>({ Object? querySpecifier }) {
     assert(TQuery != AFAsyncQuery, errSpecifyTypeParameter);

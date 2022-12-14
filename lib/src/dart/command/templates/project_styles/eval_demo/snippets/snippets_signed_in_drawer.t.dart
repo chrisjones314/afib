@@ -3,15 +3,13 @@ import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_spi.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_extra_imports.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_navigate_push.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_standard_route_param.t.dart';
 
 
 class SnippetSignedInDrawerExtraImportsT {
   static SnippetExtraImportsT example() {
     return SnippetExtraImportsT(
       templateFileId: "signed_in_drawer_extra_imports",    
-      templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+      templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertExtraImportsInsertion: '''
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/referenced_user.dart';
@@ -25,7 +23,7 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/refe
 class SnippetSignedInDrawerBuildBodyT extends AFSnippetSourceTemplate {
   SnippetSignedInDrawerBuildBodyT(): super(
     templateFileId: "signed_in_drawer_build_body",
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
   String get template => '''
@@ -61,7 +59,7 @@ class SnippetSignedInDrawerBuildBodyT extends AFSnippetSourceTemplate {
 class SnippetSignedInDrawerBuildWithSPIImplT extends AFSnippetSourceTemplate {
   SnippetSignedInDrawerBuildWithSPIImplT(): super(
     templateFileId: "signed_in_drawer_build_with_spi",
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
   String get template => '''
@@ -102,7 +100,7 @@ String get email {
     });
     return SnippetDeclareSPIT(
       templateFileId: "signed_in_drawer_spi",    
-      templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+      templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: ei,
     );
   }

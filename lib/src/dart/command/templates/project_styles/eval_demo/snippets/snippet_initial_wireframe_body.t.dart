@@ -6,7 +6,7 @@ import 'package:afib/src/dart/command/templates/core/files/unit_test.t.dart';
 class SnippetInitialWireframeBodyT extends AFSnippetSourceTemplate {
   SnippetInitialWireframeBodyT(): super(
     templateFileId: "initial_wireframe_body",
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
 
   @override

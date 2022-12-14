@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_error.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';

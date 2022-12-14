@@ -10,6 +10,7 @@ class QueryStartHereStartupT extends QueryExampleStartHereT {
     required Object insertStartImpl,
     required Object insertConstructorParams,
     required Object insertFinishImpl,
+    required Object insertAdditionalMethods,
   }): super(
     templateFileId: "query_startup",
     insertExtraImports: insertExtraImports,
@@ -17,6 +18,7 @@ class QueryStartHereStartupT extends QueryExampleStartHereT {
     insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
+    insertAdditionalMethods: insertAdditionalMethods,
   );
 
   factory QueryStartHereStartupT.example() {
@@ -30,50 +32,57 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_c
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplate.insertAppNamespaceInsertion}_id.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/home_page_screen.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
 ''',
       insertMemberVariables: AFSourceTemplate.empty,
       insertConstructorParams: AFSourceTemplate.empty,
       insertStartImpl: '''
-// Note: You would be much, must more likely to throw an unimplemented
-// exception here initially (use throwUnimplemented(), which has a nice error message built in), 
-// and then implement actual asynchronous calls to an external API or store here eventually.   If you want to pass test data
-// as a result in development, the state-test is the correct mechanism to do so.
-// In this example, I _neither_ want to commit to a particular storage model (e.g. sqllite, firebase),
-// nor do I want the sample app to fail in debug mode, so I have hard-coded a result here.
+final db = await ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.accessDB();
 
-// do a delay here so you can see the startup screen briefly.
-Timer(const Duration(milliseconds: 100), () {
-  context.onSuccess(UserCredentialRoot(
-    userId: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris,
-    token:  ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris,
-  ));
-});
+// see if the count table exists.
+final result = db.select("SELECT name FROM sqlite_master WHERE type='table' AND name='\${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableUserCredential}';");
+if(result.isEmpty) {
+  // if it doesn't, then create the entire schema and populate it
+  _establishSchema(db);
+}
+
+context.onSuccess(AFUnused.unused);
 ''',
       insertFinishImpl: '''
-final cred = context.response;
-
-// save the user credential to our state.
-context.updateComponentRootStateOne<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>(cred);
-
-if(cred.isSignedIn) {
-  // load in the user record for this user.
-  final startupLoad = AFCompositeQuery.createList();
-  startupLoad.add(ReadReferencedUserQuery(userId: cred.userId));
-  startupLoad.add(ReadCountInStateQuery(userId: cred.userId));
-  
-  context.executeQuery(AFCompositeQuery.createFrom(
-    queries: startupLoad, onSuccess: (successCtx) {
-      // Now that we have our state established, navigate to the home screen.   Note that AFib in no way requires a 
-      // 'load all your state on startup' model, but it is a simple place to start in this example.
-      context.navigateReplaceAll(HomePageScreen.navigatePush().castToReplaceAll());
-    }));
-} else {
-  // do nothing, we will just stay on the startup screen.  Later, when we integrate
-  // afib signin, we will transition the startup screen from a 'loading' state to a 
-  // 'show the signin ui' state here.   In this example we haven't yet added a way 
-  // to sign in.
-}
+context.executeQuery(CheckSigninQuery());
 ''',
+      insertAdditionalMethods: '''
+  void _establishSchema(Database db) {
+db.execute(\'''CREATE TABLE IF NOT EXISTS \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableCountHistory} (
+  \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colId} INTEGER PRIMARY KEY,
+  \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colUserId} INTEGER NOT NULL,
+  \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colCount} INTEGER NOT NULL
+);\''');
+
+db.execute(\'''CREATE TABLE IF NOT EXISTS \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableUsers} (
+  \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colId} INTEGER PRIMARY KEY,
+  \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colFirstName} TEXT NOT NULL,
+  \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colLastName} TEXT NOT NULL,
+  \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colEmail} TEXT NOT NULL
+);\''');
+
+db.select("INSERT INTO \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableUsers} (\${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colFirstName}, \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colLastName}, \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colEmail}) values (?, ?, ?)", [
+  "Chris",
+  "Sqlite",
+  "chris@debugnowhere.com",
+]);    
+
+final userId = db.lastInsertRowId;
+db.execute(\'''CREATE TABLE IF NOT EXISTS \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableUserCredential} (
+  \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colId} INTEGER PRIMARY KEY,
+  \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colActiveUserId} INTEGER NOT NULL
+);\''');
+
+db.select("INSERT INTO \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableUserCredential} (\${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colActiveUserId}) values (?)", [
+  userId
+]);    
+}
+'''
     );
   }
 

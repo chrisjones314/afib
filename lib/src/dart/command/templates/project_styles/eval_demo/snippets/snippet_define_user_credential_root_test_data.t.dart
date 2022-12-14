@@ -8,7 +8,7 @@ class SnippetDefineUserCredentialRootTestDataT {
   static SnippetDefineTestDataT example() {
     return SnippetDefineTestDataT(
       templateFileId: "define_user_credential_root_test_data",
-      templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+      templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         SnippetDefineTestDataT.insertModelDeclaration: '''
 final userCred = UserCredentialRoot(

@@ -10,14 +10,16 @@ class QueryExampleStartHereT extends SimpleQueryT {
     required Object insertStartImpl,
     required Object insertConstructorParams,
     required Object insertFinishImpl,
+    required Object insertAdditionalMethods,
   }): super(
     templateFileId: templateFileId,
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereFiles,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoFiles,
     insertExtraImports: insertExtraImports,
     insertMemberVariables: insertMemberVariables,
     insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
+    insertAdditionalMethods: insertAdditionalMethods,
   );
 
 }

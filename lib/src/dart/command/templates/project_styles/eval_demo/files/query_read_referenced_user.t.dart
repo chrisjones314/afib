@@ -17,6 +17,7 @@ class QueryReadReferencedUserT extends QueryExampleStartHereT {
     insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
+    insertAdditionalMethods: AFSourceTemplate.empty,
   );
 
   factory QueryReadReferencedUserT.example() {
@@ -25,20 +26,21 @@ class QueryReadReferencedUserT extends QueryExampleStartHereT {
 import 'dart:async';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplate.insertAppNamespaceInsertion}_id.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
 ''',
       insertMemberVariables: 'final String userId;',
       insertConstructorParams: 'required this.userId,',
       insertStartImpl: '''
-// See StartupQuery for an explanation of why you would never hard-code a test result
-// in a real app.  This is an ideosyncracy of this example app.
-Timer(const Duration(seconds: 1), () {
-  context.onSuccess(ReferencedUser(
-    id: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris,
-    firstName: "Chris",
-    lastName: "Debug",
-  email: 'chris.debug@nowhere.com',
-  ));
-});
+final db = await ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.accessDB();
+final userIdInt = int.tryParse(userId);
+final dbResults = db.select("SELECT * from \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableUsers} where id = ?", [userIdInt]);
+if(dbResults.isEmpty) {
+  context.onError(AFQueryError(message: "Internal error: No user with id \$userId in database?"));
+} else {
+  final firstResult = dbResults.first;
+  final user = ReferencedUser.fromDB(firstResult);
+  context.onSuccess(user);
+}
 ''',
       insertFinishImpl: '''
 // the user we loaded is the response.

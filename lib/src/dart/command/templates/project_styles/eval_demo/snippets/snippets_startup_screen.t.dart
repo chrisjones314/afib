@@ -5,7 +5,7 @@ import 'package:afib/src/dart/command/af_source_template.dart';
 class SnippetStartupScreenBuildBodyT extends AFSnippetSourceTemplate {
   SnippetStartupScreenBuildBodyT(): super(
     templateFileId: "startup_screen_build_body",
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
   String get template => '''
@@ -25,7 +25,7 @@ return Center(
 class SnippetStartupScreenBuildWithSPIImplT extends AFSnippetSourceTemplate {
   SnippetStartupScreenBuildWithSPIImplT(): super(
     templateFileId: "startup_screen_build_with_spi",
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
   String get template => '''

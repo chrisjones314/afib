@@ -9,7 +9,7 @@ class ModelExampleStartHereT extends ModelT {
     AFSourceTemplateInsertions? embeddedInsertions,
   }): super(
     templateFileId: templateFileId,
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereFiles,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoFiles,
     embeddedInsertions: embeddedInsertions,
   );  
 

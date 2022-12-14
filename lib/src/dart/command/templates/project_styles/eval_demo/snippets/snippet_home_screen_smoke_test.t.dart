@@ -6,7 +6,7 @@ class SnippetHomeScreenSmokeTest extends AFSnippetSourceTemplate {
 
   SnippetHomeScreenSmokeTest(): super(
     templateFileId: "home_screen_smoke_test",
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
 
   @override

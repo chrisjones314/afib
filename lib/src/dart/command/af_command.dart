@@ -4,6 +4,7 @@ import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_create_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_custom_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_id_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
@@ -11,6 +12,7 @@ import 'package:afib/src/dart/command/commands/af_generate_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/commands/af_integrate_command.dart';
 import 'package:afib/src/dart/command/commands/af_override_command.dart';
+import 'package:afib/src/dart/command/commands/af_require_command.dart';
 import 'package:afib/src/dart/command/commands/af_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/command/templates/af_template_registry.dart';
@@ -19,6 +21,7 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:args/args.dart' as args;
 import 'package:collection/collection.dart';
 import 'package:path/path.dart';
+import 'package:pubspec_parse/pubspec_parse.dart';
 
 class AFItemWithNamespace {
   /// The namespace used to differentiate third party commands.
@@ -359,6 +362,28 @@ class AFCommandContext {
       arguments: argsParsed,
       coreInsertions: coreInsertions
     );
+  }
+
+  Pubspec loadPubspec( { String? packageName }) {
+    final pathPubspec = generator.pathPubspecYaml;
+    if(!generator.fileExists(pathPubspec)) {
+      throw AFCommandError(error: "The file ${pathPubspec.last} must exist in the folder from which you are running this command");
+    }
+
+    final filePubspec = generator.modifyFile(this, pathPubspec);
+    final pubspec = filePubspec.loadPubspec();
+    final name = pubspec.name;
+
+    if(packageName != null && name != packageName) {
+      throw AFCommandError(error: "Expected yourpackagename to be $name but found $packageName");
+    }
+
+    final import = pubspec.dependencies["afib"];
+    if(import == null) {
+      throw AFCommandError(error: "You must update your pubspec's dependencies section to include afib");
+    }
+    
+    return pubspec;
   }
 
   void setCoreInsertions(AFSourceTemplateInsertions insertions, { required String packagePath }) {
@@ -843,6 +868,7 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
       defineCommand(AFVersionCommand());
       defineCommand(AFCreateAppCommand());
       _defineGenerateCommand(hidden: true);
+      defineCommand(AFRequireCommand(), hidden: true);
     }
 
 
@@ -854,6 +880,7 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
       defineCommand(AFHelpCommand());
       defineCommand(AFInstallCommand());
       defineCommand(AFOverrideCommand());
+      defineCommand(AFRequireCommand());
     }
 
     void _defineGenerateCommand({ required bool hidden }) {
@@ -864,6 +891,7 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
       generateCmd.addSubcommand(AFGenerateCommandSubcommand());      
       generateCmd.addSubcommand(AFGenerateTestSubcommand());
       generateCmd.addSubcommand(AFGenerateIDSubcommand());
+      generateCmd.addSubcommand(AFGenerateCustomSubcommand());
 
     }
 }

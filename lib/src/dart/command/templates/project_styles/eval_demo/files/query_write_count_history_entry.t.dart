@@ -17,6 +17,7 @@ class QueryWriteCountHistoryEntryT extends QueryExampleStartHereT {
     insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
+    insertAdditionalMethods: AFSourceTemplate.empty,
   );
 
   factory QueryWriteCountHistoryEntryT.example() {

@@ -1,8 +1,3 @@
-
-
-
-
-import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 
 class InstallBaseT extends AFCoreFileSourceTemplate {

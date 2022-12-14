@@ -7,7 +7,7 @@ class SnippetDefineCountHistoryRootTestDataT extends SnippetDefineTestDataT {
   
   SnippetDefineCountHistoryRootTestDataT(): super(
       templateFileId: "define_count_history_root_test_data",
-      templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+      templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         SnippetDefineTestDataT.insertModelDeclaration: '''
 final countChris = CountHistoryRoot.fromList([

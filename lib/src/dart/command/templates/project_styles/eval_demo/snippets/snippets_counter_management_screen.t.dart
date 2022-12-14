@@ -11,11 +11,12 @@ class SnippetCounterManagementScreenExtraImportsT {
   static SnippetExtraImportsT example() {
     return SnippetExtraImportsT(
       templateFileId: "counter_management_screen_extra_imports",    
-      templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+      templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertExtraImportsInsertion: '''
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/count_history_entry.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/write_count_history_entry_query.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/reset_history_query.dart';
 ''',
       })
     );
@@ -27,7 +28,7 @@ class SnippetCounterManagementScreenRouteParamT {
   static SnippetStandardRouteParamT example() {
     return SnippetStandardRouteParamT(
       templateFileId: "counter_management_screen_route_param",
-      templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+      templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertMemberVariablesInsertion: '''
 final int clickCount;
@@ -52,7 +53,7 @@ class SnippetCounterManagementScreenNavigatePushT {
   static SnippetNavigatePushT example() {
     return SnippetNavigatePushT(
       templateFileId: "counter_management_screen_navigate_push",
-      templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+      templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         SnippetNavigatePushT.insertParamDecl: '{ int clickCount = 0, }',
         SnippetNavigatePushT.insertParamCall: 'clickCount: clickCount,',
@@ -64,7 +65,7 @@ class SnippetCounterManagementScreenNavigatePushT {
 class SnippetCounterManagementScreenAdditionalMethodsT extends AFSnippetSourceTemplate {
   SnippetCounterManagementScreenAdditionalMethodsT(): super(
     templateFileId: "counter_management_screen_additional_methods",
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
   String get template => '''
@@ -125,6 +126,15 @@ Widget _buildIncrementStateCard(CounterManagementScreenSPI spi) {
     )
   ));
 
+  rows.add(t.childSingleRowButton(
+    button: t.childButtonPrimaryText(
+      wid: ${insertAppNamespaceUpper}WidgetID.buttonResetHistory,
+      text: "Reset History", 
+      onPressed: spi.onPressedResetHistory,
+    )
+  ));
+
+
   rows.add(t.childCaptionSimulatedLatency());
 
   return _buildCard(spi, rows);
@@ -167,7 +177,7 @@ Widget _buildFullHistoryCard(CounterManagementScreenSPI spi) {
 class SnippetCounterManagementScreenBuildBodyT extends AFSnippetSourceTemplate {
   SnippetCounterManagementScreenBuildBodyT(): super(
     templateFileId: "counter_management_screen_build_body",
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
   String get template => '''
@@ -188,7 +198,7 @@ return ListView(
 class SnippetCounterManagementScreenBuildWithSPIImplT extends AFSnippetSourceTemplate {
   SnippetCounterManagementScreenBuildWithSPIImplT(): super(
     templateFileId: "counter_management_screen_build_with_spi",
-    templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+    templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
   String get template => '''
@@ -253,6 +263,11 @@ void onPressedPersistTransientCount() {
 
 }
 
+void onPressedResetHistory() {
+  context.executeQuery(ResetHistoryQuery(userId: context.s.userCredential.userId));
+}
+
+
 void _onClearClickCount() {
   // then, clear the transient click count.
   final revisedClear = context.p.reviseClearClickCount();
@@ -263,7 +278,7 @@ void _onClearClickCount() {
     });
     return SnippetDeclareSPIT(
       templateFileId: "counter_management_screen_spi",    
-      templateFolder: AFProjectPaths.pathGenerateExampleStartHereSnippets,
+      templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: ei,
     );
   }

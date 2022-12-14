@@ -1,6 +1,5 @@
 
 import 'package:afib/afib_command.dart';
-import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
 
 class SnippetDrawerExtraConfigParamsT extends AFCoreSnippetSourceTemplate {
 

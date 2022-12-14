@@ -38,6 +38,7 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_fundamenta
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_include_install_tests.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_prototype_environment_impl.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
+import 'package:pubspec_parse/pubspec_parse.dart';
 
 class AFCreateCommandContext {
   final AFCommandContext command;
@@ -223,7 +224,7 @@ $optionsHeader
     context.output.writeTwoColumns(col1: "creating ", col2: "project-style=$projectStyle");
 
     final generator = ctx.generator;
-    _verifyPubspec(ctx, packageName);
+    final pubspec = ctx.loadPubspec(packageName: packageName);
 
     _createStandardFolders(context);
     if(!context.isLibrary) {
@@ -425,30 +426,6 @@ $optionsHeader
     AFConfigCommand.updateConfig(context.command, AFibD.config, AFibD.configEntries, context.command.arguments);
     AFConfigCommand.writeUpdatedConfig(context.command);
   }
-
-  AFGeneratedFile _verifyPubspec(AFCommandContext ctx, String packageName) {
-    final generator = ctx.generator;
-    final pathPubspec = generator.pathPubspecYaml;
-    if(!generator.fileExists(pathPubspec)) {
-      throw AFCommandError(error: "The file ${pathPubspec.last} must exist in the folder from which you are running this command");
-    }
-
-    final filePubspec = generator.modifyFile(ctx, pathPubspec);
-    final pubspec = filePubspec.loadPubspec();
-    final name = pubspec.name;
-
-    if(name != packageName) {
-      throwUsageError("Expected yourpackagename to be $name but found $packageName");
-    }
-
-    final import = pubspec.dependencies["afib"];
-    if(import == null) {
-      throw AFCommandError(error: "You must update your pubspec's dependencies section to include afib");
-    }
-    
-    return filePubspec;
-  }
-
 
   AFGeneratedFile _createAppCommand(AFCreateCommandContext context) {
     final generator = context.generator;

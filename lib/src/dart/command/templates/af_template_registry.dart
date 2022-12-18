@@ -51,8 +51,10 @@ import 'package:afib/src/dart/command/templates/project_styles/minimal.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin-integrate.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_signin.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_signout.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_starter_signin_startup.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/signin_actions_lpi.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin/snippets/snippets_home_page_screen.t.dart';
 import 'package:path/path.dart';
 
 import 'project_styles/starter-signin/files/query_check_signin.t.dart';
@@ -156,6 +158,12 @@ class AFTemplateRegistry {
     registerFile(QueryCheckSigninSigninStarterT.example());
     registerFile(SigninStarterSigninActionsLPIT.example());
     registerFile(QuerySigninSigninStarterT.example());
+    registerFile(QuerySigninSignoutStarterT.example());
+
+    registerSnippet(SnippetSigninStarterHomePageScreenExtraImportsT.example());
+    registerSnippet(SnippetSigninStarterHomePageScreenBuildBodyT());
+    registerSnippet(SnippetSigninStarterHomePageScreenSPIT.example());
+    
   }  
 
   AFFileSourceTemplate? findEmbeddedTemplateFile(List<String> path) {

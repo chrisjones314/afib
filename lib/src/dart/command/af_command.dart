@@ -571,6 +571,37 @@ class AFCommandContext {
     return generator.createFile(this, projectPath, template, insertions: fullInsert);
   }
 
+  static List<String> consolidateProjectStyleLines(List<String> rawLines) {
+    final result = <String>[];
+    var idxLine = 0;
+    while(idxLine < rawLines.length) {
+      var rawLine = rawLines[idxLine].trim();
+      if(rawLine.endsWith("+")) {
+        rawLine = rawLine.substring(0, rawLine.length-1).trim();
+      }
+      idxLine++;
+      final compressed = StringBuffer();
+      var lineNext = (idxLine < rawLines.length) ? rawLines[idxLine].trim() : "";
+      while(lineNext.startsWith("+")) {
+        final add = lineNext.substring(1);
+        if(compressed.isNotEmpty) {
+          compressed.write(",");
+        }
+        compressed.write(add);
+        idxLine++;
+        lineNext = (idxLine < rawLines.length) ? rawLines[idxLine].trim() : "";
+      }
+      
+      if(compressed.isNotEmpty) {
+        rawLine = '$rawLine "$compressed"';
+      }
+      result.add(rawLine);
+    }
+
+    return result;
+  }
+
+
   AFGeneratedFile readProjectStyle(
     List<String> projectPath, { 
       AFSourceTemplateInsertions? extend,

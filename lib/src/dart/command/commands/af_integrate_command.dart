@@ -120,7 +120,7 @@ $optionsHeader
 
     final fileProjectStyle = context.readProjectStyle(stylePath, insertions: context.coreInsertions.insertions);
 
-    final lines = fileProjectStyle.buffer.lines;
+    final lines = AFCommandContext.consolidateProjectStyleLines(fileProjectStyle.buffer.lines);
     for(final line in lines) {
       context.output.writeTwoColumns(col1: "execute ", col2: "$line");
       if(!line.startsWith("echo")) {

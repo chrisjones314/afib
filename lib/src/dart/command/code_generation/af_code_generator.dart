@@ -713,7 +713,7 @@ class AFCodeGenerator {
       template = templates.find(templateOrId);
     }
     
-    if(action == AFGeneratedFileAction.create && AFProjectPaths.projectFileExists(projectPath) && !isRenamed(projectPath)) {
+    if(action == AFGeneratedFileAction.create && AFProjectPaths.projectFileExists(projectPath) && !isRenamed(projectPath) && !context.isForceOverwrite) {
       throw AFCommandError(error: "File at $projectPath needs to be created, but already exists, delete or move it if you'd like to re-create it.");
     }
 

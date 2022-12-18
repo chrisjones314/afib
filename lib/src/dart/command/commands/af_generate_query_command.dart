@@ -40,6 +40,7 @@ $optionsHeader
   --$argRootStateType [YourRootState] - the name of the root state this query updates, defaults to your root state
   --$argExportTemplatesHelp
   --$argOverrideTemplatesHelp
+  --$argForceOverwriteHelp
 
   ${AFCommand.argPrivateOptionHelp}
 

@@ -4,6 +4,7 @@ import 'package:afib/src/dart/command/templates/core/files/command_afib.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/custom.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/install_base.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/library_exports.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/lpi.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/theme.t.dart';
@@ -17,6 +18,7 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_add
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_build_with_spi_impl.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_smoke_test_impl.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_standard_route_param.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_startup_screen_complete_project_style.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_state_test_impl.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_wireframe_body.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_wireframe_impl.t.dart';
@@ -46,7 +48,14 @@ import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippet
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippets/snippets_signed_in_drawer.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippets/snippets_startup_screen.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/minimal.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin-integrate.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_signin.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_starter_signin_startup.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/signin_actions_lpi.t.dart';
 import 'package:path/path.dart';
+
+import 'project_styles/starter-signin/files/query_check_signin.t.dart';
 
 
 /// A registry of source code templates umodel in code generation.
@@ -62,6 +71,7 @@ class AFTemplateRegistry {
   AFTemplateRegistry() {
     registerFile(MinimalT());
     registerFile(StartHereT());
+    registerFile(StarterSigninT());
 
     registerFile(SimpleQueryT.core());
     registerFile(DeferredQueryT.core());
@@ -73,6 +83,8 @@ class AFTemplateRegistry {
     registerFile(ThemeT.core());
     registerFile(CommandT());
     registerFile(CustomT.core());
+    registerFile(StarterSigninIntegrateT());
+    registerFile(LPIT.core());
 
     registerSnippet(SnippetDefineTestDataT.core());
     registerSnippet(SnippetStandardRouteParamT.core());
@@ -89,6 +101,7 @@ class AFTemplateRegistry {
     registerSnippet(SnippetStateTestImplT());
     registerSnippet(SnippetWireframeImplT());
     registerSnippet(SnippetWireframeBodyT());
+    registerSnippet(SnippetStartupScreenCompleteProjectStyleT());
 
     // start-here example
     registerFile(StartHereThemeT.example());
@@ -137,6 +150,12 @@ class AFTemplateRegistry {
     registerSnippet(SnippetDefineCountHistoryRootTestDataT.example());
     registerSnippet(SnippetDefineReferencedUsersRootTestDataT.example());
     registerSnippet(SnippetInitialWireframeBodyT());
+
+    // starter-signin example
+    registerFile(QueryStarterSigninStartupT.example());
+    registerFile(QueryCheckSigninSigninStarterT.example());
+    registerFile(SigninStarterSigninActionsLPIT.example());
+    registerFile(QuerySigninSigninStarterT.example());
   }  
 
   AFFileSourceTemplate? findEmbeddedTemplateFile(List<String> path) {

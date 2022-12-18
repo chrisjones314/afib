@@ -63,8 +63,41 @@ class AFArgs {
     args.addAll(parsed);
   }
 
+  static String _cleanEdgeQuotes(String source) {
+    var result = source;
+    if(result.startsWith('"')) {
+      result = result.substring(1);
+    }
+    if(result.endsWith('"')) {
+      result = result.substring(0, result.length - 1);
+    }
+    return result;
+  }
+
   static List<String> parseArgs(String revised) {
-    return revised.trim().split(RegExp(r"[ \t]"));
+    final raw = revised.trim().split(RegExp(r"[ \t]"));
+    final result = <String>[];
+    var i = 0;
+    while(i < raw.length) {
+      final current = raw[i++];
+      final buffer = StringBuffer();      
+      if(current.startsWith('"')) {
+        buffer.write(_cleanEdgeQuotes(current));
+        while(i < raw.length) {
+          final next = raw[i++];
+          if(next.endsWith('"')) {
+            buffer.write(" ${_cleanEdgeQuotes(next)}");
+            break;
+          } else {
+            buffer.write(" $next");
+          }
+        }
+        result.add(buffer.toString());
+      } else {
+        result.add(current);
+      }
+    }
+    return result;
   }
 
   /// The nth space-separated argument (not including the command itself)

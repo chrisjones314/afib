@@ -2,6 +2,7 @@
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_create_command.dart';
+import 'package:afib/src/dart/command/commands/af_echo_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_custom_command.dart';
@@ -11,7 +12,7 @@ import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/commands/af_integrate_command.dart';
-import 'package:afib/src/dart/command/commands/af_override_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_override_command.dart';
 import 'package:afib/src/dart/command/commands/af_require_command.dart';
 import 'package:afib/src/dart/command/commands/af_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
@@ -81,7 +82,7 @@ class AFCommandArgumentsParsed {
   }
 
   void setIfNull(String name, String value) {
-    if(accessNamed(name) == null) {
+    if(named[name] == null) {
       named[name] = value;
     }
   }
@@ -292,7 +293,7 @@ class AFCommandContext {
 
   AFCommandArgumentsParsed parseArguments({
     required AFCommand command,
-    required int unnamedCount,
+    int unnamedCount = -1,
     required Map<String, String?> named
   }) {
     final unnamed = <String>[];
@@ -300,6 +301,7 @@ class AFCommandContext {
     allNamed[AFCommand.argPrivate] = "false";
     allNamed[AFGenerateSubcommand.argExportTemplatesFlag] = "";
     allNamed[AFGenerateSubcommand.argOverrideTemplatesFlag] = "";
+    allNamed[AFGenerateSubcommand.argForceOverwrite] = "";
 
     final foundNamed = Map<String, String?>.from(named);
     foundNamed[AFCommand.argPrivate] = "false";
@@ -328,7 +330,7 @@ class AFCommandContext {
       unnamed: unnamed,
     );
 
-    if(unnamed.length != unnamedCount) {
+    if(unnamedCount >= 0 && unnamed.length != unnamedCount) {
       command.throwUsageError("Expected $unnamedCount unnamed arguments, but found ${unnamed.length}");
     }
 
@@ -339,6 +341,12 @@ class AFCommandContext {
     }
 
     return parsedArguments;
+  }
+
+  void setProjectStyle(String projectStyle) {
+    coreInsertions = coreInsertions.reviseOverwrite({
+      AFSourceTemplate.insertProjectStyleInsertion: projectStyle,
+    });
   }
 
 
@@ -362,6 +370,25 @@ class AFCommandContext {
       arguments: argsParsed,
       coreInsertions: coreInsertions
     );
+  }
+
+  bool get isForceOverwrite {
+    var overwrite = findArgument(AFGenerateSubcommand.argForceOverwrite);
+    if(overwrite is bool) {
+      return overwrite;
+    }
+    return false;
+  }
+
+  Future<void> executeSubCommand(String cmd, AFSourceTemplateInsertions? insertions) async {
+    final arguments = AFArgs.createFromString(cmd);
+    final revisedCommand = this.reviseWithArguments(
+      insertions: insertions ?? coreInsertions, 
+      arguments: arguments
+    );
+
+    revisedCommand.startCommand();
+    await definitions.execute(revisedCommand);
   }
 
   Pubspec loadPubspec( { String? packageName }) {
@@ -457,7 +484,7 @@ class AFCommandContext {
 
     final idFile = generator.modifyFile(this, generator.pathIdFile);
     final regexClz = RegExp("class\\s+$clz");
-    final idxOpenClass = idFile.firstLineContaining(this, regexClz);
+    final idxOpenClass = idFile.findFirstLineContaining(this, regexClz);
     if(idxOpenClass < 0) {
       throw AFException("Could not find $regexClz in id file");
     }
@@ -558,8 +585,19 @@ class AFCommandContext {
     }
     
     // we need to find the template for this path.
-    final template = generator.definitions.templates.findEmbeddedTemplateFile(projectPath);
-    return generator.readProjectStyle(this, projectPath, template, insertions: fullInsert);
+    final templateOrig = generator.definitions.templates.findEmbeddedTemplateFile(projectPath);
+    if(templateOrig == null) {
+      throw AFException("No template found at ${joinAll(projectPath)}");
+    }
+
+    final generated = AFGeneratedFile.fromTemplate(
+      context: this, 
+      projectPath: projectPath, 
+      template: templateOrig, 
+      action: AFGeneratedFileAction.skip
+    );
+    generated.performInsertions(this, fullInsert);
+    return generated;
   }
 
   Object? findArgument(String key) {
@@ -869,6 +907,8 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
       defineCommand(AFCreateAppCommand());
       _defineGenerateCommand(hidden: true);
       defineCommand(AFRequireCommand(), hidden: true);
+      defineCommand(AFIntegrateCommand(), hidden: true);
+      defineCommand(AFEchoCommand(), hidden: true);
     }
 
 
@@ -878,9 +918,9 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
       _defineGenerateCommand(hidden: false);
       defineCommand(AFTestCommand());
       defineCommand(AFHelpCommand());
-      defineCommand(AFInstallCommand());
-      defineCommand(AFOverrideCommand());
-      defineCommand(AFRequireCommand());
+      defineCommand(AFIntegrateCommand());
+      defineCommand(AFRequireCommand(), hidden: true);
+      defineCommand(AFEchoCommand(), hidden: true);
     }
 
     void _defineGenerateCommand({ required bool hidden }) {
@@ -891,7 +931,8 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
       generateCmd.addSubcommand(AFGenerateCommandSubcommand());      
       generateCmd.addSubcommand(AFGenerateTestSubcommand());
       generateCmd.addSubcommand(AFGenerateIDSubcommand());
+      generateCmd.addSubcommand(AFGenerateOverrideSubcommand());
       generateCmd.addSubcommand(AFGenerateCustomSubcommand());
-
+      
     }
 }

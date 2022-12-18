@@ -11,9 +11,9 @@ class StartHereT extends AFProjectStyleSourceTemplate {
 require sqlite3
 require path_provider
 generate id ${insertAppNamespaceUpper}TestDataID.referencedUserChris
+generate id ${insertAppNamespaceUpper}TestDataID.userCredentialChris
 generate id ${insertAppNamespaceUpper}WidgetID.buttonSaveTransientCount
 generate id ${insertAppNamespaceUpper}WidgetID.buttonResetHistory
-generate id ${insertAppNamespaceUpper}TestDataID.userCredentialChris
 generate id ${insertAppNamespaceUpper}TestDataID.countHistoryChris
 generate id ${insertAppNamespaceUpper}TestDataID.referencedUsersChris
 generate id ${insertAppNamespaceUpper}WidgetID.buttonIHaveNoObjection
@@ -68,7 +68,8 @@ generate test StartupStateTest --override-templates +
   +core/snippets/state_test_impl=project_styles/eval_demo/snippets/startup_state_test
 generate test InitialWireframe --initial-screen HomePageScreen --override-templates +
   +core/snippets/wireframe_body=project_styles/eval_demo/snippets/initial_wireframe_body
-generate custom ${insertAppNamespaceUpper}SqliteDB --path lib/state/db --override-templates "core/files/custom=project_styles/eval_demo/files/sqlite_db"
+generate custom file --main-type ${insertAppNamespaceUpper}SqliteDB --path lib/state/db --override-templates "core/files/custom=project_styles/eval_demo/files/sqlite_db"
+echo --success "Project setup completed successfully."
 ''';
 
 }

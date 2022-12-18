@@ -95,7 +95,7 @@ $optionsHeader
     // create the LPI file
     final isOverride = fullId != null;
     final lpiPath = generator.pathLPI(identifier, isOverride: isOverride);
-    final lpiFile = context.createFile(lpiPath, LPIT(), insertions: {
+    final lpiFile = context.createFile(lpiPath, LPIT.core(), insertions: {
       AFSourceTemplate.insertMainTypeInsertion: identifier,
       AFSourceTemplate.insertMainParentTypeInsertion: parentType
     });
@@ -120,8 +120,8 @@ $optionsHeader
     // register the LPI
     final definesFile = generator.modifyFile(context, generator.pathDefineCore);
     final defineLPI = context.createSnippet(SnippetCallDefineLPIT(), insertions: {
-      SnippetCallDefineLPIT.insertLPIID: identifier,
-      SnippetCallDefineLPIT.insertLPIType: fullId ?? "${generator.appNamespaceUpper}LibraryProgrammingInterfaceID.$idIdentifier",
+      SnippetCallDefineLPIT.insertLPIID: fullId ?? "${generator.appNamespaceUpper}LibraryProgrammingInterfaceID.$idIdentifier",
+      SnippetCallDefineLPIT.insertLPIType: identifier,
     });
     definesFile.addLinesAfter(context, AFCodeRegExp.startDefineLPI, defineLPI.lines);
     definesFile.importFile(context, lpiFile);

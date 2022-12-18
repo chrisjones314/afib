@@ -13,11 +13,12 @@ class SnippetDefineUserCredentialRootTestDataT {
         SnippetDefineTestDataT.insertModelDeclaration: '''
 final userCred = UserCredentialRoot(
   userId: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris,
-  token: "--",
+  token: UserCredentialRoot.notSpecified,
+  storedEmail: UserCredentialRoot.notSpecified,
 );
 
 // feel its a little less confusing if the example state test refers to a more natural ID.
-context.define(HCTestDataID.userCredentialChris, userCred);
+context.define(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.userCredentialChris, userCred);
 
 ''',
         SnippetDefineTestDataT.insertModelCall: "userCred"

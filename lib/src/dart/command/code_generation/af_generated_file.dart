@@ -204,7 +204,7 @@ class AFGeneratedFile {
     }
   }
 
-  int firstLineContaining(AFCommandContext context, RegExp match) {
+  int findFirstLineContaining(AFCommandContext context, RegExp match) {
     return buffer.firstLineContaining(context, match);
   }
 
@@ -241,6 +241,10 @@ class AFGeneratedFile {
 
   void performInsertions(AFCommandContext context, AFSourceTemplateInsertions insertions) {
     buffer.performInsertions(context, insertions);
+  }
+
+  void replaceLine(AFCommandContext context, int idx, String value) {
+    buffer.replaceLine(context, idx, value);
   }
 
   /// Replaces all instances of the specified id with 

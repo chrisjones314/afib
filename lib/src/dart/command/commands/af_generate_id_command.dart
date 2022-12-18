@@ -2,13 +2,14 @@
 
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
+import 'package:afib/src/dart/utils/afib_d.dart';
 
 class AFGenerateIDSubcommand extends AFGenerateSubcommand {
 
   AFGenerateIDSubcommand();
   
   @override
-  String get description => "Declare an ID in the xxx_id.dart file";
+  String get description => "Declare an ID in the ${AFibD.config.appNamespace}_id.dart file";
 
   @override
   String get name => "id";
@@ -16,10 +17,11 @@ class AFGenerateIDSubcommand extends AFGenerateSubcommand {
   String get usage {
     return '''
 $usageHeader
-  $nameOfExecutable generate id XXXKindID.yourWhatever
+  $nameOfExecutable generate id ${AFibD.config.appNamespace.toUpperCase()}{Kind}ID.yourWhatever
 
 $descriptionHeader
   $description
+  e.g. generate id ${AFibD.config.appNamespace.toUpperCase()}WidgetID.buttonSaveFile
 
 $optionsHeader
   None

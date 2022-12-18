@@ -60,7 +60,8 @@ class AFCreateCommandContext {
     required String projectStyle,
   }) {
       final packagePath = command.generator.packagePath(AFibD.config.packageName);
-     final coreInsertions = AFSourceTemplateInsertions.createCore(packagePath: packagePath);
+     var coreInsertions = AFSourceTemplateInsertions.createCore(packagePath: packagePath);
+     coreInsertions = coreInsertions.reviseAugment(command.coreInsertions.insertions);
 
       final insertions = coreInsertions.reviseAugment({
         AFSourceTemplate.insertLibKindInsertion: kind == AFCreateAppCommand.kindApp ? "App" : "Library"
@@ -117,14 +118,7 @@ class AFCreateCommandContext {
   }
 
   Future<void> executeSubCommand(String cmd) async {
-    final revisedCommand = command.reviseWithArguments(
-      insertions: insertions, 
-      arguments: AFArgs.createFromString(cmd)
-    );
-
-    revisedCommand.startCommand();
-
-    await command.definitions.execute(revisedCommand);
+    await command.executeSubCommand(cmd, insertions);
   }
 
   AFCodeGenerator get generator => command.generator;
@@ -148,7 +142,11 @@ class AFCreateAppCommand extends AFCommand {
   static const kindStateLibrary = "state_library";
   static const argProjectStyle = "project-style";
   static const projectStyleMinimal = "minimal";
+  static const integrateSuffix = "-integrate";
   static const projectStyleEvalDemo = "eval-demo";
+  static const projectStyleSignin = "starter-signin";
+  static const projectStyleSigninIntegrate = "starter-signin$integrateSuffix";
+  static const projectStyleSigninFirebase = "starter-signin-firebase";
 
   final String name = "create";
   final String description = "Install afib framework support into an existing flutter app project";
@@ -173,6 +171,8 @@ $optionsHeader
   $argProjectStyle - a string specifying the project style to use, currently:
     $projectStyleMinimal - minimal project style
     $projectStyleEvalDemo - a simple example demonstrating many of AFib's core features and referenced in the evaluation video and documentation.
+    $projectStyleSignin - a simple starter project how to use AFib signin, if you are not using firebase for signin
+    $projectStyleSigninFirebase - a starter project showing how to use AFib signin with Firebase
     or, you can define your own project styles.
 
   ${AFGenerateSubcommand.argExportTemplatesHelpStatic}
@@ -202,6 +202,7 @@ $optionsHeader
     final packageCode = args.accessUnnamedThird;
 
     final projectStyle = args.accessNamed(argProjectStyle);
+    ctx.setProjectStyle(projectStyle);
 
     if(projectStyle == null || projectStyle.isEmpty) {
       throwUsageError("You must specify --$argProjectStyle");
@@ -254,13 +255,26 @@ $optionsHeader
     await _executeProjectStyle(context);
 
     generator.finalizeAndWriteFiles(ctx);
+
+    await _executeProjectStyleEcho(context);
   }
 
   Future<void> _executeProjectStyle(AFCreateCommandContext context) async {
     final lines = context.projectStyleLines;
     for(final line in lines) {
-      context.output.writeTwoColumns(col1: "execute ", col2: "$line");
-      await context.executeSubCommand(line);
+      if(!line.startsWith("echo ")) {
+        context.output.writeTwoColumns(col1: "execute ", col2: "$line");
+        await context.executeSubCommand(line);
+      }
+    }
+  }
+
+  Future<void> _executeProjectStyleEcho(AFCreateCommandContext context) async {
+    final lines = context.projectStyleLines;
+    for(final line in lines) {
+      if(line.startsWith("echo ")) {
+        await context.executeSubCommand(line);
+      }
     }
   }
 

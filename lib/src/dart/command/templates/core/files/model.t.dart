@@ -24,7 +24,6 @@ class ModelT extends AFFileSourceTemplate {
         AFSourceTemplate.insertExtraImportsInsertion: AFSourceTemplate.empty,
         AFSourceTemplate.insertMemberVariablesInsertion: AFSourceTemplate.empty,
         AFSourceTemplate.insertConstructorParamsInsertion: AFSourceTemplate.empty,
-        AFSourceTemplate.insertAdditionalMethodsInsertion: AFSourceTemplate.empty,
         AFSourceTemplate.insertCopyWithParamsInsertion: AFSourceTemplate.empty,
         AFSourceTemplate.insertCopyWithCallInsertion: AFSourceTemplate.empty,      
     }));

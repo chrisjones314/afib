@@ -152,6 +152,7 @@ abstract class AFSourceTemplate {
   static const insertCreateParamsInsertion = AFSourceTemplateInsertion("create_params");
   static const insertCreateParamsCallInsertion = AFSourceTemplateInsertion("create_params_call");
   static const insertMainTypeNoRootInsertion = AFSourceTemplateInsertion("main_type_no_root");
+  static const insertProjectStyleInsertion = AFSourceTemplateInsertion("project_style");
 
   static const empty = SnippetEmptyStatementT();
   final AFSourceTemplateRole role;
@@ -166,6 +167,7 @@ abstract class AFSourceTemplate {
     return <String>[];
   }
 
+  AFSourceTemplateInsertion get insertProjectStyle { return AFSourceTemplate.insertProjectStyleInsertion; }
   AFSourceTemplateInsertion get insertAppNamespace { return AFSourceTemplate.insertAppNamespaceInsertion; }
   AFSourceTemplateInsertion get insertAppNamespaceUpper { return AFSourceTemplate.insertAppNamespaceInsertion.upper; }
   AFSourceTemplateInsertion get insertStateType { return AFSourceTemplate.insertStateTypeInsertion; }

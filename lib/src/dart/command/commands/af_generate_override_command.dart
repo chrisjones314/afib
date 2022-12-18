@@ -5,7 +5,7 @@ import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/templates/core/files/lpi.t.dart';
 
 /// Parent for commands executed through the afib command line app.
-class AFOverrideCommand extends AFCommand { 
+class AFGenerateOverrideSubcommand extends AFCommand { 
   static const argParentType = "parent-type";
   static const themeSuffix = "Theme";
   static const spiSuffix = "SPI";
@@ -17,7 +17,7 @@ class AFOverrideCommand extends AFCommand {
   String get usage {
     return '''
 $usageHeader
-  $nameOfExecutable override [Your$themeSuffix|Your$lpiSuffix] [--some required options, see below]
+  $nameOfExecutable generate override [Your$themeSuffix|Your$lpiSuffix] [--some required options, see below]
 
 $optionsHeader
   YourTheme - override a theme from a third party library, requires additional options:
@@ -32,7 +32,7 @@ $optionsHeader
   }
 
 
-  AFOverrideCommand();
+  AFGenerateOverrideSubcommand();
 
   Future<void> run(AFCommandContext ctx) async {
     // override this to avoid 'error not in root of project'
@@ -88,7 +88,7 @@ $optionsHeader
 
     // create the LPI file itself.
     final lpiPath = generator.pathLPI(identifier, isOverride: true);
-    context.createFile(lpiPath, LPIT(), insertions: {
+    context.createFile(lpiPath, LPIT.core(), insertions: {
       AFSourceTemplate.insertMainTypeInsertion: identifier,
     });
 

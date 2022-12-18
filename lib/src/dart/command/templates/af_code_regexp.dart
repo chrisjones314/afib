@@ -23,6 +23,7 @@ class AFCodeRegExp {
   static final startDeclareLPI = RegExp(r"class\s+.*LPI\s+extends\s+.*LPI\s+{");
   static final afTag = RegExp(r".*\[!af_.*\].*");
   static final startImportLine = RegExp(r"import\s+.*;");
+  static final defineStartupScreen = RegExp(r"\s+context.defineStartupScreen\(");
 
   static RegExp startDefineTestsFunction(String suffix) {
     return RegExp("void\\s+define${suffix}s\\(AF${suffix}DefinitionContext\\s+context\\)\\s+{");

@@ -8,6 +8,7 @@ class MinimalT extends AFProjectStyleSourceTemplate {
   );
 
   String get template => '''
+echo --success "Project setup completed successfully."
 ''';
 
 }

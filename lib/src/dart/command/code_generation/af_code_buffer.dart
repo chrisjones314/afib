@@ -84,6 +84,9 @@ class AFCodeBuffer {
     return null;
   }
 
+  void replaceLine(AFCommandContext context, int idx, String value) {
+    lines[idx] = value;
+  }
 
   void resetText(String text) {
     final ls = LineSplitter();

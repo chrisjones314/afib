@@ -33,7 +33,7 @@ class AFUIPrototypeLibraryListScreen extends AFUIConnectedScreen<AFUIPrototypeLi
 
   static AFNavigatePushAction navigatePush() {
     return AFNavigatePushAction(
-      launchParam: AFRouteParamUnused.unused);
+      launchParam: AFRouteParamUnused.forScreen(AFUIScreenID.screenPrototypeLibraryList));
   }
 
   @override

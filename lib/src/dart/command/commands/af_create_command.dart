@@ -82,6 +82,19 @@ class AFCreateCommandContext {
     return AFCommandContext.consolidateProjectStyleLines(rawLines);
   }
 
+  List<String> get projectStyleCommands {
+
+    final rawLines = projectStyle.lines;
+    var consolidated = AFCommandContext.consolidateProjectStyleLines(rawLines);
+    if(consolidated.isNotEmpty && consolidated.first.startsWith("--${AFGenerateSubcommand.argOverrideTemplatesFlag}")) {
+      consolidated = consolidated.sublist(1);
+    }
+    return consolidated;
+  }
+
+  String get projectStyleGlobalOverrides {
+    return AFCommandContext.findProjectStyleGlobalOverrides(projectStyleLines);
+  }
 
   bool get includeUI => !isStateLibrary;
   bool get isApp => kind == AFCreateAppCommand.kindApp;
@@ -116,7 +129,7 @@ class AFCreateAppCommand extends AFCommand {
   static const kindUILibrary = "ui_library";
   static const kindStateLibrary = "state_library";
   static const argProjectStyle = "project-style";
-  static const projectStyleMinimal = "minimal";
+  static const projectStyleStarterMinimal = "starter-minimal";
   static const integrateSuffix = "-integrate";
   static const projectStyleEvalDemo = "eval-demo";
   static const projectStyleSignin = "starter-signin";
@@ -144,11 +157,11 @@ $optionsHeader
   YPC - a lowercase 2-5 digit the code/prefix for your app, all uppercase.  For example, for the AFib Signin library this is afsi, in the app 'Dinner Familias this is 'df' (
     note that you should not prefix yours with 'af')
   $argProjectStyle - a string specifying the project style to use, currently:
-    $projectStyleMinimal - minimal project style
     $projectStyleEvalDemo - a simple example demonstrating many of AFib's core features and referenced in the evaluation video and documentation.
-    $projectStyleSignin - a simple starter project how to use AFib signin, if you are not using firebase for signin
-    $projectStyleSigninFirebase - a starter project showing how to use AFib signin with Firebase
-    or, you can define your own project styles.
+    $projectStyleStarterMinimal - minimal project style
+    $projectStyleSignin - a simple starter project how to use AFib Signin, if you are not using firebase for signin
+    $projectStyleSigninFirebase - a starter project showing how to use AFib Signin with Firebase
+
 
   ${AFGenerateSubcommand.argExportTemplatesHelpStatic}
 ''';
@@ -177,11 +190,12 @@ $optionsHeader
     final packageCode = args.accessUnnamedThird;
 
     final projectStyle = args.accessNamed(argProjectStyle);
-    ctx.setProjectStyle(projectStyle);
 
     if(projectStyle == null || projectStyle.isEmpty) {
       throwUsageError("You must specify --$argProjectStyle");
     }
+
+    ctx.setProjectStyle(projectStyle);
 
     verifyAllLowercase(packageCode);
     verifyAllLowercase(packageName);
@@ -196,6 +210,7 @@ $optionsHeader
       kind: kind,
       projectStyle: projectStyle,
     );
+    ctx.setProjectStyleGlobalOverrides(context.projectStyleGlobalOverrides);
 
     context.output.writeTwoColumns(col1: "creating ", col2: "project-style=$projectStyle");
 
@@ -215,7 +230,7 @@ $optionsHeader
     await _createQueryFiles(context);
     await _createStateFiles(context);
     if(!context.isStateLibrary) {
-      _createTestFiles(context);
+      await _createTestFiles(context);
     }
 
     if(!context.isStateLibrary) {
@@ -235,7 +250,7 @@ $optionsHeader
   }
 
   Future<void> _executeProjectStyle(AFCreateCommandContext context) async {
-    final lines = context.projectStyleLines;
+    final lines = context.projectStyleCommands;
     for(final line in lines) {
       if(!line.startsWith("echo ")) {
         context.output.writeTwoColumns(col1: "execute ", col2: "$line");
@@ -245,7 +260,7 @@ $optionsHeader
   }
 
   Future<void> _executeProjectStyleEcho(AFCreateCommandContext context) async {
-    final lines = context.projectStyleLines;
+    final lines = context.projectStyleCommands;
     for(final line in lines) {
       if(line.startsWith("echo ")) {
         await context.executeSubCommand(line);
@@ -311,7 +326,7 @@ $optionsHeader
     await context.executeSubCommand("generate query ${context.generator.nameStartupQuery} --${AFGenerateQuerySubcommand.argResultModelType} AFUnused");
   }
 
-  void _createTestFiles(AFCreateCommandContext context) {
+  Future<void> _createTestFiles(AFCreateCommandContext context) async {
     final generator = context.generator;
 
     generator.renameExistingFileToOld(context.command, generator.pathOriginalWidgetTest);
@@ -331,6 +346,9 @@ $optionsHeader
     _createTestDefinitionFile(context, "UIPrototype", filename: "ui_prototype");
     _createTestDefinitionFile(context, "StateTest");
     _createTestDefinitionFile(context, "UnitTest");
+
+
+    await context.executeSubCommand("generate test StartupStateTest");    
   }
 
   AFGeneratedFile _createTestDefinitionFile(AFCreateCommandContext context, String kind, { String? filename }) {
@@ -358,11 +376,12 @@ $optionsHeader
     final generator = context.generator;
     final declareUIFn = includeUI ? DefineCoreUIFunctionsT() : AFSourceTemplate.empty;
     final callUIFn = includeUI ? DefineCoreCallUIFunctionsT() : AFSourceTemplate.empty;
-    final defineFundamentalImpl = context.isApp ? SnippetFundamentalThemeInitT() : SnippetFundamentalThemeInitUILibraryT();
+    final defineFundamentalImpl = context.isApp ? SnippetFundamentalThemeInitT.core() : SnippetFundamentalThemeInitUILibraryT.core();
+    final snippetFundamentalImpl = context.command.createSnippet(defineFundamentalImpl);
     final fileDefineCore = context.createFile(generator.pathDefineCore, DefineCoreT(), insertions: {
       DefineCoreT.insertCallUIFunctions: callUIFn,
       DefineCoreT.insertDeclareUIFunctions: declareUIFn,
-      DefineCoreUIFunctionsT.insertFundamentalThemeInitCall: defineFundamentalImpl,
+      DefineCoreUIFunctionsT.insertFundamentalThemeInitCall: snippetFundamentalImpl,
     });
 
     final imports = AFCodeBuffer.empty();

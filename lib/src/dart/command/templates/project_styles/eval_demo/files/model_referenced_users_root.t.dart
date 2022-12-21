@@ -35,7 +35,7 @@ factory ReferencedUsersRoot.initialState() {
   );
 }
 
-ReferencedUser? find(String userId) {
+ReferencedUser? findById(String userId) {
   return users[userId];
 }
 

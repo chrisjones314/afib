@@ -13,6 +13,7 @@ class SnippetSigninStarterHomePageScreenExtraImportsT {
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertExtraImportsInsertion: '''
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signout_query.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/referenced_user.dart';
 ''',
       })
     );
@@ -34,12 +35,25 @@ rows.add(t.childMarginStandard(
     style: t.styleOnCard.headline6)
 ));
 
+final activeUser = spi.activeUser;
 rows.add(t.childMarginStandard(
   child: t.childText("userId: \${spi.userId}")
 ));
 
 rows.add(t.childMarginStandard(
-  child: t.childText("email: \${spi.storedEmail}")
+  child: t.childText("email: \${activeUser.email}")
+));
+
+rows.add(t.childMarginStandard(
+  child: t.childText("first: \${activeUser.firstName}")
+));
+
+rows.add(t.childMarginStandard(
+  child: t.childText("last: \${activeUser.lastName}")
+));
+
+rows.add(t.childMarginStandard(
+  child: t.childText("zip: \${activeUser.zipCode}")
 ));
 
 rows.add(t.childMarginStandard(
@@ -70,6 +84,14 @@ String get userId {
 
 String get storedEmail {
   return context.s.userCredential.storedEmail;
+}
+
+ReferencedUser get activeUser {
+  final result = context.s.referencedUsers.findById(userId);
+  if(result == null) {
+    throw AFException("No active user?");
+  }
+  return result;
 }
 
 void onPressedSignout() {

@@ -14,7 +14,8 @@ class SnippetDefineReferencedUsersRootTestDataT extends SnippetDefineTestDataT {
     id: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris, 
     firstName: "Chris", 
     lastName: "Test", 
-    email: "chris.test@nowhere.com"
+    email: "chris.test@nowhere.com",
+    zipCode: "98105",
   ));
 
   final users = <String, ReferencedUser>{

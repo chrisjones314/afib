@@ -13,6 +13,7 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_tes
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_drawer_build_body.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_empty_screen_build_body_impl.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_extra_imports.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_fundamental_theme_init_ui_library.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_navigate_push.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_additional_methods.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_build_with_spi_impl.t.dart';
@@ -20,6 +21,8 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_smoke_test
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_standard_route_param.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_startup_screen_complete_project_style.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_state_test_impl.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_widget_build_body.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_widget_route_param.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_wireframe_body.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_wireframe_impl.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/eval-demo.t.dart';
@@ -47,17 +50,24 @@ import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippet
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippets/snippets_home_page_screen.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippets/snippets_signed_in_drawer.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippets/snippets_startup_screen.t.dart';
-import 'package:afib/src/dart/command/templates/project_styles/minimal.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-minimal.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin-integrate.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/model_referenced_user.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_read_user.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_signin.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_signout.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_starter_signin_startup.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_write_user.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/signin_actions_lpi.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin/snippets/snippet_fundmental_theme_init.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/snippets/snippets_home_page_screen.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin/snippets/snippets_registration_details_widget.t.dart';
 import 'package:path/path.dart';
 
 import 'project_styles/starter-signin/files/query_check_signin.t.dart';
+import 'project_styles/starter-signin/files/query_registration.t.dart';
+import 'project_styles/starter-signin/files/theme_signin.t.dart';
 
 
 /// A registry of source code templates umodel in code generation.
@@ -71,7 +81,7 @@ class AFTemplateRegistry {
   final snippetTemplates = <String, AFSnippetSourceTemplate>{};
   
   AFTemplateRegistry() {
-    registerFile(MinimalT());
+    registerFile(StarterMinimalT());
     registerFile(StartHereT());
     registerFile(StarterSigninT());
 
@@ -104,6 +114,10 @@ class AFTemplateRegistry {
     registerSnippet(SnippetWireframeImplT());
     registerSnippet(SnippetWireframeBodyT());
     registerSnippet(SnippetStartupScreenCompleteProjectStyleT());
+    registerSnippet(SnippetFundamentalThemeInitUILibraryT.core());
+    registerSnippet(SnippetWidgetRouteParamT.core());
+    registerSnippet(SnippetWidgetBuildBodyT.core());
+    registerSnippet(SnippetStateTestImplMinimalT());
 
     // start-here example
     registerFile(StartHereThemeT.example());
@@ -159,10 +173,21 @@ class AFTemplateRegistry {
     registerFile(SigninStarterSigninActionsLPIT.example());
     registerFile(QuerySigninSigninStarterT.example());
     registerFile(QuerySigninSignoutStarterT.example());
+    registerFile(QueryRegistrationSigninStarterT.example());
+    registerFile(StarterSigninModelReferencedUserT.example());
+    registerFile(QueryReadUserSigninStarterT.example());
+    registerFile(QueryWriteUserSigninStarterT.example());
+    registerFile(StarterSigninThemeSigninT.example());
 
     registerSnippet(SnippetSigninStarterHomePageScreenExtraImportsT.example());
     registerSnippet(SnippetSigninStarterHomePageScreenBuildBodyT());
     registerSnippet(SnippetSigninStarterHomePageScreenSPIT.example());
+    registerSnippet(SnippetRegistrationDetailsWidgetExtraImportsT.example());
+    registerSnippet(SnippetRegistrationDetailsWidgetRouteParamT());
+    registerSnippet(SnippetRegistrationDetailsWidgetAdditionalMethodsT());
+    registerSnippet(SnippetRegistrationDetailsWidgetBuildBodyT());
+    registerSnippet(SnippetRegistrationDetailsWidgetSPIT.example());
+    registerSnippet(SnippetSigninStarterFundamentalThemeInitT.example());
     
   }  
 

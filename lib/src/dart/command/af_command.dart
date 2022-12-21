@@ -276,6 +276,7 @@ class AFCommandContext {
   final args.ArgResults arguments;
   String packagePath;
   AFSourceTemplateInsertions coreInsertions;
+  Map<String, String> globalTemplateOverrides;
 
   int commandArgCount = 1;
 
@@ -287,6 +288,7 @@ class AFCommandContext {
     required this.arguments,
     required this.packagePath,
     required this.coreInsertions,
+    required this.globalTemplateOverrides 
   });
 
   bool get isRootCommand => parents.isEmpty;
@@ -349,6 +351,20 @@ class AFCommandContext {
     });
   }
 
+  void setProjectStyleGlobalOverrides(String templateOverrides) {
+    if(templateOverrides.isNotEmpty) {
+      globalTemplateOverrides = _parseOverrides(templateOverrides);
+    }
+  }
+
+  static String findProjectStyleGlobalOverrides(List<String> rawLines) {
+    var consolidated = AFCommandContext.consolidateProjectStyleLines(rawLines);
+    if(consolidated.isNotEmpty && consolidated.first.startsWith("--${AFGenerateSubcommand.argOverrideTemplatesFlag}")) {
+      final args = AFArgs.parseArgs(consolidated.first);
+      return args.last;
+    }
+    return "";    
+  }
 
   factory AFCommandContext.withArguments({
     required AFCommandAppExtensionContext definitions,
@@ -357,7 +373,8 @@ class AFCommandContext {
     required String packagePath,
     required AFArgs arguments,
     required AFSourceTemplateInsertions coreInsertions,
-    List<AFCommandContext>? parents
+    List<AFCommandContext>? parents,
+    required Map<String, String>? globalTemplateOverrides,
   }) {
     final parsed = args.ArgParser.allowAnything();
     final argsParsed = parsed.parse(arguments.args);
@@ -368,7 +385,8 @@ class AFCommandContext {
       definitions: definitions, 
       generator: generator, 
       arguments: argsParsed,
-      coreInsertions: coreInsertions
+      coreInsertions: coreInsertions,
+      globalTemplateOverrides: globalTemplateOverrides ?? const <String, String>{}
     );
   }
 
@@ -437,6 +455,7 @@ class AFCommandContext {
       generator: this.generator,
       arguments: revisedArgs,
       coreInsertions: insertions,   
+      globalTemplateOverrides: this.globalTemplateOverrides
     );
   }
 
@@ -670,15 +689,18 @@ class AFCommandContext {
 
   List<String> findOverrideTemplate(List<String> sourceTemplate) {
     var override = findArgument(AFGenerateSubcommand.argOverrideTemplatesFlag);
-    if(override == null || override is! String) {
-      return sourceTemplate;
+    var found = <String, String>{};
+    if(override != null && override is String) {
+      found = _parseOverrides(override);
     }
 
     final sourcePath = joinAll(sourceTemplate);
-    final found = _parseOverrides(override);
-    final result = found[sourcePath];
+    var result = found[sourcePath];
     if(result == null) {
-      return sourceTemplate;
+      result = globalTemplateOverrides[sourcePath];
+      if(result == null) {
+        return sourceTemplate;
+      }
     }
     return result.split("/");
   }

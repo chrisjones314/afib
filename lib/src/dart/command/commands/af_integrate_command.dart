@@ -59,9 +59,16 @@ $optionsHeader
 
   Future<void> _integrateProjectStyle(AFCommandContext context, AFCommandArgumentsParsed args) async {
     final projectStyle = "${args.accessUnnamedSecond}${AFCreateAppCommand.integrateSuffix}";
-    context.setProjectStyle(projectStyle);
     context.output.writeTwoColumns(col1: "integrate ", col2: "project-style=$projectStyle");
-    await _executeProjectStyle(context, projectStyle);
+    final stylePath = AFProjectPaths.pathProjectStyles.toList();
+    stylePath.add(projectStyle);
+
+
+    final fileProjectStyle = context.readProjectStyle(stylePath, insertions: context.coreInsertions.insertions);
+    final lines = AFCommandContext.consolidateProjectStyleLines(fileProjectStyle.buffer.lines);
+    context.setProjectStyle(projectStyle);
+    context.setProjectStyleGlobalOverrides(AFCommandContext.findProjectStyleGlobalOverrides(lines));
+    await _executeProjectStyle(context, lines);
   }
 
   Future<void> _integrateLibrary(AFCommandContext context, AFCommandArgumentsParsed args) async {
@@ -114,13 +121,8 @@ $optionsHeader
     context.generator.finalizeAndWriteFiles(context);
   }
 
-  Future<void> _executeProjectStyle(AFCommandContext context, String projectStyle) async {
-      final stylePath = AFProjectPaths.pathProjectStyles.toList();
-      stylePath.add(projectStyle);
+  Future<void> _executeProjectStyle(AFCommandContext context, List<String> lines) async {
 
-    final fileProjectStyle = context.readProjectStyle(stylePath, insertions: context.coreInsertions.insertions);
-
-    final lines = AFCommandContext.consolidateProjectStyleLines(fileProjectStyle.buffer.lines);
     for(final line in lines) {
       context.output.writeTwoColumns(col1: "execute ", col2: "$line");
       if(!line.startsWith("echo")) {

@@ -94,6 +94,7 @@ Future<void> _afCommandMain(AFDartParams paramsD, AFArgs argsIn, String cmdName,
     arguments: argsIn,
     packagePath: packagePath,
     coreInsertions: coreInsertions,
+    globalTemplateOverrides: null,
   );
 
   context.startCommand();

@@ -1,23 +1,31 @@
 
+import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
-import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/model_example_start_here.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
 
-class ModelReferencedUserT extends ModelExampleStartHereT {
+class ModelReferencedUserT extends ModelT {
   
   ModelReferencedUserT({
+    required String templateFileId,
+    required List<String> templateFolder,
     AFSourceTemplateInsertions? embeddedInsertions,
   }): super(
-    templateFileId: "model_referenced_user",
+    templateFileId: templateFileId,
+    templateFolder: templateFolder,
     embeddedInsertions: embeddedInsertions,
   );  
 
-  factory ModelReferencedUserT.example() {
-    return ModelReferencedUserT(embeddedInsertions: AFSourceTemplateInsertions(insertions: {
-      AFSourceTemplate.insertExtraImportsInsertion: '''
-import 'package:afib/afib_flutter.dart';
-import 'package:sqlite3/sqlite3.dart' as sql;
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
-''',
+  factory ModelReferencedUserT.custom({
+    required String templateFileId,
+    required List<String> templateFolder,
+    required Object extraImports,
+    required Object additionalMethods, 
+  }) {
+    return ModelReferencedUserT(
+      templateFileId: templateFileId,
+      templateFolder: templateFolder,
+      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      AFSourceTemplate.insertExtraImportsInsertion: extraImports,
       AFSourceTemplate.insertMemberVariablesInsertion: '''
 // Note: even if have integer ID values on the server, you should
 // convert them to String ids within AFib.   Doing so allows you to
@@ -26,26 +34,44 @@ final String id;
 final String firstName;
 final String lastName;
 final String email;
+final String zipCode;
 ''',
       AFSourceTemplate.insertConstructorParamsInsertion: '''{
 required this.id,
 required this.firstName,
 required this.lastName,
 required this.email,
+required this.zipCode,
 }''',
       AFSourceTemplate.insertCopyWithParamsInsertion: '''{
 String? id,
 String? firstName,
 String? lastName,
 String? email,
+String? zipCode,
 }''',
     AFSourceTemplate.insertCopyWithCallInsertion: '''      
 id: id ?? this.id,
 firstName: firstName ?? this.firstName,
 lastName: lastName ?? this.lastName,
 email: email ?? this.email,
+zipCode: zipCode ?? this.zipCode,
 ''',
-      AFSourceTemplate.insertAdditionalMethodsInsertion: '''
+      AFSourceTemplate.insertAdditionalMethodsInsertion: additionalMethods
+    }));
+
+  }
+
+  factory ModelReferencedUserT.example() {
+    return ModelReferencedUserT.custom(
+      templateFileId: "model_referenced_user",
+      templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoFiles,
+      extraImports: '''
+import 'package:afib/afib_flutter.dart';
+import 'package:sqlite3/sqlite3.dart' as sql;
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
+''', 
+      additionalMethods: '''
 static ReferencedUser fromDB(sql.Row row) {
   final entries = row.toTableColumnMap();
   if(entries == null) {
@@ -69,6 +95,6 @@ static ReferencedUser fromDB(sql.Row row) {
   );
 }
 ''',
-    }));
+    );
   }
 }

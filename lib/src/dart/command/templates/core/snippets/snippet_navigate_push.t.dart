@@ -13,8 +13,7 @@ class SnippetNavigatePushT extends AFSnippetSourceTemplate {
     templateFileId: templateFileId,
     templateFolder: templateFolder,
     embeddedInsertions: embeddedInsertions,
-  )
-  ;
+  );
 
   factory SnippetNavigatePushT.core() {
     return SnippetNavigatePushT(

@@ -1,6 +1,43 @@
+import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 
-class SnippetFundamentalThemeInitT extends AFCoreSnippetSourceTemplate {
+class SnippetFundamentalThemeInitT extends AFSnippetSourceTemplate {
+  static const insertExtraTranslations = AFSourceTemplateInsertion("extra_translations");
+
+  SnippetFundamentalThemeInitT({
+    required String templateFileId,
+    required List<String> templateFolder,
+    required AFSourceTemplateInsertions? embeddedInsertions,
+  }): super(
+    templateFileId: templateFileId,
+    templateFolder: templateFolder,
+    embeddedInsertions: embeddedInsertions,
+  );
+
+   factory SnippetFundamentalThemeInitT.custom({
+    required String templateFileId,
+    required List<String> templateFolder,
+    required Object extraTranslations,
+  }) {
+    return SnippetFundamentalThemeInitT(
+      templateFileId: templateFileId,
+      templateFolder: templateFolder,
+      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+        insertExtraTranslations: extraTranslations,
+      })
+    );
+
+  }
+
+  factory SnippetFundamentalThemeInitT.core() {
+    return SnippetFundamentalThemeInitT.custom(
+      templateFileId: "fundamental_theme_init",
+      templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
+      extraTranslations: AFSourceTemplate.empty,
+    );
+  }
+ 
+
   String get template => '''
   const colorPrimary = Color(0xFF344955);
   const colorSecondary = Color(0xFF5d4037);
@@ -56,7 +93,8 @@ class SnippetFundamentalThemeInitT extends AFCoreSnippetSourceTemplate {
   primary.setAfibFundamentals();
 
   primary.setTranslations(AFUILocaleID.englishUS, {
-    AFUITranslationID.appTitle: "$insertPackageName"
+    AFUITranslationID.appTitle: "${insertPackageName.spaces}",
+    $insertExtraTranslations
   });
 ''';
 }

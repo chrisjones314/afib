@@ -8,6 +8,8 @@ class StartHereT extends AFProjectStyleSourceTemplate {
   );
 
   String get template => '''
+--override-templates +
+  +core/snippets/state_test_impl=project_styles/eval_demo/snippets/startup_state_test
 require sqlite3
 require path_provider
 generate id ${insertAppNamespaceUpper}TestDataID.referencedUserChris
@@ -63,9 +65,7 @@ generate ui SignedInDrawer --override-templates +
   +core/snippets/declare_spi=project_styles/eval_demo/snippets/signed_in_drawer_spi
   +core/snippets/screen_build_with_spi_impl=project_styles/eval_demo/snippets/signed_in_drawer_build_with_spi
   +core/snippets/drawer_build_body=project_styles/eval_demo/snippets/signed_in_drawer_build_body
-generate test StartupUnitTest
-generate test StartupStateTest --override-templates +
-  +core/snippets/state_test_impl=project_styles/eval_demo/snippets/startup_state_test
+generate test StartupUnitTest  
 generate test InitialWireframe --initial-screen HomePageScreen --override-templates +
   +core/snippets/wireframe_body=project_styles/eval_demo/snippets/initial_wireframe_body
 generate custom file --main-type ${insertAppNamespaceUpper}SqliteDB --path lib/state/db --override-templates "core/files/custom=project_styles/eval_demo/files/sqlite_db"

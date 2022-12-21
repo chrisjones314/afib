@@ -8,8 +8,15 @@ class StarterSigninT extends AFProjectStyleSourceTemplate {
   );
 
   String get template => '''
+--override-templates +
+  +core/snippets/fundamental_theme_init=project_styles/starter-signin/snippets/fundamental_theme_init
 integrate library --package-name afib_signin --package-code afsi
+generate id ${insertAppNamespaceUpper}WidgetID.textFirstName
+generate id ${insertAppNamespaceUpper}WidgetID.textLastName
+generate id ${insertAppNamespaceUpper}WidgetID.textZipCode
+generate id ${insertAppNamespaceUpper}WidgetID.widgetRegistrationDetails
 generate id ${insertAppNamespaceUpper}TestDataID.referencedUserChris
+generate id ${insertAppNamespaceUpper}TestDataID.referencedUsersChris
 generate id ${insertAppNamespaceUpper}TestDataID.userCredentialChris
 generate ui StartupScreen --override-templates +
   +core/snippets/minimal_screen_build_body_impl=core/snippets/snippet_startup_screen_complete_project_style

@@ -30,6 +30,8 @@ import 'package:afib/afib_flutter.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_credential_root.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/home_page_screen.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/read_user_query.dart';
+
 import 'package:afib_signin/afsi_flutter.dart';
 ''',
       insertMemberVariables: '''
@@ -67,17 +69,18 @@ static void onSuccessfulSignin(AFFinishQuerySuccessContext<UserCredentialRoot> c
   assert(cred.isSignedIn);
 
   // save the user credential to our state.
-  context.updateComponentRootStateOne<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>(cred);
+  context.updateComponentRootStateOne<STState>(cred);
 
   // TODO: you can execute several queries here to load in app data based on the user credential.
-  //final startupLoad = AFCompositeQuery.createList();
-  //startupLoad.add(ReadReferencedUserQuery(user: cred));
+  // As written, this will only navigate to the home page once all the queries in startup load complete.
+  final startupLoad = AFCompositeQuery.createList();
+  startupLoad.add(ReadUserQuery(credential: cred));
 
-  //context.executeQuery(AFCompositeQuery.createFrom(
-  //  queries: startupLoad, onSuccess: (successCtx) {
+  context.executeQuery(AFCompositeQuery.createFrom(
+    queries: startupLoad, onSuccess: (successCtx) {
       // Then, when you've loaded enough state, you can navigate to the home screen.
       context.navigateReplaceAll(HomePageScreen.navigatePush().castToReplaceAll());
-  //}));
+  }));
 }
 
 @override

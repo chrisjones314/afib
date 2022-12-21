@@ -29,6 +29,7 @@ class StateTestT extends AFFileSourceTemplate {
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackagePath/${insertAppNamespace}_id.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/test/${AFSourceTemplate.insertAppNamespaceInsertion}_state_test_shortcuts.dart';
 $insertExtraImports
 
 void define${UnitTestT.insertTestName}StateTest(AFStateTestDefinitionContext definitions) {

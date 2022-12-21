@@ -18,6 +18,7 @@ class ThemeT extends AFFileSourceTemplate {
       templateFileId: "theme",
       templateFolder: AFProjectPaths.pathGenerateCoreFiles,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+        AFSourceTemplate.insertExtraImportsInsertion: AFSourceTemplate.empty,
         AFSourceTemplate.insertAdditionalMethodsInsertion: AFSourceTemplate.empty,
       })
     );
@@ -26,6 +27,7 @@ class ThemeT extends AFFileSourceTemplate {
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 import 'package:flutter/material.dart';
+$insertExtraImports
 
 class $insertMainType extends $insertMainParentType {
   $insertMainType(AFThemeID id, AFFundamentalThemeState fundamentals, AFBuildContext context): super(id, fundamentals, context);

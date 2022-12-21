@@ -1203,8 +1203,16 @@ class AFStateTest extends AFScreenTestDescription {
           state: store.state,
         );
 
-        query.finishAsyncExecute(successContext);
-        dispatcher.dispatch(AFShutdownDeferredQueryAction(query.key));
+        // when we are in a state test in the interactive UI, it is important to actually do the delay,
+        // as sometimes an animation must complete before it is safe to execute the deferred action.
+        if(AFibF.g.isInteractiveStateTestContext) {
+          Future.delayed(query.delay, () async {
+            query.finishAsyncExecute(successContext);
+          });
+        } else {
+          query.finishAsyncExecute(successContext);
+          dispatcher.dispatch(AFShutdownDeferredQueryAction(query.key));
+        }
 
         return;
       }

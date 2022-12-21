@@ -165,6 +165,7 @@ class AFibGlobalState {
   AFibStoreStackEntry? uiStore;
   AFibStoreStackEntry? backgroundStore;
   AFConceptualStore activeConceptualStore = AFConceptualStore.appStore;
+  bool isInteractiveStateTestContext = false;
 
   final stateStack = <AFibStateStackEntry>[];
   AFStateTestContext? demoModeTest;

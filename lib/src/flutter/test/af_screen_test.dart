@@ -1747,6 +1747,7 @@ class AFWorkflowStatePrototype extends AFScreenPrototype {
   }
 
   static void initializeMultiscreenPrototype(AFDispatcher dispatcher, AFWorkflowStatePrototype test) {
+    AFibF.g.isInteractiveStateTestContext = false;
     dispatcher.dispatch(AFResetToInitialStateAction());
     dispatcher.dispatch(AFUpdateActivePrototypeAction(prototypeId: test.id));
 
@@ -1821,6 +1822,7 @@ class AFWorkflowStatePrototype extends AFScreenPrototype {
         }
       });   
     }
+    AFibF.g.isInteractiveStateTestContext = true;
   }
 
 

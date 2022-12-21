@@ -330,7 +330,10 @@ $optionsHeader
     final generator = context.generator;
 
     generator.renameExistingFileToOld(context.command, generator.pathOriginalWidgetTest);
-    final appParam = context.isApp ? "installCoreApp: installCoreApp" : "installCoreLibrary: installCoreLibrary,";
+    final appParam = context.isApp ? '''
+installCoreApp: installCoreApp,
+installUILibrary: installCoreLibrary,
+''' : "installCoreLibrary: installCoreLibrary,";
     final fileMain = context.createFile(generator.pathMainAFibTest, MainAFibTestT(), insertions: {
       MainAFibTestT.insertInstallAppParam: appParam,
 

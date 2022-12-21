@@ -14,6 +14,7 @@ import 'package:$insertPackagePath/initialization/create_dart_params.dart';
 import 'package:$insertPackagePath/initialization/install/install_base.dart';
 import 'package:$insertPackagePath/initialization/install/install_base_library.dart';
 import 'package:$insertPackagePath/initialization/install/install_test.dart';
+import 'package:$insertPackagePath/initialization/install/install_core_library.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 //------------------------------------------------------------------------------
@@ -34,7 +35,7 @@ void main() async {
             paramsDart: paramsDart,
             installBase: installBase, 
             installBaseLibrary: installBaseLibrary, 
-            $insertInstallAppParam,            
+            $insertInstallAppParam    
             installTest: installTest,
             widgetTester: tester
           );

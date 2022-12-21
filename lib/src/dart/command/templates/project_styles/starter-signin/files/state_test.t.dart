@@ -157,7 +157,7 @@ void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
     // You might choose to build a hierarchy of tests that manipulate SPIs, leaving you in more and more robust test states, and
     // on different screens.   Each new extended test can pick up from where its 'extendTest' predecessor left off.
 
-    // Or, you might choose to override some of the defined query results from alreadyLoggedInChris, starting with different
+    // Or, you might choose to override some of the defined query results from alreadyLoggedInWestCoast, starting with different
     // test data as your app grows more complex.   This can allow you to preserve the test data that existing tests see, while
     // also developing more robust test data for new tests.
     final shortcuts = ${insertAppNamespaceUpper}StateTestShortcuts(testContext);
@@ -176,7 +176,8 @@ void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
   definitions.addTest(${insertAppNamespaceUpper}StateTestID.readyToRegister, extendTest: ${insertAppNamespaceUpper}StateTestID.readyForLoginWestCoast, body: (testContext) {
     // this is an important example, because rather than using a fixed result, it dynamically generates a result 
     // for the RegistrationQuery.  As a result, we can drive the UI from the signin page, all the way through the reegistration
-    // process, and get the expected result.
+    // process, and get the expected result.  That is, you can click on the readyToRegister test in prototype mode, enter your own 
+    // registration details, click Signup, and it will work.
     testContext.defineQueryResponseDynamic<RegistrationQuery>(body: (context, query) {
       final email = query.email;
       context.onSuccess(UserCredentialRoot(
@@ -228,7 +229,7 @@ void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
       screenContext.executeBuild((spi) => spi.onChangedPassword("test"));
 
       // now, we need to modify the controls on the custom RegistrationDetailsWidget that we inserted into the 
-      // standard signin UI.
+      // standard signin UI  via our SigninTheme override
       registerDetails.executeWidget(screenContext, 
         // often the launch param would come from the SPI of the parent screen.  But in this case, the parent is 
         // AFSI, which knows nothing about our custom widget, so it comes from a static method on the widget itself.

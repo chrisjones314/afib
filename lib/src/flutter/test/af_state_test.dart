@@ -196,6 +196,36 @@ class AFStateTests {
   }
 }
 
+class AFCreateDynamicQueryResultContext<TQuery extends AFAsyncQuery> {
+  final TQuery query;
+  final AFStateTestContext testContext;
+  AFQueryError? error;
+  Object? response;
+
+  AFCreateDynamicQueryResultContext({
+    required this.query,
+    required this.testContext,
+  });
+
+  bool get isValid => isError || isResponse;
+  bool get isError => error != null;
+  bool get isResponse => response != null;
+
+  AFPublicState get public => testContext.public;
+  AFTimeState get currentTime => testContext.currentTime;
+
+
+  void onError(AFQueryError err) {
+    assert(error == null, "Did you call onError twice?");
+    error = err;
+  }
+
+  void onSuccess(Object resp) {
+    assert(response == null, "Did you call onResponse twice?");
+    response = resp;
+  }
+}
+
 class _AFStateResultEntry<TQuery extends AFAsyncQuery> {
   final dynamic querySpecifier;
   final AFProcessQueryDelegate<TQuery>? handler;
@@ -413,9 +443,19 @@ class _AFStateRegisterDynamicResultStatement<TQuery extends AFAsyncQuery> extend
   void execute(AFStateTestContext context) {
     final test = context.test;
     test.registerResult<TQuery>(querySpecifier, (context, query) {
-      final result = delegate(context, query);
-      query.testFinishAsyncWithResponse(context, result);
-      return result;
+      final dynContext = AFCreateDynamicQueryResultContext<TQuery>(testContext: context, query: query);
+      delegate(dynContext, query);
+      assert(dynContext.isValid, "You must call either onError or onSuccess");
+      if(dynContext.isError) {
+        final err = dynContext.error;
+        if(err != null) {
+          query.testFinishAsyncWithError(context, err);
+        }
+        return err;
+      } else {
+        query.testFinishAsyncWithResponse(context, dynContext.response);
+        return dynContext.response;
+      }
     });
   }
 }
@@ -438,10 +478,19 @@ class _AFStateRegisterDynamicCrossQueryResultStatement<TQuerySource extends AFAs
 
       var result;
       for(final delegate in delegates) {
-        result = delegate(context, query);
-        // in this case, we don't send the result to the original query, but rather a
-        // listener query they specified
-        listenerQuery.testFinishAsyncWithResponse(context, result);
+        final dynContext = AFCreateDynamicQueryResultContext(query: query, testContext: context);
+        delegate(dynContext, query);
+        assert(dynContext.isValid, "You must call onSuccess or onError");
+        if(dynContext.isError) {
+          final err = dynContext.error;
+          if(err != null) {
+            listenerQuery.testFinishAsyncWithError(context, err);
+          }
+        } else {
+          // in this case, we don't send the result to the original query, but rather a
+          // listener query they specified
+          listenerQuery.testFinishAsyncWithResponse(context, result);
+        }
       }
       return result;
     });

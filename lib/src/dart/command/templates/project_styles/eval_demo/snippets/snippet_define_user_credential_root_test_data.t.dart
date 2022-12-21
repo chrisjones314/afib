@@ -11,17 +11,26 @@ class SnippetDefineUserCredentialRootTestDataT {
       templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         SnippetDefineTestDataT.insertModelDeclaration: '''
-final userCred = UserCredentialRoot(
-  userId: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris,
+// this was previously defined, so we can access it
+final userWC = context.find<ReferencedUser>(STTestDataID.referencedUserWestCoast);
+final userCredWC = UserCredentialRoot(
+  userId: userWC.id,
   token: UserCredentialRoot.notSpecified,
-  storedEmail: UserCredentialRoot.notSpecified,
+  storedEmail: userWC.email,
+);
+
+final userEC = context.find<ReferencedUser>(STTestDataID.referencedUserEastCoast);
+final userCredEC = UserCredentialRoot(
+  userId: userEC.id,
+  token: UserCredentialRoot.notSpecified,
+  storedEmail: userEC.email,
 );
 
 // feel its a little less confusing if the example state test refers to a more natural ID.
-context.define(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.userCredentialChris, userCred);
-
+context.define(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.userCredentialWestCoast, userCredWC);
+context.define(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.userCredentialEastCoast, userCredEC);
 ''',
-        SnippetDefineTestDataT.insertModelCall: "userCred"
+        SnippetDefineTestDataT.insertModelCall: "userCredWC"
       }
 
     ));

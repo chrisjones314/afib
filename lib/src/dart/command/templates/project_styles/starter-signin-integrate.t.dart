@@ -9,13 +9,16 @@ class StarterSigninIntegrateT extends AFProjectStyleSourceTemplate {
 
   String get template => '''
 generate id ${insertAppNamespaceUpper}QueryID.deferredSignout
+generate id ${insertAppNamespaceUpper}StateTestID.alreadyLoggedInWestCoast
+generate id ${insertAppNamespaceUpper}StateTestID.alreadyLoggedInEastCoast
+generate id ${insertAppNamespaceUpper}StateTestID.readyForLoginWestCoast
+generate id ${insertAppNamespaceUpper}StateTestID.manipulateAfterSigninWestCoast
+generate id ${insertAppNamespaceUpper}StateTestID.performLoginWestCoast
+generate id ${insertAppNamespaceUpper}StateTestID.readyToRegister
+generate id ${insertAppNamespaceUpper}StateTestID.registerMidwest
 generate override ${insertAppNamespaceUpper}SigninTheme --parent-type AFSIDefaultTheme --override-templates "core/files/theme=project_styles/starter-signin/files/theme_signin"
 generate override ${insertAppNamespaceUpper}SigninActionsLPI --parent-type AFSISigninActionsLPI --override-templates "core/files/lpi=project_styles/starter-signin/files/starter_signin_actions_lpi"
 generate custom set-startup-screen --screen-id AFSIScreenID.signin --create-route-param "SigninScreenRouteParam.createSigninLoading()"
-generate state ReferencedUser --override-templates "core/files/model=project_styles/starter-signin/files/model_referenced_user"
-generate state ReferencedUsersRoot --override-templates +
-  +core/files/model=project_styles/eval_demo/files/model_referenced_users_root
-  +core/snippets/define_test_data=project_styles/eval_demo/snippets/define_referenced_users_root_test_data
 generate query StartupQuery --result-type AFUnused --force-overwrite --override-templates "core/files/query_simple=project_styles/starter-signin/files/query_startup" 
 generate query CheckSigninQuery --result-type UserCredentialRoot --override-templates "core/files/query_simple=project_styles/starter-signin/files/query_check_signin"
 generate query SigninQuery --result-type UserCredentialRoot --override-templates "core/files/query_simple=project_styles/starter-signin/files/query_signin"
@@ -32,6 +35,9 @@ generate ui RegistrationDetailsWidget --override-templates +
   +core/snippets/widget_route_param=project_styles/starter-signin/snippets/registration_details_widget_route_param
   +core/snippets/declare_spi=project_styles/starter-signin/snippets/registration_details_widget_spi
   +core/snippets/widget_build_body=project_styles/starter-signin/snippets/registration_details_widget_build_body
+  +core/snippets/screen_additional_methods=project_styles/starter-signin/snippets/registration_details_widget_additional_methods
+generate test StartupStateTest --force-overwrite --override-templates +
+  +core/files/state_test=project_styles/starter-signin/files/state_test
 echo --success "Project setup completed successfully."
 ''';
 

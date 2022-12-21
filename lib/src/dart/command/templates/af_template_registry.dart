@@ -7,6 +7,7 @@ import 'package:afib/src/dart/command/templates/core/files/library_exports.t.dar
 import 'package:afib/src/dart/command/templates/core/files/lpi.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/state_test.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/theme.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_spi.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_test_data.dart';
@@ -60,6 +61,7 @@ import 'package:afib/src/dart/command/templates/project_styles/starter-signin/fi
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_starter_signin_startup.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_write_user.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/signin_actions_lpi.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/state_test.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/snippets/snippet_fundmental_theme_init.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/snippets/snippets_home_page_screen.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/snippets/snippets_registration_details_widget.t.dart';
@@ -97,6 +99,7 @@ class AFTemplateRegistry {
     registerFile(CustomT.core());
     registerFile(StarterSigninIntegrateT());
     registerFile(LPIT.core());
+    registerFile(StateTestT.core());
 
     registerSnippet(SnippetDefineTestDataT.core());
     registerSnippet(SnippetStandardRouteParamT.core());
@@ -178,6 +181,7 @@ class AFTemplateRegistry {
     registerFile(QueryReadUserSigninStarterT.example());
     registerFile(QueryWriteUserSigninStarterT.example());
     registerFile(StarterSigninThemeSigninT.example());
+    registerFile(StarterSigninStateTestT());
 
     registerSnippet(SnippetSigninStarterHomePageScreenExtraImportsT.example());
     registerSnippet(SnippetSigninStarterHomePageScreenBuildBodyT());

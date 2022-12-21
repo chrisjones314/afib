@@ -21,13 +21,11 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplat
 Widget? childExtraInputs({
   required SigninScreenRouteParam parentParam,
 }) {
-  if(context.screenId != AFSIScreenID.signup) {
+  if(context.screenId != AFSIScreenID.register) {
     return null;
   }
-  return RegistrationDetailsWidget(launchParam: RegistrationDetailsWidgetRouteParam.create(
+  return RegistrationDetailsWidget(launchParam: RegistrationDetailsWidget.createLaunchParam(
     screenId: context.screenId,
-    wid: STWidgetID.widgetRegistrationDetails,
-    routeLocation: AFRouteLocation.screenHierarchy,
   ));
 }
 ''',

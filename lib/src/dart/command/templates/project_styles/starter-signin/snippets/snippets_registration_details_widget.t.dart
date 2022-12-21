@@ -110,6 +110,21 @@ class SnippetRegistrationDetailsWidgetAdditionalMethodsT extends AFSnippetSource
   );
   
   String get template => '''
+
+// normally, the launch param would come from the parent screen's SPI, which is accessible from both
+// the UI code that creates the widget, and the state test code that executes it.  But, the parent screen
+// here is from a third-party library, AFSI, which knows nothing about this widget, so we create it in a
+// static method called from both places.
+static RegistrationDetailsWidgetRouteParam createLaunchParam({
+  required AFScreenID screenId,
+}) {
+  return RegistrationDetailsWidgetRouteParam.create(
+    screenId: screenId, 
+    wid: ${insertAppNamespaceUpper}WidgetID.widgetRegistrationDetails, 
+    routeLocation: AFRouteLocation.screenHierarchy
+  );
+}
+
 ''';
 }
 

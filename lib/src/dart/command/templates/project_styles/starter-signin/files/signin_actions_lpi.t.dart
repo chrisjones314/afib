@@ -39,7 +39,7 @@ void onSignup(String email, String password) {
   // custom UI into UI's created by third parties.   Here, we can access the route param for the child widget
   // we returned from our STSigninTheme.
   final extraDetails = context.accessRouteParam<RegistrationDetailsWidgetRouteParam>(AFRouteParamRef.forWidget(
-    screenId: AFSIScreenID.signup, 
+    screenId: AFSIScreenID.register, 
     wid: STWidgetID.widgetRegistrationDetails
   ));
 

@@ -10,23 +10,41 @@ class SnippetDefineReferencedUsersRootTestDataT extends SnippetDefineTestDataT {
       templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         SnippetDefineTestDataT.insertModelDeclaration: '''
-  final userCJ = context.define<ReferencedUser>(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris, ReferencedUser(
-    id: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris, 
-    firstName: "Chris", 
+  final userWC = context.define<ReferencedUser>(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserWestCoast, ReferencedUser(
+    id: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserWestCoast, 
+    firstName: "Westy", 
     lastName: "Test", 
-    email: "chris.test@nowhere.com",
+    email: "westy.test@nowhere.com",
     zipCode: "98105",
   ));
 
+  context.define<ReferencedUser>(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserEastCoast, ReferencedUser(
+    id: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserEastCoast, 
+    firstName: "Easty", 
+    lastName: "Test", 
+    email: "easty.test@nowhere.com",
+    zipCode: "10005",
+  ));
+
+  context.define<ReferencedUser>(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserMidwest, ReferencedUser(
+    id: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserMidwest, 
+    firstName: "Middy", 
+    lastName: "Test", 
+    email: "middy.test@nowhere.com",
+    zipCode: "63117",
+  ));
+
+
+
   final users = <String, ReferencedUser>{
-    ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris: userCJ
+    ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserWestCoast: userWC
   };
-  final referencedUsersChris = ReferencedUsersRoot(
+  final referencedUsersWestCoast = ReferencedUsersRoot(
     users: users
   );
-  context.define(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUsersChris, referencedUsersChris);
+  context.define(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUsersWestCoast, referencedUsersWestCoast);
 ''',
-        SnippetDefineTestDataT.insertModelCall: "referencedUsersChris"
+        SnippetDefineTestDataT.insertModelCall: "referencedUsersWestCoast"
       })
   );
 

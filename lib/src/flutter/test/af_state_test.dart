@@ -197,31 +197,38 @@ class AFStateTests {
 }
 
 class AFCreateDynamicQueryResultContext<TQuery extends AFAsyncQuery> {
+  static const responseError = 0x01;
+  static const responseSuccess = 0x02;
   final TQuery query;
   final AFStateTestContext testContext;
   AFQueryError? error;
   Object? response;
+  int responseCalls = 0;
 
   AFCreateDynamicQueryResultContext({
     required this.query,
     required this.testContext,
   });
 
-  bool get isValid => isError || isResponse;
+  bool get isValid {
+    return responseCalls != 0;
+  }
   bool get isError => error != null;
-  bool get isResponse => response != null;
+  bool get isResponse => (responseCalls | responseSuccess) != 0;
 
   AFPublicState get public => testContext.public;
   AFTimeState get currentTime => testContext.currentTime;
 
 
   void onError(AFQueryError err) {
-    assert(error == null, "Did you call onError twice?");
+    assert(responseCalls == 0, "Did you call both onSuccess/onError or one multiple times?");
+    responseCalls |= responseError;
     error = err;
   }
 
-  void onSuccess(Object resp) {
-    assert(response == null, "Did you call onResponse twice?");
+  void onSuccess(Object? resp) {
+    assert(responseCalls == 0, "Did you call both onSuccess/onError or one multiple times?");
+    responseCalls |= responseSuccess;
     response = resp;
   }
 }
@@ -445,7 +452,7 @@ class _AFStateRegisterDynamicResultStatement<TQuery extends AFAsyncQuery> extend
     test.registerResult<TQuery>(querySpecifier, (context, query) {
       final dynContext = AFCreateDynamicQueryResultContext<TQuery>(testContext: context, query: query);
       delegate(dynContext, query);
-      assert(dynContext.isValid, "You must call either onError or onSuccess");
+      assert(dynContext.isValid, "You must call either onError or onSuccess for query ${query.runtimeType}");
       if(dynContext.isError) {
         final err = dynContext.error;
         if(err != null) {
@@ -489,6 +496,7 @@ class _AFStateRegisterDynamicCrossQueryResultStatement<TQuerySource extends AFAs
         } else {
           // in this case, we don't send the result to the original query, but rather a
           // listener query they specified
+          result = dynContext.response;
           listenerQuery.testFinishAsyncWithResponse(context, result);
         }
       }
@@ -921,19 +929,20 @@ class AFSpecificStateTestDefinitionContext {
 
   void defineInitialTime(Object timeOrId) {
     final time = definitions.td(timeOrId);
-    test.defineQueryResponseDynamic(AFUIQueryID.time,  (e, q) {
+    test.defineQueryResponseDynamic(AFUIQueryID.time,  (context, q) {
       if(time is AFTimeState) {
-        return time;
+        context.onSuccess(time);
+      } else {
+        assert(time is DateTime);
+        context.onSuccess(AFTimeState(
+          actualNow: time,
+          timeZone: AFTimeZone.local,
+          pauseTime: null,
+          simulatedOffset: Duration(milliseconds: 0),
+          pushUpdateFrequency: Duration(minutes: 1000),
+          pushUpdateSpecificity: AFTimeStateUpdateSpecificity.minute
+        ));
       }
-      assert(time is DateTime);
-      return AFTimeState(
-        actualNow: time,
-        timeZone: AFTimeZone.local,
-        pauseTime: null,
-        simulatedOffset: Duration(milliseconds: 0),
-        pushUpdateFrequency: Duration(minutes: 1000),
-        pushUpdateSpecificity: AFTimeStateUpdateSpecificity.minute
-      );
     });    
   }
 

@@ -10,14 +10,18 @@ class StartHereT extends AFProjectStyleSourceTemplate {
   String get template => '''
 --override-templates +
   +core/snippets/state_test_impl=project_styles/eval_demo/snippets/startup_state_test
+require meta
 require sqlite3
 require path_provider
-generate id ${insertAppNamespaceUpper}TestDataID.referencedUserChris
-generate id ${insertAppNamespaceUpper}TestDataID.userCredentialChris
+generate id ${insertAppNamespaceUpper}TestDataID.referencedUserWestCoast
+generate id ${insertAppNamespaceUpper}TestDataID.referencedUsersWestCoast
+generate id ${insertAppNamespaceUpper}TestDataID.userCredentialWestCoast
+generate id ${insertAppNamespaceUpper}TestDataID.referencedUserEastCoast
+generate id ${insertAppNamespaceUpper}TestDataID.userCredentialEastCoast
+generate id ${insertAppNamespaceUpper}TestDataID.referencedUserMidwest
 generate id ${insertAppNamespaceUpper}WidgetID.buttonSaveTransientCount
 generate id ${insertAppNamespaceUpper}WidgetID.buttonResetHistory
-generate id ${insertAppNamespaceUpper}TestDataID.countHistoryChris
-generate id ${insertAppNamespaceUpper}TestDataID.referencedUsersChris
+generate id ${insertAppNamespaceUpper}TestDataID.countHistoryWestCoast
 generate id ${insertAppNamespaceUpper}WidgetID.buttonIHaveNoObjection
 generate id ${insertAppNamespaceUpper}WidgetID.textCurrentStanza
 generate id ${insertAppNamespaceUpper}WidgetID.buttonManageCount
@@ -26,12 +30,12 @@ generate state CountHistoryEntry --override-templates "core/files/model=project_
 generate state CountHistoryRoot --override-templates +
   +core/files/model=project_styles/eval_demo/files/model_count_history_root
   +core/snippets/define_test_data=project_styles/eval_demo/snippets/define_count_history_root_test_data
-generate state ReferencedUsersRoot --override-templates +
-  +core/files/model=project_styles/eval_demo/files/model_referenced_users_root
-  +core/snippets/define_test_data=project_styles/eval_demo/snippets/define_referenced_users_root_test_data
 generate state UserCredentialRoot --override-templates +
   +core/files/model=project_styles/eval_demo/files/model_user_credential_root
   +core/snippets/define_test_data=project_styles/eval_demo/snippets/define_user_credential_root_test_data
+generate state ReferencedUsersRoot --override-templates +
+  +core/files/model=project_styles/eval_demo/files/model_referenced_users_root
+  +core/snippets/define_test_data=project_styles/eval_demo/snippets/define_referenced_users_root_test_data
 generate state ReferencedUser --override-templates "core/files/model=project_styles/eval_demo/files/model_referenced_user"
 generate query ReadCountHistoryQuery --result-type CountHistoryRoot --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_read_count_history"
 generate query ReadReferencedUserQuery --result-type ReferencedUser --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_read_referenced_user"
@@ -69,7 +73,6 @@ generate test StartupUnitTest
 generate test InitialWireframe --initial-screen HomePageScreen --override-templates +
   +core/snippets/wireframe_body=project_styles/eval_demo/snippets/initial_wireframe_body
 generate custom file --main-type ${insertAppNamespaceUpper}SqliteDB --path lib/state/db --override-templates "core/files/custom=project_styles/eval_demo/files/sqlite_db"
-echo --success "Project setup completed successfully."
 ''';
 
 }

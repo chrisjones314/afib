@@ -8,7 +8,7 @@ class SnippetStartupScreenCompleteProjectStyleT extends AFCoreSnippetSourceTempl
 final t = spi.t;
 final rows = t.column();
 rows.add(AFUICompleteProjectStyleWidget(
-  projectStyle: '${insertProjectStyle}',
+  projectStyle: '$insertProjectStyle',
 ));
 return ListView(
   children: rows

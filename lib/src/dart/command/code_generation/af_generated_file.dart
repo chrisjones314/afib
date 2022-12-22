@@ -281,21 +281,22 @@ class AFGeneratedFile {
     return buffer.replaceTemplate(context, id, template);
   }
 
-  void writeIfModified(AFCommandContext context) {
-    write(context);
+  bool writeIfModified(AFCommandContext context) {
+    return write(context);
   }
 
-  void write(AFCommandContext context) {
+  bool write(AFCommandContext context) {
     final output = context.output;
     // make sure the folder exists before we write a file.
     AFProjectPaths.ensureFolderExistsForFile(projectPath);
 
-    _writeAction(context);
-    output.startColumn(
-      alignment: AFOutputAlignment.alignLeft
+    final action = _findAction(context);
+    final color = (this.action == AFGeneratedFileAction.create) ? Styles.GREEN : Styles.YELLOW;
+    output.writeTwoColumns(
+      col1: "$action ", 
+      col2: AFProjectPaths.relativePathFor(projectPath),
+      color1: color
     );
-    output.write(AFProjectPaths.relativePathFor(projectPath));
-    output.endLine();
 
     final path = AFProjectPaths.fullPathFor(this.projectPath);
 
@@ -304,15 +305,10 @@ class AFGeneratedFile {
 
     final f = File(path);
     f.writeAsStringSync(buffer.toString());
+    return true;
   }
 
-  void _writeAction(AFCommandContext context) {
-    final output = context.output;
-    final color = (action == AFGeneratedFileAction.create) ? Styles.GREEN : Styles.YELLOW;
-    output.startColumn(
-      alignment: AFOutputAlignment.alignRight,
-      width: 15,
-      color: color);
+  String _findAction(AFCommandContext context) {
     var text = "create";
     if(action == AFGeneratedFileAction.modify) {
       if(!buffer.modified) {
@@ -328,6 +324,6 @@ class AFGeneratedFile {
       text = context.isExportTemplates ? "create" : "read";
     }
     
-    output.write("$text ");
+    return text;
   }
 }

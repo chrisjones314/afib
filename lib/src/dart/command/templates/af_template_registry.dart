@@ -52,24 +52,24 @@ import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippet
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippets/snippets_signed_in_drawer.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippets/snippets_startup_screen.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-minimal.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-minimal/files/query_minimal_startup.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin-integrate.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/model_referenced_user.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_check_signin.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_read_user.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_registration.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_signin.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_signout.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_starter_signin_startup.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_write_user.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/signin_actions_lpi.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/state_test.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/theme_signin.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/snippets/snippet_fundmental_theme_init.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/snippets/snippets_home_page_screen.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/snippets/snippets_registration_details_widget.t.dart';
 import 'package:path/path.dart';
-
-import 'project_styles/starter-signin/files/query_check_signin.t.dart';
-import 'project_styles/starter-signin/files/query_registration.t.dart';
-import 'project_styles/starter-signin/files/theme_signin.t.dart';
 
 
 /// A registry of source code templates umodel in code generation.
@@ -121,6 +121,9 @@ class AFTemplateRegistry {
     registerSnippet(SnippetWidgetRouteParamT.core());
     registerSnippet(SnippetWidgetBuildBodyT.core());
     registerSnippet(SnippetStateTestImplMinimalT());
+
+    // starter-minimal example
+    registerFile(QueryStartupStarterMinimalT.example());
 
     // start-here example
     registerFile(StartHereThemeT.example());

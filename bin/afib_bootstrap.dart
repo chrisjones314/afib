@@ -7,6 +7,7 @@ void main(List<String> argsIn) {
   final argsFull = AFArgs.create(argsIn);
   
   //argsFull.setDebugArgs("create app signin_test st --project-style eval-demo");
+  //argsFull.setDebugArgs("create app signin_test st --project-style starter-minimal");
   argsFull.setDebugArgs("create app signin_test st --project-style starter-signin");
 
   afBootstrapCommandMain(emptyParams, argsFull);

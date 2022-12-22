@@ -1711,7 +1711,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }) {
     return TextButton.styleFrom(
       backgroundColor: color,
-      primary: textColor
+      foregroundColor: textColor
     );
   }
 
@@ -1932,7 +1932,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }) {
     final style = TextButton.styleFrom(
       backgroundColor: color,
-      primary: textColor,
+      foregroundColor: textColor,
     );
 
     return TextButton(

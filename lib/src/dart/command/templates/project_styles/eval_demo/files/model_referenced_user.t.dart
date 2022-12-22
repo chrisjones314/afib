@@ -91,7 +91,8 @@ static ReferencedUser fromDB(sql.Row row) {
     id: id,
     firstName: first,
     lastName: last,
-    email: email
+    email: email,
+    zipCode: '00000',
   );
 }
 ''',

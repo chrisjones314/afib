@@ -1,6 +1,5 @@
 import 'dart:core';
 
-import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
@@ -190,7 +189,6 @@ void _navigateWireframe(Store<AFState> store, AFWireframeEventAction action, Nex
   final testStateSource = store.state.private.testState;
   final wireframe = testStateSource.activeWireframe;
   if(wireframe != null) {
-    final testState = testStateSource.findState(AFUIScreenTestID.wireframe);
     wireframe.onEvent(action.screen, action.widget, action.eventParam, action.stateView, action.onSuccess);
   }
   next(action);

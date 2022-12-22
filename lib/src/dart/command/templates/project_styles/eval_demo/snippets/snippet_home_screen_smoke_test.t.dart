@@ -15,14 +15,14 @@ class SnippetHomeScreenSmokeTest extends AFSnippetSourceTemplate {
 ];
 
   String get template => '''
-await e.matchText(HCWidgetID.textCurrentStanza, ft.contains("that a single man"));
-await e.applyTap(HCWidgetID.buttonIHaveNoObjection, verify: (verifyContext) {
+await e.matchText(${insertAppNamespaceUpper}WidgetID.textCurrentStanza, ft.contains("that a single man"));
+await e.applyTap(${insertAppNamespaceUpper}WidgetID.buttonIHaveNoObjection, verify: (verifyContext) {
   final routeParam = verifyContext.accessRouteParamUpdate<HomePageScreenRouteParam>();
   e.expect(routeParam.lineNumber, ft.equals(1));
 });
-await e.applyTap(HCWidgetID.buttonManageCount, verify: (verifyContext) {
+await e.applyTap(${insertAppNamespaceUpper}WidgetID.buttonManageCount, verify: (verifyContext) {
   final nav = verifyContext.accessOneAction<AFNavigatePushAction>();
-  e.expect(nav.screenId, ft.equals(HCScreenID.counterManagement));
+  e.expect(nav.screenId, ft.equals(${insertAppNamespaceUpper}ScreenID.counterManagement));
 });
 
 ''';

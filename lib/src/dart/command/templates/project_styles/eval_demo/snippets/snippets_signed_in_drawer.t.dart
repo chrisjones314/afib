@@ -78,7 +78,7 @@ void onTapClose() {
 
 ReferencedUser? get activeUser {
   final cred = context.s.userCredential;
-  return context.s.referencedUsers.find(cred.userId);
+  return context.s.referencedUsers.findById(cred.userId);
 }
 
 String get userName {

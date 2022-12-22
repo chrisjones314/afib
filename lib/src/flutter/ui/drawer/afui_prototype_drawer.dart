@@ -250,7 +250,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     ));
 
     final buttonStyle = OutlinedButton.styleFrom(
-      primary: t.colorOnPrimary,
+      foregroundColor: t.colorOnPrimary,
       textStyle: TextStyle(color: t.colorSecondary),
       side: BorderSide(width: 1, color: t.colorOnPrimary),
     );

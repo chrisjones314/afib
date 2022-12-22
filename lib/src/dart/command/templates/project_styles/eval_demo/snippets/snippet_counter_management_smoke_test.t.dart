@@ -21,7 +21,7 @@ await e.applyTap(${insertAppNamespaceUpper}WidgetID.buttonIncrementRouteParam);
 await e.applyTap(${insertAppNamespaceUpper}WidgetID.buttonIncrementRouteParam);
 await e.matchText(${insertAppNamespaceUpper}WidgetID.textCountRouteParam, ft.equals("3"));
 
-await e.applyTap(HCWidgetID.buttonSaveTransientCount, verify: (verifyContext) {
+await e.applyTap(${insertAppNamespaceUpper}WidgetID.buttonSaveTransientCount, verify: (verifyContext) {
   final write = verifyContext.accessOneQuery<WriteCountHistoryEntryQuery>();
   e.expect(write.entry.count, ft.equals(3));
 });

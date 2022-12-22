@@ -21,7 +21,6 @@ class ScreenT extends AFCoreFileSourceTemplate {
 import 'package:afib/afib_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:$insertPackageName/${insertAppNamespace}_id.dart';
-import 'package:$insertPackageName/state/${insertAppNamespace}_state.dart';
 $insertExtraImports
 
 $insertDeclareRouteParam

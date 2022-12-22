@@ -38,7 +38,6 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_fundamenta
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_include_install_tests.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_prototype_environment_impl.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
-import 'package:pubspec_parse/pubspec_parse.dart';
 
 class AFCreateCommandContext {
   final AFCommandContext command;
@@ -191,7 +190,7 @@ $optionsHeader
 
     final projectStyle = args.accessNamed(argProjectStyle);
 
-    if(projectStyle == null || projectStyle.isEmpty) {
+    if(projectStyle.isEmpty) {
       throwUsageError("You must specify --$argProjectStyle");
     }
 
@@ -215,7 +214,7 @@ $optionsHeader
     context.output.writeTwoColumns(col1: "creating ", col2: "project-style=$projectStyle");
 
     final generator = ctx.generator;
-    final pubspec = ctx.loadPubspec(packageName: packageName);
+    ctx.loadPubspec(packageName: packageName);
 
     _createStandardFolders(context);
     if(!context.isLibrary) {

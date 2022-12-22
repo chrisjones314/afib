@@ -38,7 +38,6 @@ generate ui RegistrationDetailsWidget --override-templates +
   +core/snippets/screen_additional_methods=project_styles/starter-signin/snippets/registration_details_widget_additional_methods
 generate test StartupStateTest --force-overwrite --override-templates +
   +core/files/state_test=project_styles/starter-signin/files/state_test
-echo --success "Project setup completed successfully."
 ''';
 
 }

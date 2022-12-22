@@ -56,7 +56,8 @@ if(signedIn.isEmpty) {
 
   context.onSuccess(UserCredentialRoot(
     userId: id.toString(),
-    token:  "--",
+    token:  UserCredentialRoot.notSpecified,
+    storedEmail: UserCredentialRoot.notSpecified,
   ));
 }
 ''',

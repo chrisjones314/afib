@@ -10,15 +10,15 @@ class SnippetDefineCountHistoryRootTestDataT extends SnippetDefineTestDataT {
       templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         SnippetDefineTestDataT.insertModelDeclaration: '''
-final countChris = CountHistoryRoot.fromList([
-  CountHistoryEntry(id: "__test_1", userId: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris, count: 4),
-  CountHistoryEntry(id: "__test_2", userId: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserChris, count: 3),
+final countWestCoast = CountHistoryRoot.fromList([
+  CountHistoryEntry(id: "__test_1", userId: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserWestCoast, count: 4),
+  CountHistoryEntry(id: "__test_2", userId: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserWestCoast, count: 3),
 ]);
 
 // feel its a little less confusing if the example state test refers to a more natural ID.
-context.define(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.countHistoryChris, countChris);
+context.define(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.countHistoryWestCoast, countWestCoast);
 ''',
-        SnippetDefineTestDataT.insertModelCall: "countChris"
+        SnippetDefineTestDataT.insertModelCall: "countWestCoast"
       })
   );
 

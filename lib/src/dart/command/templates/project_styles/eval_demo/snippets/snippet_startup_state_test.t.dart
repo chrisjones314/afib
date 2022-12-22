@@ -26,9 +26,9 @@ class SnippetStartupStateTestT extends AFSnippetSourceTemplate {
   @override
   String get template => '''
 testContext.defineQueryResponseUnused<StartupQuery>();
-testContext.defineQueryResponseFixed<CheckSigninQuery>(${insertAppNamespaceUpper}TestDataID.userCredentialChris);
-testContext.defineQueryResponseFixed<ReadReferencedUserQuery>(${insertAppNamespaceUpper}TestDataID.referencedUserChris);
-testContext.defineQueryResponseFixed<ReadCountHistoryQuery>(${insertAppNamespaceUpper}TestDataID.countHistoryChris);
+testContext.defineQueryResponseFixed<CheckSigninQuery>(${insertAppNamespaceUpper}TestDataID.userCredentialWestCoast);
+testContext.defineQueryResponseFixed<ReadReferencedUserQuery>(${insertAppNamespaceUpper}TestDataID.referencedUserWestCoast);
+testContext.defineQueryResponseFixed<ReadCountHistoryQuery>(${insertAppNamespaceUpper}TestDataID.countHistoryWestCoast);
 testContext.defineQueryResponseFixed<ResetHistoryQuery>(CountHistoryRoot.initialState());
 testContext.defineQueryResponseDynamic<WriteCountHistoryEntryQuery>(body: (context, query) {
     final entry = query.entry;
@@ -44,8 +44,8 @@ testContext.defineQueryResponseDynamic<WriteCountHistoryEntryQuery>(body: (conte
 testContext.executeStartup();
 
 final shortcuts = ${insertAppNamespaceUpper}StateTestShortcuts(testContext);
-final homeScreen = shortcuts.createHomePageScreenScreen();
-final counterScreen = shortcuts.createCounterManagementScreenScreen();
+final homeScreen = shortcuts.createHomePageScreen();
+final counterScreen = shortcuts.createCounterManagementScreen();
 const firstStanza = "that a single man";
 const secondStanza = "must be in want";
 

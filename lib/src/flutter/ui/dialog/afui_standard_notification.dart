@@ -24,7 +24,7 @@ class AFUIStandardNotification extends StatelessWidget {
   Widget build(BuildContext context) {
     
     final flatButtonStyle = OutlinedButton.styleFrom(
-      primary: colorForeground,
+      foregroundColor: colorForeground,
       side: BorderSide(color: colorForeground),
     );
 

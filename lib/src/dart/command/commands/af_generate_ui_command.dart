@@ -365,7 +365,6 @@ $optionsHeader
     // create a screen name
     final projectPath = generator.pathUI(uiName, controlSettings);
     final stateView = args.accessNamed(argStateView);
-    final theme = args.accessNamed(argTheme);
     final stateViewPrefix = generator.removeSuffix(stateView, "StateView");
 
     final screenId = generator.declareUIID(context, uiName, controlSettings);
@@ -422,10 +421,12 @@ $optionsHeader
       screenFile.importProjectPath(context, pathStateView);
     }
 
+    /*
     final pathTheme = generator.pathTheme(theme, isCustomParent: false);
     if(pathTheme != null) {
       screenFile.importProjectPath(context, pathTheme);    
     }
+    */
     
     // put the screen in the screen map
     if(controlSettings.kind != AFUIControlKind.widget) {

@@ -49,7 +49,7 @@ class AFUIWelcomeWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, AFUIDe
     rows.add(Text("See", style: t.styleOnCard.bodyText2));
     rows.add(t.childMargin(
       margin: t.margin.v.standard,
-      child: t.childText("afibframework.io/start", style: t.styleOnCard.headline6)
+      child: t.childText("afibframework.io", style: t.styleOnCard.headline6)
     ));
     rows.add(t.childMargin(
       margin: t.margin.b.s5,

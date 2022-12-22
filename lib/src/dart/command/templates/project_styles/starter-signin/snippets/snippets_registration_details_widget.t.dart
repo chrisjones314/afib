@@ -3,8 +3,6 @@ import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_spi.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_extra_imports.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_navigate_push.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_standard_route_param.t.dart';
 
 
 class SnippetRegistrationDetailsWidgetExtraImportsT {

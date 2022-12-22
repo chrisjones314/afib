@@ -35,11 +35,14 @@ class AFProjectPaths {
   static const folderEvalDemo = "eval_demo";
   static const folderSnippets = "snippets";
   static const folderStarterSignin = "starter-signin";
+  static const folderStarterMinimal = "starter-minimal";
   static const pathGenerateCoreFiles = [folderCore, folderFiles];
   static const pathGenerateCoreSnippets = [folderCore, folderSnippets];
   static const pathGenerateExample = [folderExample];
   static const pathGenerateExampleEvalDemoFiles = [folderProjectStyles, folderEvalDemo, folderFiles];
   static const pathGenerateExampleEvalDemoSnippets = [folderProjectStyles, folderEvalDemo, folderSnippets];
+  static const pathGenerateStarterMinimalFiles = [folderProjectStyles, folderStarterMinimal, folderFiles];
+  static const pathGenerateStarterMinimalSnippets = [folderProjectStyles, folderStarterMinimal, folderSnippets];
   static const pathGenerateStarterSigninFiles = [folderProjectStyles, folderStarterSignin, folderFiles];
   static const pathGenerateStarterSigninSnippets = [folderProjectStyles, folderStarterSignin, folderSnippets];
   static const pathProjectStyles = [folderProjectStyles];

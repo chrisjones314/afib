@@ -1,8 +1,8 @@
 
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_error.dart';
-import 'package:afib/src/dart/command/templates/core/files/config.t.dart';
 import 'package:afib/src/dart/command/templates/core/dynamic/dynamic_config_entries.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/config.t.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:args/args.dart' as args;
@@ -60,7 +60,7 @@ $optionsHeader
   static void writeUpdatedConfig(AFCommandContext ctx) {
     final generator = ctx.generator;
     final projectPath = generator.pathAfibConfig;
-    final configFile = generator.overwriteFile(ctx, projectPath, ConfigT(), insertions: {
+    generator.overwriteFile(ctx, projectPath, ConfigT(), insertions: {
         ConfigT.insertConfigEntries: DynamicConfigEntriesT(AFibD.config, AFibD.configEntries)
     });
     

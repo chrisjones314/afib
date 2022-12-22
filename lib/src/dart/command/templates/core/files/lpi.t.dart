@@ -1,4 +1,4 @@
-import 'package:afib/afib_command.dart';
+import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 
 class LPIT extends AFFileSourceTemplate {

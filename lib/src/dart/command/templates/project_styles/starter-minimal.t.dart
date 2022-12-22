@@ -10,6 +10,8 @@ class StarterMinimalT extends AFProjectStyleSourceTemplate {
   String get template => '''
 --override-templates +
   +core/snippets/state_test_impl=core/snippets/state_test_impl_minimal
+  +core/files/query_simple=project_styles/starter-minimal/files/query_startup
+require meta
 ''';
 
 }

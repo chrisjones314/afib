@@ -11,6 +11,9 @@ class StartHereThemeT {
       templateFileId: "start_here_theme",
       templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoFiles,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+        AFSourceTemplate.insertExtraImportsInsertion: '''
+import 'package:flutter/material.dart';
+''',
         AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 Widget childCaptionSimulatedLatency() {
   return childText("(with simulated latency)", style: styleOnCard.caption);

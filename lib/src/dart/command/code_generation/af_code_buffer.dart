@@ -142,6 +142,16 @@ class AFCodeBuffer {
     }
 
     allImports.sort();
+
+    // remove any duplicate imports.
+    for(var i = allImports.length - 1; i >= 1; i--) {
+      final cur = allImports[i];
+      final prev = allImports[i-1];
+      if(prev.trim() == cur.trim()) {
+        allImports.removeAt(i);
+      }
+    }
+
     allImports.add("");
     lines.removeRange(0, lineIdx-1);
     lines.insertAll(0, allImports);

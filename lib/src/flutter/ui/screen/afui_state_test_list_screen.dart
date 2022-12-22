@@ -128,33 +128,7 @@ class AFUIStateTestListScreen extends AFUIConnectedScreen<AFUIStateTestListScree
     final body = _buildBody(spi);
     final leading = t.childButtonStandardBack(spi, screen: screenId);
     return t.buildPrototypeScaffold(spi, spi.context.p.title, body, leading: leading);    
-  }
-  
-  Widget _buildHeader(AFUIStateTestListScreenSPI spi) {
-    final t = spi.t;
-    final cols = t.row();
-
-    // root (no parents)
-    // parents (some children)
-    // leafs (no children)
-    
-    cols.add(_childTopTab(spi, AFUIWidgetID.viewParent, "By Parent"));
-    cols.add(_childTopTab(spi, AFUIWidgetID.viewDepth, "Root"));
-
-    return t.childMargin(
-      margin: t.margin.smaller,
-      child: t.childTopTabContainer(children: cols)
-    );
-  }
-
-  Widget _childTopTab(AFUIStateTestListScreenSPI spi, AFWidgetID thisView, String title) {
-    return spi.t.childTopTabText(
-      text: title,
-      isSel: spi.activeView == thisView,
-      onPressed: () => spi.onPressedView(thisView),
-    );
-  }
-
+  }  
 
   Widget _buildBody(AFUIStateTestListScreenSPI spi) {
     final t = spi.t;

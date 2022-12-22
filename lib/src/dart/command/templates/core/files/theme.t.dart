@@ -26,7 +26,6 @@ class ThemeT extends AFFileSourceTemplate {
 
   String get template => '''
 import 'package:afib/afib_flutter.dart';
-import 'package:flutter/material.dart';
 $insertExtraImports
 
 class $insertMainType extends $insertMainParentType {

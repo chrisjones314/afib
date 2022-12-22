@@ -1,9 +1,5 @@
 
 import 'package:afib/afib_command.dart';
-import 'package:afib/src/dart/command/commands/af_create_command.dart';
-import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_install.t.dart';
-import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_from_package.t.dart';
 
 class AFEchoCommand extends AFCommand { 
   final name = "echo";

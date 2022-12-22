@@ -483,7 +483,7 @@ class AFCodeGenerator {
     List<String>? toPath,
   }) {
     final isPrivate = args.accessNamedFlag(AFCommand.argPrivate);
-    if(isPrivate != null && isPrivate) {
+    if(isPrivate) {
       return;
     }
     if(!AFibD.config.isLibraryCommand) {
@@ -538,6 +538,7 @@ class AFCodeGenerator {
     return path;
   }
 
+  /*
   void outputThreeColumns(AFCommandContext context, 
     String col1,
     String col2, 
@@ -560,14 +561,20 @@ class AFCodeGenerator {
     );
     output.write(col3);
     output.endLine();
-
   }
+  */
 
   void finalizeAndWriteFiles(AFCommandContext context) {
     if(!context.isRootCommand) {
       return;
     }
 
+    // verify that none of the files still contain [!af_] tags
+    _validateNoAFTags(context, created.values);
+    _validateNoAFTags(context, modified.values);
+
+    final output = context.output;
+    var renamedCount = 0;
     for(final original in renamed.keys) {
       final revised = renamed[original];
       if(revised == null) {
@@ -578,9 +585,8 @@ class AFCodeGenerator {
         continue;
       }
 
-      final output = context.output;
-      outputThreeColumns(context, "rename ", AFProjectPaths.relativePathFor(original), "-> ${AFProjectPaths.relativePathFor(revised)}");
-      output.endLine();
+      output.writeTwoColumns(col1: "rename ", col2: "${AFProjectPaths.relativePathFor(original)} -> ${AFProjectPaths.relativePathFor(revised)}");
+      renamedCount++;
 
       final pathOrig = AFProjectPaths.fullPathFor(original);
       final fileOrig = File(pathOrig);
@@ -588,24 +594,31 @@ class AFCodeGenerator {
       fileOrig.renameSync(pathRevised);
     }
 
-    // verify that none of the files still contain [!af_] tags
-    _validateNoAFTags(context, created.values);
-    _validateNoAFTags(context, modified.values);
 
+    var createdCount = 0;
     for(final generatedFile in created.values) {
-      generatedFile.writeIfModified(context);
+      if(generatedFile.writeIfModified(context)) {
+        createdCount++;
+      }
     }
 
+    var modifiedCount = 0;
     for(final modifiedFile in modified.values) {
-      modifiedFile.writeIfModified(context);
+      if(modifiedFile.writeIfModified(context)) {
+        modifiedCount++;
+      }
     }
 
+    var createdFolderCount = 0;
     for(final folder in ensuredFolders) {
       if(!AFProjectPaths.projectFileExists(folder)) {
-        outputThreeColumns(context, "create ", AFProjectPaths.relativePathFor(folder), "");
+        createdFolderCount++;
+        output.writeTwoColumns(col1: "create ", col2: AFProjectPaths.relativePathFor(folder));
         AFProjectPaths.createProjectFolder(folder);
       }
     }
+
+    output.writeTwoColumns(col1: "success ", col2: "renamed $renamedCount files, created $createdCount files, modified $modifiedCount files, created $createdFolderCount folders");
   }
 
 

@@ -12,14 +12,14 @@ class SnippetDefineUserCredentialRootTestDataT {
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         SnippetDefineTestDataT.insertModelDeclaration: '''
 // this was previously defined, so we can access it
-final userWC = context.find<ReferencedUser>(STTestDataID.referencedUserWestCoast);
+final userWC = context.find<ReferencedUser>(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserWestCoast);
 final userCredWC = UserCredentialRoot(
   userId: userWC.id,
   token: UserCredentialRoot.notSpecified,
   storedEmail: userWC.email,
 );
 
-final userEC = context.find<ReferencedUser>(STTestDataID.referencedUserEastCoast);
+final userEC = context.find<ReferencedUser>(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserEastCoast);
 final userCredEC = UserCredentialRoot(
   userId: userEC.id,
   token: UserCredentialRoot.notSpecified,

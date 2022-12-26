@@ -58,17 +58,24 @@ $optionsHeader
   }
 
   Future<void> _integrateProjectStyle(AFCommandContext context, AFCommandArgumentsParsed args) async {
-    final projectStyle = "${args.accessUnnamedSecond}${AFCreateAppCommand.integrateSuffix}";
+    final baseProjectStyle = args.accessUnnamedSecond;
+    final projectStyle = "$baseProjectStyle${AFCreateAppCommand.integrateSuffix}";
     context.output.writeTwoColumns(col1: "integrate ", col2: "project-style=$projectStyle");
     final stylePath = AFProjectPaths.pathProjectStyles.toList();
     stylePath.add(projectStyle);
 
 
-    final fileProjectStyle = context.readProjectStyle(stylePath, insertions: context.coreInsertions.insertions);
-    final lines = AFCommandContext.consolidateProjectStyleLines(fileProjectStyle.buffer.lines);
-    context.setProjectStyle(projectStyle);
-    context.setProjectStyleGlobalOverrides(AFCommandContext.findProjectStyleGlobalOverrides(lines));
-    await _executeProjectStyle(context, lines);
+    final allInsertions = context.coreInsertions.reviseAugment({
+      AFSourceTemplate.insertProjectStyleInsertion: baseProjectStyle,
+    });
+    final fileProjectStyle = context.readProjectStyle(stylePath, insertions: allInsertions.insertions);
+    final lines = AFCommandContext.consolidateProjectStyleLines(context, fileProjectStyle.buffer.lines);
+  context.setProjectStyle(projectStyle);
+    context.setProjectStyleGlobalOverrides(AFCommandContext.findProjectStyleGlobalOverrides(context, lines));
+    final buffer = AFCodeBuffer(projectPath: <String>[], lines: lines, modified: false, extraImports: <String>[]);
+    buffer.performInsertions(context, allInsertions);
+
+    await _executeProjectStyle(context, buffer.lines);
   }
 
   Future<void> _integrateLibrary(AFCommandContext context, AFCommandArgumentsParsed args) async {

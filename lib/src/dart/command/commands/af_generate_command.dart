@@ -19,12 +19,17 @@ abstract class AFGenerateSubcommand extends AFCommand {
   static const argForceOverwrite = "force-overwrite";
   static const argExportTemplatesHelpStatic = "$argOverrideTemplatesFlag - A comma separated list of assignments (.e.g x=y) with the template path on the right overriding that on the left (e.g 'core/query_simple=examples/query_write_count,...')";
   static const argForceOverwriteHelpStatic = "$argForceOverwrite - specify if you'd like the command to overwrite existing files";
+  static const argMemberVariables = "member-variables";
+  static const argMemberVariablesHelp = "--$argMemberVariables - A semi-colon separated list of member variables, which are automatically carried through to copyWith, etc.";
+
 
   String get argExportTemplates => argExportTemplatesFlag;
   String get argExportTemplatesHelp => "$argExportTemplatesFlag - Generate modifiable template files in the generate folder instead of executing the actual generation.";
   String get argOverrideTemplates => argOverrideTemplatesFlag;
   String get argOverrideTemplatesHelp => argExportTemplatesHelpStatic;
   String get argForceOverwriteHelp => argForceOverwriteHelpStatic;
+
+
   
 
 }

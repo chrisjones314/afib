@@ -8,7 +8,8 @@ void main(List<String> argsIn) {
   
   //argsFull.setDebugArgs("create app signin_test st --project-style eval-demo");
   //argsFull.setDebugArgs("create app signin_test st --project-style starter-minimal");
-  argsFull.setDebugArgs("create app signin_test st --project-style starter-signin");
+  //argsFull.setDebugArgs("create app signin_test st --project-style starter-signin");
+  argsFull.setDebugArgs("create app signinfb_test stfb --project-style starter-signin-firebase");
 
   afBootstrapCommandMain(emptyParams, argsFull);
 }

@@ -7,17 +7,13 @@ import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
 class QueryReadUserSigninStarterT extends SimpleQueryT {
   QueryReadUserSigninStarterT({
     required Object insertExtraImports,
-    required Object insertMemberVariables,
     required Object insertStartImpl,
-    required Object insertConstructorParams,
     required Object insertFinishImpl,
     required Object insertAdditionalMethods,
   }): super(
     templateFileId: "query_read_user",
     templateFolder: AFProjectPaths.pathGenerateStarterSigninFiles,
     insertExtraImports: insertExtraImports,
-    insertMemberVariables: insertMemberVariables,
-    insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
     insertAdditionalMethods: insertAdditionalMethods,
@@ -32,12 +28,6 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_c
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/referenced_user.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signin_query.dart';
 import 'package:afib_signin/afsi_flutter.dart';
-''',
-      insertMemberVariables: '''
-final UserCredentialRoot credential;
-''',
-      insertConstructorParams: '''
-required this.credential,
 ''',
       insertStartImpl: '''
 // TODO: Actually read the user from your data store using on credential.userId.
@@ -55,10 +45,10 @@ onUpdateReferencedUser(context);
       insertAdditionalMethods: '''
 static void onUpdateReferencedUser(AFFinishQuerySuccessContext<ReferencedUser> context) {
   final result = context.r;
-  final stState = context.accessComponentState<STState>();
+  final stState = context.accessComponentState<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>();
   final users = stState.referencedUsers;
   final revised = users.reviseUser(result);
-  context.updateComponentRootStateOne<STState>(revised);    
+  context.updateComponentRootStateOne<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>(revised);    
 }
 '''
     );

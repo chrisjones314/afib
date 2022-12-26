@@ -149,6 +149,10 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
     return DateTime.now().millisecondsSinceEpoch;
   }
 
+  Never throwUnimplemented() {
+    throw AFException("You must implement the startAsync method of the query $runtimeType");
+  }
+
   /// Called internally when redux middleware begins processing a query.
   void startAsyncAF(AFDispatcher dispatcher, AFStore store, { void Function(dynamic)? onResponseExtra, void Function(dynamic)? onErrorExtra }) {
     lastStart = currentMillis();

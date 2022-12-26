@@ -907,6 +907,11 @@ class AFCodeGenerator {
     return sb.toString();
   }  
 
+  static String upcaseFirst(String convert) {
+    final first = convert.substring(0, 1);
+    return "${first.toUpperCase()}${convert.substring(1)}";
+  }
+
 
   static String convertSnakeToMixed(String convert, { bool upcaseFirst = false } ) {
     final sb = StringBuffer();

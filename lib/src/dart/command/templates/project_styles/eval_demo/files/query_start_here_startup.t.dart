@@ -6,16 +6,12 @@ import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/q
 class QueryStartHereStartupT extends QueryExampleStartHereT {
   QueryStartHereStartupT({
     required Object insertExtraImports,
-    required Object insertMemberVariables,
     required Object insertStartImpl,
-    required Object insertConstructorParams,
     required Object insertFinishImpl,
     required Object insertAdditionalMethods,
   }): super(
     templateFileId: "query_startup",
     insertExtraImports: insertExtraImports,
-    insertMemberVariables: insertMemberVariables,
-    insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
     insertAdditionalMethods: insertAdditionalMethods,
@@ -30,8 +26,6 @@ import 'package:sqlite3/sqlite3.dart' as sql;
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/check_signin_query.dart';
 ''',
-      insertMemberVariables: AFSourceTemplate.empty,
-      insertConstructorParams: AFSourceTemplate.empty,
       insertStartImpl: '''
 final db = await ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.accessDB();
 

@@ -16,18 +16,6 @@ class ModelReferencedUsersRootT extends ModelExampleStartHereT {
       AFSourceTemplate.insertExtraImportsInsertion: '''
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/referenced_user.dart';
 ''',
-      AFSourceTemplate.insertMemberVariablesInsertion: '''
-final Map<String, ReferencedUser> users;
-''',
-      AFSourceTemplate.insertConstructorParamsInsertion: '''{
-required this.users,
-}''',
-      AFSourceTemplate.insertCopyWithParamsInsertion: '''{
-Map<String, ReferencedUser>? users
-}''',
-      AFSourceTemplate.insertCopyWithCallInsertion: '''      
-users: users ?? this.users
-''',
       AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 factory ReferencedUsersRoot.initialState() {
   return ReferencedUsersRoot(

@@ -16,9 +16,10 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_tes
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_from_package.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_initial_state_model_function.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_invoke_initial_state.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_serial_methods.t.dart';
 
 class AFGenerateStateSubcommand extends AFGenerateSubcommand {
-  static const nameCountInStateRoot = "CountInStateRoot";
+  static const argSerial = "serial";
 
   AFGenerateStateSubcommand();
   
@@ -41,6 +42,9 @@ $descriptionHeader
   If your identifer does not end with any special suffix, creates a new immutable model object under state/models, generally these objects are referenced under on of your root models.
 
 $optionsHeader
+  for Roots and Simple Models
+    ${AFGenerateSubcommand.argMemberVariablesHelp} 
+    --$argSerial - Include if you'd like to automatically generate standard serialization methods
   --${AFGenerateUISubcommand.argTheme} The type of the theme to use, defaults to your default theme
   --$argExportTemplatesHelp
   --$argOverrideTemplatesHelp
@@ -57,7 +61,9 @@ $optionsHeader
       command: this, 
       unnamedCount: 1, 
       named: {
-        AFGenerateUISubcommand.argTheme: context.generator.nameDefaultTheme
+        AFGenerateUISubcommand.argTheme: context.generator.nameDefaultTheme,
+        argSerial: "false",
+        AFGenerateSubcommand.argMemberVariables: "",
       }
     );
 
@@ -152,9 +158,38 @@ $optionsHeader
       AFSourceTemplate.insertMainTypeNoRootInsertion: identifierNoRoot,
     });
 
+    final memberVariables = context.memberVariables(args);
 
-    final modelFile = context.createFile(modelPath, ModelT.core(), extend: modelInsertions, insertions: {
-      AFSourceTemplate.insertAdditionalMethodsInsertion: isRoot ? SnippetInitialStateModelFunctionT() : AFSourceTemplate.empty,
+    Object snippetSerial = AFSourceTemplate.empty;
+    Object serialConstants = AFSourceTemplate.empty;
+    if(memberVariables != null && args.accessNamedFlag(AFGenerateStateSubcommand.argSerial)) {
+      snippetSerial = context.createSnippet(SnippetSerialMethodsT.core(
+        serializeFrom: memberVariables.serializeFrom(identifier), 
+        serializeTo: memberVariables.serializeTo
+      ));
+      serialConstants = memberVariables.serialConstants(identifier);
+    }
+
+    final modelt = ModelT.core(
+      memberVariables: memberVariables?.declareVariables,
+      constructorParams: memberVariables?.constructorParams,
+      copyWithParams: memberVariables?.copyWithParams,
+      copyWithCall: memberVariables?.copyWithCall,
+      serialMethods: snippetSerial,
+      serialConstants: serialConstants,
+    );
+
+
+    final modelFile = context.createFile(modelPath, modelt, extend: modelInsertions, insertions: {
+      AFSourceTemplate.insertMemberVariablesInsertion: memberVariables?.declareVariables ?? AFSourceTemplate.empty,
+      AFSourceTemplate.insertConstructorParamsInsertion: memberVariables?.constructorParams ?? AFSourceTemplate.empty,
+      AFSourceTemplate.insertCopyWithParamsInsertion: memberVariables?.copyWithParams ?? AFSourceTemplate.empty,
+      AFSourceTemplate.insertCopyWithCallInsertion: memberVariables?.copyWithCall ?? AFSourceTemplate.empty,      
+      ModelT.insertSerialConstantsInsertion: serialConstants,
+      ModelT.insertSerialMethodsInsertion: snippetSerial,
+      AFSourceTemplate.insertAdditionalMethodsInsertion: isRoot ? SnippetInitialStateModelFunctionT(
+        initialStateParams: memberVariables?.initialValueDeclaration ?? AFSourceTemplate.empty,
+      ) : AFSourceTemplate.empty,
     });
 
     if(isRoot) {

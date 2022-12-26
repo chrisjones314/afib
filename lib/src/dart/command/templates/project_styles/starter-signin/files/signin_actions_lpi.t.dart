@@ -15,7 +15,7 @@ import 'package:afib_signin/afsi_flutter.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signin_query.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/registration_query.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signin_query.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/st_id.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplate.insertAppNamespaceInsertion}_id.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/referenced_user.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/widgets/registration_details_widget.dart';
 
@@ -40,7 +40,7 @@ void onSignup(String email, String password) {
   // we returned from our STSigninTheme.
   final extraDetails = context.accessRouteParam<RegistrationDetailsWidgetRouteParam>(AFRouteParamRef.forWidget(
     screenId: AFSIScreenID.register, 
-    wid: STWidgetID.widgetRegistrationDetails
+    wid: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.widgetRegistrationDetails
   ));
 
   assert(extraDetails != null);

@@ -53,7 +53,18 @@ import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippet
 import 'package:afib/src/dart/command/templates/project_styles/eval_demo/snippets/snippets_startup_screen.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-minimal.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-minimal/files/query_minimal_startup.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin-firebase-integrate.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin-firebase.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin-firebase/files/query_check_signin.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin-firebase/files/query_read_user.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin-firebase/files/query_registration.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin-firebase/files/query_signout.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin-firebase/files/query_starter_signin_startup.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin-firebase/files/query_write_user.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin-firebase/files/starter_firebase_main.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin-integrate-shared.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin-integrate.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/starter-signin-shared.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/model_referenced_user.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/files/query_check_signin.t.dart';
@@ -71,6 +82,8 @@ import 'package:afib/src/dart/command/templates/project_styles/starter-signin/sn
 import 'package:afib/src/dart/command/templates/project_styles/starter-signin/snippets/snippets_registration_details_widget.t.dart';
 import 'package:path/path.dart';
 
+import 'project_styles/starter-signin-firebase/files/query_signin.t.dart';
+
 
 /// A registry of source code templates umodel in code generation.
 /// 
@@ -86,6 +99,10 @@ class AFTemplateRegistry {
     registerFile(StarterMinimalT());
     registerFile(StartHereT());
     registerFile(StarterSigninT());
+    registerFile(StarterSigninFirebaseT());
+    registerFile(StarterSigninSharedT());
+    registerFile(StarterSigninIntegrateSharedT());
+    registerFile(StarterSigninFirebaseIntegrateT());
 
     registerFile(SimpleQueryT.core());
     registerFile(DeferredQueryT.core());
@@ -195,7 +212,16 @@ class AFTemplateRegistry {
     registerSnippet(SnippetRegistrationDetailsWidgetBuildBodyT());
     registerSnippet(SnippetRegistrationDetailsWidgetSPIT.example());
     registerSnippet(SnippetSigninStarterFundamentalThemeInitT.example());
-    
+
+    // starter-signin-firebase
+    registerFile(StarterSigninFirebaseMainT.example());
+    registerFile(QueryCheckSigninSigninFirebaseStarterT.example());
+    registerFile(QuerySigninSigninStarterFirebaseT.example());
+    registerFile(QuerySigninSignoutStarterFirebaseT.example());
+    registerFile(QueryStarterSigninStartupFirebaseT.example());
+    registerFile(QueryRegistrationSigninStarterFirebaseT.example());
+    registerFile(QueryReadUserSigninStarterFirebaseT.example());
+    registerFile(QueryWriteUserSigninStarterFirebaseT.example());
   }  
 
   AFFileSourceTemplate? findEmbeddedTemplateFile(List<String> path) {

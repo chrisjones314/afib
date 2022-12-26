@@ -6,15 +6,11 @@ import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/q
 class QueryWriteCountHistoryEntryT extends QueryExampleStartHereT {
   QueryWriteCountHistoryEntryT({
     required Object insertExtraImports,
-    required Object insertMemberVariables,
     required Object insertStartImpl,
-    required Object insertConstructorParams,
     required Object insertFinishImpl,
   }): super(
     templateFileId: "query_write_count_history_entry",
     insertExtraImports: insertExtraImports,
-    insertMemberVariables: insertMemberVariables,
-    insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
     insertAdditionalMethods: AFSourceTemplate.empty,
@@ -28,11 +24,6 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplat
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
 ''',
-      insertMemberVariables: '''
-static int simulatedStaticId = 10;
-final CountHistoryEntry entry;
-''',
-      insertConstructorParams: 'required this.entry,',
       insertStartImpl: '''
 final db = await ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.accessDB();
 final uid = int.tryParse(entry.userId);

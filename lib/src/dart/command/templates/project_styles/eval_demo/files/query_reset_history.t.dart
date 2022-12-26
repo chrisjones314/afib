@@ -6,16 +6,12 @@ import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/q
 class QueryResetHistoryT extends QueryExampleStartHereT {
   QueryResetHistoryT({
     required Object insertExtraImports,
-    required Object insertMemberVariables,
     required Object insertStartImpl,
-    required Object insertConstructorParams,
     required Object insertFinishImpl,
     required Object insertAdditionalMethods,
   }): super(
     templateFileId: "query_reset_history",
     insertExtraImports: insertExtraImports,
-    insertMemberVariables: insertMemberVariables,
-    insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
     insertAdditionalMethods: insertAdditionalMethods,
@@ -28,8 +24,6 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSour
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/count_history_root.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
 ''',
-      insertMemberVariables: "final String userId;",
-      insertConstructorParams: "required this.userId,",
       insertStartImpl: '''
 final db = await ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.accessDB();
 

@@ -37,6 +37,7 @@ $optionsHeader
 
   --$argResultModelType - The model object that will be returned by the asynchronous operation for integration
     into your state.   This is unnecessary for deferred queries, which do not have a result type.
+  ${AFGenerateSubcommand.argMemberVariablesHelp}  
   --$argRootStateType [YourRootState] - the name of the root state this query updates, defaults to your root state
   --$argExportTemplatesHelp
   --$argOverrideTemplatesHelp
@@ -61,6 +62,7 @@ $optionsHeader
         argOverrideTemplates: "",
         argExportTemplates: "false",
         argOverrideTemplates: "",
+        AFGenerateSubcommand.argMemberVariables: "",
       }
     );
 
@@ -81,7 +83,7 @@ $optionsHeader
       context: context,
       querySuffix: querySuffix,
       queryType: queryName,
-      args: args.named,
+      args: args,
       usage: usage,
     );
         
@@ -94,11 +96,12 @@ $optionsHeader
     required AFCommandContext context,
     required String querySuffix,
     required String queryType,
-    required Map<String, dynamic> args,
+    required AFCommandArgumentsParsed args,
     required String usage,
   }) {
-    final rootStateType = args[argRootStateType];
-    final resultType = args[argResultModelType];
+    final rootStateType = args.accessNamed(argRootStateType);
+    final resultType = args.accessNamed(argResultModelType);
+    final memberVariables = context.memberVariables(args);
 
     AFSourceTemplate queryTemplate = SimpleQueryT.core();
     var queryParentType = "AFAsyncQuery";
@@ -127,6 +130,8 @@ $optionsHeader
       resultType: resultType,
       queryParentType: queryParentType,
       additionalMethods: additionalMethods,
+      memberVariables: memberVariables?.declareVariables ?? AFSourceTemplate.empty,
+      constructorParams: memberVariables?.constructorParamsBare ?? AFSourceTemplate.empty,
     );
 
 

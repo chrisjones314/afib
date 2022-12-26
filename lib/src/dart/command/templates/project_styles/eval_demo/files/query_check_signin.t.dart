@@ -6,16 +6,12 @@ import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/q
 class QueryCheckSigninT extends QueryExampleStartHereT {
   QueryCheckSigninT({
     required Object insertExtraImports,
-    required Object insertMemberVariables,
     required Object insertStartImpl,
-    required Object insertConstructorParams,
     required Object insertFinishImpl,
     required Object insertAdditionalMethods,
   }): super(
     templateFileId: "query_check_signin",
     insertExtraImports: insertExtraImports,
-    insertMemberVariables: insertMemberVariables,
-    insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
     insertAdditionalMethods: insertAdditionalMethods,
@@ -34,8 +30,6 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_c
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/home_page_screen.dart';
 
 ''',
-      insertMemberVariables: AFSourceTemplate.empty,
-      insertConstructorParams: AFSourceTemplate.empty,
       insertStartImpl: '''
 final db = await ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.accessDB();
 

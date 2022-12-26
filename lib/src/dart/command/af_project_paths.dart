@@ -36,6 +36,7 @@ class AFProjectPaths {
   static const folderSnippets = "snippets";
   static const folderStarterSignin = "starter-signin";
   static const folderStarterMinimal = "starter-minimal";
+  static const folderStarterSigninFirebase = "starter-signin-firebase";
   static const pathGenerateCoreFiles = [folderCore, folderFiles];
   static const pathGenerateCoreSnippets = [folderCore, folderSnippets];
   static const pathGenerateExample = [folderExample];
@@ -45,6 +46,8 @@ class AFProjectPaths {
   static const pathGenerateStarterMinimalSnippets = [folderProjectStyles, folderStarterMinimal, folderSnippets];
   static const pathGenerateStarterSigninFiles = [folderProjectStyles, folderStarterSignin, folderFiles];
   static const pathGenerateStarterSigninSnippets = [folderProjectStyles, folderStarterSignin, folderSnippets];
+  static const pathGenerateStarterSigninFirebaseFiles = [folderProjectStyles, folderStarterSigninFirebase, folderFiles];
+  static const pathGenerateStarterSigninFirebaseSnippets = [folderProjectStyles, folderStarterSigninFirebase, folderSnippets];
   static const pathProjectStyles = [folderProjectStyles];
 
   static List<String>? extraParentFolder;

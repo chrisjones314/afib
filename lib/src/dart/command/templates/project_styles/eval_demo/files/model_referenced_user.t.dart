@@ -26,37 +26,6 @@ class ModelReferencedUserT extends ModelT {
       templateFolder: templateFolder,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
       AFSourceTemplate.insertExtraImportsInsertion: extraImports,
-      AFSourceTemplate.insertMemberVariablesInsertion: '''
-// Note: even if have integer ID values on the server, you should
-// convert them to String ids within AFib.   Doing so allows you to
-// use String test ids, which are vastly clearer in debugging contexts.
-final String id;
-final String firstName;
-final String lastName;
-final String email;
-final String zipCode;
-''',
-      AFSourceTemplate.insertConstructorParamsInsertion: '''{
-required this.id,
-required this.firstName,
-required this.lastName,
-required this.email,
-required this.zipCode,
-}''',
-      AFSourceTemplate.insertCopyWithParamsInsertion: '''{
-String? id,
-String? firstName,
-String? lastName,
-String? email,
-String? zipCode,
-}''',
-    AFSourceTemplate.insertCopyWithCallInsertion: '''      
-id: id ?? this.id,
-firstName: firstName ?? this.firstName,
-lastName: lastName ?? this.lastName,
-email: email ?? this.email,
-zipCode: zipCode ?? this.zipCode,
-''',
       AFSourceTemplate.insertAdditionalMethodsInsertion: additionalMethods
     }));
 

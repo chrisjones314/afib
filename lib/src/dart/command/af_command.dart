@@ -268,6 +268,131 @@ Available subcommands
 
 }
 
+
+class AFMemberVariableTemplates {
+  final Map<String, String> nameToType;
+ 
+  AFMemberVariableTemplates({
+    required this.nameToType,
+  }); 
+
+  String get declareVariables {
+    final result = StringBuffer();
+    _iterate((identifier, kind, isLast) {
+      result.write("final $kind $identifier;");
+      if(!isLast) {
+        result.writeln();
+      }
+    });
+    return result.toString();
+  }
+
+  String get constructorParamsBare {
+    final result = StringBuffer();
+    result.writeln();
+    _iterate((identifier, kind, isLast) {
+      result.write("  required this.$identifier,");
+      result.writeln();
+    });
+    return result.toString();
+  }
+
+  String get constructorParams {
+    final result = StringBuffer("{");
+    result.writeln(constructorParamsBare);
+    result.write("}");
+    return result.toString();
+  }
+  
+  String get copyWithParams {
+    final result = StringBuffer("{");
+    result.writeln();
+    _iterate((identifier, kind, isLast) {
+      result.write("  $kind? $identifier,");
+      result.writeln();
+    });
+    result.write("}");
+    return result.toString();    
+  }
+  
+  String get copyWithCall {
+    final result = StringBuffer();
+    result.writeln();
+    _iterate((identifier, kind, isLast) {
+      result.write("$identifier: $identifier ?? this.$identifier,");
+      result.writeln();
+    });
+    return result.toString();    
+  }
+
+  String get initialValueDeclaration {
+    final result = StringBuffer();
+    result.writeln();
+    _iterate((identifier, kind, isLast) {
+      var val = "null";
+      if(kind == "int") {
+        val = "0";
+      } else if (kind == "String") {
+        val = '""';
+      } else if (kind == "double") {
+        val = '0.0';
+      }
+ 
+      result.write("$identifier: $val,");
+      result.writeln();
+    });
+    return result.toString();    
+  }
+
+  String serializeFrom(String mainType) {
+    final result = StringBuffer();
+    _iterate((identifier, kind, isLast) {
+      final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
+      result.writeln("final item$upcaseIdentifier = source[col$upcaseIdentifier];");
+    });
+
+    result.writeln("return $mainType(");
+    _iterate((identifier, kind, isLast) {
+      final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
+      result.writeln("  $identifier: item$upcaseIdentifier,");
+    });
+    result.writeln(");");
+
+
+    return result.toString();
+  }
+
+  String get serializeTo {
+    final result = StringBuffer();
+    _iterate((identifier, kind, isLast) {
+      final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
+      result.writeln("result[col$upcaseIdentifier] = item.$identifier;");
+    });
+    return result.toString();
+  }
+
+  String serialConstants(String mainType) {
+    final result = StringBuffer();
+    result.writeln("static const tableName = '${AFCodeGenerator.convertMixedToSnake(mainType)}';");
+    _iterate((identifier, kind, isLast) {
+      final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
+      result.writeln("static const col$upcaseIdentifier = '${AFCodeGenerator.convertMixedToSnake(identifier)}';");
+    });
+    return result.toString();
+  }
+
+  void _iterate(void Function(String name, String kind, bool isLast) visit) {
+    var identifiers = nameToType.keys.toList();
+    for(var i = 0; i < identifiers.length; i++) {
+      final identifier = identifiers[i];
+      final kind = nameToType[identifier];
+      if(kind != null) {
+        visit(identifier, kind, i == identifiers.length - 1);
+      }
+    }
+  }
+}
+
 class AFCommandContext {
   final List<AFCommandContext> parents;
   final AFCommandAppExtensionContext definitions;
@@ -345,6 +470,27 @@ class AFCommandContext {
     return parsedArguments;
   }
 
+  AFMemberVariableTemplates? memberVariables(AFCommandArgumentsParsed args) {
+    final vars = args.accessNamed(AFGenerateSubcommand.argMemberVariables);
+    if(vars.isEmpty) {
+      return null;
+    }
+    
+    final varItems = vars.split(";");
+    final result = <String, String>{};
+    for(final item in varItems) {
+      final itemTrimmed = item.trim();
+      final idxIdentifier = itemTrimmed.lastIndexOf(" ");
+      if(idxIdentifier < 0) {
+        throw AFException("Expected '$item' to have the form 'type identifier', e.g. 'int count'");
+      }
+      final name = itemTrimmed.substring(idxIdentifier+1);
+      final kind = itemTrimmed.substring(0, idxIdentifier);
+      result[name] = kind;
+    }
+    return AFMemberVariableTemplates(nameToType: result);
+  }
+
   void setProjectStyle(String projectStyle) {
     coreInsertions = coreInsertions.reviseOverwrite({
       AFSourceTemplate.insertProjectStyleInsertion: projectStyle,
@@ -357,8 +503,10 @@ class AFCommandContext {
     }
   }
 
-  static String findProjectStyleGlobalOverrides(List<String> rawLines) {
-    var consolidated = AFCommandContext.consolidateProjectStyleLines(rawLines);
+  
+
+  static String findProjectStyleGlobalOverrides(AFCommandContext context, List<String> rawLines) {
+    var consolidated = AFCommandContext.consolidateProjectStyleLines(context, rawLines);
     if(consolidated.isNotEmpty && consolidated.first.startsWith("--${AFGenerateSubcommand.argOverrideTemplatesFlag}")) {
       final args = AFArgs.parseArgs(consolidated.first);
       return args.last;
@@ -590,11 +738,25 @@ class AFCommandContext {
     return generator.createFile(this, projectPath, template, insertions: fullInsert);
   }
 
-  static List<String> consolidateProjectStyleLines(List<String> rawLines) {
+  static List<String> consolidateProjectStyleLines(AFCommandContext context, List<String> rawLines) {
     final result = <String>[];
     var idxLine = 0;
     while(idxLine < rawLines.length) {
       var rawLine = rawLines[idxLine].trim();
+      if(rawLine.startsWith('import')) {
+        idxLine++;
+        final params = rawLine.split(" ");
+        if(params.length != 2) {
+          throw AFException("Expected import project_styles/your-project-style, found '$rawLine'");
+        }
+        final importStylePath = params[1].split('/');
+        final importStyle = context.readProjectStyle(importStylePath);
+        final consolidated = consolidateProjectStyleLines(context, importStyle.buffer.lines);
+        result.addAll(consolidated);
+        continue;
+      }
+
+
       if(rawLine.endsWith("+")) {
         rawLine = rawLine.substring(0, rawLine.length-1).trim();
       }

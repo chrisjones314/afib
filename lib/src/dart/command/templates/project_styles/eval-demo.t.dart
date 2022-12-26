@@ -37,11 +37,11 @@ generate state ReferencedUsersRoot --override-templates +
   +core/files/model=project_styles/eval_demo/files/model_referenced_users_root
   +core/snippets/define_test_data=project_styles/eval_demo/snippets/define_referenced_users_root_test_data
 generate state ReferencedUser --override-templates "core/files/model=project_styles/eval_demo/files/model_referenced_user"
-generate query ReadCountHistoryQuery --result-type CountHistoryRoot --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_read_count_history"
-generate query ReadReferencedUserQuery --result-type ReferencedUser --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_read_referenced_user"
-generate query WriteCountHistoryEntryQuery --result-type CountHistoryEntry --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_write_count_history_entry"
+generate query ReadCountHistoryQuery --result-type CountHistoryRoot --member-variables "String userId" --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_read_count_history"
+generate query ReadReferencedUserQuery --result-type ReferencedUser --member-variables "String userId" --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_read_referenced_user"
+generate query WriteCountHistoryEntryQuery --result-type CountHistoryEntry --member-variables "CountHistoryEntry entry" --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_write_count_history_entry"
 generate query StartupQuery --result-type AFUnused --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_startup"
-generate query ResetHistoryQuery --result-type CountHistoryRoot --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_reset_history"
+generate query ResetHistoryQuery --result-type CountHistoryRoot --member-variables "String userId" --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_reset_history"
 generate query CheckSigninQuery --result-type UserCredentialRoot --override-templates "core/files/query_simple=project_styles/eval_demo/files/query_check_signin"
 generate ui StartupScreen --override-templates +
   +core/snippets/screen_build_with_spi_impl=project_styles/eval_demo/snippets/startup_screen_build_with_spi

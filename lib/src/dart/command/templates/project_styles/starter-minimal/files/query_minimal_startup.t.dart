@@ -6,17 +6,13 @@ import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
 class QueryStartupStarterMinimalT extends SimpleQueryT {
   QueryStartupStarterMinimalT({
     required Object insertExtraImports,
-    required Object insertMemberVariables,
     required Object insertStartImpl,
-    required Object insertConstructorParams,
     required Object insertFinishImpl,
     required Object insertAdditionalMethods,
   }): super(
     templateFileId: "query_startup",
     templateFolder: AFProjectPaths.pathGenerateStarterMinimalFiles,
     insertExtraImports: insertExtraImports,
-    insertMemberVariables: insertMemberVariables,
-    insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
     insertAdditionalMethods: insertAdditionalMethods,
@@ -25,10 +21,6 @@ class QueryStartupStarterMinimalT extends SimpleQueryT {
   factory QueryStartupStarterMinimalT.example() {
     return QueryStartupStarterMinimalT(
       insertExtraImports: '''
-''',
-      insertMemberVariables: '''
-''',
-      insertConstructorParams: '''
 ''',
       insertStartImpl: '''
 context.onSuccess(AFUnused.unused);

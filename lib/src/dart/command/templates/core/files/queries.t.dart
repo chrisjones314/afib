@@ -10,8 +10,6 @@ class SimpleQueryT extends AFFileSourceTemplate {
     required String templateFileId,
     required List<String> templateFolder,
     Object? insertExtraImports,
-    Object? insertMemberVariables,
-    Object? insertConstructorParams,
     Object? insertStartImpl,
     Object? insertFinishImpl,
     Object? insertAdditionalMethods,
@@ -22,10 +20,38 @@ class SimpleQueryT extends AFFileSourceTemplate {
     embeddedInsertions: AFSourceTemplateInsertions(
       insertions: <AFSourceTemplateInsertion, Object>{
         AFSourceTemplate.insertExtraImportsInsertion: insertExtraImports ?? AFSourceTemplate.empty,
-        AFSourceTemplate.insertMemberVariablesInsertion: insertMemberVariables ?? AFSourceTemplate.empty,
-        AFSourceTemplate.insertConstructorParamsInsertion: insertConstructorParams ?? AFSourceTemplate.empty,
         AFSourceTemplate.insertSuperParamsInsertion: insertSuperParams ?? AFSourceTemplate.empty,
-        insertStartImplInsertion: insertStartImpl ?? AFSourceTemplate.empty,
+        insertStartImplInsertion: insertStartImpl ?? '''
+throwUnimplemented();
+''',
+        insertFinishImplInsertion: insertFinishImpl ?? AFSourceTemplate.empty,
+        AFSourceTemplate.insertAdditionalMethodsInsertion: insertAdditionalMethods ?? AFSourceTemplate.empty,
+      }
+    ) 
+  );
+
+  SimpleQueryT.withMemberVariables({
+    required String templateFileId,
+    required List<String> templateFolder,
+    Object? insertExtraImports,
+    Object? insertStartImpl,
+    Object? insertFinishImpl,
+    Object? insertAdditionalMethods,
+    Object? insertSuperParams,
+    required Object insertConstructorParams,
+    required Object insertMemberVariables,
+  }): super(
+    templateFileId: templateFileId,
+    templateFolder: templateFolder,
+    embeddedInsertions: AFSourceTemplateInsertions(
+      insertions: <AFSourceTemplateInsertion, Object>{
+        AFSourceTemplate.insertExtraImportsInsertion: insertExtraImports ?? AFSourceTemplate.empty,
+        AFSourceTemplate.insertSuperParamsInsertion: insertSuperParams ?? AFSourceTemplate.empty,
+        AFSourceTemplate.insertConstructorParamsInsertion: insertConstructorParams,
+        AFSourceTemplate.insertMemberVariablesInsertion: insertMemberVariables,
+        insertStartImplInsertion: insertStartImpl ?? '''
+throwUnimplemented();
+''',
         insertFinishImplInsertion: insertFinishImpl ?? AFSourceTemplate.empty,
         AFSourceTemplate.insertAdditionalMethodsInsertion: insertAdditionalMethods ?? AFSourceTemplate.empty,
       }
@@ -112,16 +138,12 @@ class DeferredQueryT extends SimpleQueryT {
   DeferredQueryT({
     required String templateFileId,
     required List<String> templateFolder,
-    AFSourceTemplate? insertMemberVariables,
     AFSourceTemplate? insertStartImpl,
-    AFSourceTemplate? insertConstructorParams,
     AFSourceTemplate? insertFinishImpl = const SnippetReturnNullT(),
     AFSourceTemplate? insertAdditionalMethods,
   }): super(
     templateFileId: templateFileId,
     templateFolder: templateFolder,
-    insertMemberVariables: insertMemberVariables,
-    insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
     insertAdditionalMethods: insertAdditionalMethods,
@@ -168,16 +190,12 @@ class IsolateQueryT extends SimpleQueryT {
   IsolateQueryT({
     required String templateFileId,
     required List<String> templateFolder,
-    AFSourceTemplate? insertMemberVariables,
-    AFSourceTemplate? insertConstructorParams,
     AFSourceTemplate? insertStartImpl,
     AFSourceTemplate? insertFinishImpl,
     AFSourceTemplate? insertAdditionalMethods,
   }): super(
     templateFileId: templateFileId,
     templateFolder: templateFolder,
-    insertMemberVariables: insertMemberVariables,
-    insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
     insertAdditionalMethods: insertAdditionalMethods,

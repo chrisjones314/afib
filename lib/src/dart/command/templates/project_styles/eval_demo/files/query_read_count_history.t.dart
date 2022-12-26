@@ -6,15 +6,11 @@ import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/q
 class QueryReadCountHistoryT extends QueryExampleStartHereT {
   QueryReadCountHistoryT({
     required Object insertExtraImports,
-    required Object insertMemberVariables,
     required Object insertStartImpl,
-    required Object insertConstructorParams,
     required Object insertFinishImpl,
   }): super(
     templateFileId: "query_read_count_history",
     insertExtraImports: insertExtraImports,
-    insertMemberVariables: insertMemberVariables,
-    insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
     insertAdditionalMethods: AFSourceTemplate.empty,
@@ -27,8 +23,6 @@ import 'dart:async';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/count_history_root.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
 ''',
-      insertMemberVariables: 'final String userId;',
-      insertConstructorParams: 'required this.userId,',
       insertStartImpl: '''
 final db = await ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.accessDB();
 final uid = int.tryParse(userId);

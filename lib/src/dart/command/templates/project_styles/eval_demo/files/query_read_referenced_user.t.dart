@@ -6,15 +6,11 @@ import 'package:afib/src/dart/command/templates/project_styles/eval_demo/files/q
 class QueryReadReferencedUserT extends QueryExampleStartHereT {
   QueryReadReferencedUserT({
     required Object insertExtraImports,
-    required Object insertMemberVariables,
     required Object insertStartImpl,
-    required Object insertConstructorParams,
     required Object insertFinishImpl,
   }): super(
     templateFileId: "query_read_referenced_user",
     insertExtraImports: insertExtraImports,
-    insertMemberVariables: insertMemberVariables,
-    insertConstructorParams: insertConstructorParams,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
     insertAdditionalMethods: AFSourceTemplate.empty,
@@ -28,8 +24,6 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplat
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
 ''',
-      insertMemberVariables: 'final String userId;',
-      insertConstructorParams: 'required this.userId,',
       insertStartImpl: '''
 final db = await ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.accessDB();
 final userIdInt = int.tryParse(userId);

@@ -4,23 +4,23 @@ import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
 
-class QueryWriteUserSigninStarterT extends SimpleQueryT {
-  QueryWriteUserSigninStarterT({
+class QueryWriteUserSigninStarterFirebaseT extends SimpleQueryT {
+  QueryWriteUserSigninStarterFirebaseT({
     required Object insertExtraImports,
     required Object insertStartImpl,
     required Object insertFinishImpl,
     required Object insertAdditionalMethods,
   }): super(
     templateFileId: "query_write_user",
-    templateFolder: AFProjectPaths.pathGenerateStarterSigninFiles,
+    templateFolder: AFProjectPaths.pathGenerateStarterSigninFirebaseFiles,
     insertExtraImports: insertExtraImports,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
     insertAdditionalMethods: insertAdditionalMethods,
   );
 
-  factory QueryWriteUserSigninStarterT.example() {
-    return QueryWriteUserSigninStarterT(
+  factory QueryWriteUserSigninStarterFirebaseT.example() {
+    return QueryWriteUserSigninStarterFirebaseT(
       insertExtraImports: '''
 import 'package:afib/afib_flutter.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';

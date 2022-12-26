@@ -4,23 +4,23 @@ import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
 
-class QueryRegistrationSigninStarterT extends SimpleQueryT {
-  QueryRegistrationSigninStarterT({
+class QueryRegistrationSigninStarterFirebaseT extends SimpleQueryT {
+  QueryRegistrationSigninStarterFirebaseT({
     required Object insertExtraImports,
     required Object insertStartImpl,
     required Object insertFinishImpl,
     required Object insertAdditionalMethods,
   }): super(
     templateFileId: "query_registration",
-    templateFolder: AFProjectPaths.pathGenerateStarterSigninFiles,
+    templateFolder: AFProjectPaths.pathGenerateStarterSigninFirebaseFiles,
     insertExtraImports: insertExtraImports,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
     insertAdditionalMethods: insertAdditionalMethods,
   );
 
-  factory QueryRegistrationSigninStarterT.example() {
-    return QueryRegistrationSigninStarterT(
+  factory QueryRegistrationSigninStarterFirebaseT.example() {
+    return QueryRegistrationSigninStarterFirebaseT(
       insertExtraImports: '''
 import 'package:afib/afib_flutter.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplate.insertAppNamespaceInsertion}_id.dart';
@@ -29,18 +29,20 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_c
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/write_user_query.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/referenced_user.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/home_page_screen.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signin_query.dart';
 import 'package:afib_signin/afsi_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 ''',
       insertStartImpl: '''
-// TODO: You would actually register the user, and create a new user credential using
-// the actual ID.   You would probably also save the token you get back in the same way
-// that you do in your SigninQuery, so that the user will be signed in from here on out.
-final cred = UserCredentialRoot(
-  userId: AFDocumentIDGenerator.createTestIdIncreasing("stub_exmaple_cred"),
-  token: "--",
-  storedEmail: email,
-);
-context.onSuccess(cred);
+FirebaseAuth.instance.createUserWithEmailAndPassword(
+  email: email,
+  password: password
+).then((result) {
+  final userState = SigninQuery.convertCredential(result.user);
+  context.onSuccess(userState);
+}).catchError((err) {
+  context.onError(AFQueryError.createMessage(err.message));
+});
 ''',
       insertFinishImpl: '''
 final cred = context.r;

@@ -78,13 +78,13 @@ class AFCreateCommandContext {
   List<String> get projectStyleLines {
 
     final rawLines = projectStyle.lines;
-    return AFCommandContext.consolidateProjectStyleLines(rawLines);
+    return AFCommandContext.consolidateProjectStyleLines(command, rawLines);
   }
 
   List<String> get projectStyleCommands {
 
     final rawLines = projectStyle.lines;
-    var consolidated = AFCommandContext.consolidateProjectStyleLines(rawLines);
+    var consolidated = AFCommandContext.consolidateProjectStyleLines(command, rawLines);
     if(consolidated.isNotEmpty && consolidated.first.startsWith("--${AFGenerateSubcommand.argOverrideTemplatesFlag}")) {
       consolidated = consolidated.sublist(1);
     }
@@ -92,7 +92,7 @@ class AFCreateCommandContext {
   }
 
   String get projectStyleGlobalOverrides {
-    return AFCommandContext.findProjectStyleGlobalOverrides(projectStyleLines);
+    return AFCommandContext.findProjectStyleGlobalOverrides(command, projectStyleLines);
   }
 
   bool get includeUI => !isStateLibrary;
@@ -134,6 +134,9 @@ class AFCreateAppCommand extends AFCommand {
   static const projectStyleSignin = "starter-signin";
   static const projectStyleSigninIntegrate = "starter-signin$integrateSuffix";
   static const projectStyleSigninFirebase = "starter-signin-firebase";
+  static const projectStyleSigninFirebaseIntegrate = "starter-signin-firebase$integrateSuffix";
+  static const projectStyleSigninShared = "starter-signin-shared";
+  static const projectStyleSigninSharedIntegrate = "starter-signin-shared$integrateSuffix";
 
   final String name = "create";
   final String description = "Install afib framework support into an existing flutter app project";
@@ -160,7 +163,6 @@ $optionsHeader
     $projectStyleStarterMinimal - minimal project style
     $projectStyleSignin - a simple starter project how to use AFib Signin, if you are not using firebase for signin
     $projectStyleSigninFirebase - a starter project showing how to use AFib Signin with Firebase
-
 
   ${AFGenerateSubcommand.argExportTemplatesHelpStatic}
 ''';
@@ -364,7 +366,7 @@ installUILibrary: installCoreLibrary,
 
     final generator = context.generator;
     generator.renameExistingFileToOld(context.command, generator.pathMain);
-    final mainTemplate = context.isApp ? MainT() : MainUILibraryT();
+    final mainTemplate = context.isApp ? MainT.core() : MainUILibraryT();
 
     final mainFile = context.createFile(generator.pathMain, mainTemplate);
     context.createFile(generator.pathApp, AppT());

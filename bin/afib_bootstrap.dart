@@ -9,7 +9,8 @@ void main(List<String> argsIn) {
   //argsFull.setDebugArgs("create app signin_test st --project-style eval-demo");
   //argsFull.setDebugArgs("create app signin_test st --project-style starter-minimal");
   //argsFull.setDebugArgs("create app signin_test st --project-style starter-signin");
-  argsFull.setDebugArgs("create app signinfb_test stfb --project-style starter-signin-firebase");
+  argsFull.setDebugArgs("create app signinfb_test stfb --project-style app-starter-signin-firebase");
+  //argsFull.setDebugArgs("create state_library afib_firebase_firestore affs --project-style statelib-starter-minimal");
 
   afBootstrapCommandMain(emptyParams, argsFull);
 }

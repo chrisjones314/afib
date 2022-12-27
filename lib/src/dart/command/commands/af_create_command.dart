@@ -128,15 +128,17 @@ class AFCreateAppCommand extends AFCommand {
   static const kindUILibrary = "ui_library";
   static const kindStateLibrary = "state_library";
   static const argProjectStyle = "project-style";
-  static const projectStyleStarterMinimal = "starter-minimal";
+  static const projectStyleStarterMinimal = "app-starter-minimal";
+  static const projectStyleUILibStarterMinimal = "uilib-starter-minimal";
+  static const projectStyleStateLibStarterMinimal = "statelib-starter-minimal";
   static const integrateSuffix = "-integrate";
-  static const projectStyleEvalDemo = "eval-demo";
-  static const projectStyleSignin = "starter-signin";
-  static const projectStyleSigninIntegrate = "starter-signin$integrateSuffix";
-  static const projectStyleSigninFirebase = "starter-signin-firebase";
-  static const projectStyleSigninFirebaseIntegrate = "starter-signin-firebase$integrateSuffix";
-  static const projectStyleSigninShared = "starter-signin-shared";
-  static const projectStyleSigninSharedIntegrate = "starter-signin-shared$integrateSuffix";
+  static const projectStyleEvalDemo = "app-eval-demo";
+  static const projectStyleSignin = "app-starter-signin";
+  static const projectStyleSigninIntegrate = "app-starter-signin$integrateSuffix";
+  static const projectStyleSigninFirebase = "app-starter-signin-firebase";
+  static const projectStyleSigninFirebaseIntegrate = "app-starter-signin-firebase$integrateSuffix";
+  static const projectStyleSigninShared = "app-starter-signin-shared";
+  static const projectStyleSigninSharedIntegrate = "app-starter-signin-shared$integrateSuffix";
 
   final String name = "create";
   final String description = "Install afib framework support into an existing flutter app project";
@@ -144,7 +146,7 @@ class AFCreateAppCommand extends AFCommand {
   String get usage {
     return '''
 $usageHeader
-  afib_bootstrap.dart create [$kindApp|$kindUILibrary|$kindStateLibrary] yourpackagename YPC
+  afib_bootstrap.dart create [$kindApp|$kindUILibrary|$kindStateLibrary] yourpackagename YPC --project-style [see-below]
 
 $descriptionHeader
   $description
@@ -158,13 +160,23 @@ $optionsHeader
     name field, which should be in the folder you are running this command from. 
   YPC - a lowercase 2-5 digit the code/prefix for your app, all uppercase.  For example, for the AFib Signin library this is afsi, in the app 'Dinner Familias this is 'df' (
     note that you should not prefix yours with 'af')
-  $argProjectStyle - a string specifying the project style to use, currently:
+
+  $argProjectStyle - a string specifying the project style to use, see below.
+  ${AFGenerateSubcommand.argExportTemplatesHelpStatic}
+
+Project Styles
+  $kindApp
     $projectStyleEvalDemo - a simple example demonstrating many of AFib's core features and referenced in the evaluation video and documentation.
     $projectStyleStarterMinimal - minimal project style
     $projectStyleSignin - a simple starter project how to use AFib Signin, if you are not using firebase for signin
     $projectStyleSigninFirebase - a starter project showing how to use AFib Signin with Firebase
 
-  ${AFGenerateSubcommand.argExportTemplatesHelpStatic}
+  $kindUILibrary
+    $projectStyleUILibStarterMinimal
+
+  $kindStateLibrary
+    $projectStyleStateLibStarterMinimal
+
 ''';
   }
 
@@ -221,8 +233,8 @@ $optionsHeader
     _createStandardFolders(context);
     if(!context.isLibrary) {
       _createStandardLibraryFolders(ctx);
-      _createLibExportsFiles(context);
     }
+    _createLibExportsFiles(context);
     _createAppCommand(context);
     context.createFile(generator.pathAppId, IDT());
 
@@ -250,11 +262,13 @@ $optionsHeader
     await _executeProjectStyleEcho(context);
   }
 
+
   Future<void> _executeProjectStyle(AFCreateCommandContext context) async {
     final lines = context.projectStyleCommands;
     for(final line in lines) {
       if(!line.startsWith("echo ")) {
-        context.output.writeTwoColumns(col1: "execute ", col2: "$line");
+        final simpleLine = AFCommandContext.simplifyProjectStyleCommand(line);
+        context.output.writeTwoColumns(col1: "execute ", col2: "$simpleLine");
         await context.executeSubCommand(line);
       }
     }
@@ -308,7 +322,7 @@ $optionsHeader
 
   void _createLibExportsFiles(AFCreateCommandContext context) {
     final generator = context.generator;
-    context.createFile(generator.pathFlutterExportsFile, LibraryExportsT());
+    context.createFile(generator.pathFlutterExportsFile, LibraryExportsT());    
     context.createFile(generator.pathCommandExportsFile, LibraryExportsT());
   }
 

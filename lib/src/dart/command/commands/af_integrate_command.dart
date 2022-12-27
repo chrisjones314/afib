@@ -26,8 +26,8 @@ $descriptionHeader
 
 $optionsHeader
   $kindLibrary
-    $argPackageName - the package name for the library, e.g. afib_signin
-    $argPackageCode - the 3-5 letter all lowercase code the library uses.  This value
+    --$argPackageName - the package name for the library, e.g. afib_signin
+    --$argPackageCode - the 3-5 letter all lowercase code the library uses.  This value
       is declared in the library's xxx_config.g.dart file, it is not a
       value that you get to choose.  For example, for afib_signin it is AFSI.
       The library's installation instructions should tell you this value.
@@ -81,6 +81,8 @@ $optionsHeader
   Future<void> _integrateLibrary(AFCommandContext context, AFCommandArgumentsParsed args) async {
     final packageName = args.accessNamed(argPackageName);
     final packageCode = args.accessNamed(argPackageCode);
+    verifyNotEmpty(packageName, "You must specify --$argPackageName");
+    verifyNotEmpty(packageCode, "You must specify --$argPackageCode");
 
     _verifyPubspecContains(context, packageName);
 
@@ -131,7 +133,8 @@ $optionsHeader
   Future<void> _executeProjectStyle(AFCommandContext context, List<String> lines) async {
 
     for(final line in lines) {
-      context.output.writeTwoColumns(col1: "execute ", col2: "$line");
+      final simpleLine = AFCommandContext.simplifyProjectStyleCommand(line);
+      context.output.writeTwoColumns(col1: "execute ", col2: "$simpleLine");
       if(!line.startsWith("echo")) {
         await context.executeSubCommand(line, null);
       }

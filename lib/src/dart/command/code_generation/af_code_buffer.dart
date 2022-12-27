@@ -207,7 +207,9 @@ class AFCodeBuffer {
           replaceTextLines(context, insertion, buffer.lines);
         }
       } else if(value is AFCodeBuffer) {
-          replaceTextLines(context, insertion, value.lines);
+        replaceTextLines(context, insertion, value.lines);
+      } else if(value is List<String>) {
+        replaceTextLines(context, insertion, value);
       }
     }
 

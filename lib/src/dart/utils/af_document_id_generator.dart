@@ -10,6 +10,7 @@ class AFDocumentIDGenerator {
   /// Prefix for objects that have not yet been stored to firebase.
   static const newId = 'newId';
   static const testId = 'testId';
+  static const columnId = "id";
   static int gNewId = 100;
 
   /// Creates a temporary object id for an object that has not yet been saved to firestore.

@@ -161,6 +161,12 @@ abstract class AFCommand {
     throw AFCommandError(error: error, usage: usage);
   }
 
+  void verifyNotEmpty(String value, String msg) {
+    if(value.isEmpty) {
+      throwUsageError(msg);
+    }
+  }
+
   String verifyEndsWith(String value, String endsWith) {
     if(!value.endsWith(endsWith)) {
       throwUsageError("$value must end with $endsWith");
@@ -376,7 +382,11 @@ class AFMemberVariableTemplates {
     result.writeln("static const tableName = '${AFCodeGenerator.convertMixedToSnake(mainType)}';");
     _iterate((identifier, kind, isLast) {
       final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
-      result.writeln("static const col$upcaseIdentifier = '${AFCodeGenerator.convertMixedToSnake(identifier)}';");
+      var val = "'${AFCodeGenerator.convertMixedToSnake(identifier)}'";
+      if(identifier == "id") {
+        val = "AFDocumentIDGenerator.columnId";
+      }
+      result.writeln("static const col$upcaseIdentifier = $val;");
     });
     return result.toString();
   }
@@ -607,14 +617,25 @@ class AFCommandContext {
     );
   }
 
+  static String simplifyProjectStyleCommand(String line) {
+    var simpleLine = line;
+    /*
+    final idxOverride = line.indexOf("--${AFGenerateSubcommand.argOverrideTemplatesFlag}");
+    if(idxOverride > 0) {
+      simpleLine = line.substring(0, idxOverride).trim();
+    }
+    */
+    return simpleLine;
+  }
+
   void startCommand() {
     if(isRootCommand && isExportTemplates) {
-      output.writeTwoColumns(col1: "detected ", col2: "--${AFGenerateSubcommand.argExportTemplatesFlag}");
+      // output.writeTwoColumns(col1: "detected ", col2: "--${AFGenerateSubcommand.argExportTemplatesFlag}");
     }
 
     var override = findArgument(AFGenerateSubcommand.argOverrideTemplatesFlag) as String?;
     if(override != null) {
-      output.writeTwoColumns(col1: "detected ", col2: "--${AFGenerateSubcommand.argOverrideTemplatesFlag}: $override");
+      // output.writeTwoColumns(col1: "detected ", col2: "--${AFGenerateSubcommand.argOverrideTemplatesFlag}: $override");
 
       final overrides = _parseOverrides(override);
       for(final overrideSource in overrides.keys) {
@@ -920,6 +941,14 @@ class AFCommandLibraryExtensionContext extends AFBaseExtensionContext {
   AFCommand? findCommandByType<T extends AFCommand>() {
     final result = commands.all.firstWhereOrNull((c) => c is T);
     return result;
+  }
+
+  void registerTemplateFile(AFFileSourceTemplate source) {
+    templates.registerFile(source);
+  }
+
+  void registerTemplateSnippet(AFSnippetSourceTemplate source) {
+    templates.registerSnippet(source);
   }
 
   /*

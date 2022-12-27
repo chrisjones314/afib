@@ -37,7 +37,7 @@ class $insertCommandName extends AFCommand {
   }
 
   @override
-  void execute(AFCommandContext context) {
+  Future<void> execute(AFCommandContext context) async {
 
     // parse arguments with default values as follows
     final args = context.parseArguments(

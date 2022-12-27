@@ -98,6 +98,8 @@ $optionsHeader
     required String queryType,
     required AFCommandArgumentsParsed args,
     required String usage,
+    String? overrideParentType,
+    AFSourceTemplate? overrideTemplate,
   }) {
     final rootStateType = args.accessNamed(argRootStateType);
     final resultType = args.accessNamed(argResultModelType);
@@ -128,7 +130,7 @@ $optionsHeader
       parent: context.coreInsertions,
       queryType: queryType,
       resultType: resultType,
-      queryParentType: queryParentType,
+      queryParentType: overrideParentType ?? queryParentType,
       additionalMethods: additionalMethods,
       memberVariables: memberVariables?.declareVariables ?? AFSourceTemplate.empty,
       constructorParams: memberVariables?.constructorParamsBare ?? AFSourceTemplate.empty,
@@ -138,7 +140,7 @@ $optionsHeader
     // create a screen name
     final generator = context.generator;
     final queryPath = generator.pathQuery(queryType);
-    final queryFile = generator.createFile(context, queryPath, queryTemplate, insertions: queryInsertions);    
+    final queryFile = generator.createFile(context, queryPath, overrideTemplate ?? queryTemplate, insertions: queryInsertions);    
     
     // see if the state file exists
     final stateFilePath = generator.pathRootState(rootStateType);

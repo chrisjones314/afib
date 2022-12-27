@@ -32,11 +32,11 @@ class AFProjectPaths {
   static const folderCore = "core";
   static const folderExample = "example";
   static const folderFiles = "files";
-  static const folderEvalDemo = "eval_demo";
+  static const folderEvalDemo = "app-eval-demo";
   static const folderSnippets = "snippets";
-  static const folderStarterSignin = "starter-signin";
-  static const folderStarterMinimal = "starter-minimal";
-  static const folderStarterSigninFirebase = "starter-signin-firebase";
+  static const folderStarterSignin = "app-starter-signin";
+  static const folderStarterMinimal = "app-starter-minimal";
+  static const folderStarterSigninFirebase = "app-starter-signin-firebase";
   static const pathGenerateCoreFiles = [folderCore, folderFiles];
   static const pathGenerateCoreSnippets = [folderCore, folderSnippets];
   static const pathGenerateExample = [folderExample];

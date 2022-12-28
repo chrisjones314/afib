@@ -3,19 +3,43 @@
 import 'package:afib/afib_command.dart';
 
 class StarterSigninStateTestT extends AFFileSourceTemplate {
+  static const insertCheckSigninQuery = AFSourceTemplateInsertion("check_signin_query");
+  static const insertReadUserQuery = AFSourceTemplateInsertion("read_user_query");
 
-  StarterSigninStateTestT(): super(
-    templateFileId: "state_test",
-    templateFolder: AFProjectPaths.pathGenerateStarterSigninFiles,
+  StarterSigninStateTestT({
+    required String templateFileId,
+    required List<String> templateFolder,
+    required Object checkSigninQuery,
+    required Object readUserQuery,
+    required Object extraImports,
+  }): super(
+    templateFileId: templateFileId,
+    templateFolder: templateFolder,
+    embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      insertCheckSigninQuery: checkSigninQuery,
+      insertReadUserQuery: readUserQuery,
+      AFSourceTemplate.insertExtraImportsInsertion: extraImports,
+    })
   );
+
+  static StarterSigninStateTestT example() {
+    return StarterSigninStateTestT(
+      templateFileId: "state_test",
+      templateFolder: AFProjectPaths.pathGenerateStarterSigninFiles,
+      checkSigninQuery: "CheckSigninQuery",
+      readUserQuery: "ReadUserQuery",
+      extraImports: '''
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/check_signin_query.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/read_user_query.dart';
+''',
+    );
+  }
 
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 import 'package:afib_signin/afsi_flutter.dart';
 import 'package:afib_signin/afsi_id.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
-import 'package:$insertPackagePath/query/simple/check_signin_query.dart';
-import 'package:$insertPackagePath/query/simple/read_user_query.dart';
 import 'package:$insertPackagePath/query/simple/signin_query.dart';
 import 'package:$insertPackagePath/query/simple/signout_query.dart';
 import 'package:$insertPackagePath/query/simple/startup_query.dart';
@@ -26,6 +50,8 @@ import 'package:$insertPackagePath/${insertAppNamespace}_id.dart';
 import 'package:$insertPackagePath/state/models/referenced_user.dart';
 import 'package:$insertPackagePath/state/root/user_credential_root.dart';
 import 'package:$insertPackagePath/test/${insertAppNamespace}_state_test_shortcuts.dart';
+$insertExtraImports
+
 
 void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
 
@@ -39,12 +65,12 @@ void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
     testContext.defineInitialTime(AFTimeState.createNow());
     // when we check for signin, it returns a valid user credential.
     testContext.defineQueryResponseUnused<StartupQuery>();
-    testContext.defineQueryResponseFixed<CheckSigninQuery>(${insertAppNamespaceUpper}TestDataID.userCredentialWestCoast);
+    testContext.defineQueryResponseFixed<$insertCheckSigninQuery>(${insertAppNamespaceUpper}TestDataID.userCredentialWestCoast);
 
     // note that this query is the start of what would likely be many queries that pull back application
     // specific data.  As the list of query responses defined here grows, it will be nice to extend this test
     // and inherit all these definitions.
-    testContext.defineQueryResponseFixed<ReadUserQuery>(${insertAppNamespaceUpper}TestDataID.referencedUserWestCoast);
+    testContext.defineQueryResponseFixed<$insertReadUserQuery>(${insertAppNamespaceUpper}TestDataID.referencedUserWestCoast);
 
     // This is necessary in case you decide to click the signout button.   Note that if this seems duplicative
     // with the current implementation of SignoutQuery.startAsync, that is because that implementation would normally
@@ -75,18 +101,18 @@ void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
     // the signout query), that is due to the simplicity of the example.   In a real app, you might have a bunch of examples
     // that override some of the test data (for example, different todo list content), while leaving other data constant (for example,
     // the user settings).
-    testContext.defineQueryResponseFixed<CheckSigninQuery>(${insertAppNamespaceUpper}TestDataID.userCredentialEastCoast);
-    testContext.defineQueryResponseFixed<ReadUserQuery>(${insertAppNamespaceUpper}TestDataID.referencedUserEastCoast);
+    testContext.defineQueryResponseFixed<$insertCheckSigninQuery>(${insertAppNamespaceUpper}TestDataID.userCredentialEastCoast);
+    testContext.defineQueryResponseFixed<$insertReadUserQuery>(${insertAppNamespaceUpper}TestDataID.referencedUserEastCoast);
     testContext.defineQueryResponseFixed<SigninQuery>(${insertAppNamespaceUpper}TestDataID.userCredentialEastCoast);
   });
 
 
   definitions.addTest(${insertAppNamespaceUpper}StateTestID.readyForLoginWestCoast, extendTest: ${insertAppNamespaceUpper}StateTestID.alreadyLoggedInWestCoast, body: (testContext) {
 
-    // this will be like the alreadyLoggedInWestCoast test, except that the CheckSigninQuery will return not signed in.
+    // this will be like the alreadyLoggedInWestCoast test, except that the $insertCheckSigninQuery will return not signed in.
     // when the user clicks the signin button, it will return the west coast signin result already specified in the parent test, 
     // and everything else will work from there.
-    testContext.defineQueryResponseFixed<CheckSigninQuery>(UserCredentialRoot.createNotSignedIn());
+    testContext.defineQueryResponseFixed<$insertCheckSigninQuery>(UserCredentialRoot.createNotSignedIn());
 
     // The bast test has a fixed response, but this is a nice chance to show a dynamic response.   
     testContext.defineQueryResponseDynamic<SigninQuery>(body: (context, query) {
@@ -108,10 +134,10 @@ void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
 
   definitions.addTest(${insertAppNamespaceUpper}StateTestID.performLoginWestCoast, extendTest: ${insertAppNamespaceUpper}StateTestID.readyForLoginWestCoast, body: (testContext) {
 
-    // this will be like the alreadyLoggedInWestCoast test, except that the CheckSigninQuery will return not signed in.
+    // this will be like the alreadyLoggedInWestCoast test, except that the $insertCheckSigninQuery will return not signed in.
     // when the user clicks the signin button, it will return the west coast signin result already specified in the parent test, 
     // and everything else will work from there.
-    testContext.defineQueryResponseFixed<CheckSigninQuery>(UserCredentialRoot.createNotSignedIn());
+    testContext.defineQueryResponseFixed<$insertCheckSigninQuery>(UserCredentialRoot.createNotSignedIn());
 
     // we should start on the signin screen in this case.
     testContext.executeVerifyActiveScreenId(AFSIScreenID.signin);

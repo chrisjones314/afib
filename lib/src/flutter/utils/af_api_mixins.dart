@@ -553,6 +553,10 @@ mixin AFContextShowMixin {
       throw AFException("The screen $screenId is not registered in the screen map");
     }
 
+    // make sure multiple dialogs are not showing simulataneously, currently we only allow one.
+    final public = AFibF.g.internalOnlyActiveStore.state.public;
+    assert(!public.route.isShowing(AFUIType.dialog));
+
     dispatch(AFNavigateShowScreenBeginAction(verifiedScreenId, AFUIType.dialog, executeBefore, executeDuring));
 
     if(AFibD.config.isTestContext) {

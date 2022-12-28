@@ -20,10 +20,8 @@ generate override ${insertAppNamespaceUpper}SigninTheme --parent-type AFSIDefaul
 generate override ${insertAppNamespaceUpper}SigninActionsLPI --parent-type AFSISigninActionsLPI --override-templates "core/files/lpi=project_styles/app-starter-signin/files/starter_signin_actions_lpi"
 generate custom set-startup-screen --screen-id AFSIScreenID.signin --create-route-param "SigninScreenRouteParam.createSigninLoading()"
 generate query StartupQuery --result-type AFUnused --force-overwrite --override-templates "core/files/query_simple=project_styles/$insertProjectStyle/files/query_startup" 
-generate query SigninQuery --result-type UserCredentialRoot --member-variables "String email; String password; bool rememberMe" --override-templates "core/files/query_simple=project_styles/$insertProjectStyle/files/query_signin"
 generate query SignoutQuery --result-type UserCredentialRoot --member-variables "String storedEmail" --override-templates "core/files/query_simple=project_styles/$insertProjectStyle/files/query_signout"
 generate query RegistrationQuery --result-type UserCredentialRoot --member-variables "String email; String password; ReferencedUser newUser" --override-templates "core/files/query_simple=project_styles/$insertProjectStyle/files/query_registration"
-generate query ReadUserQuery --result-type ReferencedUser --member-variables "UserCredentialRoot credential" --override-templates "core/files/query_simple=project_styles/$insertProjectStyle/files/query_read_user"
 generate ui HomePageScreen --override-templates +
   +core/snippets/extra_imports=project_styles/app-starter-signin/snippets/home_page_screen_extra_imports
   +core/snippets/declare_spi=project_styles/app-starter-signin/snippets/home_page_screen_spi
@@ -34,6 +32,8 @@ generate ui RegistrationDetailsWidget --override-templates +
   +core/snippets/declare_spi=project_styles/app-starter-signin/snippets/registration_details_widget_spi
   +core/snippets/widget_build_body=project_styles/app-starter-signin/snippets/registration_details_widget_build_body
   +core/snippets/screen_additional_methods=project_styles/app-starter-signin/snippets/registration_details_widget_additional_methods
+generate test StartupStateTest --force-overwrite --override-templates +
+  +core/files/state_test=project_styles/$insertProjectStyle/files/state_test
 ''';
 
 }

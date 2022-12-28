@@ -5,34 +5,6 @@ import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
 
 class QuerySigninSigninStarterT extends SimpleQueryT {
-  static final insertSigninAdditionalMethods = '''
-static void onSuccessfulSignin(AFFinishQuerySuccessContext<UserCredentialRoot> context) {
-  final cred = context.response;
-  assert(cred.isSignedIn);
-
-  // save the user credential to our state.
-  context.updateComponentRootStateOne<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>(cred);
-
-  // TODO: you can execute several queries here to load in app data based on the user credential.
-  // As written, this will only navigate to the home page once all the queries in startup load complete.
-  final startupLoad = AFCompositeQuery.createList();
-  startupLoad.add(ReadUserQuery(credential: cred));
-
-  context.executeQuery(AFCompositeQuery.createFrom(
-    queries: startupLoad, onSuccess: (successCtx) {
-      // Then, when you've loaded enough state, you can navigate to the home screen.
-      context.navigateReplaceAll(HomePageScreen.navigatePush().castToReplaceAll());
-  }));
-}
-
-@override
-void finishAsyncWithError(AFFinishQueryErrorContext context) {    
-  final lpi = context.accessLPI<AFSIManipulateStateLPI>(AFSILibraryProgrammingInterfaceID.manipulateState);
-  lpi.updateSigninScreenStatus(status: AFSISigninStatus.error, message: context.e.message);
-}
-
-''';
-
   QuerySigninSigninStarterT({
     required Object insertExtraImports,
     required Object insertStartImpl,
@@ -76,10 +48,37 @@ import 'package:afib_signin/afsi_flutter.dart';
       insertFinishImpl: '''
 onSuccessfulSignin(context);
 ''',
-      insertAdditionalMethods: insertSigninAdditionalMethods
+      insertAdditionalMethods: insertSigninAdditionalMethods("ReadUserQuery")
     );
   }
 
+  static String insertSigninAdditionalMethods(String readUserQuery) => '''
+static void onSuccessfulSignin(AFFinishQuerySuccessContext<UserCredentialRoot> context) {
+  final cred = context.response;
+  assert(cred.isSignedIn);
+
+  // save the user credential to our state.
+  context.updateComponentRootStateOne<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>(cred);
+
+  // TODO: you can execute several queries here to load in app data based on the user credential.
+  // As written, this will only navigate to the home page once all the queries in startup load complete.
+  final startupLoad = AFCompositeQuery.createList();
+  startupLoad.add($readUserQuery(credential: cred));
+
+  context.executeQuery(AFCompositeQuery.createFrom(
+    queries: startupLoad, onSuccess: (successCtx) {
+      // Then, when you've loaded enough state, you can navigate to the home screen.
+      context.navigateReplaceAll(HomePageScreen.navigatePush().castToReplaceAll());
+  }));
+}
+
+@override
+void finishAsyncWithError(AFFinishQueryErrorContext context) {    
+  final lpi = context.accessLPI<AFSIManipulateStateLPI>(AFSILibraryProgrammingInterfaceID.manipulateState);
+  lpi.updateSigninScreenStatus(status: AFSISigninStatus.error, message: context.e.message);
+}
+
+''';
 
 
   

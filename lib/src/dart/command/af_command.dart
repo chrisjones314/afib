@@ -24,6 +24,8 @@ import 'package:collection/collection.dart';
 import 'package:path/path.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 
+import 'templates/core/snippets/snippet_import_from_package.t.dart';
+
 class AFItemWithNamespace {
   /// The namespace used to differentiate third party commands.
   final String namespace;
@@ -293,6 +295,29 @@ class AFMemberVariableTemplates {
     return result.toString();
   }
 
+  String extraImports(AFCommandContext context) {
+    final generator = context.generator;
+    final result = StringBuffer();
+    _iterate((identifier, kind, isLast) { 
+      if(kind == "int" || kind == "double" || kind == "String") {
+        return;
+      }
+
+      // it might be a local type, see if we can find it.
+      final pathModel = generator.pathModel(kind);
+      if(generator.fileExists(pathModel)) {
+        final importPath = generator.importStatementPath(pathModel);
+        final declareImport = SnippetImportFromPackageT().toBuffer(context, insertions: {
+          AFSourceTemplate.insertPackageNameInsertion: AFibD.config.packageName,
+          AFSourceTemplate.insertPackagePathInsertion: importPath,
+        });
+
+        result.writeln(declareImport.lines.first);
+      }
+    });
+    return result.toString();
+  }
+ 
   String get constructorParamsBare {
     final result = StringBuffer();
     result.writeln();

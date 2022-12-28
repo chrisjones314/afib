@@ -24,6 +24,7 @@ class ModelT extends AFFileSourceTemplate {
     Object? copyWithCall,
     Object? serialMethods,
     Object? serialConstants,
+    Object? memberVariableImports,
   }) {
     return ModelT(
       templateFolder: AFProjectPaths.pathGenerateCoreFiles, 
@@ -37,6 +38,7 @@ class ModelT extends AFFileSourceTemplate {
         AFSourceTemplate.insertCopyWithCallInsertion: copyWithCall ?? AFSourceTemplate.empty,      
         insertSerialConstantsInsertion: serialConstants ?? AFSourceTemplate.empty,
         insertSerialMethodsInsertion: serialMethods ?? AFSourceTemplate.empty,
+        AFSourceTemplate.insertMemberVariableImportsInsertion: memberVariableImports ?? AFSourceTemplate.empty,
     }));
   }
 
@@ -45,6 +47,7 @@ class ModelT extends AFFileSourceTemplate {
 import 'package:afib/afib_command.dart';
 import 'package:meta/meta.dart';
 $insertExtraImports
+$insertMemberVariableImports
 
 @immutable
 class $insertMainType {

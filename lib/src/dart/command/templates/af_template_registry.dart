@@ -63,6 +63,7 @@ import 'package:afib/src/dart/command/templates/project_styles/app-starter-signi
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/query_starter_signin_startup.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/query_write_user.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/starter_firebase_main.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/state_test.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-integrate-shared.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-integrate.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-shared.t.dart';
@@ -204,7 +205,7 @@ class AFTemplateRegistry {
     registerFile(QueryReadUserSigninStarterT.example());
     registerFile(QueryWriteUserSigninStarterT.example());
     registerFile(StarterSigninThemeSigninT.example());
-    registerFile(StarterSigninStateTestT());
+    registerFile(StarterSigninStateTestT.example());
 
     registerSnippet(SnippetSigninStarterHomePageScreenExtraImportsT.example());
     registerSnippet(SnippetSigninStarterHomePageScreenBuildBodyT());
@@ -225,6 +226,7 @@ class AFTemplateRegistry {
     registerFile(QueryRegistrationSigninStarterFirebaseT.example());
     registerFile(QueryReadUserSigninStarterFirebaseT.example());
     registerFile(QueryWriteUserSigninStarterFirebaseT.example());
+    registerFile(StarterSigninFirebaseStateTestT.example());
   }  
 
   AFFileSourceTemplate? findEmbeddedTemplateFile(List<String> path) {

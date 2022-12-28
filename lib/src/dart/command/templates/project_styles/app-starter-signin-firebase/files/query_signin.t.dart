@@ -27,7 +27,7 @@ import 'package:afib/afib_flutter.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_credential_root.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/home_page_screen.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/read_user_query.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/listener/read_one_user_listener_query.dart';
 import 'package:afib_signin/afsi_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 ''',
@@ -46,7 +46,7 @@ FirebaseAuth.instance.signInWithEmailAndPassword(
 onSuccessfulSignin(context);
 ''',
       insertAdditionalMethods: '''
-${QuerySigninSigninStarterT.insertSigninAdditionalMethods}
+${QuerySigninSigninStarterT.insertSigninAdditionalMethods('ReadOneUserListenerQuery')}
 
 static UserCredentialRoot convertCredential(User? user) {
   // The issue here is that you cannot construct a UserCredential easily, which makes it really

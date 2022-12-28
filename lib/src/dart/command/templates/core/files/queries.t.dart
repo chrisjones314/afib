@@ -3,6 +3,7 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_return_nul
 
 class SimpleQueryT extends AFFileSourceTemplate {
   static const insertResultTypeInsertion = AFSourceTemplateInsertion("result_type");
+  static const insertResultTypeSingleInsertion = AFSourceTemplateInsertion("result_type_single");
   static const insertStartImplInsertion = AFSourceTemplateInsertion("start_impl");
   static const insertFinishImplInsertion = AFSourceTemplateInsertion("finish_impl");
 
@@ -75,24 +76,48 @@ throwUnimplemented();
     required AFSourceTemplateInsertions parent,
     required Object queryType,
     required Object queryParentType,
-    required Object resultType,
+    required String resultType,
+    required String resultTypeCore,
     Object memberVariables = AFSourceTemplate.empty,
     Object constructorParams = AFSourceTemplate.empty,
     Object startImpl = AFSourceTemplate.empty,
     Object finishImpl = AFSourceTemplate.empty,
-    Object additionalMethods = AFSourceTemplate.empty
+    Object additionalMethods = AFSourceTemplate.empty,
+    Object memberVariableImports = AFSourceTemplate.empty,
   }) {
     return parent.reviseAugment({
         AFSourceTemplate.insertMainTypeInsertion: queryType,
         AFSourceTemplate.insertMainParentTypeInsertion: queryParentType,
         insertResultTypeInsertion: resultType,
+        insertResultTypeSingleInsertion: resultTypeCore,
         AFSourceTemplate.insertMemberVariablesInsertion: memberVariables,
         AFSourceTemplate.insertConstructorParamsInsertion: constructorParams,
         insertStartImplInsertion: startImpl,
         insertFinishImplInsertion: finishImpl,
         AFSourceTemplate.insertAdditionalMethodsInsertion: additionalMethods,
+        AFSourceTemplate.insertMemberVariableImportsInsertion: memberVariableImports,
       }
     );
+  }
+
+  static String findCoreResultType(String resultType) {
+    const startList = "List<";
+    final idxStart = resultType.indexOf(startList);
+    var result = resultType;
+    if(idxStart > 0) {
+      final idxEnd = resultType.indexOf(">");
+      if(idxEnd < 0) {
+        throw AFException("Missing > in $resultType");
+      }
+      
+      result = resultType.substring(idxStart+startList.length, idxEnd);
+    }
+
+    if(result.endsWith("?")) {
+      result = result.substring(0, result.length-1);
+    }
+
+    return result;
   }
 
 
@@ -100,6 +125,7 @@ throwUnimplemented();
 $insertFileHeader
 import 'package:afib/afib_flutter.dart';
 $insertExtraImports
+$insertMemberVariableImports
 
 class $insertQueryType extends $insertQueryParentType<$insertResultType> {
   $insertMemberVariables
@@ -159,6 +185,7 @@ class DeferredQueryT extends SimpleQueryT {
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 $insertExtraImports
+$insertMemberVariableImports
 
 class ${insertQueryType}Query extends AFDeferredQuery {
   $insertMemberVariables
@@ -211,6 +238,7 @@ class IsolateQueryT extends SimpleQueryT {
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 $insertExtraImports
+$insertMemberVariableImports
 
 class $insertQueryType extends AFIsolateListenerQuery<$insertResultType> {
   // AFib Help: 

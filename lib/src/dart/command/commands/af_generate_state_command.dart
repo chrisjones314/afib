@@ -170,6 +170,8 @@ $optionsHeader
       serialConstants = memberVariables.serialConstants(identifier);
     }
 
+    final memberVariableImports = memberVariables?.extraImports(context) ?? AFSourceTemplate.empty;
+
     final modelt = ModelT.core(
       memberVariables: memberVariables?.declareVariables,
       constructorParams: memberVariables?.constructorParams,
@@ -177,8 +179,8 @@ $optionsHeader
       copyWithCall: memberVariables?.copyWithCall,
       serialMethods: snippetSerial,
       serialConstants: serialConstants,
+      memberVariableImports: memberVariableImports,
     );
-
 
     final modelFile = context.createFile(modelPath, modelt, extend: modelInsertions, insertions: {
       AFSourceTemplate.insertMemberVariablesInsertion: memberVariables?.declareVariables ?? AFSourceTemplate.empty,
@@ -190,6 +192,7 @@ $optionsHeader
       AFSourceTemplate.insertAdditionalMethodsInsertion: isRoot ? SnippetInitialStateModelFunctionT(
         initialStateParams: memberVariables?.initialValueDeclaration ?? AFSourceTemplate.empty,
       ) : AFSourceTemplate.empty,
+      AFSourceTemplate.insertMemberVariableImportsInsertion: memberVariableImports
     });
 
     if(isRoot) {

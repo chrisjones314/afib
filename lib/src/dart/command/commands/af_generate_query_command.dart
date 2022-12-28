@@ -78,11 +78,13 @@ $optionsHeader
     } else if(queryName.endsWith(suffixIsolateQuery)) {
       querySuffix = suffixIsolateQuery;
     }
+    final resultType = args.accessNamed(argResultModelType);
 
     createQuery(
       context: context,
       querySuffix: querySuffix,
       queryType: queryName,
+      resultType: resultType,
       args: args,
       usage: usage,
     );
@@ -98,11 +100,11 @@ $optionsHeader
     required String queryType,
     required AFCommandArgumentsParsed args,
     required String usage,
+    required String resultType,
     String? overrideParentType,
     AFSourceTemplate? overrideTemplate,
   }) {
     final rootStateType = args.accessNamed(argRootStateType);
-    final resultType = args.accessNamed(argResultModelType);
     final memberVariables = context.memberVariables(args);
 
     AFSourceTemplate queryTemplate = SimpleQueryT.core();
@@ -125,15 +127,18 @@ $optionsHeader
     if(isListener || isDeferred) {
       additionalMethods = SnippetQueryShutdownMethodT();
     }
-    
+    final resultTypeCore = SimpleQueryT.findCoreResultType(resultType);    
+
     var queryInsertions = SimpleQueryT.augmentInsertions(
       parent: context.coreInsertions,
       queryType: queryType,
       resultType: resultType,
+      resultTypeCore: resultTypeCore,
       queryParentType: overrideParentType ?? queryParentType,
       additionalMethods: additionalMethods,
       memberVariables: memberVariables?.declareVariables ?? AFSourceTemplate.empty,
       constructorParams: memberVariables?.constructorParamsBare ?? AFSourceTemplate.empty,
+      memberVariableImports: memberVariables?.extraImports(context) ?? AFSourceTemplate.empty,
     );
 
 
@@ -148,7 +153,7 @@ $optionsHeader
     
     // if the result exists in the models area
     if(resultType != "AFUnused") {
-      final modelFilePath = generator.pathModel(resultType);
+      final modelFilePath = generator.pathModel(resultTypeCore);
       queryFile.importProjectPath(context, modelFilePath);
     }
   }

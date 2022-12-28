@@ -153,6 +153,7 @@ abstract class AFSourceTemplate {
   static const insertCreateParamsCallInsertion = AFSourceTemplateInsertion("create_params_call");
   static const insertMainTypeNoRootInsertion = AFSourceTemplateInsertion("main_type_no_root");
   static const insertProjectStyleInsertion = AFSourceTemplateInsertion("project_style");
+  static const insertMemberVariableImportsInsertion = AFSourceTemplateInsertion("member_variable_imports");
 
   static const empty = SnippetEmptyStatementT();
   final AFSourceTemplateRole role;
@@ -187,6 +188,7 @@ abstract class AFSourceTemplate {
   AFSourceTemplateInsertion get insertCopyWithConstructorCall { return AFSourceTemplate.insertCopyWithCallInsertion; }
   AFSourceTemplateInsertion get insertCreateParams { return AFSourceTemplate.insertCreateParamsInsertion; }
   AFSourceTemplateInsertion get insertCreateParamsCall { return AFSourceTemplate.insertCreateParamsCallInsertion; }
+  AFSourceTemplateInsertion get insertMemberVariableImports { return AFSourceTemplate.insertMemberVariableImportsInsertion; }
 
   bool get isComment { return role == AFSourceTemplateRole.comment; }
   bool get isCode { return role == AFSourceTemplateRole.code; }

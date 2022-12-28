@@ -10,7 +10,7 @@ class StarterSigninT extends AFProjectStyleSourceTemplate {
   String get template => '''
 --override-templates +
   +core/snippets/fundamental_theme_init=project_styles/app-starter-signin/snippets/fundamental_theme_init
-import project-style core/files/app-starter-signin-shared
+import project_styles/app-starter-signin-shared
 generate ui StartupScreen --override-templates +
   +core/snippets/minimal_screen_build_body_impl=core/snippets/snippet_startup_screen_complete_project_style
 secho --warning "You must now run 'dart bin/${insertAppNamespace}_afib.dart integrate project-style $insertProjectStyle' to complete setup.  Your project is not complete until you do so."

@@ -58,10 +58,12 @@ import 'package:afib/src/dart/command/templates/project_styles/app-starter-signi
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/query_check_signin.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/query_read_user.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/query_registration.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/query_reset_password.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/query_signin.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/query_signout.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/query_starter_signin_startup.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/query_write_user.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/signin_actions_lpi.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/starter_firebase_main.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/state_test.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-integrate-shared.t.dart';
@@ -227,6 +229,8 @@ class AFTemplateRegistry {
     registerFile(QueryReadUserSigninStarterFirebaseT.example());
     registerFile(QueryWriteUserSigninStarterFirebaseT.example());
     registerFile(StarterSigninFirebaseStateTestT.example());
+    registerFile(QueryForgotPasswordFirebaseStarterT.example());
+    registerFile(SigninStarterSigninFirebaseActionsLPIT.example());
   }  
 
   AFFileSourceTemplate? findEmbeddedTemplateFile(List<String> path) {

@@ -128,6 +128,8 @@ class AFCreateAppCommand extends AFCommand {
   static const kindUILibrary = "ui_library";
   static const kindStateLibrary = "state_library";
   static const argProjectStyle = "project-style";
+  static const argPackageName = "package-name";
+  static const argPackageCode = "package-code";
   static const projectStyleStarterMinimal = "app-starter-minimal";
   static const projectStyleUILibStarterMinimal = "uilib-starter-minimal";
   static const projectStyleStateLibStarterMinimal = "statelib-starter-minimal";
@@ -191,16 +193,20 @@ Project Styles
   Future<void> execute(AFCommandContext ctx) async {
     final args = ctx.parseArguments(
       command: this,
-      unnamedCount: 3,
+      unnamedCount: 1,
       named: {
       argProjectStyle: "",
+      argPackageName: "",
+      argPackageCode: "",
     });
     final kind = args.accessUnnamedFirst;
     verifyOneOf(kind, [kindApp, kindUILibrary, kindStateLibrary]);
 
     AFibD.config.setIsLibraryCommand(isLib: kind != kindApp);
-    final packageName = args.accessUnnamedSecond;
-    final packageCode = args.accessUnnamedThird;
+    final packageName = args.accessNamed(argPackageName);
+    final packageCode = args.accessNamed(argPackageCode);
+    verifyNotEmpty(packageName, "You must specify --$argPackageName");
+    verifyNotEmpty(packageCode, "You must specify --$argPackageCode");
 
     final projectStyle = args.accessNamed(argProjectStyle);
 

@@ -6,10 +6,15 @@ import 'package:afib/src/dart/command/templates/core/files/lpi.t.dart';
 
 class SigninStarterSigninActionsLPIT {
 
-   static LPIT example() {
+  static LPIT custom({
+    required String templateFileId,
+    required List<String> templateFolder,
+    Object? extraImports = "",
+    Object? additionalMethods = "",
+  }) {
     return LPIT(
-      templateFileId: "starter_signin_actions_lpi",
-      templateFolder: AFProjectPaths.pathGenerateStarterSigninFiles,
+      templateFileId: templateFileId,
+      templateFolder: templateFolder,
       insertExtraImports: '''
 import 'package:afib_signin/afsi_flutter.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signin_query.dart';
@@ -18,6 +23,7 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/sign
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplate.insertAppNamespaceInsertion}_id.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/referenced_user.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/widgets/registration_details_widget.dart';
+$extraImports
 
 ''',
       insertAdditionalMethods: '''
@@ -64,8 +70,17 @@ void onSignup(String email, String password) {
   
   context.executeQuery(register);
 }
+
+$additionalMethods
 ''',
     );
   }
- 
+
+  static LPIT example() {
+    return custom(
+      templateFileId: "starter_signin_actions_lpi",
+      templateFolder: AFProjectPaths.pathGenerateStarterSigninFiles,
+    );
+  }
+
 }

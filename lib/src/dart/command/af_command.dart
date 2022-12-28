@@ -320,10 +320,11 @@ class AFMemberVariableTemplates {
  
   String get constructorParamsBare {
     final result = StringBuffer();
-    result.writeln();
     _iterate((identifier, kind, isLast) {
-      result.write("  required this.$identifier,");
-      result.writeln();
+      result.write("required this.$identifier,");
+      if(!isLast) {
+        result.writeln();
+      }
     });
     return result.toString();
   }

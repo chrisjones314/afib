@@ -17,7 +17,7 @@ generate id ${insertAppNamespaceUpper}StateTestID.performLoginWestCoast
 generate id ${insertAppNamespaceUpper}StateTestID.readyToRegister
 generate id ${insertAppNamespaceUpper}StateTestID.registerMidwest
 generate override ${insertAppNamespaceUpper}SigninTheme --parent-type AFSIDefaultTheme --override-templates "core/files/theme=project_styles/app-starter-signin/files/theme_signin"
-generate override ${insertAppNamespaceUpper}SigninActionsLPI --parent-type AFSISigninActionsLPI --override-templates "core/files/lpi=project_styles/app-starter-signin/files/starter_signin_actions_lpi"
+generate override ${insertAppNamespaceUpper}SigninActionsLPI --parent-type AFSISigninActionsLPI --override-templates "core/files/lpi=project_styles/$insertProjectStyle/files/starter_signin_actions_lpi"
 generate custom set-startup-screen --screen-id AFSIScreenID.signin --create-route-param "SigninScreenRouteParam.createSigninLoading()"
 generate query StartupQuery --result-type AFUnused --force-overwrite --override-templates "core/files/query_simple=project_styles/$insertProjectStyle/files/query_startup" 
 generate query SignoutQuery --result-type UserCredentialRoot --member-variables "String storedEmail" --override-templates "core/files/query_simple=project_styles/$insertProjectStyle/files/query_signout"

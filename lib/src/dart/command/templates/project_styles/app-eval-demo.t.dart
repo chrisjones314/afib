@@ -10,9 +10,7 @@ class StartHereT extends AFProjectStyleSourceTemplate {
   String get template => '''
 --override-templates +
   +core/snippets/state_test_impl=project_styles/app-eval-demo/snippets/startup_state_test
-require meta
-require sqlite3
-require path_provider
+require "meta, sqlite3, path_provider"
 generate id ${insertAppNamespaceUpper}TestDataID.referencedUserWestCoast
 generate id ${insertAppNamespaceUpper}TestDataID.referencedUsersWestCoast
 generate id ${insertAppNamespaceUpper}TestDataID.userCredentialWestCoast
@@ -33,10 +31,10 @@ generate state CountHistoryRoot --override-templates +
 generate state UserCredentialRoot --override-templates +
   +core/files/model=project_styles/app-eval-demo/files/model_user_credential_root
   +core/snippets/define_test_data=project_styles/app-eval-demo/snippets/define_user_credential_root_test_data
-generate state ReferencedUsersRoot --override-templates +
+generate state ReferencedUsersRoot --member-variables "Map<String, ReferencedUser> users" --override-templates +
   +core/files/model=project_styles/app-eval-demo/files/model_referenced_users_root
   +core/snippets/define_test_data=project_styles/app-eval-demo/snippets/define_referenced_users_root_test_data
-generate state ReferencedUser --override-templates "core/files/model=project_styles/app-eval-demo/files/model_referenced_user"
+generate state ReferencedUser --member-variables "String id; String firstName; String lastName;String email;String zipCode" --override-templates "core/files/model=project_styles/app-eval-demo/files/model_referenced_user"
 generate query ReadCountHistoryQuery --result-type CountHistoryRoot --member-variables "String userId" --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_read_count_history"
 generate query ReadReferencedUserQuery --result-type ReferencedUser --member-variables "String userId" --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_read_referenced_user"
 generate query WriteCountHistoryEntryQuery --result-type CountHistoryEntry --member-variables "CountHistoryEntry entry" --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_write_count_history_entry"

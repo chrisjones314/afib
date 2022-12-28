@@ -28,6 +28,7 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplat
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_credential_root.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/write_one_user_query.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signin_query.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/referenced_user.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/home_page_screen.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signin_query.dart';
@@ -45,8 +46,13 @@ FirebaseAuth.instance.createUserWithEmailAndPassword(
   context.onError(AFQueryError.createMessage(err.message));
 });
 ''',
-      insertFinishImpl: QueryRegistrationSigninStarterT.insertFinishImplRegister,
+      insertFinishImpl: QueryRegistrationSigninStarterT.insertFinishImplRegister("SigninQuery.onSuccessfulSignin(context);"),
       insertAdditionalMethods: '''
+@override
+void finishAsyncWithError(AFFinishQueryErrorContext context) {    
+  final lpi = context.accessLPI<AFSIManipulateStateLPI>(AFSILibraryProgrammingInterfaceID.manipulateState);
+  lpi.updateRegisterScreenStatus(status: AFSISigninStatus.error, message: context.e.message);
+}
 '''
     );
   }

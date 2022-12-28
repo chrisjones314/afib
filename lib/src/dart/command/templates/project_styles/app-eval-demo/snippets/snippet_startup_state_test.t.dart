@@ -38,7 +38,7 @@ testContext.defineQueryResponseDynamic<WriteCountHistoryEntryQuery>(body: (conte
     } else {
       result = entry.copyWith();
     }
-    return result;
+    context.onSuccess(result);
 });
 
 testContext.executeStartup();

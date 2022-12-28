@@ -5,22 +5,6 @@ import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
 
 class QueryRegistrationSigninStarterT extends SimpleQueryT {
-  static final insertFinishImplRegister = '''
-final cred = context.r;
-context.updateComponentRootStateOne<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>(cred);
-
-final revisedUser = newUser.reviseId(cred.userId);
-
-// we have our user credential, now write the user record,
-// and tell it to redirect to the home screen when it completes.
-context.executeQuery(WriteOneUserQuery(
-  credential: cred,
-  user: revisedUser,
-  onSuccess: (successCtx) {
-    successCtx.navigateReplaceAll(HomePageScreen.navigatePush().castToReplaceAll());
-  }
-));
-''';
 
   QueryRegistrationSigninStarterT({
     required Object insertExtraImports,
@@ -59,12 +43,29 @@ final cred = UserCredentialRoot(
 );
 context.onSuccess(cred);
 ''',
-      insertFinishImpl: insertFinishImplRegister,
+      insertFinishImpl: insertFinishImplRegister(""),
       insertAdditionalMethods: AFSourceTemplate.empty,
     );
   }
 
 
+  static String insertFinishImplRegister(String extraAfterWrite) => '''
+final cred = context.r;
+context.updateComponentRootStateOne<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>(cred);
+
+final revisedUser = newUser.reviseId(cred.userId);
+
+// we have our user credential, now write the user record,
+// and tell it to redirect to the home screen when it completes.
+context.executeQuery(WriteOneUserQuery(
+  credential: cred,
+  user: revisedUser,
+  onSuccess: (successCtx) {
+    $extraAfterWrite
+    successCtx.navigateReplaceAll(HomePageScreen.navigatePush().castToReplaceAll());
+  }
+));
+''';
 
   
 }

@@ -3,28 +3,21 @@ import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_create_command.dart';
 import 'package:afib/src/dart/command/commands/af_echo_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_command_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_custom_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_id_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_override_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_test_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/commands/af_integrate_command.dart';
 import 'package:afib/src/dart/command/commands/af_require_command.dart';
 import 'package:afib/src/dart/command/commands/af_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/command/templates/af_template_registry.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_test_id.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_from_package.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:args/args.dart' as args;
 import 'package:collection/collection.dart';
 import 'package:path/path.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
-
-import 'templates/core/snippets/snippet_import_from_package.t.dart';
 
 class AFItemWithNamespace {
   /// The namespace used to differentiate third party commands.
@@ -60,6 +53,7 @@ class AFItemWithNamespace {
 
 class AFCommandArgumentsParsed {
   static const argTrue = "true";
+  static const argFalse = "false";
   final List<String> unnamed;
   final Map<String, String?> named;
 
@@ -90,7 +84,7 @@ class AFCommandArgumentsParsed {
   }
 
   bool accessNamedFlag(String name) {
-    return accessNamed(name) == argTrue;
+    return accessNamed(name) != argFalse;
   }
 
 
@@ -278,11 +272,31 @@ Available subcommands
 
 
 class AFMemberVariableTemplates {
+  final bool isIntId;
   final Map<String, String> nameToType;
+  final String mainType;
+  String? standardRootMapType;
  
   AFMemberVariableTemplates({
     required this.nameToType,
+    required this.isIntId,
+    required this.mainType,
   }); 
+
+  factory AFMemberVariableTemplates.createEmpty({
+    required String mainType,
+    bool isIntId = false,
+  }) {
+    return AFMemberVariableTemplates(
+      nameToType: <String, String>{}, 
+      isIntId: isIntId, 
+      mainType: mainType
+    );
+  }
+
+  void setStandardRootMapType(String kind) {
+    standardRootMapType = kind;
+  }
 
   String get declareVariables {
     final result = StringBuffer();
@@ -317,9 +331,25 @@ class AFMemberVariableTemplates {
     });
     return result.toString();
   }
+
+  String get standardReviseMethods {
+    final result = StringBuffer();
+    _iterate((identifier, kind, isLast) {
+      final methodSuffix = AFCodeGenerator.upcaseFirst(identifier);
+      result.write("$mainType revise$methodSuffix($kind $identifier) => copyWith($identifier: $identifier);");
+      if(!isLast) {
+        result.writeln();
+      }
+    });
+    return result.toString();
+  }
  
   String get constructorParamsBare {
     final result = StringBuffer();
+    if(standardRootMapType != null) {
+      result.writeln("required Map<String, $standardRootMapType> items,");
+    }
+
     _iterate((identifier, kind, isLast) {
       result.write("required this.$identifier,");
       if(!isLast) {
@@ -339,6 +369,10 @@ class AFMemberVariableTemplates {
   String get copyWithParams {
     final result = StringBuffer("{");
     result.writeln();
+    if(standardRootMapType != null) {
+      result.write("  Map<String, $standardRootMapType>? items,");
+    }
+
     _iterate((identifier, kind, isLast) {
       result.write("  $kind? $identifier,");
       result.writeln();
@@ -350,6 +384,9 @@ class AFMemberVariableTemplates {
   String get copyWithCall {
     final result = StringBuffer();
     result.writeln();
+    if(standardRootMapType != null) {
+      result.write("items: items ?? this.items");
+    }
     _iterate((identifier, kind, isLast) {
       result.write("$identifier: $identifier ?? this.$identifier,");
       result.writeln();
@@ -360,6 +397,10 @@ class AFMemberVariableTemplates {
   String get initialValueDeclaration {
     final result = StringBuffer();
     result.writeln();
+    if(standardRootMapType != null) {
+      result.writeln("items: const <String, $standardRootMapType>{},");
+    }
+
     _iterate((identifier, kind, isLast) {
       var val = "null";
       if(kind == "int") {
@@ -376,11 +417,15 @@ class AFMemberVariableTemplates {
     return result.toString();    
   }
 
-  String serializeFrom(String mainType) {
+  String get serializeFrom {
     final result = StringBuffer();
     _iterate((identifier, kind, isLast) {
       final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
-      result.writeln("final item$upcaseIdentifier = source[col$upcaseIdentifier];");
+      var convertToString = "";
+      if(identifier == AFDocumentIDGenerator.columnId && isIntId) {
+        convertToString = ".toString()";
+      } 
+      result.writeln("final item$upcaseIdentifier = source[col$upcaseIdentifier]$convertToString;");
     });
 
     result.writeln("return $mainType(");
@@ -398,12 +443,18 @@ class AFMemberVariableTemplates {
     final result = StringBuffer();
     _iterate((identifier, kind, isLast) {
       final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
-      result.writeln("result[col$upcaseIdentifier] = item.$identifier;");
+      var intConvertPrefix = "";
+      var intConvertSuffix = "";
+      if(identifier == AFDocumentIDGenerator.columnId && isIntId) {
+        intConvertPrefix = "int.tryParse(";
+        intConvertSuffix = ")";
+      }
+      result.writeln("result[col$upcaseIdentifier] = ${intConvertPrefix}item.$identifier$intConvertSuffix;");
     });
     return result.toString();
   }
 
-  String serialConstants(String mainType) {
+  String get serialConstants {
     final result = StringBuffer();
     result.writeln("static const tableName = '${AFCodeGenerator.convertMixedToSnake(mainType)}';");
     _iterate((identifier, kind, isLast) {
@@ -506,25 +557,49 @@ class AFCommandContext {
     return parsedArguments;
   }
 
-  AFMemberVariableTemplates? memberVariables(AFCommandArgumentsParsed args) {
+  AFMemberVariableTemplates? memberVariables(AFCommandContext context, AFCommandArgumentsParsed args, String mainType) {
+    final isRoot = mainType.endsWith(AFCodeGenerator.rootSuffix);
     final vars = args.accessNamed(AFGenerateSubcommand.argMemberVariables);
-    if(vars.isEmpty) {
-      return null;
-    }
     
     final varItems = vars.split(";");
+    varItems.removeWhere((val) => val.trim().isEmpty);
     final result = <String, String>{};
     for(final item in varItems) {
       final itemTrimmed = item.trim();
       final idxIdentifier = itemTrimmed.lastIndexOf(" ");
       if(idxIdentifier < 0) {
-        throw AFException("Expected '$item' to have the form 'type identifier', e.g. 'int count'");
+        throw AFCommandError(error: "Expected '$item' to have the form 'type identifier', e.g. 'int count'");
       }
       final name = itemTrimmed.substring(idxIdentifier+1);
       final kind = itemTrimmed.substring(0, idxIdentifier);
       result[name] = kind;
     }
-    return AFMemberVariableTemplates(nameToType: result);
+
+    // if they specified serial, then make sure they specified an ID.
+    var isIntId = false;
+    if(!args.accessNamedFlag(AFGenerateStateSubcommand.argNotSerial) && !isRoot) {
+      var idType = result[AFDocumentIDGenerator.columnId];
+      if(idType == "int") {
+        isIntId = true;
+        result[AFDocumentIDGenerator.columnId]= "String";
+        context.output.writeTwoColumns(col1: "info ", col2: "Converting 'int id' to a String on the client, so that String test ids can be used");
+      }
+      final errIdColumn = "You must either specify --${AFGenerateStateSubcommand.argNotSerial}, or you must specify a --${AFGenerateSubcommand.argMemberVariables} containing either 'String ${AFDocumentIDGenerator.columnId}' or 'int ${AFDocumentIDGenerator.columnId}'";
+
+      if(idType == null) {
+        throw AFCommandError(error: errIdColumn);
+      }
+
+      if(idType != "int" && idType != "String") {
+        throw AFCommandError(error: errIdColumn);
+      }
+    }
+
+    if(result.isEmpty) {
+      return null;
+    }
+
+    return AFMemberVariableTemplates(nameToType: result, isIntId: isIntId, mainType: mainType);
   }
 
   void setProjectStyle(String projectStyle) {
@@ -1009,6 +1084,13 @@ class AFCommandRunner {
     return commands;
   }
 
+  void _handleError(AFCommandContext context, AFCommandError e, AFCommand cmd) {
+    if(!context.isRootCommand) {
+      throw AFCommandError(error: e.error, usage: e.usage);
+    }
+    printUsage(error: e.error, command: cmd);
+  }
+
   Future<void> run(AFCommandContext ctx) async {
     final args = ctx.arguments.arguments;
     if(args.isEmpty) {
@@ -1023,6 +1105,7 @@ class AFCommandRunner {
       return;
     }
 
+    
     if(command.subcommands.isNotEmpty) {
       if(args.length < 2) {
         printUsage(error: "Command $commandName expects a subcommand", command: command);
@@ -1035,10 +1118,18 @@ class AFCommandRunner {
         return;
       }
       ctx.setCommandArgCount(2);
-      subcommand.run(ctx);
+      try {
+        await subcommand.run(ctx);
+      } on AFCommandError catch(e) {
+        _handleError(ctx, e, subcommand);
+      }
     } else {
       ctx.setCommandArgCount(1);
-      await command.run(ctx);
+      try {
+        await command.run(ctx);
+      } on AFCommandError catch(e) {
+        _handleError(ctx, e, command);
+      }
     }
   }
 
@@ -1064,7 +1155,7 @@ Available Commands
     }
 
     if(error != null) {
-      result.write("$error\n");
+      result.write("\nERROR: $error\n");
     }
     print(result.toString());
   }
@@ -1155,19 +1246,7 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
     );
 
     Future<void> execute(AFCommandContext context) async {
-      final output = context.output;
-      try {
-        await commands.run(context);
-      } on AFCommandError catch(e) {
-        if(!context.isRootCommand) {
-          throw AFCommandError(error: e.error, usage: e.usage);
-        }
-        final usage = e.usage;
-        if(usage != null && usage.isNotEmpty) {
-          output.writeLine(usage);
-        }
-        output.writeErrorLine(e.error);
-      }
+      await commands.run(context);
     }
 
 

@@ -1,5 +1,4 @@
 import 'package:afib/afib_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/screen_test.t.dart';

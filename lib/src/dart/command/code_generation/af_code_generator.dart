@@ -912,6 +912,11 @@ class AFCodeGenerator {
     return "${first.toUpperCase()}${convert.substring(1)}";
   }
 
+  static List<String> splitMixedCase(String convert) {
+    final spaces = convertMixedToSpaces(convert);
+    return spaces.split(" ");
+  }
+
 
   static String convertSnakeToMixed(String convert, { bool upcaseFirst = false } ) {
     final sb = StringBuffer();

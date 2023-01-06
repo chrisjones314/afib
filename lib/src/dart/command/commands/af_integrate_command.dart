@@ -8,8 +8,6 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_fro
 class AFIntegrateCommand extends AFCommand { 
   final name = "integrate";
   final description = "integrate a third-party library, or the second part of a project style";
-  static const argPackageName = "package-name";
-  static const argPackageCode = "package-code";
   static const kindLibrary = "library";
   static const kindProjectStyle = "project-style";
 
@@ -26,8 +24,8 @@ $descriptionHeader
 
 $optionsHeader
   $kindLibrary
-    --$argPackageName - the package name for the library, e.g. afib_signin
-    --$argPackageCode - the 3-5 letter all lowercase code the library uses.  This value
+    --${AFCreateAppCommand.argPackageName} - the package name for the library, e.g. afib_signin
+    --${AFCreateAppCommand.argPackageCode} - the 3-5 letter all lowercase code the library uses.  This value
       is declared in the library's xxx_config.g.dart file, it is not a
       value that you get to choose.  For example, for afib_signin it is AFSI.
       The library's installation instructions should tell you this value.
@@ -41,8 +39,8 @@ $optionsHeader
     final args = context.parseArguments(
       command: this, 
       named: {
-        argPackageName: "",
-        argPackageCode: "",
+        AFCreateAppCommand.argPackageName: "",
+        AFCreateAppCommand.argPackageCode: "",
       }
     );
 
@@ -79,10 +77,10 @@ $optionsHeader
   }
 
   Future<void> _integrateLibrary(AFCommandContext context, AFCommandArgumentsParsed args) async {
-    final packageName = args.accessNamed(argPackageName);
-    final packageCode = args.accessNamed(argPackageCode);
-    verifyNotEmpty(packageName, "You must specify --$argPackageName");
-    verifyNotEmpty(packageCode, "You must specify --$argPackageCode");
+    final packageName = args.accessNamed(AFCreateAppCommand.argPackageName);
+    final packageCode = args.accessNamed(AFCreateAppCommand.argPackageCode);
+    verifyNotEmpty(packageName, "You must specify --${AFCreateAppCommand.argPackageName}");
+    verifyNotEmpty(packageCode, "You must specify --${AFCreateAppCommand.argPackageCode}");
 
     _verifyPubspecContains(context, packageName);
 

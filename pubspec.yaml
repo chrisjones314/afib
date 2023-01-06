@@ -23,6 +23,7 @@ dependencies:
   stack_trace: ^1.10.0
   pubspec_parse: ^1.2.0
   args: ^2.3.0
+  plural_noun: ^0.1.2
   
 dev_dependencies:
   flutter_test:

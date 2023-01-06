@@ -1,8 +1,6 @@
 
 
 import 'package:afib/afib_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/core/files/lpi.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
@@ -17,9 +15,13 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_fro
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_initial_state_model_function.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_invoke_initial_state.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_serial_methods.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_standard_root_methods.t.dart';
+import 'package:plural_noun/plural_noun.dart';
 
 class AFGenerateStateSubcommand extends AFGenerateSubcommand {
-  static const argSerial = "serial";
+  static const argNotSerial = "not-serial";
+  static const argNoReviseMethods = "no-revise-methods";
+  static const argStandardRoot = "add-standard-root";
 
   AFGenerateStateSubcommand();
   
@@ -42,17 +44,23 @@ $descriptionHeader
   If your identifer does not end with any special suffix, creates a new immutable model object under state/models, generally these objects are referenced under on of your root models.
 
 $optionsHeader
-  for Roots and Simple Models
+  For Root States or Simple Models
     ${AFGenerateSubcommand.argMemberVariablesHelp} 
-    --$argSerial - Include if you'd like to automatically generate standard serialization methods
-  --${AFGenerateUISubcommand.argTheme} The type of the theme to use, defaults to your default theme
-  --$argExportTemplatesHelp
-  --$argOverrideTemplatesHelp
-  ${AFCommand.argPrivateOptionHelp}    
+
+  For Simple Models Only
+    --$argStandardRoot - Add if you want to also generate a standard root containing a map of String ids to objects of this model.
+    --$argNoReviseMethods - Include if you do not want to generate default revise methods for each member variable 
+    --$argNotSerial - Include if you do not want to generate standard serialization methods
+  
+  For State Views
+    --${AFGenerateUISubcommand.argTheme} The type of the theme to use, defaults to your default theme
+
+  Standard Options
+    --$argExportTemplatesHelp
+    --$argOverrideTemplatesHelp
+    ${AFCommand.argPrivateOptionHelp}    
 ''';
   }
-
-  
 
   @override
   Future<void> execute(AFCommandContext context) async {
@@ -62,28 +70,30 @@ $optionsHeader
       unnamedCount: 1, 
       named: {
         AFGenerateUISubcommand.argTheme: context.generator.nameDefaultTheme,
-        argSerial: "false",
+        argNotSerial: "false",
+        argNoReviseMethods: "false",
         AFGenerateSubcommand.argMemberVariables: "",
+        AFGenerateStateSubcommand.argStandardRoot: "false",
       }
     );
 
     final modelName = args.accessUnnamedFirst;
 
     verifyMixedCase(modelName, "model name");
-    generateStateStatic(context, modelName, args);
+    await generateStateStatic(context, modelName, args);
 
     // replace any default 
     context.generator.finalizeAndWriteFiles(context);
 
   }
 
-  static void generateStateStatic(AFCommandContext context, String identifier, AFCommandArgumentsParsed args) {
+  Future<void> generateStateStatic(AFCommandContext context, String identifier, AFCommandArgumentsParsed args) async {
     if(identifier.endsWith(AFCodeGenerator.lpiSuffix)) {
       generateLPIStatic(context, identifier, args);
     } else if(identifier.endsWith(AFCodeGenerator.stateViewSuffix)) {
       _generateStateViewStatic(context, identifier, args);
     } else {
-      _generateModelStatic(context, identifier, args);    
+      await _generateModelStatic(context, identifier, args);    
     }
   }
 
@@ -142,15 +152,22 @@ $optionsHeader
   }
 
   
-  static void _generateModelStatic(AFCommandContext context, String identifier, AFCommandArgumentsParsed args) {
+  Future<void> _generateModelStatic(AFCommandContext context, String identifier, AFCommandArgumentsParsed args) async {
     
     // generate the model file itself.
     final generator = context.generator;
     final isRoot = identifier.endsWith(AFCodeGenerator.rootSuffix);
     final modelPath = generator.pathModel(identifier);
+    final isAddStandardRoot = args.accessNamedFlag(AFGenerateStateSubcommand.argStandardRoot);
     var identifierNoRoot = identifier;
+    var identifierNoRootOriginal = identifier;
     if(identifierNoRoot.endsWith("Root")) {
       identifierNoRoot = identifierNoRoot.substring(0, identifierNoRoot.length-4);
+      identifierNoRootOriginal = identifierNoRoot;
+    }
+    final argAddStandard = args.accessNamed(argStandardRoot);
+    if(argAddStandard != "true" && isRoot) {
+      identifierNoRoot = argAddStandard;
     }
 
     final modelInsertions = context.coreInsertions.reviseAugment({
@@ -158,16 +175,35 @@ $optionsHeader
       AFSourceTemplate.insertMainTypeNoRootInsertion: identifierNoRoot,
     });
 
-    final memberVariables = context.memberVariables(args);
+    var memberVariables = context.memberVariables(context, args, identifier);
 
     Object snippetSerial = AFSourceTemplate.empty;
     Object serialConstants = AFSourceTemplate.empty;
-    if(memberVariables != null && args.accessNamedFlag(AFGenerateStateSubcommand.argSerial)) {
+    Object standardReviseMethods = AFSourceTemplate.empty;
+    Object superclassSyntax = AFSourceTemplate.empty;
+    Object standardRootMethods = AFSourceTemplate.empty;
+    Object superCall = AFSourceTemplate.empty;
+    if(isRoot && isAddStandardRoot) {
+      if(memberVariables == null) {
+        memberVariables = AFMemberVariableTemplates.createEmpty(mainType: identifier);
+      }
+      memberVariables.setStandardRootMapType(identifierNoRoot);
+
+      superclassSyntax = "extends AFStandardIDMapRoot<$identifier, $identifierNoRoot>";
+      standardRootMethods = context.createSnippet(SnippetStandardRootMethodsT(), extend: modelInsertions);
+      superCall = ": super(items: items)";
+    }
+
+    final isRootWithAddStandardRoot = isRoot && isAddStandardRoot;
+    if(memberVariables != null && !args.accessNamedFlag(AFGenerateStateSubcommand.argNotSerial) && !isRootWithAddStandardRoot) {
       snippetSerial = context.createSnippet(SnippetSerialMethodsT.core(
-        serializeFrom: memberVariables.serializeFrom(identifier), 
+        serializeFrom: memberVariables.serializeFrom, 
         serializeTo: memberVariables.serializeTo
       ));
-      serialConstants = memberVariables.serialConstants(identifier);
+      serialConstants = memberVariables.serialConstants;
+    }
+    if(memberVariables != null && !args.accessNamedFlag(AFGenerateStateSubcommand.argNoReviseMethods)) {
+      standardReviseMethods = memberVariables.standardReviseMethods;
     }
 
     final memberVariableImports = memberVariables?.extraImports(context) ?? AFSourceTemplate.empty;
@@ -180,6 +216,10 @@ $optionsHeader
       serialMethods: snippetSerial,
       serialConstants: serialConstants,
       memberVariableImports: memberVariableImports,
+      standardReviseMethods: standardReviseMethods,
+      standardRootMethods: standardRootMethods,
+      superclassSyntax: superclassSyntax,
+      superCall: superCall,
     );
 
     final modelFile = context.createFile(modelPath, modelt, extend: modelInsertions, insertions: {
@@ -237,7 +277,9 @@ $optionsHeader
       final pathStateViewAccess = generator.pathStateViewAccess();
       final accessFile = generator.modifyFile(context, pathStateViewAccess);
       final regexMixinStart = AFCodeRegExp.startMixinStateAccess;
-      final declareAccess = context.createSnippet(SnippetDeclareModelAccessorT(), extend: modelInsertions);
+      final declareAccess = context.createSnippet(SnippetDeclareModelAccessorT(), extend: modelInsertions, insertions: {
+        AFSourceTemplate.insertMainTypeNoRootInsertion: identifierNoRootOriginal,
+      });
       accessFile.addLinesAfter(context, regexMixinStart, declareAccess.lines);
 
       final declareImport = SnippetImportFromPackageT().toBuffer(context, insertions: {
@@ -251,6 +293,16 @@ $optionsHeader
     generator.addExportsForFiles(context, args, [
       modelFile
     ]);
+
+    // if this is a model, and they want a standard root, then we need to forumulate a sub-command to generate it.
+    if(!isRoot && isAddStandardRoot) {
+      final tokens = AFCodeGenerator.splitMixedCase(identifier);
+      final pluralLast = PluralRules().convertToPluralNoun(tokens.last);
+      tokens[tokens.length-1] = pluralLast;
+      final pluralIdentifier = tokens.join("");
+      final cmd = "generate state ${pluralIdentifier}Root --$argStandardRoot $identifier";
+      await context.executeSubCommand(cmd, context.coreInsertions);
+    }
 
   }
 

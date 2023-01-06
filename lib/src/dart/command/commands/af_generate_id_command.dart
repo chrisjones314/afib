@@ -1,6 +1,6 @@
 
 
-import 'package:afib/afib_command.dart';
+import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 

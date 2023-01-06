@@ -1,7 +1,6 @@
 
 
 import 'package:afib/afib_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/core/files/state_test.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/unit_test.t.dart';

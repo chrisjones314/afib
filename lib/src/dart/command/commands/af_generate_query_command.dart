@@ -1,8 +1,6 @@
 
 
 import 'package:afib/afib_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_command.dart';
-import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_query_shutdown_method.t.dart';
 
 class AFGenerateQuerySubcommand extends AFGenerateSubcommand {
@@ -105,7 +103,7 @@ $optionsHeader
     AFSourceTemplate? overrideTemplate,
   }) {
     final rootStateType = args.accessNamed(argRootStateType);
-    final memberVariables = context.memberVariables(args);
+    final memberVariables = context.memberVariables(context, args, rootStateType);
 
     AFSourceTemplate queryTemplate = SimpleQueryT.core();
     var queryParentType = "AFAsyncQuery";

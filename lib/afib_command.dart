@@ -22,6 +22,7 @@ export 'src/dart/command/commands/af_generate_query_command.dart';
 export 'src/dart/command/commands/af_generate_state_command.dart';
 export 'src/dart/command/commands/af_generate_ui_command.dart';
 export 'src/dart/command/templates/core/files/queries.t.dart';
+export 'src/dart/redux/state/models/af_standard_id_map_root.dart';
 export 'src/dart/redux/state/models/af_time_state.dart';
 export "src/dart/utils/af_config.dart";
 export 'src/dart/utils/af_config_entries.dart';

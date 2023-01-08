@@ -93,22 +93,22 @@ class AFFundamentalDeviceTheme {
   }
 
   Brightness brightness(AFFundamentalThemeState fundamentals) {
-    final b = fundamentals.findValue(AFUIThemeID.brightness) as Brightness?;
+    final b = fundamentals.findValue<Brightness>(AFUIThemeID.brightness);
     return b ?? brightnessValue;
   }
 
   bool alwaysUse24HourFormat(AFFundamentalThemeState fundamentals) {
-    final b = fundamentals.findValue(AFUIThemeID.alwaysUse24HourFormat) as bool?;
+    final b = fundamentals.findValue<bool>(AFUIThemeID.alwaysUse24HourFormat);
     return b ?? alwaysUse24HourFormatValue;
   }
 
   Locale locale(AFFundamentalThemeState fundamentals) {
-    final l = fundamentals.findValue(AFUIThemeID.locale) as Locale?;
+    final l = fundamentals.findValue<Locale>(AFUIThemeID.locale);
     return l ?? localeValue;
   }
 
   double textScaleFactor(AFFundamentalThemeState fundamentals) {
-    final ts = fundamentals.findValue(AFUIThemeID.textScaleFactor) as double?;
+    final ts = fundamentals.findValue<double>(AFUIThemeID.textScaleFactor);
     return ts ?? textScaleFactorValue;
   }
 }
@@ -769,11 +769,14 @@ class AFAppFundamentalThemeAreaBuilder extends AFUILibraryFundamentalThemeAreaBu
     IconData iconNavDown = Icons.chevron_right,
     Color colorTapableText = Colors.blue,
     AFConvertSizeToFormFactorDelegate convertFormFactor = AFAppFundamentalThemeAreaBuilder.convertFormFactor,
+    Color? colorAlert,
+    Color colorOnAlert = Colors.white,
   }) {
     assert(marginSizes.length == bootstrapStandardMargins.length);
     assert(paddingSizes.length == bootstrapStandardPadding.length);
     assert(borderRadiusSizes.length == bootstrapStandardBorderRadius.length);
     //assert(formFactorLimits.length == afFormFactorMinimums.length);
+    colorAlert ??= Colors.amber[900];
 
     // icons
     setValue(AFUIThemeID.marginSizes, marginSizes);
@@ -783,6 +786,8 @@ class AFAppFundamentalThemeAreaBuilder extends AFUILibraryFundamentalThemeAreaBu
     setValue(AFUIThemeID.iconNavDown, iconNavDown);
     setValue(AFUIThemeID.colorTapableText, colorTapableText);
     setValue(AFUIThemeID.formFactorDelegate, convertFormFactor);
+    setValue(AFUIThemeID.colorAlert, colorAlert);
+    setValue(AFUIThemeID.colorOnAlert, colorOnAlert);
   }
 
 
@@ -1637,19 +1642,19 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   Color get colorPrimaryDarker {
-    return fundamentals.findValue(AFUIThemeID.colorPrimaryDarker) as Color? ?? colorPrimary;
+    return fundamentals.findValue<Color>(AFUIThemeID.colorPrimaryDarker) ?? colorPrimary;
   }
 
   Color get colorPrimaryLighter {
-    return fundamentals.findValue(AFUIThemeID.colorPrimaryLighter) as Color? ?? colorPrimary;
+    return fundamentals.findValue<Color>(AFUIThemeID.colorPrimaryLighter) ?? colorPrimary;
   }
 
   Color get colorAlert {
-    return fundamentals.findValue(AFUIThemeID.colorAlert) as Color? ?? colorPrimary;
+    return fundamentals.findValue<Color>(AFUIThemeID.colorAlert) ?? colorPrimary;
   }
 
   Color get colorOnAlert {
-    return fundamentals.findValue(AFUIThemeID.colorOnAlert) as Color? ?? colorPrimary;
+    return fundamentals.findValue<Color>(AFUIThemeID.colorOnAlert) ?? colorPrimary;
   }
 
   Color get colorWhite {

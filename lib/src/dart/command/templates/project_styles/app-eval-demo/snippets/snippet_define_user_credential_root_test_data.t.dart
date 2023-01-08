@@ -10,16 +10,19 @@ class SnippetDefineUserCredentialRootTestDataT {
       templateFileId: "define_user_credential_root_test_data",
       templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+        AFSourceTemplate.insertExtraImportsInsertion: '''
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/user.dart';
+''',
         SnippetDefineTestDataT.insertModelDeclaration: '''
 // this was previously defined, so we can access it
-final userWC = context.find<ReferencedUser>(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserWestCoast);
+final userWC = context.find<User>(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.userWestCoast);
 final userCredWC = UserCredentialRoot(
   userId: userWC.id,
   token: UserCredentialRoot.notSpecified,
   storedEmail: userWC.email,
 );
 
-final userEC = context.find<ReferencedUser>(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.referencedUserEastCoast);
+final userEC = context.find<User>(${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.userEastCoast);
 final userCredEC = UserCredentialRoot(
   userId: userEC.id,
   token: UserCredentialRoot.notSpecified,

@@ -20,7 +20,9 @@ abstract class AFGenerateSubcommand extends AFCommand {
   static const argExportTemplatesHelpStatic = "$argOverrideTemplatesFlag - A comma separated list of assignments (.e.g x=y) with the template path on the right overriding that on the left (e.g 'core/query_simple=examples/query_write_count,...')";
   static const argForceOverwriteHelpStatic = "$argForceOverwrite - specify if you'd like the command to overwrite existing files";
   static const argMemberVariables = "member-variables";
+  static const argResolveVariables = "resolve-variables";
   static const argMemberVariablesHelp = "--$argMemberVariables - A semi-colon separated list of member variables, which are automatically carried through to copyWith, etc.";
+  static const argResolveVariablesHelp = "--$argResolveVariables - A semi-colon separated list of member variables, of the form 'ModelType variable;...' which is actually represented as a String id and a resolve method";
 
 
   String get argExportTemplates => argExportTemplatesFlag;

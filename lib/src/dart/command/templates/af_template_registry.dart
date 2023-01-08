@@ -27,11 +27,11 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_widget_rou
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_wireframe_body.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_wireframe_impl.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo.t.dart';
-import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/files/model_count_history_entry.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/files/model_count_history_item.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/files/model_count_history_root.t.dart';
-import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/files/model_referenced_user.t.dart';
-import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/files/model_referenced_users_root.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/files/model_user.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/files/model_user_credential_root.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/files/model_users_root.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/files/query_check_signin.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/files/query_read_count_history.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/files/query_read_referenced_user.t.dart';
@@ -113,7 +113,8 @@ class AFTemplateRegistry {
     registerFile(SimpleQueryT.core());
     registerFile(DeferredQueryT.core());
     registerFile(IsolateQueryT.core());
-    registerFile(ModelT.core());
+    registerFile(ModelT.core(isRoot: true));
+    registerFile(ModelT.core(isRoot: false));
     registerFile(CommandAFibT());
     registerFile(LibraryExportsT());
     registerFile(InstallBaseT());
@@ -151,12 +152,12 @@ class AFTemplateRegistry {
     // start-here example
     registerFile(StartHereThemeT.example());
     registerFile(ModelCountHistoryRootT.example());
-    registerFile(ModelCountHistoryEntryT.example());
-    registerFile(ModelReferencedUserT.example());
-    registerFile(ModelReferencedUsersRootT.example());
+    registerFile(ModelCountHistoryItemT.example());
+    registerFile(ModelUserT.example());
+    registerFile(ModelUsersRootT.example());
     registerFile(ModelUserCredentialRootT.example());
-    registerFile(QueryReadReferencedUserT.example());
-    registerFile(QueryWriteCountHistoryEntryT.example());
+    registerFile(QueryReadUserT.example());
+    registerFile(QueryWriteCountHistoryItemT.example());
     registerFile(QueryReadCountHistoryT.example());
     registerFile(QueryStartHereStartupT.example());
     registerFile(StartHereThemeT.example());
@@ -193,7 +194,7 @@ class AFTemplateRegistry {
 
     registerSnippet(SnippetStartupStateTestT());
     registerSnippet(SnippetDefineCountHistoryRootTestDataT.example());
-    registerSnippet(SnippetDefineReferencedUsersRootTestDataT.example());
+    registerSnippet(SnippetDefineUsersRootTestDataT.example());
     registerSnippet(SnippetInitialWireframeBodyT());
 
     // starter-signin example
@@ -203,7 +204,7 @@ class AFTemplateRegistry {
     registerFile(QuerySigninSigninStarterT.example());
     registerFile(QuerySigninSignoutStarterT.example());
     registerFile(QueryRegistrationSigninStarterT.example());
-    registerFile(StarterSigninModelReferencedUserT.example());
+    registerFile(StarterSigninModelUserT.example());
     registerFile(QueryReadUserSigninStarterT.example());
     registerFile(QueryWriteUserSigninStarterT.example());
     registerFile(StarterSigninThemeSigninT.example());

@@ -22,10 +22,10 @@ class QueryCheckSigninT extends QueryExampleStartHereT {
       insertExtraImports: '''
 import 'package:afib/afib_flutter.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/count_history_root.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/count_history_items_root.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/read_count_history_query.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/read_referenced_user_query.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/read_user_query.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_credential_root.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/home_page_screen.dart';
 
@@ -33,7 +33,7 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/home_p
       insertStartImpl: '''
 final db = await ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.accessDB();
 
-final signedIn = db.select("SELECT * from \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableUserCredential}");
+final signedIn = db.select("SELECT * from \${UserCredentialRoot.tableName}");
 if(signedIn.isEmpty) {
   context.onError(AFQueryError(message: "Error: No signed in user?"));
 } else {
@@ -42,11 +42,11 @@ if(signedIn.isEmpty) {
   if(entries == null) {
     throw AFException("No table column map?");
   }
-  final values = entries[${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableUserCredential];
+  final values = entries[UserCredentialRoot.tableName];
   if(values == null) {
     throw AFException("No users table?");
   }
-  final id = values[${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colActiveUserId].toString();
+  final id = values[UserCredentialRoot.colUserId].toString();
 
   context.onSuccess(UserCredentialRoot(
     userId: id.toString(),
@@ -64,7 +64,7 @@ context.updateComponentRootStateOne<${AFSourceTemplate.insertAppNamespaceInserti
 if(cred.isSignedIn) {
   // load in the user record for this user.
   final startupLoad = AFCompositeQuery.createList();
-  startupLoad.add(ReadReferencedUserQuery(userId: cred.userId));
+  startupLoad.add(ReadUserQuery(userId: cred.userId));
   startupLoad.add(ReadCountHistoryQuery(userId: cred.userId));
   
   context.executeQuery(AFCompositeQuery.createFrom(

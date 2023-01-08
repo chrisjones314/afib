@@ -90,7 +90,15 @@ class SnippetFundamentalThemeInitT extends AFSnippetSourceTemplate {
     textThemeLight: themeLight,
   ); 
 
+  // TODO: This function takes many parameters with default values.   Look
+  // at its documentation, and customize those values
   primary.setAfibFundamentals();
+
+  // You can also create custom theme ids values of any type (not just colors),
+  // and then access them from within your STFBDefaultTheme using 
+  // fundamentals.findValue<YourType>(STFBThemeID.exampleCustom)
+  primary.setValue(STFBThemeID.exampleCustom, Colors.yellow);
+  
 
   primary.setTranslations(AFUILocaleID.englishUS, {
     AFUITranslationID.appTitle: "${insertPackageName.spaces}",

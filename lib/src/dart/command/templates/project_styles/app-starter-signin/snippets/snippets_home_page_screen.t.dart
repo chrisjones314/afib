@@ -13,7 +13,7 @@ class SnippetSigninStarterHomePageScreenExtraImportsT {
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertExtraImportsInsertion: '''
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signout_query.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/referenced_user.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/user.dart';
 ''',
       })
     );
@@ -86,8 +86,8 @@ String get storedEmail {
   return context.s.userCredential.storedEmail;
 }
 
-ReferencedUser get activeUser {
-  final result = context.s.referencedUsers.findById(userId);
+User get activeUser {
+  final result = context.s.users.findById(userId);
   if(result == null) {
     throw AFException("No active user?");
   }

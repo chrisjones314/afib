@@ -47,7 +47,7 @@ import 'package:$insertPackagePath/ui/widgets/registration_details_widget.dart';
 import 'package:$insertPackagePath/query/simple/registration_query.dart';
 import 'package:$insertPackagePath/query/simple/write_one_user_query.dart';
 import 'package:$insertPackagePath/${insertAppNamespace}_id.dart';
-import 'package:$insertPackagePath/state/models/referenced_user.dart';
+import 'package:$insertPackagePath/state/models/user.dart';
 import 'package:$insertPackagePath/state/root/user_credential_root.dart';
 import 'package:$insertPackagePath/test/${insertAppNamespace}_state_test_shortcuts.dart';
 $insertExtraImports
@@ -57,9 +57,9 @@ void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
 
   // I don't like hard-coding values in tests.  You can access test data here
   // to avoid it.
-  final westCoastUser = definitions.find<ReferencedUser>(${insertAppNamespaceUpper}TestDataID.referencedUserWestCoast);
-  final eastCoastUser = definitions.find<ReferencedUser>(${insertAppNamespaceUpper}TestDataID.referencedUserEastCoast);
-  final midwestUser = definitions.find<ReferencedUser>(${insertAppNamespaceUpper}TestDataID.referencedUserMidwest);
+  final westCoastUser = definitions.find<User>(${insertAppNamespaceUpper}TestDataID.userWestCoast);
+  final eastCoastUser = definitions.find<User>(${insertAppNamespaceUpper}TestDataID.userEastCoast);
+  final midwestUser = definitions.find<User>(${insertAppNamespaceUpper}TestDataID.userMidwest);
 
   definitions.addTest(${insertAppNamespaceUpper}StateTestID.alreadyLoggedInWestCoast, extendTest: null, body: (testContext) {
     testContext.defineInitialTime(AFTimeState.createNow());
@@ -70,7 +70,7 @@ void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
     // note that this query is the start of what would likely be many queries that pull back application
     // specific data.  As the list of query responses defined here grows, it will be nice to extend this test
     // and inherit all these definitions.
-    testContext.defineQueryResponseFixed<$insertReadUserQuery>(${insertAppNamespaceUpper}TestDataID.referencedUserWestCoast);
+    testContext.defineQueryResponseFixed<$insertReadUserQuery>(${insertAppNamespaceUpper}TestDataID.userWestCoast);
 
     // This is necessary in case you decide to click the signout button.   Note that if this seems duplicative
     // with the current implementation of SignoutQuery.startAsync, that is because that implementation would normally
@@ -102,7 +102,7 @@ void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
     // that override some of the test data (for example, different todo list content), while leaving other data constant (for example,
     // the user settings).
     testContext.defineQueryResponseFixed<$insertCheckSigninQuery>(${insertAppNamespaceUpper}TestDataID.userCredentialEastCoast);
-    testContext.defineQueryResponseFixed<$insertReadUserQuery>(${insertAppNamespaceUpper}TestDataID.referencedUserEastCoast);
+    testContext.defineQueryResponseFixed<$insertReadUserQuery>(${insertAppNamespaceUpper}TestDataID.userEastCoast);
     testContext.defineQueryResponseFixed<SigninQuery>(${insertAppNamespaceUpper}TestDataID.userCredentialEastCoast);
   });
 
@@ -191,7 +191,7 @@ void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
 
     // this does one simple validation, as this app has no business functionality to validate, but you would begin building
     // more validations/manipulatings in tests like this.
-    final expectedUser = definitions.find<ReferencedUser>(${insertAppNamespaceUpper}TestDataID.referencedUserWestCoast);
+    final expectedUser = definitions.find<User>(${insertAppNamespaceUpper}TestDataID.userWestCoast);
     homeScreen.executeScreen((e, screenContext) { 
       screenContext.executeBuild((spi) { 
         e.expect(spi.activeUser.firstName, ft.equals(expectedUser.firstName));

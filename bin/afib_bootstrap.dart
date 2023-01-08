@@ -6,11 +6,7 @@ void main(List<String> argsIn) {
   final emptyParams = AFDartParams.createEmpty();
   final argsFull = AFArgs.create(argsIn);
   
-  //argsFull.setDebugArgs("create app signin_test st --project-style eval-demo");
-  //argsFull.setDebugArgs("create app signin_test st --project-style starter-minimal");
-  //argsFull.setDebugArgs("create app signin_test st --project-style starter-signin");
-  //argsFull.setDebugArgs("create app signinfb_test stfb --project-style app-starter-minimal");
-  //argsFull.setDebugArgs("create state_library afib_firebase_firestore affs --project-style statelib-starter-minimal");
+  argsFull.setDebugArgs("create app --package-name signinfb_test --package-code stfb --project-style app-eval-demo");
 
   afBootstrapCommandMain(emptyParams, argsFull);
 }

@@ -20,14 +20,15 @@ class QueryReadCountHistoryT extends QueryExampleStartHereT {
     return QueryReadCountHistoryT(
       insertExtraImports: '''
 import 'dart:async';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/count_history_root.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/count_history_items_root.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/count_history_item.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
 ''',
       insertStartImpl: '''
 final db = await ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.accessDB();
 final uid = int.tryParse(userId);
-final dbResults = db.select("SELECT * from \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableCountHistory} where \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colUserId} = ?", [uid]);
-final result = CountHistoryRoot.fromDB(dbResults);
+final dbResults = db.select("SELECT * from \${CountHistoryItem.tableName} where \${CountHistoryItem.colUserId} = ?", [uid]);
+final result = CountHistoryItemsRoot.fromDB(dbResults);
 context.onSuccess(result);
 ''',
       insertFinishImpl: '''

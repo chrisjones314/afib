@@ -11,14 +11,14 @@ class SnippetStartupStateTestT extends AFSnippetSourceTemplate {
   List<String> get extraImports {
     return [
 "import 'package:$insertPackagePath/query/simple/read_count_history_query.dart';",
-"import 'package:$insertPackagePath/query/simple/read_referenced_user_query.dart';",
+"import 'package:$insertPackagePath/query/simple/read_user_query.dart';",
 "import 'package:$insertPackagePath/query/simple/startup_query.dart';",
 "import 'package:$insertPackagePath/query/simple/check_signin_query.dart';",
-"import 'package:$insertPackagePath/query/simple/write_count_history_entry_query.dart';",
-"import 'package:$insertPackagePath/state/models/count_history_entry.dart';",
+"import 'package:$insertPackagePath/query/simple/write_count_history_item_query.dart';",
+"import 'package:$insertPackagePath/state/models/count_history_item.dart';",
 "import 'package:$insertPackagePath/test/${insertAppNamespace}_state_test_shortcuts.dart';",
 "import 'package:$insertPackagePath/query/simple/reset_history_query.dart';",
-"import 'package:$insertPackagePath/state/root/count_history_root.dart';",
+"import 'package:$insertPackagePath/state/root/count_history_items_root.dart';",
 
     ];
   }
@@ -27,12 +27,12 @@ class SnippetStartupStateTestT extends AFSnippetSourceTemplate {
   String get template => '''
 testContext.defineQueryResponseUnused<StartupQuery>();
 testContext.defineQueryResponseFixed<CheckSigninQuery>(${insertAppNamespaceUpper}TestDataID.userCredentialWestCoast);
-testContext.defineQueryResponseFixed<ReadReferencedUserQuery>(${insertAppNamespaceUpper}TestDataID.referencedUserWestCoast);
+testContext.defineQueryResponseFixed<ReadUserQuery>(${insertAppNamespaceUpper}TestDataID.userWestCoast);
 testContext.defineQueryResponseFixed<ReadCountHistoryQuery>(${insertAppNamespaceUpper}TestDataID.countHistoryWestCoast);
-testContext.defineQueryResponseFixed<ResetHistoryQuery>(CountHistoryRoot.initialState());
-testContext.defineQueryResponseDynamic<WriteCountHistoryEntryQuery>(body: (context, query) {
-    final entry = query.entry;
-    CountHistoryEntry result;
+testContext.defineQueryResponseFixed<ResetHistoryQuery>(CountHistoryItemsRoot.initialState());
+testContext.defineQueryResponseDynamic<WriteCountHistoryItemQuery>(body: (context, query) {
+    final entry = query.item;
+    CountHistoryItem result;
     if(AFDocumentIDGenerator.isNewId(entry.id)) {
       result = entry.copyWith(id: AFDocumentIDGenerator.createTestIdIncreasing("count_statetest"));
     } else {

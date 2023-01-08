@@ -61,6 +61,7 @@ $optionsHeader
         argExportTemplates: "false",
         argOverrideTemplates: "",
         AFGenerateSubcommand.argMemberVariables: "",
+        AFGenerateSubcommand.argResolveVariables: "",
       }
     );
 
@@ -103,7 +104,7 @@ $optionsHeader
     AFSourceTemplate? overrideTemplate,
   }) {
     final rootStateType = args.accessNamed(argRootStateType);
-    final memberVariables = context.memberVariables(context, args, rootStateType);
+    final memberVariables = context.memberVariables(context, args, queryType);
 
     AFSourceTemplate queryTemplate = SimpleQueryT.core();
     var queryParentType = "AFAsyncQuery";

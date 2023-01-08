@@ -18,6 +18,7 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:collection/collection.dart';
 import 'package:colorize/colorize.dart';
+import 'package:plural_noun/plural_noun.dart';
 
 class AFCodeGenerator { 
   static const rootSuffix = "Root";
@@ -621,6 +622,13 @@ class AFCodeGenerator {
     output.writeTwoColumns(col1: "success ", col2: "renamed $renamedCount files, created $createdCount files, modified $modifiedCount files, created $createdFolderCount folders");
   }
 
+  static String pluralize(String source) {
+    final tokens = AFCodeGenerator.splitMixedCase(source);
+    final pluralLast = PluralRules().convertToPluralNoun(tokens.last);
+    tokens[tokens.length-1] = pluralLast;
+    final pluralIdentifier = tokens.join("");
+    return pluralIdentifier;
+  }
 
   void _validateNoAFTags(AFCommandContext context, Iterable<AFGeneratedFile> files) {
     for(final file in files) {

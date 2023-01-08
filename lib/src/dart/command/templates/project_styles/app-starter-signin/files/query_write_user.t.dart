@@ -25,7 +25,7 @@ class QueryWriteUserSigninStarterT extends SimpleQueryT {
 import 'package:afib/afib_flutter.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_credential_root.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/referenced_user.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/user.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/read_user_query.dart';
 import 'package:afib_signin/afsi_flutter.dart';
 ''',
@@ -35,7 +35,7 @@ import 'package:afib_signin/afsi_flutter.dart';
 context.onSuccess(user.copyWith());
 ''',
       insertFinishImpl: '''
-ReadUserQuery.onUpdateReferencedUser(context);
+ReadUserQuery.onUpdateUser(context);
 ''',
       insertAdditionalMethods: '''
 '''

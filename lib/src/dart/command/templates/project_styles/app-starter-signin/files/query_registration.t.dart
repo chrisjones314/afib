@@ -28,7 +28,7 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplat
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_credential_root.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/write_one_user_query.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/referenced_user.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/user.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/home_page_screen.dart';
 import 'package:afib_signin/afsi_flutter.dart';
 ''',

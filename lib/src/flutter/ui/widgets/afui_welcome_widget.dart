@@ -22,12 +22,10 @@ class AFUIWelcomeWidgetSPI extends AFUIWidgetSPI<AFUIDefaultStateView, AFRoutePa
 @immutable
 class AFUIWelcomeWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, AFUIDefaultStateView, AFRouteParamUnused> {
   
-  //--------------------------------------------------------------------------------------
   static final config = AFUIDefaultWidgetConfig<AFUIWelcomeWidgetSPI, AFRouteParamUnused> (
     spiCreator: AFUIWelcomeWidgetSPI.create,
   );
 
-  //--------------------------------------------------------------------------------------
   AFUIWelcomeWidget({
     AFScreenID? screenIdOverride,
     AFWidgetID? widOverride,
@@ -38,8 +36,21 @@ class AFUIWelcomeWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, AFUIDe
     launchParam: AFRouteParamUnused.unused,
   );
 
-  @override
-  Widget buildWithSPI(AFUIWelcomeWidgetSPI spi) {
+  Widget _buildAlphaWarningCard(AFUIWelcomeWidgetSPI spi) {
+    final t = spi.t;
+    final rows = t.column();
+    rows.add(t.childText("AFib is alpha software.  Please report bugs on github.", textColor: t.colorOnAlert));
+
+    return Card(
+      color: t.colorAlert,
+      child: t.childMarginStandard(
+        child: Column(children: rows)
+      )
+    );        
+  }
+
+
+  Widget _buildWelcomeCard(AFUIWelcomeWidgetSPI spi) {
     final t = spi.t;
     final rows = t.column();
     rows.add(t.childMargin(
@@ -60,11 +71,23 @@ class AFUIWelcomeWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, AFUIDe
     rows.add(Text("in ${AFibD.config.appNamespace}_config.g.dart", style: t.styleOnCard.bodyText2));
     rows.add(Text("to use prototype mode.", style: t.styleOnCard.bodyText2));
 
-
-    return Card(child: 
-      t.childMargin(
-        margin: t.margin.standard,
+    return Card(
+      child:  t.childMarginStandard(
         child: Column(children: rows)
-      ));
+      )
+    );
+  }
+
+  @override
+  Widget buildWithSPI(AFUIWelcomeWidgetSPI spi) {
+    final t = spi.t;
+    final rows = t.column();
+    rows.add(_buildAlphaWarningCard(spi));
+    rows.add(_buildWelcomeCard(spi));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: rows
+    );
   }
 }

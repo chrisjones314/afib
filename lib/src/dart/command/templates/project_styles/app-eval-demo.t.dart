@@ -11,12 +11,12 @@ class StartHereT extends AFProjectStyleSourceTemplate {
 --override-templates +
   +core/snippets/state_test_impl=project_styles/app-eval-demo/snippets/startup_state_test
 require "meta, sqlite3, path_provider"
-generate id ${insertAppNamespaceUpper}TestDataID.referencedUserWestCoast
-generate id ${insertAppNamespaceUpper}TestDataID.referencedUsersWestCoast
+generate id ${insertAppNamespaceUpper}TestDataID.userWestCoast
+generate id ${insertAppNamespaceUpper}TestDataID.usersWestCoast
 generate id ${insertAppNamespaceUpper}TestDataID.userCredentialWestCoast
-generate id ${insertAppNamespaceUpper}TestDataID.referencedUserEastCoast
+generate id ${insertAppNamespaceUpper}TestDataID.userEastCoast
 generate id ${insertAppNamespaceUpper}TestDataID.userCredentialEastCoast
-generate id ${insertAppNamespaceUpper}TestDataID.referencedUserMidwest
+generate id ${insertAppNamespaceUpper}TestDataID.userMidwest
 generate id ${insertAppNamespaceUpper}WidgetID.buttonSaveTransientCount
 generate id ${insertAppNamespaceUpper}WidgetID.buttonResetHistory
 generate id ${insertAppNamespaceUpper}TestDataID.countHistoryWestCoast
@@ -24,22 +24,22 @@ generate id ${insertAppNamespaceUpper}WidgetID.buttonIHaveNoObjection
 generate id ${insertAppNamespaceUpper}WidgetID.textCurrentStanza
 generate id ${insertAppNamespaceUpper}WidgetID.buttonManageCount
 generate ui ${insertAppNamespaceUpper}DefaultTheme --parent-theme AFFunctionalTheme --parent-theme-id ${insertAppNamespaceUpper}ThemeID.defaultTheme --override-templates "core/files/theme=project_styles/app-eval-demo/files/start_here_theme"
-generate state CountHistoryEntry --override-templates "core/files/model=project_styles/app-eval-demo/files/model_count_history_entry" 
-generate state CountHistoryRoot --override-templates +
-  +core/files/model=project_styles/app-eval-demo/files/model_count_history_root
-  +core/snippets/define_test_data=project_styles/app-eval-demo/snippets/define_count_history_root_test_data
-generate state UserCredentialRoot --override-templates +
-  +core/files/model=project_styles/app-eval-demo/files/model_user_credential_root
-  +core/snippets/define_test_data=project_styles/app-eval-demo/snippets/define_user_credential_root_test_data
-generate state ReferencedUsersRoot --member-variables "Map<String, ReferencedUser> users" --override-templates +
-  +core/files/model=project_styles/app-eval-demo/files/model_referenced_users_root
+generate state User --add-standard-root --member-variables "int id; String firstName; String lastName;String email;String zipCode" --override-templates +
+  +core/files/model=project_styles/app-eval-demo/files/model_user
+  +core/files/model_root=project_styles/app-eval-demo/files/model_users_root
   +core/snippets/define_test_data=project_styles/app-eval-demo/snippets/define_referenced_users_root_test_data
-generate state ReferencedUser --member-variables "String id; String firstName; String lastName;String email;String zipCode" --override-templates "core/files/model=project_styles/app-eval-demo/files/model_referenced_user"
-generate query ReadCountHistoryQuery --result-type CountHistoryRoot --member-variables "String userId" --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_read_count_history"
-generate query ReadReferencedUserQuery --result-type ReferencedUser --member-variables "String userId" --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_read_referenced_user"
-generate query WriteCountHistoryEntryQuery --result-type CountHistoryEntry --member-variables "CountHistoryEntry entry" --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_write_count_history_entry"
+generate state CountHistoryItem --add-standard-root --member-variables "int id; int count;" --resolve-variables "User user;" --override-templates +
+  +core/files/model=project_styles/app-eval-demo/files/model_count_history_item
+  +core/files/model_root=project_styles/app-eval-demo/files/model_count_history_items_root
+  +core/snippets/define_test_data=project_styles/app-eval-demo/snippets/define_count_history_root_test_data
+generate state UserCredentialRoot --member-variables "String storedEmail; String token" --resolve-variables "User user;" --override-templates +
+  +core/files/model_root=project_styles/app-eval-demo/files/model_user_credential_root
+  +core/snippets/define_test_data=project_styles/app-eval-demo/snippets/define_user_credential_root_test_data
+generate query ReadCountHistoryQuery --result-type CountHistoryItemsRoot --member-variables "String userId" --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_read_count_history"
+generate query ReadUserQuery --result-type User --member-variables "String userId" --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_read_user"
+generate query WriteCountHistoryItemQuery --result-type CountHistoryItem --member-variables "CountHistoryItem item" --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_write_count_history_item"
 generate query StartupQuery --result-type AFUnused --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_startup"
-generate query ResetHistoryQuery --result-type CountHistoryRoot --member-variables "String userId" --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_reset_history"
+generate query ResetHistoryQuery --result-type CountHistoryItemsRoot --member-variables "String userId" --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_reset_history"
 generate query CheckSigninQuery --result-type UserCredentialRoot --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_check_signin"
 generate ui StartupScreen --override-templates +
   +core/snippets/screen_build_with_spi_impl=project_styles/app-eval-demo/snippets/startup_screen_build_with_spi

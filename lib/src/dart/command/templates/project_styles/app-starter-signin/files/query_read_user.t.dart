@@ -25,13 +25,13 @@ class QueryReadUserSigninStarterT extends SimpleQueryT {
 import 'package:afib/afib_flutter.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_credential_root.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/referenced_user.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/user.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signin_query.dart';
 import 'package:afib_signin/afsi_flutter.dart';
 ''',
       insertStartImpl: '''
 // TODO: Actually read the user from your data store using on credential.userId.
-context.onSuccess(ReferencedUser(
+context.onSuccess(User(
   id: credential.userId,
   email: 'test@nowwhere.com',
   firstName: "Test",
@@ -40,13 +40,13 @@ context.onSuccess(ReferencedUser(
 ));
 ''',
       insertFinishImpl: '''
-onUpdateReferencedUser(context);
+onUpdateUser(context);
 ''',
       insertAdditionalMethods: '''
-static void onUpdateReferencedUser(AFFinishQuerySuccessContext<ReferencedUser> context) {
+static void onUpdateUser(AFFinishQuerySuccessContext<User> context) {
   final result = context.r;
   final ${AFSourceTemplate.insertAppNamespaceInsertion}State = context.accessComponentState<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>();
-  final users = ${AFSourceTemplate.insertAppNamespaceInsertion}State.referencedUsers;
+  final users = ${AFSourceTemplate.insertAppNamespaceInsertion}State.users;
   final revised = users.reviseUser(result);
   context.updateComponentRootStateOne<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>(revised);    
 }

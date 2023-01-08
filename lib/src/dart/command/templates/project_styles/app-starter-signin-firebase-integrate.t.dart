@@ -10,8 +10,8 @@ class StarterSigninFirebaseIntegrateT extends AFProjectStyleSourceTemplate {
   String get template => '''
 import project_styles/app-starter-signin-shared-integrate
 generate query CheckSigninListenerQuery --result-type UserCredentialRoot --override-templates "core/files/query_simple=project_styles/app-starter-signin-firebase/files/query_check_signin"
-affs:generate query WriteOneUserQuery --result-type ReferencedUser --member-variables "UserCredentialRoot credential;ReferencedUser user" --override-templates "core/files/query_write_one=project_styles/app-starter-signin-firebase/files/query_write_one_user"
-affs:generate query ReadOneUserListenerQuery --result-type ReferencedUser --member-variables "UserCredentialRoot credential" --override-templates "core/files/query_listen_one=project_styles/app-starter-signin-firebase/files/query_listen_one_user"
+affs:generate query WriteOneUserQuery --result-type User --member-variables "UserCredentialRoot credential;User user" --override-templates "core/files/query_write_one=project_styles/app-starter-signin-firebase/files/query_write_one_user"
+affs:generate query ReadOneUserListenerQuery --result-type User --member-variables "UserCredentialRoot credential" --override-templates "core/files/query_listen_one=project_styles/app-starter-signin-firebase/files/query_listen_one_user"
 generate query SigninQuery --result-type UserCredentialRoot --member-variables "String email; String password; bool rememberMe" --override-templates "core/files/query_simple=project_styles/$insertProjectStyle/files/query_signin"
 generate query ResetPasswordQuery --result-type AFUnused --member-variables "String email" --override-templates "core/files/query_simple=project_styles/$insertProjectStyle/files/query_forgot_password"
 ''';

@@ -15,18 +15,6 @@ import 'package:sqlite3/sqlite3.dart' as sql;
 ''',
         AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 class ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB {
-  // Note: I am not suggesting this is how you should handle DB/serialization code, 
-  // I am trying to keep it trivial because this code is not the point.
-  static const tableCountHistory = "count_history";
-  static const tableUsers = "users";
-  static const tableUserCredential = "user_credential";
-  static const colId = "id";
-  static const colUserId = "user_id";
-  static const colFirstName = "first_name";
-  static const colLastName = "last_name";
-  static const colEmail = "email";
-  static const colCount = "count";
-  static const colActiveUserId = "active_user_id";
   static ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB? instance;
 
   final sql.Database db;

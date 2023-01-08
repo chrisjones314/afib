@@ -12,7 +12,7 @@ class SnippetSignedInDrawerExtraImportsT {
       templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertExtraImportsInsertion: '''
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/referenced_user.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/user.dart';
 ''',
       })
     );
@@ -76,9 +76,9 @@ void onTapClose() {
   context.closeDrawer();
 }
 
-ReferencedUser? get activeUser {
+User? get activeUser {
   final cred = context.s.userCredential;
-  return context.s.referencedUsers.findById(cred.userId);
+  return context.s.users.findById(cred.userId);
 }
 
 String get userName {

@@ -19,9 +19,9 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_standard_r
 import 'package:plural_noun/plural_noun.dart';
 
 class AFGenerateStateSubcommand extends AFGenerateSubcommand {
-  static const argNotSerial = "not-serial";
+  static const argNotSerial = "no-serial-methods";
   static const argNoReviseMethods = "no-revise-methods";
-  static const argStandardRoot = "add-standard-root";
+  static const argAddStandardRoot = "add-standard-root";
 
   AFGenerateStateSubcommand();
   
@@ -46,9 +46,11 @@ $descriptionHeader
 $optionsHeader
   For Root States or Simple Models
     ${AFGenerateSubcommand.argMemberVariablesHelp} 
+      Note: If your backend store has integer ids, specify "int id;" as your id, AFib will automatically convert to/from a string on the client.
+    ${AFGenerateSubcommand.argResolveVariablesHelp}
 
   For Simple Models Only
-    --$argStandardRoot - Add if you want to also generate a standard root containing a map of String ids to objects of this model.
+    --$argAddStandardRoot - Add if you want to also generate a standard root containing a map of String ids to objects of this model.
     --$argNoReviseMethods - Include if you do not want to generate default revise methods for each member variable 
     --$argNotSerial - Include if you do not want to generate standard serialization methods
   
@@ -73,7 +75,8 @@ $optionsHeader
         argNotSerial: "false",
         argNoReviseMethods: "false",
         AFGenerateSubcommand.argMemberVariables: "",
-        AFGenerateStateSubcommand.argStandardRoot: "false",
+        AFGenerateSubcommand.argResolveVariables: "",
+        AFGenerateStateSubcommand.argAddStandardRoot: "false",
       }
     );
 
@@ -158,14 +161,14 @@ $optionsHeader
     final generator = context.generator;
     final isRoot = identifier.endsWith(AFCodeGenerator.rootSuffix);
     final modelPath = generator.pathModel(identifier);
-    final isAddStandardRoot = args.accessNamedFlag(AFGenerateStateSubcommand.argStandardRoot);
+    final isAddStandardRoot = args.accessNamedFlag(AFGenerateStateSubcommand.argAddStandardRoot);
     var identifierNoRoot = identifier;
     var identifierNoRootOriginal = identifier;
     if(identifierNoRoot.endsWith("Root")) {
       identifierNoRoot = identifierNoRoot.substring(0, identifierNoRoot.length-4);
       identifierNoRootOriginal = identifierNoRoot;
     }
-    final argAddStandard = args.accessNamed(argStandardRoot);
+    final argAddStandard = args.accessNamed(argAddStandardRoot);
     if(argAddStandard != "true" && isRoot) {
       identifierNoRoot = argAddStandard;
     }
@@ -209,6 +212,7 @@ $optionsHeader
     final memberVariableImports = memberVariables?.extraImports(context) ?? AFSourceTemplate.empty;
 
     final modelt = ModelT.core(
+      isRoot: isRoot,      
       memberVariables: memberVariables?.declareVariables,
       constructorParams: memberVariables?.constructorParams,
       copyWithParams: memberVariables?.copyWithParams,
@@ -220,6 +224,7 @@ $optionsHeader
       standardRootMethods: standardRootMethods,
       superclassSyntax: superclassSyntax,
       superCall: superCall,
+      resolveFunctions: memberVariables?.resolveFunctions,
     );
 
     final modelFile = context.createFile(modelPath, modelt, extend: modelInsertions, insertions: {
@@ -229,7 +234,7 @@ $optionsHeader
       AFSourceTemplate.insertCopyWithCallInsertion: memberVariables?.copyWithCall ?? AFSourceTemplate.empty,      
       ModelT.insertSerialConstantsInsertion: serialConstants,
       ModelT.insertSerialMethodsInsertion: snippetSerial,
-      AFSourceTemplate.insertAdditionalMethodsInsertion: isRoot ? SnippetInitialStateModelFunctionT(
+      ModelT.insertInitialState: isRoot ? SnippetInitialStateModelFunctionT(
         initialStateParams: memberVariables?.initialValueDeclaration ?? AFSourceTemplate.empty,
       ) : AFSourceTemplate.empty,
       AFSourceTemplate.insertMemberVariableImportsInsertion: memberVariableImports
@@ -296,11 +301,8 @@ $optionsHeader
 
     // if this is a model, and they want a standard root, then we need to forumulate a sub-command to generate it.
     if(!isRoot && isAddStandardRoot) {
-      final tokens = AFCodeGenerator.splitMixedCase(identifier);
-      final pluralLast = PluralRules().convertToPluralNoun(tokens.last);
-      tokens[tokens.length-1] = pluralLast;
-      final pluralIdentifier = tokens.join("");
-      final cmd = "generate state ${pluralIdentifier}Root --$argStandardRoot $identifier";
+      final pluralIdentifier = AFCodeGenerator.pluralize(identifier);
+      final cmd = "generate state ${pluralIdentifier}Root --$argAddStandardRoot $identifier";
       await context.executeSubCommand(cmd, context.coreInsertions);
     }
 

@@ -4,12 +4,16 @@ import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 
 class ModelT extends AFFileSourceTemplate {
+  static const templateIdModel = "model";
+  static const templateIdModelRoot = "model_root";
   static const insertSerialConstantsInsertion = AFSourceTemplateInsertion("serial_constants");
   static const insertSerialMethodsInsertion = AFSourceTemplateInsertion("serial_methods");
   static const insertStandardReviseMethods = AFSourceTemplateInsertion("standard_revise_methods");
   static const insertSuperclassSyntax = AFSourceTemplateInsertion("superclass_syntax");
   static const insertStandardRootMethods = AFSourceTemplateInsertion("standard_root_methods");
   static const insertSuperCall = AFSourceTemplateInsertion("super_call");
+  static const insertResolveFunctions = AFSourceTemplateInsertion("resolve_functions");
+  static const insertInitialState = AFSourceTemplateInsertion("initial_state");
   
   ModelT({
     required List<String> templateFolder,
@@ -19,9 +23,10 @@ class ModelT extends AFFileSourceTemplate {
     templateFileId: templateFileId,
     templateFolder: templateFolder,
     embeddedInsertions: embeddedInsertions,
-  );  
+  );
 
   factory ModelT.core({
+    required bool isRoot,
     Object? memberVariables,
     Object? constructorParams,
     Object? copyWithParams,
@@ -33,10 +38,12 @@ class ModelT extends AFFileSourceTemplate {
     Object? standardRootMethods,
     Object? superclassSyntax,
     Object? superCall,
+    Object? resolveFunctions,
+    Object? additionalMethods,
   }) {
     return ModelT(
       templateFolder: AFProjectPaths.pathGenerateCoreFiles, 
-      templateFileId: "model",
+      templateFileId: isRoot ? templateIdModelRoot : templateIdModel,
       embeddedInsertions: AFSourceTemplateInsertions(
       insertions: {
         AFSourceTemplate.insertExtraImportsInsertion: AFSourceTemplate.empty,
@@ -51,6 +58,8 @@ class ModelT extends AFFileSourceTemplate {
         insertStandardRootMethods: standardRootMethods ?? AFSourceTemplate.empty,
         insertSuperclassSyntax: superclassSyntax ?? AFSourceTemplate.empty,
         insertSuperCall: superCall ?? AFSourceTemplate.empty,
+        insertResolveFunctions: resolveFunctions ?? AFSourceTemplate.empty,
+        AFSourceTemplate.insertAdditionalMethodsInsertion: additionalMethods ?? AFSourceTemplate.empty,
     }));
   }
 
@@ -68,9 +77,11 @@ class $insertMainType $insertSuperclassSyntax {
 
   $insertMainType($insertConstructorParams)$insertSuperCall;
 
-  $insertAdditionalMethods
+  $insertInitialState
+  $insertResolveFunctions
   $insertStandardReviseMethods
   $insertStandardRootMethods
+  $insertAdditionalMethods
 
   $insertMainType copyWith($insertCopyWithParams) {
     return $insertMainType($insertCopyWithConstructorCall);

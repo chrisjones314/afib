@@ -3,21 +3,21 @@
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/files/query_example_start_here.t.dart';
 
-class QueryReadReferencedUserT extends QueryExampleStartHereT {
-  QueryReadReferencedUserT({
+class QueryReadUserT extends QueryExampleStartHereT {
+  QueryReadUserT({
     required Object insertExtraImports,
     required Object insertStartImpl,
     required Object insertFinishImpl,
   }): super(
-    templateFileId: "query_read_referenced_user",
+    templateFileId: "query_read_user",
     insertExtraImports: insertExtraImports,
     insertStartImpl: insertStartImpl,
     insertFinishImpl: insertFinishImpl,
     insertAdditionalMethods: AFSourceTemplate.empty,
   );
 
-  factory QueryReadReferencedUserT.example() {
-    return QueryReadReferencedUserT(
+  factory QueryReadUserT.example() {
+    return QueryReadUserT(
       insertExtraImports: '''
 import 'dart:async';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplate.insertAppNamespaceInsertion}_id.dart';
@@ -27,12 +27,12 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSour
       insertStartImpl: '''
 final db = await ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.accessDB();
 final userIdInt = int.tryParse(userId);
-final dbResults = db.select("SELECT * from \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableUsers} where id = ?", [userIdInt]);
+final dbResults = db.select("SELECT * from \${User.tableName} where id = ?", [userIdInt]);
 if(dbResults.isEmpty) {
   context.onError(AFQueryError(message: "Internal error: No user with id \$userId in database?"));
 } else {
   final firstResult = dbResults.first;
-  final user = ReferencedUser.fromDB(firstResult);
+  final user = User.serializeFromMap(firstResult);
   context.onSuccess(user);
 }
 ''',
@@ -49,10 +49,10 @@ final tdleState = context.accessComponentState<${AFSourceTemplate.insertAppNames
 // to resolved objects.  Then, as you are rendering your UI, you 'join' to the actual user object in
 // real time.   That way, when you update a user, you update it in a single place.  All the other data
 // that references the user contains only the user id, and thus remains unchanged.
-final refererencedUsers = tdleState.referencedUsers;
+final refererencedUsers = tdleState.users;
 
 // the state is immutable, so to add this user to it, we need to revise it.
-final revisedUsers = refererencedUsers.reviseUser(user);
+final revisedUsers = refererencedUsers.reviseSetItem(user);
 
 // now, save our changes to our global state.
 context.updateComponentRootStateOne<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>(revisedUsers);

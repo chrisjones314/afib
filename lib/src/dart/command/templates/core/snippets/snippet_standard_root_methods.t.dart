@@ -11,10 +11,18 @@ class SnippetStandardRootMethodsT extends AFCoreSnippetSourceTemplate {
   ];    
 
   String get template => '''
+factory $insertMainType.fromList(Iterable<${AFSourceTemplate.insertMainTypeNoRootInsertion}> sources) => $insertMainType(items: {
+  for(final source in sources) 
+    source.id: source,
+});
+
+
 @override
 String itemId(${AFSourceTemplate.insertMainTypeNoRootInsertion} item) => item.id;
 
 @override
 $insertMainType reviseItems(Map<String, ${AFSourceTemplate.insertMainTypeNoRootInsertion}> items) => copyWith(items: items);
+
+
 ''';
 }

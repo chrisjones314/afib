@@ -29,7 +29,7 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceT
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_credential_root.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/write_one_user_query.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signin_query.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/referenced_user.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/user.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/home_page_screen.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signin_query.dart';
 import 'package:afib_signin/afsi_flutter.dart';

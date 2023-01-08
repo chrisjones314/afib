@@ -197,7 +197,7 @@ String get textCurrentStanza {
 }
 
 int get clickCountState {
-  return context.s.countHistory.totalCount;
+  return context.s.countHistoryItems.totalCount;
 }
 
 void onPressedMenu() {

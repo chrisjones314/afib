@@ -21,7 +21,7 @@ void main(List<String> args) {
     final paramsD = createDartParams();
     var argsFull = AFArgs.create(args);
     
-    // argsFull.setDebugArgs("your command arguments here");
+    // argsFull.setDebugArgs('your command arguments here');
 
     // execute the command.
     await af${insertLibKind}CommandMain(

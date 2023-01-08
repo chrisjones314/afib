@@ -18,7 +18,6 @@ import 'package:args/args.dart' as args;
 import 'package:collection/collection.dart';
 import 'package:path/path.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
-
 class AFItemWithNamespace {
   /// The namespace used to differentiate third party commands.
   final String namespace;
@@ -272,13 +271,19 @@ Available subcommands
 
 
 class AFMemberVariableTemplates {
+  static const includeMemberVars = 0x01;
+  static const includeResolveVars = 0x02;
+  static const includeAllVars = includeMemberVars | includeResolveVars;
+
   final bool isIntId;
-  final Map<String, String> nameToType;
+  final Map<String, String> memberVars;
+  final Map<String, String> resolveVars;
   final String mainType;
   String? standardRootMapType;
  
   AFMemberVariableTemplates({
-    required this.nameToType,
+    required this.memberVars,
+    required this.resolveVars,
     required this.isIntId,
     required this.mainType,
   }); 
@@ -288,7 +293,8 @@ class AFMemberVariableTemplates {
     bool isIntId = false,
   }) {
     return AFMemberVariableTemplates(
-      nameToType: <String, String>{}, 
+      memberVars: <String, String>{}, 
+      resolveVars: <String, String>{},
       isIntId: isIntId, 
       mainType: mainType
     );
@@ -298,48 +304,90 @@ class AFMemberVariableTemplates {
     standardRootMapType = kind;
   }
 
+  bool _hasFlag(int test, int flag) {
+    return (test & flag) != 0;
+  }
+
+  String _ensureIdSuffix(String source) {
+    if(!source.endsWith("Id")) {
+      source = "${source}Id";
+    }
+    return source;
+  }
+
   String get declareVariables {
     final result = StringBuffer();
-    _iterate((identifier, kind, isLast) {
+    _iterate(
+      include: includeAllVars,
+      visit: (identifier, kind, isLast, includeKind) {
       result.write("final $kind $identifier;");
-      if(!isLast) {
+      if(!isLast || resolveVars.isNotEmpty) {
         result.writeln();
       }
     });
+
     return result.toString();
   }
 
-  String extraImports(AFCommandContext context) {
+  String? _generateImportFor(AFCommandContext context, String kind) {
+    // it might be a local type, see if we can find it.
     final generator = context.generator;
+    final pathModel = generator.pathModel(kind);
+    if(!generator.fileExists(pathModel)) {
+      return null;
+    }
+    final importPath = generator.importStatementPath(pathModel);
+    final declareImport = SnippetImportFromPackageT().toBuffer(context, insertions: {
+      AFSourceTemplate.insertPackageNameInsertion: AFibD.config.packageName,
+      AFSourceTemplate.insertPackagePathInsertion: importPath,
+    });
+
+    return declareImport.lines.first;
+  }
+
+  String extraImports(AFCommandContext context) {
     final result = StringBuffer();
-    _iterate((identifier, kind, isLast) { 
+    _iterate(
+      include: includeMemberVars,
+      visit: (identifier, kind, isLast, includeKind) { 
       if(kind == "int" || kind == "double" || kind == "String") {
         return;
       }
 
-      // it might be a local type, see if we can find it.
-      final pathModel = generator.pathModel(kind);
-      if(generator.fileExists(pathModel)) {
-        final importPath = generator.importStatementPath(pathModel);
-        final declareImport = SnippetImportFromPackageT().toBuffer(context, insertions: {
-          AFSourceTemplate.insertPackageNameInsertion: AFibD.config.packageName,
-          AFSourceTemplate.insertPackagePathInsertion: importPath,
-        });
-
-        result.writeln(declareImport.lines.first);
+      final import = _generateImportFor(context, kind);
+      if(import != null) {
+        result.writeln(import);
       }
     });
+
+    _iterate(
+      include: includeResolveVars,
+      visit: (identifier, kind, isLast, includeKind) { 
+        final import = _generateImportFor(context, kind);
+        if(import != null) {
+          result.writeln(import);
+        }
+        final kindRoot = "${AFCodeGenerator.pluralize(kind)}Root";
+        final importRoot = _generateImportFor(context, kindRoot);
+        if(importRoot != null) {
+          result.writeln(importRoot);
+        }
+      }
+    );
+
     return result.toString();
   }
 
   String get standardReviseMethods {
     final result = StringBuffer();
-    _iterate((identifier, kind, isLast) {
-      final methodSuffix = AFCodeGenerator.upcaseFirst(identifier);
-      result.write("$mainType revise$methodSuffix($kind $identifier) => copyWith($identifier: $identifier);");
-      if(!isLast) {
-        result.writeln();
-      }
+    _iterate(
+      include: includeAllVars,
+      visit: (identifier, kind, isLast, includeKind) {
+        final methodSuffix = AFCodeGenerator.upcaseFirst(identifier);
+        result.write("$mainType revise$methodSuffix($kind $identifier) => copyWith($identifier: $identifier);");
+        if(!isLast) {
+          result.writeln();
+        }
     });
     return result.toString();
   }
@@ -350,11 +398,13 @@ class AFMemberVariableTemplates {
       result.writeln("required Map<String, $standardRootMapType> items,");
     }
 
-    _iterate((identifier, kind, isLast) {
-      result.write("required this.$identifier,");
-      if(!isLast) {
-        result.writeln();
-      }
+    _iterate(
+      include: includeAllVars,
+      visit: (identifier, kind, isLast, includeKind) {
+        result.write("required this.$identifier,");
+        if(!isLast) {
+          result.writeln();
+        }
     });
     return result.toString();
   }
@@ -373,9 +423,11 @@ class AFMemberVariableTemplates {
       result.write("  Map<String, $standardRootMapType>? items,");
     }
 
-    _iterate((identifier, kind, isLast) {
-      result.write("  $kind? $identifier,");
-      result.writeln();
+    _iterate(
+      include: includeAllVars,
+      visit: (identifier, kind, isLast, includeKind) {
+        result.write("  $kind? $identifier,");
+        result.writeln();
     });
     result.write("}");
     return result.toString();    
@@ -387,9 +439,11 @@ class AFMemberVariableTemplates {
     if(standardRootMapType != null) {
       result.write("items: items ?? this.items");
     }
-    _iterate((identifier, kind, isLast) {
-      result.write("$identifier: $identifier ?? this.$identifier,");
-      result.writeln();
+    _iterate(
+      include: includeAllVars,
+      visit: (identifier, kind, isLast, includeKind) {
+        result.write("$identifier: $identifier ?? this.$identifier,");
+        result.writeln();
     });
     return result.toString();    
   }
@@ -401,7 +455,9 @@ class AFMemberVariableTemplates {
       result.writeln("items: const <String, $standardRootMapType>{},");
     }
 
-    _iterate((identifier, kind, isLast) {
+    _iterate(
+      include: includeAllVars,
+      visit: (identifier, kind, isLast, includeKind) {
       var val = "null";
       if(kind == "int") {
         val = "0";
@@ -419,19 +475,23 @@ class AFMemberVariableTemplates {
 
   String get serializeFrom {
     final result = StringBuffer();
-    _iterate((identifier, kind, isLast) {
-      final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
-      var convertToString = "";
-      if(identifier == AFDocumentIDGenerator.columnId && isIntId) {
-        convertToString = ".toString()";
-      } 
-      result.writeln("final item$upcaseIdentifier = source[col$upcaseIdentifier]$convertToString;");
+    _iterate(
+      include: includeAllVars,
+      visit: (identifier, kind, isLast, includeKind) {
+        final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
+        var convertToString = "";
+        if(isIntId && (identifier == AFDocumentIDGenerator.columnId) || _hasFlag(includeKind, includeResolveVars)) {
+          convertToString = ".toString()";
+        } 
+        result.writeln("final item$upcaseIdentifier = source[col$upcaseIdentifier]$convertToString;");
     });
 
     result.writeln("return $mainType(");
-    _iterate((identifier, kind, isLast) {
-      final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
-      result.writeln("  $identifier: item$upcaseIdentifier,");
+    _iterate(
+      include: includeAllVars,
+      visit: (identifier, kind, isLast, includeKind) {
+        final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
+        result.writeln("  $identifier: item$upcaseIdentifier,");
     });
     result.writeln(");");
 
@@ -441,11 +501,13 @@ class AFMemberVariableTemplates {
 
   String get serializeTo {
     final result = StringBuffer();
-    _iterate((identifier, kind, isLast) {
+    _iterate(
+      include: includeAllVars,
+      visit: (identifier, kind, isLast, includeKind) {
       final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
       var intConvertPrefix = "";
       var intConvertSuffix = "";
-      if(identifier == AFDocumentIDGenerator.columnId && isIntId) {
+      if(isIntId && (identifier == AFDocumentIDGenerator.columnId) || _hasFlag(includeKind, includeResolveVars)) {
         intConvertPrefix = "int.tryParse(";
         intConvertSuffix = ")";
       }
@@ -457,7 +519,9 @@ class AFMemberVariableTemplates {
   String get serialConstants {
     final result = StringBuffer();
     result.writeln("static const tableName = '${AFCodeGenerator.convertMixedToSnake(mainType)}';");
-    _iterate((identifier, kind, isLast) {
+    _iterate(
+      include: includeAllVars,
+      visit: (identifier, kind, isLast, includeKind) {
       final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
       var val = "'${AFCodeGenerator.convertMixedToSnake(identifier)}'";
       if(identifier == "id") {
@@ -468,13 +532,56 @@ class AFMemberVariableTemplates {
     return result.toString();
   }
 
-  void _iterate(void Function(String name, String kind, bool isLast) visit) {
-    var identifiers = nameToType.keys.toList();
-    for(var i = 0; i < identifiers.length; i++) {
-      final identifier = identifiers[i];
-      final kind = nameToType[identifier];
+  String get resolveFunctions {
+    final result = StringBuffer();
+    _iterate(
+      include: includeResolveVars,
+      visit: (identifier, kind, isLast, includeKind) {
+        var upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
+        if(upcaseIdentifier.endsWith("Id")) {
+          upcaseIdentifier = upcaseIdentifier.substring(0, upcaseIdentifier.length - 2);
+        }
+        final kindPlural = AFCodeGenerator.pluralize(kind);
+        final kindPluralCamel = AFCodeGenerator.convertToCamelCase(kindPlural);
+        result.writeln("$kind? resolve$upcaseIdentifier(${kindPlural}Root $kindPluralCamel) => $kindPluralCamel.findById($identifier);");
+      }
+    );
+    return result.toString();  
+  }
+
+  void _iterate({
+    required int include,
+    required void Function(String name, String kind, bool isLast, int includeKind) visit 
+  }) {
+    final includeMember = (include & includeMemberVars) != 0;
+    final includeResolve = (include & includeResolveVars) != 0;
+
+    if(includeMember) { 
+      var identifiers = memberVars.keys.toList();
+      for(var i = 0; i < identifiers.length; i++) {
+        final identifier = identifiers[i];
+        final kind = memberVars[identifier];
+        if(kind != null) {
+          final isLast = (i == identifiers.length - 1 && (!includeResolve || resolveVars.isEmpty));
+          visit(identifier, kind, isLast, includeMemberVars);
+        }
+      }
+    }
+
+    if(!includeResolve) {
+      return;
+    }
+    
+    final resolveIds = resolveVars.keys.toList();
+    for(var i = 0; i < resolveIds.length; i++) {
+      final identifier = resolveIds[i];
+      var kind = resolveVars[identifier];
+      if(include != includeResolveVars) {
+        kind = "String";
+      }
+      final isLast = i == resolveIds.length - 1;       
       if(kind != null) {
-        visit(identifier, kind, i == identifiers.length - 1);
+        visit(_ensureIdSuffix(identifier), kind, isLast, includeResolveVars);
       }
     }
   }
@@ -557,10 +664,7 @@ class AFCommandContext {
     return parsedArguments;
   }
 
-  AFMemberVariableTemplates? memberVariables(AFCommandContext context, AFCommandArgumentsParsed args, String mainType) {
-    final isRoot = mainType.endsWith(AFCodeGenerator.rootSuffix);
-    final vars = args.accessNamed(AFGenerateSubcommand.argMemberVariables);
-    
+  Map<String, String> _parseSemicolonDeclarations(AFCommandContext context, String vars) {
     final varItems = vars.split(";");
     varItems.removeWhere((val) => val.trim().isEmpty);
     final result = <String, String>{};
@@ -574,14 +678,22 @@ class AFCommandContext {
       final kind = itemTrimmed.substring(0, idxIdentifier);
       result[name] = kind;
     }
+    return result;
+  }
 
+  AFMemberVariableTemplates? memberVariables(AFCommandContext context, AFCommandArgumentsParsed args, String mainType) {
+    final isRoot = mainType.endsWith(AFCodeGenerator.rootSuffix);
+    final isQuery = mainType.endsWith(AFGenerateQuerySubcommand.suffixQuery);
+    final memberVarsSource = args.accessNamed(AFGenerateSubcommand.argMemberVariables);
+    
+    final memberVars = _parseSemicolonDeclarations(context, memberVarsSource);
     // if they specified serial, then make sure they specified an ID.
     var isIntId = false;
-    if(!args.accessNamedFlag(AFGenerateStateSubcommand.argNotSerial) && !isRoot) {
-      var idType = result[AFDocumentIDGenerator.columnId];
+    if(!isRoot && !isQuery && !args.accessNamedFlag(AFGenerateStateSubcommand.argNotSerial)) {
+      var idType = memberVars[AFDocumentIDGenerator.columnId];
       if(idType == "int") {
         isIntId = true;
-        result[AFDocumentIDGenerator.columnId]= "String";
+        memberVars[AFDocumentIDGenerator.columnId]= "String";
         context.output.writeTwoColumns(col1: "info ", col2: "Converting 'int id' to a String on the client, so that String test ids can be used");
       }
       final errIdColumn = "You must either specify --${AFGenerateStateSubcommand.argNotSerial}, or you must specify a --${AFGenerateSubcommand.argMemberVariables} containing either 'String ${AFDocumentIDGenerator.columnId}' or 'int ${AFDocumentIDGenerator.columnId}'";
@@ -595,11 +707,19 @@ class AFCommandContext {
       }
     }
 
-    if(result.isEmpty) {
+    final resolveVarsSource = args.accessNamed(AFGenerateSubcommand.argResolveVariables);
+    final resolveVars = _parseSemicolonDeclarations(context, resolveVarsSource);
+
+    if(memberVars.isEmpty && resolveVars.isEmpty) {
       return null;
     }
 
-    return AFMemberVariableTemplates(nameToType: result, isIntId: isIntId, mainType: mainType);
+    return AFMemberVariableTemplates(
+      memberVars: memberVars, 
+      resolveVars: resolveVars,
+      isIntId: isIntId, 
+      mainType: mainType
+    );
   }
 
   void setProjectStyle(String projectStyle) {
@@ -856,6 +976,10 @@ class AFCommandContext {
     if(extend != null) {
       fullInsert = fullInsert.reviseAugment(extend.insertions);
     }
+    final originalEmbedded = template.embeddedInsertions?.insertions;
+    if(originalEmbedded != null) {
+      fullInsert = fullInsert.reviseAugment(originalEmbedded);
+    }
 
     return generator.createFile(this, projectPath, template, insertions: fullInsert);
   }
@@ -977,12 +1101,16 @@ class AFCommandContext {
     if(override != null && override is String) {
       found = _parseOverrides(override);
     }
+    
 
     final sourcePath = joinAll(sourceTemplate);
     var result = found[sourcePath];
     if(result == null) {
       result = globalTemplateOverrides[sourcePath];
       if(result == null) {
+        if(parents.isNotEmpty) {
+          return parents.last.findOverrideTemplate(sourceTemplate);
+        }
         return sourceTemplate;
       }
     }

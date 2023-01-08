@@ -13,8 +13,8 @@ class SnippetInitialWireframeBodyT extends AFSnippetSourceTemplate {
   List<String> get extraImports => [   
       "import 'package:$insertPackagePath/ui/screens/counter_management_screen.dart';",
       "import 'package:$insertPackagePath/state/stateviews/${insertAppNamespace}_default_state_view.dart';",
-      "import 'package:$insertPackagePath/state/models/count_history_entry.dart';",
-      "import 'package:$insertPackagePath/state/root/count_history_root.dart';",
+      "import 'package:$insertPackagePath/state/models/count_history_item.dart';",
+      "import 'package:$insertPackagePath/state/root/count_history_items_root.dart';",
 
   ];
   
@@ -24,9 +24,9 @@ bool _executeHandleEvent${UnitTestT.insertTestName}Wireframe(AFWireframeExecutio
 
   if(context.isScreenAndWidget(${insertAppNamespaceUpper}ScreenID.counterManagement, ${insertAppNamespaceUpper}WidgetID.buttonSaveTransientCount)) {
     final param = context.accessEventParam<CounterManagementScreenRouteParam>();
-    final countHistory = stateView.countHistory;
-    final revised = countHistory.reviseAddEntry(
-      CountHistoryEntry.createNew(
+    final countHistory = stateView.countHistoryItems;
+    final revised = countHistory.reviseSetItem(
+      CountHistoryItem.createNew(
         count: param.clickCount, 
         userId: stateView.userCredential.userId,
         idPrefix: "count_wireframe"
@@ -35,7 +35,7 @@ bool _executeHandleEvent${UnitTestT.insertTestName}Wireframe(AFWireframeExecutio
     context.updateStateViewRootOne(revised);
     return true;
   }  else if(context.isScreenAndWidget(${AFSourceTemplate.insertAppNamespaceInsertion.upper}ScreenID.counterManagement, ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.buttonResetHistory)) {
-    context.updateStateViewRootOne(CountHistoryRoot.initialState());
+    context.updateStateViewRootOne(CountHistoryItemsRoot.initialState());
     return true;
   }
   return false;

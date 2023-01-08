@@ -12,6 +12,15 @@ abstract class AFStandardIDMapRoot<TSubclass, TModel> {
   String itemId(TModel item);
   TSubclass reviseItems(Map<String, TModel> items);
 
+  TModel? findById(String id) => items[id];
+  Iterable<TModel> findByIds(List<String> ids) => items.values.where((e) {
+    return ids.contains(itemId(e)); 
+  });
+  Iterable<TModel> findWhere(bool Function(TModel e) fn) => items.values.where(fn);
+  Iterable<String> get findIds => items.keys;
+  Iterable<TModel> get findAll => items.values;
+  int get length => items.length;
+
   /// Add a single item.
   TSubclass reviseSetItem(TModel item) {
     final revised = Map<String, TModel>.from(items);

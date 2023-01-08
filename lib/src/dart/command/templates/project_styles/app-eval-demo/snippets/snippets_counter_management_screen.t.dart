@@ -14,8 +14,8 @@ class SnippetCounterManagementScreenExtraImportsT {
       templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertExtraImportsInsertion: '''
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/count_history_entry.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/write_count_history_entry_query.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/count_history_item.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/write_count_history_item_query.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/reset_history_query.dart';
 ''',
       })
@@ -140,7 +140,7 @@ Widget _buildIncrementStateCard(CounterManagementScreenSPI spi) {
   return _buildCard(spi, rows);
 }
 
-TableRow _buildHistoryEntry(CounterManagementScreenSPI spi, CountHistoryEntry entry) {
+TableRow _buildHistoryEntry(CounterManagementScreenSPI spi, CountHistoryItem entry) {
   final t = spi.t;
   final cols = t.row();
   cols.add(t.childText(entry.id));
@@ -232,11 +232,11 @@ class SnippetCounterManagementScreenSPIT {
 int get clickCountParam => context.p.clickCount;
 
 /// The difference between
-int get clickCountState => context.s.countHistory.totalCount;
+int get clickCountState => context.s.countHistoryItems.totalCount;
 
 bool get showFullHistory => clickCountState > 0;
 
-Iterable<CountHistoryEntry> get historyEntries => context.s.countHistory.history.values;
+Iterable<CountHistoryItem> get historyEntries => context.s.countHistoryItems.findAll;
 
 
 /// The second main role is to move event handling logic out of the UI and into 
@@ -256,13 +256,13 @@ void onPressedPersistTransientCount() {
 
   context.executeWireframeEvent(${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.buttonSaveTransientCount, context.p, onSuccess: _onClearClickCount);
 
-  final entry = CountHistoryEntry.createNew(
+  final entry = CountHistoryItem.createNew(
     userId: context.s.userCredential.userId,
     count: context.p.clickCount
   );
 
   // execute the query which writes it to the history, and 
-  context.executeQuery(WriteCountHistoryEntryQuery(entry: entry, onSuccess: (successCtx) {
+  context.executeQuery(WriteCountHistoryItemQuery(item: entry, onSuccess: (successCtx) {
     _onClearClickCount();
   }));
 

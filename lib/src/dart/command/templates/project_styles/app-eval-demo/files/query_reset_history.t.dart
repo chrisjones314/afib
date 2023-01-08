@@ -21,15 +21,16 @@ class QueryResetHistoryT extends QueryExampleStartHereT {
     return QueryResetHistoryT(
       insertExtraImports: '''
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/count_history_root.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/count_history_items_root.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/count_history_item.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
 ''',
       insertStartImpl: '''
 final db = await ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.accessDB();
 
 final uid = int.tryParse(userId);
-db.execute("delete from \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableCountHistory} where \${${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colUserId} = ?", [uid]);
-context.onSuccess(CountHistoryRoot.initialState());
+db.execute("delete from \${CountHistoryItem.tableName} where \${CountHistoryItem.colUserId} = ?", [uid]);
+context.onSuccess(CountHistoryItemsRoot.initialState());
 ''',
       insertFinishImpl: '''
 // reset the history to empty.

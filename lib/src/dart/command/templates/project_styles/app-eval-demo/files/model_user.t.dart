@@ -3,9 +3,9 @@ import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
 
-class ModelReferencedUserT extends ModelT {
+class ModelUserT extends ModelT {
   
-  ModelReferencedUserT({
+  ModelUserT({
     required String templateFileId,
     required List<String> templateFolder,
     AFSourceTemplateInsertions? embeddedInsertions,
@@ -15,14 +15,13 @@ class ModelReferencedUserT extends ModelT {
     embeddedInsertions: embeddedInsertions,
   );  
 
-  factory ModelReferencedUserT.custom({
-    required String templateFileId,
+  factory ModelUserT.custom({
     required List<String> templateFolder,
     required Object extraImports,
     required Object additionalMethods, 
   }) {
-    return ModelReferencedUserT(
-      templateFileId: templateFileId,
+    return ModelUserT(
+      templateFileId: "model_user",
       templateFolder: templateFolder,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
       AFSourceTemplate.insertExtraImportsInsertion: extraImports,
@@ -31,9 +30,8 @@ class ModelReferencedUserT extends ModelT {
 
   }
 
-  factory ModelReferencedUserT.example() {
-    return ModelReferencedUserT.custom(
-      templateFileId: "model_referenced_user",
+  factory ModelUserT.example() {
+    return ModelUserT.custom(
       templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoFiles,
       extraImports: '''
 import 'package:afib/afib_flutter.dart';
@@ -41,28 +39,17 @@ import 'package:sqlite3/sqlite3.dart' as sql;
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
 ''', 
       additionalMethods: '''
-static ReferencedUser fromDB(sql.Row row) {
+static User fromDB(sql.Row row) {
   final entries = row.toTableColumnMap();
   if(entries == null) {
     throw AFException("No table column map?");
   }
-  final values = entries[${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.tableUsers];
+  final values = entries[User.tableName];
   if(values == null) {
     throw AFException("No users table?");
   }
-
-  final id = values[${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colId].toString();
-  final first = values[${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colFirstName];
-  final last = values[${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colLastName];
-  final email = values[${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.colEmail];
-    
-  return ReferencedUser(
-    id: id,
-    firstName: first,
-    lastName: last,
-    email: email,
-    zipCode: '00000',
-  );
+      
+  return User.serializeFromMap(values);
 }
 ''',
     );

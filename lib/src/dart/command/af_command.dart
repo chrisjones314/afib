@@ -329,11 +329,11 @@ class AFMemberVariableTemplates {
     return result.toString();
   }
 
-  String? _generateImportFor(AFCommandContext context, String kind) {
+  String? _generateImportFor(AFCommandContext context, String kind, { bool requireFile = true }) {
     // it might be a local type, see if we can find it.
     final generator = context.generator;
     final pathModel = generator.pathModel(kind);
-    if(!generator.fileExists(pathModel)) {
+    if(requireFile && !generator.fileExists(pathModel)) {
       return null;
     }
     final importPath = generator.importStatementPath(pathModel);
@@ -363,12 +363,12 @@ class AFMemberVariableTemplates {
     _iterate(
       include: includeResolveVars,
       visit: (identifier, kind, isLast, includeKind) { 
-        final import = _generateImportFor(context, kind);
+        final import = _generateImportFor(context, kind, requireFile: false);
         if(import != null) {
           result.writeln(import);
         }
         final kindRoot = "${AFCodeGenerator.pluralize(kind)}Root";
-        final importRoot = _generateImportFor(context, kindRoot);
+        final importRoot = _generateImportFor(context, kindRoot, requireFile: false);
         if(importRoot != null) {
           result.writeln(importRoot);
         }

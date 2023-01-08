@@ -111,6 +111,7 @@ class AFTemplateRegistry {
     registerFile(UILibStarterMinimalT());
 
     registerFile(SimpleQueryT.core());
+    registerFile(SimpleQueryT.startupEmpty());
     registerFile(DeferredQueryT.core());
     registerFile(IsolateQueryT.core());
     registerFile(ModelT.core(isRoot: true));

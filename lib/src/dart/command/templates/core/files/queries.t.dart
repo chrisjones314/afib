@@ -66,6 +66,17 @@ throwUnimplemented();
     );
   }
 
+  factory SimpleQueryT.startupEmpty() {
+     return SimpleQueryT.withMemberVariables(
+       templateFileId: "query_startup_empty",
+       templateFolder: AFProjectPaths.pathGenerateCoreFiles,
+       insertMemberVariables: AFSourceTemplate.empty,
+       insertConstructorParams: AFSourceTemplate.empty,
+       insertStartImpl: AFSourceTemplate.empty,
+    );
+  }
+
+
   AFSourceTemplateInsertion get insertQueryType => AFSourceTemplate.insertMainTypeInsertion;
   AFSourceTemplateInsertion get insertQueryParentType => AFSourceTemplate.insertMainParentTypeInsertion;
   AFSourceTemplateInsertion get insertResultType => insertResultTypeInsertion;

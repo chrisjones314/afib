@@ -47,7 +47,7 @@ static void onUpdateUser(AFFinishQuerySuccessContext<User> context) {
   final result = context.r;
   final ${AFSourceTemplate.insertAppNamespaceInsertion}State = context.accessComponentState<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>();
   final users = ${AFSourceTemplate.insertAppNamespaceInsertion}State.users;
-  final revised = users.reviseUser(result);
+  final revised = users.reviseSetItem(result);
   context.updateComponentRootStateOne<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>(revised);    
 }
 '''

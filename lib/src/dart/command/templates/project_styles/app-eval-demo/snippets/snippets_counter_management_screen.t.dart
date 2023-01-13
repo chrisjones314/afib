@@ -30,14 +30,7 @@ class SnippetCounterManagementScreenRouteParamT {
       templateFileId: "counter_management_screen_route_param",
       templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
-        AFSourceTemplate.insertMemberVariablesInsertion: '''
-final int clickCount;
-''',
-        AFSourceTemplate.insertConstructorParamsInsertion: '{ required this.clickCount, }',
-        AFSourceTemplate.insertCreateParamsInsertion: "{ required int clickCount }",
-        AFSourceTemplate.insertCreateParamsCallInsertion: "clickCount: clickCount",
-        AFSourceTemplate.insertCopyWithParamsInsertion: "{  int? clickCount }",
-        AFSourceTemplate.insertCopyWithCallInsertion: "clickCount: clickCount ?? this.clickCount,",
+        AFSourceTemplate.insertCreateParamsInsertion: AFSourceTemplate.empty,
         AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 CounterManagementScreenRouteParam reviseIncrementClickCount() => copyWith(clickCount: clickCount+1);
 CounterManagementScreenRouteParam reviseClearClickCount() => copyWith(clickCount: 0);

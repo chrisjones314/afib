@@ -30,7 +30,9 @@ class SnippetHomePageScreenRouteParamT {
       templateFileId: "home_page_screen_route_param",
       templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
-        AFSourceTemplate.insertMemberVariablesInsertion: '''
+        AFSourceTemplate.insertCreateParamsInsertion: AFSourceTemplate.empty,
+        AFSourceTemplate.insertAdditionalMethodsInsertion: '''
+
 static const stanzas = <String>[
   "It is a truth universally acknowledged,\\nthat a single man\\nin possession of a good fortune,",
   "must be in want of a wife.",
@@ -45,14 +47,7 @@ static const stanzas = <String>[
   "“YOU want to tell me,\\nand I have no objection to hearing it.”",
   "This was invitation enough..."
 ];
-final int lineNumber;
-''',
-        AFSourceTemplate.insertConstructorParamsInsertion: '{ required this.lineNumber, }',
-        AFSourceTemplate.insertCreateParamsInsertion: "{ int lineNumber = 0 }",
-        AFSourceTemplate.insertCreateParamsCallInsertion: "lineNumber: lineNumber",
-        AFSourceTemplate.insertCopyWithParamsInsertion: "{ int? lineNumber }",
-        AFSourceTemplate.insertCopyWithCallInsertion: "lineNumber: lineNumber ?? this.lineNumber,",
-        AFSourceTemplate.insertAdditionalMethodsInsertion: '''
+
 String get textCurrentStanza {
   final idx = lineNumber % stanzas.length;
   return stanzas[idx];

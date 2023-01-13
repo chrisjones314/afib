@@ -14,6 +14,8 @@ class StarterSigninFirebaseT extends AFProjectStyleSourceTemplate {
 require "firebase_core, firebase_auth, cloud_firestore, meta, afib_firebase_firestore, afib_signin"
 integrate library --package-name afib_firebase_firestore --package-code affs
 import project_styles/app-starter-signin-shared
+generate ui StartupScreen --override-templates +
+  +core/snippets/minimal_screen_build_body_impl=core/snippets/snippet_startup_screen_complete_project_style
 ''';
 
 }

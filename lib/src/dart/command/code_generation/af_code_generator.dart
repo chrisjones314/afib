@@ -915,7 +915,14 @@ class AFCodeGenerator {
     return sb.toString();
   }  
 
-  static String upcaseFirst(String convert) {
+  static String convertStripId(String convert) {
+    if(convert.endsWith("Id")) {
+      convert = convert.substring(0, convert.length - 2);
+    }
+    return convert;
+  }
+
+  static String convertUpcaseFirst(String convert) {
     final first = convert.substring(0, 1);
     return "${first.toUpperCase()}${convert.substring(1)}";
   }

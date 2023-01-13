@@ -44,7 +44,7 @@ generate query CheckSigninQuery --result-type UserCredentialRoot --override-temp
 generate ui StartupScreen --override-templates +
   +core/snippets/screen_build_with_spi_impl=project_styles/app-eval-demo/snippets/startup_screen_build_with_spi
   +core/snippets/minimal_screen_build_body_impl=project_styles/app-eval-demo/snippets/startup_screen_build_body
-generate ui HomePageScreen --override-templates +
+generate ui HomePageScreen --member-variables "int lineNumber;" --override-templates +
   +core/snippets/extra_imports=project_styles/app-eval-demo/snippets/home_page_screen_extra_imports
   +core/snippets/standard_route_param=project_styles/app-eval-demo/snippets/home_page_screen_route_param
   +core/snippets/declare_spi=project_styles/app-eval-demo/snippets/home_page_screen_spi
@@ -53,7 +53,7 @@ generate ui HomePageScreen --override-templates +
   +core/snippets/minimal_screen_build_body_impl=project_styles/app-eval-demo/snippets/home_page_screen_build_body
   +core/snippets/screen_additional_methods=project_styles/app-eval-demo/snippets/home_page_screen_additional_methods
   +core/snippets/smoke_test_impl=project_styles/app-eval-demo/snippets/home_screen_smoke_test
-generate ui CounterManagementScreen --override-templates +
+generate ui CounterManagementScreen --member-variables "int clickCount;" --override-templates +
   +core/snippets/extra_imports=project_styles/app-eval-demo/snippets/counter_management_screen_extra_imports
   +core/snippets/standard_route_param=project_styles/app-eval-demo/snippets/counter_management_screen_route_param
   +core/snippets/declare_spi=project_styles/app-eval-demo/snippets/counter_management_screen_spi
@@ -69,6 +69,7 @@ generate ui SignedInDrawer --override-templates +
   +core/snippets/drawer_build_body=project_styles/app-eval-demo/snippets/signed_in_drawer_build_body
 generate test StartupUnitTest  
 generate test InitialWireframe --initial-screen HomePageScreen --override-templates +
+  +core/snippets/wireframe_impl=project_styles/app-eval-demo/snippets/wireframe_impl
   +core/snippets/wireframe_body=project_styles/app-eval-demo/snippets/initial_wireframe_body
 generate custom file --main-type ${insertAppNamespaceUpper}SqliteDB --path lib/state/db --override-templates "core/files/custom=project_styles/app-eval-demo/files/sqlite_db"
 ''';

@@ -71,7 +71,7 @@ if(cred.isSignedIn) {
     queries: startupLoad, onSuccess: (successCtx) {
       // Now that we have our state established, navigate to the home screen.   Note that AFib in no way requires a 
       // 'load all your state on startup' model, but it is a simple place to start in this example.
-      context.navigateReplaceAll(HomePageScreen.navigatePush().castToReplaceAll());
+      context.navigateReplaceAll(HomePageScreen.navigatePush(lineNumber: 0).castToReplaceAll());
     }));
 } else {
   // do nothing, we will just stay on the startup screen.  Later, when we integrate

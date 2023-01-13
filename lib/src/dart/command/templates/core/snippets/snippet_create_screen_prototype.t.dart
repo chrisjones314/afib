@@ -3,14 +3,12 @@ import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
 
 class SnippetCreateScreenPrototypeT extends AFSourceTemplate {
   static const insertFullTestDataID = AFSourceTemplateInsertion("full_test_data_id");
+  static const insertNavigatePushParams = AFSourceTemplateInsertion("push_params");
 
-  final String pushParams;
-  SnippetCreateScreenPrototypeT({
-    required this.pushParams
-  });
+  SnippetCreateScreenPrototypeT();
 
   factory SnippetCreateScreenPrototypeT.noPushParams() {
-    return SnippetCreateScreenPrototypeT(pushParams: '');
+    return SnippetCreateScreenPrototypeT();
   }
 
 
@@ -18,7 +16,7 @@ class SnippetCreateScreenPrototypeT extends AFSourceTemplate {
 var prototype = context.define${ScreenT.insertControlTypeSuffix}Prototype(
   id: ${insertAppNamespaceUpper}PrototypeID.${ScreenT.insertScreenID},
   stateView: ${insertAppNamespaceUpper}TestDataID.$insertFullTestDataID,
-  navigate: $insertMainType.navigatePush($pushParams),
+  navigate: $insertMainType.navigatePush($insertNavigatePushParams),
 );
 ''';
 }

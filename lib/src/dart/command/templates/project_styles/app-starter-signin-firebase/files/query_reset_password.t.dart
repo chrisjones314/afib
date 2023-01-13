@@ -24,12 +24,12 @@ class QueryForgotPasswordFirebaseStarterT extends SimpleQueryT {
       insertExtraImports: '''
 import 'package:afib/afib_flutter.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fba;
 import 'package:afib_signin/afsi_flutter.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplate.insertAppNamespaceInsertion}_id.dart';
 ''',
       insertStartImpl: '''
-FirebaseAuth.instance.sendPasswordResetEmail(
+fba.FirebaseAuth.instance.sendPasswordResetEmail(
   email: email)
 .then((result) {
   context.onSuccess(AFUnused.unused);

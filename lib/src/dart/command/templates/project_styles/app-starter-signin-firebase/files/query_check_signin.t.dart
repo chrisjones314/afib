@@ -34,10 +34,10 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_c
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/home_page_screen.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signin_query.dart';
 import 'package:afib_signin/afsi_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fba;
 ''',
       insertStartImpl: '''
-subscription = FirebaseAuth.instance.authStateChanges().listen((user) { 
+subscription = fba.FirebaseAuth.instance.authStateChanges().listen((user) { 
   final result = SigninQuery.convertCredential(user);
   context.onSuccess(result);
 });

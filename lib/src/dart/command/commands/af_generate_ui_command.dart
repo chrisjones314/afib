@@ -1,5 +1,6 @@
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
+import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/screen_test.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/theme.t.dart';
@@ -227,6 +228,10 @@ $optionsHeader
   --$argStateView YourStateView - the state view to use, falls back to your default state view
   --$argTheme YourTheme - the theme to use, falls back to your default theme, NOT used when creating themes
 
+  UI Elements only, targeting the route parameter
+    ${AFGenerateSubcommand.argMemberVariablesHelp} 
+    ${AFGenerateSubcommand.argResolveVariablesHelp}
+
   --$argExportTemplatesHelp
   --$argOverrideTemplatesHelp
   ${AFCommand.argPrivateOptionHelp}
@@ -245,7 +250,11 @@ $optionsHeader
         argStateView: generator.nameDefaultStateView,
         argTheme: generator.nameDefaultTheme,
         argParentTheme: generator.nameDefaultParentTheme,
-        argParentThemeID: generator.nameDefaultParentThemeID        
+        argParentThemeID: generator.nameDefaultParentThemeID,
+        AFGenerateSubcommand.argMemberVariables: "",
+        AFGenerateSubcommand.argResolveVariables: "",
+        AFGenerateStateSubcommand.argNotSerial: "true",
+        AFGenerateStateSubcommand.argNoReviseMethods: "false",
       }
     );
 
@@ -358,6 +367,8 @@ $optionsHeader
       throw AFCommandError(error: "$uiName is too short.  It maybe the name of an existing default class.  Please differentiate it.");
     }
 
+    var memberVariables = context.memberVariables(context, args, "${uiName}RouteParam");
+
     final screenIdType = "$ns${controlSettings.suffix}ID";
     final spiParentType = "$ns${controlSettings.suffix}SPI";
 
@@ -377,15 +388,34 @@ $optionsHeader
       ScreenT.insertStateViewPrefix: stateViewPrefix,
     });
 
+    Object standardReviseMethods = AFSourceTemplate.empty;
+    if(memberVariables != null && !args.accessNamedFlag(AFGenerateStateSubcommand.argNoReviseMethods)) {
+      standardReviseMethods = memberVariables.standardReviseMethods;
+    }
 
     final routeParamTemplate = routeParamImpls ?? controlSettings.routeParamImpls;
-    final routeParamSnippet = context.createSnippet(routeParamTemplate, extend: screenInsertions);
+    final routeParamSnippet = context.createSnippet(routeParamTemplate, extend: screenInsertions, insertions: {
+      AFSourceTemplate.insertMemberVariablesInsertion: memberVariables?.declareVariables ?? AFSourceTemplate.empty,
+      AFSourceTemplate.insertConstructorParamsInsertion: memberVariables?.constructorParams ?? AFSourceTemplate.empty,
+      AFSourceTemplate.insertCopyWithParamsInsertion: memberVariables?.copyWithParams ?? AFSourceTemplate.empty,
+      AFSourceTemplate.insertCopyWithCallInsertion: memberVariables?.copyWithCall ?? AFSourceTemplate.empty,      
+      AFSourceTemplate.insertMemberVariableImportsInsertion: memberVariables?.extraImports(context) ?? AFSourceTemplate.empty,
+      ModelT.insertStandardReviseMethods: standardReviseMethods,
+      ModelT.insertResolveFunctions: memberVariables?.resolveFunctions ?? AFSourceTemplate.empty,
+      AFSourceTemplate.insertCreateParamsInsertion: memberVariables?.navigatePushParams ?? AFSourceTemplate.empty,
+      AFSourceTemplate.insertCreateParamsCallInsertion: memberVariables?.navigatePushCall ?? AFSourceTemplate.empty,
+    });
 
     final navigatePushTemplate = (navigatePush ?? controlSettings.navigatePush);
-    final navigatePushSnippet = context.createSnippet(navigatePushTemplate, extend: screenInsertions);
+    final navigatePushSnippet = context.createSnippet(navigatePushTemplate, extend: screenInsertions, insertions: {
+      SnippetNavigatePushT.insertParamDecl: memberVariables?.navigatePushParams ?? AFSourceTemplate.empty,
+      SnippetNavigatePushT.insertParamCall: memberVariables?.navigatePushCall ?? AFSourceTemplate.empty,
+    });
 
     final spiSnippet = context.createSnippet(controlSettings.spi, extend: screenInsertions, insertions: {
       AFSourceTemplate.insertMainParentTypeInsertion: spiParentType,
+      SnippetDeclareSPIT.insertSPIOnUpdateMethods: memberVariables?.spiOnUpdateMethods ?? AFSourceTemplate.empty,
+      SnippetDeclareSPIT.insertSPIResolveMethods: memberVariables?.spiResolveMethods ?? AFSourceTemplate.empty,
     });
 
     final superSnippet = context.createSnippet(controlSettings.implsSuper, extend: screenInsertions);
@@ -399,6 +429,10 @@ $optionsHeader
     final screenImplsSnippet = context.createSnippet(screenImpls ?? controlSettings.screenAdditionalMethods, extend: screenInsertions);
 
     final extraImports = context.createSnippet(SnippetExtraImportsT.core(), extend: screenInsertions);
+    final extraImportsRouteParam = memberVariables?.extraImports(context);
+    if(extraImportsRouteParam != null) {
+      extraImports.addLinesAtEnd(context, [extraImportsRouteParam]);
+    }
 
     final screenFile = context.createFile(projectPath, ScreenT(), extend: screenInsertions, insertions: {
       AFSourceTemplate.insertExtraImportsInsertion: extraImports,
@@ -465,7 +499,10 @@ $optionsHeader
       final protoName = "${uiName}InitialPrototype";
       final protoId = generator.declarePrototypeID(context, protoName);
       final pathScreenTest = generator.pathScreenTest(uiName, controlSettings);
-      final createProto = createPrototype ?? controlSettings.createPrototype;
+      final createProto = context.createSnippet(createPrototype ?? controlSettings.createPrototype, insertions: {
+        SnippetCreateScreenPrototypeT.insertNavigatePushParams: memberVariables?.initialValueDeclaration ?? AFSourceTemplate.empty,
+      });
+      
       final screenTestFile = context.createFile(pathScreenTest, ScreenTestT.core(), insertions: {
           AFSourceTemplate.insertExtraImportsInsertion: "",
           AFSourceTemplate.insertMainTypeInsertion: uiName,

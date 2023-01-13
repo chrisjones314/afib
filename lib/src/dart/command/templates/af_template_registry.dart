@@ -47,6 +47,7 @@ import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/sni
 import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/snippets/snippet_home_screen_smoke_test.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/snippets/snippet_initial_wireframe_body.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/snippets/snippet_startup_state_test.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/snippets/snippet_wireframe_impl.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/snippets/snippets_counter_management_screen.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/snippets/snippets_home_page_screen.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/snippets/snippets_signed_in_drawer.t.dart';
@@ -139,7 +140,7 @@ class AFTemplateRegistry {
     registerSnippet(SnippetDrawerBuildBodyT());
     registerSnippet(SnippetSmokeTestImplT());
     registerSnippet(SnippetStateTestImplT());
-    registerSnippet(SnippetWireframeImplT());
+    registerSnippet(SnippetWireframeImplT.core());
     registerSnippet(SnippetWireframeBodyT());
     registerSnippet(SnippetStartupScreenCompleteProjectStyleT());
     registerSnippet(SnippetFundamentalThemeInitUILibraryT.core());
@@ -196,7 +197,9 @@ class AFTemplateRegistry {
     registerSnippet(SnippetStartupStateTestT());
     registerSnippet(SnippetDefineCountHistoryRootTestDataT.example());
     registerSnippet(SnippetDefineUsersRootTestDataT.example());
+    
     registerSnippet(SnippetInitialWireframeBodyT());
+    registerSnippet(SnippetEvalWireframeImplT.example());
 
     // starter-signin example
     registerFile(QueryStarterSigninStartupT.example());

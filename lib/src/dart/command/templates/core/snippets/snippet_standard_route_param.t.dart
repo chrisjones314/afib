@@ -1,5 +1,7 @@
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
+import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
+import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
 
 class SnippetStandardRouteParamT extends AFSnippetSourceTemplate {
@@ -38,6 +40,9 @@ class ${insertMainType}RouteParam extends AF${ScreenT.insertControlTypeSuffix}Ro
   factory ${insertMainType}RouteParam.create($insertCreateParams) {
     return ${insertMainType}RouteParam($insertCreateParamsCall);
   }
+
+  ${ModelT.insertResolveFunctions}
+  ${ModelT.insertStandardReviseMethods}
 
   ${insertMainType}RouteParam copyWith($insertCopyWithParams) {
     return ${insertMainType}RouteParam($insertCopyWithConstructorCall);

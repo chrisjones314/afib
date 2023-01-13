@@ -33,10 +33,10 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/user
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/home_page_screen.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signin_query.dart';
 import 'package:afib_signin/afsi_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fba;
 ''',
       insertStartImpl: '''
-FirebaseAuth.instance.createUserWithEmailAndPassword(
+fba.FirebaseAuth.instance.createUserWithEmailAndPassword(
   email: email,
   password: password
 ).then((result) {

@@ -378,12 +378,50 @@ class AFMemberVariableTemplates {
     return result.toString();
   }
 
+  String get spiResolveMethods {
+    final result = StringBuffer();
+    _iterate(
+      include: includeMemberVars,
+      visit: (identifier, kind, isLast, includeKind) {
+        result.writeln("$kind get $identifier => context.p.$identifier;");
+      }
+    );    
+
+    _iterate(
+      include: includeResolveVars,
+      visit: (identifier, kind, isLast, includeKind) {
+        final noId = AFCodeGenerator.convertStripId(identifier);
+        final methodSuffix = AFCodeGenerator.convertUpcaseFirst(noId);
+        final plural = AFCodeGenerator.pluralize(noId);
+        result.writeln("$kind? get $noId => context.p.resolve$methodSuffix(context.s.$plural);");
+      }
+    );    
+
+        result.writeln();
+    return result.toString();
+  }
+
+  String get spiOnUpdateMethods {
+    final result = StringBuffer();
+    _iterate(
+      include: includeMemberVars,
+      visit: (identifier, kind, isLast, includeKind) {
+        final methodSuffix = AFCodeGenerator.convertUpcaseFirst(identifier);
+        result.writeln("void onChanged$methodSuffix($kind value) {");
+        result.writeln("  final revised = context.p.revise$methodSuffix(value);");
+        result.writeln("  context.updateRouteParam(revised);");
+        result.writeln("}");
+        result.writeln();
+    });    
+    return result.toString();
+  }
+
   String get standardReviseMethods {
     final result = StringBuffer();
     _iterate(
       include: includeAllVars,
       visit: (identifier, kind, isLast, includeKind) {
-        final methodSuffix = AFCodeGenerator.upcaseFirst(identifier);
+        final methodSuffix = AFCodeGenerator.convertUpcaseFirst(identifier);
         result.write("$mainType revise$methodSuffix($kind $identifier) => copyWith($identifier: $identifier);");
         if(!isLast) {
           result.writeln();
@@ -432,6 +470,31 @@ class AFMemberVariableTemplates {
     result.write("}");
     return result.toString();    
   }
+
+  String get navigatePushParams {
+    final result = StringBuffer("{");
+    result.writeln();
+    _iterate(
+      include: includeAllVars,
+      visit: (identifier, kind, isLast, includeKind) {
+        result.writeln("  required $kind $identifier,");
+    });
+    result.write("}");
+    return result.toString();    
+  }
+
+  String get navigatePushCall {
+    final result = StringBuffer();
+    result.writeln();
+    _iterate(
+      include: includeAllVars,
+      visit: (identifier, kind, isLast, includeKind) {
+        result.writeln("  $identifier: $identifier,");
+    });
+    result.writeln();
+    return result.toString();    
+  }
+
   
   String get copyWithCall {
     final result = StringBuffer();
@@ -465,6 +528,8 @@ class AFMemberVariableTemplates {
         val = '""';
       } else if (kind == "double") {
         val = '0.0';
+      } else if (kind == "bool") {
+        val = 'true';
       }
  
       result.write("$identifier: $val,");
@@ -478,7 +543,7 @@ class AFMemberVariableTemplates {
     _iterate(
       include: includeAllVars,
       visit: (identifier, kind, isLast, includeKind) {
-        final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
+        final upcaseIdentifier = AFCodeGenerator.convertUpcaseFirst(identifier);
         var convertToString = "";
         if(isIntId && (identifier == AFDocumentIDGenerator.columnId) || _hasFlag(includeKind, includeResolveVars)) {
           convertToString = ".toString()";
@@ -490,7 +555,7 @@ class AFMemberVariableTemplates {
     _iterate(
       include: includeAllVars,
       visit: (identifier, kind, isLast, includeKind) {
-        final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
+        final upcaseIdentifier = AFCodeGenerator.convertUpcaseFirst(identifier);
         result.writeln("  $identifier: item$upcaseIdentifier,");
     });
     result.writeln(");");
@@ -504,7 +569,7 @@ class AFMemberVariableTemplates {
     _iterate(
       include: includeAllVars,
       visit: (identifier, kind, isLast, includeKind) {
-      final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
+      final upcaseIdentifier = AFCodeGenerator.convertUpcaseFirst(identifier);
       var intConvertPrefix = "";
       var intConvertSuffix = "";
       if(isIntId && (identifier == AFDocumentIDGenerator.columnId) || _hasFlag(includeKind, includeResolveVars)) {
@@ -522,7 +587,7 @@ class AFMemberVariableTemplates {
     _iterate(
       include: includeAllVars,
       visit: (identifier, kind, isLast, includeKind) {
-      final upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
+      final upcaseIdentifier = AFCodeGenerator.convertUpcaseFirst(identifier);
       var val = "'${AFCodeGenerator.convertMixedToSnake(identifier)}'";
       if(identifier == "id") {
         val = "AFDocumentIDGenerator.columnId";
@@ -537,10 +602,8 @@ class AFMemberVariableTemplates {
     _iterate(
       include: includeResolveVars,
       visit: (identifier, kind, isLast, includeKind) {
-        var upcaseIdentifier = AFCodeGenerator.upcaseFirst(identifier);
-        if(upcaseIdentifier.endsWith("Id")) {
-          upcaseIdentifier = upcaseIdentifier.substring(0, upcaseIdentifier.length - 2);
-        }
+        var upcaseIdentifier = AFCodeGenerator.convertUpcaseFirst(identifier);
+        upcaseIdentifier = AFCodeGenerator.convertStripId(upcaseIdentifier);
         final kindPlural = AFCodeGenerator.pluralize(kind);
         final kindPluralCamel = AFCodeGenerator.convertToCamelCase(kindPlural);
         result.writeln("$kind? resolve$upcaseIdentifier(${kindPlural}Root $kindPluralCamel) => $kindPluralCamel.findById($identifier);");

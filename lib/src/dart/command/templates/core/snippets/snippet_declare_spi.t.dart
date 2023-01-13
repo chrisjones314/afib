@@ -5,6 +5,8 @@ import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
 
 class SnippetDeclareSPIT extends AFSnippetSourceTemplate {
+  static const insertSPIResolveMethods = AFSourceTemplateInsertion("spi_resolve_methods");
+  static const insertSPIOnUpdateMethods = AFSourceTemplateInsertion("spi_on_update_methods");
 
   SnippetDeclareSPIT({
     required String templateFileId,
@@ -33,6 +35,8 @@ class ${insertMainType}SPI extends $insertMainParentType<${ScreenT.insertStateVi
     );
   }
 
+  $insertSPIResolveMethods
+  $insertSPIOnUpdateMethods
   $insertAdditionalMethods
 }
 ''';

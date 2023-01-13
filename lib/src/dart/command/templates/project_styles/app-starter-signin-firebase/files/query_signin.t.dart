@@ -29,10 +29,10 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_c
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/home_page_screen.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/listener/read_one_user_listener_query.dart';
 import 'package:afib_signin/afsi_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fba;
 ''',
       insertStartImpl: '''
-FirebaseAuth.instance.signInWithEmailAndPassword(
+fba.FirebaseAuth.instance.signInWithEmailAndPassword(
   email: email,
   password: password)
 .then((result) {
@@ -48,7 +48,7 @@ onSuccessfulSignin(context);
       insertAdditionalMethods: '''
 ${QuerySigninSigninStarterT.insertSigninAdditionalMethods('ReadOneUserListenerQuery')}
 
-static UserCredentialRoot convertCredential(User? user) {
+static UserCredentialRoot convertCredential(fba.User? user) {
   // The issue here is that you cannot construct a UserCredential easily, which makes it really
   // difficult to provide query results in testing if your only result is a user credential.   In testing,
   // The most common baseline value you need is the unique user id.  

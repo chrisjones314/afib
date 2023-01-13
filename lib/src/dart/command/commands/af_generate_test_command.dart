@@ -124,7 +124,7 @@ $optionsHeader
     if(initialScreen.isEmpty) {
       throw AFCommandError(error: "You must specify --$argInitialScreen");
     }
-    final unitTestImpl = context.createSnippet(SnippetWireframeImplT(), insertions: {
+    final unitTestImpl = context.createSnippet(SnippetWireframeImplT.core(), insertions: {
       SnippetWireframeImplT.insertInitialScreen: initialScreen
     });
 

@@ -28,10 +28,10 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplat
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/${AFSourceTemplate.insertAppNamespaceInsertion}_state.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/root/user_credential_root.dart';
 import 'package:afib_signin/afsi_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fba;
 ''',
       insertStartImpl: QuerySigninSignoutStarterT.insertStartImplSignout,
-      insertFinishImpl: QuerySigninSignoutStarterT.createFinishImpl("FirebaseAuth.instance.signOut();"),
+      insertFinishImpl: QuerySigninSignoutStarterT.createFinishImpl("fba.FirebaseAuth.instance.signOut();"),
       insertAdditionalMethods: AFSourceTemplate.empty
     );
   }

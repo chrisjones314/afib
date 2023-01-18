@@ -36,6 +36,15 @@ class AFConfigEntries {
     help: "Set to true if you'd like to run the app in dark mode, regardless of the device setting", 
     defaultValue: false);
 
+
+  static final enableGenerateAugment = AFConfigurationItemTrueFalse(
+    libraryId: AFUILibraryID.id,
+    name: "enable-generate-augment", 
+    validContexts: AFConfigurationItem.validContextsAllButNew,
+    ordinal: 305.0,
+    help: "Set to true to include comment-based breadcrumbs (starting //!af_...) in generated code, allowing member variables to be added via 'generate augment' later", 
+    defaultValue: true);
+
   /// Determines whehter afib.dart generate ... will include helpful comments for beginners
   /// in generated files.
   static final generateBeginnerComments = AFConfigurationItemTrueFalse(

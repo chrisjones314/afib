@@ -25,7 +25,7 @@ $descriptionHeader
   $description
 
 $optionsHeader
-  None
+  See the file ${AFibD.config.appNamespace}_config.g.dart, which contains comments with the command line syntax for each option.
 ''';
   }
 
@@ -54,6 +54,8 @@ $optionsHeader
       }
 
       entry.setValue(config, value);
+
+      output.writeTwoColumns(col1: "set ", col2: "${entry.name} = $value");
     }
   } 
   
@@ -68,11 +70,6 @@ $optionsHeader
 
   @override
   Future<void> execute(AFCommandContext ctx) async {    
-
-    final unnamed = ctx.rawArgs;
-    if(unnamed.isNotEmpty) {
-      throw AFCommandError(error: "The command has extra unrecognized arguments, did you forgot -- before an argument?");
-    }
 
     updateConfig(ctx, AFibD.config, AFibD.configEntries, ctx.arguments);
     writeUpdatedConfig(ctx);

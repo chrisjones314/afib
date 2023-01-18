@@ -347,9 +347,11 @@ class AFMemberVariableTemplates {
   }
 
   void _addBreadcrumb(StringBuffer result, AFSourceTemplateInsertion insert, { bool extraIndent = false }) {
+    if(!AFibD.config.enableGenerateAugment) {
+      return;
+    }
     final indent = extraIndent ? "  " : "";
     if(!isAugment) {
-
       result.writeln("$indent${insert.breadcrumb}");
     }
   }

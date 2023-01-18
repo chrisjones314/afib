@@ -574,6 +574,10 @@ class AFConfig {
     return boolFor(AFConfigEntries.forceDarkMode);
   }
 
+  bool get enableGenerateAugment {
+    return boolFor(AFConfigEntries.enableGenerateAugment);
+  }
+
   bool get generateBeginnerComments {
     return boolFor(AFConfigEntries.generateBeginnerComments);
   }

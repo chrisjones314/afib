@@ -51,8 +51,10 @@ class AFWidgetsBindingObserver extends WidgetsBindingObserver {
 
   @override 
   void didChangeMetrics() {
-    AFibD.logThemeAF?.d("Detected metrics change");
-    rebuildTheme();
+    //AFibD.logThemeAF?.d("Detected metrics change");
+    //rebuildTheme();
+    // TODO: this is causing problems because it causes the theme to be rebuild 
+    // everytime you show a drawer.  
   }
 
   @override

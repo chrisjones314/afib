@@ -2,8 +2,8 @@ import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 
 class SnippetNavigatePushT extends AFSnippetSourceTemplate {
-  static const insertParamDecl = AFSourceTemplateInsertion("param_decl");
-  static const insertParamCall = AFSourceTemplateInsertion("param_call");
+  static const insertNavigatePushParamDecl = AFSourceTemplateInsertion("navigate_push_param_decl");
+  static const insertNavigatePushParamCall = AFSourceTemplateInsertion("navigate_push_param_call");
 
   SnippetNavigatePushT({
     required String templateFileId,
@@ -20,17 +20,17 @@ class SnippetNavigatePushT extends AFSnippetSourceTemplate {
       templateFileId: "navigate_push",
       templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
       embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
-        insertParamDecl: AFSourceTemplate.empty,
-        insertParamCall: AFSourceTemplate.empty,
+        insertNavigatePushParamDecl: AFSourceTemplate.empty,
+        insertNavigatePushParamCall: AFSourceTemplate.empty,
       })
     );
   }
 
   String get template {
     return '''
-static AFNavigatePushAction navigatePush($insertParamDecl) {
+static AFNavigatePushAction navigatePush($insertNavigatePushParamDecl) {
   return AFNavigatePushAction(
-    launchParam: ${insertMainType}RouteParam.create($insertParamCall)
+    launchParam: ${insertMainType}RouteParam.create($insertNavigatePushParamCall)
   );
 }
   ''';

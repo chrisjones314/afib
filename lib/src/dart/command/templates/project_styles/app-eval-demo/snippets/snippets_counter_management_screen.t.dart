@@ -48,8 +48,8 @@ class SnippetCounterManagementScreenNavigatePushT {
       templateFileId: "counter_management_screen_navigate_push",
       templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
-        SnippetNavigatePushT.insertParamDecl: '{ int clickCount = 0, }',
-        SnippetNavigatePushT.insertParamCall: 'clickCount: clickCount,',
+        SnippetNavigatePushT.insertNavigatePushParamDecl: '{ int clickCount = 0, }',
+        SnippetNavigatePushT.insertNavigatePushParamCall: 'clickCount: clickCount,',
       })
     );
   }

@@ -24,6 +24,7 @@ class AFCodeRegExp {
   static final afTag = RegExp(r".*\[!af_.*\].*");
   static final startImportLine = RegExp(r"import\s+.*;");
   static final defineStartupScreen = RegExp(r"\s+context.defineStartupScreen\(");
+  static final isIntId = RegExp(r"int\s+id;");
 
   static RegExp startDefineTestsFunction(String suffix) {
     return RegExp("void\\s+define${suffix}s\\(AF${suffix}DefinitionContext\\s+context\\)\\s+{");

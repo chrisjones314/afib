@@ -18,6 +18,7 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:collection/collection.dart';
 import 'package:colorize/colorize.dart';
+import 'package:path/path.dart';
 import 'package:plural_noun/plural_noun.dart';
 
 class AFCodeGenerator { 
@@ -157,6 +158,19 @@ class AFCodeGenerator {
       path = rootsPath;
     }
     return _createPath(path, filename);
+  }
+
+  List<String> pathUnknown(String name) {
+    if(name.endsWith(AFGenerateQuerySubcommand.suffixQuery)) {
+      return pathQuery(name);
+    }
+
+    final controlKind = AFGenerateUISubcommand.findControlKind(name);
+    if(controlKind != null) {
+      return pathUI(name, controlKind);
+    }
+    
+    return pathModel(name);
   }
 
   List<String> pathModelFile(String filename) {
@@ -735,7 +749,7 @@ class AFCodeGenerator {
     }
     
     if(action == AFGeneratedFileAction.create && AFProjectPaths.projectFileExists(projectPath) && !isRenamed(projectPath) && !context.isForceOverwrite) {
-      throw AFCommandError(error: "File at $projectPath needs to be created, but already exists, delete or move it if you'd like to re-create it.");
+      throw AFCommandError(error: "File at '${joinAll(projectPath)}' needs to be created, but already exists, delete or move it if you'd like to re-create it.");
     }
 
     AFGeneratedFile generated;

@@ -5,6 +5,8 @@ import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 
 class SnippetSerialMethodsT extends AFSnippetSourceTemplate {
+  static const insertSerializeFromDeserializeLines = AFSourceTemplateInsertion("serialize_from_deserialize_lines");
+  static const insertSerializeFromConstructorParams = AFSourceTemplateInsertion("serialize_from_constructor_params");
   static const insertSerializeToBody = AFSourceTemplateInsertion("serialize_to_body");
   static const insertSerializeFromBody = AFSourceTemplateInsertion("serialize_from_body");
 

@@ -70,8 +70,8 @@ class SnippetHomePageScreenNavigatePushT {
       templateFileId: "home_page_screen_navigate_push",
       templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
       embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
-        SnippetNavigatePushT.insertParamDecl: '{ int lineNumber = 0 }',
-        SnippetNavigatePushT.insertParamCall: 'lineNumber: lineNumber,',
+        SnippetNavigatePushT.insertNavigatePushParamDecl: '{ int lineNumber = 0 }',
+        SnippetNavigatePushT.insertNavigatePushParamCall: 'lineNumber: lineNumber,',
       })
     );
   }

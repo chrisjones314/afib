@@ -3,6 +3,7 @@ import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_create_command.dart';
 import 'package:afib/src/dart/command/commands/af_echo_command.dart';
+import 'package:afib/src/dart/command/commands/af_generate_augment_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_custom_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_id_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_test_command.dart';
@@ -11,13 +12,19 @@ import 'package:afib/src/dart/command/commands/af_require_command.dart';
 import 'package:afib/src/dart/command/commands/af_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/command/templates/af_template_registry.dart';
+import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_create_screen_prototype.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_spi.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_test_id.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_from_package.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_navigate_push.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_serial_methods.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:args/args.dart' as args;
 import 'package:collection/collection.dart';
 import 'package:path/path.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
+
 class AFItemWithNamespace {
   /// The namespace used to differentiate third party commands.
   final String namespace;
@@ -156,6 +163,14 @@ abstract class AFCommand {
     throw AFCommandError(error: error, usage: usage);
   }
 
+  void verifyNotGenerateConflict(String itemName, List<String> invalidSuffixes, String subcommand) {
+    final idx = invalidSuffixes.indexWhere((e) => itemName.endsWith(e));
+    if(idx >= 0) {
+      throwUsageError("The 'generate $subcommand` command cannot generate an item with a suffix among ${invalidSuffixes.join('|')}");
+    }
+  }
+
+
   void verifyNotEmpty(String value, String msg) {
     if(value.isEmpty) {
       throwUsageError(msg);
@@ -276,12 +291,14 @@ class AFMemberVariableTemplates {
   static const includeAllVars = includeMemberVars | includeResolveVars;
 
   final bool isIntId;
+  final bool isAugment;
   final Map<String, String> memberVars;
   final Map<String, String> resolveVars;
   final String mainType;
   String? standardRootMapType;
  
   AFMemberVariableTemplates({
+    required this.isAugment,
     required this.memberVars,
     required this.resolveVars,
     required this.isIntId,
@@ -296,7 +313,8 @@ class AFMemberVariableTemplates {
       memberVars: <String, String>{}, 
       resolveVars: <String, String>{},
       isIntId: isIntId, 
-      mainType: mainType
+      mainType: mainType,
+      isAugment: false,
     );
   }
 
@@ -321,12 +339,19 @@ class AFMemberVariableTemplates {
       include: includeAllVars,
       visit: (identifier, kind, isLast, includeKind) {
       result.write("final $kind $identifier;");
-      if(!isLast || resolveVars.isNotEmpty) {
-        result.writeln();
-      }
+      result.writeln();
     });
+    _addBreadcrumb(result, AFSourceTemplate.insertMemberVariablesInsertion);
 
     return result.toString();
+  }
+
+  void _addBreadcrumb(StringBuffer result, AFSourceTemplateInsertion insert, { bool extraIndent = false }) {
+    final indent = extraIndent ? "  " : "";
+    if(!isAugment) {
+
+      result.writeln("$indent${insert.breadcrumb}");
+    }
   }
 
   String? _generateImportFor(AFCommandContext context, String kind, { bool requireFile = true }) {
@@ -374,6 +399,7 @@ class AFMemberVariableTemplates {
         }
       }
     );
+    _addBreadcrumb(result, AFSourceTemplate.insertExtraImportsInsertion);
 
     return result.toString();
   }
@@ -392,12 +418,15 @@ class AFMemberVariableTemplates {
       visit: (identifier, kind, isLast, includeKind) {
         final noId = AFCodeGenerator.convertStripId(identifier);
         final methodSuffix = AFCodeGenerator.convertUpcaseFirst(noId);
-        final plural = AFCodeGenerator.pluralize(noId);
-        result.writeln("$kind? get $noId => context.p.resolve$methodSuffix(context.s.$plural);");
+        final kindPlural = AFCodeGenerator.pluralize(kind);
+        final kindPluralCamel = AFCodeGenerator.convertToCamelCase(kindPlural);
+        result.writeln("$kind? get $noId => context.p.resolve$methodSuffix(context.s.$kindPluralCamel);");
       }
     );    
 
-        result.writeln();
+    result.writeln();
+    _addBreadcrumb(result, SnippetDeclareSPIT.insertSPIResolveMethods);
+
     return result.toString();
   }
 
@@ -413,20 +442,23 @@ class AFMemberVariableTemplates {
         result.writeln("}");
         result.writeln();
     });    
+
+    _addBreadcrumb(result, SnippetDeclareSPIT.insertSPIOnUpdateMethods);
+
     return result.toString();
   }
 
-  String get standardReviseMethods {
+  String get reviseMethods {
     final result = StringBuffer();
     _iterate(
       include: includeAllVars,
       visit: (identifier, kind, isLast, includeKind) {
         final methodSuffix = AFCodeGenerator.convertUpcaseFirst(identifier);
         result.write("$mainType revise$methodSuffix($kind $identifier) => copyWith($identifier: $identifier);");
-        if(!isLast) {
-          result.writeln();
-        }
+        result.writeln();
     });
+    _addBreadcrumb(result, ModelT.insertReviseMethods);
+
     return result.toString();
   }
  
@@ -439,46 +471,59 @@ class AFMemberVariableTemplates {
     _iterate(
       include: includeAllVars,
       visit: (identifier, kind, isLast, includeKind) {
-        result.write("required this.$identifier,");
-        if(!isLast) {
-          result.writeln();
-        }
+        result.writeln("required this.$identifier,");
     });
+    _addBreadcrumb(result, AFSourceTemplate.insertConstructorParamsInsertion, extraIndent: false);
     return result.toString();
   }
 
   String get constructorParams {
-    final result = StringBuffer("{");
-    result.writeln(constructorParamsBare);
+    final result = StringBuffer();
+    result.writeln("{");
+    result.write(constructorParamsBare);
     result.write("}");
     return result.toString();
   }
-  
-  String get copyWithParams {
-    final result = StringBuffer("{");
-    result.writeln();
-    if(standardRootMapType != null) {
-      result.write("  Map<String, $standardRootMapType>? items,");
+
+  String get copyWithParamsBare {
+    final result = StringBuffer();
+    if(standardRootMapType != null && !isAugment) {
+      result.write("Map<String, $standardRootMapType>? items,");
     }
 
     _iterate(
       include: includeAllVars,
       visit: (identifier, kind, isLast, includeKind) {
-        result.write("  $kind? $identifier,");
+        result.write("$kind? $identifier,");
         result.writeln();
     });
+    _addBreadcrumb(result, AFSourceTemplate.insertCopyWithParamsInsertion, extraIndent: false);
+    return result.toString();
+  }
+  
+  String get copyWithParams {
+    final result = StringBuffer();
+    result.writeln("{");
+    result.write(copyWithParamsBare);
     result.write("}");
     return result.toString();    
   }
 
-  String get navigatePushParams {
-    final result = StringBuffer("{");
-    result.writeln();
+  String get navigatePushParamsBare {
+    final result = StringBuffer();
     _iterate(
       include: includeAllVars,
       visit: (identifier, kind, isLast, includeKind) {
         result.writeln("  required $kind $identifier,");
     });
+    _addBreadcrumb(result, SnippetNavigatePushT.insertNavigatePushParamDecl);
+    return result.toString();
+  }
+
+  String get navigatePushParams {
+    final result = StringBuffer();
+    result.writeln("{");
+    result.write(navigatePushParamsBare);
     result.write("}");
     return result.toString();    
   }
@@ -491,6 +536,7 @@ class AFMemberVariableTemplates {
       visit: (identifier, kind, isLast, includeKind) {
         result.writeln("  $identifier: $identifier,");
     });
+    _addBreadcrumb(result, SnippetNavigatePushT.insertNavigatePushParamCall);
     result.writeln();
     return result.toString();    
   }
@@ -508,6 +554,7 @@ class AFMemberVariableTemplates {
         result.write("$identifier: $identifier ?? this.$identifier,");
         result.writeln();
     });
+    _addBreadcrumb(result, AFSourceTemplate.insertCopyWithCallInsertion);
     return result.toString();    
   }
 
@@ -535,10 +582,11 @@ class AFMemberVariableTemplates {
       result.write("$identifier: $val,");
       result.writeln();
     });
+    _addBreadcrumb(result,  SnippetCreateScreenPrototypeT.insertNavigatePushParams);
     return result.toString();    
   }
 
-  String get serializeFrom {
+  String get serializeFromDeserializeLines {
     final result = StringBuffer();
     _iterate(
       include: includeAllVars,
@@ -550,17 +598,29 @@ class AFMemberVariableTemplates {
         } 
         result.writeln("final item$upcaseIdentifier = source[col$upcaseIdentifier]$convertToString;");
     });
+    _addBreadcrumb(result, SnippetSerialMethodsT.insertSerializeFromDeserializeLines);
+    return result.toString();
+  }
 
-    result.writeln("return $mainType(");
+  String get serializeFromConstructorParams {
+    final result = StringBuffer();
     _iterate(
       include: includeAllVars,
       visit: (identifier, kind, isLast, includeKind) {
         final upcaseIdentifier = AFCodeGenerator.convertUpcaseFirst(identifier);
-        result.writeln("  $identifier: item$upcaseIdentifier,");
+        result.writeln("$identifier: item$upcaseIdentifier,");
     });
+    _addBreadcrumb(result, SnippetSerialMethodsT.insertSerializeFromConstructorParams, extraIndent: false);
+    return result.toString();
+  }
+
+  String get serializeFrom {
+    final result = StringBuffer();
+    result.write(serializeFromDeserializeLines);
+    result.writeln();
+    result.writeln("return $mainType(");
+    result.write(serializeFromConstructorParams);
     result.writeln(");");
-
-
     return result.toString();
   }
 
@@ -578,12 +638,16 @@ class AFMemberVariableTemplates {
       }
       result.writeln("result[col$upcaseIdentifier] = ${intConvertPrefix}item.$identifier$intConvertSuffix;");
     });
+    _addBreadcrumb(result, SnippetSerialMethodsT.insertSerializeToBody);
+
     return result.toString();
   }
 
   String get serialConstants {
     final result = StringBuffer();
-    result.writeln("static const tableName = '${AFCodeGenerator.convertMixedToSnake(mainType)}';");
+    if(!isAugment) {
+      result.writeln("static const tableName = '${AFCodeGenerator.convertMixedToSnake(mainType)}';");
+    }
     _iterate(
       include: includeAllVars,
       visit: (identifier, kind, isLast, includeKind) {
@@ -594,10 +658,11 @@ class AFMemberVariableTemplates {
       }
       result.writeln("static const col$upcaseIdentifier = $val;");
     });
+    _addBreadcrumb(result, ModelT.insertSerialConstantsInsertion);
     return result.toString();
   }
 
-  String get resolveFunctions {
+  String get resolveMethods {
     final result = StringBuffer();
     _iterate(
       include: includeResolveVars,
@@ -609,6 +674,8 @@ class AFMemberVariableTemplates {
         result.writeln("$kind? resolve$upcaseIdentifier(${kindPlural}Root $kindPluralCamel) => $kindPluralCamel.findById($identifier);");
       }
     );
+
+    _addBreadcrumb(result, ModelT.insertResolveMethods);
     return result.toString();  
   }
 
@@ -744,7 +811,10 @@ class AFCommandContext {
     return result;
   }
 
-  AFMemberVariableTemplates? memberVariables(AFCommandContext context, AFCommandArgumentsParsed args, String mainType) {
+  AFMemberVariableTemplates? memberVariables(AFCommandContext context, AFCommandArgumentsParsed args, String mainType, {
+    bool isAugment = false,
+    bool? isIntIdOverride,
+  }) {
     final isRoot = mainType.endsWith(AFCodeGenerator.rootSuffix);
     final isQuery = mainType.endsWith(AFGenerateQuerySubcommand.suffixQuery);
     final memberVarsSource = args.accessNamed(AFGenerateSubcommand.argMemberVariables);
@@ -761,12 +831,14 @@ class AFCommandContext {
       }
       final errIdColumn = "You must either specify --${AFGenerateStateSubcommand.argNotSerial}, or you must specify a --${AFGenerateSubcommand.argMemberVariables} containing either 'String ${AFDocumentIDGenerator.columnId}' or 'int ${AFDocumentIDGenerator.columnId}'";
 
-      if(idType == null) {
-        throw AFCommandError(error: errIdColumn);
-      }
+      if(!isAugment) {
+        if(idType == null) {
+          throw AFCommandError(error: errIdColumn);
+        }
 
-      if(idType != "int" && idType != "String") {
-        throw AFCommandError(error: errIdColumn);
+        if(idType != "int" && idType != "String") {
+          throw AFCommandError(error: errIdColumn);
+        }
       }
     }
 
@@ -780,7 +852,8 @@ class AFCommandContext {
     return AFMemberVariableTemplates(
       memberVars: memberVars, 
       resolveVars: resolveVars,
-      isIntId: isIntId, 
+      isAugment: isAugment,
+      isIntId: isIntIdOverride ?? isIntId, 
       mainType: mainType
     );
   }
@@ -1471,6 +1544,7 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
       generateCmd.addSubcommand(AFGenerateCommandSubcommand());      
       generateCmd.addSubcommand(AFGenerateTestSubcommand());
       generateCmd.addSubcommand(AFGenerateIDSubcommand());
+      generateCmd.addSubcommand(AFGenerateAugmentSubcommand());
       generateCmd.addSubcommand(AFGenerateOverrideSubcommand());
       generateCmd.addSubcommand(AFGenerateCustomSubcommand());
       

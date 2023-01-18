@@ -46,6 +46,10 @@ $optionsHeader
 ''';
   }
 
+  static bool isQuery(String itemName) {
+    return itemName.endsWith(suffixQuery);
+  }
+
   @override
   Future<void> execute(AFCommandContext context) async {
     final generator = context.generator;

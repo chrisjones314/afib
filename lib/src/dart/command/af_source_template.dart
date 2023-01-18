@@ -45,6 +45,9 @@ class AFSourceTemplateInsertion {
   AFSourceTemplateInsertion get snake => AFSourceTemplateInsertion(insertion, options: optionSnake);
   AFSourceTemplateInsertion get camel => AFSourceTemplateInsertion(insertion, options: optionCamel);
   AFSourceTemplateInsertion get spaces => AFSourceTemplateInsertion(insertion, options: optionSpaces);
+  String get breadcrumb {
+    return "//!af_$insertion";
+  }
 
   String get insertionPoint => "af_$insertion";
 

@@ -110,6 +110,8 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
   static const drawerSuffix = "Drawer";
   static const dialogSuffix = "Dialog";
   static const widgetSuffix = "Widget";
+  static const allUISuffixes = [screenSuffix, bottomSheetSuffix, drawerSuffix, dialogSuffix, widgetSuffix];
+
   static final controlSettingsWidget = AFUIControlSettings(
       kind: AFUIControlKind.widget, 
       suffix: widgetSuffix, 
@@ -336,6 +338,20 @@ $optionsHeader
     return fileTheme;
   }
 
+  static AFUIControlSettings? findControlKind(String uiName) {
+    for(final candidateControlKind in controlKinds) {
+      if(candidateControlKind.matchesName(uiName)) {
+        return candidateControlKind;
+      }
+    }
+    return null;
+  }
+
+  static bool hasUISuffix(String uiName) {
+    final idx = allUISuffixes.indexWhere((e) => uiName.endsWith(e));
+    return idx >= 0;
+  }
+
   static AFGeneratedFile createScreen(AFCommandContext context, String uiName, AFCommandArgumentsParsed args, {
     AFSourceTemplate? buildWithSPI,
     AFSourceTemplate? buildBody,
@@ -345,15 +361,7 @@ $optionsHeader
     AFSourceTemplate? navigatePush,
     AFSourceTemplate? createPrototype,
   }) {
-    AFUIControlSettings? controlSettings;
-
-    for(final candidateControlKind in controlKinds) {
-      if(candidateControlKind.matchesName(uiName)) {
-        controlSettings = candidateControlKind;
-        break;
-      }
-    }
-        
+    final controlSettings = findControlKind(uiName);
 
     if(controlSettings == null) {
       throw AFCommandError(error: "$uiName must end with one of $controlKinds");
@@ -390,7 +398,7 @@ $optionsHeader
 
     Object standardReviseMethods = AFSourceTemplate.empty;
     if(memberVariables != null && !args.accessNamedFlag(AFGenerateStateSubcommand.argNoReviseMethods)) {
-      standardReviseMethods = memberVariables.standardReviseMethods;
+      standardReviseMethods = memberVariables.reviseMethods;
     }
 
     final routeParamTemplate = routeParamImpls ?? controlSettings.routeParamImpls;
@@ -400,16 +408,16 @@ $optionsHeader
       AFSourceTemplate.insertCopyWithParamsInsertion: memberVariables?.copyWithParams ?? AFSourceTemplate.empty,
       AFSourceTemplate.insertCopyWithCallInsertion: memberVariables?.copyWithCall ?? AFSourceTemplate.empty,      
       AFSourceTemplate.insertMemberVariableImportsInsertion: memberVariables?.extraImports(context) ?? AFSourceTemplate.empty,
-      ModelT.insertStandardReviseMethods: standardReviseMethods,
-      ModelT.insertResolveFunctions: memberVariables?.resolveFunctions ?? AFSourceTemplate.empty,
+      ModelT.insertReviseMethods: standardReviseMethods,
+      ModelT.insertResolveMethods: memberVariables?.resolveMethods ?? AFSourceTemplate.empty,
       AFSourceTemplate.insertCreateParamsInsertion: memberVariables?.navigatePushParams ?? AFSourceTemplate.empty,
       AFSourceTemplate.insertCreateParamsCallInsertion: memberVariables?.navigatePushCall ?? AFSourceTemplate.empty,
     });
 
     final navigatePushTemplate = (navigatePush ?? controlSettings.navigatePush);
     final navigatePushSnippet = context.createSnippet(navigatePushTemplate, extend: screenInsertions, insertions: {
-      SnippetNavigatePushT.insertParamDecl: memberVariables?.navigatePushParams ?? AFSourceTemplate.empty,
-      SnippetNavigatePushT.insertParamCall: memberVariables?.navigatePushCall ?? AFSourceTemplate.empty,
+      SnippetNavigatePushT.insertNavigatePushParamDecl: memberVariables?.navigatePushParams ?? AFSourceTemplate.empty,
+      SnippetNavigatePushT.insertNavigatePushParamCall: memberVariables?.navigatePushCall ?? AFSourceTemplate.empty,
     });
 
     final spiSnippet = context.createSnippet(controlSettings.spi, extend: screenInsertions, insertions: {

@@ -77,6 +77,10 @@ class AFFundamentalDeviceTheme {
     );
   }
 
+  bool isDeviceId(AFThemeID id) {
+    return AFFundamentalThemeArea.deviceThemeIds.contains(id);
+  }
+
   dynamic findDeviceValue(AFThemeID id) {
     if(id == AFUIThemeID.brightness) {
       return this.brightnessValue;
@@ -88,7 +92,7 @@ class AFFundamentalDeviceTheme {
       return this.localeValue;
     } else if(id == AFUIThemeID.physicalSize) {
       return this.physicalSize;
-    }
+  }
     throw AFException("Unknown device theme value: $id");
   }
 
@@ -221,8 +225,8 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
       AFUIThemeID.alwaysUse24HourFormat,
       AFUIThemeID.textScaleFactor,
       AFUIThemeID.locale,
-      AFUIThemeID.formFactor,
-      AFUIThemeID.formOrientation,
+      //AFUIThemeID.formFactor,
+      //AFUIThemeID.formOrientation,
   ];
   final ThemeData themeLight;
   final ThemeData themeDark;
@@ -320,10 +324,6 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
 
   String translate(dynamic idOrText, Locale locale) {
     if(showTranslationIds && (idOrText is AFTranslationID || idOrText is AFWidgetID)) {
-      final idOrTextValues = idOrText.values;
-      if(idOrText is AFTranslationID && idOrTextValues != null) {
-        return "${idOrText.code}+${idOrTextValues.length}";
-      }
       return idOrText.code;
     }
     var result = translation(idOrText, locale);
@@ -1320,7 +1320,7 @@ class AFFundamentalThemeState {
 
   TReturn? findValue<TReturn extends Object>(AFThemeID id) {
     var result = area.findValue(id);
-    if(result == null && id.libraryTag == AFUIThemeID.tagDevice) {
+    if(result == null && device.isDeviceId(id)) {
       result = device.findDeviceValue(id);
     }
     if(result is! TReturn?) {

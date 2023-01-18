@@ -232,8 +232,8 @@ class AFCodeBuffer {
     lines.add('');
   }
 
-  int firstLineContaining(AFCommandContext context, RegExp match) {
-    for(var i = 0; i < lines.length; i++) {
+  int firstLineContaining(AFCommandContext context, RegExp match, { int startAt = 0 }) {
+    for(var i = startAt; i < lines.length; i++) {
       final line = lines[i];
       if(line.contains(match)) {
         return i;
@@ -254,6 +254,10 @@ class AFCodeBuffer {
 
   void addLinesAfterIdx(AFCommandContext context, int idx, List<String> toInsert) {
     lines.insertAll(idx+1, toInsert);
+  }
+
+  void addLinesBeforeIdx(AFCommandContext context, int idx, List<String> toInsert) {
+    lines.insertAll(idx, toInsert);
   }
 
   void addLinesAtEnd(AFCommandContext context, List<String> toInsert) {

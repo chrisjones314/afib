@@ -81,6 +81,8 @@ $optionsHeader
     );
 
     final modelName = args.accessUnnamedFirst;
+    verifyNotGenerateConflict(modelName, [AFGenerateQuerySubcommand.suffixQuery], "state");
+    verifyNotGenerateConflict(modelName, AFGenerateUISubcommand.allUISuffixes, "state");
 
     verifyMixedCase(modelName, "model name");
     await generateStateStatic(context, modelName, args);
@@ -206,7 +208,7 @@ $optionsHeader
       serialConstants = memberVariables.serialConstants;
     }
     if(memberVariables != null && !args.accessNamedFlag(AFGenerateStateSubcommand.argNoReviseMethods)) {
-      standardReviseMethods = memberVariables.standardReviseMethods;
+      standardReviseMethods = memberVariables.reviseMethods;
     }
 
     final memberVariableImports = memberVariables?.extraImports(context) ?? AFSourceTemplate.empty;
@@ -224,7 +226,7 @@ $optionsHeader
       standardRootMethods: standardRootMethods,
       superclassSyntax: superclassSyntax,
       superCall: superCall,
-      resolveFunctions: memberVariables?.resolveFunctions,
+      resolveFunctions: memberVariables?.resolveMethods,
     );
 
     final modelFile = context.createFile(modelPath, modelt, extend: modelInsertions, insertions: {

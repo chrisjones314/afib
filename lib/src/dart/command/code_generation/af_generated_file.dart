@@ -204,8 +204,8 @@ class AFGeneratedFile {
     }
   }
 
-  int findFirstLineContaining(AFCommandContext context, RegExp match) {
-    return buffer.firstLineContaining(context, match);
+  int findFirstLineContaining(AFCommandContext context, RegExp match, { int startAt = 0}) {
+    return buffer.firstLineContaining(context, match, startAt: startAt);
   }
 
 

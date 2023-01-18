@@ -41,8 +41,8 @@ class ${insertMainType}RouteParam extends AF${ScreenT.insertControlTypeSuffix}Ro
     return ${insertMainType}RouteParam($insertCreateParamsCall);
   }
 
-  ${ModelT.insertResolveFunctions}
-  ${ModelT.insertStandardReviseMethods}
+  ${ModelT.insertResolveMethods}
+  ${ModelT.insertReviseMethods}
 
   ${insertMainType}RouteParam copyWith($insertCopyWithParams) {
     return ${insertMainType}RouteParam($insertCopyWithConstructorCall);

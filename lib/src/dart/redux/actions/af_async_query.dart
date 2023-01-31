@@ -63,6 +63,16 @@ class AFStartQueryContext<TResponse> extends AFQueryContext {
   }): super(
     conceptualStore: conceptualStore,
   );
+
+  Future<AFFinishQuerySuccessContext<TRespLocal>> executeQueryWithAwait<TRespLocal>(AFAsyncQuery query) async {
+    final completer = Completer<AFFinishQuerySuccessContext<TRespLocal>>();
+    this.dispatch(AFAsyncQueryFuture<TRespLocal>(
+      query: query, 
+      completer: completer
+    ));
+    return completer.future;
+  }
+
 }
 
 
@@ -123,6 +133,16 @@ class AFFinishQueryErrorContext extends AFFinishQueryContext {
   }
 }
 
+class AFAsyncQueryFuture<TResponse> extends AFActionWithKey {
+  final AFAsyncQuery query;
+  final Completer<AFFinishQuerySuccessContext<TResponse>> completer;
+
+  AFAsyncQueryFuture({
+    required this.query,
+    required this.completer,
+  });
+}
+
 /// Superclass for a kind of action that queries some data asynchronously, then knows
 /// how to process the result.
 abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
@@ -154,7 +174,11 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
   }
 
   /// Called internally when redux middleware begins processing a query.
-  void startAsyncAF(AFDispatcher dispatcher, AFStore store, { void Function(dynamic)? onResponseExtra, void Function(dynamic)? onErrorExtra }) {
+  void startAsyncAF(AFDispatcher dispatcher, AFStore store, { 
+    required Completer<AFFinishQuerySuccessContext>? completer,
+    void Function(dynamic)? onResponseExtra, 
+    void Function(dynamic)? onErrorExtra  
+  }) {
     lastStart = currentMillis();
     final startContext = AFStartQueryContext<TResponse>(
       conceptualStore: conceptualStore,
@@ -171,6 +195,9 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
         if(onResponseExtra != null) {
           onResponseExtra(successContext);
         }
+        if(completer != null) {
+          completer.complete(successContext);
+        }
       }, 
       onError: (error) {
         final errorContext = AFFinishQueryErrorContext(
@@ -180,6 +207,9 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
         finishAsyncWithErrorAF(errorContext);
         if(onErrorExtra != null) {
           onErrorExtra(errorContext);
+        }
+        if(completer != null) {
+          completer.completeError(errorContext);
         }
       })
     ;
@@ -193,7 +223,11 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
 
     }
     AFibD.logQueryAF?.d("Starting query: $this");
-    startAsync(startContext);
+    try {
+      startAsync(startContext);
+    } on AFFinishQueryErrorContext catch(errCtx) {
+      finishAsyncWithErrorAF(errCtx);
+    }
   }
 
   /// Called internally by the framework to do pre and post processing before [finishAsyncWithResponse]
@@ -388,26 +422,31 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
     return findQueryWhere<TQuery>( (q) => true);
   }
 
-  void startAsyncAF(AFDispatcher dispatcher, AFStore store, { Function(dynamic)? onResponseExtra, Function(dynamic)? onErrorExtra }) {
-      final completer = Completer<bool>();
+  void startAsyncAF(AFDispatcher dispatcher, AFStore store, { 
+    required Completer<AFFinishQuerySuccessContext>? completer,
+    Function(dynamic)? onResponseExtra, 
+    Function(dynamic)? onErrorExtra 
+  }) {
+      final completerBool = Completer<bool>();
       lastStart = currentMillis();
       // start all the queries asynchronously.
       for(final queryResponse in queryResponses.responses) {
         final query = queryResponse.query;
         query.startAsyncAF(dispatcher, store, 
+          completer: null,
           onResponseExtra: (dynamic localResponse) {
             queryResponse.completeResponse(localResponse);
             if(queryResponses.isComplete) {
-              if(!completer.isCompleted) {
-                completer.complete(true);
+              if(!completerBool.isCompleted) {
+                completerBool.complete(true);
               }
             }
           },
           onErrorExtra: (dynamic error) {
             queryResponse.completeError(error);
             if(queryResponses.isComplete) {
-              if(!completer.isCompleted) {
-                completer.complete(true);
+              if(!completerBool.isCompleted) {
+                completerBool.complete(true);
               }
             }
           }
@@ -415,19 +454,25 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
       }
 
       // when they have all completed, then process our response.
-      completer.future.then((_) {
+      completerBool.future.then((_) {
         if(queryResponses.hasError) {
           final errorContext = AFFinishQueryErrorContext(
             conceptualStore: conceptualStore,
             error: AFQueryError(code: queryFailedCode, message: queryFailedMessage)
           );
           finishAsyncWithErrorAF(errorContext);
+          if(completer != null) {
+            completer.completeError(errorContext);
+          }
         } else {
           final successContext = AFFinishQuerySuccessContext<AFCompositeQueryResponse>(
             conceptualStore: conceptualStore,
             response: queryResponses
           );
           finishAsyncWithResponseAF(successContext);
+          if(completer != null) {
+            completer.complete(successContext);
+          }
         }
       });
   }

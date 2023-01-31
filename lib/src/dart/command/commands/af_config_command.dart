@@ -1,6 +1,5 @@
 
 import 'package:afib/src/dart/command/af_command.dart';
-import 'package:afib/src/dart/command/af_command_error.dart';
 import 'package:afib/src/dart/command/templates/core/dynamic/dynamic_config_entries.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/config.t.dart';
 import 'package:afib/src/dart/utils/af_config.dart';

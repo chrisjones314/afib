@@ -766,6 +766,9 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     config.updateRouteParam(this, param);
   }
 
+  Logger? get log {
+    return AFibD.log(AFConfigEntryLogArea.ui);
+  }
 
   void updateAddChildRouteParam(AFRouteParam revised) {
     final config = standard.config;

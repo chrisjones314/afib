@@ -11,10 +11,12 @@ class AFFirestoreDocument {
 
   String documentId;
   Map<String, dynamic> data;
+  bool exists;
 
   AFFirestoreDocument({
     required this.documentId,
-    required this.data
+    required this.data,
+    required this.exists,
   });
 
   /// Returns true if this object has not yet been saved to firestore.  

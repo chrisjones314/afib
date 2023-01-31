@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/actions/af_query_actions.dart';
@@ -9,8 +11,17 @@ import 'package:redux/redux.dart';
 class AFQueryMiddleware implements MiddlewareClass<AFState>
 {
   @override
-  dynamic call(Store<AFState> store, dynamic query, NextDispatcher next) {
-    if (query is AFAsyncQuery) {
+  dynamic call(Store<AFState> store, dynamic queryCandidate, NextDispatcher next) {
+    if(queryCandidate is AFAsyncQuery) {
+      processQuery(queryCandidate, null, next);      
+    } else if(queryCandidate is AFAsyncQueryFuture) {
+      processQuery(queryCandidate.query, queryCandidate.completer, next);
+    } 
+  
+    next(queryCandidate);
+  }
+
+  void processQuery(AFAsyncQuery query, Completer<AFFinishQuerySuccessContext>? completer, NextDispatcher next) {
       final entry = AFibF.g.internalOnlyStoreEntry(query.conceptualStore);
 
       // keep track of listener queries so we can shut them down at the end.
@@ -30,14 +41,12 @@ class AFQueryMiddleware implements MiddlewareClass<AFState>
         testContext.processQuery(query, entry.store!, entry.dispatcher!);
         return;
       } else {
-
         query.startAsyncAF(
           entry.dispatcher!,
-          entry.store!
+          entry.store!,
+          completer: completer,
         );
       }
-    }
-    next(query);
   }
 
   bool _registerQuery(AFibStoreStackEntry entry, AFAsyncQuery query, NextDispatcher next) {

@@ -216,8 +216,9 @@ class AFCreateDynamicQueryResultContext<TQuery extends AFAsyncQuery> {
   bool get isError => error != null;
   bool get isResponse => (responseCalls | responseSuccess) != 0;
 
-  AFPublicState get public => testContext.public;
-  AFTimeState get currentTime => testContext.currentTime;
+  AFPublicState get accessPublicState => testContext.public;
+  AFTimeState get accessCurrentTime => testContext.currentTime;
+  TComponentState?  accessComponentState<TComponentState extends AFComponentState>() => accessPublicState.components.findState<TComponentState>();
 
 
   void onError(AFQueryError err) {
@@ -542,7 +543,8 @@ class _AFStateRegisterSpecialResultStatement<TQuery extends AFAsyncQuery> extend
         final store = AFibF.g.internalOnlyActiveStore;
         query.startAsyncAF(
           AFStoreDispatcher(store),
-          store
+          store,
+          completer: null,
         );
 
       } else {
@@ -1185,13 +1187,13 @@ class AFStateTest extends AFScreenTestDescription {
 
     if(query is AFTimeUpdateListenerQuery) {
       if(AFibF.g.testOnlyIsInWorkflowTest) {
-        query.startAsyncAF(dispatcher, store);
+        query.startAsyncAF(dispatcher, store, completer: null);
         return;
       }
     }
 
     if(query is AFNavigateUnimplementedQuery) {
-      query.startAsyncAF(dispatcher, store);
+      query.startAsyncAF(dispatcher, store, completer: null);
       return;
     }
 

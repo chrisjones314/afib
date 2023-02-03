@@ -9,11 +9,11 @@ void defineAFDefaultFundamentalTheme(AFFundamentalDeviceTheme device, AFComponen
   final colorPrimary = Color(0xff2D4580);
   final colorPrimaryDark = Color(0xff1b2a4e);
   //final colorPrimaryDarker = Color(0xff320a00);
-  final colorSecondary = Color(0xffA17918);
-  final colorSecondaryDark = Color(0xffA17818);
+  final colorSecondary = Color(0xff803953);
+  final colorSecondaryDark = Color(0xff80143C);
   //final colorSecondaryDarker = Color(0xff1e1623);
   final colorWhite = Colors.white;
-  final colorError = Color(0xffbf0603);
+  final colorError = Colors.red;
   final colorBlack = Colors.black;
   final colorBackground = Colors.grey[200] ?? Colors.grey;
   final colorSurfaceDark = Colors.grey[900] ?? Colors.grey;

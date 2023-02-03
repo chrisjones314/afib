@@ -75,9 +75,12 @@ class AFCommandArgumentsParsed {
   String get accessUnnamedFirst => unnamed.first;
   String get accessUnnamedSecond => unnamed[1];
   String get accessUnnamedThird => unnamed[2];
-  String accessNamed(String name) {
+  String accessNamed(String name, { String? defaultVal }) {
     final result = named[name];
     if(result == null) {
+      if(defaultVal != null) {
+        return defaultVal;
+      }
       throw AFException("Missing parameter --$name");
     }
     return result;
@@ -90,7 +93,7 @@ class AFCommandArgumentsParsed {
   }
 
   bool accessNamedFlag(String name) {
-    return accessNamed(name) != argFalse;
+    return accessNamed(name, defaultVal: argFalse) != argFalse;
   }
 
 
@@ -292,6 +295,7 @@ class AFMemberVariableTemplates {
 
   final bool isIntId;
   final bool isAugment;
+  final bool withFlutterState;
   final Map<String, String> memberVars;
   final Map<String, String> resolveVars;
   final String mainType;
@@ -303,7 +307,8 @@ class AFMemberVariableTemplates {
     required this.resolveVars,
     required this.isIntId,
     required this.mainType,
-  }); 
+    required this.withFlutterState,
+  });
 
   factory AFMemberVariableTemplates.createEmpty({
     required String mainType,
@@ -315,6 +320,7 @@ class AFMemberVariableTemplates {
       isIntId: isIntId, 
       mainType: mainType,
       isAugment: false,
+      withFlutterState: false,
     );
   }
 
@@ -346,6 +352,12 @@ class AFMemberVariableTemplates {
     return result.toString();
   }
 
+  String get routeParamSuperParams {
+    final result = StringBuffer();
+    result.writeln("flutterState: flutterState,");
+    return result.toString();
+  }
+
   void _addBreadcrumb(StringBuffer result, AFSourceTemplateInsertion insert, { bool extraIndent = false }) {
     if(!AFibD.config.enableGenerateAugment) {
       return;
@@ -360,6 +372,10 @@ class AFMemberVariableTemplates {
     // it might be a local type, see if we can find it.
     final generator = context.generator;
     final pathModel = generator.pathModel(kind);
+    if(pathModel == null) {
+      return null;
+    }
+    
     if(requireFile && !generator.fileExists(pathModel)) {
       return null;
     }
@@ -475,6 +491,12 @@ class AFMemberVariableTemplates {
       visit: (identifier, kind, isLast, includeKind) {
         result.writeln("required this.$identifier,");
     });
+
+    if(withFlutterState) {
+      result.writeln("required AFFlutterRouteParamState flutterState,");
+    }
+
+
     _addBreadcrumb(result, AFSourceTemplate.insertConstructorParamsInsertion, extraIndent: false);
     return result.toString();
   }
@@ -530,14 +552,44 @@ class AFMemberVariableTemplates {
     return result.toString();    
   }
 
-  String get navigatePushCall {
+  String get routeParamCreateParams {
     final result = StringBuffer();
+    result.writeln("{");
+    result.write(navigatePushParamsBare);
+    result.writeln("  required AFFlutterRouteParamState flutterState,");
+    result.write("}");
+    return result.toString();    
+
+  }
+
+  String get routeParamCreateCall {
+    final result = StringBuffer();
+    _populateStandardNavigatePushCall(result);
+    if(withFlutterState) {
+      result.writeln("  flutterState: flutterState,");
+    }
+    return result.toString();
+  }
+
+
+  void _populateStandardNavigatePushCall(StringBuffer result) {
     result.writeln();
     _iterate(
       include: includeAllVars,
       visit: (identifier, kind, isLast, includeKind) {
         result.writeln("  $identifier: $identifier,");
     });
+  }
+
+
+  String get navigatePushCall {
+    final result = StringBuffer();
+    _populateStandardNavigatePushCall(result);
+    if(withFlutterState) {
+      result.writeln("  flutterState: AFFlutterRouteParamState(");
+      result.writeln("    // TODO: populate some of the optional parameters here");
+      result.writeln("  ),");
+    }
     _addBreadcrumb(result, SnippetNavigatePushT.insertNavigatePushParamCall);
     result.writeln();
     return result.toString();    
@@ -556,6 +608,10 @@ class AFMemberVariableTemplates {
         result.write("$identifier: $identifier ?? this.$identifier,");
         result.writeln();
     });
+
+    if(withFlutterState) {
+      result.writeln("flutterState: this.flutterStateGuaranteed,");
+    }
     _addBreadcrumb(result, AFSourceTemplate.insertCopyWithCallInsertion);
     return result.toString();    
   }
@@ -851,12 +907,15 @@ class AFCommandContext {
       return null;
     }
 
+    final withFlutterState = args.accessNamedFlag(AFGenerateUISubcommand.argWithFlutterState);
+
     return AFMemberVariableTemplates(
       memberVars: memberVars, 
       resolveVars: resolveVars,
       isAugment: isAugment,
       isIntId: isIntIdOverride ?? isIntId, 
-      mainType: mainType
+      mainType: mainType,
+      withFlutterState: withFlutterState
     );
   }
 

@@ -5,7 +5,6 @@ import 'package:afib/afui_id.dart';
 import 'package:afib/locale_id.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
-import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param_with_flutter_state.dart';
@@ -1526,20 +1525,6 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return fundamentals.themeData;
   }
 
-
-  // This function can be overriden to request that app-specific data 
-  // be included the AFFlexibleStateView passed by third-party components
-  // to theme functions that create widgets.  
-  //
-  // If you are overriding a function in a third party theme that creates
-  // a widget, and you need data from your state in that override, then 
-  // you can add the model objects you need access to here, and 
-  // access them within the override by calling [AFFlexibleStateView.findType]
-  // or [AFFlexibleStateView.findId].
-  void augmentModels(AFPublicState public, List<Object> models) {
-    
-  }
-
   TFunctionalTheme accessTheme<TFunctionalTheme extends AFFunctionalTheme>(AFThemeID themeId) {
     final fundamentals = AFibF.g.internalOnlyActiveStore.state.public.themes.fundamentals;
     return AFibF.g.coreDefinitions.createFunctionalTheme(themeId, fundamentals, context) as TFunctionalTheme;
@@ -1972,7 +1957,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   /// Create a button that the user is most likely to click.
   Widget childButtonPrimaryText({
     AFWidgetID? wid,
-    required String text,
+    required Object text,
     required AFPressedDelegate onPressed,
   }) {
     return childButtonPrimary(
@@ -2830,6 +2815,28 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return Container(
       key: keyForWID(AFUIWidgetID.contHostedControls),
       child: Stack(children: stackChildren));
+  }
+
+  Widget leadingButtonStandardBack(AFStateProgrammingInterface spi, {
+    required AFScreenID screen,
+    AFWidgetID wid = AFUIWidgetID.buttonBack,
+    dynamic iconIdOrWidget = AFUIThemeID.iconBack,
+    dynamic iconColor,
+    dynamic iconSize,
+    String tooltip = "Back",
+    bool worksInSingleScreenTest = true,
+    AFShouldContinueCheckDelegate? shouldContinueCheck,   
+  }) {
+    return childButtonStandardBack(spi, 
+      screen: screen,
+      wid: wid,
+      iconIdOrWidget: iconIdOrWidget,
+      iconColor: iconColor,
+      iconSize: iconSize,
+      tooltip: tooltip,
+      worksInSingleScreenTest: worksInSingleScreenTest,
+      shouldContinueCheck: shouldContinueCheck,
+    );
   }
 
   /// Creates a standard back button, which navigates up the screen hierarchy.

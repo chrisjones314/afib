@@ -1,4 +1,5 @@
 
+import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 
 
@@ -26,17 +27,36 @@ class DefineCoreCallUIFunctionsT extends AFSourceTemplate {
 ''';
 }
 
-class DefineCoreT extends AFCoreFileSourceTemplate {
+class DefineCoreT extends AFFileSourceTemplate {
   static const insertCallUIFunctions = AFSourceTemplateInsertion("call_ui_functions");
   static const insertDeclareUIFunctions = AFSourceTemplateInsertion("declare_ui_functions");
+  static const insertAddStateViewAugmentor = AFSourceTemplateInsertion("add_state_view_augmentor");
 
-  DefineCoreT(): super(
-    templateFileId: "define_core",
+  DefineCoreT({
+    required String templateFileId,
+    required List<String> templateFolder,
+    required AFSourceTemplateInsertions? embeddedInsertions,
+  }): super(
+    templateFileId: templateFileId,
+    templateFolder: templateFolder,
+    embeddedInsertions: embeddedInsertions,
   );
+
+  factory DefineCoreT.core() {
+    return DefineCoreT(
+      templateFileId: "define_core",
+      templateFolder: AFProjectPaths.pathGenerateCoreFiles,
+      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+        insertAddStateViewAugmentor: AFSourceTemplate.empty,
+        AFSourceTemplate.insertExtraImportsInsertion: AFSourceTemplate.empty,
+      })
+    );
+  }
 
   String get template => '''
 import 'package:flutter/material.dart';
 import 'package:afib/afib_flutter.dart';
+${AFSourceTemplate.insertExtraImportsInsertion}
 
 void defineCore(AFCoreDefinitionContext context) {
   defineEventHandlers(context);
@@ -48,7 +68,11 @@ void defineCore(AFCoreDefinitionContext context) {
 
 
 void defineEventHandlers(AFCoreDefinitionContext context) {
-  context.addDefaultQueryErrorHandler(afDefaultQueryErrorHandler);
+  context.addDefaultQueryErrorHandler((err) {
+    // TODO: If you are getting an error dialog, and you want to set a breakpoint showing where it has been thrown,
+    // this is a good place to do it.
+    afDefaultQueryErrorHandler(err);
+  });
 
   // you can add queries to run at startup.
   // context.addPluginStartupQuery(createMessagingListener);
@@ -58,6 +82,16 @@ void defineEventHandlers(AFCoreDefinitionContext context) {
   
   // you can add a callback which gets notified anytime a query successfully finishes.
   // context.addQuerySuccessListener(querySuccessListenerDelegate);
+
+  // you can add code the places extra state data into a third party state view.
+  // you can then access the data from within overrides of that third party's theme, 
+  // using context.s.findType<YourType>() (assuming you put)
+  // context.addStateViewAugmentationHandler<AFSIDefaultStateView>((context, result) { 
+  //    final ${insertAppNamespace}State = context.accessComponentState<${insertAppNamespaceUpper}State>();
+  //    result.add(${insertAppNamespace}State.yourType);
+  // });
+
+  $insertAddStateViewAugmentor
 
 }
 

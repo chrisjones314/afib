@@ -2,10 +2,10 @@
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 
-class SnippetWidgetParamsConstructorT extends AFSnippetSourceTemplate {
+class SnippetScreenParamsConstructorT extends AFSnippetSourceTemplate {
   static const insertExtraConstructorParams = AFSourceTemplateInsertion("extra_constructor_params");
   
-  SnippetWidgetParamsConstructorT({
+  SnippetScreenParamsConstructorT({
     required String templateFileId,
     required List<String> templateFolder,
     required AFSourceTemplateInsertions? embeddedInsertions,
@@ -15,9 +15,9 @@ class SnippetWidgetParamsConstructorT extends AFSnippetSourceTemplate {
     embeddedInsertions: embeddedInsertions
   );
 
-  factory SnippetWidgetParamsConstructorT.core() {
-    return SnippetWidgetParamsConstructorT(
-      templateFileId: "widget_params_constructor",
+  factory SnippetScreenParamsConstructorT.core() {
+    return SnippetScreenParamsConstructorT(
+      templateFileId: "screen_params_constructor",
       templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         insertExtraConstructorParams: AFSourceTemplate.empty,
@@ -25,9 +25,5 @@ class SnippetWidgetParamsConstructorT extends AFSnippetSourceTemplate {
     );
   }
 
-  String get template => '''{
-    AFWidgetID? widOverride,
-    required AFRouteParam launchParam,
-    $insertExtraConstructorParams
-}''';  
+  String get template => '$insertExtraConstructorParams';  
 }

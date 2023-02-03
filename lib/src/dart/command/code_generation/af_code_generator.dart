@@ -151,7 +151,10 @@ class AFCodeGenerator {
     return _createPath(control.path, filename);
   }
 
-  List<String> pathModel(String modelName) {
+  List<String>? pathModel(String modelName) {
+    if(modelName.contains(".")) {
+      return null;
+    }
     final filename = "${convertMixedToSnake(modelName)}.dart";
     var path = modelsPath;
     if(modelName.endsWith(AFCodeGenerator.rootSuffix)) {
@@ -160,7 +163,7 @@ class AFCodeGenerator {
     return _createPath(path, filename);
   }
 
-  List<String> pathUnknown(String name) {
+  List<String>? pathUnknown(String name) {
     if(name.endsWith(AFGenerateQuerySubcommand.suffixQuery)) {
       return pathQuery(name);
     }

@@ -33,6 +33,8 @@ class $insertMainType extends ${insertAppNamespaceUpper}Connected$insertControlT
     $insertExtraConfigParams
   );
 
+  ${AFSourceTemplate.insertMemberVariablesInsertion}
+
   $insertMainType($insertConstructorParams): super($insertSuperParams);
 
   $insertNavigateMethods

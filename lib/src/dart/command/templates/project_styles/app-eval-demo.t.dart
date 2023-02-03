@@ -41,16 +41,16 @@ generate query WriteCountHistoryItemQuery --result-type CountHistoryItem --membe
 generate query StartupQuery --result-type AFUnused --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_startup"
 generate query ResetHistoryQuery --result-type CountHistoryItemsRoot --member-variables "String userId" --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_reset_history"
 generate query CheckSigninQuery --result-type UserCredentialRoot --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_check_signin"
-generate ui StartupScreen --override-templates +
+generate ui StartupScreen --no-back-button --override-templates +
   +core/snippets/screen_build_with_spi_impl=project_styles/app-eval-demo/snippets/startup_screen_build_with_spi
-  +core/snippets/minimal_screen_build_body_impl=project_styles/app-eval-demo/snippets/startup_screen_build_body
-generate ui HomePageScreen --member-variables "int lineNumber;" --override-templates +
+  +core/snippets/empty_screen_build_body_impl=project_styles/app-eval-demo/snippets/startup_screen_build_body
+generate ui HomePageScreen --no-back-button --member-variables "int lineNumber;" --override-templates +
   +core/snippets/extra_imports=project_styles/app-eval-demo/snippets/home_page_screen_extra_imports
   +core/snippets/standard_route_param=project_styles/app-eval-demo/snippets/home_page_screen_route_param
   +core/snippets/declare_spi=project_styles/app-eval-demo/snippets/home_page_screen_spi
   +core/snippets/navigate_push=project_styles/app-eval-demo/snippets/home_page_screen_navigate_push
   +core/snippets/screen_build_with_spi_impl=project_styles/app-eval-demo/snippets/home_page_screen_build_with_spi
-  +core/snippets/minimal_screen_build_body_impl=project_styles/app-eval-demo/snippets/home_page_screen_build_body
+  +core/snippets/empty_screen_build_body_impl=project_styles/app-eval-demo/snippets/home_page_screen_build_body
   +core/snippets/screen_additional_methods=project_styles/app-eval-demo/snippets/home_page_screen_additional_methods
   +core/snippets/smoke_test_impl=project_styles/app-eval-demo/snippets/home_screen_smoke_test
 generate ui CounterManagementScreen --member-variables "int clickCount;" --override-templates +
@@ -59,7 +59,7 @@ generate ui CounterManagementScreen --member-variables "int clickCount;" --overr
   +core/snippets/declare_spi=project_styles/app-eval-demo/snippets/counter_management_screen_spi
   +core/snippets/navigate_push=project_styles/app-eval-demo/snippets/counter_management_screen_navigate_push
   +core/snippets/screen_build_with_spi_impl=project_styles/app-eval-demo/snippets/counter_management_screen_build_with_spi
-  +core/snippets/minimal_screen_build_body_impl=project_styles/app-eval-demo/snippets/counter_management_screen_build_body
+  +core/snippets/empty_screen_build_body_impl=project_styles/app-eval-demo/snippets/counter_management_screen_build_body
   +core/snippets/screen_additional_methods=project_styles/app-eval-demo/snippets/counter_management_screen_additional_methods
   +core/snippets/smoke_test_impl=project_styles/app-eval-demo/snippets/counter_management_smoke_test
 generate ui SignedInDrawer --override-templates +

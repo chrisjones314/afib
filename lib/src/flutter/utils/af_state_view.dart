@@ -4,6 +4,7 @@ import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:meta/meta.dart';
 
 
+
 @immutable
 abstract class AFFlexibleStateView extends AFComponentState {
   AFFlexibleStateView({

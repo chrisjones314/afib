@@ -323,7 +323,7 @@ Project Styles
     context.createFile(generator.pathConnectedBaseFile, ConnectedBaseT());
 
     await context.executeSubCommand("generate ui ${generator.appNamespaceUpper}DefaultTheme --${AFGenerateUISubcommand.argParentTheme} ${generator.nameDefaultParentTheme} --${AFGenerateUISubcommand.argParentThemeID} ${generator.nameDefaultParentThemeID}");
-    await context.executeSubCommand("generate ui ${AFGenerateUISubcommand.nameStartupScreen}");
+    await context.executeSubCommand("generate ui ${AFGenerateUISubcommand.nameStartupScreen} --no-back-button");
   }
 
   void _createLibExportsFiles(AFCreateCommandContext context) {
@@ -402,7 +402,7 @@ installUILibrary: installCoreLibrary,
     final callUIFn = includeUI ? DefineCoreCallUIFunctionsT() : AFSourceTemplate.empty;
     final defineFundamentalImpl = context.isApp ? SnippetFundamentalThemeInitT.core() : SnippetFundamentalThemeInitUILibraryT.core();
     final snippetFundamentalImpl = context.command.createSnippet(defineFundamentalImpl);
-    final fileDefineCore = context.createFile(generator.pathDefineCore, DefineCoreT(), insertions: {
+    final fileDefineCore = context.createFile(generator.pathDefineCore, DefineCoreT.core(), insertions: {
       DefineCoreT.insertCallUIFunctions: callUIFn,
       DefineCoreT.insertDeclareUIFunctions: declareUIFn,
       DefineCoreUIFunctionsT.insertFundamentalThemeInitCall: snippetFundamentalImpl,

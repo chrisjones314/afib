@@ -1,10 +1,11 @@
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
-import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
 import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
 
 class SnippetStandardRouteParamT extends AFSnippetSourceTemplate {
+  static const insertWithFlutterStateSuffix = AFSourceTemplateInsertion("with_flutter_state_suffix");
+
   SnippetStandardRouteParamT({
     required String templateFileId,
     required List<String> templateFolder,
@@ -32,10 +33,13 @@ class SnippetStandardRouteParamT extends AFSnippetSourceTemplate {
   }
   
   String get template => '''
-class ${insertMainType}RouteParam extends AF${ScreenT.insertControlTypeSuffix}RouteParam {
+class ${insertMainType}RouteParam extends AF${ScreenT.insertControlTypeSuffix}RouteParam$insertWithFlutterStateSuffix {
   $insertMemberVariables
 
-  ${insertMainType}RouteParam($insertConstructorParams): super(screenId: ${ScreenT.insertScreenIDType}.${ScreenT.insertScreenID});
+  ${insertMainType}RouteParam($insertConstructorParams): super(
+    screenId: ${ScreenT.insertScreenIDType}.${ScreenT.insertScreenID},
+    ${AFSourceTemplate.insertSuperParamsInsertion}
+  );
 
   factory ${insertMainType}RouteParam.create($insertCreateParams) {
     return ${insertMainType}RouteParam($insertCreateParamsCall);

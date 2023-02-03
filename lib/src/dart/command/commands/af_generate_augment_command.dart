@@ -72,6 +72,9 @@ $optionsHeader
     final generator = context.generator;
     generator.pathModel(itemName);
     final pathModel = generator.pathUnknown(itemName);
+    if(pathModel == null) {
+      throw AFException("Conversion from model to path failed.");
+    }
     if(!generator.fileExists(pathModel)) {
       throw AFCommandError(error: "Expected $itemName to be in file ${joinAll(pathModel)}, but no such file exists");
     }

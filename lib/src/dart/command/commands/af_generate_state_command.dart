@@ -163,6 +163,9 @@ $optionsHeader
     final generator = context.generator;
     final isRoot = identifier.endsWith(AFCodeGenerator.rootSuffix);
     final modelPath = generator.pathModel(identifier);
+    if(modelPath == null) {
+      throw AFException("Internal exception, conversion from model to path failed.");
+    }
     final isAddStandardRoot = args.accessNamedFlag(AFGenerateStateSubcommand.argAddStandardRoot);
     var identifierNoRoot = identifier;
     var identifierNoRootOriginal = identifier;

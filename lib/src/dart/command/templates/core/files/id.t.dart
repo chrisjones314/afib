@@ -21,7 +21,7 @@ class ${insertAppNamespaceUpper}QueryID extends AFQueryID {
 
 class ${insertAppNamespaceUpper}ThemeID extends AFThemeID {
   static const defaultTheme = ${insertAppNamespaceUpper}ThemeID("defaultTheme");
-  static const exampleCustom = STFBThemeID("exampleCustom");
+  static const exampleCustom = ${insertAppNamespaceUpper}ThemeID("exampleCustom");
 
   const ${insertAppNamespaceUpper}ThemeID(String code): super(code, ${insertAppNamespaceUpper}LibraryID.id);   
 }

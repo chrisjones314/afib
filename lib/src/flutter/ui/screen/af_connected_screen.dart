@@ -12,6 +12,12 @@ import 'package:quiver/core.dart';
 import 'package:redux/redux.dart';
 
 
+class AFStateViewAugmentationContext with AFAccessStateSynchronouslyMixin {
+
+  AFStateViewAugmentationContext();
+}
+
+
 @immutable
 class AFStandardSPIData {
   final AFFunctionalTheme theme;
@@ -289,11 +295,16 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
     }
     final stateViewCtx = AFBuildStateViewContext<TState, TRouteParam>(stateApp: stateApp, routeParam: param, statePublic: public, children: children, private: state.private);
     final result = createStateModels(stateViewCtx);
+    _augmentStateViewModels(result);
     final addModels = addModelsToStateView;
     if(addModels != null) {
       addModels(stateViewCtx, result);
     }
     return result;
+  }
+
+  void _augmentStateViewModels(List<Object?> result) {
+    AFibF.g.coreDefinitions.augmentStateViewModels<TStateView>(result);
   }
 
   TSPI createSPI(BuildContext? buildContext, AFBuildContext dataContext, AFScreenID parentScreenId, AFWidgetID wid) {
@@ -596,12 +607,12 @@ abstract class AFConnectedScreen<TState extends AFComponentState, TTheme extends
 abstract class AFConnectedWidget<TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFStateProgrammingInterface> extends AFConnectedUIBase<TState, TTheme, TStateView, TRouteParam, TSPI> { 
 
   AFConnectedWidget({
-    required AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> uiConfig,
+    required AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> config,
     required AFScreenID? screenIdOverride,
     required AFWidgetID? widOverride,
     required AFRouteParam launchParam,
   }): super(
-    uiConfig: uiConfig, 
+    uiConfig: config, 
     screenId: screenIdOverride ?? launchParam.screenId, 
     wid: widOverride ?? launchParam.wid, 
     launchParam: launchParam
@@ -713,7 +724,6 @@ class AFBuildStateViewContext<TState extends AFComponentState?, TRouteParam exte
   AFTimeState get accessCurrentTime {
     return statePublic.time;
   }
-
 
   TOtherState accessComponentState<TOtherState extends AFComponentState>() {
     return statePublic.components.findState<TOtherState>()!;
@@ -1099,8 +1109,10 @@ class AFScreenStateProgrammingInterface<TState extends AFComponentState, TBuildC
     AFStandardSPIData standard,
   ): super(context, standard);
 
-  void onPressedStandardBackButton() {
-    context.navigatePop();
+  void onPressedStandardBackButton({
+    bool worksInSingleScreenTest = true
+  }) {
+    context.navigatePop(worksInSingleScreenTest: worksInSingleScreenTest);
   }
 }
 
@@ -1111,8 +1123,10 @@ class AFDialogStateProgrammingInterface<TState extends AFComponentState, TBuildC
     AFStandardSPIData standard,
   ): super(context, standard);
 
-  void onPressedStandardBackButton() {
-    context.dispatch(AFNavigatePopAction());
+  void onPressedStandardBackButton({
+    bool worksInSingleScreenTest = true
+  }) {
+    context.dispatch(AFNavigatePopAction(worksInSingleScreenTest: worksInSingleScreenTest));
   }
 
   void closeDialog(dynamic result) {

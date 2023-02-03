@@ -21,7 +21,7 @@ void installTest(AFTestExtensionContext context) {
       defineTestData: defineTestData,
       defineUnitTests: defineUnitTests,
       defineStateTests: defineStateTests,
-      defineScreenTests: defineUIPrototypes,
+      defineUIPrototypes: defineUIPrototypes,
       defineWireframes: defineWireframes,
     );
 

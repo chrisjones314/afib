@@ -95,9 +95,9 @@ class SnippetFundamentalThemeInitT extends AFSnippetSourceTemplate {
   primary.setAfibFundamentals();
 
   // You can also create custom theme ids values of any type (not just colors),
-  // and then access them from within your STFBDefaultTheme using 
-  // fundamentals.findValue<YourType>(STFBThemeID.exampleCustom)
-  primary.setValue(STFBThemeID.exampleCustom, Colors.yellow);
+  // and then access them from within your ${insertAppNamespaceUpper}DefaultTheme using 
+  // fundamentals.findValue<YourType>(${insertAppNamespaceUpper}ThemeID.exampleCustom)
+  primary.setValue(${insertAppNamespaceUpper}ThemeID.exampleCustom, Colors.yellow);
   
 
   primary.setTranslations(AFUILocaleID.englishUS, {

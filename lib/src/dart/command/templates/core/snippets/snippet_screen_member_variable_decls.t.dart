@@ -2,10 +2,10 @@
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 
-class SnippetWidgetParamsConstructorT extends AFSnippetSourceTemplate {
-  static const insertExtraConstructorParams = AFSourceTemplateInsertion("extra_constructor_params");
+class SnippetScreenMemberVariableDeclsT extends AFSnippetSourceTemplate {
+  static const insertDecls = AFSourceTemplateInsertion("member_variable_decls");
   
-  SnippetWidgetParamsConstructorT({
+  SnippetScreenMemberVariableDeclsT({
     required String templateFileId,
     required List<String> templateFolder,
     required AFSourceTemplateInsertions? embeddedInsertions,
@@ -15,19 +15,15 @@ class SnippetWidgetParamsConstructorT extends AFSnippetSourceTemplate {
     embeddedInsertions: embeddedInsertions
   );
 
-  factory SnippetWidgetParamsConstructorT.core() {
-    return SnippetWidgetParamsConstructorT(
-      templateFileId: "widget_params_constructor",
+  factory SnippetScreenMemberVariableDeclsT.core() {
+    return SnippetScreenMemberVariableDeclsT(
+      templateFileId: "screen_member_variable_decls",
       templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
-        insertExtraConstructorParams: AFSourceTemplate.empty,
+        insertDecls: AFSourceTemplate.empty,
       })
     );
   }
 
-  String get template => '''{
-    AFWidgetID? widOverride,
-    required AFRouteParam launchParam,
-    $insertExtraConstructorParams
-}''';  
+  String get template => insertDecls.toString();
 }

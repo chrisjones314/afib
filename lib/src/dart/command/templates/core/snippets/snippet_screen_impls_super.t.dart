@@ -6,7 +6,7 @@ class SnippetScreenImplsSuperT extends AFCoreSnippetSourceTemplate {
   final bool usePlainConfig;
 
   SnippetScreenImplsSuperT({
-    this.usePlainConfig = false
+    this.usePlainConfig = true
   });
   
 

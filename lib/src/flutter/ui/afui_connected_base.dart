@@ -65,7 +65,7 @@ abstract class AFUIConnectedWidget<TSPI extends AFWidgetStateProgrammingInterfac
     AFWidgetID? widOverride,
     required AFRouteParam launchParam,
   }): super(
-    uiConfig: uiConfig,
+    config: uiConfig,
     screenIdOverride: screenIdOverride,
     widOverride: widOverride,
     launchParam: launchParam,

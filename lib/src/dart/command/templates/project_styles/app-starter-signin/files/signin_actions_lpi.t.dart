@@ -54,13 +54,7 @@ void onSignup(String email, String password) {
     return;
   }
 
-  final newUser = User(
-    id: AFDocumentIDGenerator.createNewId("user"), 
-    email: email,
-    firstName: extraDetails.firstName, 
-    lastName: extraDetails.lastName, 
-    zipCode: extraDetails.zipCode
-  );
+  final newUser = extraDetails.user;
   
   final register = RegistrationQuery(
     email: email,

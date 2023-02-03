@@ -44,43 +44,43 @@ class ${insertAppNamespaceUpper}FlexibleStateView extends AFFlexibleStateView  {
 
 abstract class ${insertAppNamespaceUpper}ConnectedScreen<TSPI extends AFScreenStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedScreen<${insertAppNamespaceUpper}State, ${insertAppNamespaceUpper}DefaultTheme, TStateView, TRouteParam, TSPI> {
   ${insertAppNamespaceUpper}ConnectedScreen({
-    required AFConnectedUIConfig<${insertAppNamespaceUpper}State, ${insertAppNamespaceUpper}DefaultTheme, TStateView, TRouteParam, TSPI>  uiConfig,
+    required AFConnectedUIConfig<${insertAppNamespaceUpper}State, ${insertAppNamespaceUpper}DefaultTheme, TStateView, TRouteParam, TSPI>  config,
     required AFScreenID screenId,
     TRouteParam? launchParam,
-  }): super(config: uiConfig, screenId: screenId, launchParam: launchParam);
+  }): super(config: config, screenId: screenId, launchParam: launchParam);
 }
 
 abstract class ${insertAppNamespaceUpper}ConnectedDialog<TSPI extends AFDialogStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedDialog<${insertAppNamespaceUpper}State, ${insertAppNamespaceUpper}DefaultTheme, TStateView, TRouteParam, TSPI>  {
 
   ${insertAppNamespaceUpper}ConnectedDialog({
-    required AFConnectedUIConfig<${insertAppNamespaceUpper}State, ${insertAppNamespaceUpper}DefaultTheme, TStateView, TRouteParam, TSPI> uiConfig,
+    required AFConnectedUIConfig<${insertAppNamespaceUpper}State, ${insertAppNamespaceUpper}DefaultTheme, TStateView, TRouteParam, TSPI> config,
     required AFScreenID screenId,
-  }): super(config: uiConfig, screenId: screenId);
+  }): super(config: config, screenId: screenId);
 }
 
 abstract class ${insertAppNamespaceUpper}ConnectedDrawer<TSPI extends AFScreenStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedDrawer<${insertAppNamespaceUpper}State, ${insertAppNamespaceUpper}DefaultTheme, TStateView, TRouteParam, TSPI>  {
   ${insertAppNamespaceUpper}ConnectedDrawer({
-    required AFConnectedUIConfig<${insertAppNamespaceUpper}State, ${insertAppNamespaceUpper}DefaultTheme, TStateView, TRouteParam, TSPI> uiConfig,
+    required AFConnectedUIConfig<${insertAppNamespaceUpper}State, ${insertAppNamespaceUpper}DefaultTheme, TStateView, TRouteParam, TSPI> config,
     required AFScreenID screenId,
-  }): super(config: uiConfig, screenId: screenId);
+  }): super(config: config, screenId: screenId);
 }
 
 abstract class ${insertAppNamespaceUpper}ConnectedBottomSheet<TSPI extends AFBottomSheetStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedBottomSheet<${insertAppNamespaceUpper}State, ${insertAppNamespaceUpper}DefaultTheme, TStateView, TRouteParam, TSPI> {
   ${insertAppNamespaceUpper}ConnectedBottomSheet({
-    required AFConnectedUIConfig<${insertAppNamespaceUpper}State, ${insertAppNamespaceUpper}DefaultTheme, TStateView, TRouteParam, TSPI> uiConfig,
+    required AFConnectedUIConfig<${insertAppNamespaceUpper}State, ${insertAppNamespaceUpper}DefaultTheme, TStateView, TRouteParam, TSPI> config,
     required AFScreenID screenId,
-  }): super(config: uiConfig, screenId: screenId);
+  }): super(config: config, screenId: screenId);
 }
 
 
 abstract class ${insertAppNamespaceUpper}ConnectedWidget<TSPI extends AFWidgetStateProgrammingInterface, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFConnectedWidget<${insertAppNamespaceUpper}State, ${insertAppNamespaceUpper}DefaultTheme, TStateView, TRouteParam, TSPI> {
   ${insertAppNamespaceUpper}ConnectedWidget({
-    required AFConnectedUIConfig<${insertAppNamespaceUpper}State, ${insertAppNamespaceUpper}DefaultTheme, TStateView, TRouteParam, TSPI> uiConfig,
+    required AFConnectedUIConfig<${insertAppNamespaceUpper}State, ${insertAppNamespaceUpper}DefaultTheme, TStateView, TRouteParam, TSPI> config,
     AFScreenID? screenIdOverride,
     AFWidgetID? widOverride,
     required AFRouteParam launchParam,
   }): super(
-    uiConfig: uiConfig,
+    config: config,
     screenIdOverride: screenIdOverride, 
     widOverride: widOverride,
     launchParam: launchParam,

@@ -157,7 +157,9 @@ $optionsHeader
     // if the result exists in the models area
     if(resultType != "AFUnused") {
       final modelFilePath = generator.pathModel(resultTypeCore);
-      queryFile.importProjectPath(context, modelFilePath);
+      if(modelFilePath != null) {
+        queryFile.importProjectPath(context, modelFilePath);
+      }
     }
   }
 

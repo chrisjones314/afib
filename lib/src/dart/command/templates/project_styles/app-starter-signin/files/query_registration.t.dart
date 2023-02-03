@@ -62,7 +62,6 @@ context.executeQuery(WriteOneUserQuery(
   user: revisedUser,
   onSuccess: (successCtx) {
     $extraAfterWrite
-    successCtx.navigateReplaceAll(HomePageScreen.navigatePush().castToReplaceAll());
   }
 ));
 ''';

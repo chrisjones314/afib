@@ -112,14 +112,14 @@ class AFTestExtensionContext {
     required AFInitTestDataDelegate defineTestData,
     required AFInitUnitTestsDelegate defineUnitTests,
     required AFInitStateTestsDelegate defineStateTests,
-    required AFInitScreenTestsDelegate defineScreenTests,
+    required AFInitScreenTestsDelegate defineUIPrototypes,
     AFInitWorkflowStateTestsDelegate? defineWorkflowStateTests,
     AFInitWireframesDelegate? defineWireframes,
   }) {
     addInitTestData(defineTestData);
     addInitUnitTest(defineUnitTests);
     addInitStateTest(defineStateTests);
-    addInitScreenTest(defineScreenTests);
+    addInitScreenTest(defineUIPrototypes);
     addInitWireframe(defineWireframes);
     if(defineWorkflowStateTests != null) {
       addInitWorkflowStateTest(defineWorkflowStateTests);
@@ -296,6 +296,7 @@ class AFCoreDefinitionContext {
   final createLifecycleQueryActions = <AFCreateLifecycleQueryAction>[];
   /// Used by app or third parties to listen in to all successful queries.
   final querySuccessListenerDelegates = <AFQuerySuccessListenerDelegate>[];
+  final stateViewAugmentors = <String, List<AFStateViewModelsAugmentorDelegate>>{};
 
   AFCoreDefinitionContext();
 
@@ -314,6 +315,29 @@ class AFCoreDefinitionContext {
 
   void addDefaultQueryErrorHandler(AFOnErrorDelegate onError) {
     errorListeners.add(onError);
+  }
+
+  void addStateViewAugmentationHandler<TStateView extends AFFlexibleStateView>(AFStateViewModelsAugmentorDelegate augmentor) {
+    final key = AFModelWithCustomID.stateKeyFor(TStateView);
+    var list = stateViewAugmentors[key];
+    if(list == null) {
+      list = <AFStateViewModelsAugmentorDelegate>[];
+      stateViewAugmentors[key] = list;
+    }    
+    list.add(augmentor);
+  }
+
+  void augmentStateViewModels<TStateView extends AFFlexibleStateView>(List<Object?> result) {
+    final key = AFModelWithCustomID.stateKeyFor(TStateView);
+    final augmentors = stateViewAugmentors[key];
+    if(augmentors == null) {
+      return;
+    }
+
+    final context = AFStateViewAugmentationContext();
+    for(final augmentor in augmentors) {
+      augmentor(context, result);
+    }
   }
 
   void defineScreenSPIOverride<TSPI extends AFStateProgrammingInterface, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme>({ required AFCreateSPIDelegate<TSPI, TBuildContext, TTheme> createSPI }) {

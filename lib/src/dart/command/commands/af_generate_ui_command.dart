@@ -22,6 +22,8 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_no_scaffol
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_additional_methods.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_build_with_spi_impl.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_impls_super.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_member_variable_decls.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_screen_params_constructor.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_smoke_test_impl.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_spi_on_pressed_closed.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_spi_on_tap_close.t.dart';
@@ -105,6 +107,8 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
   static const argParentTheme = "parent-theme";
   static const argParentThemeID = "parent-theme-id";
   static const argParentPackageName = "parent-package-name";
+  static const argWithFlutterState = "with-flutter-state";
+  static const argNoBackButton = "no-back-button";
   static const screenSuffix = "Screen";
   static const bottomSheetSuffix = "BottomSheet";
   static const drawerSuffix = "Drawer";
@@ -120,7 +124,7 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       implBuildBody: SnippetWidgetBuildBodyT.core(),
       implsSPI: AFSourceTemplate.empty,
       implsSuper: SnippetWidgetImplsSuperT(),
-      paramsConstructor: SnippetWidgetParamsConstructorT(),
+      paramsConstructor: SnippetWidgetParamsConstructorT.core(),
       routeParamImpls: SnippetWidgetRouteParamT.core(),
       navigatePush: AFSourceTemplate.empty,
       spi: SnippetDeclareSPIT.core(),
@@ -136,11 +140,11 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       kind: AFUIControlKind.screen, 
       suffix: screenSuffix, 
       path: AFCodeGenerator.screensPath,
-      implBuildWithSPI: SnippetScreenBuildWithSPIImplT(),
+      implBuildWithSPI: SnippetScreenBuildWithSPIImplT.core(),
       implBuildBody: SnippetMinimalScreenBuildBodyImplT(),
       implsSPI: AFSourceTemplate.empty,
       implsSuper: SnippetScreenImplsSuperT(),
-      paramsConstructor: AFSourceTemplate.empty,
+      paramsConstructor: SnippetScreenParamsConstructorT.core(),
       routeParamImpls: SnippetStandardRouteParamT.core(),
       navigatePush: SnippetNavigatePushT.core(),
       spi: SnippetDeclareSPIT.core(),
@@ -158,7 +162,7 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       implBuildBody: SnippetBottomSheetBuildBodyT(),
       implsSPI: SnippetSPIOnPressedCloseImplT(),
       implsSuper: SnippetScreenImplsSuperT(),
-      paramsConstructor: AFSourceTemplate.empty,
+      paramsConstructor: SnippetScreenParamsConstructorT.core(),
       routeParamImpls: SnippetStandardRouteParamT.core(),
       navigatePush: SnippetNavigatePushT.core(),
       spi: SnippetDeclareSPIT.core(),
@@ -176,7 +180,7 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       implBuildBody: SnippetDrawerBuildBodyT(),
       implsSPI: SnippetSPIOnTapCloseT(),
       implsSuper: SnippetScreenImplsSuperT(),
-      paramsConstructor: AFSourceTemplate.empty,
+      paramsConstructor: SnippetScreenParamsConstructorT.core(),
       routeParamImpls: SnippetStandardRouteParamT.core(),
       navigatePush: SnippetNavigatePushT.core(),
       spi: SnippetDeclareSPIT.core(),
@@ -194,7 +198,7 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       implBuildBody: SnippetDialogBuildBodyT(),
       implsSPI: SnippetSPIOnPressedCloseImplT(),
       implsSuper: SnippetScreenImplsSuperT(),
-      paramsConstructor: AFSourceTemplate.empty,
+      paramsConstructor: SnippetScreenParamsConstructorT.core(),
       routeParamImpls: SnippetStandardRouteParamT.core(),
       navigatePush: SnippetNavigatePushT.core(),
       spi: SnippetDeclareSPIT.core(),
@@ -231,8 +235,12 @@ $optionsHeader
   --$argTheme YourTheme - the theme to use, falls back to your default theme, NOT used when creating themes
 
   UI Elements only, targeting the route parameter
+    --$argWithFlutterState - add this flag to include AFib's flutter state management utilities (for text fields, focus, scroll controllers, etc)
     ${AFGenerateSubcommand.argMemberVariablesHelp} 
     ${AFGenerateSubcommand.argResolveVariablesHelp}
+
+  Screens Only
+    --$argNoBackButton - do not add the default back button
 
   --$argExportTemplatesHelp
   --$argOverrideTemplatesHelp
@@ -257,9 +265,10 @@ $optionsHeader
         AFGenerateSubcommand.argResolveVariables: "",
         AFGenerateStateSubcommand.argNotSerial: "true",
         AFGenerateStateSubcommand.argNoReviseMethods: "false",
+        argWithFlutterState: "false",
+        argNoBackButton: "false",
       }
     );
-
 
     final uiName = args.accessUnnamedFirst;
     verifyMixedCase(uiName, "ui name");
@@ -410,8 +419,10 @@ $optionsHeader
       AFSourceTemplate.insertMemberVariableImportsInsertion: memberVariables?.extraImports(context) ?? AFSourceTemplate.empty,
       ModelT.insertReviseMethods: standardReviseMethods,
       ModelT.insertResolveMethods: memberVariables?.resolveMethods ?? AFSourceTemplate.empty,
-      AFSourceTemplate.insertCreateParamsInsertion: memberVariables?.navigatePushParams ?? AFSourceTemplate.empty,
-      AFSourceTemplate.insertCreateParamsCallInsertion: memberVariables?.navigatePushCall ?? AFSourceTemplate.empty,
+      AFSourceTemplate.insertCreateParamsInsertion: memberVariables?.routeParamCreateParams ?? AFSourceTemplate.empty,
+      AFSourceTemplate.insertCreateParamsCallInsertion: memberVariables?.routeParamCreateCall ?? AFSourceTemplate.empty,
+      AFSourceTemplate.insertSuperParamsInsertion: memberVariables?.routeParamSuperParams ?? AFSourceTemplate.empty,
+      SnippetStandardRouteParamT.insertWithFlutterStateSuffix: (memberVariables?.withFlutterState ?? false) ? "WithFlutterState" : "",
     });
 
     final navigatePushTemplate = (navigatePush ?? controlSettings.navigatePush);
@@ -431,7 +442,11 @@ $optionsHeader
     final templateBody = buildBody ?? controlSettings.implBuildBody;
     final bodySnippet = context.createSnippet(templateBody, extend: screenInsertions);
 
-    final buildWithSPITemplate = buildWithSPI ?? controlSettings.implBuildWithSPI;
+    var buildWithSPITemplate = buildWithSPI ?? controlSettings.implBuildWithSPI;
+    final noBackButton = args.accessNamedFlag(argNoBackButton);
+    if(noBackButton) {
+      buildWithSPITemplate = SnippetScreenBuildWithSPIImplT.coreNoBackButton();
+    }
     final buildWithSPISnippet = context.createSnippet(buildWithSPITemplate, extend: screenInsertions);
 
     final screenImplsSnippet = context.createSnippet(screenImpls ?? controlSettings.screenAdditionalMethods, extend: screenInsertions);
@@ -441,6 +456,9 @@ $optionsHeader
     if(extraImportsRouteParam != null) {
       extraImports.addLinesAtEnd(context, [extraImportsRouteParam]);
     }
+
+    final paramsConstructorSnippet = context.createSnippet(controlSettings.paramsConstructor, extend: screenInsertions);
+    final uiMemberVariablesSnippet = context.createSnippet(SnippetScreenMemberVariableDeclsT.core(), extend: screenInsertions);
 
     final screenFile = context.createFile(projectPath, ScreenT(), extend: screenInsertions, insertions: {
       AFSourceTemplate.insertExtraImportsInsertion: extraImports,
@@ -452,8 +470,9 @@ $optionsHeader
       ScreenT.insertBuildWithSPIImpl: buildWithSPISnippet,
       ScreenT.insertExtraConfigParams: controlSettings.extraConfigParams,
       AFSourceTemplate.insertSuperParamsInsertion: superSnippet,
-      AFSourceTemplate.insertConstructorParamsInsertion: controlSettings.paramsConstructor,
       AFSourceTemplate.insertAdditionalMethodsInsertion: screenImplsSnippet,
+      AFSourceTemplate.insertConstructorParamsInsertion: paramsConstructorSnippet,
+      AFSourceTemplate.insertMemberVariablesInsertion: uiMemberVariablesSnippet,
     });
 
     screenFile.importProjectPath(context, generator.pathConnectedBaseFile);
@@ -531,7 +550,7 @@ $optionsHeader
       screenTestsFile.importFile(context, screenTestFile);
 
       final callFunction = context.createSnippet(SnippetCallDefineScreenTest(), extend: screenInsertions);
-      screenTestsFile.addLinesAfter(context, AFCodeRegExp.startDefineScreenTestsFunction, callFunction.lines);
+      screenTestsFile.addLinesAfter(context, AFCodeRegExp.startDefineUIProtoypesFunction, callFunction.lines);
     }
 
     return screenFile;

@@ -150,7 +150,9 @@ class AFDefineTestDataContext {
       }
     } else if(sources is String) {
       final item = find(sources);
-      _internalResolveStateViewModels(item, models);
+      if(item is! String) {
+        _internalResolveStateViewModels(item, models);
+      }
     } else if(sources is AFComponentState) {
       _internalApplyModels(sources.models, models);
     } else if(sources is AFFlexibleStateView) {

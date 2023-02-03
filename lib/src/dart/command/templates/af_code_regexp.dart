@@ -3,7 +3,7 @@
 class AFCodeRegExp {
   static final startMixinStateAccess = RegExp(r"mixin\s*.*StateModelAccess\s+on\s+AFStateModelAccess\s+{");
   static final startShortcutsClass = RegExp(r"class\s+.*StateTestShortcuts\s+{");
-  static final startDefineScreenTestsFunction = RegExp(r'void\s+defineUIPrototypes\(AFUIPrototypeDefinitionContext\s+context\)\s+{');
+  static final startDefineUIProtoypesFunction = RegExp(r'void\s+defineUIPrototypes\(AFUIPrototypeDefinitionContext\s+context\)\s+{');
   static final startPrototypeID = RegExp(r"class\s+.*PrototypeID\s+extends\s+AFPrototypeID\s+{");
   static final startDefineScreenTestFunction = RegExp(r"void\s+define.*Prototypes\(AFUIPrototypeDefinitionContext\s+context\)\s+{");
   static final startScreenMap = RegExp(r"void\s+defineScreens\(AFCoreDefinitionContext\s+context\)\s+{");

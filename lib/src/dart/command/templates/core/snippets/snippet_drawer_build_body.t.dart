@@ -22,7 +22,7 @@ class SnippetDrawerBuildBodyT extends AFCoreSnippetSourceTemplate {
       key: t.keyForWID(${insertAppNamespaceUpper}WidgetID.standardClose),
       leading: Icon(Icons.close),
       title: Text('Close'),
-      onTap: spi.onTapClose,
+      onTap: spi.onCloseDrawer,
     ));
 
     return Drawer(

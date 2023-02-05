@@ -18,6 +18,45 @@ class AFUIWelcomeWidgetSPI extends AFUIWidgetSPI<AFUIDefaultStateView, AFRoutePa
 
 }
 
+class AFUIAlphaWarningWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, AFUIDefaultStateView, AFRouteParamUnused> {
+
+  static final config = AFUIDefaultWidgetConfig<AFUIWelcomeWidgetSPI, AFRouteParamUnused> (
+    spiCreator: AFUIWelcomeWidgetSPI.create,
+  );
+
+
+  AFUIAlphaWarningWidget({
+    AFScreenID? screenIdOverride,
+    AFWidgetID? widOverride,
+  }): super(
+    uiConfig: config,
+    screenIdOverride: screenIdOverride, 
+    widOverride: widOverride,
+    launchParam: AFRouteParamUnused.unused,
+  );
+
+  Widget buildWithSPI(AFUIWelcomeWidgetSPI spi) {
+    return _buildAlphaWarningCard(spi);
+  }
+
+
+  Widget _buildAlphaWarningCard(AFUIWelcomeWidgetSPI spi) {
+    final t = spi.t;
+    final rows = t.column();
+    rows.add(t.childText("AFib is alpha software.  Please report bugs on github.", textColor: t.colorOnAlert));
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: t.borderRadius.t.standard,
+        color: t.colorAlert
+      ),
+      child: t.childMarginStandard(
+        child: Column(children: rows)
+      )
+    );        
+  }
+
+}
 
 @immutable
 class AFUIWelcomeWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, AFUIDefaultStateView, AFRouteParamUnused> {
@@ -35,19 +74,6 @@ class AFUIWelcomeWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, AFUIDe
     widOverride: widOverride,
     launchParam: AFRouteParamUnused.unused,
   );
-
-  Widget _buildAlphaWarningCard(AFUIWelcomeWidgetSPI spi) {
-    final t = spi.t;
-    final rows = t.column();
-    rows.add(t.childText("AFib is alpha software.  Please report bugs on github.", textColor: t.colorOnAlert));
-
-    return Card(
-      color: t.colorAlert,
-      child: t.childMarginStandard(
-        child: Column(children: rows)
-      )
-    );        
-  }
 
 
   Widget _buildWelcomeCard(AFUIWelcomeWidgetSPI spi) {
@@ -82,7 +108,7 @@ class AFUIWelcomeWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, AFUIDe
   Widget buildWithSPI(AFUIWelcomeWidgetSPI spi) {
     final t = spi.t;
     final rows = t.column();
-    rows.add(_buildAlphaWarningCard(spi));
+    rows.add(AFUIAlphaWarningWidget());
     rows.add(_buildWelcomeCard(spi));
 
     return Column(

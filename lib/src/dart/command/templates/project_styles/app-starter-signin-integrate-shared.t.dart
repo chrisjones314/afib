@@ -28,7 +28,16 @@ generate ui HomePageScreen --no-back-button --override-templates +
   +core/snippets/extra_imports=project_styles/app-starter-signin/snippets/home_page_screen_extra_imports
   +core/snippets/declare_spi=project_styles/app-starter-signin/snippets/home_page_screen_spi
   +core/snippets/empty_screen_build_body_impl=project_styles/app-starter-signin/snippets/home_page_screen_build_body
+  +core/snippets/screen_build_with_spi_impl_no_back=project_styles/app-starter-signin/snippets/screen_build_with_spi_impl
   +core/snippets/screen_additional_methods=project_styles/app-starter-signin/snippets/home_page_screen_additional_methods
+generate ui SignedInMenuDrawer --override-templates +
+  +core/snippets/extra_imports=project_styles/app-starter-signin/snippets/signed_in_menu_drawer_extra_imports
+  +core/snippets/declare_spi=project_styles/app-starter-signin/snippets/signed_in_menu_drawer_spi
+  +core/snippets/drawer_build_body=project_styles/app-starter-signin/snippets/signed_in_menu_drawer_build_body
+generate ui SignedInBottomNavBarWidget --override-templates +
+  +core/snippets/extra_imports=project_styles/app-starter-signin/snippets/signed_in_bottom_nav_bar_extra_imports
+  +core/snippets/declare_spi=project_styles/app-starter-signin/snippets/signed_in_bottom_nav_bar_spi
+  +core/snippets/widget_build_body=project_styles/app-starter-signin/snippets/signed_in_bottom_nav_bar_build_body
 generate ui RegistrationDetailsWidget --override-templates +
   +core/snippets/extra_imports=project_styles/app-starter-signin/snippets/registration_details_widget_extra_imports
   +core/snippets/screen_member_variable_decls=project_styles/app-starter-signin/snippets/screen_member_variable_decls

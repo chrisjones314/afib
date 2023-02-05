@@ -14,6 +14,8 @@ class SnippetSigninStarterHomePageScreenExtraImportsT {
         AFSourceTemplate.insertExtraImportsInsertion: '''
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signout_query.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/user.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/drawers/signed_in_menu_drawer.dart';
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/widgets/signed_in_bottom_nav_bar_widget.dart';
 import 'package:afib_signin/afsi_flutter.dart';
 ''',
       })
@@ -30,6 +32,8 @@ class SnippetSigninStarterHomePageScreenBuildBodyT extends AFSnippetSourceTempla
   String get template => '''
 final t = spi.t;
 final rows = t.column();
+rows.add(AFUIAlphaWarningWidget());
+
 rows.add(t.childMarginStandard(
   child: t.childText("Signed In", 
     textAlign: TextAlign.center, 
@@ -53,28 +57,14 @@ rows.add(Table(
   children: tableRows,
 ));
 
-rows.add(t.childMargin(
-  margin: t.margin.h.standard,
-  child: t.childButtonPrimaryText(
-    text: "Sign Out", 
-    onPressed: spi.onPressedSignout
-  )
-));
-
-rows.add(t.childMargin(
-  margin: t.margin.h.standard,
-  child: t.childButtonPrimaryText(
-    text: "Edit Account Settings", 
-    onPressed: spi.onPressedEditAccountSettings
-  )
-));
-
-rows.add(t.childMargin(
-  margin: t.marginCustom(all: 3, top: 5),
-  child: t.childButtonPrimaryText(
-    text: "Delete Your Account", 
-    onPressed: spi.onPressedDeleteAccount
-  )
+rows.add(Container(
+  margin: t.margin.standard,
+  padding: t.padding.standard,
+  decoration: BoxDecoration(
+    color: Colors.grey[300],
+    borderRadius: t.borderRadius.standard,
+  ),
+  child: t.childText("Use the menu icon at the lower left to access the drawer, with additional functionality including signout, account settings, and delete your account.")
 ));
 
 return ListView(
@@ -157,3 +147,48 @@ TableRow _createDetailRow(HomePageScreenSPI spi, { required String label, requir
 }
 ''';
 }
+
+class SnippetHomeScreenBuildWithSPIImplT extends AFSnippetSourceTemplate {
+  SnippetHomeScreenBuildWithSPIImplT({
+    required List<String> templateFolder,
+    required AFSourceTemplateInsertions? embeddedInsertions,
+  }): super(
+    templateFileId: "screen_build_with_spi_impl",
+    templateFolder: templateFolder,
+    embeddedInsertions: embeddedInsertions
+  );
+
+  factory SnippetHomeScreenBuildWithSPIImplT.example() {
+    return SnippetHomeScreenBuildWithSPIImplT(
+      templateFolder: AFProjectPaths.pathGenerateStarterSigninSnippets,
+      embeddedInsertions: null,
+    );
+  }
+
+  String get template => '''
+final t = spi.t;
+final body = _buildBody(spi);
+return t.childScaffold(
+  spi: spi,
+  body: body,
+  drawer: SignedInMenuDrawer(),
+  appBar: AppBar(
+    title: t.childText("Home Page Screen"),
+    
+    // IMPORTANT: Don't let Flutter automatically add its own back button, as that 
+    // will get out of sync with AFib's route state.   Instead you must use
+    // leading: t.leadingButtonStandardBack..., which is done by default for you 
+    // in most cases.
+    automaticallyImplyLeading: false,
+  ),
+  bottomNavigationBar: SignedInBottomNavBarWidget(
+    launchParam: SignedInBottomNavBarWidgetRouteParam.create(
+      screenId: screenId, 
+      wid: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.navBarBottom, 
+      routeLocation: AFRouteLocation.screenHierarchy
+    ),
+  )
+);
+''';
+}
+

@@ -109,9 +109,9 @@ class RegistrationDetailsWidgetRouteParam extends AFWidgetRouteParamWithFlutterS
     );
 
     final textControllers = AFTextEditingControllers.createN({
-      STFBWidgetID.textFirstName: userToEdit.firstName,
-      STFBWidgetID.textLastName: userToEdit.lastName,
-      STFBWidgetID.textZipCode: userToEdit.zipCode,
+      ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textFirstName: userToEdit.firstName,
+      ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textLastName: userToEdit.lastName,
+      ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textZipCode: userToEdit.zipCode,
     });
 
     final flutterState = AFFlutterRouteParamState(
@@ -201,12 +201,12 @@ rows.add(t.childMargin(
   margin: t.margin.v.standard,
   child: t.childTextField(
     screenId: context.screenId,
-    wid: STFBWidgetID.textFirstName,
+    wid: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textFirstName,
     parentParam: context.p,
     expectedText: context.p.user.firstName,
     style: styleText.bodyText2,
     decoration: t.decorationTextInput(
-      text: STFBWidgetID.textFirstName,
+      text: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textFirstName,
       colorForeground: colorFore,
     ),
     onChanged: spi.onChangedFirstName
@@ -217,12 +217,12 @@ rows.add(t.childMargin(
   margin: t.margin.v.standard,
   child: t.childTextField(
     screenId: context.screenId,
-    wid: STFBWidgetID.textLastName,
+    wid: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textLastName,
     parentParam: context.p,
     expectedText: context.p.user.lastName,
     style: styleText.bodyText2,
     decoration: t.decorationTextInput(
-      text: STFBWidgetID.textLastName,
+      text: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textLastName,
       colorForeground: colorFore,
     ),
     onChanged: spi.onChangedLastName
@@ -233,12 +233,12 @@ rows.add(t.childMargin(
   margin: t.margin.v.standard,
   child: t.childTextField(
   screenId: context.screenId,
-    wid: STFBWidgetID.textZipCode,
+    wid: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textZipCode,
     parentParam: context.p,
     expectedText: context.p.user.zipCode,
     style: styleText.bodyText2,
     decoration: t.decorationTextInput(
-      text: STFBWidgetID.textZipCode,
+      text: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textZipCode,
       colorForeground: colorFore,
     ),
     onChanged: spi.onChangedZipCode
@@ -253,7 +253,7 @@ if(includeSaveButton) {
   rows.add(t.childMargin(
     margin: t.margin.t.standard,
     child: t.childButtonPrimaryText(
-      wid: STFBWidgetID.buttonSaveUserDetails,
+      wid: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.buttonSaveUserDetails,
       text: "Save User Settings", 
       onPressed: spi.onPressedSaveUserDetails,
     )
@@ -284,7 +284,7 @@ User? get activeUser {
 }
 
 void onChangedFirstName(String firstName) {
-  context.updateTextField(STFBWidgetID.textFirstName, firstName);
+  context.updateTextField(${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textFirstName, firstName);
   final revised = context.p.user.copyWith(firstName: firstName);
   _reviseUser(revised);
 }
@@ -295,13 +295,13 @@ void _reviseUser(User revisedUser) {
 }
 
 void onChangedLastName(String lastName) {
-  context.updateTextField(STFBWidgetID.textLastName, lastName);
+  context.updateTextField(${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textLastName, lastName);
   final revised = context.p.user.copyWith(lastName: lastName);
   _reviseUser(revised);
 }
 
 void onChangedZipCode(String zipCode) {
-  context.updateTextField(STFBWidgetID.textZipCode, zipCode);
+  context.updateTextField(${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textZipCode, zipCode);
   final revised = context.p.user.copyWith(zipCode: zipCode);
   _reviseUser(revised);
 }

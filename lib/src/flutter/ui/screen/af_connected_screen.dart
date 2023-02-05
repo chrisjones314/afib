@@ -1129,7 +1129,7 @@ class AFDialogStateProgrammingInterface<TState extends AFComponentState, TBuildC
     context.dispatch(AFNavigatePopAction(worksInSingleScreenTest: worksInSingleScreenTest));
   }
 
-  void closeDialog(dynamic result) {
+  void onCloseDialog(dynamic result) {
     context.closeDialog(standard.screenId, result);
   }
 }
@@ -1143,7 +1143,7 @@ class AFBottomSheetStateProgrammingInterface<TState extends AFComponentState, TB
   ): super(context, standard);
 
 
-  void closeBottomSheet(dynamic result) {
+  void onCloseBottomSheet(dynamic result) {
     context.closeBottomSheet(screenId, result);
   }
 }
@@ -1154,6 +1154,10 @@ class AFDrawerStateProgrammingInterface<TState extends AFComponentState, TBuildC
     TBuildContext context,
     AFStandardSPIData standard
   ): super(context, standard);
+
+  void onCloseDrawer() {
+    context.closeDrawer();
+  }
 }
 
 

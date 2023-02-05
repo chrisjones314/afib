@@ -53,7 +53,7 @@ Widget? childExtraSectionsAccountSettings({
       includeSaveButton: true,
       launchParam: RegistrationDetailsWidgetRouteParam.create(
         screenId: context.screenId, 
-        wid: STFBWidgetID.registrationDetails,
+        wid: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.registrationDetails,
         routeLocation: AFRouteLocation.screenHierarchy,
         userToEdit: activeUser,
       )

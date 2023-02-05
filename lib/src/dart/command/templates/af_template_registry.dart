@@ -9,6 +9,7 @@ import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/state_test.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/theme.t.dart';
+import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_model_accessor.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_spi.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_test_data.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_drawer_build_body.t.dart';
@@ -80,6 +81,7 @@ import 'package:afib/src/dart/command/templates/project_styles/app-starter-signi
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/files/define_core.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/files/model_referenced_user.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/files/model_user.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/files/query_check_signin.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/files/query_read_user.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/files/query_registration.t.dart';
@@ -90,9 +92,12 @@ import 'package:afib/src/dart/command/templates/project_styles/app-starter-signi
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/files/signin_actions_lpi.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/files/state_test.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/files/theme_signin.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/snippets/snippet_declare_active_user_accessor.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/snippets/snippet_fundmental_theme_init.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/snippets/snippets_home_page_screen.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/snippets/snippets_registration_details_widget.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/snippets/snippets_signed_in_bottom_nav_bar_widget.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/snippets/snippets_signed_in_menu_drawer.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/statelib-starter-minimal.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/uilib-starter-minimal.t.dart';
 import 'package:path/path.dart';
@@ -157,6 +162,8 @@ class AFTemplateRegistry {
     registerSnippet(SnippetScreenParamsConstructorT.core());
     registerSnippet(SnippetWidgetParamsConstructorT.core());
     registerSnippet(SnippetScreenMemberVariableDeclsT.core());
+    registerSnippet(SnippetDeclareModelAccessorT.core());
+    registerSnippet(SnippetScreenBuildWithSPIImplT.coreNoBackButton());
 
     // starter-minimal example
     registerFile(QueryStartupStarterMinimalT.example());
@@ -225,6 +232,8 @@ class AFTemplateRegistry {
     registerFile(StarterSigninThemeSigninT.example());
     registerFile(StarterSigninStateTestT.example());
     registerFile(SigninStarterDefineCoreT.example());
+    registerFile(ModelSigninUserT.example());
+
 
     registerSnippet(SnippetSigninStarterHomePageScreenExtraImportsT.example());
     registerSnippet(SnippetSigninStarterHomePageScreenBuildBodyT());
@@ -238,6 +247,14 @@ class AFTemplateRegistry {
     registerSnippet(SnippetHomeScreenAdditionalMethodsT());
     registerSnippet(SnippetRegistrationDetailsWidgetParamsConstructorT.example());
     registerSnippet(SnippetRegistrationDetailsMemberVariablesDeclT.example());
+    registerSnippet(SnippetHomeScreenBuildWithSPIImplT.example());
+    registerSnippet(SnippetSigninStarterSignedInMenuDrawerExtraImportsT.example());
+    registerSnippet(SnippetSigninStarterSignedInMenuDrawerBuildBodyT());
+    registerSnippet(SnippetSigninStarterSignedInMenuDrawerSPIT.example());
+    registerSnippet(SnippetSigninStarterSignedInBottomNavBarExtraImportsT.example());
+    registerSnippet(SnippetSigninStarterSignedInBottomNavBarBuildBodyT());
+    registerSnippet(SnippetSigninStarterSignedInBottomNavBarSPIT.example());
+    registerSnippet(SnippetDeclareActiveUserAccessorT());
 
     // starter-signin-firebase
     registerFile(StarterSigninFirebaseMainT.example());

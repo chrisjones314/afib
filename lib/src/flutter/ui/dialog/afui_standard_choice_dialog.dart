@@ -106,7 +106,7 @@ class AFUIStandardChoiceDialog extends AFUIConnectedDialog<AFUIStandardChoiceDia
           child: t.childButtonFlatText(
             text: buttonTitle,
             onPressed:  () {
-              spi.closeDialog(i);
+              spi.onCloseDialog(i);
             },
         )));
       } else {
@@ -115,7 +115,7 @@ class AFUIStandardChoiceDialog extends AFUIConnectedDialog<AFUIStandardChoiceDia
           child: t.childButtonPrimaryText(
           text: buttonTitle,
           onPressed:  () {
-            spi.closeDialog(i);
+            spi.onCloseDialog(i);
           },
         )));
       }

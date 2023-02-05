@@ -242,7 +242,7 @@ $optionsHeader
       ModelT.insertInitialState: isRoot ? SnippetInitialStateModelFunctionT(
         initialStateParams: memberVariables?.initialValueDeclaration ?? AFSourceTemplate.empty,
       ) : AFSourceTemplate.empty,
-      AFSourceTemplate.insertMemberVariableImportsInsertion: memberVariableImports
+      AFSourceTemplate.insertMemberVariableImportsInsertion: memberVariableImports,
     });
 
     if(isRoot) {
@@ -287,10 +287,11 @@ $optionsHeader
       final pathStateViewAccess = generator.pathStateViewAccess();
       final accessFile = generator.modifyFile(context, pathStateViewAccess);
       final regexMixinStart = AFCodeRegExp.startMixinStateAccess;
-      final declareAccess = context.createSnippet(SnippetDeclareModelAccessorT(), extend: modelInsertions, insertions: {
+      final declareAccess = context.createSnippet(SnippetDeclareModelAccessorT.core(), extend: modelInsertions, insertions: {
         AFSourceTemplate.insertMainTypeNoRootInsertion: identifierNoRootOriginal,
       });
       accessFile.addLinesAfter(context, regexMixinStart, declareAccess.lines);
+      accessFile.importAll(context, declareAccess.extraImports);
 
       final declareImport = SnippetImportFromPackageT().toBuffer(context, insertions: {
         AFSourceTemplate.insertPackagePathInsertion: modelFile.importPathStatement

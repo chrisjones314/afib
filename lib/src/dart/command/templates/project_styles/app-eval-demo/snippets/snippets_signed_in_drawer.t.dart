@@ -42,7 +42,7 @@ class SnippetSignedInDrawerBuildBodyT extends AFSnippetSourceTemplate {
     rows.add(ListTile(
       key: t.keyForWID(${insertAppNamespaceUpper}WidgetID.standardClose),
       leading: const Icon(Icons.close),
-      onTap: spi.onTapClose,
+      onTap: spi.onCloseDrawer,
       title: const Text('Close'),
     ));
 

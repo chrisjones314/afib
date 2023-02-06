@@ -354,7 +354,9 @@ class AFMemberVariableTemplates {
 
   String get routeParamSuperParams {
     final result = StringBuffer();
-    result.writeln("flutterState: flutterState,");
+    if(withFlutterState) {
+      result.writeln("flutterState: flutterState,");
+    }
     return result.toString();
   }
 
@@ -556,7 +558,9 @@ class AFMemberVariableTemplates {
     final result = StringBuffer();
     result.writeln("{");
     result.write(navigatePushParamsBare);
-    result.writeln("  required AFFlutterRouteParamState flutterState,");
+    if(withFlutterState) {
+      result.writeln("  required AFFlutterRouteParamState flutterState,");
+    }
     result.write("}");
     return result.toString();    
 

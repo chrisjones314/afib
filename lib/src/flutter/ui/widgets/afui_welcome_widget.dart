@@ -1,4 +1,5 @@
 
+import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
@@ -24,10 +25,13 @@ class AFUIAlphaWarningWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, A
     spiCreator: AFUIWelcomeWidgetSPI.create,
   );
 
+  final bool roundBottom;
+
 
   AFUIAlphaWarningWidget({
     AFScreenID? screenIdOverride,
     AFWidgetID? widOverride,
+    this.roundBottom = false,
   }): super(
     uiConfig: config,
     screenIdOverride: screenIdOverride, 
@@ -44,10 +48,11 @@ class AFUIAlphaWarningWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, A
     final t = spi.t;
     final rows = t.column();
     rows.add(t.childText("AFib is alpha software.  Please report bugs on github.", textColor: t.colorOnAlert));
+    final borderRadius = roundBottom ? t.borderRadius.standard : t.borderRadius.t.standard;
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: t.borderRadius.t.standard,
+        borderRadius: borderRadius,
         color: t.colorAlert
       ),
       child: t.childMarginStandard(
@@ -78,28 +83,44 @@ class AFUIWelcomeWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, AFUIDe
 
   Widget _buildWelcomeCard(AFUIWelcomeWidgetSPI spi) {
     final t = spi.t;
-    final rows = t.column();
-    rows.add(t.childMargin(
+    final rowsCentered = t.column();
+    rowsCentered.add(t.childMargin(
       margin: t.margin.b.size5,
       child: t.childText("Welcome to AFib!", style: t.styleOnCard.bodyText1)
     ));
-    rows.add(Text("See", style: t.styleOnCard.bodyText2));
-    rows.add(t.childMargin(
+    rowsCentered.add(Text("See", style: t.styleOnCard.bodyText2));
+    rowsCentered.add(t.childMargin(
       margin: t.margin.v.standard,
       child: t.childText("afibframework.io", style: t.styleOnCard.headline6)
     ));
-    rows.add(t.childMargin(
+    rowsCentered.add(t.childMargin(
       margin: t.margin.b.s5,
       child: Text("for tutorials and documentation.", style: t.styleOnCard.bodyText2)
     ));
 
-    rows.add(Text("Try changing to AFEnvironment.prototype in", style: t.styleOnCard.bodyText2));
-    rows.add(Text("in ${AFibD.config.appNamespace}_config.g.dart", style: t.styleOnCard.bodyText2));
-    rows.add(Text("to use prototype mode.", style: t.styleOnCard.bodyText2));
+    rowsCentered.add(t.childText("Try changing to ", style: t.styleOnCard.bodyText2));
+    rowsCentered.add(t.childMarginStandard(child: t.childText("AFEnvironment.prototype", style: t.styleOnCard.bodyText1)));
+    rowsCentered.add(t.childText("in", style: t.styleOnCard.bodyText2));
+    rowsCentered.add(t.childMarginStandard(child: t.childText("${AFibD.config.appNamespace}_config.g.dart", style: t.styleOnCard.bodyText1)));
+    
+    rowsCentered.add(t.childText("to use prototype mode.", style: t.styleOnCard.bodyText2));
+
+    final rows = t.column();
+    rows.add(AFUIAlphaWarningWidget());
+    rows.add(t.childMargin(
+      margin: t.margin.standard,
+      child: Column(
+        children: rowsCentered
+      )
+    ));
 
     return Card(
-      child:  t.childMarginStandard(
-        child: Column(children: rows)
+      child:  t.childMargin(
+        margin: t.margin.none,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: rows
+        )
       )
     );
   }
@@ -108,7 +129,6 @@ class AFUIWelcomeWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, AFUIDe
   Widget buildWithSPI(AFUIWelcomeWidgetSPI spi) {
     final t = spi.t;
     final rows = t.column();
-    rows.add(AFUIAlphaWarningWidget());
     rows.add(_buildWelcomeCard(spi));
 
     return Column(

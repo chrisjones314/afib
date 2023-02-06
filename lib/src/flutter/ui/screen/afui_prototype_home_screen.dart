@@ -9,6 +9,7 @@ import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_library_list_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_state_test_list_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
+import 'package:afib/src/flutter/ui/widgets/afui_welcome_widget.dart';
 import 'package:afib/src/flutter/utils/af_param_ui_state_holder.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
@@ -155,6 +156,9 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFPrototypeHomeScreenSPI
     final t = spi.t;
     final context = spi.context;
     final protoRows = t.column();
+    rows.add(Card(
+      child: AFUIAlphaWarningWidget(roundBottom: true)
+    ));
 
     final primaryTests = AFibF.g.primaryUITests;
     t.buildLibraryPrototypeNav(

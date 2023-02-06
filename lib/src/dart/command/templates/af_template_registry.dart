@@ -58,6 +58,7 @@ import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/sni
 import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/snippets/snippets_startup_screen.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-minimal.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-minimal/files/query_minimal_startup.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/app-starter-minimal/snippets/snippet_minimal_startup_screen_build_body.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase-integrate.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin-firebase/files/query_change_email.t.dart';
@@ -143,7 +144,7 @@ class AFTemplateRegistry {
     registerSnippet(SnippetDefineTestDataT.core());
     registerSnippet(SnippetStandardRouteParamT.core());
     registerSnippet(SnippetScreenBuildWithSPIImplT.core());
-    registerSnippet(SnippetMinimalScreenBuildBodyImplT());
+    registerSnippet(SnippetEmptyScreenBuildBodyImplT());
     registerSnippet(SnippetDeclareSPIT.core());
     registerSnippet(SnippetScreenAdditionalMethodsT());
     registerSnippet(SnippetStandardRouteParamT.core());
@@ -164,10 +165,12 @@ class AFTemplateRegistry {
     registerSnippet(SnippetScreenMemberVariableDeclsT.core());
     registerSnippet(SnippetDeclareModelAccessorT.core());
     registerSnippet(SnippetScreenBuildWithSPIImplT.coreNoBackButton());
+    registerSnippet(SnippetEmptyScreenBuildBodyImplT());
 
     // starter-minimal example
     registerFile(QueryStartupStarterMinimalT.example());
     registerSnippet(SnippetMinimalScreenBuildBodyImplT());
+    
 
     // start-here example
     registerFile(StartHereThemeT.example());

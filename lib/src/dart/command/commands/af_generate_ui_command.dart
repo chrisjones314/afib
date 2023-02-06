@@ -141,7 +141,7 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       suffix: screenSuffix, 
       path: AFCodeGenerator.screensPath,
       implBuildWithSPI: SnippetScreenBuildWithSPIImplT.core(),
-      implBuildBody: SnippetMinimalScreenBuildBodyImplT(),
+      implBuildBody: SnippetEmptyScreenBuildBodyImplT(),
       implsSPI: AFSourceTemplate.empty,
       implsSuper: SnippetScreenImplsSuperT(),
       paramsConstructor: SnippetScreenParamsConstructorT.core(),

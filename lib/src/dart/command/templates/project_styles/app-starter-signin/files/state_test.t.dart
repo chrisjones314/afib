@@ -250,9 +250,11 @@ void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
     final registerDetails = stShortcuts.createRegistrationDetailsWidget(registerScreen);
     final homeScreen = stShortcuts.createHomePageScreen();
 
+    const testPassword = "test";
     registerScreen.executeScreen((e, screenContext) { 
       screenContext.executeBuild((spi) => spi.onChangedEmail(midwestUser.email));
-      screenContext.executeBuild((spi) => spi.onChangedPassword("test"));
+      screenContext.executeBuild((spi) => spi.onChangedPassword(testPassword));
+      screenContext.executeBuild((spi) => spi.onChangedPasswordConfirm(testPassword));
 
       // now, we need to modify the controls on the custom RegistrationDetailsWidget that we inserted into the 
       // standard signin UI  via our SigninTheme override

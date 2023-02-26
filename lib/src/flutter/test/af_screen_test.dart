@@ -785,12 +785,12 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
     return sel.elements;
   }
 
-  Future<Widget?> matchWidget(dynamic selector, { bool shouldScroll = true, bool ignoreUnderWidget = false }) async {
+  Future<TWidget?> matchWidget<TWidget extends Widget>(dynamic selector, { bool shouldScroll = true, bool ignoreUnderWidget = false }) async {
     final widgets = await matchWidgets(selector, expectedCount: 1, scrollIfMissing: shouldScroll, extraFrames: 1, ignoreUnderWidget: ignoreUnderWidget);
     if(widgets.isEmpty) {
       return null;
     }
-    return widgets.first;
+    return widgets.first as TWidget;
   }
 
   Future<List<Widget>> matchWidgets(dynamic selector, { int? expectedCount, bool scrollIfMissing = true, bool ignoreUnderWidget = false, int extraFrames = 0 }) async {

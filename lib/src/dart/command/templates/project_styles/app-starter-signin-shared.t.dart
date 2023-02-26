@@ -12,6 +12,8 @@ integrate library --package-name afib_signin --package-code afsi
 generate id ${insertAppNamespaceUpper}WidgetID.textFirstName
 generate id ${insertAppNamespaceUpper}WidgetID.textLastName
 generate id ${insertAppNamespaceUpper}WidgetID.textZipCode
+generate id ${insertAppNamespaceUpper}WidgetID.textUserId
+generate id ${insertAppNamespaceUpper}WidgetID.textEmail
 generate id ${insertAppNamespaceUpper}WidgetID.widgetRegistrationDetails
 generate id ${insertAppNamespaceUpper}TestDataID.userWestCoast
 generate id ${insertAppNamespaceUpper}TestDataID.usersWestCoast

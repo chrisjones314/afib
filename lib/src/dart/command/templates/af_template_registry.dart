@@ -258,6 +258,7 @@ class AFTemplateRegistry {
     registerSnippet(SnippetSigninStarterSignedInBottomNavBarBuildBodyT());
     registerSnippet(SnippetSigninStarterSignedInBottomNavBarSPIT.example());
     registerSnippet(SnippetDeclareActiveUserAccessorT());
+    registerSnippet(SnippetHomePageScreenSmokeTest());
 
     // starter-signin-firebase
     registerFile(StarterSigninFirebaseMainT.example());

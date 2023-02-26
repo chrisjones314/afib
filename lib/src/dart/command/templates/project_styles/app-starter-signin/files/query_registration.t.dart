@@ -43,7 +43,7 @@ final cred = UserCredentialRoot(
 );
 context.onSuccess(cred);
 ''',
-      insertFinishImpl: insertFinishImplRegister(""),
+      insertFinishImpl: insertFinishImplRegister("context.navigateReplaceAll(HomePageScreen.navigatePush().castToReplaceAll());"),
       insertAdditionalMethods: AFSourceTemplate.empty,
     );
   }

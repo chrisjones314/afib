@@ -24,10 +24,6 @@ generate id ${insertAppNamespaceUpper}WidgetID.buttonIHaveNoObjection
 generate id ${insertAppNamespaceUpper}WidgetID.textCurrentStanza
 generate id ${insertAppNamespaceUpper}WidgetID.buttonManageCount
 generate ui ${insertAppNamespaceUpper}DefaultTheme --parent-theme AFFunctionalTheme --parent-theme-id ${insertAppNamespaceUpper}ThemeID.defaultTheme --override-templates "core/files/theme=project_styles/app-eval-demo/files/start_here_theme"
-generate state User --add-standard-root --member-variables "int id; String firstName; String lastName;String email;String zipCode" --override-templates +
-  +core/files/model=project_styles/app-eval-demo/files/model_user
-  +core/files/model_root=project_styles/app-eval-demo/files/model_users_root
-  +core/snippets/define_test_data=project_styles/app-eval-demo/snippets/define_referenced_users_root_test_data
 generate state CountHistoryItem --add-standard-root --member-variables "int id; int count;" --resolve-variables "User user;" --override-templates +
   +core/files/model=project_styles/app-eval-demo/files/model_count_history_item
   +core/files/model_root=project_styles/app-eval-demo/files/model_count_history_items_root
@@ -35,6 +31,10 @@ generate state CountHistoryItem --add-standard-root --member-variables "int id; 
 generate state UserCredentialRoot --member-variables "String storedEmail; String token" --resolve-variables "User user;" --override-templates +
   +core/files/model_root=project_styles/app-eval-demo/files/model_user_credential_root
   +core/snippets/define_test_data=project_styles/app-eval-demo/snippets/define_user_credential_root_test_data
+generate state User --add-standard-root --member-variables "int id; String firstName; String lastName;String email;String zipCode" --override-templates +
+  +core/files/model=project_styles/app-eval-demo/files/model_user
+  +core/files/model_root=project_styles/app-eval-demo/files/model_users_root
+  +core/snippets/define_test_data=project_styles/app-eval-demo/snippets/define_referenced_users_root_test_data
 generate query ReadCountHistoryQuery --result-type CountHistoryItemsRoot --member-variables "String userId" --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_read_count_history"
 generate query ReadUserQuery --result-type User --member-variables "String userId" --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_read_user"
 generate query WriteCountHistoryItemQuery --result-type CountHistoryItem --member-variables "CountHistoryItem item" --override-templates "core/files/query_simple=project_styles/app-eval-demo/files/query_write_count_history_item"

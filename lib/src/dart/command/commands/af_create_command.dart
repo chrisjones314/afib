@@ -148,7 +148,7 @@ class AFCreateAppCommand extends AFCommand {
   String get usage {
     return '''
 $usageHeader
-  afib_bootstrap.dart create [$kindApp|$kindUILibrary|$kindStateLibrary] yourpackagename YPC --project-style [see-below]
+  afib_bootstrap.dart create [$kindApp|$kindUILibrary|$kindStateLibrary] --package-name yourpackagename --package-code ypc --project-style [see-below]
 
 $descriptionHeader
   $description

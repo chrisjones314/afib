@@ -6,7 +6,7 @@ void main(List<String> argsIn) {
   final emptyParams = AFDartParams.createEmpty();
   final argsFull = AFArgs.create(argsIn);
   
-  argsFull.setDebugArgs("create app --package-name signinfb_test --package-code stfb --project-style app-eval-demo");
+  argsFull.setDebugArgs("create app --package-name eval_example --package-code evex --project-style app-eval-demo");
   afBootstrapCommandMain(emptyParams, argsFull);
 }
 

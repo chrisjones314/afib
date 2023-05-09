@@ -8,11 +8,11 @@ class SnippetDialogBuildBodyT extends AFCoreSnippetSourceTemplate {
     
     rows.add(Row(
       mainAxisSize: MainAxisSize.max,
-      children: [t.childText(uiTitle)]
+      children: [t.childText("${AFSourceTemplate.insertMainTypeInsertion.spaces}")]
     ));
 
     rows.add(t.childButtonPrimaryText(
-      key: t.keyForWID(${insertAppNamespaceUpper}WidgetID.standardClose),
+      wid: ${insertAppNamespaceUpper}WidgetID.standardClose,
       text: "Close", 
       onPressed: spi.onPressedClose
     ));

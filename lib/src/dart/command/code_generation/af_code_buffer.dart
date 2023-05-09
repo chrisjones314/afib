@@ -328,6 +328,11 @@ class AFCodeBuffer {
         }
         else if(options.indexOf(AFSourceTemplateInsertion.optionSpaces) >= 0) {
           result = AFCodeGenerator.convertMixedToSpaces(value);
+        } else if(options.indexOf(AFSourceTemplateInsertion.optionCamelPluralize) >= 0) {
+          result = AFCodeGenerator.convertToCamelCase(value);
+          result = AFCodeGenerator.pluralize(result);
+        } else if(options.indexOf(AFSourceTemplateInsertion.optionUpperFirst) >= 0) {
+          result = AFCodeGenerator.convertUpcaseFirst(result);
         } else {
           throw AFCommandError(error: "Unknown option '$options' in tag $idCode");
         }
@@ -425,6 +430,10 @@ class AFCodeBuffer {
       
       curStart = lineIdx < lines.length ? lines[lineIdx].lastIndexOf(codeStart) : -1;
     }
+  }
+
+  void removeLineAt(int idx) {
+    lines.removeAt(idx);
   }
 
   String toString() {

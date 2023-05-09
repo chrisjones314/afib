@@ -2663,12 +2663,12 @@ class AFUIPrototypeDefinitionContext extends AFBaseTestDefinitionContext {
 
   AFSingleScreenPrototypeBody defineBottomSheetPrototype({
     required AFPrototypeID   id,
-    required Object? models,
+    required Object? stateView,
     required AFNavigatePushAction navigate,
     AFTestTimeHandling timeHandling = AFTestTimeHandling.paused,
     String? title,
   }) {
-    final modelsActual = models ?? <Object>[];
+    final modelsActual = stateView ?? <Object>[];
     return bottomSheetTests.addConnectedPrototype(
       id: id,
       models: modelsActual,

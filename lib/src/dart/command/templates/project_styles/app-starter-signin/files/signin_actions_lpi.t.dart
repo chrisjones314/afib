@@ -54,7 +54,8 @@ void onSignup(String email, String password) {
     return;
   }
 
-  final newUser = extraDetails.user;
+  var newUser = extraDetails.user;
+  newUser = newUser.reviseEmail(email);
   
   final register = RegistrationQuery(
     email: email,

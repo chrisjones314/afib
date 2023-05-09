@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:afib/src/dart/command/af_command.dart';
@@ -83,6 +84,9 @@ class AFCodeGenerator {
   static const queryListenerPath = [libFolder, queryFolder, listenerFolder];
   static const queryIsolatePath = [libFolder, queryFolder, isolateFolder];
   static const commandPath = [libFolder, commandFolder];
+  static const vsCodeFolder = ".vscode";
+  static const vsCodePath = [vsCodeFolder];
+  static const vsCodeExtenstionsPath = [vsCodeFolder, "extensions.json"];
   static const initializationPath = [libFolder, initializationFolder];
   static const libPath = [libFolder];
   static const uiPath = [libFolder, uiFolder];
@@ -725,6 +729,25 @@ class AFCodeGenerator {
     return generated;
   }
 
+  void writeJsonFileSync(AFCommandContext context, List<String> projectPath, Map<String, Object> json) {
+    final generatedPath = projectPath.join(Platform.pathSeparator);
+    final file = File(generatedPath);
+    final encoded = jsonEncode(json);
+    file.writeAsStringSync(encoded);
+  }
+
+
+  Map<String, Object> readJsonFileSync(AFCommandContext context, List<String> projectPath, Map<String, Object> defaultValue) {
+    final generatedPath = projectPath.join(Platform.pathSeparator);
+    final file = File(generatedPath);
+    if(!file.existsSync()) {
+      return defaultValue;
+    }
+
+    final contents = file.readAsStringSync();
+    final json = jsonDecode(contents);
+    return Map<String, Object>.from(json);
+  }
 
   AFGeneratedFile _modifyFile(AFCommandContext context, List<String> projectPath) {
     return loadFile(context, projectPath);
@@ -770,7 +793,7 @@ class AFCodeGenerator {
       throw AFException("Could not find template with id $templateOrId");
     }
 
-    final generatedPath = projectPath.join('/');
+    final generatedPath = projectPath.join(Platform.pathSeparator);
     if(action != AFGeneratedFileAction.projectStyle || context.isExportTemplates) {
       created[generatedPath] = generated;
     }

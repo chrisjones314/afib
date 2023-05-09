@@ -1275,6 +1275,8 @@ class AFStateTest extends AFScreenTestDescription {
           final consolidatedHandler = results[consolidatedKey];
           if(consolidatedHandler != null) {
             consolidatedQueries.result = consolidatedHandler.handler?.call(context, consolidatedQuery);
+          } else {
+            throw AFException("No results specified for query $consolidatedKey in composite query.  Note that you can use defineQueryResponseNone if you intend to have no results.");
           }
 
         }

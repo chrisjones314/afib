@@ -73,7 +73,7 @@ class SnippetSignedInDrawerSPIT {
     final ei = AFSourceTemplateInsertions(insertions: {
       AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 void onTapClose() {
-  context.closeDrawer();
+  context.onCloseDrawer();
 }
 
 User? get activeUser {

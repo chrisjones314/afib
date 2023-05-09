@@ -8,7 +8,7 @@ class SnippetSPIOnTapCloseT extends AFCoreSnippetSourceTemplate {
 
   String get template => '''
     void onTapClose() {
-      close${ScreenT.insertControlTypeSuffix}();
+      onClose${ScreenT.insertControlTypeSuffix}();
     }
 ''';
 }

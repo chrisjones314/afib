@@ -291,6 +291,8 @@ Available subcommands
 class AFMemberVariableTemplates {
   static const includeMemberVars = 0x01;
   static const includeResolveVars = 0x02;
+  static const excludeTempPlaceholder = 0x04;
+  static const tempPlaceholderVarName = "tempPlaceholder";
   static const includeAllVars = includeMemberVars | includeResolveVars;
 
   final bool isIntId;
@@ -427,7 +429,7 @@ class AFMemberVariableTemplates {
   String get spiResolveMethods {
     final result = StringBuffer();
     _iterate(
-      include: includeMemberVars,
+      include: includeMemberVars | excludeTempPlaceholder,
       visit: (identifier, kind, isLast, includeKind) {
         result.writeln("$kind get $identifier => context.p.$identifier;");
       }
@@ -453,7 +455,7 @@ class AFMemberVariableTemplates {
   String get spiOnUpdateMethods {
     final result = StringBuffer();
     _iterate(
-      include: includeMemberVars,
+      include: includeMemberVars | excludeTempPlaceholder,
       visit: (identifier, kind, isLast, includeKind) {
         final methodSuffix = AFCodeGenerator.convertUpcaseFirst(identifier);
         result.writeln("void onChanged$methodSuffix($kind value) {");
@@ -471,7 +473,7 @@ class AFMemberVariableTemplates {
   String get reviseMethods {
     final result = StringBuffer();
     _iterate(
-      include: includeAllVars,
+      include: includeAllVars | excludeTempPlaceholder,
       visit: (identifier, kind, isLast, includeKind) {
         final methodSuffix = AFCodeGenerator.convertUpcaseFirst(identifier);
         result.write("$mainType revise$methodSuffix($kind $identifier) => copyWith($identifier: $identifier);");
@@ -572,6 +574,8 @@ class AFMemberVariableTemplates {
     if(withFlutterState) {
       result.writeln("  flutterState: flutterState,");
     }
+    _addBreadcrumb(result, AFSourceTemplate.insertCreateParamsCallInsertion);
+
     return result.toString();
   }
 
@@ -639,6 +643,8 @@ class AFMemberVariableTemplates {
         val = '0.0';
       } else if (kind == "bool") {
         val = 'true';
+      } else if (kind == "AFWidgetID") {
+        val = "${AFibD.config.appNamespace.toUpperCase()}WidgetID.todo";
       }
  
       result.write("$identifier: $val,");
@@ -651,7 +657,7 @@ class AFMemberVariableTemplates {
   String get serializeFromDeserializeLines {
     final result = StringBuffer();
     _iterate(
-      include: includeAllVars,
+      include: includeAllVars | excludeTempPlaceholder,
       visit: (identifier, kind, isLast, includeKind) {
         final upcaseIdentifier = AFCodeGenerator.convertUpcaseFirst(identifier);
         var convertToString = "";
@@ -711,7 +717,7 @@ class AFMemberVariableTemplates {
       result.writeln("static const tableName = '${AFCodeGenerator.convertMixedToSnake(mainType)}';");
     }
     _iterate(
-      include: includeAllVars,
+      include: includeAllVars | excludeTempPlaceholder,
       visit: (identifier, kind, isLast, includeKind) {
       final upcaseIdentifier = AFCodeGenerator.convertUpcaseFirst(identifier);
       var val = "'${AFCodeGenerator.convertMixedToSnake(identifier)}'";
@@ -747,11 +753,15 @@ class AFMemberVariableTemplates {
   }) {
     final includeMember = (include & includeMemberVars) != 0;
     final includeResolve = (include & includeResolveVars) != 0;
+    final excludeTemp = (include & excludeTempPlaceholder) != 0;
 
     if(includeMember) { 
       var identifiers = memberVars.keys.toList();
       for(var i = 0; i < identifiers.length; i++) {
         final identifier = identifiers[i];
+        if(excludeTemp && identifier == AFMemberVariableTemplates.tempPlaceholderVarName) {
+          continue;
+        }
         final kind = memberVars[identifier];
         if(kind != null) {
           final isLast = (i == identifiers.length - 1 && (!includeResolve || resolveVars.isEmpty));
@@ -882,6 +892,15 @@ class AFCommandContext {
     final memberVarsSource = args.accessNamed(AFGenerateSubcommand.argMemberVariables);
     
     final memberVars = _parseSemicolonDeclarations(context, memberVarsSource);
+
+    // currently, allowing them to have no member variables adds a lot of complexity, because you then have to worry about
+    // adding in {} in a bunch of places.   So, for now, just force them to always have at least one variable.
+    if(memberVars.isEmpty) {
+      context.output.writeTwoColumns(col1: "info ", col2: "Adding tempPlaceholder member variable due to issues with 'generate augment' in scenarios with no member variables.");
+      memberVars[AFMemberVariableTemplates.tempPlaceholderVarName] = "int";
+    }
+
+
     // if they specified serial, then make sure they specified an ID.
     var isIntId = false;
     if(!isRoot && !isQuery && !args.accessNamedFlag(AFGenerateStateSubcommand.argNotSerial)) {
@@ -1014,6 +1033,22 @@ class AFCommandContext {
   void setCoreInsertions(AFSourceTemplateInsertions insertions, { required String packagePath }) {
     coreInsertions = insertions;
     this.packagePath = packagePath;
+  }
+
+  AFCommandContext reviseAddCoreInsertions(Map<AFSourceTemplateInsertion, Object> revisedInsertions) {
+    final revisedCore = this.coreInsertions.reviseOverwrite(revisedInsertions);
+
+    return AFCommandContext(
+      parents: this.parents,
+      packagePath: this.packagePath,
+      output: this.output,
+      definitions: this.definitions,
+      generator: this.generator,
+      arguments: this.arguments,
+      coreInsertions: revisedCore,   
+      globalTemplateOverrides: this.globalTemplateOverrides
+    );
+
   }
 
   AFCommandContext reviseWithArguments({

@@ -435,6 +435,7 @@ $optionsHeader
       AFSourceTemplate.insertMainParentTypeInsertion: spiParentType,
       SnippetDeclareSPIT.insertSPIOnUpdateMethods: memberVariables?.spiOnUpdateMethods ?? AFSourceTemplate.empty,
       SnippetDeclareSPIT.insertSPIResolveMethods: memberVariables?.spiResolveMethods ?? AFSourceTemplate.empty,
+      AFSourceTemplate.insertAdditionalMethodsInsertion: controlSettings.implsSPI,
     });
 
     final superSnippet = context.createSnippet(controlSettings.implsSuper, extend: screenInsertions);
@@ -459,6 +460,10 @@ $optionsHeader
 
     final paramsConstructorSnippet = context.createSnippet(controlSettings.paramsConstructor, extend: screenInsertions);
     final uiMemberVariablesSnippet = context.createSnippet(SnippetScreenMemberVariableDeclsT.core(), extend: screenInsertions);
+    final extraConfig = context.createSnippet(controlSettings.extraConfigParams, extend: screenInsertions, insertions: {
+      SnippetCreateScreenPrototypeT.insertNavigatePushParams: memberVariables?.initialValueDeclaration ?? AFSourceTemplate.empty,
+    });
+    
 
     final screenFile = context.createFile(projectPath, ScreenT(), extend: screenInsertions, insertions: {
       AFSourceTemplate.insertExtraImportsInsertion: extraImports,
@@ -468,7 +473,7 @@ $optionsHeader
       ScreenT.insertNavigateMethods: navigatePushSnippet,
       ScreenT.insertBuildBodyImpl: bodySnippet,
       ScreenT.insertBuildWithSPIImpl: buildWithSPISnippet,
-      ScreenT.insertExtraConfigParams: controlSettings.extraConfigParams,
+      ScreenT.insertExtraConfigParams: extraConfig,
       AFSourceTemplate.insertSuperParamsInsertion: superSnippet,
       AFSourceTemplate.insertAdditionalMethodsInsertion: screenImplsSnippet,
       AFSourceTemplate.insertConstructorParamsInsertion: paramsConstructorSnippet,

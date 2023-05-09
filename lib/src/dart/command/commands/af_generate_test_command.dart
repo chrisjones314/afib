@@ -28,7 +28,7 @@ class AFGenerateTestSubcommand extends AFGenerateSubcommand {
   String get usage {
     return '''
 $usageHeader
-  $nameOfExecutable generate test [Your${AFCodeGenerator.unitTestSuffix}|Your${AFCodeGenerator.stateTestSuffix}] [any --options]
+  $nameOfExecutable generate test [Your${AFCodeGenerator.unitTestSuffix}|Your${AFCodeGenerator.stateTestSuffix}|Your${AFCodeGenerator.wireframeSuffix}] [any --options]
 
 $descriptionHeader
   If your identifier ends with ${AFCodeGenerator.unitTestSuffix}, creates a new unit test.

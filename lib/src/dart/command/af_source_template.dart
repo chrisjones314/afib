@@ -32,6 +32,8 @@ class AFSourceTemplateInsertion {
   static const optionLower = "lower";
   static const optionCamel = "camel";
   static const optionSpaces = "spaces";  
+  static const optionCamelPluralize = "camelPluralize";
+  static const optionUpperFirst = "upperFirst";
 
   final String insertion;
   final String options;
@@ -42,9 +44,11 @@ class AFSourceTemplateInsertion {
 
   AFSourceTemplateInsertion get lower => AFSourceTemplateInsertion(insertion, options: optionLower);
   AFSourceTemplateInsertion get upper => AFSourceTemplateInsertion(insertion, options: optionUpper);
+  AFSourceTemplateInsertion get upperFirst => AFSourceTemplateInsertion(insertion, options: optionUpperFirst);
   AFSourceTemplateInsertion get snake => AFSourceTemplateInsertion(insertion, options: optionSnake);
   AFSourceTemplateInsertion get camel => AFSourceTemplateInsertion(insertion, options: optionCamel);
   AFSourceTemplateInsertion get spaces => AFSourceTemplateInsertion(insertion, options: optionSpaces);
+  AFSourceTemplateInsertion get camelPluralize => AFSourceTemplateInsertion(insertion, options: optionCamelPluralize);
   String get breadcrumb {
     return "//!af_$insertion";
   }

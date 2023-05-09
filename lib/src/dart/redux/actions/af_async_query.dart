@@ -35,6 +35,11 @@ class AFQueryContext with AFContextShowMixin, AFStandardAPIContextMixin, AFStand
     return AFibF.g.internalOnlyStoreEntry(conceptualStore).dispatcher!;
   }
 
+  AFPublicState? get debugOnlyPublicState {
+    return AFibF.g.internalOnlyStore(conceptualStore).state.public;
+  }
+
+
   void retargetStore(AFConceptualStore target) {
     conceptualStore = target;
   }
@@ -436,7 +441,8 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
           completer: null,
           onResponseExtra: (dynamic localResponse) {
             queryResponse.completeResponse(localResponse);
-            if(queryResponses.isComplete) {
+            final isComp = queryResponses.isComplete;
+            if(isComp) {
               if(!completerBool.isCompleted) {
                 completerBool.complete(true);
               }
@@ -453,6 +459,8 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
         );
       }
 
+      bool calledComplete = false;
+
       // when they have all completed, then process our response.
       completerBool.future.then((_) {
         if(queryResponses.hasError) {
@@ -460,18 +468,25 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
             conceptualStore: conceptualStore,
             error: AFQueryError(code: queryFailedCode, message: queryFailedMessage)
           );
-          finishAsyncWithErrorAF(errorContext);
-          if(completer != null) {
-            completer.completeError(errorContext);
+          if(!calledComplete) {
+            calledComplete = true;
+            finishAsyncWithErrorAF(errorContext);
+            if(completer != null) {
+              completer.completeError(errorContext);
+            }
           }
         } else {
           final successContext = AFFinishQuerySuccessContext<AFCompositeQueryResponse>(
             conceptualStore: conceptualStore,
             response: queryResponses
           );
-          finishAsyncWithResponseAF(successContext);
-          if(completer != null) {
-            completer.complete(successContext);
+          
+          if(!calledComplete) {
+            calledComplete = true;
+            finishAsyncWithResponseAF(successContext);
+            if(completer != null) {
+              completer.complete(successContext);
+            }
           }
         }
       });

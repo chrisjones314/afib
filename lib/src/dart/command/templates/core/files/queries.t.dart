@@ -115,7 +115,7 @@ throwUnimplemented();
     const startList = "List<";
     final idxStart = resultType.indexOf(startList);
     var result = resultType;
-    if(idxStart > 0) {
+    if(idxStart >= 0) {
       final idxEnd = resultType.indexOf(">");
       if(idxEnd < 0) {
         throw AFException("Missing > in $resultType");

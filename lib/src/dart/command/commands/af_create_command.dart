@@ -1,4 +1,7 @@
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_command.dart';
@@ -236,6 +239,7 @@ Project Styles
     final generator = ctx.generator;
     ctx.loadPubspec(packageName: packageName);
 
+    _createVSCodeRecommendedExtensions(context);
     _createStandardFolders(context);
     if(!context.isLibrary) {
       _createStandardLibraryFolders(ctx);
@@ -512,10 +516,30 @@ installUILibrary: installCoreLibrary,
     }
   }
 
+  void _createVSCodeRecommendedExtensions(AFCreateCommandContext ctx) {
+    final generator = ctx.generator;
+    
+    AFProjectPaths.ensureFolderExists(AFCodeGenerator.vsCodePath);
+    final extensions = generator.readJsonFileSync(ctx.command, AFCodeGenerator.vsCodeExtenstionsPath, <String, Object>{});
+    const recommendKey = "recommendations";
+    const extensionName = "AFibFramework.afib-project-helper";
+    var existing = extensions[recommendKey];
+    if(existing == null || existing is! List) {
+      existing = <String>[];
+      extensions[recommendKey] = existing;
+    }
+
+    if(!existing.contains(extensionName)) {
+      existing.add(extensionName);
+    }
+
+    generator.writeJsonFileSync(ctx.command,  AFCodeGenerator.vsCodeExtenstionsPath, Map<String, Object>.from(extensions));
+    ctx.output.writeTwoColumns(col1: "created ", col2: AFCodeGenerator.vsCodeExtenstionsPath.join(Platform.pathSeparator));
+  }
+  
   void _createStandardLibraryFolders(AFCommandContext ctx) {
     final generator = ctx.generator;
     generator.ensureFolderExists(AFCodeGenerator.lpisOverridePath);
-
   }
   
 }

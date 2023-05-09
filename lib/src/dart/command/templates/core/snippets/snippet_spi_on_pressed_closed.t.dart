@@ -6,8 +6,8 @@ import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
 
 class SnippetSPIOnPressedCloseImplT extends AFCoreSnippetSourceTemplate {
   String get template => '''
-    void onPressedClose() {
-      close${ScreenT.insertControlTypeSuffix}(null);
-    }
+void onPressedClose() {
+  onClose${ScreenT.insertControlTypeSuffix}(context.p);
+}
 ''';
 }

@@ -113,6 +113,7 @@ $optionsHeader
       _insertForBreadcrumb(context, modelFile, SnippetDeclareSPIT.insertSPIOnUpdateMethods, memberVariables.spiOnUpdateMethods);
       _insertForBreadcrumb(context, modelFile, SnippetNavigatePushT.insertNavigatePushParamDecl, memberVariables.navigatePushParamsBare);
       _insertForBreadcrumb(context, modelFile, SnippetNavigatePushT.insertNavigatePushParamCall, memberVariables.navigatePushCall);
+      _insertForBreadcrumb(context, modelFile, AFSourceTemplate.insertCreateParamsCallInsertion, memberVariables.routeParamCreateCall);
     }
 
     if(isModel) {
@@ -121,6 +122,20 @@ $optionsHeader
       _insertForBreadcrumb(context, modelFile, SnippetSerialMethodsT.insertSerializeFromConstructorParams, memberVariables.serializeFromConstructorParams);
       _insertForBreadcrumb(context, modelFile, SnippetSerialMethodsT.insertSerializeFromDeserializeLines, memberVariables.serializeFromDeserializeLines);  
     }  
+    
+    if(modelFile.buffer.firstLineContaining(context, RegExp(AFMemberVariableTemplates.tempPlaceholderVarName)) >0) {
+      var nRemoved = 0;
+      final buffer = modelFile.buffer;
+      for(var lineIdx = buffer.lines.length - 1; lineIdx >= 0; lineIdx--) {
+        final line = buffer.lines[lineIdx];
+        if(line.contains(AFMemberVariableTemplates.tempPlaceholderVarName)) {
+          buffer.removeLineAt(lineIdx);
+          nRemoved++;
+        }
+      }
+      
+      context.output.writeTwoColumns(col1: "info ", col2: "Removed $nRemoved lines containing ${AFMemberVariableTemplates.tempPlaceholderVarName}");
+    }
 
     generator.finalizeAndWriteFiles(context);
   }

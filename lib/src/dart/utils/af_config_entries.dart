@@ -88,6 +88,20 @@ class AFConfigEntries {
     min: 2000,
     max: 2200);
 
+  /// Used to specify the year from which [AFTimeState] 'absolute' values are measured.
+  ///
+  /// If you specify 2004 as the absolute base year, then 
+  static final baseSimulatedLatency = AFConfigurationItemInt(
+    libraryId: AFUILibraryID.id,
+    name: "base-simulated-latency", 
+    validContexts: AFConfigurationItem.validContextNewProjectCommand,
+    ordinal: 280.0,
+    help: "When running a test test in the prototype UI, all queries have this latency by default, unless they have a simulatedLatencyFactor which changes their latency", 
+    defaultValue: 200,
+    min: 0,
+    max: 10000);
+
+
   /// Set to true only when running under a flutter WidgetTester test.
   /// 
   /// The WidgetTester is thrown off by 'infinite' animations like CircularProgressIndicator:

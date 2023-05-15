@@ -2208,7 +2208,8 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     final td = definitions.td(testData);
     final successContext = AFFinishQuerySuccessContext<TQueryResponse>(
       conceptualStore: AFibF.g.activeConceptualStore,
-      response: td
+      response: td,
+      isPreExecute: false,
     );
     query.finishAsyncWithResponseAF(successContext);
   }

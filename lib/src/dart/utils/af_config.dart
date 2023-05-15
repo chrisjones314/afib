@@ -590,6 +590,10 @@ class AFConfig {
     return intFor(AFConfigEntries.absoluteBaseYear);
   }
 
+  int get baseSimulatedLatency {
+    return intFor(AFConfigEntries.baseSimulatedLatency);
+  }
+
   DateTime get absoluteBaseDate {
     return DateTime(absoluteBaseYear, DateTime.january, 1);
   }

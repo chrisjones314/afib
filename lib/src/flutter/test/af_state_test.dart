@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:afib/afib_flutter.dart';
 import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/redux/actions/af_always_fail_query.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
@@ -29,6 +30,7 @@ import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
 
 abstract class AFStateTestExecute extends AFBaseTestExecute {
@@ -1182,6 +1184,7 @@ class AFStateTest extends AFScreenTestDescription {
   /// Process a query by looking up the results we have for that query,
   /// and then feeding them to its testAsyncResponse method.
   static void processQuery(AFStateTestContext context, AFAsyncQuery query, AFStore store, AFDispatcher dispatcher) {
+
     final key = AFStateTest.specifierToId(query);
     final results = context.test.results;
 
@@ -1196,6 +1199,8 @@ class AFStateTest extends AFScreenTestDescription {
       query.startAsyncAF(dispatcher, store, completer: null);
       return;
     }
+
+
 
     var h = results[key];
     if(h == null) {
@@ -1212,19 +1217,15 @@ class AFStateTest extends AFScreenTestDescription {
         final successContext = query.createSuccessContext(
           dispatcher: dispatcher,
           state: store.state,
+          isPreExecute: false,
         );
 
         // when we are in a state test in the interactive UI, it is important to actually do the delay,
         // as sometimes an animation must complete before it is safe to execute the deferred action.
-        if(AFibF.g.isInteractiveStateTestContext) {
-          Future.delayed(query.delay, () async {
-            query.finishAsyncExecute(successContext);
-          });
-        } else {
-          query.finishAsyncExecute(successContext);
+        _simulateLatencyIfAppropriate(() => query.finishAsyncExecute(successContext), delay: query.delay, factor: 1, onSuccess: () {
           dispatcher.dispatch(AFShutdownDeferredQueryAction(query.key));
-        }
-
+        });
+        
         return;
       }
 
@@ -1239,6 +1240,7 @@ class AFStateTest extends AFScreenTestDescription {
             final successContext = query.createSuccessContext(
               dispatcher: dispatcher,
               state: store.state,
+              isPreExecute: false,
             );
             final keepGoing = query.finishAsyncExecute(successContext);
             if(!keepGoing) {
@@ -1252,6 +1254,7 @@ class AFStateTest extends AFScreenTestDescription {
             final successContext = query.createSuccessContext(
               dispatcher: dispatcher,
               state: store.state,
+              isPreExecute: false,
             );
             keepGoing = query.finishAsyncExecute(successContext);
             if(!keepGoing) {
@@ -1267,7 +1270,8 @@ class AFStateTest extends AFScreenTestDescription {
       if(query is AFCompositeQuery) {
         final successContext = AFFinishQuerySuccessContext<AFCompositeQueryResponse>(
           conceptualStore: AFibF.g.activeConceptualStore,
-          response: query.queryResponses
+          response: query.queryResponses,
+          isPreExecute: false,
         );
         for(final consolidatedQueries in query.queryResponses.responses) {
           final consolidatedQuery = consolidatedQueries.query;
@@ -1278,9 +1282,8 @@ class AFStateTest extends AFScreenTestDescription {
           } else {
             throw AFException("No results specified for query $consolidatedKey in composite query.  Note that you can use defineQueryResponseNone if you intend to have no results.");
           }
-
         }
-        query.finishAsyncWithResponseAF(successContext);
+        _simulateLatencyIfAppropriate(() => query.finishAsyncWithResponseAF(successContext), factor: query.simulatedLatencyFactor ?? 1);
         return;
       }
 
@@ -1293,9 +1296,41 @@ class AFStateTest extends AFScreenTestDescription {
 
     final handler = h.handler;
     if(handler != null) {
-      handler(context, query);
+      final pre = query.onPreExecuteResponse;
+      if(pre != null) {
+        final preResponse = pre();
+        final successContext = query.createSuccessContextForResponse(
+          dispatcher: dispatcher,
+          state: store.state,        
+          response: preResponse,  
+          isPreExecute: true,
+        );
+        query.finishAsyncWithResponseAF(successContext);
+      }
+
+      _simulateLatencyIfAppropriate(() => handler(context, query), factor: query.simulatedLatencyFactor ?? 1);
     }
   }  
+
+  static void _simulateLatencyIfAppropriate(Function callback, { Duration? delay, VoidCallback? onSuccess, required int factor }) {
+    if(delay == null) {
+      final baseLatency = AFibD.config.baseSimulatedLatency;
+      delay = Duration(milliseconds: baseLatency * factor);
+    }
+    if(AFibF.g.isInteractiveStateTestContext) {
+      Future.delayed(delay, () async {
+        callback();
+        if(onSuccess != null) {
+          onSuccess();
+        }
+      });
+    } else {
+      callback();
+      if(onSuccess != null) {
+        onSuccess();
+      }
+    }
+  }
 
   /// 
   void defineQueryResponse<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFStateTestDefinitionContext definitions, dynamic idData) {

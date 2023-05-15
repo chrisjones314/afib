@@ -64,7 +64,7 @@ class AFStartQueryContext<TResponse> extends AFQueryContext {
   AFStartQueryContext({
     required AFConceptualStore conceptualStore,
     required this.onSuccess, 
-    required this.onError
+    required this.onError,
   }): super(
     conceptualStore: conceptualStore,
   );
@@ -82,7 +82,6 @@ class AFStartQueryContext<TResponse> extends AFQueryContext {
 
 
 class AFFinishQueryContext extends AFQueryContext {
-
   AFFinishQueryContext({
     required AFConceptualStore conceptualStore,
   }): super(
@@ -107,9 +106,11 @@ class AFFinishQueryContext extends AFQueryContext {
 
 class AFFinishQuerySuccessContext<TResponse> extends AFFinishQueryContext  {
   final TResponse response;
+  final bool isPreExecute;
   AFFinishQuerySuccessContext({
     required AFConceptualStore conceptualStore,
-    required this.response
+    required this.response,
+    required this.isPreExecute,
   }): super(conceptualStore: conceptualStore);
 
 
@@ -156,12 +157,14 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
   final AFOnErrorDelegate? onError;
   final AFPreExecuteResponseDelegate<TResponse>? onPreExecuteResponse;
   int? lastStart;
+  final int? simulatedLatencyFactor;
 
   AFAsyncQuery({
     AFID? id, 
     this.onSuccess, 
     this.onError, 
-    this.onPreExecuteResponse
+    this.onPreExecuteResponse,
+    this.simulatedLatencyFactor,
   }): super(id: id) {
     conceptualStore = AFibF.g.activeConceptualStore;
   }
@@ -176,6 +179,19 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
 
   Never throwUnimplemented() {
     throw AFException("You must implement the startAsync method of the query $runtimeType");
+  }
+
+  AFFinishQuerySuccessContext<TResponse> createSuccessContextForResponse({
+    required AFDispatcher dispatcher, 
+    required AFState state, 
+    required TResponse response,
+    required bool isPreExecute,
+  }) {
+    return AFFinishQuerySuccessContext<TResponse>(    
+      conceptualStore: conceptualStore,
+      response: response,
+      isPreExecute: isPreExecute,
+    );
   }
 
   /// Called internally when redux middleware begins processing a query.
@@ -194,7 +210,8 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
         // as it might go out of date.
         final successContext = AFFinishQuerySuccessContext<TResponse>(
           conceptualStore: conceptualStore, 
-          response: response
+          response: response,
+          isPreExecute: false,
         );
         finishAsyncWithResponseAF(successContext);
         if(onResponseExtra != null) {
@@ -223,7 +240,9 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
       final preResponse = pre();
       final successContext = AFFinishQuerySuccessContext<TResponse>(
         conceptualStore: conceptualStore,
-        response: preResponse);
+        response: preResponse,
+        isPreExecute: true,
+      );
       finishAsyncWithResponseAF(successContext);
 
     }
@@ -286,7 +305,8 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
   void testFinishAsyncWithResponse(AFStateTestContext context, TResponse response) {
     final successContext = AFFinishQuerySuccessContext<TResponse>(
       conceptualStore: conceptualStore,
-      response: response
+      response: response,
+      isPreExecute: false,
     );
     finishAsyncWithResponseAF(successContext);
   }
@@ -385,7 +405,8 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
     AFID? id, 
     AFOnResponseDelegate<AFCompositeQueryResponse>? onSuccess, 
     AFOnErrorDelegate? onError,     
-  }): super(id: id, onSuccess: onSuccess, onError: onError);
+    int? simulatedLatencyFactor,
+  }): super(id: id, onSuccess: onSuccess, onError: onError, simulatedLatencyFactor: simulatedLatencyFactor);
 
   static List<AFAsyncQuery> createList() {
     return <AFAsyncQuery>[];
@@ -478,7 +499,8 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
         } else {
           final successContext = AFFinishQuerySuccessContext<AFCompositeQueryResponse>(
             conceptualStore: conceptualStore,
-            response: queryResponses
+            response: queryResponses,
+            isPreExecute: false,
           );
           
           if(!calledComplete) {

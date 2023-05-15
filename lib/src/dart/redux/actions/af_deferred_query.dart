@@ -86,11 +86,13 @@ abstract class AFDeferredQuery extends AFAsyncQuery<AFUnused> implements AFTrack
 
   AFFinishQuerySuccessContext<AFUnused> createSuccessContext({
     required AFDispatcher dispatcher, 
-    required AFState state, 
+    required AFState state,
+    required bool isPreExecute, 
   }) {
     return AFFinishQuerySuccessContext<AFUnused>(    
       conceptualStore: conceptualStore,
       response: AFUnused(),
+      isPreExecute: isPreExecute,
     );
   }
 
@@ -159,10 +161,12 @@ abstract class AFPeriodicQuery extends AFAsyncQuery<AFUnused> implements AFTrack
   AFFinishQuerySuccessContext<AFUnused> createSuccessContext({
     required AFDispatcher dispatcher, 
     required AFState state, 
+    required bool isPreExecute,
   }) {
     return AFFinishQuerySuccessContext<AFUnused>(    
       conceptualStore: conceptualStore,
       response: AFUnused(),
+      isPreExecute: isPreExecute,
     );
   }
 

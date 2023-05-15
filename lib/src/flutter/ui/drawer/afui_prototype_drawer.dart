@@ -70,20 +70,23 @@ class AFUIPrototypeDrawerRouteParam extends AFDrawerRouteParam {
     return copyWith(timeAdjustText: timeText);
   }
 
+  AFUIPrototypeDrawerRouteParam reviseLatencyAdjust(String timeText) {
+    return copyWith(latencyAdjustText: timeText);
+  }
 
   AFUIPrototypeDrawerRouteParam copyWith({
     int? view,
     Map<String, bool>? themeExpanded,
     String? timeText,
-    String ? timeAdjustText,
+    String? timeAdjustText,
+    String? latencyAdjustText,
   }) {
     return AFUIPrototypeDrawerRouteParam(
       view: view ?? this.view,
       themeExpanded: themeExpanded ?? this.themeExpanded,
       textControllers: this.textControllers,
       timeText: timeText ?? this.timeText,
-      timeAdjustText: timeAdjustText ?? this.timeAdjustText
-
+      timeAdjustText: timeAdjustText ?? this.timeAdjustText,
     );
   }
 }
@@ -118,6 +121,11 @@ class AFUIPrototypeDrawerSPI extends AFUIDrawerSPI<AFUIDefaultStateView, AFUIPro
   //--------------------------------------------------------------------------------------
   void onChangedTimeAdjust(String val) {
     context.updateRouteParam(context.p.reviseTimeAdjust(val));
+  }
+
+  //--------------------------------------------------------------------------------------
+  void onChangedLatencyAdjust(String val) {
+    context.updateRouteParam(context.p.reviseLatencyAdjust(val));
   }
 
   //--------------------------------------------------------------------------------------
@@ -686,6 +694,29 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
   Widget _buildTimeContent(AFUIPrototypeDrawerSPI spi) {
     final context = spi.context;
     final t = spi.t;
+    final timeQuery = context.s.timeQuery;
+    final rowsOverall = t.column();
+
+    if(timeQuery == null)  {
+      rowsOverall.add(Container(
+        padding: t.padding.standard,
+        margin: t.margin.standard,
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: t.borderRadius.standard,
+        ),
+        child: t.childText("An AFTimeUpdateListenerQuery is not running.  Either start one in a workflow test, or pass in runTime: true in a screen or widget test."
+      )));      
+    } else {
+      _buildTimeControls(spi, rows: rowsOverall);
+    }
+
+    return Column(children: rowsOverall);
+  }
+
+  void _buildTimeControls(AFUIPrototypeDrawerSPI spi, { required List<Widget> rows }) {
+    final context = spi.context;
+    final t = spi.t;
     final time = context.s.time;
     final timeUTC = time.reviseToUTC();
     final rowsCurrent = t.column();
@@ -704,10 +735,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     ));
     final timeQuery = context.s.timeQuery;
     if(timeQuery == null) {
-      return t.childMargin(
-        margin: t.margin.standard,
-        child: Text("A AFTimeUpdateListenerQuery is not running.  Either start one in a workflow test, or pass in runTime: true in a screen or widget test.")
-      );
+      return;
     }
 
     final colsPlayPause = t.row();
@@ -814,27 +842,24 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
 
 
 
-    final rowsOverall = t.column();
-    rowsOverall.add(t.childCardHeader(context, null, "Current Time", rowsCurrent));
+    rows.add(t.childCardHeader(context, null, "Current Time", rowsCurrent));
 
-    rowsOverall.add(t.childCardHeader(context, null, "Adjust Time", [
+    rows.add(t.childCardHeader(context, null, "Adjust Time", [
       t.childMargin(
         margin: t.margin.standard,
         child: Column(children: rowsAdjust)
       )
     ]));
 
-    rowsOverall.add(t.childCardHeader(context, null, "Set Local Time", [
+    rows.add(t.childCardHeader(context, null, "Set Local Time", [
       t.childMargin(
         margin: t.margin.standard,
         child: Column(children: rowsSet)
       )
     ]));
 
-    rowsOverall.add(_buildAbsoluteTimes(spi, "Absolute Time", time));
-    rowsOverall.add(_buildAbsoluteTimes(spi, "Absolute Time - UTC", timeUTC));
-
-    return Column(children: rowsOverall);
+    rows.add(_buildAbsoluteTimes(spi, "Absolute Time", time));
+    rows.add(_buildAbsoluteTimes(spi, "Absolute Time - UTC", timeUTC));
   }
 
   Widget _buildAbsoluteTimes(AFUIPrototypeDrawerSPI spi, String title, AFTimeState time) {

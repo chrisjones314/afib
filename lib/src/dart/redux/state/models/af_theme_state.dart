@@ -2284,6 +2284,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     required AFWidgetID wid,
     AFTextEditingControllers? controllers,
     AFTextEditingController? controller,
+    AFBuildContext? context,
     AFRouteParamWithFlutterState? parentParam,
     required AFOnChangedStringDelegate onChanged,
     String? expectedText,

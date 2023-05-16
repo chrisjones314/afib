@@ -217,7 +217,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFPrototypeHomeScreenSPI
     } else {
       favoritesRows.add(t.childMargin(
         margin: t.margin.standard,
-        child: t.childText("You can add favorite tests in initialization/environments/prototypes.dart")
+        child: t.childText(text: "You can add favorite tests in initialization/environments/prototypes.dart")
       ));
     }
     rows.add(t.childCardHeader(context, AFUIWidgetID.cardRecent, AFUITranslationID.favorites, favoritesRows, margin: t.margin.b.s3));

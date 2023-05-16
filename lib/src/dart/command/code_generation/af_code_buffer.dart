@@ -119,28 +119,23 @@ class AFCodeBuffer {
     return false;
   }
 
-  void fixupImports() {
-    
+  void fixupImports(String filePath) {
     final allImports = <String>[];
-    var lineIdx = 0;
-    while(lineIdx < lines.length) {
-      final line = lines[lineIdx++];
-      if(line.startsWith("import")) {
+
+    for(var lineIdx = lines.length - 1; lineIdx >= 0; lineIdx--) {
+      final line = lines[lineIdx];
+      if(line.startsWith("import ")) {
         final parsedLines = line.split("\n");
-        allImports.addAll(parsedLines);
-        continue;
-      } else if(line.trim().isEmpty) {
-        continue;
-      }
-      else {
-        break;
+        allImports.addAll(parsedLines.where((l) => l.trim().isNotEmpty));
+        lines.removeAt(lineIdx);
       }
     }
-
+    
     if(allImports.isEmpty) {
       return;
     }
 
+    allImports.removeWhere((l) => l.trim().isEmpty);
     allImports.sort();
 
     // remove any duplicate imports.
@@ -153,7 +148,6 @@ class AFCodeBuffer {
     }
 
     allImports.add("");
-    lines.removeRange(0, lineIdx-1);
     lines.insertAll(0, allImports);
   }
 

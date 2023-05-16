@@ -102,7 +102,6 @@ class AFUITranslationID extends AFTranslationID{
   static const screenPrototypes = AFUITranslationID("screenPrototypes");
   static const widgetPrototypes = AFUITranslationID("widgetPrototypes");
   static const appTitle = AFUITranslationID("appTitle");
-  static const notTranslated = AFUITranslationID("notTranslated");
   static const afibPrototypeLoading = AFUITranslationID("afibPrototypeLoading");
   static const afibUnimplemented = AFUITranslationID("afibUnimplemented");
 }

@@ -243,7 +243,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     rows.add(Container(
       margin: t.margin.v.s3,
       child: t.childText(
-        "AFib Prototype",
+        text: "AFib Prototype",
         style: t.styleOnPrimary.headline6
       )
     ));
@@ -251,7 +251,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     rows.add(Container(
       margin: t.margin.v.s3,
       child: t.childText(
-          context.s.prototype?.id.toString(), 
+          text: context.s.prototype?.id.toString(), 
           style: t.styleOnPrimary.bodyText2,
           overflow: TextOverflow.ellipsis,
       )
@@ -265,7 +265,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
 
     final cols = t.row();
     cols.add(TextButton(
-      child: t.childText('Exit'),
+      child: t.childText(text: 'Exit'),
       style: buttonStyle,
       onPressed: () {
           context.closeDrawer();
@@ -388,7 +388,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
 
     final values = t.fundamentals.optionsForType(attr);
     if(values == null) {
-      rows.add(t.childText(attrValue.toString()));
+      rows.add(t.childText(text: attrValue.toString()));
     } else {
       for(final value in values) {
         var text = value.toString();
@@ -399,7 +399,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
         final isSel = value == attrValue;
         rows.add(ChoiceChip(
           selected: isSel,
-          label: t.childText(text, textColor: t.colorOnPrimary),
+          label: t.childText(text: text, textColor: t.colorOnPrimary),
           selectedColor: t.colorPrimary,
           onSelected: (val) {
             if(val) {
@@ -438,7 +438,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
 
     rows.add(t.childChoiceChip(
       selected: t.fundamentals.showTranslationIds,
-      label: t.childText("Identifiers", textColor: t.colorOnPrimary),
+      label: t.childText(text: "Identifiers", textColor: t.colorOnPrimary),
       selectedColor: t.colorPrimary,
       onSelected: (val) {
         _overrideThemeValue(
@@ -454,7 +454,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
       final isSel = value == attrValue;
       rows.add(t.childChoiceChip(
         selected: isSel,
-        label: t.childText(text, textColor: t.colorOnPrimary),
+        label: t.childText(text: text, textColor: t.colorOnPrimary),
         selectedColor: t.colorPrimary,
         onSelected: (val) {
           if(val) {
@@ -539,7 +539,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
             return _buildLocaleAttributeRowValue(spi, attr, attrVal);
           }
 
-          return t.childText(attrVal.toString());        
+          return t.childText(text: attrVal.toString());        
       }));
     }
 
@@ -563,7 +563,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
         isExpanded: context.p.isExpanded(area),
         headerBuilder: (spi, isExpanded) {
           return ListTile(
-            title: t.childText("Area: $area" ),
+            title: t.childText(text: "Area: $area" ),
             dense: true,
           );
         },
@@ -617,8 +617,8 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
       }
 
       rows.add(ListTile(
-        title: t.childText(test.id.codeId),
-        subtitle: t.childText(description, textColor: descColor),
+        title: t.childText(text: test.id.codeId),
+        subtitle: t.childText(text: description, textColor: descColor),
         trailing: Icon(Icons.run_circle),
         dense: true,
         onTap: () {
@@ -632,7 +632,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     if(tests.isEmpty) {
       rows.add(t.childPadding(
         padding: t.padding.standard,
-        child: t.childText("No tests defined.")
+        child: t.childText(text: "No tests defined.")
       ));
     }
     
@@ -705,7 +705,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
           color: Colors.grey[300],
           borderRadius: t.borderRadius.standard,
         ),
-        child: t.childText("An AFTimeUpdateListenerQuery is not running.  Either start one in a workflow test, or pass in runTime: true in a screen or widget test."
+        child: t.childText(text: "An AFTimeUpdateListenerQuery is not running.  Either start one in a workflow test, or pass in runTime: true in a screen or widget test."
       )));      
     } else {
       _buildTimeControls(spi, rows: rowsOverall);

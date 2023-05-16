@@ -30,10 +30,10 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/read
 import 'package:afib_signin/afsi_flutter.dart';
 ''',
       insertStartImpl: '''
-  // TODO: You will implement this method, hitting your API with the username/password, and calling 
+  // AFIB_TODO: You will implement this method, hitting your API with the username/password, and calling 
   // context.onSuccess with a signed in user credential if successful, or context.onError with an appropriate error message
   // if not (store the email for retrieval in the CheckSigninQuery if 'rememberMe' is true).
-  final testEmail = "test@nowhere.com";
+  const testEmail = "test@nowhere.com";
   if(email == testEmail && password.isNotEmpty) {
     final signedInCred = UserCredentialRoot(
       userId: '12345',
@@ -60,10 +60,10 @@ static void onSuccessfulSignin(AFFinishQuerySuccessContext<UserCredentialRoot> c
   // save the user credential to our state.
   context.updateComponentRootStateOne<${AFSourceTemplate.insertAppNamespaceInsertion.upper}State>(cred);
 
-  // TODO: you can execute several queries here to load in app data based on the user credential.
+  // AFIB_TODO: you can execute several queries here to load in app data based on the user credential.
   // As written, this will only navigate to the home page once all the queries in startup load complete.
   final startupLoad = AFCompositeQuery.createList();
-  startupLoad.add($readUserQuery(credential: cred));
+  startupLoad.add($readUserQuery(credentialUserId: cred.userId));
 
   context.executeQuery(AFCompositeQuery.createFrom(
     queries: startupLoad, onSuccess: (successCtx) {

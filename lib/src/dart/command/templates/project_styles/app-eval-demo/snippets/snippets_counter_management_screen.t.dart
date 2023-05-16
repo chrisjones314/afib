@@ -75,7 +75,7 @@ Widget _buildIncrementParamCard(CounterManagementScreenSPI spi) {
   final rows = t.column();
   t.buildCardHeader(rows: rows, title: "Transient Count", subtitle: "(route parameter)");
   rows.add(t.childText(
-    spi.clickCountParam.toString(),
+    text: spi.clickCountParam.toString(),
     wid: ${insertAppNamespaceUpper}WidgetID.textCountRouteParam,
     style: t.styleOnCard.headline2
   ));
@@ -136,8 +136,8 @@ Widget _buildIncrementStateCard(CounterManagementScreenSPI spi) {
 TableRow _buildHistoryEntry(CounterManagementScreenSPI spi, CountHistoryItem entry) {
   final t = spi.t;
   final cols = t.row();
-  cols.add(t.childText(entry.id));
-  cols.add(t.childText(entry.count.toString()));
+  cols.add(t.childText(text: entry.id));
+  cols.add(t.childText(text: entry.count.toString()));
   return TableRow(children: cols);
 }
 
@@ -201,7 +201,7 @@ return t.childScaffold(
   spi: spi,
   body: body,
   appBar: AppBar(
-    title: t.childText("${insertPackageName.spaces}"),
+    title: t.childText(text: "${insertPackageName.spaces}"),
     leading: t.childButtonStandardBack(spi, screen: screenId, shouldContinueCheck: () async {
       return AFShouldContinue.yesContinue; 
     })

@@ -41,7 +41,7 @@ final activeUser = users.findById(${AFSourceTemplate.insertAppNamespaceInsertion
 assert(activeUser != null);
 if(activeUser != null) {
   final revised = activeUser.reviseEmail(newEmail);
-  context.executeQuery(WriteOneUserQuery(credential: ${AFSourceTemplate.insertAppNamespaceInsertion}State.userCredential, user: revised));
+  context.executeQuery(WriteOneUserQuery(user: revised));
 }
 ''',
       insertAdditionalMethods: AFSourceTemplate.empty,

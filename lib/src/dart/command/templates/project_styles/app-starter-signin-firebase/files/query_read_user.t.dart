@@ -30,7 +30,7 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/sign
 import 'package:afib_signin/afsi_flutter.dart';
 ''',
       insertStartImpl: '''
-// TODO: Actually read the user from your data store using on credential.userId.
+// AFIB_TODO: Actually read the user from your data store using on credential.userId.
 context.onSuccess(User(
   id: credential.userId,
   email: 'test@nowwhere.com',

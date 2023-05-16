@@ -321,18 +321,42 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     return brightness == Brightness.light ? themeLight : themeDark;
   }
 
-  String translate(dynamic idOrText, Locale locale) {
-    if(showTranslationIds && (idOrText is AFTranslationID || idOrText is AFWidgetID)) {
-      return idOrText.code;
+  String _processTranslationTemplate(AFTranslationTemplate template, Locale locale) {
+    var currentText = translate(text: template.template, locale: locale);
+    for(final insertKey in template.insertions.keys) {
+      final translatedValue = translate(text: template.insertions[insertKey], locale: locale);
+      currentText = currentText.replaceAll(insertKey.toString() , translatedValue);
     }
-    var result = translation(idOrText, locale);
+    return currentText;
+  }
+
+  String translate({ AFWidgetID? wid, Object? text, required Locale locale}) {
+    if(text == null) {
+      text = wid;
+    }
+
+    if(text is AFNotTranslated) {
+      return text.value;
+    }
+
+    if(text is AFTranslationTemplate) {
+      return _processTranslationTemplate(text, locale);
+    }
+
+    if(showTranslationIds) {
+      if (text is AFTranslationID) {
+        return text.code;
+      }
+      if(text is AFWidgetID) {
+        return text.code;
+      }
+    }
+
+    Object? result = translation(text: text, locale: locale);
     if(result == null) {
-      result = idOrText;
+      return text.toString();
     }
-    if(result == null) {
-      return idOrText.toString();
-    }
-    return result;
+    return result.toString();
   }
 
   dynamic value(AFThemeID? id) {
@@ -344,13 +368,13 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     return supportedLocales.first;
   }
 
-  String? translation(dynamic textOrId, Locale locale) {
-    if(textOrId is AFTranslationID) {
-      if(textOrId == AFUITranslationID.notTranslated) {
-        return textOrId.values?.first.toString();
-      }
+  static void failIfStrictTranslation(String msg) {
+    if(AFibD.config.strictTranslationMode) {
+      throw AFException(msg);
     }
-    
+  }
+
+  String? translation({ Object? text, required Locale locale }) {    
     var setT = translationSet[locale];
     if(setT == null) {
       // 
@@ -365,13 +389,15 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
       setT = translationSet[defaultLocale];
     }
     if(setT == null) {
-      return textOrId.toString();
+      failIfStrictTranslation("No translations for locale");
+      return text.toString();
     }
     final universal = translationSet[AFUILocaleID.universal];
     if(universal == null) {
-      return textOrId.toString();
+      failIfStrictTranslation("No universal translation set");
+      return text.toString();
     }
-    return setT.translate(textOrId, universal);
+    return setT.translate(text, universal);
   }
 
   dynamic findValue(AFThemeID id) {
@@ -406,24 +432,15 @@ class AFTranslationSet {
   }
 
   String? translate(dynamic textOrId, AFTranslationSet universal) {
+    if(textOrId is String) {
+      if(textOrId.isEmpty) {
+        return textOrId;
+      }
+    }
     var result = translations[textOrId];
     if(result == null) {
       result = universal.translations[textOrId];
     }      
-    if(textOrId is AFTranslationID) {
-      final textOrIdValues = textOrId.values;     
-      if(textOrIdValues != null) {
-        for(var i = 0; i < textOrIdValues.length; i++) {
-          final key = "{$i}";
-          final value = textOrIdValues[i].toString();
-          result = result?.replaceAll(key, value);
-        }
-      }
-
-      if(result == null) {
-        result = universal.translations[textOrId];
-      }      
-    }
     if(result == null) {
       if(AFibD.config.isTestContext) {
         AFibF.g.testMissingTranslations.register(locale, textOrId);
@@ -615,10 +632,18 @@ mixin AFThemeAreaUtilties {
     return color;
   }
 
-  String? translate(String idOrText, Locale locale) {
-    var result = translation(idOrText, locale);
+  String? translate({ AFWidgetID? wid, Object? text, required Locale locale }) {
+    assert(text != null || wid != null);
+    if(text == null) {
+      text = wid;
+    }
+    var result = translation(text: text, locale: locale);
     if(result == null) {
-      result = idOrText;
+      if(text == null) {
+        result = "ERROR";
+      } else {
+        result = text.toString();
+      }
     }
     return result;
   }
@@ -665,7 +690,7 @@ mixin AFThemeAreaUtilties {
   }
 
   dynamic value(AFThemeID? id);
-  String? translation(String idOrText, Locale locale);  
+  String? translation({ Object? text, required Locale locale });  
 
   void _throwUnsupportedType(dynamic id, dynamic val) {
     throw AFException("In fundamental theme, $id has unsupported type ${val.runtimeType}");
@@ -794,7 +819,7 @@ class AFAppFundamentalThemeAreaBuilder extends AFUILibraryFundamentalThemeAreaBu
     return values[id]?.value;
   }
 
-  String? translation(dynamic idOrValue, Locale locale) {
+  String? translation({ Object? text, required Locale locale }) {
     /// we shouldn't do translations at build time.
     throw UnimplementedError();
   }
@@ -1081,6 +1106,22 @@ class AFSpacing {
 
 }
 
+class AFNotTranslated {
+  final String value;
+  AFNotTranslated(this.value);
+
+  String toString() => this.value;
+}
+
+class AFTranslationTemplate {
+  final Object template;
+  final Map<Object, Object> insertions;
+
+  AFTranslationTemplate({
+    required this.template,
+    required this.insertions,
+  });
+}
 
 
 /// Fundamental values that contribute to theming in the app.
@@ -1192,8 +1233,8 @@ class AFFundamentalThemeState {
     return device.locale(this);
   }
 
-  String translate(dynamic idOrText) {
-    return area.translate(idOrText, deviceLocale);
+  String translate({ AFWidgetID? wid, Object? text }) {
+    return area.translate(wid: wid, text: text, locale: deviceLocale);
   }
 
   ThemeData get themeDataActive {
@@ -1583,7 +1624,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   Widget childTextEmpty() {
-    return childText("");
+    return childText(text: "");
   }
 
 
@@ -1757,13 +1798,20 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return Radius.circular(r);
   }
 
-  AFTranslationID notTranslated(dynamic value) {
-    return AFUITranslationID.notTranslated.insert1(value?.toString());
+  AFNotTranslated notTranslated(Object value) {
+    return AFNotTranslated(value.toString());
   }
 
   /// Here for discoverability, you might prefer [notTranslated].
-  AFTranslationID translateNot(dynamic value) {
+  AFNotTranslated translateNever(Object value) {
     return notTranslated(value);
+  }
+
+  AFTranslationTemplate translateTemplate({ 
+    required Object template,
+    required Map<Object, Object> insertions
+  }) {
+    return AFTranslationTemplate(template: template, insertions: insertions);
   }
 
   BorderRadius borderRadiusScaled({
@@ -1832,9 +1880,15 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   /// Translate the specified string id and return it.
   /// 
-  /// See also [childTextBuilder] and [childRichTextBuilder]
-  String translate(dynamic text) {
-    return fundamentals.translate(text);
+  /// The text parameter can be one of five different values types:
+  ///   * An String in your default language, useful for prototyping
+  ///   * An AFTranslationID, if you wish to explicitly specify translation IDs
+  ///   * An AFNotTranslated value, if the value is a name of other text that should not be translated.
+  ///   * An AFTranslateTemplateValue, if you want to specify a template with other (usually not translatable) values inserted within it
+  ///   * Or null, in which case the wid parameter is required, and is used as a translation ID
+  /// Note that you can specify string translations as part of the fundamental theme, which is defined in your ...define_core.dart file.
+  String translate({AFWidgetID? wid,  Object? text}) {
+    return fundamentals.translate(wid: wid, text: text);
   }
 
   FontWeight? weight(dynamic weight) {
@@ -1955,39 +2009,44 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   /// Create a button that the user is most likely to click.
+  /// 
+  /// @see [translate] for all the ways text can be specified.
   Widget childButtonPrimaryText({
     AFWidgetID? wid,
-    required Object text,
+    Object? text,
     required AFPressedDelegate onPressed,
   }) {
     return childButtonPrimary(
       wid: wid,
-      child: childText(text),
+      child: childText(text: text),
       onPressed: onPressed
     );
   }
 
   /// Create a button that the user is most likely to click.
+  /// 
+  /// @see [translate] for all the ways text can be specified.
   Widget childButtonSecondaryText({
     AFWidgetID? wid,
-    required String text,
+    Object? text,
     required AFPressedDelegate onPressed,
   }) {
     return childButtonSecondary(
       wid: wid,
-      child: childText(text),
+      child: childText(text: text),
       onPressed: onPressed
     );
   }
 
+  /// @see [translate] for all the ways text can be specified.
   Widget childButtonFlatText({
     AFWidgetID? wid,
-    required String text,
+    Object? text,
     required AFPressedDelegate onPressed,
   }) {
     return childButtonFlat(
       wid: wid,
-      child: childText(text),
+      child: childText(text: text),
       onPressed: onPressed
     );
   }
@@ -2064,7 +2123,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return TextButton(
       key: keyForWID(wid),
       style: buttonStyle,
-      child: childText(text, style: style),
+      child: childText(text: text, style: style),
       onPressed: onPressed
     );
   }
@@ -2347,7 +2406,9 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return recognizer;
   }
 
-  Text childText(dynamic text, {
+  /// @see [translate] for all the ways text can be specified.
+  Text childText({
+    Object? text,
     AFWidgetID? wid, 
     dynamic style,
     dynamic textColor,
@@ -2371,7 +2432,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
       );
     }
 
-    var textT = translate(text);
+    var textT = translate(wid: wid, text: text);
     return Text(textT, 
       key: keyForWID(wid),
       style: styleS,
@@ -2859,7 +2920,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return IconButton(
         key: keyForWID(wid),      
         icon: ico,
-        tooltip: translate(tooltip),
+        tooltip: translate(text: tooltip),
         onPressed: () async {
           if(shouldContinueCheck == null || await shouldContinueCheck() == AFShouldContinue.yesContinue) {
             spi.context.navigatePop(worksInSingleScreenTest: worksInSingleScreenTest);

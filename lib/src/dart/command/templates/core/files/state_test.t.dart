@@ -32,6 +32,8 @@ import 'package:flutter_test/flutter_test.dart' as ft;
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/test/${AFSourceTemplate.insertAppNamespaceInsertion}_state_test_shortcuts.dart';
 $insertExtraImports
 
+// ignore_for_file: depend_on_referenced_packages, unused_import
+
 void define${UnitTestT.insertTestName}StateTest(AFStateTestDefinitionContext definitions) {
 
   definitions.addTest(${insertAppNamespaceUpper}StateTestID.${UnitTestT.insertTestName.camel}, extendTest: $insertExtendTestId, body: (testContext) {

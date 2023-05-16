@@ -147,6 +147,7 @@ abstract class AFSourceTemplate {
   static const insertStateTypeInsertion = AFSourceTemplateInsertion("state_type");
   static const insertFileHeaderInsertion = AFSourceTemplateInsertion("file_header");
   static const insertAdditionalMethodsInsertion = AFSourceTemplateInsertion("additional_methods");
+  static const insertStandardAdditionalMethodsInsertion = AFSourceTemplateInsertion("standard_additional_methods");
   static const insertMemberVariablesInsertion = AFSourceTemplateInsertion("member_variables");
   static const insertConstructorParamsInsertion = AFSourceTemplateInsertion("constructor_params");
   static const insertSuperParamsInsertion = AFSourceTemplateInsertion("super_params");
@@ -185,6 +186,7 @@ abstract class AFSourceTemplate {
   AFSourceTemplateInsertion get insertConstructorParams { return AFSourceTemplate.insertConstructorParamsInsertion; }
   AFSourceTemplateInsertion get insertMemberVariables { return AFSourceTemplate.insertMemberVariablesInsertion; }
   AFSourceTemplateInsertion get insertAdditionalMethods { return AFSourceTemplate.insertAdditionalMethodsInsertion; }
+  AFSourceTemplateInsertion get insertStandardAdditionalMethods { return AFSourceTemplate.insertStandardAdditionalMethodsInsertion; }
   AFSourceTemplateInsertion get insertSuperParams { return AFSourceTemplate.insertSuperParamsInsertion; }
   AFSourceTemplateInsertion get insertExtraImports { return AFSourceTemplate.insertExtraImportsInsertion; }
   AFSourceTemplateInsertion get insertLibKind { return AFSourceTemplate.insertLibKindInsertion; }

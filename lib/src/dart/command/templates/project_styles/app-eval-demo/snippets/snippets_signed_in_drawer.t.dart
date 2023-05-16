@@ -31,8 +31,8 @@ class SnippetSignedInDrawerBuildBodyT extends AFSnippetSourceTemplate {
     final rows = t.column();
     
     rows.add(UserAccountsDrawerHeader(
-        accountEmail: t.childText(spi.email),
-        accountName: t.childText(spi.userName),
+        accountEmail: t.childText(text: spi.email),
+        accountName: t.childText(text: spi.userName),
         decoration: BoxDecoration(
           color: t.colorSecondary,
         ),
@@ -72,10 +72,6 @@ class SnippetSignedInDrawerSPIT {
   static SnippetDeclareSPIT example() {
     final ei = AFSourceTemplateInsertions(insertions: {
       AFSourceTemplate.insertAdditionalMethodsInsertion: '''
-void onTapClose() {
-  context.onCloseDrawer();
-}
-
 User? get activeUser {
   final cred = context.s.userCredential;
   return context.s.users.findById(cred.userId);

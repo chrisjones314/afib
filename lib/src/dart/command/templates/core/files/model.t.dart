@@ -70,11 +70,14 @@ import 'package:meta/meta.dart';
 $insertExtraImports
 $insertMemberVariableImports
 
+// ignore_for_file: unused_import
+
 @immutable
 class $insertMainType $insertSuperclassSyntax {
   $insertSerialConstantsInsertion
   $insertMemberVariables
 
+  // ignore: prefer_const_constructors_in_immutables
   $insertMainType($insertConstructorParams)$insertSuperCall;
 
   $insertInitialState

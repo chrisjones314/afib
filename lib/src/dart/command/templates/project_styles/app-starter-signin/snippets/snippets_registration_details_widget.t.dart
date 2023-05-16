@@ -309,7 +309,7 @@ void onChangedZipCode(String zipCode) {
 void onPressedSaveUserDetails() {
   final revisedStarted = context.p.reviseStatus(AFSISigninStatus.loading, "Saving user settings...");
   context.updateRouteParam(revisedStarted);
-  context.executeQuery(WriteOneUserQuery(credential: context.s.userCredential, user: context.p.user, onSuccess: (successCtx) {
+  context.executeQuery(WriteOneUserQuery(user: context.p.user, onSuccess: (successCtx) {
     final revisedFinished = revisedStarted.reviseStatus(AFSISigninStatus.ready, "Saved user settings.");
     context.updateRouteParam(revisedFinished);
   }));

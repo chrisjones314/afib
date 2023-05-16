@@ -435,7 +435,7 @@ $optionsHeader
       AFSourceTemplate.insertMainParentTypeInsertion: spiParentType,
       SnippetDeclareSPIT.insertSPIOnUpdateMethods: memberVariables?.spiOnUpdateMethods ?? AFSourceTemplate.empty,
       SnippetDeclareSPIT.insertSPIResolveMethods: memberVariables?.spiResolveMethods ?? AFSourceTemplate.empty,
-      AFSourceTemplate.insertAdditionalMethodsInsertion: controlSettings.implsSPI,
+      AFSourceTemplate.insertStandardAdditionalMethodsInsertion: controlSettings.implsSPI,
     });
 
     final superSnippet = context.createSnippet(controlSettings.implsSuper, extend: screenInsertions);

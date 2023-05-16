@@ -21,7 +21,6 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/sign
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/registration_query.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/signin_query.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/${AFSourceTemplate.insertAppNamespaceInsertion}_id.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/user.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/widgets/registration_details_widget.dart';
 $extraImports
 

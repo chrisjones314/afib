@@ -88,7 +88,7 @@ class AFUIPrototypeBottomSheetScreen extends AFUIConnectedScreen<AFUIPrototypeBo
     final t = spi.t;
     return t.childScaffold(
       spi: spi,
-      appBar: AppBar(title: t.childText('Bottom Sheet Test Screen')),
+      appBar: AppBar(title: t.childText(text: 'Bottom Sheet Test Screen')),
       body: AFBuilder<AFUIPrototypeBottomSheetScreenSPI>(
         spiParent: spi,
         config: config,

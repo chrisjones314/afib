@@ -26,8 +26,9 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
   }
 
   @override
-  Text childText(dynamic text, {
+  Text childText( {
     AFWidgetID? wid, 
+    Object? text,
     dynamic style,
     dynamic textColor,
     dynamic fontSize,
@@ -37,7 +38,8 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     bool? softWrap,
     int? maxLines,
   }) {
-    return super.childText(text,
+    return super.childText(
+      text: text,
       wid: wid,
       style: style,
       textColor: textColor,
@@ -48,7 +50,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
   }
 
   Widget testExplanationText(String explanation) {
-    return childText(explanation);
+    return childText(text: explanation);
   }
 
   double get resultColumnWidth {
@@ -63,7 +65,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
       margin: margin,
         padding: padding.standard,
         child: Row(
-          children: [childText(title, style: styleOnPrimary.subtitle1)],
+          children: [childText(text: title, style: styleOnPrimary.subtitle1)],
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(topLeft: radius, topRight: radius),
@@ -90,7 +92,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
   }) {
     final titleText = title ?? prototype.displayId.code;
     final cols = row();
-    cols.add(Expanded(child: childText(titleText, overflow: TextOverflow.fade)));
+    cols.add(Expanded(child: childText(text: titleText, overflow: TextOverflow.fade)));
 
     final titleRow = Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -140,7 +142,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
       spi: spi,
       body: body,
       appBar: AppBar(
-        title: childText(title),
+        title: childText(text: title),
         leading: leading,
         automaticallyImplyLeading: false,
       )
@@ -160,8 +162,8 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
       for(var i = 0; i < errors.length; i++) {
         final error = stripErrorPath(errors[i]);
         final errorCols = row();
-        errorCols.add(testResultTableErrorLine(childText((i+1).toString()), i));
-        errorCols.add(testResultTableErrorLine(childText(error), i));
+        errorCols.add(testResultTableErrorLine(childText(text: (i+1).toString()), i));
+        errorCols.add(testResultTableErrorLine(childText(text: error), i));
         tableRowsErrors.add(TableRow(children: errorCols));
       }
 
@@ -174,7 +176,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
           borderRadius: borderRadiusScaled(),
         ),
         padding: padding.standard,
-        child: childText("All Tests Passed", textColor: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold, textAlign: TextAlign.center)
+        child: childText(text: "All Tests Passed", textColor: Colors.white, fontSize: 15.0, fontWeight: FontWeight.bold, textAlign: TextAlign.center)
       );
     }
 
@@ -188,7 +190,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     return Container(
       padding: padding.standard,
       color: colorPrimary,
-      child: childText(text, textColor: colorOnPrimary, textAlign: textAlign)
+      child: childText(text: text, textColor: colorOnPrimary, textAlign: textAlign)
     );
   }
 
@@ -213,7 +215,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
     return Container(
       color: color,
       padding: padding.standard,
-      child: childText(text, textColor: colorText, textAlign: textAlign)
+      child: childText(text: text, textColor: colorText, textAlign: textAlign)
     );
   }
 
@@ -272,7 +274,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
 
   Widget _createKindRow(dynamic text, void Function()? onTap) {
     return ListTile(
-      title: childText(text),
+      title: childText(text: text),
       dense: true,
       trailing: icon(AFUIThemeID.iconNavDown),
       onTap: onTap

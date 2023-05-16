@@ -1,12 +1,8 @@
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_query_command.dart';
-import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/templates/core/files/app.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/app_state.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/command_afib.t.dart';

@@ -9,7 +9,7 @@ class SnippetBottomSheetBuildBodyT extends AFCoreSnippetSourceTemplate {
     
     rows.add(Row(
       mainAxisSize: MainAxisSize.max,
-      children: [t.childText("${AFSourceTemplate.insertMainTypeInsertion.spaces}")]
+      children: [t.childText(text: "${AFSourceTemplate.insertMainTypeInsertion.spaces}")]
     ));
 
     rows.add(t.childButtonPrimaryText(

@@ -42,7 +42,7 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/sign
 import 'package:afib_signin/afsi_flutter.dart';
 ''',
       insertStartImpl: '''
-  // TODO: You will implement this method, checking whether you have a stored auth-token, and whether it is valid.  Using it,
+  // AFIB_TODO: You will implement this method, checking whether you have a stored auth-token, and whether it is valid.  Using it,
   // you will call context.onSuccess with a user credential which either is or is not signed in.
   final stubCred = UserCredentialRoot.createNotSignedIn();
   context.onSuccess(stubCred);

@@ -26,6 +26,26 @@ class AFConfigEntries {
   /// the Afib framework, off by default.
   static final logsEnabled = AFConfigEntryLogArea();
 
+  static final strictTranslationMode = AFConfigurationItemTrueFalse(
+    libraryId: AFUILibraryID.id,
+    name: "strict-translation-mode", 
+    validContexts: AFConfigurationItem.validContextsAllButNew,
+    ordinal: 270.0,
+    help: "Set to true if you want afib to require all text to either have a translation, or be wrapped in notTranslated", 
+    defaultValue: false
+  );
+
+  static final baseSimulatedLatency = AFConfigurationItemInt(
+    libraryId: AFUILibraryID.id,
+    name: "base-simulated-latency", 
+    validContexts: AFConfigurationItem.validContextsAllButNew,
+    ordinal: 280.0,
+    help: "When running a test test in the prototype UI, all queries have this latency by default, unless they have a simulatedLatencyFactor which changes their latency", 
+    defaultValue: 200,
+    min: 0,
+    max: 10000);
+
+
   /// Used to start the app in dark mode, rather than having to configure the device/emulator for 
   /// dark mode.
   static final forceDarkMode = AFConfigurationItemTrueFalse(
@@ -88,18 +108,6 @@ class AFConfigEntries {
     min: 2000,
     max: 2200);
 
-  /// Used to specify the year from which [AFTimeState] 'absolute' values are measured.
-  ///
-  /// If you specify 2004 as the absolute base year, then 
-  static final baseSimulatedLatency = AFConfigurationItemInt(
-    libraryId: AFUILibraryID.id,
-    name: "base-simulated-latency", 
-    validContexts: AFConfigurationItem.validContextNewProjectCommand,
-    ordinal: 280.0,
-    help: "When running a test test in the prototype UI, all queries have this latency by default, unless they have a simulatedLatencyFactor which changes their latency", 
-    defaultValue: 200,
-    min: 0,
-    max: 10000);
 
 
   /// Set to true only when running under a flutter WidgetTester test.

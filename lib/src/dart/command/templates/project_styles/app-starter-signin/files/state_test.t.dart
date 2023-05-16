@@ -38,7 +38,6 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/read
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 import 'package:afib_signin/afsi_flutter.dart';
-import 'package:afib_signin/afsi_id.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
 import 'package:$insertPackagePath/query/simple/signin_query.dart';
 import 'package:$insertPackagePath/query/simple/signout_query.dart';
@@ -52,6 +51,7 @@ import 'package:$insertPackagePath/state/root/user_credential_root.dart';
 import 'package:$insertPackagePath/test/${insertAppNamespace}_state_test_shortcuts.dart';
 $insertExtraImports
 
+// ignore_for_file: depend_on_referenced_packages, unused_import
 
 void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
 
@@ -215,16 +215,12 @@ void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
 
     testContext.defineQueryResponseDynamic<WriteOneUserQuery>(body: (context, query) {
       final user = query.user;
-      final cred = query.credential;
       var result = user;
       // this is a very common pattern for write queries.  If it has a new id, you revise its ID with a test id,
       // otherwise, you just make sure to change the pointer using copyWith, as that would happen in a real query
       // which is probably deserializing a network response.
-      if(AFDocumentIDGenerator.isNewId(user.id)) {
-        result = user.reviseId(cred.userId);
-      } else {
-        result = user.copyWith();
-      }
+      assert(!AFDocumentIDGenerator.isNewId(user.id));
+      result = user.copyWith();
       context.onSuccess(result);
     });
 

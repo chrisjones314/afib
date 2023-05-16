@@ -586,6 +586,10 @@ class AFConfig {
     return boolFor(AFConfigEntries.generateUIPrototypes);
   }
 
+  bool get strictTranslationMode {
+    return boolFor(AFConfigEntries.strictTranslationMode);
+  }
+
   int get absoluteBaseYear {
     return intFor(AFConfigEntries.absoluteBaseYear);
   }

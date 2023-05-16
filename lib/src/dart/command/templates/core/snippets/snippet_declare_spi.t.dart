@@ -37,6 +37,7 @@ class ${insertMainType}SPI extends $insertMainParentType<${ScreenT.insertStateVi
 
   $insertSPIResolveMethods
   $insertSPIOnUpdateMethods
+  $insertStandardAdditionalMethods
   $insertAdditionalMethods
 }
 ''';

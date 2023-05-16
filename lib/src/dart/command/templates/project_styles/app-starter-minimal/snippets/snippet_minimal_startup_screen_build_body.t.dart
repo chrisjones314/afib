@@ -14,7 +14,7 @@ final rows = t.column();
 rows.add(AFUIWelcomeWidget());
 rows.add(t.childCard(
   child: t.childMarginStandard(
-    child: t.childText("Startup Screen", 
+    child: t.childText(text: "Startup Screen", 
       textAlign: TextAlign.center, 
       style: t.styleOnCard.headline6)
   )

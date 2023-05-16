@@ -24,6 +24,8 @@ import 'package:$insertPackageName/${insertAppNamespace}_id.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
 $insertExtraImports
 
+// ignore_for_file: depend_on_referenced_packages, unused_import
+
 void define${insertMainType}Prototypes(AFUIPrototypeDefinitionContext context) {
   _define${insertMainType}PrototypeInitial(context);
 }

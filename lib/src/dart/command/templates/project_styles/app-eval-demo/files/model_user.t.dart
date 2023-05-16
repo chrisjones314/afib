@@ -36,7 +36,6 @@ class ModelUserT extends ModelT {
       extraImports: '''
 import 'package:afib/afib_flutter.dart';
 import 'package:sqlite3/sqlite3.dart' as sql;
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
 ''', 
       additionalMethods: '''
 static User fromDB(sql.Row row) {

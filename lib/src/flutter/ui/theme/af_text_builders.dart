@@ -37,29 +37,29 @@ class AFRichTextBuilder {
     markPoint = spans.length;
   }
 
-  void insertNormal(int idx, dynamic idOrText, {
+  void insertNormal(int idx, Object idOrText, {
     GestureRecognizer? onGesture
   }) {
-    final text = theme.translate(idOrText);
+    final text = theme.translate(text: idOrText);
     spans.insert(idx, TextSpan(text: text, style: styleNormal, recognizer: onGesture));
   }
 
-  void writeTapable(dynamic idOrText, GestureRecognizer? recognizer) {
-    final text = theme.translate(idOrText);
+  void writeTapable(Object idOrText, GestureRecognizer? recognizer) {
+    final text = theme.translate(text: idOrText);
     spans.add(TextSpan(text: text, style: styleTapable, recognizer: recognizer));
   }
 
-  void writeBold(dynamic idOrText, {
+  void writeBold(Object idOrText, {
     GestureRecognizer? onGesture
   }) {
-    final text = theme.translate(idOrText);
+    final text = theme.translate(text: idOrText);
     spans.add(TextSpan(text: text, style: styleBold));
   }
 
-  void writeMuted(dynamic idOrText, {
+  void writeMuted(Object idOrText, {
     GestureRecognizer? onGesture
   }) {
-    final text = theme.translate(idOrText);
+    final text = theme.translate(text: idOrText);
     spans.add(TextSpan(text: text, style: styleMuted, recognizer: onGesture));
   }
 
@@ -67,19 +67,19 @@ class AFRichTextBuilder {
     spans.add(WidgetSpan(child: widget));
   }
 
-  void writeStyled(dynamic idOrText, TextStyle? style, {
+  void writeStyled(Object idOrText, TextStyle? style, {
     GestureRecognizer? onGesture
   }) {
-    final text = theme.translate(idOrText);
+    final text = theme.translate(text: idOrText);
     spans.add(TextSpan(text: text, style: style, recognizer: onGesture));
   }
 
-  void writeIfNonEmpty(dynamic idOrText, {
+  void writeIfNonEmpty(Object idOrText, {
     TextStyle? style,
     GestureRecognizer? onGesture
   }) {
     if(isNotEmpty) {
-      final text = theme.translate(idOrText);
+      final text = theme.translate(text: idOrText);
       spans.add(TextSpan(text: text, style: style, recognizer: onGesture));
     }
   }
@@ -88,29 +88,29 @@ class AFRichTextBuilder {
     return markPoint == spans.length;
   }
 
-  void writeIfAtMark(dynamic idOrText, {
+  void writeIfAtMark(Object idOrText, {
     TextStyle? style,
     GestureRecognizer? onGesture
   }) {
     if(markPoint == spans.length) {
-      final text = theme.translate(idOrText);
+      final text = theme.translate(text: idOrText);
       spans.add(TextSpan(text: text, style: style, recognizer: onGesture));
     }
   }
 
 
-  void writeIfPastMark(dynamic idOrText, {
+  void writeIfPastMark(Object idOrText, {
     TextStyle? style,
     GestureRecognizer? onGesture
   }) {
     if(markPoint < spans.length) {
-      final text = theme.translate(idOrText);
+      final text = theme.translate(text: idOrText);
       spans.add(TextSpan(text: text, style: style, recognizer: onGesture));
     }
   }
 
-  void writeNormal(dynamic idOrText) {
-    final text = theme.translate(idOrText);
+  void writeNormal(Object idOrText) {
+    final text = theme.translate(text: idOrText);
     write(text);
   }
 
@@ -169,8 +169,8 @@ class AFTextBuilder {
     return buffer.isEmpty;
   }
 
-  void write(dynamic idOrText) {
-    final trans = theme.translate(idOrText);
+  void write(Object idOrText) {
+    final trans = theme.translate(text: idOrText);
     buffer.write(trans);
   }
   

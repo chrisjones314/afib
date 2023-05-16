@@ -32,8 +32,8 @@ final t = spi.t;
 final rows = t.column();
 
 rows.add(UserAccountsDrawerHeader(
-  accountEmail: t.childText(spi.activeUser.email),
-  accountName: t.childText(spi.activeUser.fullName),
+  accountEmail: t.childText(text: spi.activeUser.email),
+  accountName: t.childText(text: spi.activeUser.fullName),
   decoration: BoxDecoration(
     color: t.colorSecondary,
   ),

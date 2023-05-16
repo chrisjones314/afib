@@ -38,13 +38,13 @@ class AFPrototypeLoadingScreen extends AFUIConnectedScreen<AFPrototypeLoadingScr
 
     final startupId = AFibD.config.startupPrototypeId;
     final rows = t.column();
-    rows.add(t.childText("Loading Prototype"));
-    rows.add(t.childText(startupId.toString()));
+    rows.add(t.childText(text: "Loading Prototype"));
+    rows.add(t.childText(text: startupId.toString()));
     
     return Scaffold(
       appBar: AppBar(        
         automaticallyImplyLeading: false,
-        title: t.childText(AFUITranslationID.afibPrototypeLoading)
+        title: t.childText(text: AFUITranslationID.afibPrototypeLoading)
       ),
       body: Center(
         child: Column(

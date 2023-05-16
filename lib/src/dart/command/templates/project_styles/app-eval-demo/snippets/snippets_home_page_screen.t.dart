@@ -15,7 +15,6 @@ class SnippetHomePageScreenExtraImports {
       embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertExtraImportsInsertion: '''
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/counter_management_screen.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/drawers/signed_in_drawer.dart';
 ''',
       })
     );
@@ -110,7 +109,7 @@ Widget _buildStanzasCard(HomePageScreenSPI spi) {
     height: (t.styleOnCard.bodyText2?.fontSize ?? 12.0) * 4.0,
     child: t.childText(
       wid: ${insertAppNamespaceUpper}WidgetID.textCurrentStanza,
-      spi.textCurrentStanza
+      text: spi.textCurrentStanza
     )
   ));
 
@@ -175,7 +174,7 @@ return t.childScaffold<AFBuildContext<${AFSourceTemplate.insertAppNamespaceInser
   body: body,
   drawer: SignedInDrawer(),
   appBar: AppBar(
-      title: t.childText("${AFSourceTemplate.insertPackageNameInsertion.spaces}"),
+      title: t.childText(text: "${AFSourceTemplate.insertPackageNameInsertion.spaces}"),
       leading: buttonDrawer,
   )
 );

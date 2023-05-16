@@ -26,7 +26,7 @@ class QueryStartupStarterMinimalT extends SimpleQueryT {
 context.onSuccess(AFUnused.unused);
 ''',
       insertFinishImpl: '''
-// TODO: The most likely thing you would do here is issue more queries, perhaps a CheckSigninQuery to see 
+// AFIB_TODO: The most likely thing you would do here is issue more queries, perhaps a CheckSigninQuery to see 
 // if the user is already signed in.
 ''',
       insertAdditionalMethods: '''

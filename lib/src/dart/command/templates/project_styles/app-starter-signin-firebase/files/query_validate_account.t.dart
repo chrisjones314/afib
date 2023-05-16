@@ -3,7 +3,6 @@
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
-import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/files/query_starter_signin_startup.t.dart';
 
 class QueryValidateAccountT extends SimpleQueryT {
   QueryValidateAccountT({

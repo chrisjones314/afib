@@ -159,6 +159,10 @@ class AFTranslationID extends AFID {
     return hash2(code.hashCode, library?.code);
   }
 
+  String toString() {
+    return "[!${super.toString()}]";
+  }
+
 }
 
 class AFIDWithTag extends AFID {

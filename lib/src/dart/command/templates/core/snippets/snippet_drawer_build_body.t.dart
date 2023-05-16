@@ -10,7 +10,7 @@ class SnippetDrawerBuildBodyT extends AFCoreSnippetSourceTemplate {
     final rows = t.column();
     
     rows.add(UserAccountsDrawerHeader(
-        accountEmail: t.childText("example@email.com"),
+        accountEmail: t.childText(text: "example@email.com"),
         accountName: Text("Washington Irving"),
         decoration: BoxDecoration(
           color: t.colorSecondary,

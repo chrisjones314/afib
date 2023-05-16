@@ -52,7 +52,7 @@ class AFUIUnimplementedScreen extends AFUIConnectedScreen<AFUIUnimplementedScree
 
     rows.add(t.childMargin(
       margin: t.margin.standard,
-      child: t.childText(spi.message),
+      child: t.childText(text: spi.message),
     ));
 
     

@@ -8,7 +8,7 @@ return t.childScaffold(
   spi: spi,
   body: body,
   appBar: AppBar(
-    title: t.childText("$insertMainType"),
+    title: t.childText(text: "$insertMainType"),
   ),
 );
 ''';

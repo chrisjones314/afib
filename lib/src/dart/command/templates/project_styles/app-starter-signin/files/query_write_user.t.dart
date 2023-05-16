@@ -30,7 +30,7 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/read
 import 'package:afib_signin/afsi_flutter.dart';
 ''',
       insertStartImpl: '''
-// TODO: You would actually write the user to your API/store, then 
+// AFIB_TODO: You would actually write the user to your API/store, then 
 // revise it with the actual id, and call onSuccess.
 context.onSuccess(user.copyWith());
 ''',

@@ -99,6 +99,11 @@ class ${insertAppNamespaceUpper}WireframeID extends AFWireframeID {
   const ${insertAppNamespaceUpper}WireframeID(String code): super(code, ${insertAppNamespaceUpper}LibraryID.id); 
 }
 
+class ${insertAppNamespaceUpper}TranslationID extends AFTranslationID{
+
+  const ${insertAppNamespaceUpper}TranslationID(String code) : super(code, ${insertAppNamespaceUpper}LibraryID.id);
+}
+
 
 ''';
 

@@ -23,6 +23,8 @@ import 'package:flutter/material.dart';
 import 'package:$insertPackageName/${insertAppNamespace}_id.dart';
 $insertExtraImports
 
+// ignore_for_file: unused_import
+
 $insertDeclareRouteParam
 
 $insertDeclareSPI

@@ -13,7 +13,7 @@ final t = spi.t;
 final rows = t.column();
 rows.add(t.childMargin(
   margin: t.margin.v.biggest,  
-  child: t.childText("Startup Screen", style: t.styleOnCard.headline4)
+  child: t.childText(text: "Startup Screen", style: t.styleOnCard.headline4)
 ));
 rows.add(t.childCaptionSimulatedLatency());
 return Center(
@@ -35,7 +35,7 @@ return t.childScaffold(
   spi: spi,
   body: body,
   appBar: AppBar(
-    title: t.childText("${insertPackageName.spaces}"),
+    title: t.childText(text: "${insertPackageName.spaces}"),
   ),
 );
 ''';

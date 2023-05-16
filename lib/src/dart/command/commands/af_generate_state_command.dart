@@ -16,7 +16,6 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_initial_st
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_invoke_initial_state.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_serial_methods.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_standard_root_methods.t.dart';
-import 'package:plural_noun/plural_noun.dart';
 
 class AFGenerateStateSubcommand extends AFGenerateSubcommand {
   static const argNotSerial = "no-serial-methods";

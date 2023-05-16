@@ -93,7 +93,7 @@ class AFUIPrototypeDrawerScreen extends AFUIConnectedScreen<AFUIPrototypeDrawerS
 
     return t.childScaffold(
       spi: spi,
-      appBar: AppBar(title: t.childText('Drawer Test Screen')),
+      appBar: AppBar(title: t.childText(text: 'Drawer Test Screen')),
       drawer: drawerWidget,
       body: AFBuilder<AFUIPrototypeDrawerScreenSPI>(
         spiParent: spi,

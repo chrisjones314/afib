@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:afib/src/dart/command/af_command.dart';
-import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/code_generation/af_code_buffer.dart';
@@ -301,7 +300,7 @@ class AFGeneratedFile {
     final path = AFProjectPaths.fullPathFor(this.projectPath);
 
     // fix up any imports, sorting them and removing excess spaces.
-    buffer.fixupImports();
+    buffer.fixupImports(path);
 
     final f = File(path);
     f.writeAsStringSync(buffer.toString());

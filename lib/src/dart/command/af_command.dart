@@ -328,6 +328,7 @@ class AFMemberVariableTemplates {
 
   void setStandardRootMapType(String kind) {
     standardRootMapType = kind;
+    memberVars.remove(AFMemberVariableTemplates.tempPlaceholderVarName);
   }
 
   bool _hasFlag(int test, int flag) {
@@ -493,7 +494,11 @@ class AFMemberVariableTemplates {
     _iterate(
       include: includeAllVars,
       visit: (identifier, kind, isLast, includeKind) {
-        result.writeln("required this.$identifier,");
+        if(identifier == tempPlaceholderVarName) {
+          result.writeln("this.$identifier = 0,");
+        } else {
+          result.writeln("required this.$identifier,");
+        }
     });
 
     if(withFlutterState) {
@@ -542,7 +547,11 @@ class AFMemberVariableTemplates {
     _iterate(
       include: includeAllVars,
       visit: (identifier, kind, isLast, includeKind) {
-        result.writeln("  required $kind $identifier,");
+        if(identifier == tempPlaceholderVarName) {
+          result.writeln("  $kind $identifier = 0,");
+        } else {
+          result.writeln("  required $kind $identifier,");
+        }
     });
     _addBreadcrumb(result, SnippetNavigatePushT.insertNavigatePushParamDecl);
     return result.toString();

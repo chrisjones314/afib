@@ -57,6 +57,7 @@ class AFibD<AppState> {
       registerConfigEntry(AFConfigEntries.appNamespace);
       registerConfigEntry(AFConfigEntries.packageName);
       registerConfigEntry(AFConfigEntries.baseSimulatedLatency);
+      registerConfigEntry(AFConfigEntries.strictTranslationMode);
       registerConfigEntry(AFConfigEntries.forceDarkMode);
       registerConfigEntry(AFConfigEntries.enableGenerateAugment);
       registerConfigEntry(AFConfigEntries.absoluteBaseYear);

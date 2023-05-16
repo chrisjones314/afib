@@ -52,8 +52,8 @@ class AFUIPrototypeLibraryListScreen extends AFUIConnectedScreen<AFUIPrototypeLi
       rowsCard.add(
         t.childListTileNavDown(
           wid: thirdParty.id,
-          title: t.childText(thirdParty.id.name),
-          subtitle: t.childText(subtitle),
+          title: t.childText(text: thirdParty.id.name),
+          subtitle: t.childText(text: subtitle),
           onTap: () {
             spi.context.navigatePush(AFUIPrototypeLibraryHomeScreen.navigatePush(thirdParty));
           }

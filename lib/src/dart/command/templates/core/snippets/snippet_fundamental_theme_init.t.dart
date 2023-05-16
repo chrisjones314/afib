@@ -90,7 +90,7 @@ class SnippetFundamentalThemeInitT extends AFSnippetSourceTemplate {
     textThemeLight: themeLight,
   ); 
 
-  // TODO: This function takes many parameters with default values.   Look
+  // AFIB_TODO: This function takes many parameters with default values.   Look
   // at its documentation, and customize those values
   primary.setAfibFundamentals();
 

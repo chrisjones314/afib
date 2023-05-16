@@ -24,6 +24,6 @@ class SnippetWidgetBuildBodyT extends AFSnippetSourceTemplate {
 
   String get template => '''
     final t = spi.t;
-    return t.childText("${insertMainType.spaces}");
+    return t.childText(text: "${insertMainType.spaces}");
 ''';
 }

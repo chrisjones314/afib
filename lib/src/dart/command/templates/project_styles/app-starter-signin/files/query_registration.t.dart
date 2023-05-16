@@ -33,7 +33,7 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/ui/screens/home_p
 import 'package:afib_signin/afsi_flutter.dart';
 ''',
       insertStartImpl: '''
-// TODO: You would actually register the user, and create a new user credential using
+// AFIB_TODO: You would actually register the user, and create a new user credential using
 // the actual ID.   You would probably also save the token you get back in the same way
 // that you do in your SigninQuery, so that the user will be signed in from here on out.
 final cred = UserCredentialRoot(
@@ -58,7 +58,6 @@ final revisedUser = newUser.reviseId(cred.userId);
 // we have our user credential, now write the user record,
 // and tell it to redirect to the home screen when it completes.
 context.executeQuery(WriteOneUserQuery(
-  credential: cred,
   user: revisedUser,
   onSuccess: (successCtx) {
     $extraAfterWrite

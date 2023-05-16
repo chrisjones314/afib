@@ -43,7 +43,7 @@ return t.childScaffold(
   spi: spi,
   body: body,
   appBar: AppBar(
-    title: t.childText("${insertMainType.spaces}"),
+    title: t.childText(text: "${insertMainType.spaces}"),
     $insertAppBarParams
     // IMPORTANT: Don't let Flutter automatically add its own back button, as that 
     // will get out of sync with AFib's route state.   Instead you must use

@@ -39,10 +39,10 @@ class AFUIDemoModeTransitionScreen extends AFUIConnectedScreen<AFUIDemoModeTrans
     return t.childScaffold(
       spi: spi,
       appBar: AppBar(
-        title: t.childText('$transitionTitle Demo Mode'), 
+        title: t.childText(text: '$transitionTitle Demo Mode'), 
       ),
       body: Center(
-        child: t.childText("$transitionTitle demonstration mode")
+        child: t.childText(text: "$transitionTitle demonstration mode")
       ),
     );
   }

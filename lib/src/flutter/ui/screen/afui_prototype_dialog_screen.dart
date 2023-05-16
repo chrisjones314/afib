@@ -88,7 +88,7 @@ class AFUIPrototypeDialogScreen extends AFUIConnectedScreen<AFUIPrototypeDialogS
       spi: spi,
       appBar: AppBar(
         leading: t.childButtonStandardBack(spi, screen: screenId),
-        title: t.childText('Dialog Test Screen'), 
+        title: t.childText(text: 'Dialog Test Screen'), 
       ),
       body: resultWidget,
     );

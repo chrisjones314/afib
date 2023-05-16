@@ -31,6 +31,8 @@ import 'package:$insertPackagePath/${insertAppNamespace}_id.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
 $insertExtraImports
 
+// ignore_for_file: depend_on_referenced_packages, unused_import
+
 void define${insertTestName}UnitTest(AFUnitTestDefinitionContext definitions) {
 
   definitions.defineTest(${insertAppNamespaceUpper}UnitTestID.${insertTestName.camel}, (e) {

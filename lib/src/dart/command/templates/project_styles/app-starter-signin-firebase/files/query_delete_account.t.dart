@@ -23,7 +23,6 @@ class QueryDeleteAccountT extends SimpleQueryT {
     return QueryDeleteAccountT(
       insertExtraImports: '''
 import 'package:afib_signin/afsi_flutter.dart';
-import 'package:afib_signin/afsi_id.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fba;
 ''',
       insertStartImpl: '''

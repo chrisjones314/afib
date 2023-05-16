@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 ''',
         AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 Widget childCaptionSimulatedLatency() {
-  return childText("(with simulated latency)", style: styleOnCard.caption);
+  return childText(text: "(with simulated latency)", style: styleOnCard.caption);
 }
 
 Widget childSingleRowButton({ required Widget button }) {
@@ -47,20 +47,20 @@ void buildCardHeader({
 }) {
   rows.add(childMargin(
     margin: margin.b.standard,
-    child: childText(title, style: styleOnCard.bodyText1)
+    child: childText(text: title, style: styleOnCard.bodyText1)
   ));
 
   if(subtitle != null) {
     rows.add(childMargin(
       margin: margin.b.standard,
-      child: childText(subtitle, style: styleOnCard.caption)
+      child: childText(text: subtitle, style: styleOnCard.caption)
     ));
   }
 }
 
 void buildStateCount({ required List<Widget> rows, required int clickCount }) {
   buildCardHeader(rows: rows, title: "Aggregate Persistent Count", subtitle: "(global state)");
-  rows.add(childText(clickCount.toString(), style: styleOnCard.headline2));
+  rows.add(childText(text: clickCount.toString(), style: styleOnCard.headline2));
 }
 ''',
       })

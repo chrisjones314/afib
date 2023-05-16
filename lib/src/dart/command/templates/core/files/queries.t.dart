@@ -138,6 +138,8 @@ import 'package:afib/afib_flutter.dart';
 $insertExtraImports
 $insertMemberVariableImports
 
+// ignore_for_file: unused_import
+
 class $insertQueryType extends $insertQueryParentType<$insertResultType> {
   $insertMemberVariables
   
@@ -194,6 +196,7 @@ class DeferredQueryT extends SimpleQueryT {
   }
 
   String get template => '''
+// ignore_for_file: unused_import
 import 'package:afib/afib_flutter.dart';
 $insertExtraImports
 $insertMemberVariableImports

@@ -9,7 +9,7 @@
       "type": "dart",
       "request": "launch",
       "program": "/Users/chrisjones/projects/afib/afib/bin/afib_bootstrap.dart",
-      "cwd": "/Users/chrisjones/projects/afib/temp/test_install",
+      "cwd": "/Users/chrisjones/projects/afib/temp/warning_test",
     },
     {
       "name": "Flutter",

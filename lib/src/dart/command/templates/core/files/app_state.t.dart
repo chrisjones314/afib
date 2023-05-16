@@ -31,6 +31,7 @@ class ${insertAppNamespaceUpper}State extends AFComponentState with ${insertAppN
   }
 
   factory ${insertAppNamespaceUpper}State.initial() {
+    // ignore: prefer_const_literals_to_create_immutables
     return ${insertAppNamespaceUpper}State.fromList([
     ]);
   }

@@ -9,7 +9,7 @@ final t = spi.t;
 final rows = t.column();
 rows.add(t.childCard(
   child: t.childMarginStandard(
-    child: t.childText("${AFSourceTemplate.insertMainTypeInsertion.spaces}", 
+    child: t.childText(text: "${AFSourceTemplate.insertMainTypeInsertion.spaces}", 
       textAlign: TextAlign.center, 
       style: t.styleOnCard.headline6
     )

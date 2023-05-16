@@ -35,7 +35,7 @@ final rows = t.column();
 rows.add(AFUIAlphaWarningWidget());
 
 rows.add(t.childMarginStandard(
-  child: t.childText("Signed In", 
+  child: t.childText(text: "Signed In", 
     textAlign: TextAlign.center, 
     style: t.styleOnCard.headline6)
 ));
@@ -64,7 +64,7 @@ rows.add(Container(
     color: Colors.grey[300],
     borderRadius: t.borderRadius.standard,
   ),
-  child: t.childText("Use the menu icon at the lower left to access the drawer, with additional functionality including signout, account settings, and delete your account.")
+  child: t.childText(text: "Use the menu icon at the lower left to access the drawer, with additional functionality including signout, account settings, and delete your account.")
 ));
 
 return ListView(
@@ -137,11 +137,12 @@ TableRow _createDetailRow(HomePageScreenSPI spi, { required AFWidgetID wid, requ
   final cols = t.row();
   cols.add(t.childMargin(
     margin: t.marginCustom(vertical: 3, right: 3),
-    child: t.childText("\$label:", textAlign: TextAlign.right)
+    child: t.childText(text: "\$label:", textAlign: TextAlign.right)
   ));
   cols.add(t.childMargin(
     margin: t.margin.v.standard,
-    child: t.childText(value, 
+    child: t.childText(
+      text: value, 
       style: t.styleOnCard.bodyText1,
       wid: wid
     )
@@ -176,7 +177,7 @@ return t.childScaffold(
   body: body,
   drawer: SignedInMenuDrawer(),
   appBar: AppBar(
-    title: t.childText("Home Page Screen"),
+    title: t.childText(text: "Home Page Screen"),
     
     // IMPORTANT: Don't let Flutter automatically add its own back button, as that 
     // will get out of sync with AFib's route state.   Instead you must use

@@ -38,8 +38,8 @@ class AFUIPrototypeWaitingScreen extends AFUIConnectedScreen<AFUIPrototypeWaitin
     final t = spi.t;
     
     return Scaffold(
-      appBar: AppBar(title: t.childText("Loading"), automaticallyImplyLeading: false),
-      body: Center(child: t.childText("Loading..."))
+      appBar: AppBar(title: t.childText(text: "Loading"), automaticallyImplyLeading: false),
+      body: Center(child: t.childText(text: "Loading..."))
     );    
 
   }

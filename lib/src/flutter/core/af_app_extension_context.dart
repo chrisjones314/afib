@@ -589,7 +589,6 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
 
     builder.setTranslations(AFUILocaleID.universal, {
       AFUITranslationID.appTitle: "App Title",
-      AFUITranslationID.notTranslated: "{0}",
       AFUITranslationID.widgetPrototypes: "Widget Prototypes",
       AFUITranslationID.screenPrototypes: "UI Prototypes",
       AFUITranslationID.workflowTests: "Workflow Tests",

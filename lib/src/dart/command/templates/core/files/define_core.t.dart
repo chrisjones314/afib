@@ -1,6 +1,5 @@
 
 import 'package:afib/afib_command.dart';
-import 'package:afib/src/dart/command/af_source_template.dart';
 
 
 class DefineCoreUIFunctionsT extends AFSourceTemplate {
@@ -58,6 +57,8 @@ import 'package:flutter/material.dart';
 import 'package:afib/afib_flutter.dart';
 ${AFSourceTemplate.insertExtraImportsInsertion}
 
+// ignore_for_file: unnecessary_import
+
 void defineCore(AFCoreDefinitionContext context) {
   defineEventHandlers(context);
   defineInitialState(context);
@@ -69,7 +70,7 @@ void defineCore(AFCoreDefinitionContext context) {
 
 void defineEventHandlers(AFCoreDefinitionContext context) {
   context.addDefaultQueryErrorHandler((err) {
-    // TODO: If you are getting an error dialog, and you want to set a breakpoint showing where it has been thrown,
+    // AFIB_TODO: If you are getting an error dialog, and you want to set a breakpoint showing where it has been thrown,
     // this is a good place to do it.
     afDefaultQueryErrorHandler(err);
   });

@@ -1,5 +1,4 @@
 import 'package:afib/src/dart/command/af_source_template.dart';
-import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/files/model_example_start_here.t.dart';
 
 class ModelCountHistoryRootT extends ModelExampleStartHereT {
@@ -15,9 +14,7 @@ class ModelCountHistoryRootT extends ModelExampleStartHereT {
   factory ModelCountHistoryRootT.example() {
     return ModelCountHistoryRootT(embeddedInsertions: AFSourceTemplateInsertions(insertions: {
       AFSourceTemplate.insertExtraImportsInsertion: '''
-import 'package:afib/afib_flutter.dart';
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/count_history_item.dart';
-import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
 import 'package:sqlite3/sqlite3.dart' as sql;
 ''',
       AFSourceTemplate.insertAdditionalMethodsInsertion: '''

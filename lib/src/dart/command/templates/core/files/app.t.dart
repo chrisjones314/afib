@@ -20,7 +20,7 @@ class ${insertAppNamespaceUpper}App extends AFMaterialApp<${insertAppNamespaceUp
   Widget buildMaterialApp(AFFundamentalThemeState fundamentals) {
     final screenMap = AFibF.g.effectiveScreenMap;
     return MaterialApp(
-        title: fundamentals.translate(AFUITranslationID.appTitle),
+        title: fundamentals.translate(text: AFUITranslationID.appTitle),
         navigatorKey: AFibF.g.navigatorKey,
         theme: fundamentals.themeDataActive,
         supportedLocales: fundamentals.supportedLocales,

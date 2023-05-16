@@ -58,7 +58,7 @@ lpi.navigateToSigninScreen(initialEmail: storedEmail);
 // navigation that is showing some part of your UI (and depends on that data) completes.
 context.executeDeferredCallback(${AFSourceTemplate.insertAppNamespaceInsertion.upper}QueryID.deferredSignout, const Duration(milliseconds: 500), (ctx) {
   context.executeResetToInitialState();
-  $extraAfterSignout;
+  $extraAfterSignout
 });
 ''';
   }

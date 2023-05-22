@@ -10,7 +10,7 @@ class StartHereT extends AFProjectStyleSourceTemplate {
   String get template => '''
 --override-templates +
   +core/snippets/state_test_impl=project_styles/app-eval-demo/snippets/startup_state_test
-require "meta, sqlite3, path_provider"
+require "meta, sqlite3, path_provider, afib"
 generate id ${insertAppNamespaceUpper}TestDataID.userWestCoast
 generate id ${insertAppNamespaceUpper}TestDataID.usersWestCoast
 generate id ${insertAppNamespaceUpper}TestDataID.userCredentialWestCoast

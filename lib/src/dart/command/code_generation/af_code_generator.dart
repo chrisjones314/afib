@@ -102,6 +102,7 @@ class AFCodeGenerator {
   final AFCommandAppExtensionContext definitions;
   final created = <String, AFGeneratedFile>{};
   final modified = <String, AFGeneratedFile>{};
+  final read = <String, AFGeneratedFile>{};
   final renamed = <List<String>, List<String>>{};
   final ensuredFolders = <List<String>>[];
 
@@ -693,6 +694,10 @@ class AFCodeGenerator {
     return _modifyFile(context, projectPath);    
   }
 
+  AFGeneratedFile readFile(AFCommandContext context, List<String> projectPath) {
+    return _readFile(context, projectPath);    
+  }
+
   /// Used for generated files which always get overwritten.
   AFGeneratedFile overwriteFile(AFCommandContext context, List<String> projectPath, dynamic templateOrId, {
     Map<AFSourceTemplateInsertion, AFSourceTemplate>? insertions,
@@ -749,6 +754,10 @@ class AFCodeGenerator {
 
   AFGeneratedFile _modifyFile(AFCommandContext context, List<String> projectPath) {
     return loadFile(context, projectPath);
+  }
+
+  AFGeneratedFile _readFile(AFCommandContext context, List<String> projectPath) {
+    return loadFile(context, projectPath, forModify: false);
   }
 
   bool isRenamed(List<String> projectPath) {
@@ -886,14 +895,25 @@ class AFCodeGenerator {
     return null;
   }
 
-  AFGeneratedFile loadFile(AFCommandContext context, List<String> path) {
+  AFGeneratedFile loadFile(AFCommandContext context, List<String> path, {
+    bool forModify = true
+  }) {
+    if(path.contains("pubspec.yaml")) {
+      int i = 0;
+      i++;
+    }
     final key = _keyForPath(path);
     final inMem = _findInMemory(key);
     if(inMem != null) {
       return inMem;
     }
     final result = AFGeneratedFile.fromPath(projectPath: path);
-    modified[key] = result;
+    if(forModify) {
+      modified[key] = result;
+    } else {
+      read[key] = result;
+    }
+  
     return result;
   }
 

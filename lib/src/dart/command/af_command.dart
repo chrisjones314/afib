@@ -1023,17 +1023,12 @@ class AFCommandContext {
       throw AFCommandError(error: "The file ${pathPubspec.last} must exist in the folder from which you are running this command");
     }
 
-    final filePubspec = generator.modifyFile(this, pathPubspec);
+    final filePubspec = generator.readFile(this, pathPubspec);
     final pubspec = filePubspec.loadPubspec();
     final name = pubspec.name;
 
     if(packageName != null && name != packageName) {
       throw AFCommandError(error: "Expected yourpackagename to be $name but found $packageName");
-    }
-
-    final import = pubspec.dependencies["afib"];
-    if(import == null) {
-      throw AFCommandError(error: "You must update your pubspec's dependencies section to include afib");
     }
     
     return pubspec;

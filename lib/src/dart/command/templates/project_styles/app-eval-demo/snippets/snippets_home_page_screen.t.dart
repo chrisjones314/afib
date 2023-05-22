@@ -106,7 +106,7 @@ Widget _buildStanzasCard(HomePageScreenSPI spi) {
 
   rows.add(Container(
     margin: t.margin.bigger,
-    height: (t.styleOnCard.bodyText2?.fontSize ?? 12.0) * 4.0,
+    height: (t.styleOnCard.bodyMedium?.fontSize ?? 12.0) * 4.0,
     child: t.childText(
       wid: ${insertAppNamespaceUpper}WidgetID.textCurrentStanza,
       text: spi.textCurrentStanza

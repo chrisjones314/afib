@@ -46,16 +46,16 @@ class AFUICompleteProjectStyleWidget extends AFUIConnectedWidget<AFUICompletePro
     final rows = t.column();
     rows.add(t.childMargin(
       margin: t.margin.b.size5,
-      child: t.childText(text: "Opps, project style not complete", style: t.styleOnCard.headline6)
+      child: t.childText(text: "Opps, project style not complete", style: t.styleOnCard.titleLarge)
     ));
-    rows.add(Text("Run", style: t.styleOnCard.bodyText2));
+    rows.add(Text("Run", style: t.styleOnCard.bodyMedium));
     rows.add(t.childMargin(
       margin: t.margin.v.standard,
-      child: t.childText(text: "dart bin/${AFibD.config.appNamespace}_afib.dart integrate project-style $projectStyle", style: t.styleOnCard.bodyText1)
+      child: t.childText(text: "dart bin/${AFibD.config.appNamespace}_afib.dart integrate project-style $projectStyle", style: t.styleOnCard.bodyLarge)
     ));
     rows.add(t.childMargin(
       margin: t.margin.b.s5,
-      child: Text("from the project root folder to complete setup.", style: t.styleOnCard.bodyText2)
+      child: Text("from the project root folder to complete setup.", style: t.styleOnCard.bodyMedium)
     ));
 
     return Card(child: 

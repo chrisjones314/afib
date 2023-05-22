@@ -39,7 +39,6 @@ export "src/dart/utils/af_route_param_with_flutter_state.dart";
 export "src/dart/utils/af_should_continue_route_param.dart";
 export "src/dart/utils/af_typedefs_dart.dart";
 export "src/dart/utils/af_unused.dart";
-export "src/dart/utils/af_unused.dart"; // ok
 export "src/dart/utils/afib_d.dart";
 export 'src/flutter/af_main.dart';
 export 'src/flutter/af_main_test_startup.dart';
@@ -52,7 +51,6 @@ export 'src/flutter/test/af_matchers.dart';
 export 'src/flutter/test/af_screen_test.dart';
 export 'src/flutter/test/af_screen_test_main.dart';
 export 'src/flutter/test/af_state_test.dart';
-export "src/flutter/test/af_state_test.dart";
 export 'src/flutter/test/af_state_test_main.dart';
 export "src/flutter/test/af_test_data_registry.dart";
 export "src/flutter/test/af_test_main.dart";

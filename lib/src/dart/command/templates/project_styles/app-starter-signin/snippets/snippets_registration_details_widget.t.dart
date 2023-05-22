@@ -204,7 +204,7 @@ rows.add(t.childMargin(
     wid: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textFirstName,
     parentParam: context.p,
     expectedText: context.p.user.firstName,
-    style: styleText.bodyText2,
+    style: styleText.bodyMedium,
     decoration: t.decorationTextInput(
       text: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textFirstName,
       colorForeground: colorFore,
@@ -220,7 +220,7 @@ rows.add(t.childMargin(
     wid: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textLastName,
     parentParam: context.p,
     expectedText: context.p.user.lastName,
-    style: styleText.bodyText2,
+    style: styleText.bodyMedium,
     decoration: t.decorationTextInput(
       text: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textLastName,
       colorForeground: colorFore,
@@ -236,7 +236,7 @@ rows.add(t.childMargin(
     wid: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textZipCode,
     parentParam: context.p,
     expectedText: context.p.user.zipCode,
-    style: styleText.bodyText2,
+    style: styleText.bodyMedium,
     decoration: t.decorationTextInput(
       text: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}WidgetID.textZipCode,
       colorForeground: colorFore,

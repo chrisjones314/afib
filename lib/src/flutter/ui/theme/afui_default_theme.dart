@@ -65,7 +65,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
       margin: margin,
         padding: padding.standard,
         child: Row(
-          children: [childText(text: title, style: styleOnPrimary.subtitle1)],
+          children: [childText(text: title, style: styleOnPrimary.titleMedium)],
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(topLeft: radius, topRight: radius),

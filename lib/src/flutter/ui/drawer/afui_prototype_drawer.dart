@@ -244,7 +244,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
       margin: t.margin.v.s3,
       child: t.childText(
         text: "AFib Prototype",
-        style: t.styleOnPrimary.headline6
+        style: t.styleOnPrimary.titleLarge
       )
     ));
 
@@ -252,7 +252,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
       margin: t.margin.v.s3,
       child: t.childText(
           text: context.s.prototype?.id.toString(), 
-          style: t.styleOnPrimary.bodyText2,
+          style: t.styleOnPrimary.bodyMedium,
           overflow: TextOverflow.ellipsis,
       )
     ));

@@ -1929,10 +1929,10 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
     return childRichTextBuilder(
       wid: wid,
-      styleNormal: styleOnCard.bodyText2,
-      styleBold: styleOnCard.bodyText1,
-      styleTapable: styleOnCard.bodyText2?.copyWith(color: colorTapableText),
-      styleMuted: styleOnCard.bodyText2,
+      styleNormal: styleOnCard.bodyMedium,
+      styleBold: styleOnCard.bodyLarge,
+      styleTapable: styleOnCard.bodyMedium?.copyWith(color: colorTapableText),
+      styleMuted: styleOnCard.bodyMedium,
     );
   }
 
@@ -2114,7 +2114,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     required bool isSel, 
     required AFPressedDelegate onPressed
   }) {
-    final style = isSel ? styleOnPrimary.bodyText1 : styleOnPrimary.bodyText2;
+    final style = isSel ? styleOnPrimary.bodyLarge : styleOnPrimary.bodyMedium;
     final colorButton = isSel ? colorPrimaryDarker : colorPrimary;
     final buttonStyle = TextButton.styleFrom(
       backgroundColor: colorButton,
@@ -2134,7 +2134,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     required bool isSel, 
     required AFPressedDelegate onPressed
   }) {
-    final style = isSel ? styleOnPrimary.bodyText1 : styleOnPrimary.bodyText2;
+    final style = isSel ? styleOnPrimary.bodyLarge : styleOnPrimary.bodyMedium;
     final colorButton = isSel ? colorPrimaryDarker : colorPrimary;
     final buttonStyle = TextButton.styleFrom(
       backgroundColor: colorButton,
@@ -2746,7 +2746,10 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   /// You might prefer [AFStateProgrammingInterface.showSnackbarText].  This is just
   /// a one line call to that method for discoverability.
   void showSnackbarText(AFStateProgrammingInterface spi, String text) {
-    spi.context.showSnackbarText(text);
+    spi.context.showSnackbarText(
+        themeOrId: spi.t,
+        text: text
+    );
   }
 
   /// See [AFStateProgrammingInterface.showDialogAFib], this is just a one line call to that method

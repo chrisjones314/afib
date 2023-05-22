@@ -16,7 +16,7 @@ rows.add(t.childCard(
   child: t.childMarginStandard(
     child: t.childText(text: "Startup Screen", 
       textAlign: TextAlign.center, 
-      style: t.styleOnCard.headline6)
+      style: t.styleOnCard.titleLarge)
   )
 ));
 return ListView(

@@ -19,7 +19,6 @@ import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/screen/afui_prototype_widget_screen.dart';
 import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
-import 'package:afib/src/flutter/utils/af_state_view.dart';
 import 'package:flutter/material.dart';
 
 /// Delegate used to populate the screen map used to associate keys with screens.

@@ -37,7 +37,7 @@ rows.add(AFUIAlphaWarningWidget());
 rows.add(t.childMarginStandard(
   child: t.childText(text: "Signed In", 
     textAlign: TextAlign.center, 
-    style: t.styleOnCard.headline6)
+    style: t.styleOnCard.titleLarge)
 ));
 
 final tableRows = t.columnTable();
@@ -143,7 +143,7 @@ TableRow _createDetailRow(HomePageScreenSPI spi, { required AFWidgetID wid, requ
     margin: t.margin.v.standard,
     child: t.childText(
       text: value, 
-      style: t.styleOnCard.bodyText1,
+      style: t.styleOnCard.bodyLarge,
       wid: wid
     )
   ));

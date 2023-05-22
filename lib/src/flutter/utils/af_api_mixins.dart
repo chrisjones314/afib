@@ -226,19 +226,6 @@ mixin AFStandardAPIContextMixin implements AFDispatcher {
     dispatcher.dispatch(action);
   }
 
-  //-------------------------------------------------------------------------------------
-  // access...
-  //-------------------------------------------------------------------------------------
-  /*
-  TTheme accessTheme<TTheme extends AFFunctionalTheme>(AFThemeID themeId) {
-    final theme = _publicState.themes.findById(themeId);
-    if(theme == null) {
-      throw AFException("Unknown theme $themeId");
-    }
-    return theme as TTheme;
-  }
-  */
-
   TLPI accessLPI<TLPI extends AFLibraryProgrammingInterface>(AFLibraryProgrammingInterfaceID id) {
     final lpi = AFibF.g.createLPI(id, dispatcher, targetStore);
     return lpi as TLPI;
@@ -601,8 +588,8 @@ mixin AFContextShowMixin {
 
   void showDialogInfoText({
     required Object themeOrId,
-    required String title,
-    String? body,
+    required Object title,
+    Object? body,
     List<String>? buttonTitles,   
     void Function(int)? onReturn
   }) {
@@ -618,8 +605,8 @@ mixin AFContextShowMixin {
 
   void showDialogWarningText({
     required Object themeOrId,
-    required String title,
-    String? body,
+    required Object title,
+    Object? body,
     List<String>? buttonTitles,   
     void Function(int)? onReturn
   }) {
@@ -635,8 +622,8 @@ mixin AFContextShowMixin {
 
   void showDialogErrorText({
     required Object themeOrId,
-    required String title,
-    String? body,
+    required Object title,
+    Object? body,
     List<String>? buttonTitles,   
     void Function(int)? onReturn
   }) {
@@ -684,8 +671,8 @@ mixin AFContextShowMixin {
   void showDialogChoiceText({
     required Object themeOrId,
     AFUIStandardChoiceDialogIcon icon = AFUIStandardChoiceDialogIcon.question,
-    required String title,
-    String? body,
+    required Object title,
+    Object? body,
     required List<String>? buttonTitles,   
     void Function(int)? onReturn
   }) {
@@ -739,11 +726,11 @@ mixin AFContextShowMixin {
   void showInAppNotificationText({
     required Object themeOrId,
     VoidCallback? onAction,
-    String? actionText,
+    Object? actionText,
     Color? colorBackground,
     Color? colorForeground,
-    required String title,
-    String? body,
+    required Object title,
+    Object? body,
     Duration? duration,
     NotificationPosition position = NotificationPosition.top,
   }) {
@@ -830,10 +817,18 @@ mixin AFContextShowMixin {
   /// Shows a snackbar containing the specified [text].   
   /// 
   /// See also [showSnackbarText]
-  void showSnackbarText(String text, { Duration duration = const Duration(seconds: 2)}) {
+  void showSnackbarText({ 
+    required Object themeOrId,
+    required Object text, 
+    Duration duration = const Duration(seconds: 2)
+  }) {
+    var themeActual = _findTheme(themeOrId);        
     final ctx = flutterContext;
     if(ctx != null) {
-      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(text), duration: duration));
+      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+        content: themeActual.childText(text: text), 
+        duration: duration
+      ));
     }
   }
 

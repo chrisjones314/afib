@@ -37,7 +37,7 @@ $optionsHeader
     AFConfigCommand.writeUpdatedConfig(ctx);
     ctx.generator.finalizeAndWriteFiles(ctx);
       
-    Process.start('flutter', ['test', AFProjectPaths.relativePathFor(AFProjectPaths.afTestPath)]).then((process) {
+    await Process.start('flutter', ['test', AFProjectPaths.relativePathFor(AFProjectPaths.afTestPath)]).then((process) {
       stdout.addStream(process.stdout);
       stderr.addStream(process.stderr);      
     });

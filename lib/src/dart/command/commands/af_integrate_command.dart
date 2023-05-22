@@ -173,7 +173,7 @@ $optionsHeader
       throw AFCommandError(error: "The file ${pathPubspec.last} must exist in the folder from which you are running this command");
     }
 
-    final filePubspec = generator.modifyFile(ctx, pathPubspec);
+    final filePubspec = generator.readFile(ctx, pathPubspec);
     final pubspec = filePubspec.loadPubspec();
 
     final import = pubspec.dependencies[packageName];

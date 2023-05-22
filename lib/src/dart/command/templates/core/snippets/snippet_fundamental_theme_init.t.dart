@@ -76,11 +76,11 @@ class SnippetFundamentalThemeInitT extends AFSnippetSourceTemplate {
   const origLight = Typography.blackCupertino;
 
   final themeDark = origDark.copyWith(
-    bodyText1: origDark.bodyText1?.copyWith(fontWeight: FontWeight.bold)
+    bodyLarge: origDark.bodyLarge?.copyWith(fontWeight: FontWeight.bold)
   );
 
   final themeLight = origLight.copyWith(
-    bodyText1: origLight.bodyText1?.copyWith(fontWeight: FontWeight.bold)
+    bodyLarge: origLight.bodyLarge?.copyWith(fontWeight: FontWeight.bold)
   );
 
   primary.setFlutterFundamentals(

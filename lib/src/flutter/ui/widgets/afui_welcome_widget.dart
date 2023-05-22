@@ -1,5 +1,4 @@
 
-import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
@@ -86,24 +85,24 @@ class AFUIWelcomeWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, AFUIDe
     final rowsCentered = t.column();
     rowsCentered.add(t.childMargin(
       margin: t.margin.b.size5,
-      child: t.childText(text: "Welcome to AFib!", style: t.styleOnCard.bodyText1)
+      child: t.childText(text: "Welcome to AFib!", style: t.styleOnCard.bodyLarge)
     ));
-    rowsCentered.add(Text("See", style: t.styleOnCard.bodyText2));
+    rowsCentered.add(Text("See", style: t.styleOnCard.bodyMedium));
     rowsCentered.add(t.childMargin(
       margin: t.margin.v.standard,
-      child: t.childText(text: "afibframework.io", style: t.styleOnCard.headline6)
+      child: t.childText(text: "afibframework.io", style: t.styleOnCard.titleLarge)
     ));
     rowsCentered.add(t.childMargin(
       margin: t.margin.b.s5,
-      child: Text("for tutorials and documentation.", style: t.styleOnCard.bodyText2)
+      child: Text("for tutorials and documentation.", style: t.styleOnCard.bodyMedium)
     ));
 
-    rowsCentered.add(t.childText(text: "Try changing to ", style: t.styleOnCard.bodyText2));
-    rowsCentered.add(t.childMarginStandard(child: t.childText(text: "AFEnvironment.prototype", style: t.styleOnCard.bodyText1)));
-    rowsCentered.add(t.childText(text: "in", style: t.styleOnCard.bodyText2));
-    rowsCentered.add(t.childMarginStandard(child: t.childText(text: "${AFibD.config.appNamespace}_config.g.dart", style: t.styleOnCard.bodyText1)));
+    rowsCentered.add(t.childText(text: "Try changing to ", style: t.styleOnCard.bodyMedium));
+    rowsCentered.add(t.childMarginStandard(child: t.childText(text: "AFEnvironment.prototype", style: t.styleOnCard.bodyLarge)));
+    rowsCentered.add(t.childText(text: "in", style: t.styleOnCard.bodyMedium));
+    rowsCentered.add(t.childMarginStandard(child: t.childText(text: "${AFibD.config.appNamespace}_config.g.dart", style: t.styleOnCard.bodyLarge)));
     
-    rowsCentered.add(t.childText(text: "to use prototype mode.", style: t.styleOnCard.bodyText2));
+    rowsCentered.add(t.childText(text: "to use prototype mode.", style: t.styleOnCard.bodyMedium));
 
     final rows = t.column();
     rows.add(AFUIAlphaWarningWidget());

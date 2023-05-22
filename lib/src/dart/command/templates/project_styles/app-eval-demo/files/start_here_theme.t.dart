@@ -47,7 +47,7 @@ void buildCardHeader({
 }) {
   rows.add(childMargin(
     margin: margin.b.standard,
-    child: childText(text: title, style: styleOnCard.bodyText1)
+    child: childText(text: title, style: styleOnCard.bodyLarge)
   ));
 
   if(subtitle != null) {

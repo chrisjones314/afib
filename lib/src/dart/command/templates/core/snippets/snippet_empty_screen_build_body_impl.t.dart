@@ -11,7 +11,7 @@ rows.add(t.childCard(
   child: t.childMarginStandard(
     child: t.childText(text: "${AFSourceTemplate.insertMainTypeInsertion.spaces}", 
       textAlign: TextAlign.center, 
-      style: t.styleOnCard.headline6
+      style: t.styleOnCard.titleLarge
     )
   )
 ));

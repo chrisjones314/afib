@@ -11,6 +11,7 @@ class StarterSigninT extends AFProjectStyleSourceTemplate {
 --override-templates +
   +core/snippets/fundamental_theme_init=project_styles/app-starter-signin/snippets/fundamental_theme_init
   +core/files/define_core=project_styles/app-starter-signin/files/define_core
+require "meta, afib, afib_signin"
 import project_styles/app-starter-signin-shared
 generate ui StartupScreen --no-back-button --override-templates +
   +core/snippets/empty_screen_build_body_impl=core/snippets/snippet_startup_screen_complete_project_style

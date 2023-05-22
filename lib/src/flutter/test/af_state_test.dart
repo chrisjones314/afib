@@ -421,6 +421,24 @@ class _AFStateRegisterFixedResultStatement<TQuery extends AFAsyncQuery> extends 
   }
 }
 
+class _AFStateRegisterFixedErrorStatement<TQuery extends AFAsyncQuery> extends _AFStateTestDefinitionStatement {
+  final Object querySpecifier;
+  final AFStateTestDefinitionContext definitions;
+  final AFQueryError error;
+
+  _AFStateRegisterFixedErrorStatement(this.querySpecifier, this.definitions, this.error);
+
+  void execute(AFStateTestContext context) {
+    final test = context.test;
+    test.registerResult<TQuery>(querySpecifier, (context, query) {
+      query.testFinishAsyncWithError(context, error);
+      return error;
+    });
+
+  }
+}
+
+
 class _AFStateRegisterDynamicResultStatement<TQuery extends AFAsyncQuery> extends _AFStateTestDefinitionStatement {
   final Object querySpecifier;
   final AFCreateQueryResultDelegate<TQuery> delegate;
@@ -864,6 +882,12 @@ class AFSpecificStateTestDefinitionContext {
     assert(TQuery != AFAsyncQuery, errSpecifyTypeParameter);
 
     test.defineQueryResponse<TQuery>(querySpecifier ?? TQuery, definitions, idData);
+  }
+
+  void defineQueryResponseError<TQuery extends AFAsyncQuery>(AFQueryError error, { Object? querySpecifier }) {
+    assert(TQuery != AFAsyncQuery, errSpecifyTypeParameter);
+
+    test.defineQueryResponseError<TQuery>(querySpecifier ?? TQuery, definitions, error);
   }
 
   void defineQueryResponseNone<TQuery extends AFAsyncQuery>({ Object? querySpecifier }) {
@@ -1311,6 +1335,10 @@ class AFStateTest extends AFScreenTestDescription {
   /// 
   void defineQueryResponse<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFStateTestDefinitionContext definitions, dynamic idData) {
     currentStatements.addDefinitionStatement(_AFStateRegisterFixedResultStatement<TQuery>(querySpecifier, definitions, idData), hasExecutionStatements: currentStatements.hasExecutionStatements);
+  }
+
+  void defineQueryResponseError<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFStateTestDefinitionContext definitions, AFQueryError error) {
+    currentStatements.addDefinitionStatement(_AFStateRegisterFixedErrorStatement<TQuery>(querySpecifier, definitions, error), hasExecutionStatements: currentStatements.hasExecutionStatements);
   }
 
   void defineQueryResponseNone<TQuery extends AFAsyncQuery>(dynamic querySpecifier, AFStateTestDefinitionContext definitions) {

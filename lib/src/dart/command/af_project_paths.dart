@@ -64,8 +64,8 @@ class AFProjectPaths {
 
   static String generatePathFor(List<String> projectPath) {
     final subpath = generateFolderFor(projectPath);
-    final current = Directory.current;      
-    final projectRoot = split(current.path);
+    final current = AFibD.currentWorkingDirectory;      
+    final projectRoot = split(current);
     final projectRootFolders = List<String>.from(projectRoot);
     projectRootFolders.addAll(subpath);
     return joinAll(projectRootFolders);
@@ -91,8 +91,8 @@ class AFProjectPaths {
   }
 
   static String createLibraryFriendlyPathFor(List<String> relativeFolder) {
-    final current = Directory.current;  
-    final projectRoot = split(current.path);
+    final current = AFibD.currentWorkingDirectory;
+    final projectRoot = split(current);
     final projectRootFolders = List<String>.from(projectRoot);
     final relativeSrcFolder = List<String>.from(relativeFolder);        
     /*

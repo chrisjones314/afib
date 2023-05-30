@@ -5,7 +5,7 @@ import 'package:afib/src/dart/utils/af_dart_params.dart';
 void main(List<String> argsIn) {  
   final emptyParams = AFDartParams.createEmpty();
   final argsFull = AFArgs.create(argsIn);
-  //argsFull.setDebugArgs("create app --package-name warning_test --package-code wt --project-style app-starter-signin-firebase");
+  argsFull.setDebugArgs("create app --package-name warning_test --package-code wt --project-style app-starter-minimal --cwd /Users/chrisjones/projects/afib/temp/warning_test");
   
   afBootstrapCommandMain(emptyParams, argsFull);
 }

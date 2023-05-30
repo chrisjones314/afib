@@ -104,6 +104,7 @@ abstract class AFCommand {
   static const optionPrefix = "--";
   static const argPrivate = "private";
   static const argPrivateOptionHelp = "--${AFCommand.argPrivate} - if specified for a library, does not export the generated class via [YourAppNamespace]_flutter.dart";
+  static const argCurrentWorkingDirectory = "cwd";
   
   
   final subcommands = <String, AFCommand>{};

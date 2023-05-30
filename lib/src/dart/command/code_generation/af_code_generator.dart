@@ -898,10 +898,6 @@ class AFCodeGenerator {
   AFGeneratedFile loadFile(AFCommandContext context, List<String> path, {
     bool forModify = true
   }) {
-    if(path.contains("pubspec.yaml")) {
-      int i = 0;
-      i++;
-    }
     final key = _keyForPath(path);
     final inMem = _findInMemory(key);
     if(inMem != null) {

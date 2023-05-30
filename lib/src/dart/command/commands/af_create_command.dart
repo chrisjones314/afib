@@ -197,9 +197,12 @@ Project Styles
       argProjectStyle: "",
       argPackageName: "",
       argPackageCode: "",
+      AFCommand.argCurrentWorkingDirectory: "",
     });
     final kind = args.accessUnnamedFirst;
     verifyOneOf(kind, [kindApp, kindUILibrary, kindStateLibrary]);
+
+    AFibD.establishCurrentWorkingDirectory(args.accessNamed(AFCommand.argCurrentWorkingDirectory));
 
     AFibD.config.setIsLibraryCommand(isLib: kind != kindApp);
     final packageName = args.accessNamed(argPackageName);

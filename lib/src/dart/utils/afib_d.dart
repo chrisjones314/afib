@@ -3,6 +3,7 @@ import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/flutter/utils/af_log_printer.dart';
 import 'package:collection/collection.dart';
 import 'package:logger/logger.dart';
+import 'dart:io';
 
 class AFibD<AppState> {
     static final AFConfig _afConfig = AFConfig();
@@ -11,6 +12,7 @@ class AFibD<AppState> {
     static final libraries = <AFLibraryID>[];
     static final logs = <String, Logger>{};
     static final codeGenerationOverrides = <AFSourceTemplateInsertion, Object>{};
+    static String? cwd;
     
     /// Register an entry in the configuration file.
     static void registerConfigEntry(AFConfigurationItem entry) {
@@ -21,6 +23,20 @@ class AFibD<AppState> {
       if(!libraries.contains(id)) {
         libraries.add(id);
       }
+    }
+
+    static void setCurrentWorkingDirectory(String current) {
+      cwd = current;
+    }
+
+    static void establishCurrentWorkingDirectory(String proposed) {
+      if(proposed.isNotEmpty) {
+        cwd = proposed;
+      }
+    }
+
+    static String get currentWorkingDirectory {
+      return cwd ?? Directory.current.path;
     }
 
     static AFLibraryID? findLibraryWithPrefix(String prefix) {

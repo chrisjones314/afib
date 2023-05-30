@@ -86,7 +86,7 @@ class AFUITextField extends StatelessWidget {
     assert(textController?.controller != null);
     if(expectedText != null) {
       assert(textController?.text == expectedText, '''The text value in the text controller was different from the value you passed into 
-  childTextField was different from the value in the text controller for $wid ('$expectedText' != '${textController?.text})'.  This can happen if you
+  childTextField was different from the value in the text controller for $wid ('$expectedText' != '${textController?.text}').  This can happen if you
   normalize or change the value of the text field in your code.  It can also happen in state testing, when you call methods that update the 
   value that would be in a text field.  In either case, you can resolve the problem by calling AFTextControllersHolder.update in the method
   of your SPI that is called with the normalized value, or that is called from the test.  That method is idempotent, it does nothing if called

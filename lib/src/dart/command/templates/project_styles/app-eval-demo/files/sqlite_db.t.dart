@@ -28,6 +28,12 @@ class ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB {
     return result.db;
   }
 
+  static Map<String, dynamic> toColumnMap(sql.Row row) {
+    final result = <String, dynamic>{};
+    row.forEach((key, value) { result[key] = value; });
+    return result;
+  }
+
   static Future<${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB> access() async {
 
     final dir = await getApplicationDocumentsDirectory();

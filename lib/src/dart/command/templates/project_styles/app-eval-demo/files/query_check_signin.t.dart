@@ -38,15 +38,8 @@ if(signedIn.isEmpty) {
   context.onError(AFQueryError(message: "Error: No signed in user?"));
 } else {
   final row = signedIn.first;
-  final entries = row.toTableColumnMap();
-  if(entries == null) {
-    throw AFException("No table column map?");
-  }
-  final values = entries[UserCredentialRoot.tableName];
-  if(values == null) {
-    throw AFException("No users table?");
-  }
-  final id = values[UserCredentialRoot.colUserId].toString();
+  final entries = EXTESqliteDB.toColumnMap(row);
+  final id = entries[UserCredentialRoot.colUserId].toString();
 
   context.onSuccess(UserCredentialRoot(
     userId: id.toString(),

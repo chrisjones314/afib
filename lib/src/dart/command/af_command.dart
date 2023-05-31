@@ -1344,7 +1344,7 @@ class AFCommandContext {
     }
     
 
-    final sourcePath = joinAll(sourceTemplate);
+    final sourcePath = sourceTemplate.join("/");
     var result = found[sourcePath];
     if(result == null) {
       result = globalTemplateOverrides[sourcePath];

@@ -16,6 +16,7 @@ class ModelCountHistoryRootT extends ModelExampleStartHereT {
       AFSourceTemplate.insertExtraImportsInsertion: '''
 import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/count_history_item.dart';
 import 'package:sqlite3/sqlite3.dart' as sql;
+import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSourceTemplate.insertAppNamespaceInsertion}_sqlite_db.dart';
 ''',
       AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 int get totalCount {
@@ -30,16 +31,8 @@ static CountHistoryItemsRoot fromDB(sql.ResultSet results) {
   final history = <String, CountHistoryItem>{};
 
   for(final row in results) {
-    final entries = row.toTableColumnMap();
-    if(entries == null) {
-      throw AFException("No table column map?");
-    }
-    final values = entries[CountHistoryItem.tableName];
-    if(values == null) {
-      throw AFException("No users table?");
-    }
-
-    final entry = CountHistoryItem.serializeFromMap(values);
+    final entries = EXTESqliteDB.toColumnMap(row);
+    final entry = CountHistoryItem.serializeFromMap(entries);
     history[entry.id] = entry;
   }
 

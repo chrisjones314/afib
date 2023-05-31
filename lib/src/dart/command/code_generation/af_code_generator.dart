@@ -734,7 +734,7 @@ class AFCodeGenerator {
 
   void writeJsonFileSync(AFCommandContext context, List<String> projectPath, Map<String, Object> json) {
     final generatedPath = projectPath.join(Platform.pathSeparator);
-    final file = File(generatedPath);
+    final file = File("${AFibD.currentWorkingDirectory}${Platform.pathSeparator}${generatedPath}");
     final encoded = jsonEncode(json);
     file.writeAsStringSync(encoded);
   }
@@ -781,7 +781,11 @@ class AFCodeGenerator {
       template = templates.find(templateOrId);
     }
     
-    if(action == AFGeneratedFileAction.create && AFProjectPaths.projectFileExists(projectPath) && !isRenamed(projectPath) && !context.isForceOverwrite) {
+    if(action == AFGeneratedFileAction.create && 
+      AFProjectPaths.projectFileExists(projectPath) && 
+      !isRenamed(projectPath) && 
+      !context.isForceOverwrite && 
+      !context.isExportTemplates) {
       throw AFCommandError(error: "File at '${joinAll(projectPath)}' needs to be created, but already exists, delete or move it if you'd like to re-create it.");
     }
 
@@ -879,7 +883,7 @@ class AFCodeGenerator {
   }
 
   String _keyForPath(List<String> path) {
-    final key = path.join('/');
+    final key = path.join(Platform.pathSeparator);
     return key;
   }
 

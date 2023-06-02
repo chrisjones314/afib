@@ -17,6 +17,7 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_invoke_ini
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_serial_methods.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_standard_root_methods.t.dart';
 
+/// The class that handles 'generate state...'
 class AFGenerateStateSubcommand extends AFGenerateSubcommand {
   static const argNotSerial = "no-serial-methods";
   static const argNoReviseMethods = "no-revise-methods";

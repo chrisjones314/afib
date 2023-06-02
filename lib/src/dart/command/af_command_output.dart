@@ -6,7 +6,7 @@ enum AFOutputAlignment {
 }
 
 
-
+/// Defines properties of a column in the command output.
 class AFCommandOutputColumn {
   AFOutputAlignment alignment;
   Styles color;
@@ -96,7 +96,7 @@ class AFCommandOutput {
   }
 
   void writeTwoColumnsError({
-    String col1 = "error",
+    String col1 = "error ",
     required String col2, 
     int width1 = 15,
     int? width2,

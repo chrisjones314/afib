@@ -1,6 +1,8 @@
-/// AFib code used in the bin/XX_afib command in your project.
+/// AFib code used in the bin/xxx_afib.dart command for your project.
 /// 
-/// This code cannot pull in flutter/UI source.
+/// This code is separated out because it cannot reference flutter UI,
+/// or the command won't load properly.  When creating an AFib command,
+/// you should import this library, not afib_flutter.
 library afib_command;
 
 export 'afui_id.dart'; // ok

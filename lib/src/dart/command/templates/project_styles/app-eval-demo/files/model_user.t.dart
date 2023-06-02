@@ -40,7 +40,7 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/db/${AFSour
 ''', 
       additionalMethods: '''
 static User fromDB(sql.Row row) {
-  final entries = EXTESqliteDB.toColumnMap(row);
+  final entries = ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.toColumnMap(row);
   return User.serializeFromMap(entries);
 }
 ''',

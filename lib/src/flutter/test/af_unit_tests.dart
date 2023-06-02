@@ -1,5 +1,6 @@
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
+import 'package:afib/src/flutter/test/af_test_stats.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 
 
@@ -8,6 +9,11 @@ class AFUnitTestContext extends AFUnitTestExecute {
   AFUnitTestContext(this.test);
 
   AFBaseTestID get testID => this.test.id;
+
+  void finishAndUpdateStats(AFTestStats stats) {
+    stats.addPasses(errors.pass);
+    stats.addErrors(errors);
+  }
 
 }
 

@@ -4,12 +4,12 @@ import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
 
-void nullConfigFunction(AFConfig config) {}
+void _nullConfigFunction(AFConfig config) {}
 
 /// Application initialization parameters that do not depend on flutter.
 /// 
-/// It is important to keep flutter dependencies separate so this data
-/// can still be used from command-line executables.
+/// This data is available from both AFib's command-line commands and Flutter.
+/// You cannot import any Flutter UI into this class.
 @immutable
 class AFDartParams<AppState> {
   final AFInitConfigurationDelegate configureAfib;
@@ -38,12 +38,12 @@ class AFDartParams<AppState> {
 
   static AFDartParams createEmpty() {
     return AFDartParams(
-      configureAfib: nullConfigFunction,
-      configureAppConfig: nullConfigFunction,
-      configureDebugConfig: nullConfigFunction,
-      configureProductionConfig: nullConfigFunction,
-      condfigurePrototypeConfig: nullConfigFunction,
-      configureTestConfig: nullConfigFunction,
+      configureAfib: _nullConfigFunction,
+      configureAppConfig: _nullConfigFunction,
+      configureDebugConfig: _nullConfigFunction,
+      configureProductionConfig: _nullConfigFunction,
+      condfigurePrototypeConfig: _nullConfigFunction,
+      configureTestConfig: _nullConfigFunction,
     );
   }
 

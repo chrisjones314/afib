@@ -1,5 +1,5 @@
 
-/// Used for errors thrown by Afib.
+/// Thrown by AFib to indicate problems in runtime contexts.
 class AFException implements Exception {
   String cause;
   AFException(this.cause);
@@ -13,6 +13,10 @@ class AFException implements Exception {
   }
 }
 
+/// Used by AFib to stop a state test where it is.  
+/// 
+/// See [AFStateTestScreenContext.executeDebugStopHere] or 
+/// [AFStateTest.executeDebugStopHere].
 class AFExceptionStopHere extends AFException {
   AFExceptionStopHere(): super("debug stop here");
 }

@@ -5,8 +5,6 @@ library afib_flutter;
 
 export 'afui_id.dart';
 export 'locale_id.dart';
-export "src/dart/command/af_command.dart";
-export "src/dart/command/af_standard_commands.dart";
 export "src/dart/redux/actions/af_action_with_key.dart";
 export 'src/dart/redux/actions/af_always_fail_query.dart';
 export "src/dart/redux/actions/af_app_state_actions.dart";
@@ -24,13 +22,7 @@ export 'src/dart/redux/state/models/af_app_platform_info_state.dart';
 export "src/dart/redux/state/models/af_app_state.dart";
 export "src/dart/redux/state/models/af_route_state.dart";
 export 'src/dart/redux/state/models/af_theme_state.dart';
-export "src/dart/redux/state/models/af_time_state.dart";
-export "src/dart/utils/af_config.dart";  // ok
-export 'src/dart/utils/af_config_entries.dart'; // ok
-export 'src/dart/utils/af_document_id_generator.dart';
-export "src/dart/utils/af_exception.dart"; // ok
 export 'src/dart/utils/af_firestore_document.dart';
-export "src/dart/utils/af_id.dart";
 export 'src/dart/utils/af_library_programming_interface.dart';
 export "src/dart/utils/af_object_with_key.dart";
 export "src/dart/utils/af_query_error.dart";

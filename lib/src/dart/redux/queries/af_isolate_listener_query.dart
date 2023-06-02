@@ -1,5 +1,6 @@
 import 'dart:isolate';
 
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 
 class AFIsolateListenerExecutionContext<TMessage> {

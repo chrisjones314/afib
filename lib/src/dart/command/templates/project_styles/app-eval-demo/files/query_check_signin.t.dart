@@ -38,7 +38,7 @@ if(signedIn.isEmpty) {
   context.onError(AFQueryError(message: "Error: No signed in user?"));
 } else {
   final row = signedIn.first;
-  final entries = EXTESqliteDB.toColumnMap(row);
+  final entries = ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.toColumnMap(row);
   final id = entries[UserCredentialRoot.colUserId].toString();
 
   context.onSuccess(UserCredentialRoot(

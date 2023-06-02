@@ -5,6 +5,7 @@ import 'package:afib/src/dart/command/templates/af_code_regexp.dart';
 import 'package:afib/src/dart/command/templates/core/files/command.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_define_command.t.dart';
 
+/// Superclass for generation subcommands.
 class AFGenerateCommandSubcommand extends AFGenerateSubcommand {
   AFGenerateCommandSubcommand();
   

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/actions/af_root_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
@@ -186,11 +187,6 @@ class AFibGlobalState {
   /// access this.  AFib's testing and prototyping systems sometimes operate in contexts
   /// with a specially modified store, without a store at all, or with a special dispatcher.  If you try to access
   /// the store directly, or dispatch actions on it directly, you will compromise these systems.   
-  /// 
-  /// If you need to dispatch an action, you should typically call [AFBuildContext.dispatch].
-  /// If you need access to items from your reduce state, you should typically override
-  /// [AFConnectedScreen.createStateView], [AFConnectedWidget.createStateView], or the same method
-  /// for dialogs, bottom sheets, etc.
   AFStore get internalOnlyActiveStore {
     return internalOnlyStoreEntry(activeConceptualStore).store!;
   }
@@ -777,9 +773,6 @@ class AFibGlobalState {
   }
 
   /// Used internally by the framework.
-  /// 
-  /// If you'd like to dispatch a startup action, see [AFAppExtensionContext.installCoreApp]
-  /// or [AFAppExtensionContext.addStartupAction]
   void dispatchStartupQueries(AFDispatcher dispatcher) {
     final queries = createStartupQueries();
     for(final query in queries) {
@@ -927,8 +920,7 @@ class AFibGlobalState {
     return found.id;
   }
 
-  /// Called internally when a query finishes successfully, see [AFFlutterParams.querySuccessDelegate] 
-  /// to listen for query success.
+  /// Called internally when a query finishes successfully.
   void onQuerySuccess(AFAsyncQuery query, AFFinishQuerySuccessContext successContext) {
     coreDefinitions.updateQueryListeners(query, successContext);
   }

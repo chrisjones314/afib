@@ -280,8 +280,8 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
     }
   }
 
-  /// The default implementation calls the error handler passed in to 
-  /// [installCoreLibrary] in extend_app.dart
+  /// The default implementation calls the error handler specified
+  /// in your xxx_define_core.dart file.
   void finishAsyncWithError(AFFinishQueryErrorContext context) {
     if(onError == null) {
       AFibF.g.finishAsyncWithError(context);
@@ -291,8 +291,8 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
   /// Called at the start of an asynchronous process, starts the query using data from the
   /// command. 
   /// 
-  /// The implementation should call either [AFStartQueryContext.onResponse] or [AFStartQueryContext.onError], which will in turn
-  /// call [finishAsyncWithResult] or [finishAsyncWithError].
+  /// The implementation should call either [AFStartQueryContext.onSuccess] or [AFStartQueryContext.onError], which will in turn
+  /// call [finishAsyncWithResponse] or [finishAsyncWithError].
   void startAsync(AFStartQueryContext<TResponse> context);
 
   /// Called when the asynchronous process completes with a response  It should merge the results 
@@ -538,9 +538,9 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
 /// A version of [AFAsyncQuery] for queries that have some kind of ongoing
 /// connection or state that needs to be shutdown.  
 /// 
-/// Afib will automatically track these queries when you dispatch them.  You can dispatch the
-/// [AFShutdownQueryListeners] action to call the shutdown method on some or all outstanding
-/// listeners.  
+/// Afib will automatically track these queries when you dispatch them.  You can use 
+/// [AFStandardAPIContextMixin.executeShutdownAllActiveQueries] or [AFStandardAPIContextMixin.executeShutdownListenerQuery]
+/// to shut them down.
 abstract class AFAsyncListenerQuery<TResponse> extends AFAsyncQuery<TResponse> implements AFTrackedQuery {
   AFAsyncListenerQuery({
     AFID? id, 

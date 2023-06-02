@@ -3,6 +3,7 @@
 import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 
+/// Any class that ends in "T" is a source template used in code generation.
 class ModelT extends AFFileSourceTemplate {
   static const templateIdModel = "model";
   static const templateIdModelRoot = "model_root";

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/flutter/ui/dialog/afui_standard_notification.dart';
 import 'package:afib/src/flutter/ui/screen/afui_demo_mode_transition_screen.dart';
@@ -999,9 +1000,10 @@ mixin AFContextShowMixin {
   /// You may optionally specify the optional screenId (which must match the screen id of the drawer
   /// you specified to the scaffold) and param.   The route parameter for a drawer is stored in the global
   /// pool.    The first time your drawer is shown, it will use the [param] you pass to this function, or if you omit it,
-  /// then your [AFConnectedDrawer.createDefaultRouteParam]
+  /// then your [AFDrawerConfig.createDefaultRouteParam]
   /// method will be called to create it the very first time the drawer is shown.  Subsequently, it will
-  /// use the param you pass to this function, or if you omit it, the value that is already in the global route pool.
+  /// use the param you pass to this function, or if you omit it, the value that is already in the global route pool.  
+  /// 
   void showLeftSideDrawer({
     AFNavigatePushAction? navigate
   }) {

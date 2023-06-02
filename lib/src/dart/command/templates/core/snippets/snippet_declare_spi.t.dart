@@ -4,6 +4,7 @@ import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
 
+/// Any class that ends in "T" is a source template used in code generation.
 class SnippetDeclareSPIT extends AFSnippetSourceTemplate {
   static const insertSPIResolveMethods = AFSourceTemplateInsertion("spi_resolve_methods");
   static const insertSPIOnUpdateMethods = AFSourceTemplateInsertion("spi_on_update_methods");

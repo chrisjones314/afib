@@ -1,3 +1,4 @@
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/actions/af_theme_actions.dart';
@@ -627,30 +628,13 @@ abstract class AFConnectedWidget<TState extends AFComponentState, TTheme extends
 /// Use this to connect a drawer to the store.
 /// 
 /// Drawers are special because the user can drag in from the left or right to open them.
-/// Consequently, you will need to override [AFConnectedScreenWithGlobalParam.createDefaultRouteParam],
-/// which will be used to create your route parameter if the drawer was dragged onto the
-/// screen without you explicitly calling [AFBuildContext.showLeftSideDrawer].
+/// Consequently, AFib creates a default version of their route parameter in the global state, 
+/// which is used if the drawer is dragged onto the screen.
 abstract class AFConnectedDrawer<TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFScreenStateProgrammingInterface> extends AFConnectedScreen<TState, TTheme, TStateView, TRouteParam, TSPI> {
   AFConnectedDrawer({
     required AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> config,
     required AFScreenID screenId,
   }): super(config: config, screenId: screenId, launchParam: null);
-
-  /*
-  /// Look for this screens route parameter in the global pool, 
-  /// rather than in the navigational hierarchy.
-  @override
-  AFRouteSegment? findRouteSegment(AFState state) {
-    var current = super.findRouteSegment(state);
-    // Note that because the user can slide a drawer on screen without the
-    // application explictly opening it, we need to have the drawer create a default
-    // route parameter if one does not already exist. 
-    if(current == null) {
-      current = AFRouteSegment(param: createDefaultRouteParam(state), children: null, createDefaultChildParam: null);
-    }
-    return current;
-  }
-  */
 
 }
 
@@ -667,8 +651,7 @@ abstract class AFConnectedDialog<TState extends AFComponentState, TTheme extends
 
 /// Use this to connect a bottom sheet to the store.
 /// 
-/// You can open a bottom sheet with [AFBuildContext.showBottomSheet]
-/// or [AFBuildContext.showModalBottomSheeet].
+/// You can open a bottom sheet with [AFContextShowMixin.showBottomSheet]
 abstract class AFConnectedBottomSheet<TState extends AFComponentState, TTheme extends AFFunctionalTheme, TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam, TSPI extends AFBottomSheetStateProgrammingInterface> extends AFConnectedScreen<TState, TTheme, TStateView, TRouteParam, TSPI> {
   AFConnectedBottomSheet({
     required AFConnectedUIConfig<TState, TTheme, TStateView, TRouteParam, TSPI> config,

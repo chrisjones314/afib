@@ -129,9 +129,9 @@ abstract class AFConfigurationItem {
   }
   
   void validateWithException(String value) {
-    final val = validate(value);
-    if(val != null) {
-      throw AFException("Invalid value $value for $name");
+    final err = validate(value);
+    if(err != null) {
+      throw AFException("Invalid value $value for $name: $err");
     }
   }
 }
@@ -272,7 +272,7 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
   }
 }
 
-
+/// A configuration item that is a string value.
 class AFConfigurationItemString extends AFConfigurationItem {
 
   AFConfigurationItemString({ 
@@ -306,6 +306,7 @@ class AFConfigurationItemString extends AFConfigurationItem {
 }
 
 
+/// A configuration item that is a boolean value.
 class AFConfigurationItemTrueFalse extends AFConfigurationItemOptionChoice {
 
   AFConfigurationItemTrueFalse({ 
@@ -336,6 +337,7 @@ class AFConfigurationItemTrueFalse extends AFConfigurationItemOptionChoice {
    
 }
 
+/// A configuration item that is an integer.
 class AFConfigurationItemInt extends AFConfigurationItem {
   final int min;
   final int max;
@@ -386,7 +388,7 @@ class AFConfigurationItemInt extends AFConfigurationItem {
    
 }
 
-
+/// Superclass for various configuration items that offer a set of options.
 class AFConfigurationItemOption extends AFConfigurationItem {
   static const optionLowercase = 1;
   static const optionIdentifier = 2;
@@ -443,13 +445,7 @@ class AFConfigurationItemOption extends AFConfigurationItem {
 }
 
 
-/// A config is used to agreggate, universal and environment specific configuration settings
-/// for use throughout your AFib app.
-/// 
-/// An Afib app combines the settings in config/application.dart with those in your current
-/// environment specific file (e.g. config/environments/production.dart).
-/// 
-/// All get methods return null if the key does not have a value. 
+/// Accessor for values in xxx_config.g.dart, accessible via [AFibD.config].
 class AFConfig {
   AFPrototypeID? startupWireframe;
   AFPrototypeID? startupScreenPrototype;

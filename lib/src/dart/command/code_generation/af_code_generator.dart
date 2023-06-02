@@ -20,6 +20,7 @@ import 'package:collection/collection.dart';
 import 'package:path/path.dart';
 import 'package:plural_noun/plural_noun.dart';
 
+/// Primary API for code generation, accessible via [AFCommandContext.generator]
 class AFCodeGenerator { 
   static const rootSuffix = "Root";
   static const stateViewSuffix = "StateView";
@@ -110,33 +111,40 @@ class AFCodeGenerator {
     required this.definitions
   });
 
+  /// The project path of the xxx_id.dart file.
   List<String> get pathIdFile { 
     final idFile = "${appNamespace}_id.dart";
     return [libFolder, idFile];
   }
 
+  /// The project path of the xxx_config.g.dart file.
   List<String> get pathAfibConfig {
     final filename = "${appNamespace}_config.g.dart";
     return _createPath(initializationPath, filename);
   }
 
+  /// The project code.
   String get appNamespace {
     return AFibD.config.appNamespace;
   }
 
+  /// The project code, uppercased
   String get appNamespaceUpper {
     return AFibD.config.appNamespace.toUpperCase();
   }
 
+  /// The path of the xxx_define_core.dart file.
   List<String> get pathDefineCore { 
     return _createPath(initializationPath, "${appNamespace}_define_core.dart");
   }
 
+  /// Converts pathTests("StateTest") to tests/state_tests.dart
   List<String> pathTests(String suffix) { 
     final suffixSnake = convertMixedToSnake("${suffix}s");
     return _createPath(testPath, "$suffixSnake.dart");
   }
 
+  /// Converts pathTest("MyStateTest", "StateTest") to tests/state_tests/my_state_test.dart.
   List<String> pathTest(String testName, String suffix) { 
     final filename = "${convertMixedToSnake(testName)}.dart";
     final suffixSnake = convertMixedToSnake("${suffix}s");
@@ -145,15 +153,18 @@ class AFCodeGenerator {
     return _createPath(fullPath, filename);
   }
 
+  /// path to the xxx_state_test_shortcuts.dart file.
   List<String> get pathStateTestShortcutsFile {
     return _createPath(testPath, "${appNamespace}_state_test_shortcuts.dart");
   }
 
+  /// Returns a path for the specified [uiName] and type.
   List<String> pathUI(String uiName, AFUIControlSettings control) {
     final filename = "${convertMixedToSnake(uiName)}.dart";
     return _createPath(control.path, filename);
   }
 
+  /// Returns a path for the specified model name, which will be under state/models, or state/roots if it ends in Root.
   List<String>? pathModel(String modelName) {
     if(modelName.contains(".")) {
       return null;
@@ -166,6 +177,9 @@ class AFCodeGenerator {
     return _createPath(path, filename);
   }
 
+  /// Given an class name, attempts to determine its correct path based on its suffix.
+  /// 
+  /// Defaults to state/models.
   List<String>? pathUnknown(String name) {
     if(name.endsWith(AFGenerateQuerySubcommand.suffixQuery)) {
       return pathQuery(name);
@@ -179,16 +193,21 @@ class AFCodeGenerator {
     return pathModel(name);
   }
 
+  /// Takes a file name, and returns a path under state/models.
   List<String> pathModelFile(String filename) {
     return _createPath(modelsPath, filename);
   }
 
+  /// Returns the path for an LPI class name.
+  /// 
+  /// If [isOverride], places it under overrides/lpis, otherwise unders state/lpis.
   List<String> pathLPI(String lpiName, { required bool isOverride}) {
     final shortened = removeSuffix(removePrefix(lpiName, appNamespaceUpper), "LPI");
     final filename = "${appNamespace}_${convertMixedToSnake(shortened)}_lpi.dart";
     return _createPath(isOverride ? lpisOverridePath : lpisPath, filename);
   }
 
+  /// Returns the path of a query class name.
   List<String> pathQuery(String modelName) {
     final filename = "${convertMixedToSnake(modelName)}.dart";
     var path = querySimplePath;
@@ -202,6 +221,7 @@ class AFCodeGenerator {
     return _createPath(path, filename);
   }
 
+  /// Returns the path of a state view class name.
   List<String>? pathStateView(String stateViewName) {
     final filename = _namedObjectToFilename(stateViewName, "StateView");
     if(filename == null) {
@@ -210,6 +230,7 @@ class AFCodeGenerator {
     return _createPath(stateViewsPath, filename);
   }
 
+  /// Ensures the specified folder exists, relative to the project root.
   void ensureFolderExists(List<String> path) {
 
     final modifiedPath = path.toList();
@@ -220,6 +241,9 @@ class AFCodeGenerator {
     ensuredFolders.add(modifiedPath);
   }
 
+  /// Returns the path for the theme class name.
+  /// 
+  /// If [isCustomParent], places it under overrides/themes, otherwise under ui/themes.
   List<String>? pathTheme(String themeName, { required bool isCustomParent }) {
     final filename = _namedObjectToFilename(themeName, "Theme");
     if(filename == null) {
@@ -229,6 +253,7 @@ class AFCodeGenerator {
     return _createPath(path, filename);
   }
 
+  /// Returns the path for the specified screen test class name.
   List<String> pathScreenTest(String screenName, AFUIControlSettings control) {
     final filename = "${convertMixedToSnake(screenName)}_tests.dart";
     return _createPath(control.prototypesPath, filename);
@@ -238,6 +263,7 @@ class AFCodeGenerator {
     return _createPath(testPath, uiPrototypesFilename);
   }
 
+  /// Returns the default name of the 'full login' state used by default in new UI prototypes.
   String get stateFullLoginID {
     return "${AFibD.config.appNamespace}StateFullLogin";
   }
@@ -257,6 +283,8 @@ class AFCodeGenerator {
     return "${ns}_${convertMixedToSnake(internal)}.dart";
   }
 
+  /// Returns the path of the xxx_connected_base file, which contains
+  /// superclasses and utilities associated 
   List<String> get pathConnectedBaseFile {
     final filename = "${AFibD.config.appNamespace}_connected_base.dart";
     return _createPath(uiPath, filename);
@@ -559,32 +587,8 @@ class AFCodeGenerator {
     return path;
   }
 
-  /*
-  void outputThreeColumns(AFCommandContext context, 
-    String col1,
-    String col2, 
-    String col3,
-  ) {
-    final output = context.output;
-    output.startColumn(
-      alignment: AFOutputAlignment.alignRight,
-      width: 15,
-      color: Styles.GREEN);
-    output.write(col1);
-    output.startColumn(
-      alignment: AFOutputAlignment.alignLeft
-    );
-    output.write(col2);
-
-    output.startColumn(
-      alignment: AFOutputAlignment.alignLeft,
-      width: 40,
-    );
-    output.write(col3);
-    output.endLine();
-  }
-  */
-
+  /// Used at the very end of a command to cleanup and write out all the files which 
+  /// were generated or modified.
   void finalizeAndWriteFiles(AFCommandContext context) {
     if(!context.isRootCommand) {
       return;
@@ -666,6 +670,7 @@ class AFCodeGenerator {
 
   } 
 
+  /// Renames an existing file with .old
   void renameExistingFileToOld(AFCommandContext context, List<String> projectPath) {
     if(!AFProjectPaths.projectFileExists(projectPath)) {
        throw AFCommandError(error: "Expected to find file at $projectPath but did not.");

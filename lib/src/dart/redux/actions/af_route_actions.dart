@@ -1,3 +1,4 @@
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/flutter/utils/af_api_mixins.dart';
 import 'package:flutter/widgets.dart';

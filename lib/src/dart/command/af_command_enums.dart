@@ -1,7 +1,7 @@
 
 import 'package:meta/meta.dart';
 
-/// Used in Afib.g.dart to specify the environment to run under.
+/// Used in xxx_config.g.dart to specify the environment to run under.
 enum AFEnvironment {
   /// Used for production builds.
   production,
@@ -51,6 +51,9 @@ enum AFFormFactor {
   largeTablet,
 }
 
+/// An attempt to create standardized sizes which can be used to differentiate rendering.
+/// 
+/// I am not sure this effort is really fully baked.  
 @immutable
 class AFFormFactorSize {
   static const idTabletLarge = 'tablet-large';

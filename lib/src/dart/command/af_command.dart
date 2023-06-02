@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
 import 'package:afib/src/dart/command/commands/af_create_command.dart';
@@ -9,6 +11,7 @@ import 'package:afib/src/dart/command/commands/af_generate_id_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_integrate_command.dart';
 import 'package:afib/src/dart/command/commands/af_require_command.dart';
+import 'package:afib/src/dart/command/commands/af_smoketest_command.dart';
 import 'package:afib/src/dart/command/commands/af_test_command.dart';
 import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/command/templates/af_template_registry.dart';
@@ -57,6 +60,9 @@ class AFItemWithNamespace {
 
 }
 
+/// Returned by [AFCommandContext.parseArguments], the best way to access arguments from a command.
+/// 
+/// Used [accessUnnamedFirst] and [accessNamed] to easily access command arguments.
 class AFCommandArgumentsParsed {
   static const argTrue = "true";
   static const argFalse = "false";
@@ -72,12 +78,16 @@ class AFCommandArgumentsParsed {
     return AFCommandArgumentsParsed(unnamed: <String>[], named: <String, String>{});
   }
 
+  /// Accesses the first unnamed argument, which would typically be a class name.
   String get accessUnnamedFirst => unnamed.first;
   String get accessUnnamedSecond => unnamed[1];
   String get accessUnnamedThird => unnamed[2];
+
+  /// Accesses a named argument.
   String accessNamed(String name, { String? defaultVal }) {
     final result = named[name];
     if(result == null) {
+      
       if(defaultVal != null) {
         return defaultVal;
       }
@@ -92,11 +102,11 @@ class AFCommandArgumentsParsed {
     }
   }
 
+  /// Returns true if the specified named argument does not have the 
+  /// String value "false".
   bool accessNamedFlag(String name) {
     return accessNamed(name, defaultVal: argFalse) != argFalse;
   }
-
-
 }
 
 /// Parent for commands executed through the afib command line app.
@@ -132,9 +142,6 @@ abstract class AFCommand {
   }
 
   /// Override this to implement the command.   The first item in the list is the command name.
-  /// 
-  /// [afibConfig] contains only the values from initialization/afib.g.dart, which can be 
-  /// manipulated from the command line.
   Future<void> run(AFCommandContext ctx) async {
     // make sure we are in the project root.
     if(!errorIfNotProjectRoot(ctx)) {
@@ -266,6 +273,9 @@ abstract class AFCommand {
   }
 }
 
+/// Utility which allows a command like 'generate' to have multiple subcommands.
+/// 
+/// e.g. 'generate ui', 'generate query', etc.
 abstract class AFCommandGroup extends AFCommand {
 
   @override 
@@ -288,7 +298,7 @@ Available subcommands
 
 }
 
-
+/// Utility used to encapsulate handling of the --member-variables and --resolve-variables flags.
 class AFMemberVariableTemplates {
   static const includeMemberVars = 0x01;
   static const includeResolveVars = 0x02;
@@ -799,16 +809,34 @@ class AFMemberVariableTemplates {
   }
 }
 
+/// The primary runtime context passed to a command during execution.
 class AFCommandContext {
+  static const pullDownArguments = <String>[
+      AFGenerateSubcommand.argExportTemplatesFlag,
+      AFRequireCommand.argAutoInstall,
+      AFRequireCommand.argLocalAFib,
+  ];
+  /// A list of parent commands, if this command was executed via [executeSubCommand]
   final List<AFCommandContext> parents;
-  final AFCommandAppExtensionContext definitions;
-  final AFCommandOutput output;
-  final AFCodeGenerator generator;
-  final args.ArgResults arguments;
-  String packagePath;
-  AFSourceTemplateInsertions coreInsertions;
-  Map<String, String> globalTemplateOverrides;
 
+  /// Definitions, notablly of commands themselves, and of registered source code templates.
+  final AFCommandAppExtensionContext definitions;
+
+  /// A utility for writing command line output.
+  final AFCommandOutput output;
+
+  /// The primary interface for code generation.
+  final AFCodeGenerator generator;
+
+  /// The arguments to the command, but use [parseArguments] for a higher level interface.
+  final args.ArgResults arguments;
+
+  String packagePath;
+
+  /// The baseline set of code insertions for this context.
+  AFSourceTemplateInsertions coreInsertions;
+
+  Map<String, String> globalTemplateOverrides;
   int commandArgCount = 1;
 
   AFCommandContext({
@@ -819,15 +847,19 @@ class AFCommandContext {
     required this.arguments,
     required this.packagePath,
     required this.coreInsertions,
-    required this.globalTemplateOverrides 
+    required this.globalTemplateOverrides,
   });
 
   bool get isRootCommand => parents.isEmpty;
 
+  /// Used to parse the command's arguments at a high-level.
+  /// 
+  /// [named] is a map from an argument to a default value for that argument.  Do not
+  /// prefix the argument name with '--'.
   AFCommandArgumentsParsed parseArguments({
     required AFCommand command,
     int unnamedCount = -1,
-    required Map<String, String?> named
+    required Map<String, String?> named,
   }) {
     final unnamed = <String>[];
     final allNamed = Map<String, String?>.from(named);
@@ -836,7 +868,8 @@ class AFCommandContext {
     allNamed[AFGenerateSubcommand.argOverrideTemplatesFlag] = "";
     allNamed[AFGenerateSubcommand.argForceOverwrite] = "";
 
-    final foundNamed = Map<String, String?>.from(named);
+    //final foundNamed = Map<String, String?>.from(named);
+    final foundNamed = <String, String?>{}; 
     foundNamed[AFCommand.argPrivate] = "false";
     final source = rawArgs;
 
@@ -858,6 +891,28 @@ class AFCommandContext {
       }
     }
 
+    for(final namedKey in pullDownArguments)  {
+      for(final parent in parents) {
+        final found = foundNamed[namedKey];
+        if(found != null) {
+          continue;
+        }
+
+        final parentVal = parent.findArgument("--$namedKey");
+        if(parentVal != null) {
+          foundNamed[namedKey] = parentVal.toString();
+          continue;          
+        }
+      }
+    }
+
+    for(final namedKey in named.keys) {
+      final found = foundNamed[namedKey];
+      if(found == null) {
+        foundNamed[namedKey] = named[namedKey];
+      }      
+    }
+
     final parsedArguments = AFCommandArgumentsParsed(
       named: foundNamed,
       unnamed: unnamed,
@@ -868,7 +923,7 @@ class AFCommandContext {
     }
 
     for(final foundKey in foundNamed.keys) {
-      if(!allNamed.containsKey(foundKey)) {
+      if(!allNamed.containsKey(foundKey) && !AFCommandContext.pullDownArguments.contains(foundKey)) {
         command.throwUsageError("Found unexpected option --$foundKey");
       }
     }
@@ -893,6 +948,7 @@ class AFCommandContext {
     return result;
   }
 
+  /// Utility for parsing the --member-variables and --resolve-variables flags, if present.
   AFMemberVariableTemplates? memberVariables(AFCommandContext context, AFCommandArgumentsParsed args, String mainType, {
     bool isAugment = false,
     bool? isIntIdOverride,
@@ -958,14 +1014,14 @@ class AFCommandContext {
     });
   }
 
+  /// Used to provide source template overrides at a global level.
   void setProjectStyleGlobalOverrides(String templateOverrides) {
     if(templateOverrides.isNotEmpty) {
       globalTemplateOverrides = _parseOverrides(templateOverrides);
     }
   }
 
-  
-
+  /// Used to provide source templates overrides at a global level.
   static String findProjectStyleGlobalOverrides(AFCommandContext context, List<String> rawLines) {
     var consolidated = AFCommandContext.consolidateProjectStyleLines(context, rawLines);
     if(consolidated.isNotEmpty && consolidated.first.startsWith("--${AFGenerateSubcommand.argOverrideTemplatesFlag}")) {
@@ -995,10 +1051,11 @@ class AFCommandContext {
       generator: generator, 
       arguments: argsParsed,
       coreInsertions: coreInsertions,
-      globalTemplateOverrides: globalTemplateOverrides ?? const <String, String>{}
+      globalTemplateOverrides: globalTemplateOverrides ?? const <String, String>{},
     );
   }
 
+  /// True if force override argument was specified.
   bool get isForceOverwrite {
     var overwrite = findArgument(AFGenerateSubcommand.argForceOverwrite);
     if(overwrite is bool) {
@@ -1007,6 +1064,9 @@ class AFCommandContext {
     return false;
   }
 
+  /// Used to execute a subcommand.
+  /// 
+  /// [cmd] is the string text of the command, just as you would type it on the command line.
   Future<void> executeSubCommand(String cmd, AFSourceTemplateInsertions? insertions) async {
     final arguments = AFArgs.createFromString(cmd);
     final revisedCommand = this.reviseWithArguments(
@@ -1018,6 +1078,7 @@ class AFCommandContext {
     await definitions.execute(revisedCommand);
   }
 
+  /// Loads the pubspec file for the current project.
   Pubspec loadPubspec( { String? packageName }) {
     final pathPubspec = generator.pathPubspecYaml;
     if(!generator.fileExists(pathPubspec)) {
@@ -1051,11 +1112,12 @@ class AFCommandContext {
       generator: this.generator,
       arguments: this.arguments,
       coreInsertions: revisedCore,   
-      globalTemplateOverrides: this.globalTemplateOverrides
+      globalTemplateOverrides: this.globalTemplateOverrides,
     );
 
   }
 
+  /// Used to create a new subcommand with a revised set of arguments.
   AFCommandContext reviseWithArguments({
     required AFSourceTemplateInsertions insertions,
     required AFArgs arguments,
@@ -1063,9 +1125,6 @@ class AFCommandContext {
     final revisedParents = parents.toList();
     revisedParents.add(this);
     var revisedArgs = arguments;
-    if(isExportTemplates) {
-      revisedArgs = revisedArgs.reviseAddArg("--${AFGenerateSubcommand.argExportTemplatesFlag}");
-    }
 
     return AFCommandContext.withArguments(
       parents: revisedParents,
@@ -1075,7 +1134,7 @@ class AFCommandContext {
       generator: this.generator,
       arguments: revisedArgs,
       coreInsertions: insertions,   
-      globalTemplateOverrides: this.globalTemplateOverrides
+      globalTemplateOverrides: this.globalTemplateOverrides,
     );
   }
 
@@ -1124,6 +1183,7 @@ class AFCommandContext {
     return found;
   }
 
+  /// Given a fully specified id, like XXXScreenID.myScreen, creates an entry for it in the id file.
   void createDeclareId(String id) {
     final splitVals = id.split(".");
     if(splitVals.length != 2) {
@@ -1158,7 +1218,8 @@ class AFCommandContext {
     
     idFile.addLinesAfterIdx(this, idxOpenClass, lines);
   }
-
+  
+  /// Given a snippet and a set of insertions, returns a code buffer with the insertions replaced.
   AFCodeBuffer createSnippet(
     Object source, {
       AFSourceTemplateInsertions? extend,
@@ -1204,6 +1265,7 @@ class AFCommandContext {
     return effective;
   }
 
+  /// Creates a file from the specified template at the specified path, with the specified insertions replaced.
   AFGeneratedFile createFile(
     List<String> projectPath,
     AFFileSourceTemplate template, { 
@@ -1225,6 +1287,7 @@ class AFCommandContext {
     return generator.createFile(this, projectPath, template, insertions: fullInsert);
   }
 
+  /// Utility which allows project styles to contain a + syntax that spreads a command out over multiple lines.
   static List<String> consolidateProjectStyleLines(AFCommandContext context, List<String> rawLines) {
     final result = <String>[];
     var idxLine = 0;
@@ -1269,7 +1332,7 @@ class AFCommandContext {
     return result;
   }
 
-
+  /// Reads the specified project sytle, replacing the specified insertions.
   AFGeneratedFile readProjectStyle(
     List<String> projectPath, { 
       AFSourceTemplateInsertions? extend,
@@ -1299,6 +1362,8 @@ class AFCommandContext {
     return generated;
   }
 
+
+  /// It is bettter to use [AFCommandContext.parseArguments].
   Object? findArgument(String key) {
     final args = arguments.rest;
     for(var i = 0; i < args.length; i++) {
@@ -1314,6 +1379,7 @@ class AFCommandContext {
     return null;
   }
 
+  /// Returns true if the user specified the --export-templates flag.
   bool get isExportTemplates {
     return findArgument(AFGenerateSubcommand.argExportTemplatesFlag) != null;
   }
@@ -1336,6 +1402,7 @@ class AFCommandContext {
     return result; 
   }
 
+  /// Given a template path, returns an override template path if the --override-templates flag was specified.
   List<String> findOverrideTemplate(List<String> sourceTemplate) {
     var override = findArgument(AFGenerateSubcommand.argOverrideTemplatesFlag);
     var found = <String, String>{};
@@ -1358,10 +1425,12 @@ class AFCommandContext {
     return result.split("/");
   }
 
+  /// Finds a file template that is part of the [AFTemplateRegistry]
   AFFileSourceTemplate? findEmbeddedTemplateFile(List<String> path) {
     return this.definitions.templates.findEmbeddedTemplateFile(path);
   }
 
+  /// Finds a snippet template that is part of the [AFTemplateRegistry]
   AFSnippetSourceTemplate? findEmbeddedTemplateSnippet(List<String> path) {
     return this.definitions.templates.findEmbeddedTemplateSnippet(path);
   }
@@ -1376,16 +1445,26 @@ class AFCommandContext {
   AFCommandOutput get out { return output; }
 }
 
-
+/// Root class for contexts that extend AFib at the earliest, 'base' phase.
+/// 
+/// First phase of AFib extension, can register libraries and configuration items, which appear in xxx_config.g.dart.
 class AFBaseExtensionContext {
+  /// Used to register the exists of an integrated AFib-aware library.
   void registerLibrary(AFLibraryID id) {
     AFibD.registerLibrary(id);
   }
+
+  /// Used to register a configuration item that appears in xxx_config.g.dart.
   void registerConfigurationItem(AFConfigurationItem entry) {
     AFibD.registerConfigEntry(entry);
   }
 }
 
+/// Context for registering commands, and source templates
+/// 
+/// Second phase of AFib extention. Can register custom commands, which will be available via
+/// your bin/xxx_afib.dart command.  Can also register custom source templates and snippets used
+/// during code generation.
 class AFCommandLibraryExtensionContext extends AFBaseExtensionContext {
   final AFDartParams paramsD;
   final AFCommandRunner commands;
@@ -1421,34 +1500,23 @@ class AFCommandLibraryExtensionContext extends AFBaseExtensionContext {
     templates.registerSnippet(source);
   }
 
-  /*
-  void finalize(AFCommandContext context) {
-  for(final command in commands.all) {
-      command.ctx = context;
-      command.registerArguments(command.argParser);
-      command.finalize();
-
-      for(final sub in command.subcommands.values) {
-        if(sub is AFCommand) {
-          sub.ctx = context;
-          sub.registerArguments(sub.argParser);
-          sub.finalize();
-        }
-      }
-    }
-    
-  }
-  */
-
 }
 
+/// Provides the set of known commands in a given context, and the ability to run them.
+/// 
+/// The contexts are afib_bootstrap and your project-specific xxx_afib.dart command.
 class AFCommandRunner {
+  /// Commands that are visible in the command line's help summary.
   List<AFCommand> commands = <AFCommand>[];
+
+  /// Commands that can be executed as part of a project style, but are not visible in the help
+  /// and are not intended to be run standalone.
   List<AFCommand> commandsHidden = <AFCommand>[];
   final String name;
   final String description;
   AFCommandRunner(this.name, this.description);
 
+  /// All visible commands.
   List<AFCommand> get all {
     return commands;
   }
@@ -1458,8 +1526,18 @@ class AFCommandRunner {
       throw AFCommandError(error: e.error, usage: e.usage);
     }
     printUsage(error: e.error, command: cmd);
+    exitCode = 400;
   }
 
+  void _handleException(AFCommandContext context, Exception e, AFCommand cmd) {
+    if(!context.isRootCommand) {
+      throw e;
+    }
+    print("Unhandled exception ${e}");
+    exitCode = 400;
+  }
+
+  /// Runs the command specified by the arguments in [ctx]
   Future<void> run(AFCommandContext ctx) async {
     final args = ctx.arguments.arguments;
     if(args.isEmpty) {
@@ -1491,6 +1569,8 @@ class AFCommandRunner {
         await subcommand.run(ctx);
       } on AFCommandError catch(e) {
         _handleError(ctx, e, subcommand);
+      } on Exception catch(e) {
+        _handleException(ctx, e, subcommand);
       }
     } else {
       ctx.setCommandArgCount(1);
@@ -1498,6 +1578,8 @@ class AFCommandRunner {
         await command.run(ctx);
       } on AFCommandError catch(e) {
         _handleError(ctx, e, command);
+      } on Exception catch (e) {
+        _handleException(ctx, e, command);
       }
     }
   }
@@ -1547,6 +1629,8 @@ Available Commands
 
 }
 
+
+/// The command that handles 'help ...' commands.
 class AFHelpCommand extends AFCommand {
   final name = "help";
   final description = "Show help for other commands";
@@ -1603,7 +1687,7 @@ Available commands:
   }
 }
 
-
+/// The extension context used by the app itself to register commands.
 class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
   AFCommandAppExtensionContext({
     required AFDartParams paramsD, 
@@ -1618,11 +1702,11 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
       await commands.run(context);
     }
 
-
     void registerBootstrapCommands() {
       defineCommand(AFHelpCommand());
       defineCommand(AFVersionCommand());
       defineCommand(AFCreateAppCommand());
+      defineCommand(AFSmoketestCommand());
       _defineGenerateCommand(hidden: true);
       defineCommand(AFRequireCommand(), hidden: true);
       defineCommand(AFIntegrateCommand(), hidden: true);

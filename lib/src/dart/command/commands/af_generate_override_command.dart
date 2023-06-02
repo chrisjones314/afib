@@ -4,7 +4,7 @@ import 'package:afib/src/dart/command/commands/af_generate_state_command.dart';
 import 'package:afib/src/dart/command/commands/af_generate_ui_command.dart';
 import 'package:afib/src/dart/command/templates/core/files/lpi.t.dart';
 
-/// Parent for commands executed through the afib command line app.
+/// The command which handles 'generate override' 
 class AFGenerateOverrideSubcommand extends AFCommand { 
   static const argParentType = "parent-type";
   static const themeSuffix = "Theme";

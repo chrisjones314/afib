@@ -37,11 +37,14 @@ $optionsHeader
     AFConfigCommand.writeUpdatedConfig(ctx);
     ctx.generator.finalizeAndWriteFiles(ctx);
       
-    await Process.start('flutter', ['test', AFProjectPaths.relativePathFor(AFProjectPaths.afTestPath)]).then((process) {
-      stdout.addStream(process.stdout);
-      stderr.addStream(process.stderr);      
-    });
+    final process = await Process.start('flutter', ['test', AFProjectPaths.relativePathFor(AFProjectPaths.afTestPath)]);
+    stdout.addStream(process.stdout);
+    stderr.addStream(process.stderr);      
     // reset the local config file to run all tests, in case they run 'flutter test'  
+
+    // pass the exit code from the test back to the parent.
+    final ec = await process.exitCode;
+    exitCode = ec;
   }
 
   void _updateRecentTests(AFConfig config, List<String>? args) {

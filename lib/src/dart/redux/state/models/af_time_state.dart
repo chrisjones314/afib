@@ -5,6 +5,8 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 
+/// Can be used to specify how frequently AFib pushes time updates into the state, and 
+/// also to specify how frequently a specific UI element listens for those updates.
 enum AFTimeStateUpdateSpecificity {
   day,
   hour,
@@ -18,6 +20,9 @@ enum AFTimeZone {
   local
 }
 
+/// AFib's built-in notion of time.
+/// 
+/// See the written guide for comments on how time is integrated into AFib.
 class AFTimeState {
   static const todayText = "today";
   static const tomorrowText = "tomorrow";

@@ -1,5 +1,6 @@
 import 'package:afib/src/dart/command/af_source_template.dart';
 
+/// Any class that ends in "T" is a source template used in code generation.
 class StateViewT extends AFCoreFileSourceTemplate {
   static const insertStateViewPrefix = AFSourceTemplateInsertion("state_view_prefix");
   static const insertThemeType = AFSourceTemplateInsertion("theme_type");

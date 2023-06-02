@@ -1,3 +1,4 @@
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';

@@ -1,3 +1,4 @@
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 
 class AFAlwaysFailQuery extends AFAsyncQuery<String> {

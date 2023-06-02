@@ -1,5 +1,6 @@
 import 'package:afib/src/dart/command/af_source_template.dart';
 
+/// Any class that ends in "T" is a source template used in code generation.
 class ScreenT extends AFCoreFileSourceTemplate {
   static const insertDeclareRouteParam = AFSourceTemplateInsertion("declare_route_param");
   static const insertDeclareSPI = AFSourceTemplateInsertion("declare_spi");

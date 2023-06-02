@@ -1,6 +1,6 @@
 import 'package:afib/src/dart/command/af_command.dart';
 
-
+/// The command that groups all the various 'generate' subcommands.
 class AFGenerateParentCommand extends AFCommandGroup {
   final name = "generate";
   final description = "Generate AFib source code for screens, queries, models, and more";
@@ -12,7 +12,7 @@ class AFGenerateParentCommand extends AFCommandGroup {
   }
 }
 
-
+/// The superclass for all the AFGenerateSubcommand variants.
 abstract class AFGenerateSubcommand extends AFCommand {
   static const argExportTemplatesFlag = "export-templates";
   static const argOverrideTemplatesFlag = "override-templates";

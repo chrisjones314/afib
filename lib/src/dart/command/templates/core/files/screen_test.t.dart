@@ -1,5 +1,6 @@
 import 'package:afib/src/dart/command/af_source_template.dart';
 
+/// Any class that ends in "T" is a source template used in code generation.
 class ScreenTestT extends AFCoreFileSourceTemplate {
   static const insertDeclarePrototype = AFSourceTemplateInsertion("declare_prototype");
   static const insertSmokeTestImpl = AFSourceTemplateInsertion("smoke_test_impl");

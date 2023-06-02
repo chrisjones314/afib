@@ -1,5 +1,6 @@
 import 'package:afib/src/dart/command/af_source_template.dart';
 
+/// Any class that ends in "T" is a source template used in code generation.
 class InstallCoreLibraryT extends AFCoreFileSourceTemplate {
   final bool defineFundamentalTheme;
   InstallCoreLibraryT({
@@ -26,6 +27,7 @@ void installCoreLibrary(AFCoreLibraryExtensionContext context) {
   }
 }
 
+/// Any class that ends in "T" is a source template used in code generation.
 class InstallUILibraryT extends InstallCoreLibraryT {
   InstallUILibraryT(): super(
     defineFundamentalTheme: true,
@@ -33,6 +35,7 @@ class InstallUILibraryT extends InstallCoreLibraryT {
   );
 }
 
+/// Any class that ends in "T" is a source template used in code generation.
 class InstallStateLibraryT extends InstallCoreLibraryT {
   InstallStateLibraryT(): super(
     defineFundamentalTheme: false,

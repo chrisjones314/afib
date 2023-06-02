@@ -3,6 +3,7 @@ import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_fundamental_theme_init.t.dart';
 
+/// Any class that ends in "T" is a source template used in code generation.
 class SnippetFundamentalThemeInitUILibraryT extends AFSnippetSourceTemplate {
 
   SnippetFundamentalThemeInitUILibraryT({

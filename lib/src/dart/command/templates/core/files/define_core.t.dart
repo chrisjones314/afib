@@ -1,7 +1,7 @@
 
 import 'package:afib/afib_command.dart';
 
-
+/// Any class that ends in "T" is a source template used in code generation.
 class DefineCoreUIFunctionsT extends AFSourceTemplate {
   static const insertFundamentalThemeInitCall = AFSourceTemplateInsertion("query_type");
 

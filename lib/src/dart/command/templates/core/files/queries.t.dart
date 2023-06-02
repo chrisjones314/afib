@@ -1,6 +1,7 @@
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_return_null.t.dart';
 
+/// Any class that ends in "T" is a source template used in code generation.
 class SimpleQueryT extends AFFileSourceTemplate {
   static const insertResultTypeInsertion = AFSourceTemplateInsertion("result_type");
   static const insertResultTypeSingleInsertion = AFSourceTemplateInsertion("result_type_single");
@@ -172,6 +173,7 @@ class $insertQueryType extends $insertQueryParentType<$insertResultType> {
 ''';
 }
 
+/// Anything that ends in "T" is a source template used in code generation.
 class DeferredQueryT extends SimpleQueryT {
 
   DeferredQueryT({
@@ -226,6 +228,7 @@ class ${insertQueryType}Query extends AFDeferredQuery {
 ''';
 }
 
+/// Any class that ends in "T" is a source template used in code generation.
 class IsolateQueryT extends SimpleQueryT {
 
   IsolateQueryT({

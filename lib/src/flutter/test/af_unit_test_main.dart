@@ -29,7 +29,10 @@ void afUnitTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams para
       final context = AFUnitTestContext(test);
       test.execute(context);
       contexts.add(context);
+      output.indent();
       printTestResult(output, testKind, context, localStats);
+      output.outdent();
+      context.finishAndUpdateStats(localStats);
     }
   }
 

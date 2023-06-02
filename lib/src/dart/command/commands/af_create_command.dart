@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_config_command.dart';
+import 'package:afib/src/dart/command/commands/af_require_command.dart';
 import 'package:afib/src/dart/command/templates/core/files/app.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/app_state.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/command_afib.t.dart';
@@ -140,6 +141,8 @@ class AFCreateAppCommand extends AFCommand {
   static const projectStyleSigninFirebaseIntegrate = "app-starter-signin-firebase$integrateSuffix";
   static const projectStyleSigninShared = "app-starter-signin-shared";
   static const projectStyleSigninSharedIntegrate = "app-starter-signin-shared$integrateSuffix";
+  static const projectStyleTestIntentionalFailCreate = "app-test-intentional-fail-create";
+  static const projectStyleTestIntentionalFailTest  = "app-test-intentional-fail-test";
 
   final String name = "create";
   final String description = "Install afib framework support into an existing flutter app project";
@@ -171,6 +174,8 @@ Project Styles
     $projectStyleStarterMinimal - minimal project style
     $projectStyleSignin - a simple starter project how to use AFib Signin, if you are not using firebase for signin
     $projectStyleSigninFirebase - a starter project showing how to use AFib Signin with Firebase
+    $projectStyleTestIntentionalFailCreate - intentionally throws an exception when creating the project, for testing purposes
+    $projectStyleTestIntentionalFailTest - intentionally fails a test, for testing purposes.
 
   $kindUILibrary
     $projectStyleUILibStarterMinimal
@@ -198,6 +203,8 @@ Project Styles
       argPackageName: "",
       argPackageCode: "",
       AFCommand.argCurrentWorkingDirectory: "",
+      AFRequireCommand.argAutoInstall: "false",
+      AFRequireCommand.argLocalAFib: "",
     });
     final kind = args.accessUnnamedFirst;
     verifyOneOf(kind, [kindApp, kindUILibrary, kindStateLibrary]);
@@ -214,6 +221,10 @@ Project Styles
 
     if(projectStyle.isEmpty) {
       throwUsageError("You must specify --$argProjectStyle");
+    }
+
+    if(projectStyle == projectStyleTestIntentionalFailCreate) {
+      throwUsageError("This is an intentional failure during the build stage for test purposes");
     }
 
     ctx.setProjectStyle(projectStyle);

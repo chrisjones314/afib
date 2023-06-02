@@ -1,3 +1,7 @@
+/// IDs used in the UI provided by AFib, like the prototype mode UI.
+
+library afib_uiid;
+
 import 'package:afib/src/dart/utils/af_id.dart';
 
 class AFUILibraryID {
@@ -127,7 +131,7 @@ class AFUIThemeID extends AFThemeID {
   /// Used for the icon that indicates you are navigating down into more detailed screens, often a right caret.
   static const iconNavDown = AFUIThemeID("iconNavDown");
 
-  /// Used to determine the values of [AFFunctionalTheme.margin...], must be an array of 6 values, indicating the
+  /// Used to determine the values of `AFFunctionalTheme.margin...`, must be an array of 6 values, indicating the
   /// margin amount for s0 through s5 (the first should be zero, or s0 will be confusing).
   static const marginSizes = AFUIThemeID("marginSizes");
   static const paddingSizes = AFUIThemeID("paddingSizes");

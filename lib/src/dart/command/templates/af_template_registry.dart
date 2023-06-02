@@ -9,6 +9,7 @@ import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/queries.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/state_test.t.dart';
 import 'package:afib/src/dart/command/templates/core/files/theme.t.dart';
+import 'package:afib/src/dart/command/templates/core/files/unit_test.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_model_accessor.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_spi.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_define_test_data.dart';
@@ -99,6 +100,9 @@ import 'package:afib/src/dart/command/templates/project_styles/app-starter-signi
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/snippets/snippets_registration_details_widget.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/snippets/snippets_signed_in_bottom_nav_bar_widget.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/app-starter-signin/snippets/snippets_signed_in_menu_drawer.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/app-test-intentional-fail-create.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/app-test-intentional-fail-test.t.dart';
+import 'package:afib/src/dart/command/templates/project_styles/app-test-intentional-fail-test/files/unit_test_inentional_fail_body.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/statelib-starter-minimal.t.dart';
 import 'package:afib/src/dart/command/templates/project_styles/uilib-starter-minimal.t.dart';
 import 'package:path/path.dart';
@@ -140,6 +144,7 @@ class AFTemplateRegistry {
     registerFile(StarterSigninIntegrateT());
     registerFile(LPIT.core());
     registerFile(StateTestT.core());
+    registerFile(UnitTestT.core());
 
     registerSnippet(SnippetDefineTestDataT.core());
     registerSnippet(SnippetStandardRouteParamT.core());
@@ -276,6 +281,11 @@ class AFTemplateRegistry {
     registerFile(QueryDeleteAccountT.example());
     registerFile(QueryChangeEmailT.example());
     registerFile(QueryChangePasswordT.example());
+
+    registerFile(StarterTestIntentionalFailCreateT());
+
+    registerFile(StarterTestIntentionalFailTestT());
+    registerFile(UnitTestIntentionalFail.template());
   }  
 
   AFFileSourceTemplate? findEmbeddedTemplateFile(List<String> path) {

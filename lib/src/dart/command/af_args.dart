@@ -1,10 +1,10 @@
 import 'package:colorize/colorize.dart';
 
-/// Utility for accessing arguments to an afib command. 
+/// The set of arguments specified for an AFib command.
 /// 
-/// All methods ignore the command name itself, which is already implied
-/// within the command.  For example 'afib environment production' has one
-/// argument, production.
+/// Mainly you would use [setDebugArgs] from your main function as an easy way to specfy debug arguments.
+/// 
+/// Otherwise, you should prefer [AFCommandContext.parseArguments] for accessing argument values.
 class AFArgs {
   List<String> args;
   AFArgs(this.args);
@@ -15,15 +15,21 @@ class AFArgs {
     return AFArgs(revised);
   }
 
-  // create args that are modifiable.
+  AFArgs reviseAddArgs(List<String> args) {
+    final revised = args.toList();
+    revised.addAll(args);
+    return AFArgs(revised);
+  }
+
+  /// Create from a list of arguments
   factory AFArgs.create(List<String> args) {
     return AFArgs(List<String>.of(args));
   }
 
+  /// Create from a string, which is parsed into distinct arguments.
   factory AFArgs.createFromString(String arguments) {
     return AFArgs(parseArgs(arguments));
   }
-
 
   /// The name of the command that was executed.
   String get command {
@@ -52,6 +58,18 @@ class AFArgs {
     args.add(arg);
   }
 
+  /// Reset the arguments to those specified in revised.
+  /// 
+  /// This is useful during dubugging, if you prefer not to use VS Code's configuration files.  It allows
+  /// you to type a set of arguments in a string, just as you would on the command line.
+  /// 
+  /// For example, in your project's bin/xxx_afib.dart, you could use:
+  /// 
+  /// ```dart
+  ///   args.setDebugArgs("generate query TestQuery --result-type String")
+  /// ```
+  /// 
+  /// To debug the command that generates a query.
   void setDebugArgs(String revised) {
     final result = StringBuffer();
     result.writeln("********* ATTENTION: USING DEBUG ARGUMENTS: '$revised' ******************************");
@@ -74,6 +92,7 @@ class AFArgs {
     return result;
   }
 
+  /// Parses a string into a list of string arguments.
   static List<String> parseArgs(String revised) {
     final raw = revised.trim().split(RegExp(r"[ \t]"));
     final result = <String>[];

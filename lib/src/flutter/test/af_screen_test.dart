@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
@@ -2076,8 +2077,8 @@ class AFSingleScreenTests<TState> {
     return null;
   }
 
-  /// Add a prototype of a particular screen with the specified [stateViews]
-  /// and [routeParam].  
+  /// Add a prototype of a particular screen with the specified [stateView]
+  /// and an initial route parameter from [navigate].  
   /// 
   /// Returns an [AFSingleScreenPrototypeBody], which can be used to create a 
   /// test for the screen.
@@ -2437,11 +2438,7 @@ class AFWorkflowStateTestPrototype {
 }
 
 
-/// Used for tests which have a real redux state/store, and navigate across multiple 
-/// screens.
-/// 
-/// These tests by combine an initial state from an [AFStateTest] with a series
-/// of screen manipulations from an [AFScreenTest]
+/// Workflow tests have been superceded by state tests.
 class AFWorkflowStateTests {
   final stateTests = <AFWorkflowStatePrototype>[];
 
@@ -2712,9 +2709,7 @@ class AFUIPrototypeDefinitionContext extends AFBaseTestDefinitionContext {
     );
   }
 
-  /// Used to define a reusable test which takes three parameters.
-  /// 
-  /// See [defineReusableTest1] for more.
+  @Deprecated("Superceded by state tests")
   void defineReusableTest({
     required AFScreenTestID id, 
     required AFSingleScreenPrototypeBody prototype, 
@@ -2732,8 +2727,7 @@ class AFUIPrototypeDefinitionContext extends AFBaseTestDefinitionContext {
     executeReusableTest(prototype, id, params: params, disabled: disabled);
   }
 
-  /// Executes a test defined with [defineResuable1] or one of its variants, allowing
-  /// you to provide values from the 1-3 parameters required by the test.
+  /// This is obsolete, do not use.
   void executeReusableTest(AFSingleScreenPrototypeBody body, AFScreenTestID bodyId, {
     List<Object> params = const <Object>[],
     String? disabled,

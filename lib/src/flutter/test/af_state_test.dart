@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/flutter/test/af_base_test_execute.dart';
@@ -921,7 +922,7 @@ class AFSpecificStateTestDefinitionContext {
   /// 
   /// When the query 'executes', its [AFAsyncQuery.startAsync] method will be skipped
   /// and its [AFAsyncQuery.finishAsyncWithResponse] method will be called with the 
-  /// test data that is created by [delegate].
+  /// test data that is [AFCreateDynamicQueryResultContext.onSuccess] or [AFCreateDynamicQueryResultContext.onError].
   void defineQueryResponseDynamic<TQuery extends AFAsyncQuery>({ Object? querySpecifier, required AFCreateQueryResultDelegate<TQuery> body}) {
     assert(TQuery != AFAsyncQuery);
     test.defineQueryResponseDynamic<TQuery>(querySpecifier ?? TQuery, body);

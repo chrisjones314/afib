@@ -22,11 +22,9 @@ class AFUpdateAppPlatformInfoAction {
   AFUpdateAppPlatformInfoAction(this.appState);
 }
 
-/// Action used to update one or more of the root objects in the [AFAppState].
+/// Use `context.updateComponent...` instead of using this directly.
 /// 
-/// If you have nested data that you need to update, update the leaf objects
-/// and use copyWith to propogate the change up to a root object in [AFAppState],
-/// then issue an [AFUpdateAppStateAction]
+/// Action used to update one or more of the root objects in the [AFComponentStates].
 class AFUpdateAppStateAction extends AFActionWithKey {
   final Type area;
   final List<Object> toIntegrate;
@@ -37,16 +35,12 @@ class AFUpdateAppStateAction extends AFActionWithKey {
     required this.toIntegrate
   }): super(id: id);
 
-  /// A utility for creating a list of revised models.   
-  /// 
-  /// You will repeatedly call .add for all your revised models,
-  /// then use [AFUpdateAppStateAction..updateMany] to create an action
-  /// that updates them all.
+  /// A utility for creating an empty list of models.
   static List<Object> createModelList() {
     return <Object>[];
   }
 
-  /// Constructor for updating one object at the root of the [AFAppState]
+  /// Constructor for updating one object at the root of the [AFComponentState]
   factory AFUpdateAppStateAction.updateOne(Type area, Object o) {
     final toIntegrate = [o];
     return AFUpdateAppStateAction(
@@ -55,7 +49,7 @@ class AFUpdateAppStateAction extends AFActionWithKey {
     );
   }
 
-  /// Constructor for updating multiple objects at the root of the [AFAppState]
+  /// Constructor for updating multiple objects at the root of the [AFComponentState]
   factory AFUpdateAppStateAction.updateMany(Type area, Iterable<Object> objs) {
     final toIntegrate = objs.toList();
     return AFUpdateAppStateAction(

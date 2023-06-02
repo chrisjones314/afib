@@ -31,7 +31,7 @@ static CountHistoryItemsRoot fromDB(sql.ResultSet results) {
   final history = <String, CountHistoryItem>{};
 
   for(final row in results) {
-    final entries = EXTESqliteDB.toColumnMap(row);
+    final entries = ${AFSourceTemplate.insertAppNamespaceInsertion.upper}SqliteDB.toColumnMap(row);
     final entry = CountHistoryItem.serializeFromMap(entries);
     history[entry.id] = entry;
   }

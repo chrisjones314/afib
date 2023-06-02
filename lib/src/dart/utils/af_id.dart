@@ -116,6 +116,10 @@ class AFID {
   }
 }
 
+/// ID type which can be used to refer to translations specified in xxx_define_core.dart.
+/// 
+/// However, note that theme methods allow you to address translations by widget id, and you can just
+/// hard code strings in your primary langauge if you prefer to avoid maintaining ids.
 class AFTranslationID extends AFID {
   final List<dynamic>? values;
   const AFTranslationID(String code, AFLibraryID library, { this.values }) : super("i18n", code, library);
@@ -207,6 +211,7 @@ class AFWidgetID extends AFID {
     return AFWidgetID(code, library, withItems: withItems);
   }
 
+  /// Used to differentiate widget ids, usually used to add the persistent id of an item in a list.
   AFWidgetID with1(Object? item) {
     return with3(item, null, null);
   }
@@ -227,10 +232,17 @@ class AFWidgetID extends AFID {
   }
 }
 
+/// Base class for all test related ids
+/// 
+/// Note that UI prototypes, state tests, unit test, etc are all different forms of tests.
 class AFBaseTestID extends AFID {
   const AFBaseTestID(String prefix, String code, AFLibraryID library, { List<Object>? withItems }) : super(prefix, code, library, withItems: withItems);
 }
 
+
+/// A test ID which can be constructed from a string.
+/// 
+/// Used to recognize recent tests stored as string identifiers.
 class AFFromStringTestID extends AFBaseTestID {
   final String fullId;
   AFFromStringTestID(this.fullId): super("", "", AFUILibraryID.id);
@@ -256,7 +268,6 @@ class AFScreenTestID extends AFBaseTestID {
   static const screenTestPrefix = "screentest";
   const AFScreenTestID(String code, AFLibraryID library) : super(screenTestPrefix, code, library);
 }
-
 
 class AFPrototypeID extends AFBaseTestID {
   static const prototypePrefix = "pr";

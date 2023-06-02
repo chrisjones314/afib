@@ -14,9 +14,18 @@ class SnippetStateTestImplT extends AFCoreSnippetSourceTemplate {
 class SnippetStateTestImplMinimalT extends AFCoreSnippetSourceTemplate {
   SnippetStateTestImplMinimalT(): super(templateFileId: "state_test_impl_minimal");
 
+  @override
+  List<String> get extraImports {
+    return [
+"import 'package:$insertPackagePath/query/simple/startup_query.dart';",
+    ];
+  }
+
   String get template => '''
 // first, you will define query results using variants of 
 // testContext.defineQueryResponse...
+testContext.defineQueryResponseUnused<StartupQuery>();
+
 
 // then, you will start your app, which will cause your StartupQuery to execute.
 testContext.executeStartup();

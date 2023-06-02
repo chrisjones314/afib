@@ -7,6 +7,7 @@ class SnippetInitialState extends AFSourceTemplate {
 
 }
 
+/// Any class that ends in "T" is a source template used in code generation.
 class SnippetDefineTestDataT extends AFSnippetSourceTemplate {
   static const insertModelDeclaration = AFSourceTemplateInsertion("model_declaration");
   static const insertModelCall = AFSourceTemplateInsertion("model_call");

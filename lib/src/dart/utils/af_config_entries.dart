@@ -5,9 +5,11 @@ import 'package:afib/afui_id.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
 
-/// Constants used to specify values in [AF.afConfig].
+/// Constants used to specify values in xxx_config.g.dart
 /// 
-/// All keys end in ...Key.
+/// The values associated with these definitions are available via
+/// [AFibD.config].  You can register your own configuration values
+/// using [AFBaseExtensionContext.registerConfigurationItem].
 class AFConfigEntries {  
   
   /// The namespace Afib uses for its native commands, configuration values, etc.
@@ -16,10 +18,7 @@ class AFConfigEntries {
   static const afNamespace = 'af';
   static const afNamespaceSeparator = ':';
 
-  /// Used to indicate an environment of [debug], [production], [prototype] or [release].
-  /// 
-  /// Use the command afib environment debug|production|prototype|release to set the 
-  /// environment.
+  /// Used to indicate an environment from [AFEnvironment]
   static final environment = AFConfigEntryEnvironment();
 
   /// Used to turn on debug logging that may be useful in finding problems in 
@@ -139,7 +138,7 @@ class AFConfigEntries {
     validContexts: AFConfigurationItem.validContextsNewProjectAndConfig,
     ordinal: 120.0,
     minChars: 2, 
-    maxChars: 4,
+    maxChars: 5,
     options: AFConfigurationItemOption.optionLowercase | AFConfigurationItemOption.optionIdentifier
   );
 

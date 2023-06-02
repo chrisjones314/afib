@@ -1,38 +1,33 @@
 import 'package:afib/afib_command.dart';
 import 'package:afib/src/dart/command/commands/af_typedefs_command.dart';
-import 'package:afib/src/dart/command/commands/af_version_command.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
-/// Initialize commands that are used only from the afib command
-/// line app itself (e.g. new).
-void afRegisterAfibOnlyCommands(AFCommandAppExtensionContext commands) {
-  commands.defineCommand(AFVersionCommand());
-  //commands.register(AFNewProjectCommand());
-}
 
 /// Initialize afib comamnds that are used from the application-specific
 /// commamd
-void afRegisterAppCommands(AFCommandAppExtensionContext definitions) {
+void _afRegisterAppCommands(AFCommandAppExtensionContext definitions) {
   definitions.registerStandardCommands();
 }
 
-void afRegisterBootstrapCommands(AFCommandAppExtensionContext definitions) {
+void _afRegisterBootstrapCommands(AFCommandAppExtensionContext definitions) {
   definitions.registerBootstrapCommands();
 }
 
-/// Used to initialize and execute commands available via afib_bootstrap
+/// The function called from the afib_bootstrap command.
 Future<void> afBootstrapCommandMain(AFDartParams paramsD, AFArgs args) async {
   await _afCommandMain(paramsD, args, "afib_bootstrap", "Command used to create new afib projects", null, null, [
-    afRegisterBootstrapCommands
+    _afRegisterBootstrapCommands
   ], null);
 }
 
+/// A wrapper which sets up AFib's global state for use in commands, prior to call the main AFib function.
 void afCommandStartup(Future<void> Function() onRun) async {
   AFibD.registerGlobals();
   await onRun();
 }
 
+/// The function called from your bin/xxx_afib.dart file.
 Future<void> afAppCommandMain({
   required AFArgs args, 
   required AFDartParams paramsDart, 
@@ -42,11 +37,12 @@ Future<void> afAppCommandMain({
   required AFExtendCommandsLibraryDelegate installCommandLibrary
 }) async {
   await _afCommandMain(paramsDart, args, "afib", "App-specific afib command", installBase, installBaseLibrary, [
-    afRegisterAppCommands,
+    _afRegisterAppCommands,
     installCommand
   ], installCommandLibrary);
 }
 
+/// The main function called from the bin/xxx_afib.dart command of a library.
 Future<void> afLibraryCommandMain({ 
   required AFDartParams paramsDart, 
   required AFArgs args, 
@@ -57,7 +53,7 @@ Future<void> afLibraryCommandMain({
 }) async {
   AFibD.config.setIsLibraryCommand(isLib: true);
   await _afCommandMain(paramsDart, args, "afib", "App-specific afib command", installBase, installBaseLibrary, [
-    afRegisterAppCommands,
+    _afRegisterAppCommands,
     installCommand,
   ], installCommandLibrary);
 }

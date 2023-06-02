@@ -35,7 +35,7 @@ abstract class AFDeferredQuery extends AFAsyncQuery<AFUnused> implements AFTrack
     AFOnResponseDelegate<AFUnused>? onSuccess
   }): super(id: id, onSuccess: onSuccess);
 
-  /// Delays for [nextDelay] and then calls [finishAsyncWithResponse] with null as the value.
+  /// Delays for [delay] and then calls [finishAsyncWithResponse] with null as the value.
   /// 
   /// There is no way to execute code during the startAsync function by design,
   /// the whole point of a deferred query is to execute some code after a delay.
@@ -59,7 +59,7 @@ abstract class AFDeferredQuery extends AFAsyncQuery<AFUnused> implements AFTrack
     });
   }
 
-  /// Calls the more appropriate [finishAsyncExecute] when the [initialDelay] associated with this
+  /// Calls the more appropriate [finishAsyncExecute] when the [delay] associated with this
   /// query has expired.
   void finishAsyncWithResponse(AFFinishQuerySuccessContext<AFUnused> context) {
     finishAsyncExecute(context);
@@ -131,7 +131,7 @@ abstract class AFPeriodicQuery extends AFAsyncQuery<AFUnused> implements AFTrack
     });
   }
 
-  /// Calls the more appropriate [finishAsyncExecute] when the [initialDelay] associated with this
+  /// Calls the more appropriate [finishAsyncExecute] when the [delay] associated with this
   /// query has expired.
   void finishAsyncWithResponse(AFFinishQuerySuccessContext<AFUnused> context) {
     keepGoing = finishAsyncExecute(context);

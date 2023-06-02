@@ -36,6 +36,7 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_widget_par
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_widget_route_param.t.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 
+/// The types of UI elements that AFib supports.
 enum AFUIControlKind {
   screen,
   bottomSheet,
@@ -44,6 +45,7 @@ enum AFUIControlKind {
   widget,
 }
 
+/// Summary of the generation logic used for various kinds of UI elements.
 class AFUIControlSettings {
   final AFUIControlKind kind;
   final String suffix;
@@ -97,6 +99,7 @@ class AFUIControlSettings {
   }
 }
 
+/// The class that handles 'generate ui...' commands.
 class AFGenerateUISubcommand extends AFGenerateSubcommand {
   static const nameStartupScreen = "StartupScreen";
   static const nameButtonIncrementRouteParam = "buttonIncrementRouteParam";

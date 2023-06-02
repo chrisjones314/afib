@@ -19,14 +19,14 @@ class AFWrapModelWithCustomID {
 }
 
 
-// When an object is derived from this method.
+
 class AFModelWithCustomID {
   final String? customStateId;
 
   /// By default each model uses its class name as a key to uniquely 
   /// identify itself in the [AFComponentState].  However, if you want
   /// to have two objects of the same class in the AFAppState,
-  /// you can pass each one a unique [customStateKey].
+  /// you can pass each one a unique [customStateId].
   AFModelWithCustomID({this.customStateId});
 
   static String stateKeyFor(Object o) {
@@ -66,6 +66,10 @@ class AFModelWithCustomID {
 
 }
 
+/// Interface for finding state data 
+/// 
+/// Both states and state views are mappings of type names to object values.  This interface
+/// provides standard methods for accessing data at the root of a state or state view.
 abstract class AFStateModelAccess {
   T findType<T extends Object>();
   T? findTypeOrNull<T extends Object>();
@@ -79,8 +83,7 @@ abstract class AFStateModelAccess {
   Iterable<Object> get allModels;
 }
 
-/// 
-/// 
+/// The root class for both state and state views
 @immutable
 abstract class AFComponentState extends AFStateModelAccess {
   final Map<String, Object> models;
@@ -91,10 +94,13 @@ abstract class AFComponentState extends AFStateModelAccess {
     required this.create,
   });
 
+  /// Returns the map of type names to objects that the 
+  /// constructor's [models] parameter expects.
   static Map<String, Object> createModels(Iterable<Object> toIntegrate) {
     return integrate(<String, Object>{}, toIntegrate);
   }
 
+  /// Utility used to augment an existing mapping of type names to objects.
   static Map<String, Object> integrate(Map<String, Object> original, Iterable<Object> toIntegrate) {
     final revised = Map<String, Object>.of(original);
     for(final sourceModel in toIntegrate) {
@@ -107,6 +113,7 @@ abstract class AFComponentState extends AFStateModelAccess {
     return revised;
   }
 
+  //// Returns an empty map of type names to objects.
   static Map<String, Object> empty() {
     return <String, Object>{};
   }
@@ -138,32 +145,39 @@ abstract class AFComponentState extends AFStateModelAccess {
     return code;    
   }
 
+  /// Returns all the model objects
   Iterable<Object> get allModels {
     return models.values;
   }
 
+  /// Returns the object value for the type T
   T findType<T extends Object>() {
     return findModelWithCustomKey(T.toString());
   }
 
+  /// Returns the object value for the type T, allows null or missing values.
   T? findTypeOrNull<T extends Object>() {
     return findModelWithCustomKeyOrNull(T.toString());
   }
 
+  /// Returns the object value for the specified String key.
   T findId<T extends Object>(String id) {
     return findModelWithCustomKey(id);
   }
 
+  /// Returns the object value for the specified String key, allows null or missing values.
   T? findIdOrNull<T extends Object>(String id) {
     return findModelWithCustomKeyOrNull(id);
   }
 
+  /// Same as [findId]
   T findModelWithCustomKey<T>(String key) {
     final result = models[key] as T;
     if(result == null) throw AFException("No model defined for $key");
     return result;
   }
 
+  /// Same as [findIdOrNull]
   T? findModelWithCustomKeyOrNull<T extends Object?>(String key) {
     final result = models[key] as T?;
     return result;
@@ -189,11 +203,13 @@ abstract class AFComponentState extends AFStateModelAccess {
     return models[key] as TRouteParam?;
   }
 
+  /// Returns a new state, which overrides or augments this object's models with those from [other].
   AFComponentState mergeWith(AFComponentState other) {
     final revisedModels = integrate(this.models, other.models.values);
     return createWith(revisedModels);    
   }
 
+  /// Returns a new state with the new objects integrated at the root, overriding or augmenting the existing objects.
   AFComponentState copyWith(List<Object> toIntegrate) {
     return createWith(AFComponentState.integrate(models, toIntegrate));
   }
@@ -202,6 +218,7 @@ abstract class AFComponentState extends AFStateModelAccess {
     return createWith(AFComponentState.integrate(models, toIntegrate));
   }
 
+  // Returns a new state, with [toIntegrate] overriding or augmenting the existing objects.
   AFComponentState copyWithOne(Object toIntegrate) {
     final toI = <Object>[];
     toI.add(toIntegrate);
@@ -226,6 +243,9 @@ class AFComponentStateUnused extends AFComponentState {
 
 
 /// Tracks the application state and any state provided by third parties.
+/// 
+/// You will not usually interact with this class directly.  It is maintained 
+/// by AFib.  You manipulate it using `context.update...` calls.
 @immutable
 class AFComponentStates {
   final Map<String, AFComponentState> states;

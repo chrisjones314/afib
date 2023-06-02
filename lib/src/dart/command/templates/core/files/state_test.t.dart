@@ -2,6 +2,7 @@ import 'package:afib/src/dart/command/af_project_paths.dart';
 import 'package:afib/src/dart/command/af_source_template.dart';
 import 'package:afib/src/dart/command/templates/core/files/unit_test.t.dart';
 
+/// Any class that ends in "T" is a source template used in code generation.
 class StateTestT extends AFFileSourceTemplate {
   static const insertExtendTestId = AFSourceTemplateInsertion("extend_test_id");
 

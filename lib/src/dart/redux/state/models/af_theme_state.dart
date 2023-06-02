@@ -1306,8 +1306,7 @@ class AFFundamentalThemeState {
     return themeDataActive.colorScheme.secondary;
   }
 
-  /// This indicates whether this is a bright or dark color scheme,
-  /// use [deviceBrightness] to find out the current mode of the device.
+  /// This indicates whether this is a bright or dark color scheme.
   /// 
   /// Note that the primary 'bright' color scheme could still be 'dark'
   /// in nature.
@@ -2206,10 +2205,6 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   /// 
   /// This method does a few nice things for you:
   /// *  It automatically attaches the AFib prototype drawer in prototype mode.
-  /// *  If you use the [bodyUnderScaffold] instead of [body], it will automatically use a builder to 
-  ///    enable you to do Scaffold.of(context.c) to retrieve the Scaffold lower in the tree.  Note that if you
-  ///    do pass in bodyUnderScaffold, you need to provide the 3 type parameters, which will be the same paramters
-  ///    your [AFBuildContext] has.
   /// 
   /// You will most likely want to create one or more app-specific version of this method in your own app's 
   /// conceptual theme, which might fill in many of the parameters (e.g. appBar) with standard values, rather than 
@@ -2665,7 +2660,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }
 
   /// Important: the values you are passing in are scale factors on the
-  /// value specified by [AFUIThemeID.sizeMargin], they are not
+  /// value specified by your fundamental theme they are not
   /// absolute measurements.
   /// 
   /// For example, if the default margin is 8.0, and you pass in all: 2,
@@ -2743,7 +2738,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   /// Show the text in a snackbar. 
   /// 
-  /// You might prefer [AFStateProgrammingInterface.showSnackbarText].  This is just
+  /// You might prefer [AFBuildContext.showSnackbarText].  This is just
   /// a one line call to that method for discoverability.
   void showSnackbarText(AFStateProgrammingInterface spi, String text) {
     spi.context.showSnackbarText(
@@ -2752,7 +2747,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     );
   }
 
-  /// See [AFStateProgrammingInterface.showDialogAFib], this is just a one line call to that method
+  /// See [AFBuildContext.showDialogAFib], this is just a one line call to that method
   /// for discoverability.
   void showDialog<TReturn>({
     required AFStateProgrammingInterface spi,
@@ -2775,7 +2770,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     );
   }
 
-  /// See [AFStateProgrammingInterface.showModalBottomSheetAFib], this is a one line call to that method, here for discoverability.
+  /// See [AFBuildContext.showModalBottomSheetAFib], this is a one line call to that method, here for discoverability.
   void showModalBottomSheet({
     required AFStateProgrammingInterface spi,
     required AFNavigatePushAction navigate,
@@ -2807,7 +2802,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     );
   }
 
-  /// See [AFStateProgrammingInterface.showBottomSheet], this is a one line call to that method, here for discoverability.
+  /// See [AFBuildContext.showBottomSheet], this is a one line call to that method, here for discoverability.
   void showBottomSheet({
     required AFStateProgrammingInterface spi,
     required AFNavigatePushAction navigate,

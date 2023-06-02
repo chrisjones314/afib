@@ -10,7 +10,7 @@ class AFCircularProgressIndicator extends StatelessWidget {
   final String? semanticsLabel;
   final String? semanticsValue;
   
-  AFCircularProgressIndicator({
+  const AFCircularProgressIndicator({
     Key? key,
     this.childKey,
     this.value, 

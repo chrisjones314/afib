@@ -20,7 +20,7 @@ void installCoreApp(AFAppExtensionContext context) {
       defineCore: defineCore,
       defineFundamentalTheme: defineFundamentalTheme, 
       createStartupQuery: () => StartupQuery(),
-      createApp: () => ${insertAppNamespaceUpper}App(),
+      createApp: () => const ${insertAppNamespaceUpper}App(),
     );
 
 }

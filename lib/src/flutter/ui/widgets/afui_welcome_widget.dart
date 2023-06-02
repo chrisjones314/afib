@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 class AFUIWelcomeWidgetSPI extends AFUIWidgetSPI<AFUIDefaultStateView, AFRouteParamUnused> {
 
   //--------------------------------------------------------------------------------------
-  AFUIWelcomeWidgetSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIWelcomeWidgetSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard): super(context, standard);
   factory AFUIWelcomeWidgetSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard) {
     return AFUIWelcomeWidgetSPI(context, standard);
   }

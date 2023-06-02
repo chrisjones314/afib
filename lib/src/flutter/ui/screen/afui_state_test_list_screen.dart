@@ -1,4 +1,4 @@
-import 'package:afib/afui_id.dart';
+import 'package:afib/afib_uiid.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
@@ -51,7 +51,7 @@ class AFUIStateTestListScreenParam extends AFScreenRouteParam {
 
 class AFUIStateTestListScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIStateTestListScreenParam> {
   static const rootParentName = "root";
-  AFUIStateTestListScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIStateTestListScreenParam> context, AFStandardSPIData standard): super(context, standard );
+  const AFUIStateTestListScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIStateTestListScreenParam> context, AFStandardSPIData standard): super(context, standard );
   
   factory AFUIStateTestListScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIStateTestListScreenParam> context, AFStandardSPIData standard) {
     return AFUIStateTestListScreenSPI(context, standard,

@@ -28,7 +28,7 @@ void afMainUILibrary({
   // ignore: omit_local_variable_types
   final AFExtendAppDelegate extendAppFull = (context) {
     context.fromUILibrary(contextLibrary,
-      createApp: () => AFAppUILibrary(),
+      createApp: () => const AFAppUILibrary(),
       defineFundamentalTheme: defineAFDefaultFundamentalTheme,
     );
   };

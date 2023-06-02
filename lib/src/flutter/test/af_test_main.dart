@@ -1,4 +1,4 @@
-import 'package:afib/afui_id.dart';
+import 'package:afib/afib_uiid.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
@@ -50,7 +50,7 @@ Future<void> afTestMainUILibrary({
 
   final extendAppFull = (context) {
     context.fromUILibrary(contextLibrary,
-      createApp: () => AFAppUILibrary(),
+      createApp: () => const AFAppUILibrary(),
       defineAppFundamentalTheme: defineAFDefaultFundamentalTheme,
     );
   };

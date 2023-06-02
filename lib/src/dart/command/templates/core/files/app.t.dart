@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 
 class ${insertAppNamespaceUpper}App extends AFMaterialApp<${insertAppNamespaceUpper}State> {
 
-  ${insertAppNamespaceUpper}App({
+  const ${insertAppNamespaceUpper}App({
     Key? key,
   }): super(
     key: key,

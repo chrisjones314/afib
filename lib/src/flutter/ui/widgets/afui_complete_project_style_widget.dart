@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 class AFUICompleteProjectStyleWidgetSPI extends AFUIWidgetSPI<AFUIDefaultStateView, AFRouteParamUnused> {
 
   //--------------------------------------------------------------------------------------
-  AFUICompleteProjectStyleWidgetSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard): super(context, standard);
+  const AFUICompleteProjectStyleWidgetSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard): super(context, standard);
   factory AFUICompleteProjectStyleWidgetSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard) {
     return AFUICompleteProjectStyleWidgetSPI(context, standard);
   }

@@ -57,13 +57,13 @@ class AFTimeState {
   }
 
   factory AFTimeState.initialState() {
-    return AFTimeState(actualNow: null, pauseTime: null, simulatedOffset: Duration(milliseconds: 0), pushUpdateFrequency: Duration(days: 1), pushUpdateSpecificity: AFTimeStateUpdateSpecificity.second, timeZone: AFTimeZone.local);
+    return AFTimeState(actualNow: null, pauseTime: null, simulatedOffset: const Duration(milliseconds: 0), pushUpdateFrequency: const Duration(days: 1), pushUpdateSpecificity: AFTimeStateUpdateSpecificity.second, timeZone: AFTimeZone.local);
   }
 
   factory AFTimeState.createNow({ Duration updateFrequency = const Duration(milliseconds: 250),  AFTimeStateUpdateSpecificity updateSpecificity = AFTimeStateUpdateSpecificity.second }) {
     return AFTimeState.createBaseTime(
       actualNow: DateTime.now(),
-      simulatedOffset: Duration(days: 0),
+      simulatedOffset: const Duration(days: 0),
       updateFrequency: updateFrequency,
       updateSpecificity: updateSpecificity,
       timeZone: AFTimeZone.local,

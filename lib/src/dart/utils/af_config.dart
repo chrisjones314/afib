@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:core';
 
-import 'package:afib/afui_id.dart';
+import 'package:afib/afib_uiid.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/utils/af_config_entries.dart';

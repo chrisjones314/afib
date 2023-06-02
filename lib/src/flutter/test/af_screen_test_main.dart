@@ -1,4 +1,4 @@
-import 'package:afib/afui_id.dart';
+import 'package:afib/afib_uiid.dart';
 import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';

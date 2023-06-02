@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 
 //--------------------------------------------------------------------------------------
 class AFUITextFieldSPI extends AFUIWidgetSPI<AFUIDefaultStateView, AFRouteParamUnused> {
-  AFUITextFieldSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard): super(context, standard);
+  const AFUITextFieldSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard): super(context, standard);
 factory AFUITextFieldSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard) {
     return AFUITextFieldSPI(context, standard);
   }

@@ -5,7 +5,7 @@
 /// you should import this library, not afib_flutter.
 library afib_command;
 
-export 'afui_id.dart'; // ok
+export 'afib_uiid.dart'; // ok
 export 'src/dart/command/af_args.dart'; // ok
 export "src/dart/command/af_command.dart";
 export "src/dart/command/af_command_enums.dart";

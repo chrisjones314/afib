@@ -1,4 +1,4 @@
-import 'package:afib/afui_id.dart';
+import 'package:afib/afib_uiid.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
@@ -7,7 +7,7 @@ import 'package:afib/src/flutter/ui/stateviews/afui_default_state_view.dart';
 import 'package:flutter/material.dart';
 
 class AFPrototypeLoadingScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFRouteParam> {
-  AFPrototypeLoadingScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFPrototypeLoadingScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard): super(context, standard);
   
   factory AFPrototypeLoadingScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard) {
     return AFPrototypeLoadingScreenSPI(context, standard,

@@ -10,6 +10,8 @@ class StateModelAccessT extends AFCoreFileSourceTemplate {
 
   @override
   String get template => '''
+// ignore_for_file: unused_import
+
 import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 

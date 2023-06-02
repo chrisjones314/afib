@@ -19,7 +19,7 @@ void afStateTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams par
 
   final tests = AFibF.g.stateTests;
   final contexts = <AFStateTestContext>[];
-  final testKind = "State";
+  const testKind = "State";
   final localStats = AFTestStats();
 
   final store = AFibF.g.internalOnlyActiveStore;

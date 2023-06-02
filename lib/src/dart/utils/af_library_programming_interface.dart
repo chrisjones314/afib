@@ -48,7 +48,7 @@ class AFLibraryProgrammingInterface {
   @protected 
   final AFLibraryProgrammingInterfaceContext context;
   
-  AFLibraryProgrammingInterface(this.id, this.context);
+  const AFLibraryProgrammingInterface(this.id, this.context);
 
 
 }

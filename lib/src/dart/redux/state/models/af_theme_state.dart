@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:afib/afui_id.dart';
-import 'package:afib/locale_id.dart';
+import 'package:afib/afib_uiid.dart';
+import 'package:afib/afib_localeid.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';

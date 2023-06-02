@@ -1,4 +1,4 @@
-import 'package:afib/afui_id.dart';
+import 'package:afib/afib_uiid.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 
 
 class AFUIPrototypeWaitingScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFRouteParam> {
-  AFUIPrototypeWaitingScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard): super(context, standard );
+  const AFUIPrototypeWaitingScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard): super(context, standard );
   
   factory AFUIPrototypeWaitingScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard) {
     return AFUIPrototypeWaitingScreenSPI(context, standard,

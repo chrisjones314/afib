@@ -1,4 +1,4 @@
-import 'package:afib/afui_id.dart';
+import 'package:afib/afib_uiid.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/models/af_route_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
@@ -33,7 +33,7 @@ class AFUIPrototypeDialogRouteParam extends AFScreenRouteParam {
 }
 
 class AFUIPrototypeDialogScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeDialogRouteParam> {
-  AFUIPrototypeDialogScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDialogRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIPrototypeDialogScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDialogRouteParam> context, AFStandardSPIData standard): super(context, standard);
   
   factory AFUIPrototypeDialogScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDialogRouteParam> context, AFStandardSPIData standard) {
     return AFUIPrototypeDialogScreenSPI(context, standard,

@@ -1163,11 +1163,11 @@ class AFBuilder<TSPI extends AFStateProgrammingInterface> extends StatelessWidge
   final TSPI spiParent;
   final AFBuildWithSPIDelegate<TSPI> builder;
 
-  const AFBuilder({
+  const AFBuilder({Key? key, 
     required this.config,
     required this.spiParent,
     required this.builder,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

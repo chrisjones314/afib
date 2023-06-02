@@ -1,4 +1,4 @@
-import 'package:afib/afui_id.dart';
+import 'package:afib/afib_uiid.dart';
 import 'package:afib/src/dart/redux/state/models/af_test_state.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param_with_flutter_state.dart';
@@ -85,7 +85,7 @@ class AFUIPrototypeHomeScreenParam extends AFScreenRouteParamWithFlutterState {
 }
 
 class AFPrototypeHomeScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeHomeScreenParam> {
-  AFPrototypeHomeScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeHomeScreenParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFPrototypeHomeScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeHomeScreenParam> context, AFStandardSPIData standard): super(context, standard);
   
   factory AFPrototypeHomeScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeHomeScreenParam> context, AFStandardSPIData standard) {
     return AFPrototypeHomeScreenSPI(context, standard,

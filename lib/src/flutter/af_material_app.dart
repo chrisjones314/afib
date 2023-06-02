@@ -50,7 +50,7 @@ class AFNavigatorObserver extends NavigatorObserver {
 abstract class AFMaterialApp<AppState> extends AFApp<AppState> {
   
   /// Construct an app with the specified [AFScreenMap]
-  AFMaterialApp({
+  const AFMaterialApp({
     Key? key,
   }): super(
     key: key,

@@ -958,8 +958,8 @@ class AFSpecificStateTestDefinitionContext {
           actualNow: time,
           timeZone: AFTimeZone.local,
           pauseTime: null,
-          simulatedOffset: Duration(milliseconds: 0),
-          pushUpdateFrequency: Duration(minutes: 1000),
+          simulatedOffset: const Duration(milliseconds: 0),
+          pushUpdateFrequency: const Duration(minutes: 1000),
           pushUpdateSpecificity: AFTimeStateUpdateSpecificity.minute
         ));
       }

@@ -1,5 +1,5 @@
 
-import 'package:afib/afui_id.dart';
+import 'package:afib/afib_uiid.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
@@ -25,7 +25,7 @@ void afInitPrototypeScreenMap(AFScreenMap screens) {
     screens.registerStartupScreen(AFUIScreenID.screenPrototypeHome, () => AFUIPrototypeHomeScreenParam.createOncePerScreen());
   } else {
     assert(config.isPrototypeEnvironment);
-    screens.registerStartupScreen(AFUIScreenID.screenPrototypeLoading, () => AFRouteParam(screenId: AFUIScreenID.screenPrototypeLoading, wid: AFUIWidgetID.useScreenParam, routeLocation: AFRouteLocation.screenHierarchy));
+    screens.registerStartupScreen(AFUIScreenID.screenPrototypeLoading, () => const AFRouteParam(screenId: AFUIScreenID.screenPrototypeLoading, wid: AFUIWidgetID.useScreenParam, routeLocation: AFRouteLocation.screenHierarchy));
   }
 
   screens.registerScreen(AFUIScreenID.screenPrototypeHome, (_) => AFPrototypeHomeScreen(), AFPrototypeHomeScreen.config);

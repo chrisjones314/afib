@@ -14,7 +14,7 @@ class AFUIUnimplementedScreenRouteParam extends AFScreenRouteParam {
 
 
 class AFUIUnimplementedScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIUnimplementedScreenRouteParam> {
-  AFUIUnimplementedScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIUnimplementedScreenRouteParam> context, AFStandardSPIData standard): super(context, standard, );
+  const AFUIUnimplementedScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIUnimplementedScreenRouteParam> context, AFStandardSPIData standard): super(context, standard, );
   
   factory AFUIUnimplementedScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIUnimplementedScreenRouteParam> context, AFStandardSPIData standard) {
     return AFUIUnimplementedScreenSPI(context, standard,

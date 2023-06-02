@@ -3,8 +3,8 @@
 /// Be careful not to reference this library from integration tests.
 library afib_flutter;
 
-export 'afui_id.dart';
-export 'locale_id.dart';
+export 'afib_uiid.dart';
+export 'afib_localeid.dart';
 export "src/dart/redux/actions/af_action_with_key.dart";
 export 'src/dart/redux/actions/af_always_fail_query.dart';
 export "src/dart/redux/actions/af_app_state_actions.dart";

@@ -144,9 +144,12 @@ class AFCreateAppCommand extends AFCommand {
   static const projectStyleTestIntentionalFailCreate = "app-test-intentional-fail-create";
   static const projectStyleTestIntentionalFailTest  = "app-test-intentional-fail-test";
 
+  @override
   final String name = "create";
+  @override
   final String description = "Install afib framework support into an existing flutter app project";
 
+  @override
   String get usage {
     return '''
 $usageHeader
@@ -189,11 +192,14 @@ Project Styles
 
   AFCreateAppCommand();
 
+  @override
   Future<void> run(AFCommandContext ctx) async {
     // override this to avoid 'error not in root of project'
     await execute(ctx);
   }
 
+  @override
+  // ignore: avoid_renaming_method_parameters
   Future<void> execute(AFCommandContext ctx) async {
     final args = ctx.parseArguments(
       command: this,
@@ -288,7 +294,7 @@ Project Styles
     for(final line in lines) {
       if(!line.startsWith("echo ")) {
         final simpleLine = AFCommandContext.simplifyProjectStyleCommand(line);
-        context.output.writeTwoColumns(col1: "execute ", col2: "$simpleLine");
+        context.output.writeTwoColumns(col1: "execute ", col2: simpleLine);
         await context.executeSubCommand(line);
       }
     }
@@ -477,7 +483,7 @@ installUILibrary: installCoreLibrary,
     final generator = context.generator;
     final pathAppCommand = generator.pathAppCommand;
     
-    final result = context.createFile(pathAppCommand, CommandAFibT());
+    final result = context.createFile(pathAppCommand, const CommandAFibT());
     return result;
   }
 
@@ -486,7 +492,7 @@ installUILibrary: installCoreLibrary,
   AFGeneratedFile _createEnvironmentFile(AFCreateCommandContext context, String suffix, AFSourceTemplate? body) {
     final result = context.createFile(context.generator.pathEnvironment(suffix), ConfigureEnvironmentT(), insertions: {
       ConfigureEnvironmentT.insertEnvironmentName: suffix,
-      ConfigureEnvironmentT.insertConfigureBody: body ?? SnippetEmptyStatementT()
+      ConfigureEnvironmentT.insertConfigureBody: body ?? const SnippetEmptyStatementT()
     });
 
     return result;

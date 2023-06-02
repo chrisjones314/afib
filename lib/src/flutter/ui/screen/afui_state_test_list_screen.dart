@@ -143,7 +143,7 @@ class AFUIStateTestListScreen extends AFUIConnectedScreen<AFUIStateTestListScree
     groupIds.sort((l, r) => l.compareTo(r));
     final roots = groups[AFUIStateTestListScreenSPI.rootParentName];
     if(roots != null) {
-      final groupId = AFUIStateTestListScreenSPI.rootParentName;
+      const groupId = AFUIStateTestListScreenSPI.rootParentName;
       rows.add(_addGroup(spi, AFUIWidgetID.cardTestGroup.with1(groupId), groupId, roots));
     }
 

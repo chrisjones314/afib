@@ -19,12 +19,13 @@ class SnippetWidgetParamsConstructorT extends AFSnippetSourceTemplate {
     return SnippetWidgetParamsConstructorT(
       templateFileId: "widget_params_constructor",
       templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         insertExtraConstructorParams: AFSourceTemplate.empty,
       })
     );
   }
 
+  @override
   String get template => '''{
     AFWidgetID? widOverride,
     required AFRouteParam launchParam,

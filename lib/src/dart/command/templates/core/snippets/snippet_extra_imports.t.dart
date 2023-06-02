@@ -20,12 +20,13 @@ class SnippetExtraImportsT extends AFSnippetSourceTemplate {
     return SnippetExtraImportsT(
       templateFileId: "extra_imports",    
       templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertExtraImportsInsertion: AFSourceTemplate.empty,
       })
     );
   }
 
+  @override
   String get template => '''
 $insertExtraImports
 ''';

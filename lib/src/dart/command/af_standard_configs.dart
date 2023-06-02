@@ -24,6 +24,7 @@ class AFConfigEntryEnvironment extends AFConfigurationItemOptionChoice {
     addChoice(textValue: "test", help: "Used internally when command-line tests are executing, not usually explicitly used by developers", runtimeValue: AFEnvironment.test);
   }
 
+  @override
   void setValueWithString(AFConfig dest, String value) {
     final choice = this.findChoice(value);
     if(choice == null) {
@@ -234,6 +235,7 @@ class AFConfigEntryTestSize extends AFConfigurationItemOptionChoice {
   }
 
   /// Return an error message if the value is invalid, otherwise return null.
+  @override
   String? validate(dynamic value) {
     final parsed = _parseValue(value);
     if(parsed is String) {
@@ -248,7 +250,7 @@ class AFConfigEntryTestSize extends AFConfigurationItemOptionChoice {
       return standard;
     }
 
-    const badFormatError = "Expected test-size to be either a standard size (see afib.dart help config) or [width]x[height]";;
+    const badFormatError = "Expected test-size to be either a standard size (see afib.dart help config) or [width]x[height]";
     final dims = value.split("x");
     if(dims.length != 2) {
       return badFormatError;
@@ -264,6 +266,7 @@ class AFConfigEntryTestSize extends AFConfigurationItemOptionChoice {
     return AFFormFactorSize(identifier: "custom${w}x$h", width: w, height: h);
   }
 
+  @override
   void setValue(AFConfig dest, dynamic value) {
     if(value is String) {
       final size = _parseValue(value);
@@ -304,6 +307,7 @@ class AFConfigEntryTestOrientation extends AFConfigurationItemOptionChoice {
   }
 
   /// Return an error message if the value is invalid, otherwise return null.
+  @override
   String? validate(dynamic value) {
     if(value != AFFormFactorSize.idOrientationPortrait && value != AFFormFactorSize.idOrientationLandscape) {
       return "Value for $name must be ${AFFormFactorSize.idOrientationPortrait} or ${AFFormFactorSize.idOrientationLandscape}";

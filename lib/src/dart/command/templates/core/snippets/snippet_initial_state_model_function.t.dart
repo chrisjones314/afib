@@ -16,6 +16,7 @@ class SnippetInitialStateModelFunctionT extends AFSnippetSourceTemplate {
     })
   );
 
+  @override
   String get template => '''
 static $insertMainType initialState() {
   return $insertMainType($insertInitialStateParams);

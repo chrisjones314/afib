@@ -65,6 +65,7 @@ class ModelT extends AFFileSourceTemplate {
   }
 
 
+  @override
   String get template => '''
 import 'package:afib/afib_command.dart';
 import 'package:meta/meta.dart';

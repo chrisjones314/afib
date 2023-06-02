@@ -9,7 +9,7 @@ class SnippetSigninStarterSignedInBottomNavBarExtraImportsT {
     return SnippetExtraImportsT(
       templateFileId: "signed_in_bottom_nav_bar_extra_imports",    
       templateFolder: AFProjectPaths.pathGenerateStarterSigninSnippets,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertExtraImportsInsertion: '''
 ''',
       })
@@ -23,6 +23,7 @@ class SnippetSigninStarterSignedInBottomNavBarBuildBodyT extends AFSnippetSource
     templateFolder: AFProjectPaths.pathGenerateStarterSigninSnippets,
   );
   
+  @override
   String get template => '''
 final t = spi.t;
 final cols = t.row();
@@ -40,7 +41,7 @@ return BottomAppBar(
 class SnippetSigninStarterSignedInBottomNavBarSPIT {
 
   static SnippetDeclareSPIT example() {
-    final ei = AFSourceTemplateInsertions(insertions: {
+    const ei = AFSourceTemplateInsertions(insertions: {
       AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 void onPressedMenuDrawer() {
   context.showLeftSideDrawer();

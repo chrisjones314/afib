@@ -18,6 +18,7 @@ class SnippetInitialWireframeBodyT extends AFSnippetSourceTemplate {
 
   ];
   
+  @override
   String get template => '''
 bool _executeHandleEvent${UnitTestT.insertTestName}Wireframe(AFWireframeExecutionContext context) {
   final stateView = context.accessStateView<${insertAppNamespaceUpper}DefaultStateView>();

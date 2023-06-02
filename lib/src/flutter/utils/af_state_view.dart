@@ -23,7 +23,7 @@ abstract class AFFlexibleStateView extends AFComponentState {
 
 @immutable 
 class AFStateViewUnused extends AFFlexibleStateView {
-  static final unused = AFStateViewUnused(<String, Object>{});
+  static final unused = AFStateViewUnused(const <String, Object>{});
   static final AFCreateStateViewDelegate creator = (models) => AFStateViewUnused(models);
 
   AFStateViewUnused(Map<String, Object> models): super(models: models, create: (models) => AFStateViewUnused(models));

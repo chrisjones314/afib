@@ -7,6 +7,7 @@ class CommandAFibT extends AFCoreFileSourceTemplate {
     templateFileId: "command_afib",
   );
 
+  @override
   String get template => '''
 import 'package:afib/afib_command.dart';
 import 'package:$insertPackagePath/initialization/create_dart_params.dart';

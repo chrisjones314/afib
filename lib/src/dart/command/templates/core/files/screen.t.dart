@@ -18,7 +18,9 @@ class ScreenT extends AFCoreFileSourceTemplate {
     templateFileId: "screen",
   );
 
+  @override
   String get template => '''
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:$insertPackageName/${insertAppNamespace}_id.dart';

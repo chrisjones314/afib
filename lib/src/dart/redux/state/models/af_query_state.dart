@@ -57,9 +57,7 @@ class AFQueryState {
     dynamic result = listenerQueries[id];
     if(result == null) {
       result = deferredQueries[id];
-      if(result == null) {
-        result = periodicQueries[id];
-      }
+      result ??= periodicQueries[id];
     }
     return result as AFTrackedQuery?;
   }

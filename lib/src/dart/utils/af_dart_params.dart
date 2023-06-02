@@ -21,7 +21,7 @@ class AFDartParams<AppState> {
   final Logger? logger;
   final AFEnvironment? forceEnv;   
   
-  AFDartParams({
+  const AFDartParams({
     required this.configureAfib,
     required this.configureAppConfig,
     required this.configureDebugConfig,
@@ -37,7 +37,7 @@ class AFDartParams<AppState> {
   }
 
   static AFDartParams createEmpty() {
-    return AFDartParams(
+    return const AFDartParams(
       configureAfib: _nullConfigFunction,
       configureAppConfig: _nullConfigFunction,
       configureDebugConfig: _nullConfigFunction,

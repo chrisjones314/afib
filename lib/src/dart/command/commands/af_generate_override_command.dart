@@ -11,9 +11,12 @@ class AFGenerateOverrideSubcommand extends AFCommand {
   static const spiSuffix = "SPI";
   static const lpiSuffix = "LPI";
 
+  @override
   final String name = "override";
+  @override
   final String description = "Override a theme or LPI from a 3rd party library";
 
+  @override
   String get usage {
     return '''
 $usageHeader
@@ -34,15 +37,16 @@ $optionsHeader
 
   AFGenerateOverrideSubcommand();
 
+  @override
   Future<void> run(AFCommandContext ctx) async {
     // override this to avoid 'error not in root of project'
     await execute(ctx);
   }
 
   @override
-  Future<void> execute(AFCommandContext ctx) async {
+  Future<void> execute(AFCommandContext context) async {
     // first, determine the base path.
-    final args = ctx.parseArguments(
+    final args = context.parseArguments(
       command: this, 
       unnamedCount: 1, 
       named: {
@@ -58,7 +62,7 @@ $optionsHeader
       throwUsageError("You must specify --$argParentType");
     }
 
-    final generator = ctx.generator;
+    final generator = context.generator;
     if(uiName.endsWith(themeSuffix)) {
       
       final fullId = generator.deriveFullLibraryIDFromType(parentType, themeSuffix);
@@ -67,7 +71,7 @@ $optionsHeader
       args.setIfNull(AFGenerateUISubcommand.argParentThemeID, fullId);
         
       final fromLib = generator.findLibraryForTypeWithPrefix(parentType);
-      AFGenerateUISubcommand.createTheme(ctx, uiName, args, 
+      AFGenerateUISubcommand.createTheme(context, uiName, args, 
         fullId: fullId,
         fromLib: fromLib,
       );
@@ -75,12 +79,12 @@ $optionsHeader
 
 
     } else if(uiName.endsWith(lpiSuffix)) {
-      _generateLPIOverride(ctx, uiName, parentType);      
+      _generateLPIOverride(context, uiName, parentType);      
     } else {
       throwUsageError("Expected $uiName to end with Theme or SPI");
     }
 
-      generator.finalizeAndWriteFiles(ctx);
+      generator.finalizeAndWriteFiles(context);
   }
 
   void _generateLPIOverride(AFCommandContext context, String identifier, String parentType) {

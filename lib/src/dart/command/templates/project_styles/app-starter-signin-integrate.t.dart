@@ -7,6 +7,7 @@ class StarterSigninIntegrateT extends AFProjectStyleSourceTemplate {
     templateFileId: AFCreateAppCommand.projectStyleSigninIntegrate,
   );
 
+  @override
   String get template => '''
 import project_styles/app-starter-signin-shared-integrate
 generate query CheckSigninQuery --result-type UserCredentialRoot --override-templates "core/files/query_simple=project_styles/app-starter-signin/files/query_check_signin"

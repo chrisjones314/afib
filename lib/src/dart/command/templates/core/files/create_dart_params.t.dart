@@ -7,6 +7,7 @@ class CreateDartParamsT extends AFCoreFileSourceTemplate {
     templateFileId: "create_dart_params",
   );  
 
+  @override
   String get template => '''
 import 'package:afib/afib_command.dart';
 import 'package:$insertPackagePath/initialization/application.dart';
@@ -17,7 +18,7 @@ import 'package:$insertPackagePath/initialization/environments/prototype.dart';
 import 'package:$insertPackagePath/initialization/environments/test.dart';
 
 AFDartParams createDartParams() {
-  return AFDartParams(    
+  return const AFDartParams(    
     configureAfib: configureAfib,
     configureAppConfig: configureApplication,
     configureProductionConfig: configureProduction,

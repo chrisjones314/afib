@@ -27,6 +27,7 @@ class UnitTestT extends AFFileSourceTemplate {
     );
   } 
 
+  @override
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackagePath/${insertAppNamespace}_id.dart';

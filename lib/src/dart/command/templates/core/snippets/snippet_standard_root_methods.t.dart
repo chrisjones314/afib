@@ -10,6 +10,7 @@ class SnippetStandardRootMethodsT extends AFCoreSnippetSourceTemplate {
     "import 'package:$insertPackagePath/state/models/${AFSourceTemplate.insertMainTypeNoRootInsertion.snake}.dart';"
   ];    
 
+  @override
   String get template => '''
 factory $insertMainType.fromList(Iterable<${AFSourceTemplate.insertMainTypeNoRootInsertion}> sources) => $insertMainType(items: {
   for(final source in sources) 

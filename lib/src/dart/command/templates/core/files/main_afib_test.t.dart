@@ -8,6 +8,7 @@ class MainAFibTestT extends AFCoreFileSourceTemplate {
     templateFileId: "main_afib_test",
   );  
 
+  @override
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackageName/${insertAppNamespace}_id.dart';

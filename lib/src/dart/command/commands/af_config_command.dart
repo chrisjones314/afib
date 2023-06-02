@@ -10,11 +10,14 @@ import 'package:args/args.dart' as args;
 /// Command that displays or modified values from [AFConfig], and
 /// that modifed values under the initialization/afib.g.dart.
 class AFConfigCommand extends AFCommand { 
+  @override
   final name = "config";
+  @override
   String get description {
     return "Set configuration values in initialization/${AFibD.config.appNamespace}_config.g.dart";
   } 
 
+  @override
   String get usage {
     return '''
 $usageHeader
@@ -68,13 +71,13 @@ $optionsHeader
   }
 
   @override
-  Future<void> execute(AFCommandContext ctx) async {    
+  Future<void> execute(AFCommandContext context) async {    
 
-    updateConfig(ctx, AFibD.config, AFibD.configEntries, ctx.arguments);
-    writeUpdatedConfig(ctx);
+    updateConfig(context, AFibD.config, AFibD.configEntries, context.arguments);
+    writeUpdatedConfig(context);
 
     // replace any default 
-    ctx.generator.finalizeAndWriteFiles(ctx);
+    context.generator.finalizeAndWriteFiles(context);
 
   }
 }

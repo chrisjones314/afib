@@ -8,6 +8,7 @@ class AppT extends AFCoreFileSourceTemplate {
     templateFileId: "app",
   );
 
+  @override
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackagePath/state/${insertAppNamespace}_state.dart';
@@ -15,7 +16,11 @@ import 'package:flutter/material.dart';
 
 class ${insertAppNamespaceUpper}App extends AFMaterialApp<${insertAppNamespaceUpper}State> {
 
-  ${insertAppNamespaceUpper}App(): super();
+  ${insertAppNamespaceUpper}App({
+    Key? key,
+  }): super(
+    key: key,
+  );
 
   @override
   Widget buildMaterialApp(AFFundamentalThemeState fundamentals) {

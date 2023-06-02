@@ -10,7 +10,7 @@ import 'package:meta/meta.dart';
 abstract class AFStandardIDMapRoot<TSubclass, TModel> {
   final Map<String, TModel> items;
 
-  AFStandardIDMapRoot({
+  const AFStandardIDMapRoot({
     required this.items,
   });
 

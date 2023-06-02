@@ -19,11 +19,12 @@ class SnippetScreenParamsConstructorT extends AFSnippetSourceTemplate {
     return SnippetScreenParamsConstructorT(
       templateFileId: "screen_params_constructor",
       templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         insertExtraConstructorParams: AFSourceTemplate.empty,
       })
     );
   }
 
+  @override
   String get template => '$insertExtraConstructorParams';  
 }

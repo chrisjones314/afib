@@ -6,6 +6,7 @@ class LibraryExportsT extends AFCoreFileSourceTemplate {
     templateFileId: "library_exports",
   );
 
+  @override
   String get template => '''
 library $insertPackageName;
 

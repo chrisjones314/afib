@@ -18,10 +18,11 @@ class SnippetWidgetRouteParamT extends AFSnippetSourceTemplate {
     return SnippetWidgetRouteParamT(
       templateFileId: "widget_route_param",
       templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {})
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {})
     );
   }
 
+  @override
   String get template => '''
 class ${insertMainType}RouteParam extends AF${ScreenT.insertControlTypeSuffix}RouteParam {
   

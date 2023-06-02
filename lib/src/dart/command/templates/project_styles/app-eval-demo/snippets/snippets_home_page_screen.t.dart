@@ -28,7 +28,7 @@ class SnippetHomePageScreenRouteParamT {
     return SnippetStandardRouteParamT(
       templateFileId: "home_page_screen_route_param",
       templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertCreateParamsInsertion: AFSourceTemplate.empty,
         AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 
@@ -82,6 +82,7 @@ class SnippetHomePageScreenAdditionalMethodsT extends AFSnippetSourceTemplate {
     templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
+  @override
   String get template => '''
 Widget _buildManageCountCard(HomePageScreenSPI spi) {
   final  t = spi.t;
@@ -134,6 +135,7 @@ class SnippetHomePageScreenBuildBodyT extends AFSnippetSourceTemplate {
     templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
+  @override
   String get template => '''
     final t = spi.t;
     final rows = t.column();
@@ -154,6 +156,7 @@ class SnippetHomePageScreenBuildWithSPIImplT extends AFSnippetSourceTemplate {
     templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
+  @override
   String get template => '''
 final t = spi.t;
 
@@ -184,7 +187,7 @@ return t.childScaffold<AFBuildContext<${AFSourceTemplate.insertAppNamespaceInser
 class SnippetHomePageScreenSPIT {
 
   static SnippetDeclareSPIT example() {
-    final ei = AFSourceTemplateInsertions(insertions: {
+    const ei = AFSourceTemplateInsertions(insertions: {
       AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 String get textCurrentStanza {
   return context.p.textCurrentStanza;

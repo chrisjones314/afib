@@ -7,6 +7,7 @@ class AppStateT extends AFCoreFileSourceTemplate {
     templateFileId: "app_state",
   );
 
+  @override
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackagePath/state/${insertAppNamespace}_state_model_access.dart';

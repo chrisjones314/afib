@@ -8,7 +8,9 @@ class StateModelAccessT extends AFCoreFileSourceTemplate {
   );
 
 
+  @override
   String get template => '''
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 
 mixin ${insertAppNamespaceUpper}StateModelAccess on AFStateModelAccess {

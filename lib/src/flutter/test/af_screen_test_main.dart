@@ -82,8 +82,6 @@ Future<void> afScreenTestMain(AFCommandOutput output, AFTestStats stats, AFDartP
       await _afWorkflowTestMain(output, stats, tester, app);
     }
   }
-
-  return null;
 }
 
 
@@ -136,11 +134,11 @@ Future<void> _afStandardScreenTestMain(
       }
 
       // tell the store to go to the correct screen.
-      await tester.pumpAndSettle(Duration(seconds: 1));
+      await tester.pumpAndSettle(const Duration(seconds: 1));
 
       if(showItem != null) {
         await showItem(dispatcher, prototype);
-        await tester.pumpAndSettle(Duration(seconds: 1));
+        await tester.pumpAndSettle(const Duration(seconds: 1));
       }
 
       output.indent();
@@ -155,7 +153,7 @@ Future<void> _afStandardScreenTestMain(
       }
       
       dispatcher.setContext(context);
-      await tester.pumpAndSettle(Duration(seconds: 1));
+      await tester.pumpAndSettle(const Duration(seconds: 1));
     }
   }
 
@@ -256,7 +254,7 @@ Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, 
 
 Future<void> _afWorkflowTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
  final multiContexts = <AFScreenTestContextWidgetTester>[];
-  final testKind = "Workflow";
+  const testKind = "Workflow";
   final localStats = AFTestStats();
 
   for(final test in AFibF.g.workflowTests.stateTests) {
@@ -278,7 +276,7 @@ Future<void> _afWorkflowTestMain(AFCommandOutput output, AFTestStats stats, Widg
       AFWorkflowStatePrototype.initializeMultiscreenPrototype(dispatcher, test);
       
       // tell the store to go to the correct screen.
-      await tester.pumpAndSettle(Duration(seconds: 1));
+      await tester.pumpAndSettle(const Duration(seconds: 1));
 
       AFibD.logTestAF?.d("Finished pumpWidget for ${test.id}");
       await test.body.run(context);
@@ -289,7 +287,7 @@ Future<void> _afWorkflowTestMain(AFCommandOutput output, AFTestStats stats, Widg
       AFibF.g.internalOnlyActiveStore.dispatch(AFShutdownOngoingQueriesAction());
       
       //dispatcher.setContext(context);
-      await tester.pumpAndSettle(Duration(seconds: 1));
+      await tester.pumpAndSettle(const Duration(seconds: 1));
 
       /// Clear out our cache of screen info for the next test.
       AFibF.g.resetTestScreens();
@@ -301,5 +299,4 @@ Future<void> _afWorkflowTestMain(AFCommandOutput output, AFTestStats stats, Widg
   final baseMultiContexts = List<AFBaseTestExecute>.of(multiContexts);
    printTestTotal(output, baseMultiContexts, localStats);
   stats.mergeIn(localStats);
-  return null;
 }

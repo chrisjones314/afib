@@ -14,6 +14,7 @@ class AFGenerateIDSubcommand extends AFGenerateSubcommand {
   @override
   String get name => "id";
 
+  @override
   String get usage {
     return '''
 $usageHeader

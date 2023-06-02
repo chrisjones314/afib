@@ -20,6 +20,7 @@ class AFGenerateQuerySubcommand extends AFGenerateSubcommand {
   @override
   String get name => "query";
 
+  @override
   String get usage {
     return '''
 $usageHeader

@@ -20,13 +20,15 @@ class StateTestT extends AFFileSourceTemplate {
     return StateTestT(
       templateFileId: "state_test",
       templateFolder: AFProjectPaths.pathGenerateCoreFiles,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertAdditionalMethodsInsertion: AFSourceTemplate.empty,
       })
     );
   } 
 
+  @override
   String get template => '''
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackagePath/${insertAppNamespace}_id.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;

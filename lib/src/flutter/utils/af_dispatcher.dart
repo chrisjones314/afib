@@ -21,6 +21,7 @@ class AFStoreDispatcher extends AFDispatcher {
   AFStore store;
   AFStoreDispatcher(this.store);
 
+  @override
   dynamic dispatch(dynamic action) {  
 
     if(action is AFExecuteBeforeInterface) {
@@ -102,6 +103,7 @@ class AFTestDispatcher extends AFDispatcher {
     actions.clear();
   }
 
+  @override
   dynamic dispatch(dynamic action) {
     actions.add(action);
     return null;

@@ -97,9 +97,4 @@ class AFWidgetScreenTestDispatcher extends AFScreenTestDispatcher {
     required this.originalParam
   }): super(main, context);
 
-  @override
-  void dispatch(dynamic action) {
-    super.dispatch(action);
-  }
-
 }

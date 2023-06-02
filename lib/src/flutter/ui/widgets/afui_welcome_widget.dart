@@ -38,6 +38,7 @@ class AFUIAlphaWarningWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, A
     launchParam: AFRouteParamUnused.unused,
   );
 
+  @override
   Widget buildWithSPI(AFUIWelcomeWidgetSPI spi) {
     return _buildAlphaWarningCard(spi);
   }
@@ -49,6 +50,7 @@ class AFUIAlphaWarningWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, A
     rows.add(t.childText(text: "AFib is alpha software.  Please report bugs on github.", textColor: t.colorOnAlert));
     final borderRadius = roundBottom ? t.borderRadius.standard : t.borderRadius.t.standard;
 
+    // ignore: avoid_unnecessary_containers
     return Container(
       decoration: BoxDecoration(
         borderRadius: borderRadius,

@@ -14,6 +14,7 @@ class SnippetCounterManagementSmokeTest extends AFSnippetSourceTemplate {
   "import 'package:$insertPackagePath/query/simple/write_count_history_item_query.dart';"
 ];
 
+  @override
   String get template => '''
 await e.matchText(${insertAppNamespaceUpper}WidgetID.textCountRouteParam, ft.equals("0"));
 await e.applyTap(${insertAppNamespaceUpper}WidgetID.buttonIncrementRouteParam);

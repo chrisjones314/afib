@@ -3,6 +3,7 @@ import 'package:afib/src/dart/command/af_source_template.dart';
 
 class SnippetInitialState extends AFSourceTemplate {
 
+  @override
   String get template => "$insertMainType.initialState()";
 
 }
@@ -33,6 +34,7 @@ class SnippetDefineTestDataT extends AFSnippetSourceTemplate {
     );
   }
 
+  @override
   String get template => '''
 void _define$insertMainType(AFDefineTestDataContext context) {
   $insertModelDeclaration

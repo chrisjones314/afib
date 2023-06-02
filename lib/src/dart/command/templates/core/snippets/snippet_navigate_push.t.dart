@@ -26,6 +26,7 @@ class SnippetNavigatePushT extends AFSnippetSourceTemplate {
     );
   }
 
+  @override
   String get template {
     return '''
 static AFNavigatePushAction navigatePush($insertNavigatePushParamDecl) {

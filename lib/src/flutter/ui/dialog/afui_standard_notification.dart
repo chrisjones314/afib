@@ -46,7 +46,7 @@ class AFUIStandardNotification extends StatelessWidget {
       color: colorBackground,
       child: SafeArea(
         child: Container(
-          padding: EdgeInsets.only(top: 15.0),
+          padding: const EdgeInsets.only(top: 15.0),
           child: ListTile(          
             title: title.toRichText(),
             subtitle: body?.toRichText(),

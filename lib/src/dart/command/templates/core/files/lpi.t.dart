@@ -27,7 +27,9 @@ class LPIT extends AFFileSourceTemplate {
     );
   }
 
+  @override
   String get template => '''
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 $insertExtraImports
 

@@ -11,7 +11,7 @@ class ModelCountHistoryItemT extends ModelExampleStartHereT {
   );  
 
   factory ModelCountHistoryItemT.example() {
-    return ModelCountHistoryItemT(embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+    return ModelCountHistoryItemT(embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
       AFSourceTemplate.insertExtraImportsInsertion: '''
 import 'package:afib/afib_command.dart';
 ''',

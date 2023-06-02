@@ -17,7 +17,7 @@ void afUnitTestMain(AFCommandOutput output, AFTestStats stats, AFDartParams para
 
   final tests = AFibF.g.unitTests;
   final contexts = <AFUnitTestContext>[];
-  final testKind = "Unit";
+  const testKind = "Unit";
   final localStats = AFTestStats();
 
   for(final test in tests.tests) {

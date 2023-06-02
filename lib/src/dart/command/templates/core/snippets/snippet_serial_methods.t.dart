@@ -36,6 +36,7 @@ class SnippetSerialMethodsT extends AFSnippetSourceTemplate {
     );
   }
 
+  @override
   String get template {
     return '''
 static Map<String, dynamic> serializeToMap($insertMainType item) {

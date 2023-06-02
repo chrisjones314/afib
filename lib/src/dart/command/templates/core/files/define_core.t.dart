@@ -5,6 +5,7 @@ import 'package:afib/afib_command.dart';
 class DefineCoreUIFunctionsT extends AFSourceTemplate {
   static const insertFundamentalThemeInitCall = AFSourceTemplateInsertion("query_type");
 
+  @override
   String get template => '''
 void defineFunctionalThemes(AFCoreDefinitionContext context) {
 }
@@ -20,6 +21,7 @@ void defineFundamentalTheme(AFFundamentalDeviceTheme device, AFComponentStates a
 }
 
 class DefineCoreCallUIFunctionsT extends AFSourceTemplate {
+  @override
   final String template = '''
   defineFunctionalThemes(context);
   defineScreens(context);
@@ -45,13 +47,14 @@ class DefineCoreT extends AFFileSourceTemplate {
     return DefineCoreT(
       templateFileId: "define_core",
       templateFolder: AFProjectPaths.pathGenerateCoreFiles,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         insertAddStateViewAugmentor: AFSourceTemplate.empty,
         AFSourceTemplate.insertExtraImportsInsertion: AFSourceTemplate.empty,
       })
     );
   }
 
+  @override
   String get template => '''
 import 'package:flutter/material.dart';
 import 'package:afib/afib_flutter.dart';

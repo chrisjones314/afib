@@ -8,12 +8,13 @@ class SnippetStartupScreenBuildBodyT extends AFSnippetSourceTemplate {
     templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
+  @override
   String get template => '''
 final t = spi.t;
 final rows = t.column();
 rows.add(t.childMargin(
   margin: t.margin.v.biggest,  
-  child: t.childText(text: "Startup Screen", style: t.styleOnCard.headline4)
+  child: t.childText(text: "Startup Screen", style: t.styleOnCard.headlineMedium)
 ));
 rows.add(t.childCaptionSimulatedLatency());
 return Center(
@@ -28,6 +29,7 @@ class SnippetStartupScreenBuildWithSPIImplT extends AFSnippetSourceTemplate {
     templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
+  @override
   String get template => '''
 final t = spi.t;
 final body = _buildBody(spi);

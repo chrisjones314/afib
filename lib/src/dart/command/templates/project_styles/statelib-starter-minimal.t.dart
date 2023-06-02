@@ -7,6 +7,7 @@ class StateLibStarterMinimalT extends AFProjectStyleSourceTemplate {
     templateFileId: AFCreateAppCommand.projectStyleStateLibStarterMinimal,
   );
 
+  @override
   String get template => '''
 require meta
 ''';

@@ -35,7 +35,7 @@ class SnippetRegistrationDetailsMemberVariablesDeclT {
     return SnippetScreenMemberVariableDeclsT(
       templateFileId: "screen_member_variable_decls",
       templateFolder: AFProjectPaths.pathGenerateStarterSigninSnippets,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         SnippetScreenMemberVariableDeclsT.insertDecls: '''
 final Color? colorForeground;
 final TextTheme? textTheme;
@@ -56,7 +56,7 @@ class SnippetRegistrationDetailsWidgetParamsConstructorT {
     return SnippetWidgetParamsConstructorT(
       templateFileId: "widget_params_constructor",
       templateFolder: AFProjectPaths.pathGenerateStarterSigninSnippets,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         SnippetWidgetParamsConstructorT.insertExtraConstructorParams: '''
 this.textTheme,
 this.colorForeground,
@@ -78,6 +78,7 @@ class SnippetRegistrationDetailsWidgetRouteParamT extends AFSnippetSourceTemplat
       templateFolder: AFProjectPaths.pathGenerateStarterSigninSnippets,
     );
 
+  @override
   String get template => '''
 class RegistrationDetailsWidgetRouteParam extends AFWidgetRouteParamWithFlutterState {
   final User user;
@@ -166,6 +167,7 @@ class SnippetRegistrationDetailsWidgetAdditionalMethodsT extends AFSnippetSource
     templateFolder: AFProjectPaths.pathGenerateStarterSigninSnippets,
   );
   
+  @override
   String get template => '''
 
 // normally, the launch param would come from the parent screen's SPI, which is accessible from both
@@ -191,6 +193,7 @@ class SnippetRegistrationDetailsWidgetBuildBodyT extends AFSnippetSourceTemplate
     templateFolder: AFProjectPaths.pathGenerateStarterSigninSnippets,
   );
   
+  @override
   String get template => '''
 final context = spi.context;
 final t = spi.themeSignin;

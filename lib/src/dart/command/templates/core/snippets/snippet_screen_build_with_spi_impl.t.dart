@@ -17,7 +17,7 @@ class SnippetScreenBuildWithSPIImplT extends AFSnippetSourceTemplate {
   factory SnippetScreenBuildWithSPIImplT.core() {
     return SnippetScreenBuildWithSPIImplT(
       templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         insertAppBarParams: '''
 leading: t.leadingButtonStandardBack(spi, screen: screenId),
 '''
@@ -29,13 +29,14 @@ leading: t.leadingButtonStandardBack(spi, screen: screenId),
     return SnippetScreenBuildWithSPIImplT(
       templateFileId: "screen_build_with_spi_impl_no_back",
       templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         insertAppBarParams: AFSourceTemplate.empty,
       })
     );
   }
 
 
+  @override
   String get template => '''
 final t = spi.t;
 final body = _buildBody(spi);

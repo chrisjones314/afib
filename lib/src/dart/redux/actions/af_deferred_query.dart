@@ -42,6 +42,7 @@ abstract class AFDeferredQuery extends AFAsyncQuery<AFUnused> implements AFTrack
   /// In addition, any calculations done at the beginning might be based on an
   /// obsolete state by the time onResponse gets called.   Instead, you want to
   /// do your calculations on the state you are handed on [finishAsyncExecute]
+  @override
   void startAsync(AFStartQueryContext<AFUnused> context) {
     _delayThenExecute(context);
   }
@@ -61,12 +62,14 @@ abstract class AFDeferredQuery extends AFAsyncQuery<AFUnused> implements AFTrack
 
   /// Calls the more appropriate [finishAsyncExecute] when the [delay] associated with this
   /// query has expired.
+  @override
   void finishAsyncWithResponse(AFFinishQuerySuccessContext<AFUnused> context) {
     finishAsyncExecute(context);
     context.dispatch(AFShutdownDeferredQueryAction(this.key));
   }
 
   /// Returns the new query, causing any existing query to be shutdown and replaced with the new one
+  @override
   AFTrackedQuery? mergeOnWrite(AFTrackedQuery newQuery) {
     return newQuery;
   }
@@ -82,6 +85,7 @@ abstract class AFDeferredQuery extends AFAsyncQuery<AFUnused> implements AFTrack
     shutdown();
   }
 
+  @override
   void shutdown();
 
   AFFinishQuerySuccessContext<AFUnused> createSuccessContext({
@@ -119,12 +123,12 @@ abstract class AFPeriodicQuery extends AFAsyncQuery<AFUnused> implements AFTrack
   /// In addition, any calculations done at the beginning might be based on an
   /// obsolete state by the time onResponse gets called.   Instead, you want to
   /// do your calculations on the state you are handed on [finishAsyncExecute]
+  @override
   void startAsync(AFStartQueryContext<AFUnused> context) {
     if(executeImmediately) {
       AFibD.logQueryAF?.d("Executing immediately for deferred query $this");
       context.onSuccess(AFUnused.unused);
     }
-    print("Starting period with delay $delay");
     timer = Timer.periodic(delay, (_) {
       AFibD.logQueryAF?.d("Executing finishAsyncExecute for deferred query $this");
       context.onSuccess(AFUnused.unused);
@@ -133,6 +137,7 @@ abstract class AFPeriodicQuery extends AFAsyncQuery<AFUnused> implements AFTrack
 
   /// Calls the more appropriate [finishAsyncExecute] when the [delay] associated with this
   /// query has expired.
+  @override
   void finishAsyncWithResponse(AFFinishQuerySuccessContext<AFUnused> context) {
     keepGoing = finishAsyncExecute(context);
     if(!keepGoing) {
@@ -152,10 +157,12 @@ abstract class AFPeriodicQuery extends AFAsyncQuery<AFUnused> implements AFTrack
   }
 
   /// Returns the new query, causing any existing query to be shutdown and replaced with the new one
+  @override
   AFTrackedQuery? mergeOnWrite(AFTrackedQuery newQuery) {
     return newQuery;
   }
 
+  @override
   void shutdown();
 
   AFFinishQuerySuccessContext<AFUnused> createSuccessContext({
@@ -177,6 +184,7 @@ abstract class AFPeriodicQuery extends AFAsyncQuery<AFUnused> implements AFTrack
 class AFDeferredSuccessQuery extends AFDeferredQuery {
 
   AFDeferredSuccessQuery(AFID id, Duration delayOnce, AFOnResponseDelegate<AFUnused> onSuccess): super(delayOnce, id: id, onSuccess: onSuccess);
+  @override
   Duration? finishAsyncExecute(AFFinishQuerySuccessContext<AFUnused> context) {
     final onSuccessD = this.onSuccess;
     if(onSuccessD != null) {
@@ -186,10 +194,12 @@ class AFDeferredSuccessQuery extends AFDeferredQuery {
   }
 
   /// Returns the existing query, dropping the new query.
+  @override
   AFTrackedQuery mergeOnWrite(AFTrackedQuery newQuery) {
     return this;
   }
 
+  @override
   void shutdown() {
 
   }

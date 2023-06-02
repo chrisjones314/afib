@@ -469,6 +469,7 @@ class AFTimeState {
     return right;
   }
 
+  @override
   bool operator==(Object other) {
     if(other is! AFTimeState) {
       return false;
@@ -493,10 +494,12 @@ class AFTimeState {
     return actualNow == other.actualNow;
   }
 
+  @override
   int get hashCode {
     return currentPushTime.hashCode;
   }
 
+  @override
   String toString() {
     if(actualNow == null) {
       return missingNowError;

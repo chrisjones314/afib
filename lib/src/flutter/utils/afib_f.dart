@@ -59,7 +59,7 @@ class AFWidgetsBindingObserver extends WidgetsBindingObserver {
   }
 
   @override
-  void didChangeLocales(List<Locale>? locale) {
+  void didChangeLocales(List<Locale>? locales) {
     AFibD.logThemeAF?.d("Detected local change");
     rebuildTheme();
   }
@@ -127,9 +127,7 @@ class AFibStoreStackEntry {
   });
 
   Stream<AFPublicStateChange> get changeEvents {
-    if(stageChangeStream == null) {
-      stageChangeStream = stateChangeController.stream.asBroadcastStream();
-    }
+    stageChangeStream ??= stateChangeController.stream.asBroadcastStream();
     return stageChangeStream!;
   }
 }
@@ -661,7 +659,7 @@ class AFibGlobalState {
   }
 
   Duration get testDelayOnNewScreen {
-    return Duration(milliseconds: 500);
+    return const Duration(milliseconds: 500);
   }
 
 
@@ -753,9 +751,7 @@ class AFibGlobalState {
 
   AFThemeState initializeThemeState({AFComponentStates? components}) {
     AFibD.logThemeAF?.d("Rebuild fundamental and functional themes");
-    if(components == null) {
-      components = internalOnlyActiveStore.state.public.components;
-    }
+    components ??= internalOnlyActiveStore.state.public.components;
     final device = AFFundamentalDeviceTheme.create();
     
     var fundamentals = appContext.createFundamentalTheme(device, components, thirdPartyLibraries);

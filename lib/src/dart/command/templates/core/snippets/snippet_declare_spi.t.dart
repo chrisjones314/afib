@@ -26,10 +26,11 @@ class SnippetDeclareSPIT extends AFSnippetSourceTemplate {
     );
   }
 
+  @override
   String get template => '''
 @immutable
 class ${insertMainType}SPI extends $insertMainParentType<${ScreenT.insertStateViewType}, ${insertMainType}RouteParam> {
-  ${insertMainType}SPI(AFBuildContext<${ScreenT.insertStateViewType}, ${insertMainType}RouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const ${insertMainType}SPI(AFBuildContext<${ScreenT.insertStateViewType}, ${insertMainType}RouteParam> context, AFStandardSPIData standard): super(context, standard);
   
   factory ${insertMainType}SPI.create(AFBuildContext<${ScreenT.insertStateViewType}, ${insertMainType}RouteParam> context, AFStandardSPIData standard) {
     return ${insertMainType}SPI(context, standard,

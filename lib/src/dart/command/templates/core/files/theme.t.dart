@@ -18,14 +18,16 @@ class ThemeT extends AFFileSourceTemplate {
     return ThemeT(
       templateFileId: "theme",
       templateFolder: AFProjectPaths.pathGenerateCoreFiles,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertExtraImportsInsertion: AFSourceTemplate.empty,
         AFSourceTemplate.insertAdditionalMethodsInsertion: AFSourceTemplate.empty,
       })
     );
   } 
 
+  @override
   String get template => '''
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 $insertExtraImports
 

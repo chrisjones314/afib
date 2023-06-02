@@ -29,6 +29,7 @@ class SnippetSigninStarterHomePageScreenBuildBodyT extends AFSnippetSourceTempla
     templateFolder: AFProjectPaths.pathGenerateStarterSigninSnippets,
   );
   
+  @override
   String get template => '''
 final t = spi.t;
 final rows = t.column();
@@ -83,7 +84,7 @@ return ListView(
 class SnippetSigninStarterHomePageScreenSPIT {
 
   static SnippetDeclareSPIT example() {
-    final ei = AFSourceTemplateInsertions(insertions: {
+    const ei = AFSourceTemplateInsertions(insertions: {
       AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 String get userId {
   return context.s.userCredential.userId;
@@ -131,6 +132,7 @@ class SnippetHomeScreenAdditionalMethodsT extends AFSnippetSourceTemplate {
     templateFolder: AFProjectPaths.pathGenerateStarterSigninSnippets,
   );
   
+  @override
   String get template => '''
 TableRow _createDetailRow(HomePageScreenSPI spi, { required AFWidgetID wid, required String label, required String value }) {
   final t = spi.t;
@@ -169,6 +171,7 @@ class SnippetHomeScreenBuildWithSPIImplT extends AFSnippetSourceTemplate {
     );
   }
 
+  @override
   String get template => '''
 final t = spi.t;
 final body = _buildBody(spi);
@@ -209,6 +212,7 @@ class SnippetHomePageScreenSmokeTest extends AFSnippetSourceTemplate {
   "import 'package:${AFSourceTemplate.insertPackagePathInsertion}/state/models/user.dart';"
 ];
 
+  @override
   String get template => '''
 // stfbStateFullLogin is signed in as the west coast user by default.
 final userWest = context.find<User>(${insertAppNamespaceUpper}TestDataID.userWestCoast);

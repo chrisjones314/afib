@@ -654,6 +654,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
     return AFComponentStates.createFrom(componentStates);
   }
  
+  @override
   void defineScreenMap(AFScreenMap screenMap, Iterable<AFCoreLibraryExtensionContext> libraries) {
     for(final thirdParty in libraries) {
       for(final init in thirdParty.defineScreenMaps) {

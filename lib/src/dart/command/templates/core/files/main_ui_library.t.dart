@@ -7,6 +7,7 @@ class MainUILibraryT extends AFCoreFileSourceTemplate {
     templateFileId: "main_ui_library",
   );  
 
+  @override
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackageName/${insertAppNamespace}_id.dart';

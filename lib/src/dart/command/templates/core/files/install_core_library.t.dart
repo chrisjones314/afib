@@ -11,6 +11,7 @@ class InstallCoreLibraryT extends AFCoreFileSourceTemplate {
   );
 
 
+  @override
   String get template {
     final defineFundamentalThemeText = defineFundamentalTheme ? "defineFundamentalTheme: defineFundamentalTheme," : "";
     return '''

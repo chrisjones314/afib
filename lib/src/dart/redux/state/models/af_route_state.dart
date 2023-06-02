@@ -13,7 +13,7 @@ import 'package:meta/meta.dart';
 class AFRouteSegmentChildren {
   final Map<AFID, AFRouteSegment> children;
 
-  AFRouteSegmentChildren({
+  const AFRouteSegmentChildren({
     required this.children
   });
 
@@ -31,7 +31,7 @@ class AFRouteSegmentChildren {
   }
 
   factory AFRouteSegmentChildren.create() {
-    return AFRouteSegmentChildren(children: <AFID, AFRouteSegment>{});
+    return const AFRouteSegmentChildren(children: <AFID, AFRouteSegment>{});
   }
 
   int get size {
@@ -120,7 +120,7 @@ class AFRouteSegment {
   final AFRouteSegmentChildren? children;
   final AFCreateDefaultChildParamDelegate? createDefaultChildParam;
 
-  AFRouteSegment({
+  const AFRouteSegment({
     required this.param,
     required this.children,
     required this.createDefaultChildParam,
@@ -176,6 +176,7 @@ class AFRouteSegment {
     return effective ?? screen;
   }
 
+  @override
   String toString() {
     return screen.code;
   }
@@ -218,7 +219,7 @@ class AFRouteStateSegments {
   final List<AFRouteSegment> prior;  
   final List<AFRouteSegment> active;
 
-  AFRouteStateSegments({
+  const AFRouteStateSegments({
     required this.prior, 
     required this.active
   });
@@ -408,6 +409,7 @@ class AFRouteStateSegments {
     return List<AFRouteSegment>.from(this.active);
   }
 
+  @override
   String toString() {
     final result = StringBuffer("ACTIVE=[");
     
@@ -487,7 +489,7 @@ class AFRouteState {
   final Map<AFID, AFRouteSegment> globalPool;
   final Map<AFUIType, AFRouteStateShowScreen> showingScreens;
 
-  AFRouteState({
+  const AFRouteState({
     required this.screenHierarchy, 
     required this.globalPool,
     required this.timeLastUpdate,
@@ -502,8 +504,8 @@ class AFRouteState {
     screen.add(AFRouteSegment.withParam(routeParamFactory(), null, null));
     final screenSegs = AFRouteStateSegments(active: screen, prior: emptySegments);
     final globalPool = <AFScreenID, AFRouteSegment>{};
-    globalPool[AFUIScreenID.unused] = AFRouteSegment(param: AFRouteParamUnused.unused, children: null, createDefaultChildParam: null);
-    return AFRouteState(screenHierarchy: screenSegs, globalPool: globalPool, timeLastUpdate: AFTimeState.createNow(), showingScreens: <AFUIType, AFRouteStateShowScreen>{});
+    globalPool[AFUIScreenID.unused] = const AFRouteSegment(param: AFRouteParamUnused.unused, children: null, createDefaultChildParam: null);
+    return AFRouteState(screenHierarchy: screenSegs, globalPool: globalPool, timeLastUpdate: AFTimeState.createNow(), showingScreens: const <AFUIType, AFRouteStateShowScreen>{});
   }
 
   bool isActiveScreen(AFScreenID screen) {
@@ -835,7 +837,7 @@ class AFRouteState {
 
     return copyWith(
       globalPool: <AFScreenID, AFRouteSegment>{},
-      popupSegs: AFRouteStateSegments(active: emptySegments, prior: emptySegments),
+      popupSegs: const AFRouteStateSegments(active: emptySegments, prior: emptySegments),
       screenSegs: revisedSegs
     );
   }
@@ -995,7 +997,7 @@ class AFRouteState {
     var gp = globalPool ?? this.globalPool;
     if(!gp.containsKey(AFUIScreenID.unused)) {
       gp = Map<AFID, AFRouteSegment>.from(gp);
-      gp[AFUIScreenID.unused] = AFRouteSegment(param: AFRouteParamUnused.unused, children: null, createDefaultChildParam: null);
+      gp[AFUIScreenID.unused] = const AFRouteSegment(param: AFRouteParamUnused.unused, children: null, createDefaultChildParam: null);
     }
 
     final revised = AFRouteState(
@@ -1013,6 +1015,7 @@ class AFRouteState {
 
 
   //---------------------------------------------------------------------------------------
+  @override
   String toString() {
     final result = StringBuffer();
     result.write(screenHierarchy.toString());

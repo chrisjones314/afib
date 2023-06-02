@@ -8,6 +8,7 @@ class InstallCoreLibraryAppT extends AFCoreFileSourceTemplate {
     templateFileId: "install_core_library_app",
   );
 
+  @override
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 

@@ -7,6 +7,7 @@ class StarterSigninFirebaseT extends AFProjectStyleSourceTemplate {
     templateFileId: AFCreateAppCommand.projectStyleSigninFirebase,
   );
 
+  @override
   String get template => '''
 --override-templates +
   +core/files/main=project_styles/app-starter-signin-firebase/files/main

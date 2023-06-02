@@ -133,8 +133,10 @@ throwUnimplemented();
   }
 
 
+  @override
   String get template => '''
 $insertFileHeader
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 $insertExtraImports
 $insertMemberVariableImports
@@ -197,6 +199,7 @@ class DeferredQueryT extends SimpleQueryT {
     );
   }
 
+  @override
   String get template => '''
 // ignore_for_file: unused_import
 import 'package:afib/afib_flutter.dart';
@@ -252,6 +255,7 @@ class IsolateQueryT extends SimpleQueryT {
     );
   }
 
+  @override
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 $insertExtraImports

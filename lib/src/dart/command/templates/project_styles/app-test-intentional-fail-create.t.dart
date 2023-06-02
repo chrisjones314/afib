@@ -7,6 +7,7 @@ class StarterTestIntentionalFailCreateT extends AFProjectStyleSourceTemplate {
     templateFileId: AFCreateAppCommand.projectStyleTestIntentionalFailCreate,
   );
 
+  @override
   String get template => '''
 require "afib, meta"
 ''';

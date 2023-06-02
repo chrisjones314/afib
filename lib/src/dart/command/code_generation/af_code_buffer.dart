@@ -71,7 +71,7 @@ class AFCodeBuffer {
   factory AFCodeBuffer.fromFullPath(List<String> projectPath, String fullPath) {
     final file = File(fullPath);
 
-    final ls = LineSplitter();
+    const ls = LineSplitter();
     final lines = ls.convert(file.readAsStringSync());    
     return AFCodeBuffer(projectPath: projectPath, lines: lines, modified: false, extraImports: <String>[]);    
   }
@@ -79,7 +79,7 @@ class AFCodeBuffer {
 
   /// Returns a code buffer created from the specified source template.
   factory AFCodeBuffer.fromTemplate(AFSourceTemplate template) {
-    final ls = LineSplitter();
+    const ls = LineSplitter();
     final lines = ls.convert(template.template);    
     final extraImports = template.extraImports;
     return AFCodeBuffer(projectPath: null, lines: lines, modified: true, extraImports: extraImports);
@@ -102,7 +102,7 @@ class AFCodeBuffer {
 
   /// Replaces the entire content of this file with the specified text.
   void resetText(String text) {
-    final ls = LineSplitter();
+    const ls = LineSplitter();
     final newLines = ls.convert(text);    
     lines.clear();
     lines.addAll(newLines);
@@ -335,30 +335,30 @@ class AFCodeBuffer {
         if(options.isEmpty) {
 
         }
-        else if(options.indexOf(AFSourceTemplateInsertion.optionLower) >= 0) {
+        else if(options.contains(AFSourceTemplateInsertion.optionLower)) {
           result = value.toLowerCase();
         }
-        else if(options.indexOf(AFSourceTemplateInsertion.optionUpper) >= 0) {
+        else if(options.contains(AFSourceTemplateInsertion.optionUpper)) {
           result = value.toUpperCase();
         }
-        else if(options.indexOf(AFSourceTemplateInsertion.optionSnake) >= 0) {
+        else if(options.contains(AFSourceTemplateInsertion.optionSnake)) {
           result = AFCodeGenerator.convertMixedToSnake(value);
         }
-        else if(options.indexOf(AFSourceTemplateInsertion.optionCamel) >= 0) {
+        else if(options.contains(AFSourceTemplateInsertion.optionCamel)) {
           result = AFCodeGenerator.convertToCamelCase(value);
         }
-        else if(options.indexOf(AFSourceTemplateInsertion.optionSpaces) >= 0) {
+        else if(options.contains(AFSourceTemplateInsertion.optionSpaces)) {
           result = AFCodeGenerator.convertMixedToSpaces(value);
-        } else if(options.indexOf(AFSourceTemplateInsertion.optionCamelPluralize) >= 0) {
+        } else if(options.contains(AFSourceTemplateInsertion.optionCamelPluralize)) {
           result = AFCodeGenerator.convertToCamelCase(value);
           result = AFCodeGenerator.pluralize(result);
-        } else if(options.indexOf(AFSourceTemplateInsertion.optionUpperFirst) >= 0) {
+        } else if(options.contains(AFSourceTemplateInsertion.optionUpperFirst)) {
           result = AFCodeGenerator.convertUpcaseFirst(result);
         } else {
           throw AFCommandError(error: "Unknown option '$options' in tag $idCode");
         }
 
-        return ["$result"];
+        return [result];
       });
     }
   }
@@ -458,6 +458,7 @@ class AFCodeBuffer {
     lines.removeAt(idx);
   }
 
+  @override
   String toString() {
     return lines.join("\n");
   }

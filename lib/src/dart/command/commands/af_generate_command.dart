@@ -2,12 +2,14 @@ import 'package:afib/src/dart/command/af_command.dart';
 
 /// The command that groups all the various 'generate' subcommands.
 class AFGenerateParentCommand extends AFCommandGroup {
+  @override
   final name = "generate";
+  @override
   final description = "Generate AFib source code for screens, queries, models, and more";
   
 
   @override
-  Future<void> execute(AFCommandContext ctx) async {
+  Future<void> execute(AFCommandContext context) async {
 
   }
 }

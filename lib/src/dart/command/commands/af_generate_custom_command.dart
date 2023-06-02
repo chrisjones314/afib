@@ -23,6 +23,7 @@ class AFGenerateCustomSubcommand extends AFGenerateSubcommand {
   @override
   String get name => "custom";
 
+  @override
   String get usage {
     return '''
 $usageHeader

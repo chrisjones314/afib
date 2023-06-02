@@ -19,11 +19,12 @@ class SnippetScreenMemberVariableDeclsT extends AFSnippetSourceTemplate {
     return SnippetScreenMemberVariableDeclsT(
       templateFileId: "screen_member_variable_decls",
       templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         insertDecls: AFSourceTemplate.empty,
       })
     );
   }
 
+  @override
   String get template => insertDecls.toString();
 }

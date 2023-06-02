@@ -5,5 +5,6 @@ class SnippetCallUnitTestT extends AFSourceTemplate {
   static const insertTestName = AFSourceTemplateInsertion("test_name");
   static const insertTestSuffix = AFSourceTemplateInsertion("test_suffix");
 
+  @override
   String get template => '  define$insertTestName$insertTestSuffix(context);';
 }

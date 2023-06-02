@@ -1,6 +1,7 @@
 import 'package:afib/src/dart/command/af_source_template.dart';
 
 class SnippetQueryShutdownMethodT extends AFCoreSnippetSourceTemplate {
+  @override
   final String template = '''
 @override
 void shutdown() {

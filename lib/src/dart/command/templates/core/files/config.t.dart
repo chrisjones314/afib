@@ -8,6 +8,7 @@ class ConfigT extends AFCoreFileSourceTemplate {
     templateFileId: "config",
   );
 
+  @override
   String get template => '''
 import 'package:afib/afib_command.dart';
 

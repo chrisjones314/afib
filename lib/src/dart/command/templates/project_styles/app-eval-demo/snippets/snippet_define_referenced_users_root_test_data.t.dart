@@ -14,7 +14,7 @@ class SnippetDefineUsersRootTestDataT extends SnippetDefineTestDataT {
     id: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.userWestCoast, 
     firstName: "Westy", 
     lastName: "Test", 
-    email: "westy.test@nowhere.com",
+    email: "westy.test@afibframework.io",
     zipCode: "98105",
   ));
 
@@ -22,7 +22,7 @@ class SnippetDefineUsersRootTestDataT extends SnippetDefineTestDataT {
     id: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.userEastCoast, 
     firstName: "Easty", 
     lastName: "Test", 
-    email: "easty.test@nowhere.com",
+    email: "easty.test@afibframework.io",
     zipCode: "10005",
   ));
 
@@ -30,7 +30,7 @@ class SnippetDefineUsersRootTestDataT extends SnippetDefineTestDataT {
     id: ${AFSourceTemplate.insertAppNamespaceInsertion.upper}TestDataID.userMidwest, 
     firstName: "Middy", 
     lastName: "Test", 
-    email: "middy.test@nowhere.com",
+    email: "middy.test@afibframework.io",
     zipCode: "63117",
   ));
 

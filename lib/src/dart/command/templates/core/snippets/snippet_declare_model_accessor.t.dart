@@ -21,5 +21,6 @@ class SnippetDeclareModelAccessorT extends AFSnippetSourceTemplate {
     );
   }
 
+  @override
   String get template => '''  $insertMainType get ${insertMainTypeNoRoot.camel} => findType<$insertMainType>();''';
 }

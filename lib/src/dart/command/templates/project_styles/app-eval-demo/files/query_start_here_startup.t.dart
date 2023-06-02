@@ -63,7 +63,7 @@ db.execute(\'''CREATE TABLE IF NOT EXISTS \${User.tableName} (
 db.select("INSERT INTO \${User.tableName} (\${User.colFirstName}, \${User.colLastName}, \${User.colEmail}, \${User.colZipCode}) values (?, ?, ?, ?)", [
   "Chris",
   "Sqlite",
-  "chris@debugnowhere.com",
+  "chris@afibframework.io",
   "10001",
 ]);    
 

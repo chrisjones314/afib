@@ -133,7 +133,7 @@ $optionsHeader
         SnippetCallDefineLPIT.insertLPIID: idIdentifier,
       });
       final idFile = generator.modifyFile(context,  generator.pathIdFile);
-      final kind = "LibraryProgrammingInterface";
+      const kind = "LibraryProgrammingInterface";
       final after = AFCodeRegExp.startUIID(kind, kind);
       idFile.addLinesAfter(context, after, declareId.lines);
     } 
@@ -192,9 +192,7 @@ $optionsHeader
     Object standardRootMethods = AFSourceTemplate.empty;
     Object superCall = AFSourceTemplate.empty;
     if(isRoot && isAddStandardRoot) {
-      if(memberVariables == null) {
-        memberVariables = AFMemberVariableTemplates.createEmpty(mainType: identifier);
-      }
+      memberVariables ??= AFMemberVariableTemplates.createEmpty(mainType: identifier);
       memberVariables.setStandardRootMapType(identifierNoRoot);
 
       superclassSyntax = "extends AFStandardIDMapRoot<$identifier, $identifierNoRoot>";

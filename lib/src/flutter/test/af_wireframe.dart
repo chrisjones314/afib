@@ -95,6 +95,7 @@ class AFWireframeExecutionContext with AFStandardNavigateMixin {
     return wireframe.testData.find(id);
   }
 
+  @override
   void dispatch(dynamic action) {
     AFibF.g.internalOnlyActiveDispatcher.dispatch(action);
   }

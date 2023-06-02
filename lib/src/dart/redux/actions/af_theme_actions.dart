@@ -15,7 +15,7 @@ class AFUpdateThemeStateAction {
 class AFOverrideThemeValueAction {
   final AFThemeID id;
   final dynamic value;
-  AFOverrideThemeValueAction({
+  const AFOverrideThemeValueAction({
     required this.id,
     required this.value,
   });

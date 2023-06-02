@@ -23,7 +23,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
   }
 
   Widget iconClear() {
-    return Icon(Icons.clear);
+    return const Icon(Icons.clear);
   }
 
   @override
@@ -60,17 +60,17 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
 
 
   Widget childCardHeader(AFBuildContext context, AFWidgetID? wid, dynamic title, List<Widget> rows, { EdgeInsets? margin }) {
-    final radius = Radius.circular(4.0);
+    const radius = Radius.circular(4.0);
     final content = column();
     content.add(Container(
       margin: margin,
         padding: padding.standard,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(topLeft: radius, topRight: radius),
+          color: colorPrimary,
+        ),
         child: Row(
           children: [childText(text: title, style: styleOnPrimary.titleMedium)],
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.only(topLeft: radius, topRight: radius),
-          color: colorPrimary,
         ),
       )
     );
@@ -133,7 +133,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
         title: title,
         subtitle: subtitle,
         dense: true,
-        trailing: Icon(Icons.chevron_right),
+        trailing: const Icon(Icons.chevron_right),
         onTap: onTap,
       ));
   }
@@ -168,7 +168,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
         tableRowsErrors.add(TableRow(children: errorCols));
       }
 
-      final columnWidths = columnWidthsForNumValueTable;
+      const columnWidths = columnWidthsForNumValueTable;
       content = Table(children: tableRowsErrors, columnWidths: columnWidths);
     } else {
       content = Container(

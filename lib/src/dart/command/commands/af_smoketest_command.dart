@@ -9,7 +9,9 @@ class AFSmoketestCommand extends AFCommand {
   static const argWorkingFolder = "working-folder";
   static const msgSmoketestPass = "SMOKETEST PASS";
   static const msgSmoketestFail = "SMOKETEST FAIL";
+  @override
   final String name = "smoketest";
+  @override
   final String description = "A command used to smoke test AFib itself, used in continuous integration";
 
   AFSmoketestCommand();
@@ -74,9 +76,9 @@ class AFSmoketestCommand extends AFCommand {
       "--${AFCreateAppCommand.argPackageName}", packageName, 
       "--${AFCreateAppCommand.argPackageCode}", packageCode,
       "--${AFCreateAppCommand.argProjectStyle}", projectStyle, 
-      "--${AFCommand.argCurrentWorkingDirectory}", '${packageFolder.path}',
+      "--${AFCommand.argCurrentWorkingDirectory}", packageFolder.path,
       "--${AFRequireCommand.argAutoInstall}", "true",
-      "--${AFRequireCommand.argLocalAFib}", '$localAfib',
+      "--${AFRequireCommand.argLocalAFib}", localAfib,
     ], echoOutput: true);
     final exitAFibCreate = await processAFibCreate.exitCode;
     output.writeTwoColumns(col1: "exit code ", col2: exitAFibCreate.toString());
@@ -112,7 +114,7 @@ class AFSmoketestCommand extends AFCommand {
       output.writeTwoColumnsError(col2: "Tests failed with exit code $exitAFibCreate");
       return false;
     }
-    output.writeTwoColumns(col1: "pass ", col2: "$projectStyle");
+    output.writeTwoColumns(col1: "pass ", col2: projectStyle);
     return true;
   }
 

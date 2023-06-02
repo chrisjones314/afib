@@ -7,12 +7,13 @@ class StarterMinimalT extends AFProjectStyleSourceTemplate {
     templateFileId: AFCreateAppCommand.projectStyleStarterMinimal,
   );
 
+  @override
   String get template => '''
 --override-templates +
   +core/snippets/state_test_impl=core/snippets/state_test_impl_minimal
   +core/files/query_simple=project_styles/app-starter-minimal/files/query_startup
   +core/snippets/empty_screen_build_body_impl=project_styles/app-starter-minimal/snippets/minimal_startup_screen_build_body_impl
-require "afib, meta"
+require "afib, meta" 
 ''';
 
 }

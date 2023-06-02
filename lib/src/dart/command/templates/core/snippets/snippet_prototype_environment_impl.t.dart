@@ -1,6 +1,7 @@
 import 'package:afib/src/dart/command/af_source_template.dart';
 
 class SnippetPrototypeEnvironmentImplT extends AFSourceTemplate {
+  @override
   String get template => '''
   // use this, plus AFEnvironment.wireframe to start up directly into a wireframe.
   // config.setStartupWireframe(${insertAppNamespaceUpper}WireframeID.initial);

@@ -8,6 +8,7 @@ class SnippetMinimalScreenBuildBodyImplT extends AFSnippetSourceTemplate {
     templateFolder: AFProjectPaths.pathGenerateStarterMinimalSnippets
   );
 
+  @override
   String get template => '''
 final t = spi.t;
 final rows = t.column();

@@ -94,6 +94,7 @@ class AFUIControlSettings {
     return result;
   }
 
+  @override
   String toString() {
     return suffix;
   }
@@ -190,7 +191,7 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
       stateTestShortcut: SnippetStateTestScreenShortcutT(),
       createPrototype: SnippetCreateScreenPrototypeT.noPushParams(),
       screenAdditionalMethods: SnippetScreenAdditionalMethodsT(),
-      extraConfigParams: SnippetDrawerExtraConfigParamsT(),
+      extraConfigParams: const SnippetDrawerExtraConfigParamsT(),
       smokeTestImpl: SnippetSmokeTestImplRequireCloseT()
     ),
     AFUIControlSettings(
@@ -223,6 +224,7 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
   String get name => "ui";
 
 
+  @override
   String get usage {
     return '''
 $usageHeader

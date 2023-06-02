@@ -10,6 +10,7 @@ class ConfigureEnvironmentT extends AFCoreFileSourceTemplate {
     templateFileId: "configure_environment",
   );  
 
+  @override
   String get template => '''
 import 'package:afib/afib_command.dart';
 

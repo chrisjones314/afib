@@ -8,7 +8,9 @@ class ConnectedBaseT extends AFCoreFileSourceTemplate {
     templateFileId: "connected_base",
   );
 
+  @override
   String get template => '''
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackageName/${insertAppNamespace}_id.dart';
 import 'package:$insertPackagePath/state/${insertAppNamespace}_state.dart';
@@ -16,24 +18,24 @@ import 'package:$insertPackagePath/ui/themes/${insertAppNamespace}_default_theme
 
 // a default screen programming interface while we transition to this new model.
 class ${insertAppNamespaceUpper}ScreenSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFScreenStateProgrammingInterface<${insertAppNamespaceUpper}State, AFBuildContext<TStateView, TRouteParam>, ${insertAppNamespaceUpper}DefaultTheme> {
-  ${insertAppNamespaceUpper}ScreenSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const ${insertAppNamespaceUpper}ScreenSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
 }
 
 class ${insertAppNamespaceUpper}DialogSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFDialogStateProgrammingInterface<${insertAppNamespaceUpper}State, AFBuildContext<TStateView, TRouteParam>, ${insertAppNamespaceUpper}DefaultTheme> {
-  ${insertAppNamespaceUpper}DialogSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const ${insertAppNamespaceUpper}DialogSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
 }
 
 class ${insertAppNamespaceUpper}DrawerSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFDrawerStateProgrammingInterface<${insertAppNamespaceUpper}State, AFBuildContext<TStateView, TRouteParam>, ${insertAppNamespaceUpper}DefaultTheme> {
-  ${insertAppNamespaceUpper}DrawerSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const ${insertAppNamespaceUpper}DrawerSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
 }
 
 class ${insertAppNamespaceUpper}BottomSheetSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFBottomSheetStateProgrammingInterface<${insertAppNamespaceUpper}State, AFBuildContext<TStateView, TRouteParam>, ${insertAppNamespaceUpper}DefaultTheme> {
-  ${insertAppNamespaceUpper}BottomSheetSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const ${insertAppNamespaceUpper}BottomSheetSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
 }
 
 // a default screen programming interface while we transition to this new model.
 class ${insertAppNamespaceUpper}WidgetSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFWidgetStateProgrammingInterface<${insertAppNamespaceUpper}State, AFBuildContext<TStateView, TRouteParam>, ${insertAppNamespaceUpper}DefaultTheme> {
-  ${insertAppNamespaceUpper}WidgetSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const ${insertAppNamespaceUpper}WidgetSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
 }
 
 class ${insertAppNamespaceUpper}FlexibleStateView extends AFFlexibleStateView  {

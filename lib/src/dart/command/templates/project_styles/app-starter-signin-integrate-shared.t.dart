@@ -7,6 +7,7 @@ class StarterSigninIntegrateSharedT extends AFProjectStyleSourceTemplate {
     templateFileId: AFCreateAppCommand.projectStyleSigninSharedIntegrate,
   );
 
+  @override
   String get template => '''
 generate id ${insertAppNamespaceUpper}QueryID.deferredSignout
 generate id ${insertAppNamespaceUpper}StateTestID.alreadyLoggedInWestCoast

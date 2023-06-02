@@ -44,6 +44,7 @@ class AFUITextField extends StatelessWidget {
 
   
   //--------------------------------------------------------------------------------------
+  // ignore: use_key_in_widget_constructors
   AFUITextField({
     required this.screenId,
     required this.wid,
@@ -99,12 +100,8 @@ class AFUITextField extends StatelessWidget {
 
   AFTextEditingController get effectiveController {
     var result = controller;
-    if(result == null) {
-      result = controllers?.access(wid);
-    }
-    if(result == null) {
-      result = parentParam?.flutterState?.textControllers?.access(wid);
-    }
+    result ??= controllers?.access(wid);
+    result ??= parentParam?.flutterState?.textControllers?.access(wid);
     if(result == null) {
       throw AFException("Missing text controller for $wid");
     }

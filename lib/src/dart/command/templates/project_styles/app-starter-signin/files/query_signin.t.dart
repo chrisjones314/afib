@@ -33,7 +33,7 @@ import 'package:afib_signin/afsi_flutter.dart';
   // AFIB_TODO: You will implement this method, hitting your API with the username/password, and calling 
   // context.onSuccess with a signed in user credential if successful, or context.onError with an appropriate error message
   // if not (store the email for retrieval in the CheckSigninQuery if 'rememberMe' is true).
-  const testEmail = "test@nowhere.com";
+  const testEmail = "test@afibframework.io";
   if(email == testEmail && password.isNotEmpty) {
     final signedInCred = UserCredentialRoot(
       userId: '12345',

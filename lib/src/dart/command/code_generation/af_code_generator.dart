@@ -316,7 +316,7 @@ class AFCodeGenerator {
   }
 
   List<String> get pathCreateDartParams {
-    final filename = "create_dart_params.dart";
+    const filename = "create_dart_params.dart";
     return _createPath(initializationPath, filename);
   }
 
@@ -326,32 +326,32 @@ class AFCodeGenerator {
 
 
   List<String> get pathExtendApplication {
-    final filename = "application.dart";
+    const filename = "application.dart";
     return _createPath(initializationPath, filename);
   }
 
   List<String> get pathInstallCoreApp {
-    final filename = "install_core_app.dart";
+    const filename = "install_core_app.dart";
     return _createPath(installPath, filename);
   }
 
   List<String> get pathInstallTest {
-    final filename = "install_test.dart";
+    const filename = "install_test.dart";
     return _createPath(installPath, filename);
   }
 
   List<String> get pathMain {
-    final filename = "main.dart";
+    const filename = "main.dart";
     return _createPath(libPath, filename, underSrc: false);
   }
 
   List<String> get pathMainAFibTest {
-    final filename = "main_afib_test.dart";
+    const filename = "main_afib_test.dart";
     return _createPath(testAFibPath, filename);
   }
 
   List<String> get pathTestData {
-    final filename = "test_data.dart";
+    const filename = "test_data.dart";
     return _createPath(testPath, filename);
   }
 
@@ -366,7 +366,7 @@ class AFCodeGenerator {
   }
 
   List<String> get pathApp {
-    final filename = "app.dart";
+    const filename = "app.dart";
     return _createPath(libPath, filename);
   }
 
@@ -401,7 +401,7 @@ class AFCodeGenerator {
   }
 
   List<String> get pathInstallBase {
-    final filename = "install_base.dart";
+    const filename = "install_base.dart";
     return _createPath(installPath, filename);
   }
 
@@ -416,22 +416,22 @@ class AFCodeGenerator {
   }
 
   List<String> get pathInstallLibraryBase {
-    final filename = "install_base_library.dart";
+    const filename = "install_base_library.dart";
     return _createPath(installPath, filename);
   }
 
   List<String> get pathExtendCommand {
-    final filename = "install_command.dart";
+    const filename = "install_command.dart";
     return _createPath(installPath, filename);
   }
 
   List<String> get pathInstallLibraryCommand {
-    final filename = "install_command_library.dart";
+    const filename = "install_command_library.dart";
     return _createPath(installPath, filename);
   }
 
   List<String> get pathInstallLibraryCore {
-    final filename = "install_core_library.dart";
+    const filename = "install_core_library.dart";
     return _createPath(installPath, filename);
   }
 
@@ -739,7 +739,7 @@ class AFCodeGenerator {
 
   void writeJsonFileSync(AFCommandContext context, List<String> projectPath, Map<String, Object> json) {
     final generatedPath = projectPath.join(Platform.pathSeparator);
-    final file = File("${AFibD.currentWorkingDirectory}${Platform.pathSeparator}${generatedPath}");
+    final file = File("${AFibD.currentWorkingDirectory}${Platform.pathSeparator}$generatedPath");
     final encoded = jsonEncode(json);
     file.writeAsStringSync(encoded);
   }
@@ -779,7 +779,7 @@ class AFCodeGenerator {
   AFGeneratedFile _createFile(AFCommandContext context, List<String> projectPath, dynamic templateOrId, AFGeneratedFileAction action) {
     // if not, return the contents of the template
     final templates = context.definitions.templates;
-    var template;
+    AFSourceTemplate? template;
     if(templateOrId is AFSourceTemplate) {
       template = templateOrId;
     } else {

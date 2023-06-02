@@ -9,7 +9,9 @@ import 'package:flutter/widgets.dart';
 class AFNavigateAction extends AFActionWithKey implements AFExecuteBeforeInterface, AFExecuteDuringInterface {
   final AFRouteParam param;
   final List<AFRouteParam>? children;
+  @override
   final AFAsyncQuery? executeBefore;
+  @override
   final AFAsyncQuery? executeDuring;
   final RouteTransitionsBuilder? transitionsBuilder;
 

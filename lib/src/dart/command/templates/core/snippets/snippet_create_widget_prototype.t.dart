@@ -4,6 +4,7 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_create_scr
 
 /// Any class that ends in "T" is a source template used in code generation.
 class SnippetCreateWidgetPrototypeT extends AFSourceTemplate {
+  @override
   String get template => '''
   var prototype = context.define${ScreenT.insertControlTypeSuffix}Prototype(
     id: ${insertAppNamespaceUpper}PrototypeID.${ScreenT.insertScreenID},

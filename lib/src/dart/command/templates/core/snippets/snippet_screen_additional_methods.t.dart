@@ -7,5 +7,6 @@ class SnippetScreenAdditionalMethodsT extends AFCoreSnippetSourceTemplate {
     return SnippetScreenAdditionalMethodsT();
   }
 
+  @override
   String get template => "";  
 }

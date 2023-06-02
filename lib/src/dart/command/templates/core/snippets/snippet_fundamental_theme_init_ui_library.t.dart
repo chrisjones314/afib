@@ -39,6 +39,7 @@ class SnippetFundamentalThemeInitUILibraryT extends AFSnippetSourceTemplate {
     );
   }
   
+  @override
   String get template => '''
   primary.setTranslations(AFUILocaleID.englishUS, {
     AFUITranslationID.appTitle: "${insertPackageName.spaces}"

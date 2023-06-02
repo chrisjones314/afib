@@ -7,6 +7,7 @@ class StartHereT extends AFProjectStyleSourceTemplate {
     templateFileId: AFCreateAppCommand.projectStyleEvalDemo,
   );
 
+  @override
   String get template => '''
 --override-templates +
   +core/snippets/state_test_impl=project_styles/app-eval-demo/snippets/startup_state_test

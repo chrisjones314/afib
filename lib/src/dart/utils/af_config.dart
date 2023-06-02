@@ -70,7 +70,7 @@ abstract class AFConfigurationItem {
       final argParser = args.ArgParser();
       addArguments(argParser);
       final usage = argParser.usage;
-      final ls = LineSplitter();
+      const ls = LineSplitter();
       final lines = ls.convert(usage);
       final result = StringBuffer();
       for(var i = 0; i < lines.length; i++) {
@@ -189,9 +189,7 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
     required String textValue, 
     required String help, 
     dynamic runtimeValue }) {
-    if(runtimeValue == null) {
-      runtimeValue = name;
-    }
+    runtimeValue ??= name;
     choices.add(AFConfigEntryDescription(
       textValue: textValue,
       runtimeValue: runtimeValue,
@@ -212,11 +210,13 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
     return choicesText.join("|");
   }
 
+  @override
   String get argumentHelp {
     final choicesText = choices.map((c) => "  ${c.textValue} - ${c.help}");
     return choicesText.join("\n");
   }
 
+  @override
   void addArguments(args.ArgParser argParser) {
     var allowed;
     var allowedHelp;
@@ -248,16 +248,17 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
     
   }
 
-  String? validate(dynamic listValue) {
-    if(listValue is! List) {
-      if(listValue is! String) {
+  @override
+  String? validate(dynamic value) {
+    if(value is! List) {
+      if(value is! String) {
         return "Expected value for $name to be a list";
       }
-      listValue = listValue.split("[ ,]");
+      value = value.split("[ ,]");
     }
 
     if(findChoice(wildcardValue) == null) {
-      for(final textValue in listValue) {
+      for(final textValue in value) {
         final choice = findChoice(textValue);
         if(choice == null) {
           return "$textValue is not a valid choice for $name";
@@ -291,15 +292,18 @@ class AFConfigurationItemString extends AFConfigurationItem {
     help: help
   );
 
-   void addArguments(args.ArgParser argParser) {
+   @override
+  void addArguments(args.ArgParser argParser) {
     argParser.addOption(name, help: help);
    }
 
+  @override
   String? validate(dynamic value) {
     return null;
   }
 
 
+  @override
   void setValue(AFConfig dest, dynamic value) {
     dest.putInternal(this, value);
   } 
@@ -327,6 +331,7 @@ class AFConfigurationItemTrueFalse extends AFConfigurationItemOptionChoice {
     addChoice(textValue: "false", runtimeValue: false, help: "");
   }
 
+  @override
   void setValue(AFConfig dest, dynamic value) {
     if(value is String) {
       dest.putInternal(this, value == "true");
@@ -359,16 +364,19 @@ class AFConfigurationItemInt extends AFConfigurationItem {
     ordinal: ordinal, help: help
   );
 
+  @override
   void addArguments(args.ArgParser argParser) {
     argParser.addOption(name, help: help);
   }
 
   /// Return an error message if the value is invalid, otherwise return null.
+  @override
   String? validate(dynamic value) {
     return null;
   }
 
 
+  @override
   void setValue(AFConfig dest, dynamic value) {
     int? val;
     if(value is String) {
@@ -396,13 +404,12 @@ class AFConfigurationItemOption extends AFConfigurationItem {
 
   final int maxChars;
   final int minChars;
-  final String help;
   final int options;
 
   AFConfigurationItemOption({
     required AFLibraryID libraryId,
     required String name, 
-    required this.help, 
+    required String help, 
     required int validContexts, 
     required double ordinal, 
     String defaultValue = "",
@@ -418,6 +425,7 @@ class AFConfigurationItemOption extends AFConfigurationItem {
     defaultValue: defaultValue,
   );
 
+  @override
   void addArguments(args.ArgParser argParser) {
     argParser.addOption(name, help: help);
   }

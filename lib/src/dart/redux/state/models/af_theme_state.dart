@@ -27,9 +27,9 @@ import 'package:flutter/material.dart';
 class AFFundamentalDeviceTheme {
   final Brightness brightnessValue;
   final bool alwaysUse24HourFormatValue;
-  final WindowPadding padding;
-  final WindowPadding viewInsets;
-  final WindowPadding viewPadding;
+  final ViewPadding padding;
+  final ViewPadding viewInsets;
+  final ViewPadding viewPadding;
   final Locale localeValue;
   final Size physicalSize;
   final Size logicalSize;
@@ -148,6 +148,7 @@ class AFTextStyle extends AFThemeResolvableValue {
     this.weight,
   });
 
+  @override
   void resolve(AFFundamentalThemeState theme) {
     final c = theme.foreground(color);
     final fs = theme.size(fontSize);
@@ -179,6 +180,7 @@ class AFColor extends AFThemeResolvableValue {
 
   Color? color(Brightness brightness) { return brightness == Brightness.light ? colorLightCache : colorDarkCache; }
 
+  @override
   void resolve(AFFundamentalThemeState theme) {
     colorLightCache = theme.color(colorLight);
     colorDarkCache = theme.color(colorDark);
@@ -208,6 +210,7 @@ class AFColorPairing extends AFThemeResolvableValue {
     return background.color(brightness);
   }
 
+  @override
   void resolve(AFFundamentalThemeState theme) {
     foreground.resolve(theme);
     background.resolve(theme);
@@ -330,10 +333,9 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     return currentText;
   }
 
+  @override
   String translate({ AFWidgetID? wid, Object? text, required Locale locale}) {
-    if(text == null) {
-      text = wid;
-    }
+    text ??= wid;
 
     if(text is AFNotTranslated) {
       return text.value;
@@ -359,6 +361,7 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     return result.toString();
   }
 
+  @override
   dynamic value(AFThemeID? id) {
     return values[id]?.value;
   }
@@ -374,6 +377,7 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
     }
   }
 
+  @override
   String? translation({ Object? text, required Locale locale }) {    
     var setT = translationSet[locale];
     if(setT == null) {
@@ -402,9 +406,7 @@ class AFFundamentalThemeArea with AFThemeAreaUtilties {
 
   dynamic findValue(AFThemeID id) {
     var val = overrides[id];
-    if(val == null) {
-      val = values[id];
-    }
+    val ??= values[id];
     return val?.value;
   }
 }
@@ -438,9 +440,7 @@ class AFTranslationSet {
       }
     }
     var result = translations[textOrId];
-    if(result == null) {
-      result = universal.translations[textOrId];
-    }      
+    result ??= universal.translations[textOrId];      
     if(result == null) {
       if(AFibD.config.isTestContext) {
         AFibF.g.testMissingTranslations.register(locale, textOrId);
@@ -634,9 +634,7 @@ mixin AFThemeAreaUtilties {
 
   String? translate({ AFWidgetID? wid, Object? text, required Locale locale }) {
     assert(text != null || wid != null);
-    if(text == null) {
-      text = wid;
-    }
+    text ??= wid;
     var result = translation(text: text, locale: locale);
     if(result == null) {
       if(text == null) {
@@ -815,10 +813,12 @@ class AFAppFundamentalThemeAreaBuilder extends AFUILibraryFundamentalThemeAreaBu
   }
 
 
+  @override
   dynamic value(AFThemeID? id) {
     return values[id]?.value;
   }
 
+  @override
   String? translation({ Object? text, required Locale locale }) {
     /// we shouldn't do translations at build time.
     throw UnimplementedError();
@@ -847,7 +847,7 @@ class AFAppFundamentalThemeAreaBuilder extends AFUILibraryFundamentalThemeAreaBu
       values: this.values, 
       translationSet: translationSet,
       supportedLocalesApp: supportedLocalesApp,
-      overrides: <AFThemeID, AFFundamentalThemeValue>{},
+      overrides: const <AFThemeID, AFFundamentalThemeValue>{},
       optionsForType: optionsForType,
     );
   }
@@ -1110,6 +1110,7 @@ class AFNotTranslated {
   final String value;
   AFNotTranslated(this.value);
 
+  @override
   String toString() => this.value;
 }
 
@@ -1450,7 +1451,7 @@ class AFFundamentalThemeState {
     int? all
   }) {
     final basicSizes = spacing.sizes;
-    final m = 0.0;
+    const m = 0.0;
     var t = m;
     var b = m;
     var l = m;
@@ -1774,11 +1775,11 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   /// Merges bold into whatever the style would have been.
   TextStyle styleBold() { 
-    return TextStyle(fontWeight: FontWeight.bold);
+    return const TextStyle(fontWeight: FontWeight.bold);
   }
 
   TextStyle hintStyle() {
-    return TextStyle(color: Colors.grey);
+    return const TextStyle(color: Colors.grey);
   }
 
   TextStyle styleHint() {
@@ -1865,9 +1866,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     if(rightBottom != null) {
       rb = base * rightBottom;
     }
-    if(createRadius == null) {
-      createRadius = radiusCircular;
-    }
+    createRadius ??= radiusCircular;
 
     return BorderRadius.only(
       topLeft: createRadius(lt),
@@ -1980,9 +1979,9 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
     return TextButton(
       key: keyForWID(wid),
-      child: child,
       style: style,
-      onPressed: onPressed
+      onPressed: onPressed,
+      child: child
     );
   }
 
@@ -2122,8 +2121,8 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return TextButton(
       key: keyForWID(wid),
       style: buttonStyle,
-      child: childText(text: text, style: style),
-      onPressed: onPressed
+      onPressed: onPressed,
+      child: childText(text: text, style: style)
     );
   }
 
@@ -2142,8 +2141,8 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return TextButton(
       key: keyForWID(wid),
       style: buttonStyle,
-      child: child,
-      onPressed: onPressed
+      onPressed: onPressed,
+      child: child
     );
   }
 
@@ -2388,9 +2387,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   }) {
     assert(recognizers != null || parentParam?.flutterStatePrivate != null, "You must specify either recognizers or parentParam");
     assert(recognizers == null || parentParam == null, "You cannot specify both recognizers and parentParam");
-    if(recognizers == null) {
-      recognizers = parentParam?.flutterState?.tapRecognizers;
-    }
+    recognizers ??= parentParam?.flutterState?.tapRecognizers;
 
     if(recognizers == null) {
       throw AFException("Need to specify recognizers or parentParam");
@@ -2461,6 +2458,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return fundamentals.deviceFormFactor;
   }
 
+  @override
   bool deviceHasFormFactor({
     AFFormFactor? atLeast,
     AFFormFactor? atMost,
@@ -2823,8 +2821,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   Row childRow(List<Widget> children, {
    MainAxisAlignment mainAxisAlignment =  MainAxisAlignment.start
   }) {
-    return Row(children: children,
-      mainAxisAlignment: mainAxisAlignment);
+    return Row(mainAxisAlignment: mainAxisAlignment, children: children);
   }
 
   Column childColumn(List<Widget> children, {
@@ -2833,11 +2830,10 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
    CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.start,
    MainAxisSize mainAxisSize = MainAxisSize.max,
   }) {
-    return Column(children: children,
-      key: keyForWID(wid),
+    return Column(key: keyForWID(wid),
       mainAxisAlignment: mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment,
-      mainAxisSize: mainAxisSize,
+      mainAxisSize: mainAxisSize,children: children,
     );
   }
 

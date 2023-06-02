@@ -49,6 +49,7 @@ class AFID {
     return code.compareTo(other.code);
   }
 
+  @override
   bool operator==(Object other) {
     return toString() == other.toString();
     //return (other is AFID && other.code == code);
@@ -103,6 +104,7 @@ class AFID {
   }
 
 
+  @override
   int get hashCode {
     return code.hashCode;
   }
@@ -155,14 +157,17 @@ class AFTranslationID extends AFID {
     return AFTranslationID(codeId, lib, values: values);
   }
 
+  @override
   bool operator==(Object other) {
     return (other is AFTranslationID && other.code == code && other.library == library);
   }
 
+  @override
   int get hashCode {
     return hash2(code.hashCode, library?.code);
   }
 
+  @override
   String toString() {
     return "[!${super.toString()}]";
   }
@@ -252,6 +257,7 @@ class AFFromStringTestID extends AFBaseTestID {
     return fullId;
   }
 
+  @override
   String toString() {
     return fullId;
   }

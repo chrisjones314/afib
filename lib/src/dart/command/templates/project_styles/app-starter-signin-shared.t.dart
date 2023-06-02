@@ -7,6 +7,7 @@ class StarterSigninSharedT extends AFProjectStyleSourceTemplate {
     templateFileId: AFCreateAppCommand.projectStyleSigninShared,
   );
 
+  @override
   String get template => '''
 integrate library --package-name afib_signin --package-code afsi
 generate id ${insertAppNamespaceUpper}WidgetID.textFirstName

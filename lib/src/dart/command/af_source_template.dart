@@ -74,6 +74,7 @@ class AFSourceTemplateInsertion {
     return "($options)";
   }
 
+  @override
   String toString() {
     return "${AFCodeBuffer.startCode}$insertionPoint$optionsSuffix${AFCodeBuffer.endCode}";
   }
@@ -223,7 +224,7 @@ abstract class AFSourceTemplate {
   }
 
   AFCodeBuffer toBuffer(AFCommandContext context, { Map<AFSourceTemplateInsertion, Object>? insertions }) {
-    var fullInsertions = AFSourceTemplateInsertions(insertions: <AFSourceTemplateInsertion, Object>{});
+    var fullInsertions = const AFSourceTemplateInsertions(insertions: <AFSourceTemplateInsertion, Object>{});
     if(insertions != null) {
       fullInsertions = fullInsertions.reviseAugment(insertions);
     }
@@ -354,6 +355,7 @@ abstract class AFProjectStyleSourceTemplate extends AFFileSourceTemplate {
 /// Override [createLinesWithOptions] to generate the code to insert.
 abstract class AFDynamicSourceTemplate extends AFSourceTemplate {
 
+  @override
   final template = "";
   
   @override
@@ -365,5 +367,6 @@ abstract class AFDynamicSourceTemplate extends AFSourceTemplate {
   }
 
 
+  @override
   List<String> createLinesWithOptions(AFCommandContext context, List<String> options);
 }

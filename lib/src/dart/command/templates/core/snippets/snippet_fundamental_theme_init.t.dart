@@ -39,6 +39,7 @@ class SnippetFundamentalThemeInitT extends AFSnippetSourceTemplate {
   }
  
 
+  @override
   String get template => '''
   const colorPrimary = Color(0xFF344955);
   const colorSecondary = Color(0xFF5d4037);

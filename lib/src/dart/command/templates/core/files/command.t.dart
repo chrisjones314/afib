@@ -10,6 +10,7 @@ class CommandT extends AFCoreFileSourceTemplate {
 
   CommandT(): super(templateFileId: "command");
 
+  @override
   String get template => '''
 import 'package:afib/afib_command.dart';
 

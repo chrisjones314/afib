@@ -10,6 +10,7 @@ class SnippetScreenImplsSuperT extends AFCoreSnippetSourceTemplate {
   });
   
 
+  @override
   String get template {
     final superConfigName = usePlainConfig ? "config" : "uiConfig";
     return '''

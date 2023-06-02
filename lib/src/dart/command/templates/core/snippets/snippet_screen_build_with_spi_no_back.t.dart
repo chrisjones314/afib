@@ -1,6 +1,7 @@
 import 'package:afib/src/dart/command/af_source_template.dart';
 
 class SnippetScreenBuildWithSPINoBackImplT extends AFCoreSnippetSourceTemplate {
+  @override
   String get template => '''
 final t = spi.t;
 final body = _buildBody(spi);

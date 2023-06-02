@@ -14,6 +14,7 @@ class SnippetHomeScreenSmokeTest extends AFSnippetSourceTemplate {
   "import 'package:$insertPackagePath/ui/screens/home_page_screen.dart';"
 ];
 
+  @override
   String get template => '''
 await e.matchText(${insertAppNamespaceUpper}WidgetID.textCurrentStanza, ft.contains("that a single man"));
 await e.applyTap(${insertAppNamespaceUpper}WidgetID.buttonIHaveNoObjection, verify: (verifyContext) {

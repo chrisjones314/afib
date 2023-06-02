@@ -22,10 +22,12 @@ class AFStateTestStateVerificationContext with AFAccessStateSynchronouslyMixin {
     required this.afState,
   });
 
+  @override
   TAppState accessComponentState<TAppState extends AFComponentState>() {
     return _findComponentState<TAppState>(afState);
   }
 
+  @override
   AFPublicState get accessPublicState {
     return afState.public;
   }
@@ -57,6 +59,7 @@ abstract class AFStateTestContext extends AFStateTestExecute {
   
   AFStateTestContext(this.test, { required this.isTrueTestContext, required this.targetStore } );
 
+  @override
   AFStateTestID get testID { return this.test.id as AFStateTestID; }
   AFState get afState { return store.state; }
   AFRouteState get route { return store.state.public.route; }
@@ -102,6 +105,7 @@ class AFStateTestContextForState extends AFStateTestContext {
   ): super(test, isTrueTestContext: isTrueTestContext, targetStore: targetStore);
 
 
+  @override
   AFStateTestScreenContext<TSPI> createScreenContext<TSPI extends AFStateProgrammingInterface>({
     required AFScreenID screenId,
     required AFConnectedUIConfig screenConfig,
@@ -120,6 +124,7 @@ class AFStateTestContextForScreen extends AFStateTestContext {
   ): super(test, isTrueTestContext: isTrueTestContext, targetStore: targetStore);
 
 
+  @override
   AFStateTestScreenContext<TSPI> createScreenContext<TSPI extends AFStateProgrammingInterface>({
     required AFScreenID screenId,
     required AFConnectedUIConfig screenConfig,
@@ -348,6 +353,7 @@ class _AFStateTestStartupStatement extends _AFStateTestQueryStatement {
 class _AFStateTestVerifyStatement extends _AFStateTestExecutionStatement {
   final AFStateTestVerifyStateDelegate verifyDelegate;
   _AFStateTestVerifyStatement(this.verifyDelegate);
+  @override
   _AFStateTestExecutionNext execute(AFStateTestContext context, { required bool verify }) {
     if(verify) {
       final verifyContext = AFStateTestStateVerificationContext(afState: AFibF.g.internalOnlyActiveStore.state);
@@ -360,6 +366,7 @@ class _AFStateTestVerifyStatement extends _AFStateTestExecutionStatement {
 class _AFStateTestAdvanceTimeStatement extends _AFStateTestExecutionStatement {
  final Duration duration;
   _AFStateTestAdvanceTimeStatement(this.duration);
+  @override
   _AFStateTestExecutionNext execute(AFStateTestContext context, { required bool verify }) {
     if(verify) {
       final state = AFibF.g.internalOnlyActiveStore.state;
@@ -385,6 +392,7 @@ class _AFStateTestAdvanceTimeStatement extends _AFStateTestExecutionStatement {
 class _AFStateTestSetAbsoluteTimeStatement extends _AFStateTestExecutionStatement {
  final DateTime time;
   _AFStateTestSetAbsoluteTimeStatement(this.time);
+  @override
   _AFStateTestExecutionNext execute(AFStateTestContext context, { required bool verify }) {
     if(verify) {
       final state = AFibF.g.internalOnlyActiveStore.state;
@@ -411,6 +419,7 @@ class _AFStateRegisterFixedResultStatement<TQuery extends AFAsyncQuery> extends 
 
   _AFStateRegisterFixedResultStatement(this.querySpecifier, this.definitions, this.idData);
 
+  @override
   void execute(AFStateTestContext context) {
     final test = context.test;
     test.registerResult<TQuery>(querySpecifier, (context, query) {
@@ -429,6 +438,7 @@ class _AFStateRegisterFixedErrorStatement<TQuery extends AFAsyncQuery> extends _
 
   _AFStateRegisterFixedErrorStatement(this.querySpecifier, this.definitions, this.error);
 
+  @override
   void execute(AFStateTestContext context) {
     final test = context.test;
     test.registerResult<TQuery>(querySpecifier, (context, query) {
@@ -445,6 +455,7 @@ class _AFStateRegisterDynamicResultStatement<TQuery extends AFAsyncQuery> extend
   final AFCreateQueryResultDelegate<TQuery> delegate;
   _AFStateRegisterDynamicResultStatement(this.querySpecifier, this.delegate);
 
+  @override
   void execute(AFStateTestContext context) {
     final test = context.test;
     test.registerResult<TQuery>(querySpecifier, (context, query) {
@@ -471,6 +482,7 @@ class _AFStateRegisterDynamicCrossQueryResultStatement<TQuerySource extends AFAs
   final List<AFCreateQueryResultDelegate<TQuerySource>> delegates;
    _AFStateRegisterDynamicCrossQueryResultStatement(this.querySpecifier, this.listenerSpecifier, this.delegates);
 
+  @override
   void execute(AFStateTestContext context) {
     final test = context.test;
     test.registerResult<TQuerySource>(querySpecifier, (context, query) {
@@ -528,6 +540,7 @@ class _AFStateRegisterSpecialResultStatement<TQuery extends AFAsyncQuery> extend
     return _AFStateRegisterSpecialResultStatement(querySpecifier,_AFStateRegisterSpecialResultKind.resultLive);
   }
 
+  @override
   void execute(AFStateTestContext context) {
     final test = context.test;
     test.registerResult(querySpecifier,  (context, q) {
@@ -611,6 +624,7 @@ mixin AFExecuteWidgetMixin {
 }
 
 class AFStateTestWidgetContext<TSPI extends AFStateProgrammingInterface> with AFExecuteWidgetMixin {
+  @override
   final AFStateTestScreenContext screenContext; 
   final AFWidgetConfig widgetConfig;
   final AFRouteParam launchParam;
@@ -646,6 +660,7 @@ abstract class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface
     required this.screenConfig,
   });
 
+  @override
   AFStateTestScreenContext get screenContext {
     return this;
   }

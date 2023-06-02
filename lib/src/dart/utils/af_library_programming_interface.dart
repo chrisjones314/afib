@@ -6,7 +6,9 @@ import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
 
 class AFCurrentStateContext with AFStandardAPIContextMixin, AFStandardNavigateMixin, AFNonUIAPIContextMixin, AFAccessStateSynchronouslyMixin, AFContextShowMixin {
+  @override
   final AFDispatcher dispatcher;
+  @override
   final AFConceptualStore targetStore;
 
   AFCurrentStateContext({
@@ -14,6 +16,7 @@ class AFCurrentStateContext with AFStandardAPIContextMixin, AFStandardNavigateMi
     required this.targetStore,
   });
 
+  @override
   void dispatch(dynamic action) {
     dispatcher.dispatch(action);
   }

@@ -93,7 +93,7 @@ class AFUIPrototypeDrawerRouteParam extends AFDrawerRouteParam {
 
 class AFUIPrototypeDrawerSPI extends AFUIDrawerSPI<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> {
 
-  AFUIPrototypeDrawerSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIPrototypeDrawerSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> context, AFStandardSPIData standard): super(context, standard);
   
   factory AFUIPrototypeDrawerSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> context, AFStandardSPIData standard) {
     return AFUIPrototypeDrawerSPI(context, standard);
@@ -208,6 +208,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
   AFUIPrototypeDrawer(): super(screenId: AFUIScreenID.drawerPrototype, config: config);
 
   //--------------------------------------------------------------------------------------
+  @override
   AFScreenID? get primaryScreenId {
     return null;
   }
@@ -265,12 +266,12 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
 
     final cols = t.row();
     cols.add(TextButton(
-      child: t.childText(text: 'Exit'),
       style: buttonStyle,
       onPressed: () {
           context.closeDrawer();
           context.dispatch(AFNavigateExitTestAction());
-      }
+      },
+      child: t.childText(text: 'Exit')
     ));
 
     cols.add(
@@ -278,7 +279,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
         margin: t.margin.l.s3,
         child: OutlinedButton(
           style: buttonStyle,
-          child: Text('Reset'),
+          child: const Text('Reset'),
           onPressed: () {
               context.closeDrawer();
               test?.onDrawerReset(context.d);
@@ -324,10 +325,10 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     return Container(
       padding: t.padding.none,
       margin: t.margin.b.s3,
-      child: button,
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: color))
-      )
+      ),
+      child: button
     );
   }
 
@@ -589,7 +590,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     final context = spi.context;
     final test = context.s.prototype;
     context.closeDrawer();
-    Timer(Duration(seconds: 1), () async {         
+    Timer(const Duration(seconds: 1), () async {         
       final prevContext = context.s.testContext as AFScreenTestContextSimulator?;
       final testState = context.s.singleScreenTestState;
       await test?.onDrawerRun(context, prevContext, testState, id, () {
@@ -619,7 +620,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
       rows.add(ListTile(
         title: t.childText(text: test.id.codeId),
         subtitle: t.childText(text: description, textColor: descColor),
-        trailing: Icon(Icons.run_circle),
+        trailing: const Icon(Icons.run_circle),
         dense: true,
         onTap: () {
           final testId = test.id;
@@ -664,7 +665,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     return t.childCard(
       child: t.childPadding(
         padding: t.padding.standard,
-        child: Column(children: rows, crossAxisAlignment: CrossAxisAlignment.stretch)
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: rows)
       )
     );
   }
@@ -726,8 +727,8 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     trsCurrent.add(_createTimeRow(spi, "UTC", timeUTC));
 
     final columnWidths = <int, TableColumnWidth>{};
-    columnWidths[0] = FixedColumnWidth(50);
-    columnWidths[1] = FlexColumnWidth();
+    columnWidths[0] = const FixedColumnWidth(50);
+    columnWidths[1] = const FlexColumnWidth();
 
     rowsCurrent.add(Table(
       children: trsCurrent,
@@ -740,13 +741,13 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
 
     final colsPlayPause = t.row();
     colsPlayPause.add(OutlinedButton(
-      child: Icon(Icons.play_arrow),
+      child: const Icon(Icons.play_arrow),
       onPressed: () => spi.onPressedPlayTime(timeQuery)
 
     ));
 
     colsPlayPause.add(OutlinedButton(
-      child: Icon(Icons.pause),
+      child: const Icon(Icons.pause),
       onPressed: () => spi.onPressedPauseTime(timeQuery)
     ));
 
@@ -764,7 +765,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
       obscureText: false,
       autofocus: false,
       textAlign: TextAlign.left,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: "Adjustment"
       ),
@@ -779,14 +780,14 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
 
     final colsAdd = t.row();
     colsAdd.add(OutlinedButton(
-      child: Text("Add"),
+      child: const Text("Add"),
       onPressed: () {
         spi.onTapAddDuration();
       }
     ));
 
     colsAdd.add(OutlinedButton(
-      child: Text("Subtract"),
+      child: const Text("Subtract"),
       onPressed: () {
         spi.onTapSubtractDuration();
       }
@@ -805,7 +806,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
       obscureText: false,
       autofocus: false,
       textAlign: TextAlign.left,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: "Enter Time"
       ),
@@ -815,7 +816,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
 
     final colsActions = t.row();
     colsActions.add(OutlinedButton(
-      child: Row(children: [
+      child: const Row(children: [
         Text("Get"),
         Icon(Icons.arrow_downward)
       ]),
@@ -826,7 +827,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     ));
 
     colsActions.add(OutlinedButton(
-      child: Row(children: [
+      child: const Row(children: [
         Text("Set"),
         Icon(Icons.arrow_upward)
       ]),
@@ -909,7 +910,7 @@ class AFUIPrototypeDrawer extends AFUIConnectedDrawer<AFUIPrototypeDrawerSPI, AF
     tableRows.add(TableRow(children: resultCols));
 
     final columnWidths = {
-      1: FlexColumnWidth(),
+      1: const FlexColumnWidth(),
       2: FixedColumnWidth(t.resultColumnWidth),
       3: FixedColumnWidth(t.resultColumnWidth),
     };

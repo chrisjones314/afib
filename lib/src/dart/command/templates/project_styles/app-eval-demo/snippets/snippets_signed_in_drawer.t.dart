@@ -26,6 +26,7 @@ class SnippetSignedInDrawerBuildBodyT extends AFSnippetSourceTemplate {
     templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
+  @override
   String get template => '''
     final t = spi.t;
     final rows = t.column();
@@ -62,6 +63,7 @@ class SnippetSignedInDrawerBuildWithSPIImplT extends AFSnippetSourceTemplate {
     templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
+  @override
   String get template => '''
 return _buildBody(spi);
 ''';
@@ -70,7 +72,7 @@ return _buildBody(spi);
 class SnippetSignedInDrawerSPIT {
 
   static SnippetDeclareSPIT example() {
-    final ei = AFSourceTemplateInsertions(insertions: {
+    const ei = AFSourceTemplateInsertions(insertions: {
       AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 User? get activeUser {
   final cred = context.s.userCredential;

@@ -13,6 +13,7 @@ class SnippetCreateScreenPrototypeT extends AFSourceTemplate {
   }
 
 
+  @override
   String get template => '''
 var prototype = context.define${ScreenT.insertControlTypeSuffix}Prototype(
   id: ${insertAppNamespaceUpper}PrototypeID.${ScreenT.insertScreenID},

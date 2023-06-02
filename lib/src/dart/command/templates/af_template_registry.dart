@@ -135,7 +135,7 @@ class AFTemplateRegistry {
     registerFile(IsolateQueryT.core());
     registerFile(ModelT.core(isRoot: true));
     registerFile(ModelT.core(isRoot: false));
-    registerFile(CommandAFibT());
+    registerFile(const CommandAFibT());
     registerFile(LibraryExportsT());
     registerFile(InstallBaseT());
     registerFile(ThemeT.core());

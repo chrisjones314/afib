@@ -118,6 +118,7 @@ abstract class AFComponentState extends AFStateModelAccess {
     return <String, Object>{};
   }
 
+  @override
   bool operator==(Object other) {
     if(other is! AFComponentState) {
       return false;
@@ -137,6 +138,7 @@ abstract class AFComponentState extends AFStateModelAccess {
     return true;
   }
 
+  @override
   int get hashCode {
     var code = 0;
     for(final model in models.values) {
@@ -146,26 +148,31 @@ abstract class AFComponentState extends AFStateModelAccess {
   }
 
   /// Returns all the model objects
+  @override
   Iterable<Object> get allModels {
     return models.values;
   }
 
   /// Returns the object value for the type T
+  @override
   T findType<T extends Object>() {
     return findModelWithCustomKey(T.toString());
   }
 
   /// Returns the object value for the type T, allows null or missing values.
+  @override
   T? findTypeOrNull<T extends Object>() {
     return findModelWithCustomKeyOrNull(T.toString());
   }
 
   /// Returns the object value for the specified String key.
+  @override
   T findId<T extends Object>(String id) {
     return findModelWithCustomKey(id);
   }
 
   /// Returns the object value for the specified String key, allows null or missing values.
+  @override
   T? findIdOrNull<T extends Object>(String id) {
     return findModelWithCustomKeyOrNull(id);
   }
@@ -183,21 +190,25 @@ abstract class AFComponentState extends AFStateModelAccess {
     return result;
   }
 
+  @override
   TRouteParam findScreenParam<TRouteParam extends AFRouteParam>(AFScreenID screenId) {
     final key = screenId.toString();
     return models[key] as TRouteParam;
   }
 
+  @override
   TRouteParam? findScreenParamOrNull<TRouteParam extends AFRouteParam>(AFScreenID screenId) {
     final key = screenId.toString();
     return models[key] as TRouteParam;
   }
 
+  @override
   TRouteParam findChildWidgetParam<TRouteParam extends AFRouteParam>(AFWidgetID widgetId) {
     final key = widgetId.toString();
     return models[key] as TRouteParam;
   }
 
+  @override
   TRouteParam? findChildWidgetParamOrNull<TRouteParam extends AFRouteParam>(AFWidgetID widgetId) {
     final key = widgetId.toString();
     return models[key] as TRouteParam?;
@@ -236,7 +247,7 @@ class AFComponentStateUnused extends AFComponentState {
   AFComponentStateUnused(Map<String, Object> models): super(models: models, create: creator);
 
 
-  static AFComponentStateUnused initialValue() { return AFComponentStateUnused(<String, Object>{}); }
+  static AFComponentStateUnused initialValue() { return AFComponentStateUnused(const <String, Object>{}); }
 
 
 }
@@ -250,7 +261,7 @@ class AFComponentStateUnused extends AFComponentState {
 class AFComponentStates {
   final Map<String, AFComponentState> states;
 
-  AFComponentStates({
+  const AFComponentStates({
     required this.states
   });
 
@@ -263,7 +274,7 @@ class AFComponentStates {
 
     // if you don't have a state, you can use AFFlexibleState as a substitute.  We need to have this
     // be non-null, so we add an empty one.
-    final tempModel = AFComponentStateUnused(<String, Object>{});
+    final tempModel = AFComponentStateUnused(const <String, Object>{});
     final areaType = _keyForComponent(tempModel);
     states[areaType] = tempModel;
 

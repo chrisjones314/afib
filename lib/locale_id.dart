@@ -1,3 +1,5 @@
+library afib_localeid;
+
 /// A future holding place for constants specifying langauge IDs.
 /// 
 /// When I looked at the time, it did not seem that Flutter itself provided constants for known language ids,
@@ -7,7 +9,7 @@ import 'dart:ui';
 
 
 class AFUILocaleID {
-  static final universal = Locale.fromSubtags(languageCode: "und");
-  static final englishUS = Locale.fromSubtags(languageCode: 'en', countryCode: 'us');
-  static final spanish = Locale.fromSubtags(languageCode: 'sp');
+  static const universal = Locale.fromSubtags(languageCode: "und");
+  static const englishUS = Locale.fromSubtags(languageCode: 'en', countryCode: 'us');
+  static const spanish = Locale.fromSubtags(languageCode: 'sp');
 }

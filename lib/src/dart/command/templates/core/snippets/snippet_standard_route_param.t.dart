@@ -20,7 +20,7 @@ class SnippetStandardRouteParamT extends AFSnippetSourceTemplate {
     return SnippetStandardRouteParamT(
       templateFileId: "standard_route_param",
       templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertConstructorParamsInsertion: AFSourceTemplate.empty, 
         AFSourceTemplate.insertMemberVariablesInsertion: AFSourceTemplate.empty,
         AFSourceTemplate.insertCreateParamsInsertion: AFSourceTemplate.empty,
@@ -32,6 +32,7 @@ class SnippetStandardRouteParamT extends AFSnippetSourceTemplate {
     );
   }
   
+  @override
   String get template => '''
 class ${insertMainType}RouteParam extends AF${ScreenT.insertControlTypeSuffix}RouteParam$insertWithFlutterStateSuffix {
   $insertMemberVariables

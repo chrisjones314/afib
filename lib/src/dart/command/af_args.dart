@@ -74,6 +74,7 @@ class AFArgs {
     final result = StringBuffer();
     result.writeln("********* ATTENTION: USING DEBUG ARGUMENTS: '$revised' ******************************");
     final colorized = Colorize(result.toString()).apply(Styles.YELLOW);    
+    // ignore: avoid_print
     print(colorized);
 
     final parsed = parseArgs(revised);

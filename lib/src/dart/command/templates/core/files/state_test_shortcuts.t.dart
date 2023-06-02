@@ -7,6 +7,7 @@ class StateTestShortcutsT extends AFCoreFileSourceTemplate {
     templateFileId: "state_test_shortcuts",
   );
 
+  @override
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackageName/${insertAppNamespace}_id.dart';

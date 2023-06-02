@@ -8,6 +8,7 @@ class AFUnitTestContext extends AFUnitTestExecute {
   final AFUnitTest test;
   AFUnitTestContext(this.test);
 
+  @override
   AFBaseTestID get testID => this.test.id;
 
   void finishAndUpdateStats(AFTestStats stats) {

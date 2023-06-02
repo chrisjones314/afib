@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
-import 'package:afib/src/dart/command/af_command_enums.dart';
-import 'package:afib/src/dart/command/af_command_output.dart';
 import 'package:afib/src/dart/command/af_standard_configs.dart';
 import 'package:afib/src/dart/redux/state/models/af_test_state.dart';
 import 'package:afib/src/flutter/af_app.dart';
@@ -121,18 +119,22 @@ class AFKeySelector extends AFWidgetSelector {
     return AFKeySelector(wid.code);
   }
 
+  @override
   bool matches(Element elem) {
     return elem.widget.key == key;
   }
 
-  bool operator==(dynamic o) {
-    return o is AFKeySelector && o.key == key;
+  @override
+  bool operator==(dynamic other) {
+    return other is AFKeySelector && other.key == key;
   }
 
+  @override
   int get hashCode {
     return key.hashCode;
   }
 
+  @override
   String toString() {
     return "$key";
   }
@@ -145,18 +147,22 @@ class AFWidgetTypeSelector extends AFWidgetSelector {
   Type widgetType;
   AFWidgetTypeSelector(this.widgetType);
 
-bool matches(Element elem) {
+@override
+  bool matches(Element elem) {
     return elem.widget.runtimeType == widgetType;
   }
 
-  bool operator==(dynamic o) {
-    return o is AFWidgetTypeSelector && o.widgetType == widgetType;
+  @override
+  bool operator==(dynamic other) {
+    return other is AFWidgetTypeSelector && other.widgetType == widgetType;
   }
 
+  @override
   int get hashCode {
     return widgetType.hashCode;
   }
 
+  @override
   String toString() {
     return widgetType.toString();
   }
@@ -166,6 +172,7 @@ class AFIconDataSelector extends AFWidgetSelector {
   IconData data;
   AFIconDataSelector(this.data);
 
+  @override
   bool matches(Element elem) {
     final widget = elem.widget;
     if(widget is Icon) {
@@ -174,14 +181,17 @@ class AFIconDataSelector extends AFWidgetSelector {
     return false;
   }
 
-  bool operator==(dynamic o) {
-    return o is AFIconDataSelector && o.data == this.data;
+  @override
+  bool operator==(dynamic other) {
+    return other is AFIconDataSelector && other.data == this.data;
   }
 
+  @override
   int get hashCode {
     return data.hashCode;
   }
 
+  @override
   String toString() {
     return data.toString();
   }
@@ -197,6 +207,7 @@ class AFMultipleWidgetSelector extends AFWidgetSelector {
     }
   }
 
+  @override
   bool matches(Element elem) {
     for(final sel in selectors) {
       if(sel.matches(elem)) {
@@ -206,18 +217,19 @@ class AFMultipleWidgetSelector extends AFWidgetSelector {
     return false;
   }
 
-  bool operator==(dynamic o) {
-    if(!(o is AFMultipleWidgetSelector)) {
+  @override
+  bool operator==(dynamic other) {
+    if(other is! AFMultipleWidgetSelector) {
       return false;
     }
 
-    if(o.selectors.length != selectors.length) {
+    if(other.selectors.length != selectors.length) {
       return false;
     }
 
     for(var i = 0; i < selectors.length; i++) {
       final l = selectors[i];
-      final r = o.selectors[i];
+      final r = other.selectors[i];
       if(l != r) {
         return false;
       }
@@ -225,6 +237,7 @@ class AFMultipleWidgetSelector extends AFWidgetSelector {
     return true;
   }
 
+  @override
   int get hashCode {
     return selectors.hashCode;
   }
@@ -242,29 +255,33 @@ class AFRichTextGestureTapSpecifier extends AFWidgetSelector {
     return AFRichTextGestureTapSpecifier(sel, containsText);
   }
 
+  @override
   bool matches(Element elem) {
     return selector.matches(elem);
   }
 
-  bool operator==(dynamic o) {
-    if(!(o is AFRichTextGestureTapSpecifier)) {
+  @override
+  bool operator==(dynamic other) {
+    if(other is! AFRichTextGestureTapSpecifier) {
       return false;
     }
 
-    if(o.selector != selector) {
+    if(other.selector != selector) {
       return false;
     }
 
-    if(o.containsText != containsText) {
+    if(other.containsText != containsText) {
       return false;
     }
     return true;
   }
 
+  @override
   int get hashCode {
     return hash2(selector.hashCode, containsText.hashCode);
   }
 
+  @override
   String toString() {
     final result = StringBuffer();
     result.write(selector.toString());
@@ -299,11 +316,12 @@ class AFSparsePathWidgetSelector extends AFWidgetSelector {
 
 
   
-  bool matchesPath(List<Element> path) {
+  @override
+  bool matchesPath(List<Element> elem) {
     // first, make sure the final path element matches, we don't want 
     // extra stuff below the last selector.
     final lastSelector = pathSelectors.last;
-    final lastPath = path.last;
+    final lastPath = elem.last;
 
     if(!lastSelector.matches(lastPath)) {
       return false;
@@ -311,11 +329,11 @@ class AFSparsePathWidgetSelector extends AFWidgetSelector {
 
     // if the last matches, then go up the path making sure that we can
     // find all the other path selectors.
-    var curPath = path.length - 2;
+    var curPath = elem.length - 2;
     var curSel = pathSelectors.length - 2;
     while(curSel >= 0 && curPath >= 0) {
       final sel   = pathSelectors[curSel];
-      final item  = path[curPath];
+      final item  = elem[curPath];
       if(sel.matches(item)) {
         if(curSel == 0) {
           return true;
@@ -328,6 +346,7 @@ class AFSparsePathWidgetSelector extends AFWidgetSelector {
     return false;
   }
 
+  @override
   Element? activeElementForPath(List<Element> elems) {
     var matchedSels = 0;
     for(var i = elems.length-1; i >= 0; i--) {
@@ -351,19 +370,21 @@ class AFSparsePathWidgetSelector extends AFWidgetSelector {
     return AFSparsePathWidgetSelector(revised);
   }
 
+  @override
   bool matches(Element elem) {
     throw AFException("Do not attempt to add sparse path widget selectors recursively into each other.");
   }
 
-  bool operator==(dynamic o) {
-    if(o is AFSparsePathWidgetSelector) {
-      if(o.pathSelectors.length != pathSelectors.length) {
+  @override
+  bool operator==(dynamic other) {
+    if(other is AFSparsePathWidgetSelector) {
+      if(other.pathSelectors.length != pathSelectors.length) {
         return false;
       }
 
       for(var i = 0; i < pathSelectors.length; i++) {
         final l = pathSelectors[i];
-        final r = o.pathSelectors[i];
+        final r = other.pathSelectors[i];
         if(l != r) {
           return false;
         }
@@ -374,10 +395,12 @@ class AFSparsePathWidgetSelector extends AFWidgetSelector {
     return false;
   }
 
+  @override
   int get hashCode {
     return pathSelectors.hashCode;
   }
 
+  @override
   String toString() {
     final result = StringBuffer();
     for(final sel in pathSelectors) {
@@ -430,7 +453,7 @@ class AFUIVerifyContext {
   final Map<AFScreenID, dynamic> showResults;
   final AFScreenID activeScreenId;
 
-  AFUIVerifyContext({
+  const AFUIVerifyContext({
     required this.actions,
     required this.activeScreenId,
     required this.showResults,
@@ -516,9 +539,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
 
   AFScreenPrototype? get test {
     var found = AFibF.g.findScreenTestById(this.testId);
-    if(found == null) {
-      found = AFibF.g.widgetTests.findById(this.testId);
-    }
+    found ??= AFibF.g.widgetTests.findById(this.testId);
     return found;
   }
 
@@ -573,9 +594,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
   /// under a sparse-path containing all the items in the list.
   Future<void> underWidget(dynamic selector, Future<void> Function() underHere) async {
     var path = activeSelectorPath;
-    if(path == null) {
-      path = AFSparsePathWidgetSelector.createEmpty();
-    }
+    path ??= AFSparsePathWidgetSelector.createEmpty();
     var next = path;
     if(selector is List) {
       for(final sel in selector) {
@@ -607,7 +626,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
   }
 
   Future<void> underScreen(AFScreenID screen, Function underHere) async {
-    final shouldPush = true; //activeScreenIDs.isEmpty || activeScreenIDs.last != screen;
+    const shouldPush = true; //activeScreenIDs.isEmpty || activeScreenIDs.last != screen;
     if(shouldPush) {
       pushScreen(screen);
       await pauseForRender();
@@ -630,6 +649,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
     underPaths.removeLast();
   }
 
+  @override
   bool deviceHasFormFactor({
     AFFormFactor? atLeast,
     AFFormFactor? atMost,
@@ -652,9 +672,6 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
     await this.underScreen(dialogScreenId, () async {
       await onDialog(this);
     });
-
-    return null;
-
   }
 
   /// Tap on the specified widget, then expect a dialog which you can interact with via the onSheet parameter.
@@ -665,9 +682,6 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
     await this.underScreen(dialogScreenId, () async {
       await onSheet(this);
     });
-
-    return null;
-
   }
 
   Future<void> matchChipsSelected(List<dynamic> selectors, { required bool selected }) async {
@@ -849,7 +863,8 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
   Future<void> updateStateViews(dynamic data);
 
   Future<void> pauseForRender();
-  void addError(String error, int depth);
+  @override
+  void addError(String desc, int depth);
 
   // Go though all the children of [current], having the parent path [currentPath],
   // and add path entries for any widgets with keys.
@@ -888,8 +903,10 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
 
 abstract class AFSingleScreenTestExecute extends AFScreenTestExecute {
   AFSingleScreenTestExecute(AFBaseTestID testId): super(testId);
+  @override
   bool isEnabled(AFBaseTestID id) { return true; }
 
+  @override
   AFScreenID get activeScreenId {
     if(activeScreenIDs.isNotEmpty) {
       return activeScreenIDs.last;
@@ -1000,7 +1017,7 @@ class AFSingleScreenPrototypeBody {
     if(body == null) {
       throw AFException("The reusable test $bodyId must be defined using tests.defineReusable");
     }
-    final bodyTest = AFScreenTestBody(id: bodyId, description: description, disabled: disabled, body: body.body, bodyReusable: body, params: params);;
+    final bodyTest = AFScreenTestBody(id: bodyId, description: description, disabled: disabled, body: body.body, bodyReusable: body, params: params);
     addReusable(bodyTest);
   }
 
@@ -1054,9 +1071,7 @@ class AFSingleScreenPrototypeBody {
       sectionPrev = section;
 
 
-      if(params == null) {
-        params = section.params;
-      }
+      params ??= section.params;
 
       context.startSection(section.id, resetSection: true);
       final paramsFull = AFTestParams(params);
@@ -1093,8 +1108,10 @@ class AFScreenTestWidgetCollectorScrollableSubpath {
 abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
   final AFDispatcher dispatcher;
   AFScreenTestContext(this.dispatcher, AFBaseTestID testId): super(testId);
+  @override
   AFBaseTestID get testID { return this.testId; }
 
+  @override
   Future<void> applyWidgetValue(dynamic selectorDyn, dynamic value, String applyType, { 
       AFUIVerifyDelegate? verify,
       int maxWidgets = 1, 
@@ -1149,7 +1166,7 @@ abstract class AFScreenTestContext extends AFSingleScreenTestExecute {
 
   Future<void> yieldToRenderLoop() async {
     AFibD.logUIAF?.d("Starting yield to event loop");
-    await Future<void>.delayed(Duration(milliseconds: 100), () {});
+    await Future<void>.delayed(const Duration(milliseconds: 100), () {});
   }
 
   @override
@@ -1165,14 +1182,17 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
 
   AFScreenTestContextSimulator(AFDispatcher dispatcher, AFBaseTestID testId, this.runNumber, this.selectedTest): super(dispatcher, testId);
 
+  @override
   bool isEnabled(AFBaseTestID id) { return selectedTest == null || selectedTest == id; }
 
+  @override
   void addError(String desc, int depth) {
     final err = AFBaseTestExecute.composeError(desc, depth);
     dispatcher.dispatch(AFPrototypeScreenTestAddError(this.testId, err));
     //AFibD.log?.e(err);
   }
 
+  @override
   bool addPassIf({required bool test}) {
     if(test) {
       dispatcher.dispatch(AFPrototypeScreenTestIncrementPassCount(this.testId));
@@ -1191,12 +1211,13 @@ class AFScreenTestContextWidgetTester extends AFScreenTestContext {
 
   @override
   Future<void> pauseForRender() async {
-    await tester.pumpAndSettle(Duration(seconds: 2));
+    await tester.pumpAndSettle(const Duration(seconds: 2));
     await super.pauseForRender();
   }
 
+  @override
   Future<void> yieldToRenderLoop() async {
-    await tester.pumpAndSettle(Duration(seconds: 2));
+    await tester.pumpAndSettle(const Duration(seconds: 2));
   }
 
   @override
@@ -1304,10 +1325,13 @@ abstract class AFScreenPrototype {
 }
 
 abstract class AFScreenLikePrototype extends AFScreenPrototype {
+  @override
   dynamic stateView;
   final AFSingleScreenPrototypeBody body;
   //final AFConnectedScreenWithoutRoute screen;
+  @override
   final AFNavigatePushAction navigate;
+  @override
   final AFTestTimeHandling timeHandling;
 
   AFScreenLikePrototype({
@@ -1319,22 +1343,29 @@ abstract class AFScreenLikePrototype extends AFScreenPrototype {
     required AFUIType uiType,
   }): super(id: id, uiType: uiType);
 
+  @override
   AFID get displayId {
     return id;
   }
 
+  @override
   void openTestDrawer(AFScreenTestID id) {
     body.openTestDrawer(id);
   }
 
+  @override
   AFSingleScreenPrototypeBody get singleScreenBody {
     return body;
   }
 
+  @override
   List<AFScreenTestDescription> get smokeTests { return List<AFScreenTestDescription>.from(body.smokeTests); }
+  @override
   List<AFScreenTestDescription> get reusableTests { return  List<AFScreenTestDescription>.from(body.reusableTests); }
+  @override
   List<AFScreenTestDescription> get regressionTests { return  List<AFScreenTestDescription>.from(body.regressionTests); }
   
+  @override
   Future<void> run(AFScreenTestExecute context, { List<Object?>? params, Function? onEnd}) {
     return body.run(context, onEnd: onEnd, params: params);
   }
@@ -1405,6 +1436,7 @@ class AFSingleScreenPrototype extends AFScreenLikePrototype {
     ));
   }
 
+  @override
   void onDrawerReset(AFDispatcher dispatcher) {
     AFSingleScreenPrototype.resetTestParam(dispatcher, this.id, this.navigate);
     final sv = AFibF.g.testData.resolveStateViewModels(this.stateView);
@@ -1415,6 +1447,7 @@ class AFSingleScreenPrototype extends AFScreenLikePrototype {
 
 
 abstract class AFWidgetPrototype extends AFScreenPrototype {
+  @override
   final dynamic stateView;
   final AFSingleScreenPrototypeBody body;
   final AFRenderConnectedChildDelegate render;
@@ -1429,6 +1462,7 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
     String? title
   }): super(id: id, uiType: AFUIType.widget);
 
+  @override
   AFID get displayId {
     return id;
   }
@@ -1437,14 +1471,17 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
     return AFUIScreenID.screenPrototypeWidget;
   }
 
+  @override
   void openTestDrawer(AFScreenTestID id) {
     body.openTestDrawer(id);
   }
 
+  @override
   AFSingleScreenPrototypeBody get singleScreenBody {
     return body;
   }
 
+  @override
   void startScreen(AFDispatcher dispatcher,  BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? stateView }) {
     final ms = stateView ?? this.stateView;
     final rpp = routeParam ?? this.navigate.param;
@@ -1458,6 +1495,7 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
     dispatcher.dispatch(AFUIPrototypeWidgetScreen.navigatePush(this, id: this.id));    
   }
   
+  @override
   Future<void> run(AFScreenTestExecute context, { Function? onEnd }) {
     return body.run(context, onEnd: onEnd);
   }
@@ -1468,7 +1506,7 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
     final testContext = prepareRun(context.dispatcher, prevContext, selectedTestId);
     //await testContext.pauseForRender(screenUpdateCount, true);
     run(testContext, onEnd: onEnd);
-    return null;
+    return;
   }
 }
 
@@ -1478,6 +1516,7 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
 class AFConnectedWidgetPrototype extends AFWidgetPrototype {
   final AFRouteParam routeParam;
   final List<AFRouteParam>? children;
+  @override
   final AFTestTimeHandling timeHandling;
 
   AFConnectedWidgetPrototype({
@@ -1490,13 +1529,18 @@ class AFConnectedWidgetPrototype extends AFWidgetPrototype {
     required this.timeHandling,
   }): super(id: id, body: body, stateView: models, render: render);
 
+  @override
   List<AFScreenTestDescription> get smokeTests { return List<AFScreenTestDescription>.from(body.smokeTests); }
+  @override
   List<AFScreenTestDescription> get reusableTests { return  List<AFScreenTestDescription>.from(body.reusableTests); }
+  @override
   List<AFScreenTestDescription> get regressionTests { return  List<AFScreenTestDescription>.from(body.regressionTests); }
+  @override
   AFNavigatePushAction get navigate { 
     return AFNavigatePushAction(launchParam: AFRouteParamWrapper(original: routeParam, screenId: AFUIScreenID.screenPrototypeWidget));
   }
 
+  @override
   void onDrawerReset(AFDispatcher dispatcher) {
     assert(false);
     /*
@@ -1530,6 +1574,7 @@ class AFDialogPrototype extends AFScreenLikePrototype {
     return AFUIScreenID.screenPrototypeDialog;
   }
 
+  @override
   void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? stateView }) {
     final ms = stateView ?? this.stateView;
     final rpp = routeParam ?? this.navigate.param;
@@ -1543,6 +1588,7 @@ class AFDialogPrototype extends AFScreenLikePrototype {
     dispatcher.dispatch(AFUIPrototypeDialogScreen.navigatePush(this, id: this.id));    
   }
 
+  @override
   void onDrawerReset(AFDispatcher dispatcher) {
   }
 
@@ -1566,10 +1612,9 @@ class AFDialogPrototype extends AFScreenLikePrototype {
     );
    
     // instead, wait for the dialog to be displayed, then run the test.
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       run(testContext, onEnd: onEnd);
     });
-    return null;
   }
 }
 
@@ -1594,6 +1639,7 @@ class AFBottomSheetPrototype extends AFScreenLikePrototype {
     return AFUIScreenID.screenPrototypeBottomSheet;
   }
 
+  @override
   void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? stateView }) {
     final ms = stateView ?? this.stateView;
     final rpp = routeParam ?? this.navigate.param;
@@ -1607,6 +1653,7 @@ class AFBottomSheetPrototype extends AFScreenLikePrototype {
     dispatcher.dispatch(AFUIPrototypeBottomSheetScreen.navigatePush(this, id: this.id));    
   }
 
+  @override
   void onDrawerReset(AFDispatcher dispatcher) {
   }
 
@@ -1629,10 +1676,9 @@ class AFBottomSheetPrototype extends AFScreenLikePrototype {
     );
    
     // instead, wait for the dialog to be displayed, then run the test.
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       run(testContext, onEnd: onEnd);
     });
-    return null;
   }
 }
 
@@ -1657,6 +1703,7 @@ class AFDrawerPrototype extends AFScreenLikePrototype {
     return AFUIScreenID.screenPrototypeDrawer;
   }
 
+  @override
   void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? stateView }) {
     final ms = stateView ?? this.stateView;
     final rpp = routeParam ?? this.navigate.param;
@@ -1670,6 +1717,7 @@ class AFDrawerPrototype extends AFScreenLikePrototype {
     dispatcher.dispatch(AFUIPrototypeDrawerScreen.navigatePush(this, id: this.id));    
   }
 
+  @override
   void onDrawerReset(AFDispatcher dispatcher) {
   }
 
@@ -1690,10 +1738,10 @@ class AFDrawerPrototype extends AFScreenLikePrototype {
     );
    
     // instead, wait for the dialog to be displayed, then run the test.
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       run(testContext, onEnd: onEnd);
     });
-    return null;
+    return;
   }
 }
 
@@ -1711,24 +1759,33 @@ class AFWorkflowStatePrototype extends AFScreenPrototype {
     this.actualDisplayId,
   }): super(id: id, uiType: AFUIType.screen);
 
+  @override
   List<AFScreenTestDescription> get smokeTests { return List<AFScreenTestDescription>.from(body.smokeTests); }
+  @override
   List<AFScreenTestDescription> get reusableTests { return  List<AFScreenTestDescription>.from(body.reusableTests); }
+  @override
   List<AFScreenTestDescription> get regressionTests { return  List<AFScreenTestDescription>.from(body.regressionTests); }
   
+  @override
   AFTestTimeHandling get timeHandling { return AFTestTimeHandling.running; }
 
+  @override
   AFSingleScreenPrototypeBody get singleScreenBody {
     throw UnimplementedError();
   }
 
+  @override
   AFID get displayId {
     return actualDisplayId ?? id;
   }
 
+  @override
   dynamic get stateView { return null; }
   dynamic get routeParam { return null; }
+  @override
   AFNavigatePushAction get navigate { return AFNavigatePushAction(launchParam: AFRouteParamUnused.unused); }
 
+  @override
   void openTestDrawer(AFScreenTestID id) {
     body.openTestDrawer(id);
   }
@@ -1743,6 +1800,7 @@ class AFWorkflowStatePrototype extends AFScreenPrototype {
     return AFibF.g.screenTests;
   }
 
+  @override
   void startScreen(AFDispatcher dispatcher, BuildContext? flutterContext, AFDefineTestDataContext registry, { AFRouteParam? routeParam, List<Object>? stateView }) {
     initializeMultiscreenPrototype(dispatcher, this);
   }
@@ -1791,7 +1849,7 @@ class AFWorkflowStatePrototype extends AFScreenPrototype {
       // because we didn't have a BuildContext at the time.   So, below, we do the 
       // actual open, then make sure to route the result through the expected code-path
       // as though it had been opened the normal way.
-      Future.delayed(Duration(seconds: 1), () async {
+      Future.delayed(const Duration(seconds: 1), () async {
         final uiType = showingScreen.kind;
         final showScreenId = showingScreen.screenId;
 
@@ -1827,10 +1885,12 @@ class AFWorkflowStatePrototype extends AFScreenPrototype {
   }
 
 
+  @override
   Future<void> run(AFScreenTestContext context, { Function? onEnd}) {
     return body.run(context, onEnd: onEnd);
   }
 
+  @override
   void onDrawerReset(AFDispatcher dispatcher) {
     dispatcher.dispatch(AFNavigateExitTestAction());
     initializeMultiscreenPrototype(dispatcher, this);
@@ -2002,7 +2062,7 @@ class AFSingleScreenReusableBody {
   final AFSingleScreenPrototypeBody prototype;
   final AFReusableScreenTestBodyExecuteDelegate body;
 
-  AFSingleScreenReusableBody({
+  const AFSingleScreenReusableBody({
     required this.id,
     required this.prototype, 
     required this.body,
@@ -2188,6 +2248,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
 
   AFWorkflowTestContext(this.screenContext);  
 
+  @override
   void expect(dynamic value, ft.Matcher matcher, {int extraFrames = 0}) {
     screenContext.expect(value, matcher, extraFrames: extraFrames+1);
   }
@@ -2204,6 +2265,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     } 
   }
 
+  @override
   Future<void> pushQueryListener<TQueryResponse>(AFAsyncListenerQuery query, AFWorkflowTestDefinitionContext definitions, dynamic testData) async {
     assert(TQueryResponse != dynamic, "You need to specify a type for the query response");
     final td = definitions.td(testData);
@@ -2254,6 +2316,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
   }
 
 
+  @override
   Future<void> runWidgetTest(AFBaseTestID widgetTestId, AFScreenID originScreen, {AFScreenID? terminalScreen, AFBaseTestID? queryResults}) async {
     _installQueryResults(queryResults);
     final widgetTest = AFibF.g.widgetTests.findById(widgetTestId);
@@ -2264,6 +2327,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     screenContext.popScreen();    
   }
 
+  @override
   Future<void> tapNavigateFromTo({
     required dynamic tap,
     required AFScreenID startScreen,
@@ -2279,6 +2343,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     });
   }
 
+  @override
   Future<void> tapOpenDrawer({
     required dynamic tap,
     required AFScreenID startScreen,
@@ -2287,6 +2352,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     return tapNavigateFromTo(tap: tap, startScreen: startScreen, endScreen: drawerId, verifyScreen: false);
   }
 
+  @override
   Future<void> onDrawer({
     required AFScreenID drawerId, 
     AFScreenID? endScreen, 
@@ -2302,6 +2368,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     );
   }
 
+  @override
   Future<void> onScreen({
     required AFScreenID startScreen, 
     AFScreenID? endScreen, 
@@ -2313,9 +2380,7 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
     if(verifyScreen) {
       AFibF.g.testOnlyVerifyActiveScreen(startScreen);
     }
-    if(endScreen == null) {
-      endScreen = startScreen;
-    }
+    endScreen ??= startScreen;
     screenContext.startSection(startScreen, resetSection: true);
     if(printResults) {
       screenContext.printStartTest(startScreen);

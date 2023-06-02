@@ -5,5 +5,6 @@ class SnippetCallInstallT extends AFSourceTemplate {
   static const insertPackageCode = AFSourceTemplateInsertion("package_code");
   static const insertInstallKind = AFSourceTemplateInsertion("install_kind");
 
+  @override
   String get template => '  ${insertPackageCode}Install$insertInstallKind(context);';
 }

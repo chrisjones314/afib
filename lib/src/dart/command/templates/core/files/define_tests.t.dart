@@ -9,6 +9,7 @@ class DefineTestsT extends AFCoreFileSourceTemplate {
     templateFileId: "define_tests",
   );
 
+  @override
   final String template = '''
 import 'package:afib/afib_flutter.dart';
 

@@ -23,6 +23,7 @@ mixin AFNonUIAPIContextMixin implements AFDispatcher {
 
   AFDispatcher get dispatcher;
 
+  @override
   void dispatch(dynamic action) {
     dispatcher.dispatch(action);
   }
@@ -223,6 +224,7 @@ mixin AFStandardAPIContextMixin implements AFDispatcher {
   AFDispatcher get dispatcher;
   AFConceptualStore get targetStore;
 
+  @override
   void dispatch(dynamic action) {
     dispatcher.dispatch(action);
   }
@@ -371,7 +373,7 @@ mixin AFStandardAPIContextMixin implements AFDispatcher {
     
     // Note: you cannot use executeDeferredCallback here, because in prototype mode it doesn't actually delay, 
     // and we really need to delay and wait for the screen to render, even in prototype mode.
-    Timer(Duration(seconds: 1), () { 
+    Timer(const Duration(seconds: 1), () { 
       AFibF.g.swapActiveAndBackgroundStores(
         mergePublicState: (source, dest) {
           var revised = mergePublicState(source, dest);
@@ -409,7 +411,7 @@ mixin AFStandardAPIContextMixin implements AFDispatcher {
     
     // Note: you cannot use executeDeferredCallback here, because in prototype mode it doesn't actually delay, 
     // and we really need to delay and wait for the screen to render, even in prototype mode.
-    Timer(Duration(seconds: 1), () { 
+    Timer(const Duration(seconds: 1), () { 
       
       // restore the demo mode store to its initial state.
       final demoDispatcher = AFibF.g.internalOnlyDispatcher(AFConceptualStore.demoModeStore);
@@ -520,7 +522,7 @@ mixin AFContextShowMixin {
   }
 
   static Future<void> showDialogStatic<TReturn>({
-    required dynamic dispatch(dynamic action),
+    required dynamic Function(dynamic action) dispatch,
     required BuildContext? flutterContext,
     required AFNavigatePushAction navigate,
     required AFAsyncQuery? executeBefore,
@@ -656,7 +658,7 @@ mixin AFContextShowMixin {
 
       final context = AFBuildContext<AFFlexibleStateView, AFRouteParamUnused>(
         standard,
-        AFUIDefaultStateView.create(<String, Object>{}),
+        AFUIDefaultStateView.create(const <String, Object>{}),
         AFRouteParamUnused.unused,
         null,
       );
@@ -688,9 +690,7 @@ mixin AFContextShowMixin {
       richBody.writeNormal(body);
     }
 
-    if(buttonTitles == null) {
-      buttonTitles = ["OK"];
-    }
+    buttonTitles ??= ["OK"];
     showDialogAFib<int>(
        navigate: AFUIStandardChoiceDialog.navigatePush(
           icon: icon,
@@ -757,7 +757,7 @@ mixin AFContextShowMixin {
     // in testing, the notification library starts a timer, which doesn't get shut 
     // down, and causes error messages at the end of the test.
     if(AFibD.config.isWidgetTesterContext) {
-      duration = Duration(seconds: 0);
+      duration = const Duration(seconds: 0);
     }
 
     showInAppNotification(
@@ -930,7 +930,7 @@ mixin AFContextShowMixin {
   }
 
   static void showModalBottomSheetStatic<TReturn extends Object?>({
-    required dynamic dispatch(dynamic action),
+    required dynamic Function(dynamic action) dispatch,
     BuildContext? flutterContext,    
     required AFNavigatePushAction navigate,
     required AFAsyncQuery? executeBefore,
@@ -1015,7 +1015,7 @@ mixin AFContextShowMixin {
   }
 
   static void showDrawerStatic({
-    required dynamic dispatch(dynamic action),
+    required dynamic Function(dynamic action) dispatch,
     BuildContext? flutterContext,    
     AFNavigatePushAction? navigate
   }) {

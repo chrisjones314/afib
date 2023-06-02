@@ -69,6 +69,7 @@ class AFScrollableScrollTracker extends AFScrollTracker {
 
   AFScrollableScrollTracker(AFWidgetSelector selector, Element element): super(selector, element);
   
+  @override
   bool canScrollMore() {
     final controller = _controller();
     assert(controller != null);
@@ -78,6 +79,7 @@ class AFScrollableScrollTracker extends AFScrollTracker {
     return false;
   }
 
+  @override
   Future<void> scrollMore() async {
     if(!AFibD.config.isWidgetTesterContext) {
       final controller = _controller();
@@ -87,7 +89,7 @@ class AFScrollableScrollTracker extends AFScrollTracker {
         if(newPos > controller.position.maxScrollExtent) {
           newPos = controller.position.maxScrollExtent;
         }
-        await controller.animateTo(newPos, duration: Duration(milliseconds: 500), curve: Curves.ease);
+        await controller.animateTo(newPos, duration: const Duration(milliseconds: 500), curve: Curves.ease);
       }
     }
   }
@@ -102,11 +104,13 @@ class AFScrollableScrollTracker extends AFScrollTracker {
 }
 
 class AFScrollableScrollerAction extends AFScrollerAction {
+  @override
   bool matches(Element elem) {
     final widget = elem.widget;
     return widget is Scrollable;
   }
 
+  @override
   AFScrollTracker createScrollTracker(AFWidgetSelector selector, Element element) {
     return AFScrollableScrollTracker(selector, element);
   }
@@ -324,7 +328,7 @@ class AFRichTextGestureTapAction extends AFApplyTapWidgetAction {
   @override
   bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
     final tapOn = elem.widget;
-    if(!(selector is AFRichTextGestureTapSpecifier)) {
+    if(selector is! AFRichTextGestureTapSpecifier) {
       throw AFException("If you want to tap on text within a RichText widget, you need to specify an AFRichTextGestureTapSpecifier explicitly as your widget specifier.");
     }
     final specifier = selector;
@@ -441,8 +445,8 @@ class AFApplyTextTextFieldAction extends AFApplySetValueWidgetAction {
   AFApplyTextTextFieldAction(): super(TextField);
 
   @override
-  bool applyInternal(String applyType, AFWidgetSelector selector, Element element, dynamic data) {
-    final widget = element.widget;
+  bool applyInternal(String applyType, AFWidgetSelector selector, Element elem, dynamic data) {
+    final widget = elem.widget;
     if(widget is TextField && data is String) {
       final widCont = widget.controller;
       if(widCont != null) {

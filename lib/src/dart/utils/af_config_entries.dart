@@ -116,7 +116,7 @@ class AFConfigEntries {
   /// you should use widgets like [AFCircularProgressIndicator], which use this flag,
   /// by way of the utility [AFConfig.isWidgetTesterContext] to return static widgets
   /// instead of an infinite animation in the widget tester context.
-  static final widgetTesterContextKey = "widgetTesterContext";
+  static const widgetTesterContextKey = "widgetTesterContext";
   static final widgetTesterContext = AFConfigurationItemTrueFalse(
     libraryId: AFUILibraryID.id,
     name: widgetTesterContextKey, 

@@ -12,7 +12,7 @@ class ModelUsersRootT extends ModelExampleStartHereT {
   );  
 
   factory ModelUsersRootT.example() {
-    return ModelUsersRootT(embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+    return ModelUsersRootT(embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
       AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 ''',
     }));

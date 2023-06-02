@@ -19,7 +19,7 @@ class AFSingleScreenTestState {
   final AFNavigatePushAction navigate;
   final AFTestTimeHandling timeHandling;
 
-  AFSingleScreenTestState({
+  const AFSingleScreenTestState({
     required this.testId,
     required this.navigate,
     required this.pass, 
@@ -95,7 +95,7 @@ class AFTestState {
   final Map<AFBaseTestID, AFScreenTestContext> testContexts;
   final Map<AFBaseTestID, AFSingleScreenTestState> testStates;
 
-  AFTestState({
+  const AFTestState({
     required this.activeTestIds, 
     required this.activeWireframe,
     required this.testContexts, 
@@ -104,11 +104,11 @@ class AFTestState {
   });
 
   factory AFTestState.initial() {
-    return AFTestState(
+    return const AFTestState(
       activeTestIds: <AFBaseTestID>[],
       activeWireframe: null,
       testContexts: <AFBaseTestID, AFScreenTestContext>{}, 
-      testStates:<AFBaseTestID, AFSingleScreenTestState>{},
+      testStates: <AFBaseTestID, AFSingleScreenTestState>{},
       activePrototypeId: null,
     );
   }
@@ -179,7 +179,7 @@ class AFTestState {
   AFTestState startWireframe(AFWireframe wireframe) {
 
     final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
-    final testId = AFUIScreenTestID.wireframe;
+    const testId = AFUIScreenTestID.wireframe;
     final models = AFibF.g.testData.resolveStateViewModels(wireframe.stateView);
     final now = AFTimeState.createNow();
     final timeStateKey = AFModelWithCustomID.stateKeyFor(now);
@@ -191,7 +191,7 @@ class AFTestState {
       testId: AFUIScreenTestID.wireframe,
       models: models,
       pass: 0, 
-      errors: <String>[],
+      errors: const <String>[],
       navigate: AFNavigatePushAction(launchParam: AFRouteParamUnused.unused),
       timeHandling: wireframe.timeHandling,
     );
@@ -206,7 +206,7 @@ class AFTestState {
     final revisedStates = Map<AFBaseTestID, AFSingleScreenTestState>.from(testStates);
     final orig = testStates[testId];
     if(orig == null) {
-      revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: <String>[], models: models, navigate: navigate, timeHandling: timeHandling);
+      revisedStates[testId] = AFSingleScreenTestState(testId: testId, pass: 0, errors: const <String>[], models: models, navigate: navigate, timeHandling: timeHandling);
     } else {
       revisedStates[testId] = orig.copyWith(pass: 0, errors: <String>[]);
     }

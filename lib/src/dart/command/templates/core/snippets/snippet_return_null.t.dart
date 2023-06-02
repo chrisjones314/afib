@@ -5,6 +5,7 @@ class SnippetReturnNullT extends AFCoreSnippetSourceTemplate {
 
   const SnippetReturnNullT();
 
+  @override
   String get template => 'return null;';
 
 }

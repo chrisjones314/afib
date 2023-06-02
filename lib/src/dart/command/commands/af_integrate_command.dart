@@ -6,12 +6,15 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_call_insta
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_from_package.t.dart';
 
 class AFIntegrateCommand extends AFCommand { 
+  @override
   final name = "integrate";
+  @override
   final description = "integrate a third-party library, or the second part of a project style";
   static const kindLibrary = "library";
   static const kindProjectStyle = "project-style";
 
 
+  @override
   String get usage {
     return '''
 $usageHeader
@@ -132,7 +135,7 @@ $optionsHeader
 
     for(final line in lines) {
       final simpleLine = AFCommandContext.simplifyProjectStyleCommand(line);
-      context.output.writeTwoColumns(col1: "execute ", col2: "$simpleLine");
+      context.output.writeTwoColumns(col1: "execute ", col2: simpleLine);
       if(!line.startsWith("echo")) {
         await context.executeSubCommand(line, null);
       }

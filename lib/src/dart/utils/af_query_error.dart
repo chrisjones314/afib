@@ -22,6 +22,7 @@ class AFQueryError {
     return AFQueryError(message: noMessage, code: code);
   }
 
+  @override
   String toString() {
     final sb = StringBuffer();
     if(code != noCode) {

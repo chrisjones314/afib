@@ -10,6 +10,7 @@ class DynamicConfigEntriesT extends AFDynamicSourceTemplate {
 
   DynamicConfigEntriesT(this.source, this.entries);
     
+  @override
   List<String> createLinesWithOptions(AFCommandContext context, List<String> options) {
     final afibConfig = AFibD.config;
     final scope = this.entries ?? afibConfig.all;

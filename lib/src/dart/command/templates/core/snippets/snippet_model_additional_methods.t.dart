@@ -21,6 +21,7 @@ class SnippetModelAdditionalMethodsT extends AFSnippetSourceTemplate {
     );
   }
 
+  @override
   String get template {
     return '''
   ''';

@@ -16,3 +16,5 @@ linter:
     one_member_abstracts: false
     prefer_mixin: false
     avoid_returning_null: false
+    prefer_typing_uninitialized_variables: false
+    avoid_renaming_method_parameters: false

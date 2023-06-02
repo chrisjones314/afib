@@ -7,6 +7,7 @@ class SnippetDrawerExtraConfigParamsT extends AFCoreSnippetSourceTemplate {
 
   const SnippetDrawerExtraConfigParamsT();
 
+  @override
   String get template => '''createDefaultRouteParam: (ref, state) => ${AFSourceTemplate.insertMainTypeInsertion}RouteParam.create(${SnippetCreateScreenPrototypeT.insertNavigatePushParams}),''';
 
 }

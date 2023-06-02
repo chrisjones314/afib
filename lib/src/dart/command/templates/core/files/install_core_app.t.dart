@@ -7,6 +7,7 @@ class InstallCoreAppT extends AFCoreFileSourceTemplate {
     templateFileId: "install_core_app",
   );
 
+  @override
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackagePath/app.dart';

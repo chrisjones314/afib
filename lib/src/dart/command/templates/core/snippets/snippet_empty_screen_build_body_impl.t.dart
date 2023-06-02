@@ -5,6 +5,7 @@ class SnippetEmptyScreenBuildBodyImplT extends AFCoreSnippetSourceTemplate {
 
   SnippetEmptyScreenBuildBodyImplT(): super(templateFileId: "empty_screen_build_body_impl");
 
+  @override
   String get template => '''
 final t = spi.t;
 final rows = t.column();

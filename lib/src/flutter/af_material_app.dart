@@ -6,27 +6,33 @@ import 'package:overlay_support/overlay_support.dart';
 
 
 class AFNavigatorObserver extends NavigatorObserver {
+  @override
   void didPop(Route route, Route? previousRoute) {
     _logNav("didPPop");
   }
 
+  @override
   void didPush(Route route, Route? previousRoute) {
     _logNav("didPush");
   }
 
+  @override
   void didRemove(Route route, Route? previousRoute) {
     _logNav("didRemove");
 
   }
   
+  @override
   void didReplace({Route? newRoute, Route? oldRoute}) {
     _logNav("didReplace");
   }
 
+  @override
   void didStartUserGesture(Route route, Route? previousRoute) {
     _logNav("didStartUserGesture");
   }
 
+  @override
   void didStopUserGesture() {
     _logNav("didStopUserGesture");
   }
@@ -44,7 +50,11 @@ class AFNavigatorObserver extends NavigatorObserver {
 abstract class AFMaterialApp<AppState> extends AFApp<AppState> {
   
   /// Construct an app with the specified [AFScreenMap]
-  AFMaterialApp(): super();
+  AFMaterialApp({
+    Key? key,
+  }): super(
+    key: key,
+  );
   
   /// This widget is the root of your application
   @override

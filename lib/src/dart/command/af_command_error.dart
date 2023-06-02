@@ -10,6 +10,7 @@ class AFCommandError implements Exception {
     this.usage,
   });
 
+  @override
   String toString() {
     return this.error;
   }

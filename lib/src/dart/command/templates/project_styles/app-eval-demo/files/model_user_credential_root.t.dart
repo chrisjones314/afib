@@ -13,7 +13,7 @@ class ModelUserCredentialRootT extends ModelExampleStartHereT {
   );  
 
   factory ModelUserCredentialRootT.example() {
-    return ModelUserCredentialRootT(embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+    return ModelUserCredentialRootT(embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
       ModelT.insertInitialState: '''
 factory UserCredentialRoot.initialState() {
   // Note: Using flag values here, rather than null, works better with copyWith,

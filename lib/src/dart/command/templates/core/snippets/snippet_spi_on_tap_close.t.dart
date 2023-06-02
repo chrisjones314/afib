@@ -6,6 +6,7 @@ import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
 
 class SnippetSPIOnTapCloseT extends AFCoreSnippetSourceTemplate {
 
+  @override
   String get template => '''
 void onTapClose() {
   onClose${ScreenT.insertControlTypeSuffix}();

@@ -7,6 +7,7 @@ class UILibStarterMinimalT extends AFProjectStyleSourceTemplate {
     templateFileId: AFCreateAppCommand.projectStyleUILibStarterMinimal,
   );
 
+  @override
   String get template => '''
 require meta
 ''';

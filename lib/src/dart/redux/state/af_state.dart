@@ -103,7 +103,7 @@ class AFState {
   final AFPrivateState private;
 
   /// Construct an AFib state with the specified route and app state.
-  AFState({
+  const AFState({
     required this.private,
     required this.public
   });

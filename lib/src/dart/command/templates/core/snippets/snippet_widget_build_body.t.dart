@@ -18,10 +18,11 @@ class SnippetWidgetBuildBodyT extends AFSnippetSourceTemplate {
     return SnippetWidgetBuildBodyT(
       templateFileId: "widget_build_body",
       templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {})
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {})
     );
   }
 
+  @override
   String get template => '''
     final t = spi.t;
     return t.childText(text: "${insertMainType.spaces}");

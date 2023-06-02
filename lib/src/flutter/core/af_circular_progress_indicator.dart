@@ -2,7 +2,6 @@ import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:flutter/material.dart';
 
 class AFCircularProgressIndicator extends StatelessWidget {
-  final Key? key;
   final Key? childKey;
   final double? value;
   final Color? backgroundColor;
@@ -12,14 +11,15 @@ class AFCircularProgressIndicator extends StatelessWidget {
   final String? semanticsValue;
   
   AFCircularProgressIndicator({
-    this.key,
+    Key? key,
     this.childKey,
     this.value, 
     this.backgroundColor, 
     this.valueColor, 
     this.strokeWidth = 4.0, 
     this.semanticsLabel, 
-    this.semanticsValue});
+    this.semanticsValue}): 
+    super(key: key);
 
   @override
   Widget build(BuildContext context) {

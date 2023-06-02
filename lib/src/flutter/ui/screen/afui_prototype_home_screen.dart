@@ -53,11 +53,11 @@ class AFUIPrototypeHomeScreenParam extends AFScreenRouteParamWithFlutterState {
     final flutterState = AFFlutterRouteParamState(
       textControllers: textControllers
     );
-    final filter = "";
+    const filter = "";
     final controllers = AFTextEditingControllers.createOne(AFUIWidgetID.textTestSearch, filter);
     return AFUIPrototypeHomeScreenParam(
       view: viewFilter,
-      results: <AFScreenTestResultSummary>[],
+      results: const <AFScreenTestResultSummary>[],
       textControllers: controllers,
       search: filter,
       flutterState: flutterState,
@@ -265,7 +265,7 @@ class AFPrototypeHomeScreen extends AFUIConnectedScreen<AFPrototypeHomeScreenSPI
         autofocus: false,
         autocorrect: false,
         textAlign: TextAlign.left,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           border: InputBorder.none,
         ),
         onChanged: spi.onEditSearchText

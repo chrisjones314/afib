@@ -7,6 +7,7 @@ class StarterSigninT extends AFProjectStyleSourceTemplate {
     templateFileId: AFCreateAppCommand.projectStyleSignin,
   );
 
+  @override
   String get template => '''
 --override-templates +
   +core/snippets/fundamental_theme_init=project_styles/app-starter-signin/snippets/fundamental_theme_init

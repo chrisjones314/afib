@@ -8,6 +8,7 @@ class AFException implements Exception {
     return AFException("Missing state: $item");
   }
 
+  @override
   String toString() {
     return cause;
   }

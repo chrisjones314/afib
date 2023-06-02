@@ -7,6 +7,7 @@ class InstallLibraryCommandT extends AFCoreFileSourceTemplate {
     templateFileId: "install_library_command",
   );  
 
+  @override
   String get template => '''
 import 'package:afib/afib_command.dart';
 

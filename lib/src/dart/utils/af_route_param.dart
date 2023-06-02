@@ -52,6 +52,7 @@ class AFRouteParam {
     return null;
   }
 
+  @override
   String toString() {
     return runtimeType.toString();
   }

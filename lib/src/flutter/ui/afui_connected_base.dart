@@ -18,20 +18,20 @@ class AFUIFlexibleStateView extends AFFlexibleStateView  {
 }
 
 class AFUIScreenSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFScreenStateProgrammingInterface<AFUIState, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> {
-  AFUIScreenSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIScreenSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
 }
 
 class AFUIDialogSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFDialogStateProgrammingInterface<AFUIState, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> {
-  AFUIDialogSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIDialogSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
 }
 
 class AFUIDrawerSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFDrawerStateProgrammingInterface<AFUIState, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> {
-  AFUIDrawerSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIDrawerSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
 }
 
 // a default screen programming interface while we transition to this new model.
 class AFUIWidgetSPI<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> extends AFWidgetStateProgrammingInterface<AFUIState, AFBuildContext<TStateView, TRouteParam>, AFUIDefaultTheme> {
-  AFUIWidgetSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIWidgetSPI(AFBuildContext<TStateView, TRouteParam> context, AFStandardSPIData standard): super(context, standard);
 }
 
 

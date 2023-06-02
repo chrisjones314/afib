@@ -43,7 +43,7 @@ class AFScreenMap {
      final result = _screens.map<String, WidgetBuilder>((k, v) {
        return MapEntry(k.code, v);
      });
-     result[AFUIScreenID.screenStartupWrapper.code] = (_) => AFStartupScreenWrapper();
+     result[AFUIScreenID.screenStartupWrapper.code] = (_) => const AFStartupScreenWrapper();
      result[AFUIScreenID.screenUnimplemented.code] = (_) => AFUIUnimplementedScreen();
      return result;
   }
@@ -68,7 +68,7 @@ class AFScreenMap {
     final builder = _screens[id];
     if(builder == null) {
       if(id == AFUIScreenID.screenStartupWrapper) {
-        return AFStartupScreenWrapper();
+        return const AFStartupScreenWrapper();
       }
       throw AFException("Please add an entry for $id in screen_map.dart");
     }

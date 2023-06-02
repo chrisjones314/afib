@@ -24,7 +24,7 @@ class AFStandardSPIData {
   final AFFunctionalTheme theme;
   final AFScreenID screenId;
   final AFWidgetID wid;
-  AFStandardSPIData({
+  const AFStandardSPIData({
     required this.theme,
     required this.screenId,
     required this.wid,
@@ -210,9 +210,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
       routeLocation: AFRouteLocation.screenHierarchy,
       includePrior: true
     );
-    if(seg == null) {
-      seg = _createDefaultRouteSegment(screenId: parentScreen, newParam: null, launchParam: launchParam);
-    }
+    seg ??= _createDefaultRouteSegment(screenId: parentScreen, newParam: null, launchParam: launchParam);
     return seg;    
   }
 
@@ -227,9 +225,7 @@ abstract class AFConnectedUIConfig<TState extends AFComponentState, TTheme exten
     required TRouteParam? launchParam,
   }) {
     AFRouteParam? actualParam = newParam;
-    if(actualParam == null) {
-      actualParam = launchParam;
-    }
+    actualParam ??= launchParam;
     if(actualParam == null && (TRouteParam == AFRouteParamUnused || TRouteParam == AFRouteParam)) {
       actualParam = AFRouteParamUnused.unused;
     } 
@@ -478,7 +474,7 @@ abstract class AFConnectedUIBase<TState extends AFComponentState, TTheme extends
         distinct: true,
         builder: (buildContext, dataContext) {
           if(dataContext == null) {
-            return material.Container(child: material.Text("Loading..."));
+            return const material.Text("Loading...");
           }
           var screenIdRegister = wid == AFUIWidgetID.useScreenParam ? screenId : null;          
           if(screenIdRegister != null) {            
@@ -587,7 +583,9 @@ abstract class AFConnectedScreen<TState extends AFComponentState, TTheme extends
   }): super(uiConfig: config, screenId: screenId, wid: AFUIWidgetID.useScreenParam, launchParam: launchParam);
 
 
+  @override
   bool get testOnlyRequireScreenIdMatchForTestContext { return true; }
+  @override
   bool get isPrimaryScreen { return true; }
 
   AFScreenID? get primaryScreenId {
@@ -735,6 +733,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
   /// Shorthand for accessing the route param.
   TRouteParam get p { return routeParam; }
 
+  @override
   AFConceptualStore get targetStore {
     return AFibF.g.activeConceptualStore;
   }
@@ -815,6 +814,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     );
   }
   
+  @override
   material.BuildContext? get flutterContext { 
     // there is a brief time where we don't have a context internally, as the AFBuildContext is 
     // being constructed.   But, for the purposes of users of the framework, there will always
@@ -822,6 +822,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     return standard.context; 
   }  
 
+  @override
   AFDispatcher get dispatcher { return standard.dispatcher; }
   AFScreenPrototype? get screenTest { return standard.screenTest; }
 
@@ -832,6 +833,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
   material.BuildContext get c { return flutterContext!; }
 
   /// Dispatch an action or query.
+  @override
   void dispatch(dynamic action) {
 
     final wireframe = activeWireframe;
@@ -875,6 +877,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     return null;
   }
 
+  @override
   BuildContext get contextNullCheck {
     final ctx = flutterContext;
     if(ctx == null) { throw AFException("Missing build context"); }
@@ -964,17 +967,19 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     }
   }
 
-  bool operator==(dynamic o) {
-    if(o is! AFBuildContext<TStateView, TRouteParam>) {
+  @override
+  bool operator==(dynamic other) {
+    if(other is! AFBuildContext<TStateView, TRouteParam>) {
       return false;
     }
-    var result = (routeParam == o.routeParam && stateView == o.stateView);
+    var result = (routeParam == other.routeParam && stateView == other.stateView);
     if(compareChildren) {
-      result &= (children == o.children);
+      result &= (children == other.children);
     }
     return result;
   }
 
+  @override
   int get hashCode {
     return hash2(routeParam.hashCode, stateView.hashCode);
   }
@@ -1020,7 +1025,7 @@ class AFStateProgrammingInterface<TState extends AFComponentState, TBuildContext
   final TBuildContext context;
   final AFStandardSPIData standard;
 
-  AFStateProgrammingInterface(this.context, this.standard);
+  const AFStateProgrammingInterface(this.context, this.standard);
 
   bool get hasFlutterContext {
     return context.flutterContext != null;
@@ -1065,7 +1070,7 @@ class AFStateProgrammingInterface<TState extends AFComponentState, TBuildContext
   }
 
   AFRouteParamRef launchParamUnused() {
-    return AFRouteParamRef(screenId: AFUIScreenID.unused, routeLocation: AFRouteLocation.globalPool, wid: AFUIWidgetID.useScreenParam);
+    return const AFRouteParamRef(screenId: AFUIScreenID.unused, routeLocation: AFRouteLocation.globalPool, wid: AFUIWidgetID.useScreenParam);
   }
 
   TChildRouteParam? findChild<TChildRouteParam extends AFRouteParam>(AFWidgetID wid) {
@@ -1087,7 +1092,7 @@ class AFStateProgrammingInterface<TState extends AFComponentState, TBuildContext
 
 @immutable
 class AFScreenStateProgrammingInterface<TState extends AFComponentState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFStateProgrammingInterface<TState, TBuildContext, TTheme> {
-  AFScreenStateProgrammingInterface(
+  const AFScreenStateProgrammingInterface(
     TBuildContext context,
     AFStandardSPIData standard,
   ): super(context, standard);
@@ -1101,11 +1106,12 @@ class AFScreenStateProgrammingInterface<TState extends AFComponentState, TBuildC
 
 @immutable
 class AFDialogStateProgrammingInterface<TState extends AFComponentState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFScreenStateProgrammingInterface<TState, TBuildContext, TTheme> {
-  AFDialogStateProgrammingInterface(
+  const AFDialogStateProgrammingInterface(
     TBuildContext context,
     AFStandardSPIData standard,
   ): super(context, standard);
 
+  @override
   void onPressedStandardBackButton({
     bool worksInSingleScreenTest = true
   }) {
@@ -1120,7 +1126,7 @@ class AFDialogStateProgrammingInterface<TState extends AFComponentState, TBuildC
 
 @immutable
 class AFBottomSheetStateProgrammingInterface<TState extends AFComponentState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFScreenStateProgrammingInterface<TState, TBuildContext, TTheme> {
-  AFBottomSheetStateProgrammingInterface(
+  const AFBottomSheetStateProgrammingInterface(
     TBuildContext context,
     AFStandardSPIData standard,
   ): super(context, standard);
@@ -1133,7 +1139,7 @@ class AFBottomSheetStateProgrammingInterface<TState extends AFComponentState, TB
 
 @immutable
 class AFDrawerStateProgrammingInterface<TState extends AFComponentState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFScreenStateProgrammingInterface<TState, TBuildContext, TTheme> {
-  AFDrawerStateProgrammingInterface(
+  const AFDrawerStateProgrammingInterface(
     TBuildContext context,
     AFStandardSPIData standard
   ): super(context, standard);
@@ -1146,7 +1152,7 @@ class AFDrawerStateProgrammingInterface<TState extends AFComponentState, TBuildC
 
 @immutable
 class AFWidgetStateProgrammingInterface<TState extends AFComponentState, TBuildContext extends AFBuildContext, TTheme extends AFFunctionalTheme> extends AFStateProgrammingInterface<TState, TBuildContext, TTheme> {
-  AFWidgetStateProgrammingInterface(
+  const AFWidgetStateProgrammingInterface(
     TBuildContext context,
     AFStandardSPIData standard,
   ): super(context, standard);
@@ -1157,13 +1163,14 @@ class AFBuilder<TSPI extends AFStateProgrammingInterface> extends StatelessWidge
   final TSPI spiParent;
   final AFBuildWithSPIDelegate<TSPI> builder;
 
-  AFBuilder({
+  const AFBuilder({
     required this.config,
     required this.spiParent,
     required this.builder,
   });
 
-  Widget build(BuildContext ctx) {
+  @override
+  Widget build(BuildContext context) {
     return Builder(
         builder: (revisedCtx) {
           final spi = config.createSPI(revisedCtx, spiParent.context, spiParent.screenId, AFUIWidgetID.unused);

@@ -6,6 +6,7 @@ class SnippetDrawerBuildBodyT extends AFCoreSnippetSourceTemplate {
 
   SnippetDrawerBuildBodyT(): super(templateFileId: "drawer_build_body");
   
+  @override
   String get template => '''
     final t = spi.t;
     final rows = t.column();

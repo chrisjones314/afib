@@ -35,6 +35,7 @@ class AFObjectWithKey {
     return sb.toString();
   }
 
+  @override
   String toString() {
     return key;
   }

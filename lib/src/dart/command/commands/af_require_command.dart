@@ -7,10 +7,13 @@ class AFRequireCommand extends AFCommand {
   static const argAutoInstall = "auto-install";
   static const argLocalAFib = "local-afib";
   static const argIntegrateCode = "integrate-code";
+  @override
   final name = "require";
+  @override
   final description = "Require that a library is in the pubspec/integrated, used mainly in project styles.";
 
 
+  @override
   String get usage {
     return '''
 $usageHeader

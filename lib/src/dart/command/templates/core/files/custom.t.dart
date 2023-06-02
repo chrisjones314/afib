@@ -19,13 +19,14 @@ class CustomT extends AFFileSourceTemplate {
     return CustomT(
       templateFileId: "custom",
       templateFolder: AFProjectPaths.pathGenerateCoreFiles,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertExtraImportsInsertion: AFSourceTemplate.empty,
         AFSourceTemplate.insertAdditionalMethodsInsertion: AFSourceTemplate.empty,        
       })
     );
   }
 
+  @override
   String get template => '''
 $insertExtraImports
 

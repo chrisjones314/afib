@@ -15,6 +15,7 @@ class AFGenerateCommandSubcommand extends AFGenerateSubcommand {
   @override
   String get name => "command";
 
+  @override
   String get usage {
     return '''
 $usageHeader

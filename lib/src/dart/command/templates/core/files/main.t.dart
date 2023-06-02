@@ -42,6 +42,7 @@ class MainT extends AFFileSourceTemplate {
     );
   }
 
+  @override
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackagePath/initialization/create_dart_params.dart';

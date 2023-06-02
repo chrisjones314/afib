@@ -35,7 +35,9 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/read
     );
   }
 
+  @override
   String get template => '''
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib_signin/afsi_flutter.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;
@@ -232,7 +234,7 @@ void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
     // registering, you will see that it is there (actually, it gets pulled onto the registration screen also,
     // as afib_signin does that by default)
     signinScreen.executeScreen((e, screenContext) { 
-      screenContext.executeBuild((spi) => spi.onChangedEmail("southy.was.here@nowhere.com"));
+      screenContext.executeBuild((spi) => spi.onChangedEmail("southy.was.here@afibframework.io"));
       screenContext.executeBuild((spi) => spi.onPressedRegister());
     });
   });

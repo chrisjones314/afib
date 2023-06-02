@@ -27,10 +27,12 @@ class AFQueryContext with AFContextShowMixin, AFStandardAPIContextMixin, AFStand
     required this.conceptualStore,
   });
 
+  @override
   AFConceptualStore get targetStore {
     return conceptualStore;
   }
 
+  @override
   AFDispatcher get dispatcher {
     return AFibF.g.internalOnlyStoreEntry(conceptualStore).dispatcher!;
   }
@@ -44,6 +46,7 @@ class AFQueryContext with AFContextShowMixin, AFStandardAPIContextMixin, AFStand
     conceptualStore = target;
   }
 
+  @override
   void dispatch(dynamic action) {
     dispatcher.dispatch(action);
   }
@@ -52,6 +55,7 @@ class AFQueryContext with AFContextShowMixin, AFStandardAPIContextMixin, AFStand
     return AFibD.log(AFConfigEntryLogArea.query);
   }
 
+  @override
   material.BuildContext? get flutterContext {
     return AFibF.g.currentFlutterContext;
   }
@@ -92,10 +96,12 @@ class AFFinishQueryContext extends AFQueryContext {
     return AFibF.g.internalOnlyStoreEntry(conceptualStore).store!.state;
   }
 
+  @override
   AFPublicState get accessPublicState {
     return state.public;
   }
 
+  @override
   Logger? get log {
     return AFibD.log(AFConfigEntryLogArea.query);
   }
@@ -448,6 +454,7 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
     return findQueryWhere<TQuery>( (q) => true);
   }
 
+  @override
   void startAsyncAF(AFDispatcher dispatcher, AFStore store, { 
     required Completer<AFFinishQuerySuccessContext>? completer,
     Function(dynamic)? onResponseExtra, 
@@ -515,6 +522,7 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
   }
 
   /// This function will not be called in this variant, so overriding it is useless.
+  @override
   void startAsync(AFStartQueryContext<AFCompositeQueryResponse> context) {
     throw UnimplementedError();
   }
@@ -523,6 +531,7 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
   /// 
   /// You can override this in your own subclass if you want, but many uses cases 
   /// are adequately covered by passing onSuccess.
+  @override
   void finishAsyncWithResponse(AFFinishQuerySuccessContext<AFCompositeQueryResponse> response) {
 
   }
@@ -530,6 +539,7 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
   /// A utility for throwing unimplemented in your startAsync method before you have implemented it.
   /// 
   /// Provides a nice error message
+  @override
   Never throwUnimplemented() {
     throw AFException("The query $runtimeType is not implemented in debug/production, fill in startAsync");
   }
@@ -558,9 +568,11 @@ abstract class AFAsyncListenerQuery<TResponse> extends AFAsyncQuery<TResponse> i
   /// start a query and a previous version of it already exists in the state.
   /// 
   /// By default, just returns this, meaning that writes are just straight replacements.
+  @override
   AFTrackedQuery? mergeOnWrite(AFTrackedQuery oldQuery) {
     return this;
   }
 
+  @override
   void shutdown();
 }

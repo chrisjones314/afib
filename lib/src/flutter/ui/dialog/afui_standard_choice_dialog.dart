@@ -90,7 +90,7 @@ class AFUIStandardChoiceDialog extends AFUIConnectedDialog<AFUIStandardChoiceDia
     rows.add(Row(children: titleCols));
     if(body != null) {
       rows.add(t.childMargin(
-        margin: EdgeInsets.fromLTRB(38, 8, 8, 8),
+        margin: const EdgeInsets.fromLTRB(38, 8, 8, 8),
         child: body.toRichText(maxLines: 10,
           softWrap: true)
       ));

@@ -8,6 +8,7 @@ class InstallTestT extends AFCoreFileSourceTemplate {
   );  
 
 
+  @override
   String get template => '''
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackagePath/test/ui_prototypes.dart';

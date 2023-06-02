@@ -6,6 +6,7 @@ import 'package:afib/src/dart/command/af_source_template.dart';
 class SnippetStateTestImplT extends AFCoreSnippetSourceTemplate {
   SnippetStateTestImplT(): super(templateFileId: "state_test_impl");
 
+  @override
   String get template => '''
 ''';
 }
@@ -21,6 +22,7 @@ class SnippetStateTestImplMinimalT extends AFCoreSnippetSourceTemplate {
     ];
   }
 
+  @override
   String get template => '''
 // first, you will define query results using variants of 
 // testContext.defineQueryResponse...

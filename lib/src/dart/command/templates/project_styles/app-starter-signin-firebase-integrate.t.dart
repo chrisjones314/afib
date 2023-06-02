@@ -7,6 +7,7 @@ class StarterSigninFirebaseIntegrateT extends AFProjectStyleSourceTemplate {
     templateFileId: AFCreateAppCommand.projectStyleSigninFirebaseIntegrate,
   );
 
+  @override
   String get template => '''
 import project_styles/app-starter-signin-shared-integrate
 generate query CheckSigninListenerQuery --result-type UserCredentialRoot --override-templates "core/files/query_simple=project_styles/app-starter-signin-firebase/files/query_check_signin"

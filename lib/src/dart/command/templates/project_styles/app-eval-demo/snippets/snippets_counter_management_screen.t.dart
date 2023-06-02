@@ -29,7 +29,7 @@ class SnippetCounterManagementScreenRouteParamT {
     return SnippetStandardRouteParamT(
       templateFileId: "counter_management_screen_route_param",
       templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
-      embeddedInsertions: AFSourceTemplateInsertions(insertions: {
+      embeddedInsertions: const AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertCreateParamsInsertion: AFSourceTemplate.empty,
         AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 CounterManagementScreenRouteParam reviseIncrementClickCount() => copyWith(clickCount: clickCount+1);
@@ -61,6 +61,7 @@ class SnippetCounterManagementScreenAdditionalMethodsT extends AFSnippetSourceTe
     templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
+  @override
   String get template => '''
 /// This method creates the UI card which displays the route parameter
 /// count.
@@ -77,7 +78,7 @@ Widget _buildIncrementParamCard(CounterManagementScreenSPI spi) {
   rows.add(t.childText(
     text: spi.clickCountParam.toString(),
     wid: ${insertAppNamespaceUpper}WidgetID.textCountRouteParam,
-    style: t.styleOnCard.headline2
+    style: t.styleOnCard.displayMedium
   ));
 
   rows.add(t.childSingleRowButton(
@@ -173,6 +174,7 @@ class SnippetCounterManagementScreenBuildBodyT extends AFSnippetSourceTemplate {
     templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
+  @override
   String get template => '''
 final t = spi.t;
 final rows = t.column();
@@ -194,6 +196,7 @@ class SnippetCounterManagementScreenBuildWithSPIImplT extends AFSnippetSourceTem
     templateFolder: AFProjectPaths.pathGenerateExampleEvalDemoSnippets,
   );
   
+  @override
   String get template => '''
 final t = spi.t;
 final body = _buildBody(spi);

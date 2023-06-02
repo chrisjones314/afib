@@ -24,6 +24,8 @@ dependencies:
   pubspec_parse: ^1.2.0
   args: ^2.3.0
   plural_noun: ^0.1.2
+  meta: ^1.9.1
+  collection: ^1.17.1
   
 dev_dependencies:
   flutter_test:

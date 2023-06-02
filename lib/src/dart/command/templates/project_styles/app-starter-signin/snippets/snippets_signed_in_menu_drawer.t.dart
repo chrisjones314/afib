@@ -27,6 +27,7 @@ class SnippetSigninStarterSignedInMenuDrawerBuildBodyT extends AFSnippetSourceTe
     templateFolder: AFProjectPaths.pathGenerateStarterSigninSnippets,
   );
   
+  @override
   String get template => '''
 final t = spi.t;
 final rows = t.column();
@@ -71,7 +72,7 @@ return Drawer(
 class SnippetSigninStarterSignedInMenuDrawerSPIT {
 
   static SnippetDeclareSPIT example() {
-    final ei = AFSourceTemplateInsertions(insertions: {
+    const ei = AFSourceTemplateInsertions(insertions: {
       AFSourceTemplate.insertAdditionalMethodsInsertion: '''
 User get activeUser => context.s.activeUser;
 

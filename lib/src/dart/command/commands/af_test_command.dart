@@ -8,10 +8,13 @@ import 'package:collection/collection.dart';
 
 class AFTestCommand extends AFCommand { 
 
+  @override
   final name = "test";
+  @override
   final description = "Run tests, you can specify any prototype name, test name, or any of the values for afib.dart help config's --tests-enabled option";
 
 
+  @override
   String get usage {
     return '''
 $usageHeader
@@ -27,15 +30,15 @@ $optionsHeader
   }
 
   @override
-  Future<void> execute(AFCommandContext ctx) async {
+  Future<void> execute(AFCommandContext context) async {
     final config = AFibD.config;
-    AFConfigEntries.testsEnabled.setValue(config, ctx.rawArgs);
-    _updateRecentTests(config, ctx.rawArgs);
+    AFConfigEntries.testsEnabled.setValue(config, context.rawArgs);
+    _updateRecentTests(config, context.rawArgs);
 
 
-    AFConfigCommand.updateConfig(ctx, config, [AFConfigEntries.testSize, AFConfigEntries.testOrientation], ctx.arguments);
-    AFConfigCommand.writeUpdatedConfig(ctx);
-    ctx.generator.finalizeAndWriteFiles(ctx);
+    AFConfigCommand.updateConfig(context, config, [AFConfigEntries.testSize, AFConfigEntries.testOrientation], context.arguments);
+    AFConfigCommand.writeUpdatedConfig(context);
+    context.generator.finalizeAndWriteFiles(context);
       
     final process = await Process.start('flutter', ['test', AFProjectPaths.relativePathFor(AFProjectPaths.afTestPath)]);
     stdout.addStream(process.stdout);

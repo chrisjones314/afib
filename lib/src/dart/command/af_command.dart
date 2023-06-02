@@ -1,4 +1,6 @@
 
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 
 import 'package:afib/afib_command.dart';
@@ -976,7 +978,7 @@ class AFCommandContext {
         memberVars[AFDocumentIDGenerator.columnId]= "String";
         context.output.writeTwoColumns(col1: "info ", col2: "Converting 'int id' to a String on the client, so that String test ids can be used");
       }
-      final errIdColumn = "You must either specify --${AFGenerateStateSubcommand.argNotSerial}, or you must specify a --${AFGenerateSubcommand.argMemberVariables} containing either 'String ${AFDocumentIDGenerator.columnId}' or 'int ${AFDocumentIDGenerator.columnId}'";
+      const errIdColumn = "You must either specify --${AFGenerateStateSubcommand.argNotSerial}, or you must specify a --${AFGenerateSubcommand.argMemberVariables} containing either 'String ${AFDocumentIDGenerator.columnId}' or 'int ${AFDocumentIDGenerator.columnId}'";
 
       if(!isAugment) {
         if(idType == null) {
@@ -1533,7 +1535,7 @@ class AFCommandRunner {
     if(!context.isRootCommand) {
       throw e;
     }
-    print("Unhandled exception ${e}");
+    print("Unhandled exception $e");
     exitCode = 400;
   }
 
@@ -1613,9 +1615,7 @@ Available Commands
 
   AFCommand? findByName(String name) {
     var result = commands.firstWhereOrNull((c) => c.name == name);
-    if(result == null) {
-      result = commandsHidden.firstWhereOrNull((c) => c.name == name);
-    }
+    result ??= commandsHidden.firstWhereOrNull((c) => c.name == name);
     return result;
   }
 
@@ -1632,12 +1632,16 @@ Available Commands
 
 /// The command that handles 'help ...' commands.
 class AFHelpCommand extends AFCommand {
+  @override
   final name = "help";
+  @override
   final description = "Show help for other commands";
   
   
+  @override
   final usage = "afib help <command> [<subcommand>]";
 
+  @override
   bool errorIfNotProjectRoot(AFCommandContext ctx) {
     return true;
   }
@@ -1658,15 +1662,15 @@ Available commands:
   }
 
   @override
-  Future<void> execute(AFCommandContext ctx) async {
-    final args = ctx.arguments.arguments;
+  Future<void> execute(AFCommandContext context) async {
+    final args = context.arguments.arguments;
     if(args.length < 2) {
-      printFullUsage(ctx);
+      printFullUsage(context);
       return;
     }
 
     final cmdName = args[1];
-    final command = ctx.definitions.commands.findByName(cmdName);
+    final command = context.definitions.commands.findByName(cmdName);
     if(command == null) {
       print("Error: Unknown command $cmdName");
       return;

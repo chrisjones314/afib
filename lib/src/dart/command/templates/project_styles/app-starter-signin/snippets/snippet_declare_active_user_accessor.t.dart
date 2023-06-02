@@ -18,6 +18,7 @@ class SnippetDeclareActiveUserAccessorT extends SnippetDeclareModelAccessorT {
     ];
   }
 
+  @override
   String get template {
     final result = StringBuffer(super.template);
     result.write('''

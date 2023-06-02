@@ -22,6 +22,7 @@ class AFTestError {
   final String description;
   AFTestError(this.level, this.testID, this.description);
 
+  @override
   String toString() {
     return description;
   }
@@ -308,7 +309,7 @@ abstract class AFBaseTestExecute extends AFModelWithCustomID {
   }
 
   static void writeSeparatorLine(AFCommandOutput output) {
-    final count = titleColWidth;
+    const count = titleColWidth;
     final line = StringBuffer();
     for(var i = 0; i < count; i++) {
       line.write("-");

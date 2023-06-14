@@ -58,6 +58,7 @@ export 'src/flutter/ui/theme/af_text_builders.dart';
 export 'src/flutter/ui/widgets/afui_complete_project_style_widget.dart';
 export 'src/flutter/ui/widgets/afui_text_field.dart';
 export 'src/flutter/ui/widgets/afui_welcome_widget.dart';
+export 'src/flutter/ui/widgets/afui_debug_time_state_widget.dart';
 export 'src/flutter/ui/widgets/afui_widget_list_wrapper.dart';
 export 'src/flutter/utils/af_dispatcher.dart';
 export 'src/flutter/utils/af_param_ui_state_holder.dart';

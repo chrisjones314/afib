@@ -19,6 +19,7 @@ var prototype = context.define${ScreenT.insertControlTypeSuffix}Prototype(
   id: ${insertAppNamespaceUpper}PrototypeID.${ScreenT.insertScreenID},
   stateView: ${insertAppNamespaceUpper}TestDataID.$insertFullTestDataID,
   navigate: $insertMainType.navigatePush($insertNavigatePushParams),
+  timeHandling: AFTestTimeHandling.running,
 );
 ''';
 }

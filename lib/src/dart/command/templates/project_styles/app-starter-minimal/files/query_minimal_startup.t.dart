@@ -28,6 +28,10 @@ context.onSuccess(AFUnused.unused);
       insertFinishImpl: '''
 // AFIB_TODO: The most likely thing you would do here is issue more queries, perhaps a CheckSigninQuery to see 
 // if the user is already signed in.
+context.executeStandardAFibStartup(
+  updateFrequency: const Duration(seconds: 10),
+  defaultUpdateSpecificity: AFTimeStateUpdateSpecificity.day,
+);
 ''',
       insertAdditionalMethods: '''
 '''

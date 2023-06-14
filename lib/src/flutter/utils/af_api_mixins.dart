@@ -37,6 +37,22 @@ mixin AFNonUIAPIContextMixin implements AFDispatcher {
     dispatch(AFNavigateSetParamAction(param: param));
   }
 
+  void executeStandardAFibStartup({
+    required Duration updateFrequency,
+    required AFTimeStateUpdateSpecificity defaultUpdateSpecificity,
+  }) {
+     final baseTime = AFTimeState.createBaseTime(
+      actualNow: DateTime.now(),
+      updateFrequency: updateFrequency,
+      updateSpecificity: defaultUpdateSpecificity,
+      timeZone: AFTimeZone.local,
+    );
+
+    executeStartTimeListenerQuery(baseTime);
+
+    // always do the package info query at startup.
+    dispatch(AFAppPlatformInfoQuery());
+  }
   void executeStartTimeListenerQuery(AFTimeState baseTime) {
     dispatch(AFTimeUpdateListenerQuery(baseTime: baseTime));
   }

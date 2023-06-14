@@ -9,6 +9,7 @@ class TestDataT extends AFCoreFileSourceTemplate {
 
   @override
   String get template => '''
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackageName/${insertAppNamespace}_id.dart';
 import 'package:$insertPackagePath/state/${insertAppNamespace}_state.dart';
@@ -19,7 +20,7 @@ void defineTestData(AFDefineTestDataContext context) {
 
 void defineStates(AFDefineTestDataContext context) {
   final stateFullLogin = <Object>[
-
+    AFTimeState.createNow(),
   ];
 
   context.define(${insertAppNamespaceUpper}TestDataID.${insertAppNamespace}StateFullLogin, ${insertAppNamespaceUpper}State.fromList(stateFullLogin));

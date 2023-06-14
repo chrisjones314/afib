@@ -21,6 +21,7 @@ class ScreenTestT extends AFCoreFileSourceTemplate {
 
   @override
   String get template => '''
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackageName/${insertAppNamespace}_id.dart';
 import 'package:flutter_test/flutter_test.dart' as ft;

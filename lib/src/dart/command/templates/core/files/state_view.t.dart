@@ -11,6 +11,7 @@ class StateViewT extends AFCoreFileSourceTemplate {
 
   @override
   String get template => '''
+import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:$insertPackagePath/state/${insertAppNamespace}_state_model_access.dart';
 import 'package:$insertPackagePath/state/${insertAppNamespace}_state.dart';
@@ -36,7 +37,9 @@ mixin ${insertMainType}ModelsMixin<TRouteParam extends AFRouteParam> {
   //--------------------------------------------------------------------------------------
   List<Object?> createStateModels(AFBuildStateViewContext<${insertAppNamespaceUpper}State, TRouteParam> context) {
     final state = context.stateApp;
-    return state.allModels.toList();
+    final models = state.allModels.toList();
+    models.add(context.accessCurrentTime.reviseSpecificity(AFTimeStateUpdateSpecificity.day));
+    return models;
   }
 }
 

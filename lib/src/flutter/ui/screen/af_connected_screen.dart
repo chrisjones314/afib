@@ -758,6 +758,24 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     config.updateRouteParam(this, param);
   }
 
+  /// Access the push time in your state view, which is only accurate to your state view's time specificity.
+  AFTimeState accessPushTime() {
+    final pushTime = s.findTypeOrNull<AFTimeState>();
+    if(pushTime == null) {
+      throw AFException("No push time in state view.  Make sure you added an AFTimeState in your ...state_view.dart");
+    }
+    return pushTime;
+  }
+
+  /// Pull the exact current time, which should only be used from event handlers.
+  AFTimeState accessPullTime() {
+    final pushTime = s.findTypeOrNull<AFTimeState>();
+    if(pushTime == null) {
+      throw AFException("No push time in state view.  Make sure you added an AFTimeState in your ...state_view.dart");
+    }
+    return pushTime.reviseForActualNow(DateTime.now());
+  }
+
   Logger? get log {
     return AFibD.log(AFConfigEntryLogArea.ui);
   }

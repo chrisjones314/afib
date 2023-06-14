@@ -20,6 +20,10 @@ rows.add(t.childCard(
       style: t.styleOnCard.titleLarge)
   )
 ));
+
+final currentTime = spi.context.accessPushTime();
+rows.add(AFUIDebugTimeStateWidget(displayTime: currentTime));
+
 return ListView(
   children: rows
 );

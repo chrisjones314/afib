@@ -29,7 +29,7 @@ context.onSuccess(AFUnused.unused);
 // AFIB_TODO: The most likely thing you would do here is issue more queries, perhaps a CheckSigninQuery to see 
 // if the user is already signed in.
 context.executeStandardAFibStartup(
-  updateFrequency: const Duration(seconds: 10),
+  updateFrequency: const Duration(seconds: 1),
   defaultUpdateSpecificity: AFTimeStateUpdateSpecificity.day,
 );
 ''',

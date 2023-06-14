@@ -31,6 +31,11 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/simple/chec
 ''',
       insertStartImpl: insertStartImplStartup,
       insertFinishImpl: '''
+context.executeStandardAFibStartup(
+  updateFrequency: const Duration(seconds: 1),
+  defaultUpdateSpecificity: AFTimeStateUpdateSpecificity.day,
+);
+
 context.executeQuery(CheckSigninQuery());
 ''',
       insertAdditionalMethods: '''

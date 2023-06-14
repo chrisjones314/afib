@@ -27,6 +27,11 @@ import 'package:${AFSourceTemplate.insertPackagePathInsertion}/query/listener/ch
 ''',
       insertStartImpl: QueryStarterSigninStartupT.insertStartImplStartup,
       insertFinishImpl: '''
+context.executeStandardAFibStartup(
+  updateFrequency: const Duration(seconds: 1),
+  defaultUpdateSpecificity: AFTimeStateUpdateSpecificity.day,
+);
+
 context.executeQuery(CheckSigninListenerQuery());
 ''',
       insertAdditionalMethods: '''

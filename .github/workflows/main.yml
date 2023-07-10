@@ -1,6 +1,9 @@
 name: afib-smoketest-action
 run-name: Run AFib Smoketest
-on: [push]
+on: 
+  push:
+    branches:
+      - master
 jobs:
   setup:
     runs-on: macos-latest
@@ -10,16 +13,19 @@ jobs:
         with: 
           repository: chrisjones314/afib
           path: afib
+          ref: master
       - name: Checkout afib_signin
         uses: actions/checkout@v3
         with:
           repository: chrisjones314/afib_signin
           path: afib_signin
+          ref: master
       - name: Checkout afib_firebase_firestore
         uses: actions/checkout@v3
         with:
           repository: chrisjones314/afib_firebase_firestore
           path: afib_firebase_firestore
+          ref: master
       - name: Create Download Folder
         run: mkdir ~/downloads
       - name: Download Flutter 3.5

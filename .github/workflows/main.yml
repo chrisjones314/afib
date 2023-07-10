@@ -9,7 +9,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Add Deploy Key for AFib Signin
-      - run: ssh-add - <<< '${{ secrets.AFIB_SIGNIN_DEPLOY_KEY }}'
+        run: ssh-add - <<< '${{ secrets.AFIB_SIGNIN_DEPLOY_KEY }}'
       - name: Checkout afib
         uses: actions/checkout@v3
         with: 

@@ -15,9 +15,13 @@ jobs:
       - name: Inspect filesystem
         run: ls ~/
       - name: Download Flutter
-        run: curl https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_3.10.5-stable.zip -o ~/downloads/flutter_stable.zip
+        run: curl https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_3.10.5-stable.zip -o ~/Downloads/flutter_stable.zip
+      - name: Inspect filesystem 1
+        run: ls ~/Downloads
       - name: Unzip Flutter
-        run: unzip ~/flutter_stable.zip
+        run: unzip ~/Downloads/flutter_stable.zip
+      - name: Inspect filesystem 2
+        run: ls ~/Downloads
       - name: Change path
         run: export PATH="$PATH:~/downloads/flutter/bin"
       - name: Show Flutter Version

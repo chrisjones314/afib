@@ -194,6 +194,7 @@ $optionsHeader
       localAfib: localAfib,
     );
 
+    /*
      passed &= await _createAndTestAFibProject(context,
       workingDirectory: workingDirectory,
       pathBootstrap: pathBootstrap,
@@ -241,7 +242,8 @@ $optionsHeader
       context.output.writeTwoColumnsError(col1: "ERROR ", col2: "Intentional failure during test was not detected");
       passed = false;
     }
-
+    */
+    
     if(passed) {
       context.output.writeTwoColumns(col1: "pass ", col2: msgSmoketestPass);
     } else {

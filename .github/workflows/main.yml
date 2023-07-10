@@ -12,10 +12,13 @@ jobs:
         uses: actions/checkout@v3
         with: 
           ref: master
-      - name: Create Download Folder
-        run: mkdir ~/downloads
-      - name: Download Flutter 3.5
+      - name: Inspect filesystem
+        run: ls ~/
+      - name: Download Flutter
         run: curl https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_3.10.5-stable.zip -o ~/downloads/flutter_stable.zip
       - name: Unzip Flutter
         run: unzip ~/flutter_stable.zip
-      
+      - name: Change path
+        run: export PATH="$PATH:~/downloads/flutter/bin"
+      - name: Show Flutter Version
+        run: flutter --version

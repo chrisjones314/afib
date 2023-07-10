@@ -26,6 +26,7 @@ class SnippetStateTestImplMinimalT extends AFCoreSnippetSourceTemplate {
   String get template => '''
 // first, you will define query results using variants of 
 // testContext.defineQueryResponse...
+testContext.defineInitialTime(AFTimeState.createNow());
 testContext.defineQueryResponseUnused<StartupQuery>();
 
 

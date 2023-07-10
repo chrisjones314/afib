@@ -767,6 +767,16 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     return pushTime;
   }
 
+  /// Access platform-related info like you app versions, and what OS you are running on.   
+  /// 
+  /// Note that this information does not need to be in your state view, because none of it can change during the course
+  /// of your app's execution.  It is all static.
+  AFAppPlatformInfoState accessAppPlatformInfo() {
+    
+    final publicState = AFibF.g.internalOnlyActiveStore.state.public;
+    return publicState.appPlatformInfo;
+  }
+
   /// Pull the exact current time, which should only be used from event handlers.
   AFTimeState accessPullTime() {
     final pushTime = s.findTypeOrNull<AFTimeState>();

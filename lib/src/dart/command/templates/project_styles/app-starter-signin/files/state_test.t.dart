@@ -66,6 +66,7 @@ void defineStartupStateTest(AFStateTestDefinitionContext definitions) {
   definitions.addTest(${insertAppNamespaceUpper}StateTestID.alreadyLoggedInWestCoast, extendTest: null, body: (testContext) {
     testContext.defineInitialTime(AFTimeState.createNow());
     // when we check for signin, it returns a valid user credential.
+    testContext.defineInitialTime(AFTimeState.createNow());
     testContext.defineQueryResponseUnused<StartupQuery>();
     testContext.defineQueryResponseFixed<$insertCheckSigninQuery>(${insertAppNamespaceUpper}TestDataID.userCredentialWestCoast);
 

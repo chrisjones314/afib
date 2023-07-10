@@ -25,6 +25,7 @@ class SnippetStartupStateTestT extends AFSnippetSourceTemplate {
 
   @override
   String get template => '''
+testContext.defineInitialTime(AFTimeState.createNow());
 testContext.defineQueryResponseUnused<StartupQuery>();
 testContext.defineQueryResponseFixed<CheckSigninQuery>(${insertAppNamespaceUpper}TestDataID.userCredentialWestCoast);
 testContext.defineQueryResponseFixed<ReadUserQuery>(${insertAppNamespaceUpper}TestDataID.userWestCoast);

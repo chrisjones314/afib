@@ -84,6 +84,9 @@ $optionsHeader
     final isModel = !isQuery && !isUI;
     final modelFile = generator.modifyFile(context, pathModel);
     final isIntId = modelFile.findFirstLineContaining(context, AFCodeRegExp.isIntId) > 0;
+    if(isIntId) {
+      AFCommandContext.writeConvertingIntIdMessage(context);
+    }
        
     final itemNameFull = isUI ? "${itemName}RouteParam" : itemName;
 

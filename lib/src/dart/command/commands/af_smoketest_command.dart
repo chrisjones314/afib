@@ -17,6 +17,21 @@ class AFSmoketestCommand extends AFCommand {
   AFSmoketestCommand();
 
   @override
+  String get usage {
+    return '''
+$usageHeader
+  afib_bootstrap.dart smoketest --$argWorkingFolder /folder/for/test/output --${AFRequireCommand.argLocalAFib} /path/to/local/afib/projects
+
+$descriptionHeader
+  $description
+
+$optionsHeader
+  --$argWorkingFolder - Specify the folder in which the resultant test projects should be created.
+  --${AFRequireCommand.argLocalAFib} - Specify the local path of afib projects, the version of afib you wish to test
+''';
+  }
+
+  @override
   Future<void> run(AFCommandContext ctx) async {
     // override this to avoid 'error not in root of project'
     await execute(ctx);
@@ -140,11 +155,23 @@ class AFSmoketestCommand extends AFCommand {
     final localAfib = args.accessNamed(AFRequireCommand.argLocalAFib);
     verifyNotEmpty(workingFolder, "You must specify --$argWorkingFolder");
     verifyNotEmpty(localAfib, "You must specify --${AFRequireCommand.argLocalAFib}");
-    final workingDirectory = Directory(workingFolder);
-    if(!workingDirectory.existsSync()) {
+    final workingDirectoryBase = Directory(workingFolder);
+    if(!workingDirectoryBase.existsSync()) {
       context.output.writeErrorLine("The working folder must exist ($workingFolder)");
       return;
     }
+
+    // create a subfolder for the output.
+    final now = DateTime.now();
+
+    final subfolder = "st_${now.day}_${now.month}_${now.year}_${now.hour}_${now.minute}_${now.second}";
+    final workingDirectory = Directory("$workingFolder${Platform.pathSeparator}$subfolder");
+    workingDirectory.createSync();
+    if(!workingDirectory.existsSync()) {
+      context.output.writeErrorLine("Failed to create folder $workingDirectory");
+      return;
+    }
+
 
     context.output.writeTwoColumns(col1: "smoketest ", col2: workingFolder);
     //var passed = true;

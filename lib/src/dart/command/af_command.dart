@@ -722,11 +722,12 @@ class AFMemberVariableTemplates {
       final upcaseIdentifier = AFCodeGenerator.convertUpcaseFirst(identifier);
       var intConvertPrefix = "";
       var intConvertSuffix = "";
-      if(isIntId && (identifier == AFDocumentIDGenerator.columnId) || _hasFlag(includeKind, includeResolveVars)) {
+      if(isIntId && ((identifier == AFDocumentIDGenerator.columnId) || _hasFlag(includeKind, includeResolveVars))) {
         intConvertPrefix = "int.tryParse(";
         intConvertSuffix = ")";
       }
-      result.writeln("result[col$upcaseIdentifier] = ${intConvertPrefix}item.$identifier$intConvertSuffix;");
+      final toWrite = "result[col$upcaseIdentifier] = ${intConvertPrefix}item.$identifier$intConvertSuffix;";
+      result.writeln(toWrite);
     });
     _addBreadcrumb(result, SnippetSerialMethodsT.insertSerializeToBody);
 
@@ -950,6 +951,10 @@ class AFCommandContext {
     return result;
   }
 
+  static void writeConvertingIntIdMessage(AFCommandContext context) {
+    context.output.writeTwoColumns(col1: "info ", col2: "Converting 'int id' to a String on the client, so that String test ids can be used");
+  }
+
   /// Utility for parsing the --member-variables and --resolve-variables flags, if present.
   AFMemberVariableTemplates? memberVariables(AFCommandContext context, AFCommandArgumentsParsed args, String mainType, {
     bool isAugment = false,
@@ -976,7 +981,7 @@ class AFCommandContext {
       if(idType == "int") {
         isIntId = true;
         memberVars[AFDocumentIDGenerator.columnId]= "String";
-        context.output.writeTwoColumns(col1: "info ", col2: "Converting 'int id' to a String on the client, so that String test ids can be used");
+        writeConvertingIntIdMessage(context);
       }
       const errIdColumn = "You must either specify --${AFGenerateStateSubcommand.argNotSerial}, or you must specify a --${AFGenerateSubcommand.argMemberVariables} containing either 'String ${AFDocumentIDGenerator.columnId}' or 'int ${AFDocumentIDGenerator.columnId}'";
 

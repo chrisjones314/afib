@@ -5,5 +5,25 @@ jobs:
   setup:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout afib
+        uses: actions/checkout@v3
+        with: 
+          repository: chrisjones314/afib
+          path: afib
+      - name: Checkout afib_signin
+        uses: actions/checkout@v3
+        with:
+          repository: chrisjones314/afib_signin
+          path: afib_signin
+      - name: Checkout afib_firebase_firestore
+        uses: actions/checkout@v3
+        with:
+          repository: chrisjones314/afib_firebase_firestore
+          path: afib_firebase_firestore
+      - name: Create Download Folder
+        run: mkdir ~/downloads
+      - name: Download Flutter 3.5
+        run: curl https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_3.10.5-stable.zip -o ~/downloads/flutter_stable.zip
+      - name: Unzip Flutter
+        run: unzip ~/flutter_stable.zip
       

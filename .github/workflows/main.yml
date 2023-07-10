@@ -14,20 +14,7 @@ jobs:
           ref: master
       - name: Inspect filesystem
         run: ls ~/
-      - name: Download Flutter
-        run: curl https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_3.10.5-stable.zip -o ~/Downloads/flutter_stable.zip
-      - name: Inspect filesystem 1
-        run: ls ~/Downloads
-      - name: Unzip Flutter
-        run: unzip ~/Downloads/flutter_stable.zip
+      - name: Inspect current directory
+        run: pwd
       - name: Inspect filesystem 2
-        run: ls ~/Downloads
-      - name: Change path
-        run: echo "~/Downloads/flutter/bin" >> $GITHUB_PATH
-      - name: Show path
-        run: echo $PATH
-      - name: Show Flutter Version
-        run: flutter --version
-      - name: Show Dart Version
-        run: dart --version
-        
+        run: ls

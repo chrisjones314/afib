@@ -1,0 +1,22 @@
+name: afib-smoketest-action
+run-name: Run AFib Smoketest
+on: 
+  push:
+    branches:
+      - master
+jobs:
+  setup:
+    runs-on: macos-latest
+    steps:
+      - name: Add Deploy Key for AFib Signin
+        run: ssh-add - <<< '${{ secrets.AFIB_SIGNIN_DEPLOY_KEY }}'
+      - name: Checkout afib
+        uses: actions/checkout@v3
+        with: 
+          ref: master
+      - name: Checkout afib_signin
+        uses: actions/checkout@v3
+        with:
+          repository: chrisjones314/afib_signin
+          path: afib_signin
+          ref: master

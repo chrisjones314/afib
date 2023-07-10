@@ -23,6 +23,8 @@ jobs:
       - name: Inspect filesystem 2
         run: ls ~/Downloads
       - name: Change path
-        run: export PATH="$PATH:~/downloads/flutter/bin"
+        run: export PATH="$PATH:~/Downloads/flutter/bin"
+      - name: Show path
+        run: echo $PATH
       - name: Show Flutter Version
         run: flutter --version

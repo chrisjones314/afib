@@ -1,0 +1,9 @@
+name: afib-smoketest-action
+run-name: Run AFib Smoketest
+on: [push]
+jobs:
+  setup:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      

@@ -34,4 +34,9 @@ jobs:
         run: flutter --version
       - name: Show Dart Version
         run: dart --version
+      - name: Show Flutter Doctor
+        run: flutter doctor
+      - name: Show AFib Bootstrap help
+        run: dart bin/afib_bootstrap.dart help
+        
         

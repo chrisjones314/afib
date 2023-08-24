@@ -14,9 +14,25 @@ jobs:
         uses: actions/checkout@v3
         with: 
           ref: master
-      - name: Checkout afib_signin
-        uses: actions/checkout@v3
-        with:
-          repository: chrisjones314/afib_signin
-          path: afib_signin
-          ref: master
+      - name: Download Flutter
+        run: curl https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_3.10.5-stable.zip -o ~/Downloads/flutter_stable.zip
+      - name: Unzip Flutter
+        run: unzip ~/Downloads/flutter_stable.zip -d ~/Downloads
+      - name: Change path
+        run: echo "/Users/runner/Downloads/flutter/bin" >> $GITHUB_PATH
+      - name: Show Flutter Version
+        run: flutter --version
+      - name: Show Dart Version
+        run: dart --version
+      - name: Show Flutter Doctor
+        run: flutter doctor
+      - name: Flutter pub get
+        run: flutter pub get
+      - name: Show AFib Bootstrap help
+        run: dart bin/afib_bootstrap.dart help
+      - name: Create Smoketest folder
+        run: mkdir /Users/runner/smoketest
+      - name: Run Smoketest
+        run: dart bin/afib_bootstrap.dart smoketest --working-folder /Users/runner/smoketest --local-afib /Users/runner/work/afib
+        
+        

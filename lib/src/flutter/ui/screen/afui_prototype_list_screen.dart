@@ -71,7 +71,7 @@ class AFUIPrototypeTestScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFU
     
     final result = <AFID, List<AFScreenPrototype>>{};
     for(final test in activeTests) {
-      final nav = test.navigate;
+      final nav = test.createNavigatePush();
       final screenId = nav.screenId;
       var list = result[screenId];
       if(list == null) {

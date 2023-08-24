@@ -249,10 +249,6 @@ class AFCodeBuffer {
   int firstLineContaining(AFCommandContext context, RegExp match, { int startAt = 0 }) {
     for(var i = startAt; i < lines.length; i++) {
       final line = lines[i];
-      if(i == 60) {
-        var j = 0;
-        j++;
-      }
       if(line.contains(match)) {
         return i;
       }

@@ -10,6 +10,7 @@ import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
+import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/utils/af_api_mixins.dart';
 import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
@@ -106,7 +107,14 @@ class AFFinishQueryContext extends AFQueryContext {
     return AFibD.log(AFConfigEntryLogArea.query);
   }
 
-
+  /// Provided for consistency with [AFBuildContext.accessOnEventContext], so that
+  /// you can pass an [AFOnEventContext] to any shared function that requires one.
+  AFOnEventContext accessOnEventContext() {
+    return AFPublicStateOnEventContext(
+      dispatcher: dispatcher,
+      public: accessPublicState,
+    );
+  }
 }
 
 

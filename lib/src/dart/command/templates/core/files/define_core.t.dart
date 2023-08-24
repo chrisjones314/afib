@@ -59,6 +59,7 @@ class DefineCoreT extends AFFileSourceTemplate {
 import 'package:flutter/material.dart';
 import 'package:afib/afib_flutter.dart';
 ${AFSourceTemplate.insertExtraImportsInsertion}
+import 'package:$insertPackagePath/state/stateviews/${insertAppNamespace}_default_state_view.dart';
 
 // ignore_for_file: unnecessary_import
 
@@ -102,6 +103,10 @@ void defineEventHandlers(AFCoreDefinitionContext context) {
 
 void defineInitialState(AFCoreDefinitionContext context) {
   context.defineComponentStateInitializer(() => ${insertAppNamespaceUpper}State.initial());
+
+  context.defineComponentStateCreator<${insertAppNamespaceUpper}State>(${insertAppNamespaceUpper}State.create);
+
+  context.defineStateViewCreator<${insertAppNamespaceUpper}DefaultStateView>(${insertAppNamespaceUpper}DefaultStateView.create);
 }
 
 void defineLibraryProgrammingInterfaces(AFCoreDefinitionContext context) {

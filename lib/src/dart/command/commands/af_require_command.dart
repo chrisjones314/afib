@@ -87,6 +87,7 @@ $optionsHeader
           // 'afib:{"path":"/Users/chrisjones/projects/afib/afib"}'
           addText = "$miss:{\"path\":\"$localAFib${Platform.pathSeparator}$miss\"}";
           addCmd = "dart";
+          context.output.writeLine("Using local afib path: $localAFib");
         }
 
         var process = await _runProcess(addCmd, ['pub', 'add', addText]);

@@ -12,6 +12,6 @@ class AFVersionCommand extends AFCommand {
 
   @override
   Future<void> execute(AFCommandContext context) async {
-    context.output.writeLine("Afib 0.0.10");
+    context.output.writeLine("AFib 0.5.0");
   }
 }

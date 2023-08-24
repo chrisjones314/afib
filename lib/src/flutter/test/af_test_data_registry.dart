@@ -24,7 +24,10 @@ class AFDefineTestDataContext {
   });
 
 
-
+  /// Associates the test data id [id] with the value [data], and returns the [data] for further use.
+  /// 
+  /// The data can later be located using the [find] method, and can be referenced directly using the ID
+  /// from a variety of AFib test contexts.
   TData define<TData>(dynamic id, TData data) { 
     if(testData.containsKey(id)) {
       assert(false, "You should not redefine a of the existing id $id in the test data");
@@ -33,6 +36,22 @@ class AFDefineTestDataContext {
     return data;
   }
 
+  /// Given a list of test data ids and object values in [sources], resolves them into a list of
+  /// root state objects, and returns that list.
+  /// 
+  /// This method works just as the `stateView` parameter in UI protoypes does.  If you pass in the test id
+  /// of an existing state object, all it's root objects are used.  Then, any additional root objects in [sources]
+  /// are written into the state, overwritting those that already exist.
+  /// 
+  /// This can be used to create a differentiated state with just a few of the root objects replaced.   If you'd like
+  /// to create a state from the returned list, you can use your XXXState.fromList constructor.
+  List<Object> defineRootStateObjectList(Object id, List<Object> sources) {
+    final resolved = resolveStateViewModels(sources);
+    final models = define(id, resolved.values.toList());
+    return models;
+  }
+
+  /// Creates a list of objects of a given type from a list of existing test data ids.
   List<TValue> defineIdentifierList<TValue>(Object id, List<String> listIds) {
     assert(TValue != dynamic);
     final result = <TValue>[];
@@ -46,6 +65,7 @@ class AFDefineTestDataContext {
     return result;
   }
 
+  /// Creates a map from test data ids to object values
   Map<String, TValue> defineIdentifierMap<TValue>(Object id, List<dynamic> list, {
     String Function(TValue)? getId,
   }) {

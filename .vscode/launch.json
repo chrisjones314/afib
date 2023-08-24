@@ -8,8 +8,8 @@
       "name": "Dart: AFib Bootstrap",
       "type": "dart",
       "request": "launch",
-      "program": "/Users/chrisjones/projects/afib/temp/tutorial_todo/bin/todo_afib.dart",
-      "cwd": "/Users/chrisjones/projects/afib/temp/tutorial_todo"
+      "program": "/Users/chrisjones/projects/afib/afib/bin/afib_bootstrap.dart",
+      "cwd": "/Users/chrisjones/projects/afib/temp/tutorial_eval"
     },
     {
       "name": "Flutter",

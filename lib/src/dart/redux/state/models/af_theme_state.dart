@@ -1571,6 +1571,17 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return AFibF.g.coreDefinitions.createFunctionalTheme(themeId, fundamentals, context) as TFunctionalTheme;
   }
 
+  /// Intended to be used in subclasses to access [AFOnEventContext] in event handlers for returned widgets.
+  /// 
+  /// Data from this object should not be used in rendering.  If you need additional data for rendering in a theme subclass
+  /// (especially for a third party library), then see ..._define_core.dart `context.addStateViewAugmentationHandler`.
+  AFOnEventContext accessOnEventContext() {
+    return AFBuildOnEventContext(
+      dispatcher: context.dispatcher,
+      buildContext: context,
+    );
+  }
+
   /// A utility for creating a list of widgets in a row.   
   /// 
   /// This allows for a readable syntax like:
@@ -2035,6 +2046,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
       onPressed: onPressed
     );
   }
+
 
   /// @see [translate] for all the ways text can be specified.
   Widget childButtonFlatText({

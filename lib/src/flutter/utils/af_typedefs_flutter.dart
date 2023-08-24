@@ -1,5 +1,6 @@
 import 'package:afib/src/dart/command/af_command_enums.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
+import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_theme_state.dart';
@@ -208,3 +209,5 @@ typedef AFMergePublicStateDelegate = AFPublicState Function(AFPublicState realSt
 typedef AFCreateDefaultRouteParamDelegate = AFRouteParam Function(AFRouteParamRef source, AFPublicState publicState);
 
 typedef AFAddScreenSpecificModelsDelegate = void Function(AFBuildStateViewContext config, List<Object?> destination);
+
+typedef AFNavigateWithOnEventContextDelegate = AFNavigatePushAction Function(AFOnEventContext);

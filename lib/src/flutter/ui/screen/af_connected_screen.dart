@@ -716,6 +716,95 @@ class AFBuildStateViewContext<TState extends AFComponentState?, TRouteParam exte
 
 }
 
+/// A utility providing access to all the functionality that can be used in an event 
+/// that occurs at a specific instant in time, as in an event, as opposed to a rendering context.
+abstract class AFOnEventContext with AFContextShowMixin  {
+  //TRouteParam? accessRouteParam<TRouteParam extends AFRouteParam>(AFRouteParamRef ref);
+  TState accessComponentState<TState extends AFComponentState>();
+
+  /// Pull the exact current time, which should only be used from event handlers.
+  AFTimeState accessPullTime() {
+    final pushTime = AFibF.g.internalOnlyActiveStore.state.public.time;
+    return pushTime.reviseForActualNow(DateTime.now());
+  }
+
+}
+
+class AFPublicStateOnEventContext extends AFOnEventContext {
+  final AFPublicState public;
+  @override
+  final AFDispatcher dispatcher;
+
+  AFPublicStateOnEventContext({
+    required this.dispatcher,
+    required this.public,
+  });
+
+  @override
+  TState accessComponentState<TState extends AFComponentState>() {
+    return public.components.findState<TState>()!;
+  }
+
+}
+
+class AFBuildOnEventContext extends AFOnEventContext {
+  
+  @override
+  final AFDispatcher dispatcher;
+  final AFBuildContext buildContext;
+
+
+  AFBuildOnEventContext({
+    required this.dispatcher,
+    required this.buildContext,
+  });
+
+  @override
+  TState accessComponentState<TState extends AFComponentState>() {
+    final stateView = buildContext.stateView;
+    return createStateFromModels<TState>(stateView.models);
+  }
+  
+  static TState createStateFromModels<TState extends AFComponentState>(Map<String, Object> models) {
+    final creator = AFibF.g.findComponentStateCreator<TState>();
+    if(creator == null) {
+      throw AFException("No component state registered for $TState?  It should be registered in ..._define_core.dart");
+    }
+    final compState = creator(models);    
+    if(compState is! TState) {
+      throw AFException ("Wrong type returned by state creator registerd in ..._define_core.dart?");
+    }
+    return compState;    
+  }
+
+}
+
+class AFTestOnEventContext extends AFOnEventContext {
+  @override
+  final AFDispatcher dispatcher;
+  final Object stateView;
+
+  AFTestOnEventContext({
+    required this.dispatcher,
+    required this.stateView
+  });
+
+  /*
+  @override
+  TRouteParam? accessRouteParam<TRouteParam extends AFRouteParam>(AFRouteParamRef ref) {
+    final seg = accessRouteParamSegment(ref);
+    return seg?.param as TRouteParam?;
+  }
+  */
+
+  @override
+  TState accessComponentState<TState extends AFComponentState>() {
+    final registry = AFibF.g.testData;
+    final models = registry.resolveStateViewModels(stateView);
+    return AFBuildOnEventContext.createStateFromModels<TState>(models);
+  }
+}
+
 
 /// A utility class which you can use when you have a complex screen which passes the dispatcher,
 /// screen data and param to many functions, to make things more concise.  
@@ -736,6 +825,28 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
   @override
   AFConceptualStore get targetStore {
     return AFibF.g.activeConceptualStore;
+  }
+
+  /// Provides access the full AFPublicState, which can be accessed in a UI event handler,
+  /// but not as part of your actual build logic.
+  /// 
+  /// Note that the build logic should only reference data in your route parameter and state view,
+  /// because your UI only re-builds when data in those objects changes.
+  /// 
+  /// However, in an event handler, like that for a button press, you can and should be able to access
+  /// any data in the entire AFib state.   This call lets you do so, while clarifying that it should not
+  /// be used as part of your build logic.
+  /// 
+  /// There are parallel versions in the finish query context and in the context within your default theme
+  /// and LPIs, for easy-of-use with shared functions that expect an [AFOnEventContext].
+  /// 
+  /// Note that when defining a screen prototype, you can use the navigateWithEventContext parameter, rather
+  /// than navigate, to gain access to an eventContext and pass it to a navigatePush function, or other shared function.
+  AFOnEventContext accessOnEventContext() {
+    return AFBuildOnEventContext(
+      dispatcher: dispatcher,
+      buildContext: this
+    );
   }
 
   /// Shorthand for accessing data from the store
@@ -775,15 +886,6 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     
     final publicState = AFibF.g.internalOnlyActiveStore.state.public;
     return publicState.appPlatformInfo;
-  }
-
-  /// Pull the exact current time, which should only be used from event handlers.
-  AFTimeState accessPullTime() {
-    final pushTime = s.findTypeOrNull<AFTimeState>();
-    if(pushTime == null) {
-      throw AFException("No push time in state view.  Make sure you added an AFTimeState in your ...state_view.dart");
-    }
-    return pushTime.reviseForActualNow(DateTime.now());
   }
 
   Logger? get log {
@@ -1057,6 +1159,12 @@ class AFStateProgrammingInterface<TState extends AFComponentState, TBuildContext
 
   bool get hasFlutterContext {
     return context.flutterContext != null;
+  }
+
+  /// Provided for consistency with [AFBuildContext.accessOnEventContext], so that
+  /// you can pass an [AFOnEventContext] to any shared function that requires one.
+  AFOnEventContext accessOnEventContext() {
+    return context.accessOnEventContext();
   }
 
   AFRouteLocation get routeLocation {

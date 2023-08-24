@@ -146,7 +146,7 @@ class AFTestState {
   }
 
   AFTestState navigateToTest(AFScreenPrototype test, AFNavigatePushAction navigate, dynamic models) {
-    final revisedStates = _createTestState(test.id, test.navigate, models, timeHandling: test.timeHandling);
+    final revisedStates = _createTestState(test.id, test.createNavigatePush(), models, timeHandling: test.timeHandling);
     final revisedActive = List<AFBaseTestID>.from(activeTestIds);
     revisedActive.add(test.id);
     return copyWith(activeTestIds: revisedActive, testStates: revisedStates);

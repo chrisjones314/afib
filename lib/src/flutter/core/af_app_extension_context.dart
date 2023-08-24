@@ -291,6 +291,8 @@ class AFCoreDefinitionContext {
   final themeFactories = <AFThemeID, AFCreateFunctionalThemeDelegate>{};
   final AFScreenMap screenMap = AFScreenMap();
   final componentStateInitializers = <AFInitializeComponentStateDelegate>[];
+  final componentStateCreators = <Type, AFCreateComponentStateDelegate>{};
+  final stateViewCreators = <Type, AFCreateStateViewDelegate>{};
   final errorListeners = <AFOnErrorDelegate>[];
   final createStartupQueries = <AFCreateStartupQueryActionDelegate>[];
   /// Used by the app or third parties to create a query that runs on lifecycle actions.
@@ -357,6 +359,23 @@ class AFCoreDefinitionContext {
   void defineComponentStateInitializer(AFInitializeComponentStateDelegate define) {
     componentStateInitializers.add(define);
   }
+
+  void defineComponentStateCreator<TState extends AFComponentState>(AFCreateComponentStateDelegate creator) {
+    componentStateCreators[TState] = creator;
+  }
+
+  void defineStateViewCreator<TState extends AFFlexibleStateView>(AFCreateStateViewDelegate creator) {
+    stateViewCreators[TState] = creator;
+  }
+
+  AFCreateStateViewDelegate? findStateViewCreator<TState extends AFFlexibleStateView>() {
+    return stateViewCreators[TState];
+  }
+
+  AFCreateComponentStateDelegate? findComponentStateCreator<TState extends AFComponentState>() {
+    return componentStateCreators[TState];
+  }
+  
 
   void defineStartupScreen(AFScreenID screenId, AFCreateRouteParamDelegate createParam) {    
     if(screenMap.hasStartupScreen) {

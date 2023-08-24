@@ -121,7 +121,7 @@ Future<void> _afStandardScreenTestMain(
       final dispatcher = AFSingleScreenTestDispatcher(prototype.id, storeDispatcher, null);
       final context = AFScreenTestContextWidgetTester(tester, app, dispatcher, prototype.id, output, localStats);
       storeDispatcher.dispatch(AFResetToInitialStateAction());
-      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, models: prototype.stateView, navigate: prototype.navigate, timeHandling: prototype.timeHandling));
+      dispatcher.dispatch(AFStartPrototypeScreenTestContextAction(context, models: prototype.stateView, navigate: prototype.createNavigatePush(), timeHandling: prototype.timeHandling));
       dispatcher.setContext(context);
       simpleContexts.add(context);
       if(prototype.timeHandling == AFTestTimeHandling.running) {
@@ -167,7 +167,7 @@ Future<void> _afWidgetTestMain(AFCommandOutput output, AFTestStats stats, Widget
   return _afStandardScreenTestMain(output, stats, tester, app, AFibF.g.widgetTests.all, "Widget", createPush: (test) {
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
-      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.stateView),
+      AFStartPrototypeScreenTestAction(test, navigate: test.createNavigatePush(), models: test.stateView),
       AFUIPrototypeWidgetScreen.navigatePush(test as AFWidgetPrototype)
     ];
   });
@@ -177,7 +177,7 @@ Future<void> _afDialogTestMain(AFCommandOutput output, AFTestStats stats, Widget
   return _afStandardScreenTestMain(output, stats, tester, app, AFibF.g.dialogTests.all, "Dialog", createPush: (test) {
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
-      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.stateView),
+      AFStartPrototypeScreenTestAction(test, navigate: test.createNavigatePush(), models: test.stateView),
       AFUIPrototypeDialogScreen.navigatePush(test as AFDialogPrototype)
     ];
   }, showItem: (dispatcher, test) async {
@@ -187,7 +187,7 @@ Future<void> _afDialogTestMain(AFCommandOutput output, AFTestStats stats, Widget
     // show the dialog, but don't wait it, because it won't return until the dialog is closed.
     AFContextShowMixin.showDialogStatic(
         dispatch: dispatcher.dispatch,
-        navigate: test.navigate,
+        navigate: test.createNavigatePush(),
         flutterContext: buildContext,
         executeBefore: null,
         executeDuring: null,
@@ -199,7 +199,7 @@ Future<void> _afBottomSheetTestMain(AFCommandOutput output, AFTestStats stats, W
   return _afStandardScreenTestMain(output, stats, tester, app, AFibF.g.bottomSheetTests.all, "BottomSheet", createPush: (test) {
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
-      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.stateView),
+      AFStartPrototypeScreenTestAction(test, navigate: test.createNavigatePush(), models: test.stateView),
       AFUIPrototypeBottomSheetScreen.navigatePush(test as AFBottomSheetPrototype)
     ];
   }, showItem: (dispatcher, test) async {
@@ -209,7 +209,7 @@ Future<void> _afBottomSheetTestMain(AFCommandOutput output, AFTestStats stats, W
     // show the dialog, but don't wait it, because it won't return until the dialog is closed.
     AFContextShowMixin.showModalBottomSheetStatic(
         dispatch: dispatcher.dispatch,
-        navigate: test.navigate,
+        navigate: test.createNavigatePush(),
         flutterContext: buildContext,
         executeBefore: null,
         executeDuring: null,
@@ -221,7 +221,7 @@ Future<void> _afDrawerTestMain(AFCommandOutput output, AFTestStats stats, Widget
   return _afStandardScreenTestMain(output, stats, tester, app, AFibF.g.drawerTests.all, "Drawer", createPush: (test) {
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
-      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: test.stateView),
+      AFStartPrototypeScreenTestAction(test, navigate: test.createNavigatePush(), models: test.stateView),
       AFUIPrototypeDrawerScreen.navigatePush(test as AFDrawerPrototype)
     ];
   }, showItem: (dispatcher, test) async {
@@ -240,13 +240,14 @@ Future<void> _afDrawerTestMain(AFCommandOutput output, AFTestStats stats, Widget
 Future<void> _afSingleScreenTestMain(AFCommandOutput output, AFTestStats stats, WidgetTester tester, AFApp app) async {
   return _afStandardScreenTestMain(output, stats, tester, app, AFibF.g.screenTests.all, "Single-Screen", createPush: (test) {
     final stateViews = AFibF.g.testData.resolveStateViewModels(test.stateView);
+    final navigate = test.createNavigatePush();
     return [
       AFUpdateActivePrototypeAction(prototypeId: test.id),
-      AFStartPrototypeScreenTestAction(test, navigate: test.navigate, models: stateViews),
+      AFStartPrototypeScreenTestAction(test, navigate: navigate, models: stateViews),
       AFNavigatePushAction(
-        launchParam: test.navigate.param,
-        children: test.navigate.children,
-        createDefaultChildParam: test.navigate.createDefaultChildParam,
+        launchParam: navigate.param,
+        children: navigate.children,
+        createDefaultChildParam: navigate.createDefaultChildParam,
       )
     ];
   });

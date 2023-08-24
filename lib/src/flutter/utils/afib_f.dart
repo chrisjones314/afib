@@ -388,6 +388,10 @@ class AFibGlobalState {
     return coreDefinitions.screenMap;
   }
 
+  AFCreateComponentStateDelegate? findComponentStateCreator<TState extends AFComponentState>() {
+    return coreDefinitions.findComponentStateCreator<TState>();
+  }
+
   Iterable<AFCoreLibraryExtensionContext> get thirdPartyLibraries {
     return appContext.thirdParty.libraries.values;
   }

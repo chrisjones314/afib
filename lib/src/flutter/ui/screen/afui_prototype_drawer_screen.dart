@@ -84,7 +84,7 @@ class AFUIPrototypeDrawerScreen extends AFUIConnectedScreen<AFUIPrototypeDrawerS
   Widget _createScaffold(AFUIPrototypeDrawerScreenSPI spi) {
     final t = spi.t;
     final test = spi.context.p.test;
-    final drawerBuilder = AFibF.g.screenMap.findBy(test.navigate.screenId);
+    final drawerBuilder = AFibF.g.screenMap.findBy(test.createNavigatePush().screenId);
     Widget? drawerWidget;
     final fc = spi.flutterContext;
     if(drawerBuilder != null && fc != null) {

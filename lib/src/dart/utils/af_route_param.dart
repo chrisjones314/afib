@@ -74,12 +74,13 @@ class AFScreenRouteParam extends AFRouteParam {
     required AFScreenID screenId,
     AFRouteLocation routeLocation = AFRouteLocation.screenHierarchy,
     AFTimeStateUpdateSpecificity? timeSpecificity,
+    AFWidgetID wid = AFUIWidgetID.useScreenParam,
   }): super(
     screenId: screenId,
     routeLocation: routeLocation,
     timeSpecificity: timeSpecificity,
     flutterStatePrivate: null,
-    wid: AFUIWidgetID.useScreenParam,
+    wid: wid,
   );
 }
 

@@ -1,12 +1,11 @@
 name: afib
-version: 0.0.10
+version: 0.5.0
 description: >-
   Beta framework for flutter.
 homepage: https://afibframework.org
 documentation: https://afibframework.org/docs
 environment:
   sdk: ">=2.15.0 <3.12.0"
-publish_to: none
 
 dependencies:
   flutter:
@@ -15,22 +14,22 @@ dependencies:
   flutter_redux: ^0.10.0
   intl: ^0.18.1
   colorize: ^3.0.0
-  logger: ^1.1.0  
-  package_info_plus: ^4.0.1
-  quiver: ^3.0.1
-  path: ^1.8.0
-  overlay_support: ^2.0.1
-  stack_trace: ^1.10.0
-  pubspec_parse: ^1.2.0
-  args: ^2.3.0
+  logger: ^2.0.1  
+  package_info_plus: ^4.1.0
+  quiver: ^3.2.1
+  path: ^1.8.3
+  overlay_support: ^2.1.0
+  stack_trace: ^1.11.1
+  pubspec_parse: ^1.2.3
+  args: ^2.4.2
   plural_noun: ^0.1.2
   meta: ^1.9.1
-  collection: ^1.17.1
-  
-dev_dependencies:
+  collection: ^1.18.0
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.1
+  
+dev_dependencies:
+  flutter_lints: ^2.0.2
 
 executables:
   afib_bootstrap:

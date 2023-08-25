@@ -12,12 +12,11 @@ import 'package:flutter/material.dart';
 @immutable
 class AFUIPrototypeWidgetRouteParam extends AFScreenRouteParam {
   final AFWidgetPrototype test;
-  final AFWidgetID wid;
 
   AFUIPrototypeWidgetRouteParam({
     required this.test, 
-    required this.wid,
-  }): super(screenId: AFUIScreenID.screenPrototypeWidget);
+    required AFWidgetID wid,
+  }): super(screenId: AFUIScreenID.screenPrototypeWidget, wid: wid);
 
   AFUIPrototypeWidgetRouteParam copyWith({
     AFWidgetPrototype? test,

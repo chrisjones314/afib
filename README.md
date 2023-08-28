@@ -1,7 +1,8 @@
 # afib
 
 [![pub package](https://img.shields.io/pub/a/afib.svg?logo=dart&logoColor=00b9fc)](https://pub.dartlang.org/packages/afib)
-[![License](https://img.shields.io/github/license/afib/afib?logo=open-source-initiative&logoColor=green)](https://github.com/chrisjones314/afib/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/chrisjones314/afib
+)](https://github.com/chrisjones314/afib/blob/master/LICENSE)
 
 
 A framework for building Flutter applications.

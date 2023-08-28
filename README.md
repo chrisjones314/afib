@@ -1,5 +1,7 @@
 # afib
 
+[![pub package](https://img.shields.io/pub/a/afib.svg?logo=dart&logoColor=00b9fc)](https://pub.dartlang.org/packages/afib)
+
 A framework for building Flutter applications.
 
 ## Getting Started

@@ -6,8 +6,12 @@
 [![License](https://img.shields.io/github/license/chrisjones314/afib
 )](https://github.com/chrisjones314/afib/blob/master/LICENSE)
 
-A framework for building Flutter applications.
+## What is AFib?
+
+AFib is a framework that makes building Flutter applications easier.  It is designed to help you build prototypes that scale to production quality efficiently.
 
 ## Getting Started
 
-This package is in the process of being published, but not quite ready for public use.  I will update this readme when it is ready for publication.
+The best place to start is [www.afibframework.io](https://www.afibframework.io), where you will find links to a [YouTube trailer](https://www.youtube.com/watch?v=VWJyNueiwRc) and a [YouTube tutorial](https://www.youtube.com/watch?v=pCprhGAAdME).
+
+After you have reviewed both of those, you can get started using [the written guide.](https://docs.afibframework.io/v0.5/afib/startup/start_here/).

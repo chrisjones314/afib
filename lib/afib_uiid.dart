@@ -43,6 +43,7 @@ class AFUIScreenID extends AFScreenID {
 
 class AFUIWidgetID extends AFWidgetID {
   const AFUIWidgetID(String code) : super(code, AFUILibraryID.id);
+  static const none = AFUIWidgetID("__none__");
   static const cardSearchResults = AFUIWidgetID("cardSearchResults");
   static const rowSearchControls = AFUIWidgetID("rowSearchControls");
   static const cardSearchControls = AFUIWidgetID("cardSearchControls");

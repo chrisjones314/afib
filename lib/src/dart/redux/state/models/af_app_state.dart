@@ -153,6 +153,11 @@ abstract class AFComponentState extends AFStateModelAccess {
     return models.values;
   }
 
+  bool hasRootType<T extends Object>() {
+    final result = findTypeOrNull<T>();
+    return result != null;
+  }
+
   /// Returns the object value for the type T
   @override
   T findType<T extends Object>() {

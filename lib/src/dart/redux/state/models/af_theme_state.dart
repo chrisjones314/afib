@@ -1749,11 +1749,13 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
 
   ButtonStyle styleTextButton({
     Color? color,
-    Color? textColor
+    Color? textColor,
+    MaterialTapTargetSize? tapTargetSize,
   }) {
     return TextButton.styleFrom(
       backgroundColor: color,
-      foregroundColor: textColor
+      foregroundColor: textColor,
+      tapTargetSize: tapTargetSize,
     );
   }
 
@@ -1980,18 +1982,22 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     AFWidgetID? wid,
     required Widget child,
     required AFPressedDelegate? onPressed,
+    MaterialTapTargetSize? tapTargetSize,
+    AFPressedDelegate? onLongPress,
     Color? color,
     Color? textColor    
   }) {
     final style = TextButton.styleFrom(
       backgroundColor: color,
       foregroundColor: textColor,
+      tapTargetSize: tapTargetSize,
     );
 
     return TextButton(
       key: keyForWID(wid),
       style: style,
       onPressed: onPressed,
+      onLongPress: onLongPress,
       child: child
     );
   }
@@ -2001,14 +2007,17 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     AFWidgetID? wid,
     required Widget child,
     required AFPressedDelegate? onPressed,
+    MaterialTapTargetSize tapTargetSize = MaterialTapTargetSize.padded,
+    AFPressedDelegate? onLongPress,
   }) {
     return childButton(
       wid: wid,
       child: child,
       color: colorPrimary,
-      
+      tapTargetSize: tapTargetSize,
       textColor: colorOnPrimary,
-      onPressed: onPressed
+      onPressed: onPressed,
+      onLongPress: onLongPress,
     );
   }
 
@@ -2024,11 +2033,13 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     AFWidgetID? wid,
     Object? text,
     required AFPressedDelegate onPressed,
+     AFPressedDelegate? onLongPress,
   }) {
     return childButtonPrimary(
       wid: wid,
       child: childText(text: text),
-      onPressed: onPressed
+      onPressed: onPressed,
+      onLongPress: onLongPress,
     );
   }
 
@@ -2066,13 +2077,15 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     AFWidgetID? wid,
     required Widget child,
     required AFPressedDelegate onPressed,
+    AFPressedDelegate? onLongPress,
   }) {
     return childButton(
       wid: wid,
       child: child,
       color: colorSecondary,
       textColor: colorOnSecondary,
-      onPressed: onPressed
+      onPressed: onPressed,
+      onLongPress: onLongPress,
     );
   }
 
@@ -2081,11 +2094,13 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     AFWidgetID? wid,
     required Widget child,
     required AFPressedDelegate onPressed,
+    AFPressedDelegate? onLongPress,
   }) {
     return childButton(
       wid: wid,
       child: child,
-      onPressed: onPressed
+      onPressed: onPressed,
+      onLongPress: onLongPress,
     );
   }
 

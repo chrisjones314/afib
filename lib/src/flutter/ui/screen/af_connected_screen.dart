@@ -849,6 +849,10 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     );
   }
 
+  TRootModel findRootType<TRootModel extends Object>() {
+    return s.findType<TRootModel>();
+  }
+
   /// Shorthand for accessing data from the store
   TStateView get s { return stateView; }
 

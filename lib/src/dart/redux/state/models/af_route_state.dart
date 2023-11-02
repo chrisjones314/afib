@@ -815,11 +815,32 @@ class AFRouteState {
     }
 
     final revisedParam = param.reviseForTime(nowSpecific);
-    if(revisedParam == null) {
-      return segment;
+    var didReviseParam = (revisedParam != null);
+
+    final children = segment.children?.values ?? <AFRouteSegment>[];
+    var revisedChildren = <AFRouteParam>[];
+
+    var didReviseChildren = false;
+    for(final child in children) {
+      var revisedChild = child.param.reviseForTime(nowSpecific);
+      if(revisedChild != null) {
+        didReviseChildren = true;
+      } else {
+        revisedChild = child.param;
+      }
+      revisedChildren.add(revisedChild);
+    }    
+
+
+    var revisedSegment = segment;
+    if(didReviseParam) {
+      revisedSegment = revisedSegment.copyWith(param: revisedParam);    
     }
 
-    return segment.copyWith(param: revisedParam);    
+    if(didReviseChildren) {
+      revisedSegment = revisedSegment.reviseChildren(AFRouteSegmentChildren.fromList(revisedChildren));
+    }
+    return revisedSegment;
   }
 
   AFRouteState resetToInitialRoute() {

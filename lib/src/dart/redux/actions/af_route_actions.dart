@@ -252,6 +252,7 @@ class AFNavigatePopAction extends AFNavigateActionWithReturnData {
     dynamic returnData, 
     bool worksInSingleScreenTest = false
   }): super(id: id, returnData: returnData, worksInSingleScreenTest: worksInSingleScreenTest);
+
 }
 
 /// Pops [popCount] screens off the navigation stack.
@@ -285,6 +286,15 @@ class AFNavigatePopToAction extends AFNavigateActionWithReturnData {
     returnData: returnData,
     worksInSingleScreenTest: worksInPrototypeMode
   );
+
+  @override
+  AFAsyncQuery? get executeBefore {
+    final pushAction = push?.executeBefore;
+    final actionAbove = super.executeBefore;
+    assert(pushAction == null || actionAbove == null);
+    return pushAction ?? actionAbove;
+  }
+
 }
 
 class AFNavigateAddChildParamAction extends AFNavigateAction {

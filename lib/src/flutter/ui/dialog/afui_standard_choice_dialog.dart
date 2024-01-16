@@ -101,22 +101,28 @@ class AFUIStandardChoiceDialog extends AFUIConnectedDialog<AFUIStandardChoiceDia
     for(var i = 0; i < buttonTitles.length; i++) {
       final buttonTitle = buttonTitles[i];
       if(i < buttonTitles.length - 1) {
-        actions.add(t.childMargin(
-          margin: t.margin.h.s3,
-          child: t.childButtonFlatText(
+        actions.add(Expanded(
+          flex: 1,
+          child: t.childMargin(
+            margin: t.margin.h.s3,
+            child: t.childButtonFlatText(
+              text: buttonTitle,
+              onPressed:  () {
+                spi.onCloseDialog(i);
+              },
+            )
+        )));
+      } else {
+        actions.add(Expanded(
+          flex: 1,
+          child: t.childMargin(
+            margin: t.margin.h.s3,
+            child: t.childButtonPrimaryText(
             text: buttonTitle,
             onPressed:  () {
               spi.onCloseDialog(i);
             },
-        )));
-      } else {
-        actions.add(t.childMargin(
-          margin: t.margin.h.s3,
-          child: t.childButtonPrimaryText(
-          text: buttonTitle,
-          onPressed:  () {
-            spi.onCloseDialog(i);
-          },
+          )
         )));
       }
     }
@@ -124,16 +130,17 @@ class AFUIStandardChoiceDialog extends AFUIConnectedDialog<AFUIStandardChoiceDia
     rows.add(t.childMargin(
       margin: t.margin.t.s3,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: actions
     )));
 
     return Dialog(
+      shape: t.shapeStandardDialog,
       backgroundColor: t.colorSurface,
       child: Container(
         margin: t.margin.a.s5,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: rows
         )

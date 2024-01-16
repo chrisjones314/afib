@@ -218,7 +218,7 @@ class AFGenerateUISubcommand extends AFGenerateSubcommand {
   AFGenerateUISubcommand();
   
   @override
-  String get description => "Generate a screen";
+  String get description => "Generate a screen, dialog, bottom sheet, drawer, or widget";
 
   @override
   String get name => "ui";

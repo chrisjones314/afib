@@ -82,10 +82,54 @@ class _AFHasWidgetIds extends ft.Matcher {
   }
 }
 
+class _AFStartsWithWidgetIds extends ft.Matcher {
+  final List<AFWidgetID?> _expected;
+
+  const _AFStartsWithWidgetIds(this._expected);
+
+  @override
+  bool matches(dynamic item, Map matchState) {
+    var listWidget;
+    if (item is List<Widget>) {
+      listWidget = item;
+    } 
+    
+    if(listWidget.length < _expected.length) {
+      return false;
+    }
+
+    for(var i = 0; i < _expected.length; i++) {
+      final actualWidget = listWidget[i];
+      final expectedKey = AFFunctionalTheme.keyForWIDStatic(_expected[i]);
+      if(actualWidget.key != expectedKey) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @override
+  ft.Description describe(ft.Description description) {
+      return description.add('starts with widget ids ').addDescriptionOf(_expected);
+  }
+
+  @override
+  ft.Description describeMismatch(
+      dynamic item, ft.Description mismatchDescription, Map matchState, bool verbose) {
+    if (item is List<Widget>) {
+      return super.describeMismatch(item, mismatchDescription, matchState, verbose);
+    } else {
+      return mismatchDescription.add('is not a list of widgets');
+    }
+  }
+}
+
+
 typedef AFWidgetMapperDelegate = AFWidgetID Function(dynamic);
 
 ft.Matcher hasWidgetId(AFWidgetID expected) => _AFHasWidgetId(expected);
 ft.Matcher hasOneWidgetId(AFWidgetID expected) => _AFHasWidgetIds([expected]);
+ft.Matcher startsWithWidgetIds(List<AFWidgetID> expected) => _AFStartsWithWidgetIds(expected);
 ft.Matcher hasWidgetIds(List<AFWidgetID> expected) => _AFHasWidgetIds(expected);
 ft.Matcher hasWidgetIdsWith(List<dynamic> expected, { AFWidgetMapperDelegate? mapper }) {
     if(mapper != null ) {

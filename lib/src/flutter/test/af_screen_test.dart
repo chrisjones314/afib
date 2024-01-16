@@ -881,6 +881,11 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
       }
     }
 
+    final key = currentPath.last.widget.key;
+    if(key != null) {
+      AFibD.logUIAF?.d("Found key $key");
+    }
+
     if(selector.matchesPath(currentPath)) {
       final activeElement = selector.activeElementForPath(currentPath);
       if(activeElement != null) {

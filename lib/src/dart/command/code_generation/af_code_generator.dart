@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:afib/afib_uiid.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_error.dart';
 import 'package:afib/src/dart/command/af_project_paths.dart';
@@ -519,6 +520,10 @@ class AFCodeGenerator {
     // sort them from longest to shortest, to be sure we don't take a short one that is a prefix
     // of a long one.
     libs.sort((l, r) => r.codeId.length.compareTo(l.codeId.length));
+
+    if(parentType.startsWith("AFUI")) {
+      return AFUILibraryID.id;
+    }
 
     for(final lib in libs) {
       if(parentType.startsWith(lib.codeId.toUpperCase())) {

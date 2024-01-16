@@ -26,7 +26,7 @@ class AFGenerateStateSubcommand extends AFGenerateSubcommand {
   AFGenerateStateSubcommand();
   
   @override
-  String get description => "Generate a state model or state view";
+  String get description => "Generate a state model, state view or LPI";
 
   @override
   String get name => "state";

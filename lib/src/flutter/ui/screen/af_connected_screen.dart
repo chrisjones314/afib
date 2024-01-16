@@ -810,7 +810,7 @@ class AFTestOnEventContext extends AFOnEventContext {
 /// screen data and param to many functions, to make things more concise.  
 /// 
 /// The framework cannot pass you this itself because 
-class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> with AFContextShowMixin, AFStandardAPIContextMixin, AFStandardNavigateMixin {
+class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends AFRouteParam> with AFContextShowMixin, AFStandardAPIContextMixin, AFStandardNavigateMixin implements AFStandardAPIContextInterface {
   AFStandardBuildContextData standard;
   TStateView stateView;
   TRouteParam routeParam;
@@ -826,6 +826,11 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
   AFConceptualStore get targetStore {
     return AFibF.g.activeConceptualStore;
   }
+
+  AFTimeState accessCurrentTime() {
+    return AFibF.g.internalOnlyActiveStore.state.public.time;
+  }
+
 
   /// Provides access the full AFPublicState, which can be accessed in a UI event handler,
   /// but not as part of your actual build logic.
@@ -924,6 +929,7 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
     controllers.update(wid, text);
   }
 
+  @override
   void executeWireframeEvent(AFID widget, Object? eventData, {
     AFPressedDelegate? onSuccess,
   }) {

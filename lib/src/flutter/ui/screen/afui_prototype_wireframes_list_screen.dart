@@ -73,7 +73,7 @@ class AFUIPrototypeWireframesListScreen extends AFUIConnectedScreen<AFUIPrototyp
     final rows = t.column();
     rows.add(t.childCardHeader(context, AFUIWidgetID.cardWireframes, "Wireframes", rowsCard));
     final main = ListView(children: rows);
-    final leading = t.childButtonStandardBack(spi, screen: screenId);
+    final leading = t.childButtonStandardBack(spi.context, screen: screenId);
     return t.buildPrototypeScaffold(spi, "AFib Wireframes", main, leading: leading);
 
   }

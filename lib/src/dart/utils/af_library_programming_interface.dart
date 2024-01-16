@@ -26,7 +26,7 @@ class AFCurrentStateContext with AFStandardAPIContextMixin, AFStandardNavigateMi
   }
 }
 
-class AFLibraryProgrammingInterfaceContext extends AFCurrentStateContext {
+class AFLibraryProgrammingInterfaceContext extends AFCurrentStateContext implements AFStandardAPIContextInterface {
   AFLibraryProgrammingInterfaceContext({
     required AFDispatcher dispatcher,
     required AFConceptualStore targetStore,

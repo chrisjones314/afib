@@ -65,3 +65,4 @@ export 'src/flutter/utils/af_param_ui_state_holder.dart';
 export 'src/flutter/utils/af_state_view.dart';
 export "src/flutter/utils/af_typedefs_flutter.dart";
 export 'src/flutter/utils/afib_f.dart';
+export 'src/flutter/ui/theme/afui_default_theme.dart';

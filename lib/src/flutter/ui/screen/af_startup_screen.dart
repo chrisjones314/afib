@@ -26,7 +26,7 @@ class AFLifecycleEventHandler extends WidgetsBindingObserver {
   });
 
   @override
-  Future<Null> didChangeAppLifecycleState(AppLifecycleState state) async {
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     this.eventHandler(state);
   }
 }

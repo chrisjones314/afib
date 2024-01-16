@@ -100,7 +100,7 @@ class AFUIPrototypeWidgetScreen extends AFUIConnectedScreen<AFUIPrototypeWidgetS
       //key: _mainScaffoldKey,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        leading: t.childButtonStandardBack(spi, screen: screenId),
+        leading: t.childButtonStandardBack(spi.context, screen: screenId),
         title: t.childText(text: 'Widget Test Screen',
           style: t.styleOnPrimary.titleLarge,
         ),

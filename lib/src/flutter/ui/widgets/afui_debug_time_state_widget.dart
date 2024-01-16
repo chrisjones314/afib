@@ -8,8 +8,9 @@ class AFUIDebugTimeStateWidget extends StatelessWidget {
   final AFTimeState displayTime;
 
   const AFUIDebugTimeStateWidget({
+    Key? key,
     required this.displayTime,
-  });
+  }): super(key: key);
   
   @override
   Widget build(BuildContext c) {

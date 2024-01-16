@@ -62,7 +62,7 @@ class AFUIPrototypeLibraryListScreen extends AFUIConnectedScreen<AFUIPrototypeLi
 
     final rows = t.column();
     rows.add(t.childCardHeader(context, AFUIWidgetID.cardLibrary, "Libraries", rowsCard));
-    final leading = t.childButtonStandardBack(spi, screen: screenId);
+    final leading = t.childButtonStandardBack(spi.context, screen: screenId);
     final main = ListView(children: rows);
     return t.buildPrototypeScaffold(spi, "AFib Libraries", main, leading: leading);
 

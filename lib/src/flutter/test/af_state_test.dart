@@ -645,7 +645,7 @@ class AFStateTestWidgetContext<TSPI extends AFStateProgrammingInterface> with AF
   }
 
   TSPI createWidgetSPI() {
-    return AFStateTestScreenContextForState.createSPI<TSPI>(widgetConfig, screenContext.screenId, launchParam.wid, launchParam: launchParam);
+    return AFStateTestScreenContextForState.createSPI<TSPI>(widgetConfig, launchParam.screenId, launchParam.wid, launchParam: launchParam);
   }
 
 

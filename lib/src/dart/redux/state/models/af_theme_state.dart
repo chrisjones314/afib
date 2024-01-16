@@ -16,6 +16,7 @@ import 'package:afib/src/flutter/ui/drawer/afui_prototype_drawer.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
 import 'package:afib/src/flutter/ui/theme/af_text_builders.dart';
 import 'package:afib/src/flutter/ui/widgets/afui_text_field.dart';
+import 'package:afib/src/flutter/utils/af_dispatcher.dart';
 import 'package:afib/src/flutter/utils/af_param_ui_state_holder.dart';
 import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
@@ -2058,11 +2059,24 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     );
   }
 
+  /// @see [translate] for all the ways text can be specified.
+  Widget childButtonOutlineText({
+    AFWidgetID? wid,
+    Object? text,
+    required AFPressedDelegate onPressed,
+  }) {
+    return OutlinedButton(
+      key: keyForWID(wid),
+      onPressed: onPressed,
+      child: childText(text: text),
+    );
+  }
+
 
   /// @see [translate] for all the ways text can be specified.
   Widget childButtonFlatText({
     AFWidgetID? wid,
-    Object? text,
+  Object? text,
     required AFPressedDelegate onPressed,
   }) {
     return childButtonFlat(
@@ -2910,7 +2924,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     bool worksInSingleScreenTest = true,
     AFShouldContinueCheckDelegate? shouldContinueCheck,   
   }) {
-    return childButtonStandardBack(spi, 
+    return childButtonStandardBack(spi.context, 
       screen: screen,
       wid: wid,
       iconIdOrWidget: iconIdOrWidget,
@@ -2926,7 +2940,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   /// 
   /// The back button can optionally display a dialog which checks whether the user
   /// should continue, see [standardShouldContinueAlertCheck] for more.
-  Widget childButtonStandardBack(AFStateProgrammingInterface spi, {
+  Widget childButtonStandardBack(AFStandardAPIContextInterface context, {
     required AFScreenID screen,
     AFWidgetID wid = AFUIWidgetID.buttonBack,
     dynamic iconIdOrWidget = AFUIThemeID.iconBack,
@@ -2935,6 +2949,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     String tooltip = "Back",
     bool worksInSingleScreenTest = true,
     AFShouldContinueCheckDelegate? shouldContinueCheck,   
+    AFNavigateAction? navigatePopAction,
   }) {
     var ico = icon(iconIdOrWidget, iconColor: iconColor, iconSize: iconSize);
     if(ico == null) throw AFException("Could not create icon");
@@ -2944,8 +2959,12 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
         tooltip: translate(text: tooltip),
         onPressed: () async {
           if(shouldContinueCheck == null || await shouldContinueCheck() == AFShouldContinue.yesContinue) {
-            spi.context.navigatePop(worksInSingleScreenTest: worksInSingleScreenTest);
-            spi.context.executeWireframeEvent(wid, null);
+            if(navigatePopAction != null) {
+              context.navigate(navigatePopAction);
+            } else {
+              context.navigatePop();
+            }
+            context.executeWireframeEvent(wid, null);
           } 
         }
     );
@@ -2974,7 +2993,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return () {
         final completer = Completer<AFShouldContinue>();
 
-        if(shouldAsk && !AFibD.config.isTestContext) {
+        if(shouldAsk && (!AFibD.config.isTestContext || AFibF.g.isInteractiveStateTestContext)) {
           // set up the buttons
           // show the dialog
           spi.context.showDialogAFib<AFShouldContinueRouteParam>(

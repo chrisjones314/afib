@@ -187,6 +187,10 @@ mixin AFAccessStateSynchronouslyMixin {
 }
 
 mixin AFStandardNavigateMixin implements AFDispatcher {
+  void navigate(AFNavigateAction navigate) {
+    dispatch(navigate);
+  }
+
   void navigatePop({
     bool worksInSingleScreenTest = false,
   }) {
@@ -232,6 +236,10 @@ mixin AFStandardNavigateMixin implements AFDispatcher {
     required AFNavigatePushAction push
   }) {
     dispatch(AFNavigatePopToAction(popTo: popTo, push: push));
+  }
+
+  void executeWireframeEvent(AFWidgetID wid, Object? event) {
+    //dispatch(AFWireframeEventAction(wid: wid, event: event));
   }
 }
 
@@ -322,6 +330,23 @@ mixin AFStandardAPIContextMixin implements AFDispatcher {
   void executeDeferredCallback(AFID uniqueQueryId, Duration duration, AFOnResponseDelegate<AFUnused> callback) {
     dispatch(AFDeferredSuccessQuery(uniqueQueryId, duration, callback));
   }
+
+  /// A utility which dispatches an asynchronous query.
+  void executeSendResultToListenerQuery<TQuery extends AFAsyncListenerQuery, TResult>(TResult result) {
+    final state = AFibF.g.internalOnlyActiveStore.state;
+    final key = AFStateTest.specifierToId(TQuery);
+    final listener = state.public.queries.findListenerQueryById(key);
+    if(listener != null) {
+      final successContext = listener.createSuccessContextForResponse(
+        dispatcher: dispatcher,
+        state: state,        
+        response: result,  
+        isPreExecute: true,
+      );
+      listener.finishAsyncWithResponseAF(successContext);
+    }
+  }
+
 
   //-------------------------------------------------------------------------------------
   // execute...

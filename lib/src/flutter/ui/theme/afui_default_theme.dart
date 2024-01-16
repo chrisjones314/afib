@@ -281,4 +281,9 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
       onTap: onTap
     );
   }
+
+  ShapeBorder? get shapeStandardDialog {
+    return null;
+  }
+
 }

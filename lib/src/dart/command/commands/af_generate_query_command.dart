@@ -15,7 +15,7 @@ class AFGenerateQuerySubcommand extends AFGenerateSubcommand {
   AFGenerateQuerySubcommand();
   
   @override
-  String get description => "Generate a query";
+  String get description => "Generate a query, including listener queries, deferred queries, and isolate (thread) queries";
 
   @override
   String get name => "query";

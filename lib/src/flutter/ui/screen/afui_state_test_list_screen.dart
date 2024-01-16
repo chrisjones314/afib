@@ -126,7 +126,7 @@ class AFUIStateTestListScreen extends AFUIConnectedScreen<AFUIStateTestListScree
   Widget buildWithSPI(AFUIStateTestListScreenSPI spi) {
     final t = spi.t;
     final body = _buildBody(spi);
-    final leading = t.childButtonStandardBack(spi, screen: screenId);
+    final leading = t.childButtonStandardBack(spi.context, screen: screenId);
     return t.buildPrototypeScaffold(spi, spi.context.p.title, body, leading: leading);    
   }  
 

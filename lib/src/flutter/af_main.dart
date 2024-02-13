@@ -10,10 +10,10 @@ void afMainFirstStartup() {
   WidgetsFlutterBinding.ensureInitialized();
 }
 
-void afMainWrapper(Function() onReady) {
-  WidgetsFlutterBinding.ensureInitialized();
+void afMainWrapper(Function(WidgetsBinding binding) onReady) {
+  final binding = WidgetsFlutterBinding.ensureInitialized();
   AFibD.registerGlobals();
-  onReady();
+  onReady(binding);
 }
 
 

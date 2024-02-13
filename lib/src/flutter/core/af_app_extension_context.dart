@@ -2,7 +2,6 @@ import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 import 'package:afib/src/dart/redux/state/models/afui_proto_state.dart';
 import 'package:afib/src/flutter/ui/theme/af_prototype_area.dart';
-import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
 import 'package:flutter/material.dart';
 
 class AFSharedTestExtensionContext {
@@ -626,6 +625,7 @@ class AFAppExtensionContext extends AFPluginExtensionContext {
       AFUITranslationID.wireframes: "Wireframes",
       AFUITranslationID.afibUnimplemented: "Unimplemented",
     });
+
 
     final result = AFFundamentalThemeState(
       device: device, 

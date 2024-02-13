@@ -727,6 +727,30 @@ abstract class AFOnEventContext with AFContextShowMixin  {
     final pushTime = AFibF.g.internalOnlyActiveStore.state.public.time;
     return pushTime.reviseForActualNow(DateTime.now());
   }
+  
+  AFPublicState get accessPublicState {
+    return AFibF.g.internalOnlyActiveStore.state.public;
+  }
+
+  AFRouteSegment? accessRouteParamSegment(AFRouteParamRef ref) {
+    return accessPublicState.route.findRouteParamFull(
+      screenId: ref.screenId,
+      wid: ref.wid,
+      routeLocation: ref.routeLocation
+    );
+  }
+
+  TRouteParamOther? accessRouteParam<TRouteParamOther extends AFRouteParam>(AFRouteParamRef ref) {
+    final seg = accessRouteParamSegment(ref);
+    return seg?.param as TRouteParamOther?;
+  }
+
+  /// Dispatches an action that updates the route parameter for the specified screen.
+  void updateRouteParam(AFRouteParam param) {
+    dispatch(AFNavigateSetParamAction(
+      param: param, 
+    ));
+  }
 
 }
 
@@ -830,7 +854,6 @@ class AFBuildContext<TStateView extends AFFlexibleStateView, TRouteParam extends
   AFTimeState accessCurrentTime() {
     return AFibF.g.internalOnlyActiveStore.state.public.time;
   }
-
 
   /// Provides access the full AFPublicState, which can be accessed in a UI event handler,
   /// but not as part of your actual build logic.

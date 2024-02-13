@@ -19,6 +19,10 @@ class AFFirestoreDocument {
     required this.exists,
   });
 
+  factory AFFirestoreDocument.fromDoc(dynamic doc) {
+    return AFFirestoreDocument(documentId: doc.documentId, data: doc.data, exists: true);    
+  }
+
   /// Returns true if this object has not yet been saved to firestore.  
   /// 
   /// Assumes new objects' ids will start with newId.

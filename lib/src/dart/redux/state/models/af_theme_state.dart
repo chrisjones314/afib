@@ -22,6 +22,7 @@ import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:material_color_utilities/material_color_utilities.dart';
 
 /// These are fundamental values for theming derived from the device
 /// and operating system itself.
@@ -1268,14 +1269,6 @@ class AFFundamentalThemeState {
     return area.flag(id);
   }
 
-  Color get colorPrimary {
-    return themeDataActive.colorScheme.primary;
-  }
-
-  Color get colorOnPrimary {
-    return themeDataActive.colorScheme.onPrimary;
-  }
-
   Color get colorBackground {
     return themeDataActive.colorScheme.background;
   }
@@ -1300,12 +1293,62 @@ class AFFundamentalThemeState {
     return themeDataActive.colorScheme.onSurface;
   }
 
+  Color get colorPrimary {
+    return themeDataActive.colorScheme.primary;
+  }
+
+  TonalPalette get colorPrimaryPalette {
+    final hct = Hct.fromInt(colorPrimary.value);
+    return TonalPalette.of(hct.hue, hct.chroma);
+  }
+
+  static TonalPalette getPalette(Color c) {
+    final hct = Hct.fromInt(c.value);
+    return TonalPalette.of(hct.hue, hct.chroma);
+  }
+
+  Color get colorOnPrimary {
+    return themeDataActive.colorScheme.onPrimary;
+  }
+
+  Color get colorPrimaryContainer {
+    return themeDataActive.colorScheme.primaryContainer;
+  }
+
+  Color get colorOnPrimaryContainer {
+    return themeDataActive.colorScheme.onPrimaryContainer;
+  }
+
   Color get colorPrimaryLight {
     return themeDataActive.primaryColorLight;
   }
 
   Color get colorSecondary {
     return themeDataActive.colorScheme.secondary;
+  }
+
+  Color get colorSecondaryContainer {
+    return themeDataActive.colorScheme.secondaryContainer;
+  }
+
+  Color get colorOnSecondaryContainer {
+    return themeDataActive.colorScheme.onSecondaryContainer;
+  }
+
+  Color get colorTertiary {
+    return themeDataActive.colorScheme.tertiary;
+  }
+
+  Color get colorOnTertiary {
+    return themeDataActive.colorScheme.onTertiary;
+  }
+
+  Color get colorTertiaryContainer {
+    return themeDataActive.colorScheme.tertiaryContainer;
+  }
+
+  Color get colorOnTertiaryContainer {
+    return themeDataActive.colorScheme.onTertiaryContainer;
   }
 
   /// This indicates whether this is a bright or dark color scheme.
@@ -1677,6 +1720,14 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   // The primary color from [ThemeData], adjusted for light/dark mode.
   Color get colorPrimary {
     return fundamentals.colorPrimary;
+  }
+
+  Color get colorPrimaryContainer {
+    return fundamentals.colorPrimaryContainer;
+  }
+
+  Color get colorOnPrimaryContainer {
+    return fundamentals.colorOnPrimaryContainer;
   }
 
   Color get colorPrimaryDarker {
@@ -2694,8 +2745,28 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return fundamentals.colorSecondary;
   }
 
+  Color get colorSecondaryContainer {
+    return fundamentals.colorSecondaryContainer;
+  }
+
   Color get colorOnSecondary {
     return fundamentals.colorOnPrimary;
+  }
+
+  Color get colorTertiary {
+    return fundamentals.colorTertiary;
+  }
+
+  Color get colorOnTertiary {
+    return fundamentals.colorOnTertiary;
+  }
+
+  Color get colorTertiaryContainer {
+    return fundamentals.colorTertiaryContainer;
+  }
+
+  Color get colorOnTertiaryContainer {
+    return fundamentals.colorOnTertiaryContainer;
   }
 
   /// Important: the values you are passing in are scale factors on the
@@ -2911,7 +2982,9 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     }
     return Container(
       key: keyForWID(AFUIWidgetID.contHostedControls),
-      child: Stack(children: stackChildren));
+      color: colorSurface,
+      child: Stack(children: stackChildren)
+    );
   }
 
   Widget leadingButtonStandardBack(AFStateProgrammingInterface spi, {
@@ -2950,6 +3023,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     bool worksInSingleScreenTest = true,
     AFShouldContinueCheckDelegate? shouldContinueCheck,   
     AFNavigateAction? navigatePopAction,
+    AFPressedDelegate? onPressed,
   }) {
     var ico = icon(iconIdOrWidget, iconColor: iconColor, iconSize: iconSize);
     if(ico == null) throw AFException("Could not create icon");
@@ -2957,7 +3031,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
         key: keyForWID(wid),      
         icon: ico,
         tooltip: translate(text: tooltip),
-        onPressed: () async {
+        onPressed: onPressed ?? () async {
           if(shouldContinueCheck == null || await shouldContinueCheck() == AFShouldContinue.yesContinue) {
             if(navigatePopAction != null) {
               context.navigate(navigatePopAction);

@@ -53,7 +53,7 @@ import 'package:$insertPackagePath/initialization/install/install_test.dart';
 $insertExtraImports
 
 void main() {  
-  afMainWrapper(() {
+  afMainWrapper((widgetBinding) {
     $insertBeforeMain
     $insertMainImpl
     $insertAfterMain

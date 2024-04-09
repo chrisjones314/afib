@@ -32,3 +32,4 @@ export "src/dart/utils/af_dart_params.dart";
 export 'src/dart/utils/af_document_id_generator.dart';
 export "src/dart/utils/af_exception.dart"; // ok
 export 'src/dart/utils/af_id.dart';
+export "src/dart/command/af_command_lpi.dart";

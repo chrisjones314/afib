@@ -1,4 +1,5 @@
 import 'package:afib/src/dart/command/af_command.dart';
+import 'package:afib/src/dart/command/af_command_lpi.dart';
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_config.dart';
@@ -44,4 +45,6 @@ typedef AFCreateComponentStateDelegate = AFComponentState Function(Map<String, O
 
 /// Used to create a default child param the first time a particular child wid is used.
 typedef AFCreateDefaultChildParamDelegate = AFRouteParam? Function(AFID wid, dynamic public, dynamic segParent);
+
+typedef AFCreateCommandLPIDelegate = AFCommandLPI Function(AFLibraryProgrammingInterfaceID id, AFCommandContext context);
 

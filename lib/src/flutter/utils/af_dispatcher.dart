@@ -8,6 +8,7 @@ import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/utils/af_library_programming_interface.dart';
+import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/test/af_test_actions.dart';
 import 'package:afib/src/flutter/utils/af_api_mixins.dart';
@@ -112,6 +113,9 @@ abstract class AFStandardAPIContextInterface {
     required AFScreenID popTo,
     required AFNavigatePushAction push
   });
+
+
+  void updateRouteParam(AFRouteParam param);
 
 }
 

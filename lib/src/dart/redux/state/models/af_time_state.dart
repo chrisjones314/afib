@@ -306,6 +306,14 @@ class AFTimeState {
     return currentPushTime.second;
   }
 
+  int get dayOfWeek {
+    return currentPushTime.weekday;
+  }
+
+  int get weekday {
+    return currentPushTime.weekday;
+  }
+
   static Duration parseDuration(String text) {
     final tokens = text.split(" ");
     var amounts = [0,0,0,0,0];

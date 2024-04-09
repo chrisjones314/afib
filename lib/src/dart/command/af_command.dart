@@ -24,6 +24,7 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_declare_te
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_import_from_package.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_navigate_push.t.dart';
 import 'package:afib/src/dart/command/templates/core/snippets/snippet_serial_methods.t.dart';
+import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:args/args.dart' as args;
 import 'package:collection/collection.dart';
@@ -934,6 +935,10 @@ class AFCommandContext {
     return parsedArguments;
   }
 
+  TLPI accessLPI<TLPI extends AFCommandLPI>(AFLibraryProgrammingInterfaceID id) {
+    return definitions.accessLPI<TLPI>(id, this);
+  }
+
   Map<String, String> _parseSemicolonDeclarations(AFCommandContext context, String vars) {
     final varItems = vars.split(";");
     varItems.removeWhere((val) => val.trim().isEmpty);
@@ -1476,12 +1481,16 @@ class AFCommandLibraryExtensionContext extends AFBaseExtensionContext {
   final AFDartParams paramsD;
   final AFCommandRunner commands;
   final AFTemplateRegistry templates;
+  final Map<AFLibraryProgrammingInterfaceID, AFCreateCommandLPIDelegate> createCommandLPIs;
 
   AFCommandLibraryExtensionContext({
     required this.paramsD, 
     required this.commands, 
     required this.templates, 
+    required this.createCommandLPIs,
   });
+
+
 
   /// Used to register a new root level command 
   /// command line.
@@ -1492,6 +1501,14 @@ class AFCommandLibraryExtensionContext extends AFBaseExtensionContext {
       commands.addCommand(command);
     }
     return command;
+  }
+
+  void defineLPI(AFLibraryProgrammingInterfaceID id, {
+    required AFCreateCommandLPIDelegate createLPI
+  }) {
+    if(!createCommandLPIs.containsKey(id)) {
+      createCommandLPIs[id] = createLPI;
+    }
   }
   
   AFCommand? findCommandByType<T extends AFCommand>() {
@@ -1704,11 +1721,20 @@ class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
   }): super(
       paramsD: paramsD, 
       commands: commands,
-      templates: AFTemplateRegistry()
+      templates: AFTemplateRegistry(),
+      createCommandLPIs: <AFLibraryProgrammingInterfaceID, AFCreateCommandLPIDelegate>{},
     );
 
     Future<void> execute(AFCommandContext context) async {
       await commands.run(context);
+    }
+
+    TLPI accessLPI<TLPI extends AFCommandLPI>(AFLibraryProgrammingInterfaceID id, AFCommandContext context) {
+      final createLPI = createCommandLPIs[id];
+      if(createLPI == null) {
+        throw AFException("No LPI factory found for $id");
+      }
+      return createLPI(id, context) as TLPI;
     }
 
     void registerBootstrapCommands() {

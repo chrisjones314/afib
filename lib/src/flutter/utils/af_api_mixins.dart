@@ -960,7 +960,7 @@ mixin AFContextShowMixin {
 
     final ctx = flutterContext;
     if(ctx != null) {
-      material.Scaffold.of(ctx).showBottomSheet<dynamic>(
+      material.Scaffold.of(ctx).showBottomSheet(
         builder,
         backgroundColor: backgroundColor,
         elevation: elevation,

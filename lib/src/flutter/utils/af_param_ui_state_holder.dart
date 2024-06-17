@@ -23,9 +23,9 @@ class AFTextEditingController  {
     TextAffinity affinity = TextAffinity.downstream
   }) {
     final sel = TextSelection(baseOffset: start, extentOffset: end, affinity: affinity);
-    if(!controller.isSelectionWithinTextBounds(sel)) {
-      throw AFException("Text selection from $start to $end is out of range for ${controller.text}");
-    }
+    //if(!controller.isSelectionWithinTextBounds(sel)) {
+    //  throw AFException("Text selection from $start to $end is out of range for ${controller.text}");
+    //}
     controller.selection = sel;
   }
 

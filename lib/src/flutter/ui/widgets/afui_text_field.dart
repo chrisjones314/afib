@@ -34,6 +34,7 @@ class AFUITextField extends StatelessWidget {
   final TextStyle? style;
   final int? minLines;
   final int maxLines;
+  final int? maxLength;
   final Color? cursorColor;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
@@ -63,6 +64,7 @@ class AFUITextField extends StatelessWidget {
     this.style,
     this.minLines,
     this.maxLines = 1,
+    this.maxLength,
     this.cursorColor,
     this.onSubmitted,
     this.onChanged,
@@ -136,6 +138,7 @@ class AFUITextField extends StatelessWidget {
       autocorrect: autocorrect,
       autofocus: autofocus,
       textAlign: textAlign,
+      maxLength: maxLength,
       minLines: minLines,
       maxLines: maxLines,
       decoration: decoration,

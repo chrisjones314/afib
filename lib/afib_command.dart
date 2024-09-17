@@ -33,3 +33,5 @@ export 'src/dart/utils/af_document_id_generator.dart';
 export "src/dart/utils/af_exception.dart"; // ok
 export 'src/dart/utils/af_id.dart';
 export "src/dart/command/af_command_lpi.dart";
+export 'src/dart/utils/af_firestore_document.dart';
+export 'src/flutter/test/af_test_utils.dart';

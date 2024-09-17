@@ -2951,7 +2951,6 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     );
   }
 
-
   /// Create a widget that has the [bottomControls] and [topControls] permenantly
   /// affixed above/below the [main] widget.
   Widget childTopBottomHostedControls(BuildContext context, Widget main, {

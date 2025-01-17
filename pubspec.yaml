@@ -7,14 +7,14 @@ documentation: https://docs.afibframework.io/v0.5/afib/startup/start_here/
 repository: https://github.com/chrisjones314/afib
 issue_tracker: https://github.com/chrisjones314/afib/issues
 environment:
-  sdk: ">=2.18.5 <4.0.0"
+  sdk: ">=3.5.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   redux: ^5.0.0
   flutter_redux: ^0.10.0
-  intl: ^0.18.1
+  intl: ^0.20.1
   colorize: ^3.0.0
   logger: ^2.0.1  
   package_info_plus: ^4.1.0
@@ -27,7 +27,7 @@ dependencies:
   plural_noun: ^0.1.2
   meta: ^1.9.1
   collection: ^1.17.1
-  material_color_utilities: ^0.8.0
+  material_color_utilities: ^0.11.1
   flutter_test:
     sdk: flutter
   

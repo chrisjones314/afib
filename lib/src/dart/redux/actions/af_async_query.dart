@@ -74,7 +74,7 @@ class AFStartQueryContext<TResponse> extends AFQueryContext {
     conceptualStore: conceptualStore,
   );
 
-  Future<AFFinishQuerySuccessContext<TRespLocal>> executeQueryWithAwait<TRespLocal>(AFAsyncQuery query) async {
+  Future<AFFinishQuerySuccessContext<TRespLocal>> executeQueryWithAwait<TRespLocal>(AFAsyncQuery query) {
     final completer = Completer<AFFinishQuerySuccessContext<TRespLocal>>();
     this.dispatch(AFAsyncQueryFuture<TRespLocal>(
       query: query, 

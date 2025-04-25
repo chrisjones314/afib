@@ -2084,12 +2084,13 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   Widget childButtonPrimaryText({
     AFWidgetID? wid,
     Object? text,
+    bool? softWrap,
     required AFPressedDelegate onPressed,
      AFPressedDelegate? onLongPress,
   }) {
     return childButtonPrimary(
       wid: wid,
-      child: childText(text: text),
+      child: childText(text: text, softWrap: softWrap),
       onPressed: onPressed,
       onLongPress: onLongPress,
     );

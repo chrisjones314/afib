@@ -126,7 +126,7 @@ class AFKeySelector extends AFWidgetSelector {
   }
 
   @override
-  bool operator==(dynamic other) {
+  bool operator==(Object other) {
     return other is AFKeySelector && other.key == key;
   }
 
@@ -154,7 +154,7 @@ class AFWidgetTypeSelector extends AFWidgetSelector {
   }
 
   @override
-  bool operator==(dynamic other) {
+  bool operator==(Object other) {
     return other is AFWidgetTypeSelector && other.widgetType == widgetType;
   }
 
@@ -183,7 +183,7 @@ class AFIconDataSelector extends AFWidgetSelector {
   }
 
   @override
-  bool operator==(dynamic other) {
+  bool operator==(Object other) {
     return other is AFIconDataSelector && other.data == this.data;
   }
 
@@ -219,7 +219,7 @@ class AFMultipleWidgetSelector extends AFWidgetSelector {
   }
 
   @override
-  bool operator==(dynamic other) {
+  bool operator==(Object other) {
     if(other is! AFMultipleWidgetSelector) {
       return false;
     }
@@ -262,7 +262,7 @@ class AFRichTextGestureTapSpecifier extends AFWidgetSelector {
   }
 
   @override
-  bool operator==(dynamic other) {
+  bool operator==(Object other) {
     if(other is! AFRichTextGestureTapSpecifier) {
       return false;
     }
@@ -377,7 +377,7 @@ class AFSparsePathWidgetSelector extends AFWidgetSelector {
   }
 
   @override
-  bool operator==(dynamic other) {
+  bool operator==(Object other) {
     if(other is AFSparsePathWidgetSelector) {
       if(other.pathSelectors.length != pathSelectors.length) {
         return false;
@@ -908,7 +908,7 @@ abstract class AFScreenTestExecute extends AFBaseTestExecute with AFDeviceFormFa
 }
 
 abstract class AFSingleScreenTestExecute extends AFScreenTestExecute {
-  AFSingleScreenTestExecute(AFBaseTestID testId): super(testId);
+  AFSingleScreenTestExecute(super.testId);
   @override
   bool isEnabled(AFBaseTestID id) { return true; }
 
@@ -1188,7 +1188,7 @@ class AFScreenTestContextSimulator extends AFScreenTestContext {
   final DateTime lastRun = DateTime.now();
   final AFBaseTestID? selectedTest;
 
-  AFScreenTestContextSimulator(AFDispatcher dispatcher, AFBaseTestID testId, this.runNumber, this.selectedTest): super(dispatcher, testId);
+  AFScreenTestContextSimulator(super.dispatcher, super.testId, this.runNumber, this.selectedTest);
 
   @override
   bool isEnabled(AFBaseTestID id) { return selectedTest == null || selectedTest == id; }
@@ -1387,14 +1387,14 @@ abstract class AFScreenLikePrototype extends AFScreenPrototype {
   AFNavigateWithOnEventContextDelegate? navigateWithEventContext;
 
   AFScreenLikePrototype({
-    required AFPrototypeID id,
+    required super.id,
     required this.stateView,
     required this.navigate,
     required this.navigateWithEventContext,
     required this.body,
     required this.timeHandling,
-    required AFUIType uiType,
-  }): super(id: id, uiType: uiType);
+    required super.uiType,
+  });
 
   @override
   AFID get displayId {
@@ -1437,20 +1437,14 @@ abstract class AFScreenLikePrototype extends AFScreenPrototype {
 class AFSingleScreenPrototype extends AFScreenLikePrototype {
 
   AFSingleScreenPrototype({
-    required AFPrototypeID id,
-    required dynamic stateView,
-    AFNavigatePushAction? navigate,
-    AFNavigateWithOnEventContextDelegate? navigateWithEventContext,
-    required AFSingleScreenPrototypeBody body,
-    required AFTestTimeHandling timeHandling,
+    required super.id,
+    required super.stateView,
+    super.navigate,
+    super.navigateWithEventContext,
+    required super.body,
+    required super.timeHandling,
   }): super(
-    id: id,
-    stateView: stateView,
-    navigate: navigate,
-    navigateWithEventContext: navigateWithEventContext,
-    body: body,
-    uiType: AFUIType.screen,
-    timeHandling: timeHandling
+    uiType: AFUIType.screen
   );
 
 
@@ -1511,13 +1505,13 @@ abstract class AFWidgetPrototype extends AFScreenPrototype {
   final AFCreateWidgetWrapperDelegate? createWidgetWrapperDelegate;
 
   AFWidgetPrototype({
-    required AFPrototypeID id,
+    required super.id,
     required this.body,
     required this.stateView,
     required this.render,
     this.createWidgetWrapperDelegate,
     String? title
-  }): super(id: id, uiType: AFUIType.widget);
+  }): super(uiType: AFUIType.widget);
 
   @override
   AFID get displayId {
@@ -1577,14 +1571,14 @@ class AFConnectedWidgetPrototype extends AFWidgetPrototype {
   final AFTestTimeHandling timeHandling;
 
   AFConnectedWidgetPrototype({
-    required AFPrototypeID id,
+    required super.id,
     required dynamic models,
     required this.routeParam,
     this.children,
-    required AFRenderConnectedChildDelegate render,
-    required AFSingleScreenPrototypeBody body,
+    required super.render,
+    required super.body,
     required this.timeHandling,
-  }): super(id: id, body: body, stateView: models, render: render);
+  }): super(stateView: models);
 
   @override
   List<AFScreenTestDescription> get smokeTests { return List<AFScreenTestDescription>.from(body.smokeTests); }
@@ -1620,19 +1614,14 @@ class AFConnectedWidgetPrototype extends AFWidgetPrototype {
 class AFDialogPrototype extends AFScreenLikePrototype {
 
   AFDialogPrototype({
-    required AFPrototypeID id,
+    required super.id,
     required dynamic models,
-    AFNavigatePushAction? navigate,
-    AFNavigateWithOnEventContextDelegate? navigateWithEventContext,
-    required AFSingleScreenPrototypeBody body,
-    required AFTestTimeHandling timeHandling,
+    super.navigate,
+    super.navigateWithEventContext,
+    required super.body,
+    required super.timeHandling,
   }): super(
-    id: id,
-    stateView: models,
-    navigate: navigate,
-    navigateWithEventContext: navigateWithEventContext,
-    body: body,
-    timeHandling: timeHandling, uiType: AFUIType.dialog);
+    stateView: models, uiType: AFUIType.dialog);
 
   AFScreenID get screenId {
     return AFUIScreenID.screenPrototypeDialog;
@@ -1685,19 +1674,14 @@ class AFDialogPrototype extends AFScreenLikePrototype {
 class AFBottomSheetPrototype extends AFScreenLikePrototype {
 
   AFBottomSheetPrototype({
-    required AFPrototypeID id,
+    required super.id,
     required dynamic models,
-    AFNavigatePushAction? navigate,
-    AFNavigateWithOnEventContextDelegate? navigateWithEventContext,
-    required AFSingleScreenPrototypeBody body,
-    required AFTestTimeHandling timeHandling,
+    super.navigate,
+    super.navigateWithEventContext,
+    required super.body,
+    required super.timeHandling,
   }): super(
-    id: id,
     stateView: models,
-    navigate: navigate,
-    navigateWithEventContext: navigateWithEventContext,
-    body: body,
-    timeHandling: timeHandling,
     uiType: AFUIType.bottomSheet
   );
 
@@ -1751,19 +1735,14 @@ class AFBottomSheetPrototype extends AFScreenLikePrototype {
 class AFDrawerPrototype extends AFScreenLikePrototype {
 
   AFDrawerPrototype({
-    required AFPrototypeID id,
+    required super.id,
     required dynamic models,
-    AFNavigatePushAction? navigate,
-    AFNavigateWithOnEventContextDelegate? navigateWithEventContext,
-    required AFSingleScreenPrototypeBody body,
-    required AFTestTimeHandling timeHandling,
+    super.navigate,
+    super.navigateWithEventContext,
+    required super.body,
+    required super.timeHandling,
   }): super(
-    id: id,
     stateView: models,
-    navigate: navigate,
-    navigateWithEventContext: navigateWithEventContext,
-    body: body,
-    timeHandling: timeHandling,
     uiType: AFUIType.drawer
   );
 
@@ -1821,11 +1800,11 @@ class AFWorkflowStatePrototype extends AFScreenPrototype {
   final AFID? actualDisplayId;
 
   AFWorkflowStatePrototype({
-    required AFPrototypeID id,
+    required super.id,
     required this.stateTestId,
     required this.body,
     this.actualDisplayId,
-  }): super(id: id, uiType: AFUIType.screen);
+  }): super(uiType: AFUIType.screen);
 
   @override
   List<AFScreenTestDescription> get smokeTests { return List<AFScreenTestDescription>.from(body.smokeTests); }
@@ -2504,20 +2483,20 @@ class AFWorkflowTestContext extends AFWorkflowTestExecute {
 class AFWorkflowStateTestUI extends AFScreenTestDescription {
   final AFStateTestID uiStartsWith;
   AFWorkflowStateTestUI(
-    AFScreenTestID id,
-    String? description,
-    String? disabled,
-    this.uiStartsWith): super(id, description, disabled);
+    AFScreenTestID super.id,
+    super.description,
+    super.disabled,
+    this.uiStartsWith);
 
 }
 
 class AFWorkflowStateTestBodyWithParam extends AFScreenTestDescription {
   final AFWorkflowTestBodyExecuteDelegate body;
   AFWorkflowStateTestBodyWithParam(
-    AFScreenTestID id,
-    String? description,
-    String? disabled,
-    this.body): super(id, description, disabled);
+    AFScreenTestID super.id,
+    super.description,
+    super.disabled,
+    this.body);
 
 }
 

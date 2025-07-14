@@ -1,6 +1,5 @@
 import 'package:afib/src/dart/redux/actions/af_action_with_key.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_platform_info_state.dart';
-import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:meta/meta.dart';
 
 
@@ -30,10 +29,10 @@ class AFUpdateAppStateAction extends AFActionWithKey {
   final List<Object> toIntegrate;
   
   AFUpdateAppStateAction({
-    AFID? id,
+    super.id,
     required this.area,
     required this.toIntegrate
-  }): super(id: id);
+  });
 
   /// A utility for creating an empty list of models.
   static List<Object> createModelList() {

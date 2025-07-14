@@ -1,5 +1,4 @@
 import 'package:afib/afib_uiid.dart';
-import 'package:afib/src/dart/redux/state/models/af_time_state.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
 import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
@@ -32,17 +31,13 @@ class AFFlutterRouteParamState {
 class AFRouteParamWithFlutterState extends AFRouteParam {
 
   AFRouteParamWithFlutterState({
-    required AFScreenID screenId,
-    required AFRouteLocation routeLocation,
-    required AFWidgetID wid,
+    required super.screenId,
+    required super.routeLocation,
+    required super.wid,
     AFFlutterRouteParamState? flutterState,
-    AFTimeStateUpdateSpecificity? timeSpecificity,
+    super.timeSpecificity,
   }): super(
-    screenId: screenId,
-    routeLocation: routeLocation,
-    timeSpecificity: timeSpecificity,
     flutterStatePrivate: flutterState,
-    wid: wid,
   );
 
    void updateTextField(AFWidgetID wid, String text) {
@@ -110,66 +105,50 @@ class AFRouteParamWithFlutterState extends AFRouteParam {
 
 class AFScreenRouteParamWithFlutterState extends AFRouteParamWithFlutterState  {
   AFScreenRouteParamWithFlutterState({
-    required AFScreenID screenId,
-    required AFFlutterRouteParamState flutterState,
-    AFTimeStateUpdateSpecificity? timeSpecificity,
-    AFRouteLocation routeLocation = AFRouteLocation.screenHierarchy,
+    required super.screenId,
+    required AFFlutterRouteParamState super.flutterState,
+    super.timeSpecificity,
+    super.routeLocation = AFRouteLocation.screenHierarchy,
   }): super(
-    screenId: screenId,
     wid: AFUIWidgetID.useScreenParam,
-    routeLocation: routeLocation,
-    timeSpecificity: timeSpecificity,
-    flutterState: flutterState,
     
   );
 }
 
 class AFBottomSheetRouteParamWithFlutterState extends AFScreenRouteParamWithFlutterState {
   AFBottomSheetRouteParamWithFlutterState({
-    required AFScreenID screenId,
-    required AFFlutterRouteParamState flutterState,
-    AFTimeStateUpdateSpecificity? timeSpecificity    
+    required super.screenId,
+    required super.flutterState,
+    super.timeSpecificity    
   }): super(
-    screenId: screenId,
-    flutterState: flutterState,
-    timeSpecificity: timeSpecificity,
     routeLocation: AFRouteLocation.globalPool
   );
 }
 
 class AFDialogRouteParamWithFlutterState extends AFScreenRouteParamWithFlutterState {
   AFDialogRouteParamWithFlutterState({
-    required AFScreenID screenId,
-    required AFFlutterRouteParamState flutterState,
+    required super.screenId,
+    required super.flutterState,
   }): super(
-    screenId: screenId,
-    flutterState: flutterState,
     routeLocation: AFRouteLocation.globalPool
   );
 }
 
 class AFDrawerRouteParamWithFlutterState extends AFScreenRouteParamWithFlutterState {
   AFDrawerRouteParamWithFlutterState({
-    required AFScreenID screenId,
-    required AFFlutterRouteParamState flutterState,
+    required super.screenId,
+    required super.flutterState,
   }): super(
-    screenId: screenId,
-    flutterState: flutterState,
     routeLocation: AFRouteLocation.globalPool,
   );
 }
 
 class AFWidgetRouteParamWithFlutterState extends AFRouteParamWithFlutterState {
   AFWidgetRouteParamWithFlutterState({
-    required AFScreenID screenId,
-    required AFRouteLocation routeLocation,
-    required AFWidgetID wid,
-    required AFFlutterRouteParamState flutterState,
-  }): super(
-    screenId: screenId,
-    routeLocation: routeLocation,
-    wid: wid,
-    flutterState: flutterState,
-  );
+    required super.screenId,
+    required super.routeLocation,
+    required super.wid,
+    required AFFlutterRouteParamState super.flutterState,
+  });
 }
 

@@ -162,5 +162,5 @@ Future<void> afTestMainApp({
     AFBaseTestExecute.writeSeparatorLine(output);
   }
 
-  return null;
+  return;
 }

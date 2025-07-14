@@ -12,7 +12,7 @@ import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 
 class AFUIPrototypeWireframesListScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFRouteParam> {
-  const AFUIPrototypeWireframesListScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard): super(context, standard );
+  const AFUIPrototypeWireframesListScreenSPI(super.context, super.standard);
   
   factory AFUIPrototypeWireframesListScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard) {
     return AFUIPrototypeWireframesListScreenSPI(context, standard,

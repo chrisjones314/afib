@@ -8,15 +8,13 @@ class MainT extends AFFileSourceTemplate {
   static const insertAfterMain = AFSourceTemplateInsertion("after_main");
 
   MainT({
-    required String templateFileId,
-    required List<String> templateFolder,
+    required super.templateFileId,
+    required super.templateFolder,
     Object? mainImpl,
     Object? beforeMain,
     Object? afterMain,
     Object? insertExtraImports,
   }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
     embeddedInsertions: AFSourceTemplateInsertions(insertions: {
       insertBeforeMain: beforeMain ?? AFSourceTemplate.empty,
       insertAfterMain: afterMain ?? AFSourceTemplate.empty,

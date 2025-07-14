@@ -6,12 +6,9 @@ import 'package:afib/src/dart/command/templates/core/files/unit_test.t.dart';
 class WireframeT extends AFFileSourceTemplate {
 
   WireframeT({
-    required String templateFileId,
-    required List<String> templateFolder,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-  );  
+    required super.templateFileId,
+    required super.templateFolder,
+  });  
 
   factory WireframeT.core() {
     return WireframeT(

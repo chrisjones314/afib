@@ -176,7 +176,7 @@ class AFTranslationID extends AFID {
 
 class AFIDWithTag extends AFID {
   final String? tag;
-  const AFIDWithTag(String prefix, String code, AFLibraryID library, { this.tag }): super(prefix, code, library);
+  const AFIDWithTag(String super.prefix, super.code, AFLibraryID super.library, { this.tag });
 }
 
 class AFScreenID extends AFID {
@@ -188,15 +188,15 @@ class AFScreenID extends AFID {
 }
 
 class AFDialogID extends AFScreenID {
-  const AFDialogID(String code, AFLibraryID library): super(code, library, prefix: "dialog");
+  const AFDialogID(super.code, super.library): super(prefix: "dialog");
 }
 
 class AFDrawerID extends AFScreenID {
-  const AFDrawerID(String code, AFLibraryID library): super(code, library, prefix: "drawer");
+  const AFDrawerID(super.code, super.library): super(prefix: "drawer");
 }
 
 class AFBottomSheetID extends AFScreenID {
-  const AFBottomSheetID(String code, AFLibraryID library): super(code, library, prefix: "bottomsheet");
+  const AFBottomSheetID(super.code, super.library): super(prefix: "bottomsheet");
 }
 
 class AFLibraryID extends AFID {
@@ -241,7 +241,7 @@ class AFWidgetID extends AFID {
 /// 
 /// Note that UI prototypes, state tests, unit test, etc are all different forms of tests.
 class AFBaseTestID extends AFID {
-  const AFBaseTestID(String prefix, String code, AFLibraryID library, { List<Object>? withItems }) : super(prefix, code, library, withItems: withItems);
+  const AFBaseTestID(String super.prefix, super.code, AFLibraryID super.library, { super.withItems });
 }
 
 
@@ -296,7 +296,7 @@ class AFPrototypeID extends AFBaseTestID {
 
 class AFWireframeID extends AFPrototypeID {
   static const wireframePrefix = "wireframe";
-  const AFWireframeID(String code, AFLibraryID library) : super(code, library, prefix: wireframePrefix);
+  const AFWireframeID(super.code, super.library) : super(prefix: wireframePrefix);
 }
 
 class AFQueryTestID extends AFID {

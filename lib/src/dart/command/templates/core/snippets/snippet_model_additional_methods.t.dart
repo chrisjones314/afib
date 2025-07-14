@@ -4,14 +4,10 @@ import 'package:afib/src/dart/command/af_source_template.dart';
 class SnippetModelAdditionalMethodsT extends AFSnippetSourceTemplate {
 
   SnippetModelAdditionalMethodsT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    required AFSourceTemplateInsertions? embeddedInsertions,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions,
-  );
+    required super.templateFileId,
+    required super.templateFolder,
+    required super.embeddedInsertions,
+  });
 
   factory SnippetModelAdditionalMethodsT.core() {
     return SnippetModelAdditionalMethodsT(

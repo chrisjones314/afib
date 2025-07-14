@@ -5,10 +5,9 @@ class ModelUsersRootT extends ModelExampleStartHereT {
   
   ModelUsersRootT({
     List<String>? templatePath,
-    AFSourceTemplateInsertions? embeddedInsertions,
+    super.embeddedInsertions,
   }): super(
     templateFileId: "model_users_root",
-    embeddedInsertions: embeddedInsertions,
   );  
 
   factory ModelUsersRootT.example() {

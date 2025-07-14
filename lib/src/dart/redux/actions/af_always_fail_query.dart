@@ -1,4 +1,3 @@
-import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 
 class AFAlwaysFailQuery extends AFAsyncQuery<String> {
@@ -7,8 +6,8 @@ class AFAlwaysFailQuery extends AFAsyncQuery<String> {
   //------------------------------------------------------------------------
   AFAlwaysFailQuery({
     required this.message, 
-    AFID? id
-  }): super(id: id);
+    super.id
+  });
   
   //------------------------------------------------------------------------
   @override

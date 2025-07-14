@@ -16,13 +16,13 @@ class AFNavigateAction extends AFActionWithKey implements AFExecuteBeforeInterfa
   final RouteTransitionsBuilder? transitionsBuilder;
 
   AFNavigateAction({
-    AFID? id,
+    super.id,
     required this.param,
     required this.children,
     required this.executeBefore,
     required this.executeDuring,
     required this.transitionsBuilder,    
-  }): super(id: id);
+  });
 
   AFScreenID get screenId { return param.screenId; }
 }
@@ -32,14 +32,11 @@ class AFNavigateAction extends AFActionWithKey implements AFExecuteBeforeInterfa
 class AFNavigateSetParamAction extends AFNavigateAction {
   final AFCreateDefaultChildParamDelegate? createDefaultChildParam;
   AFNavigateSetParamAction({
-    AFID? id, 
-    required AFRouteParam param,
-    List<AFRouteParam>? children,
+    super.id, 
+    required super.param,
+    super.children,
     this.createDefaultChildParam,
   }): super(
-    id: id, 
-    param: param, 
-    children: children, 
     executeBefore: null, 
     executeDuring: null,
     transitionsBuilder: null,
@@ -50,49 +47,36 @@ class AFNavigateActionWithReturn extends AFNavigateAction {
   final AFActionOnReturnDelegate? onReturn;
   final AFCreateDefaultChildParamDelegate? createDefaultChildParam;
   AFNavigateActionWithReturn({
-    AFID? id, 
-    required AFRouteParam param, 
+    super.id, 
+    required super.param, 
     this.onReturn,
-    List<AFRouteParam>? children,
+    super.children,
     this.createDefaultChildParam,
-    AFAsyncQuery? executeBefore,
-    AFAsyncQuery? executeDuring,
-    RouteTransitionsBuilder? transitionsBuilder,
-  }): super(
-    id: id, 
-    param: param, 
-    children: children, 
-    executeBefore: executeBefore, 
-    executeDuring: executeDuring,
-    transitionsBuilder: transitionsBuilder
-    );
+    super.executeBefore,
+    super.executeDuring,
+    super.transitionsBuilder,
+  });
 }
 
 /// Action that replaces the current leaf screen with a new screen.
 class AFNavigateReplaceAction extends AFNavigateAction {  
   final AFCreateDefaultChildParamDelegate? createDefaultChildParam;
   AFNavigateReplaceAction({
-    AFID? id, 
+    super.id, 
     required AFRouteParam launchParam,
-    List<AFRouteParam>? children,
+    super.children,
     this.createDefaultChildParam,
-    AFAsyncQuery? executeBefore,
-    AFAsyncQuery? executeDuring,
-    RouteTransitionsBuilder? transitionsBuilder,
+    super.executeBefore,
+    super.executeDuring,
+    super.transitionsBuilder,
   }): super(
-    id: id, 
-    param: launchParam, 
-    children: children, 
-    executeBefore: executeBefore, 
-    executeDuring: executeDuring,
-    transitionsBuilder: transitionsBuilder,
+    param: launchParam,
   );
 }
 
 /// Action that exits the current test screen in prototype mode.
 class AFNavigateExitTestAction extends AFNavigateAction {  
-  AFNavigateExitTestAction({AFID? id}): super(
-    id: id, 
+  AFNavigateExitTestAction({super.id}): super(
     param: AFRouteParamUnused.unused, 
     children: null, 
     executeBefore: null, 
@@ -103,8 +87,7 @@ class AFNavigateExitTestAction extends AFNavigateAction {
 
 class AFNavigateSyncNavigatorStateWithRoute extends AFNavigateAction {
   final AFRouteState route;
-  AFNavigateSyncNavigatorStateWithRoute(this.route, {AFID? id}): super(
-    id: id, 
+  AFNavigateSyncNavigatorStateWithRoute(this.route, {super.id}): super(
     param: AFRouteParamUnused.unused, 
     children: null, 
     executeBefore: null, 
@@ -118,20 +101,15 @@ class AFNavigateSyncNavigatorStateWithRoute extends AFNavigateAction {
 class AFNavigateReplaceAllAction extends AFNavigateAction {
   final AFCreateDefaultChildParamDelegate? createDefaultChildParam;
   AFNavigateReplaceAllAction({
-    AFID? id, 
+    super.id, 
     required AFRouteParam launchParam,
-    List<AFRouteParam>? children,
+    super.children,
     this.createDefaultChildParam,
-    AFAsyncQuery? executeBefore,
-    AFAsyncQuery? executeDuring,
-    RouteTransitionsBuilder? transitionsBuilder,
+    super.executeBefore,
+    super.executeDuring,
+    super.transitionsBuilder,
   }): super(
-    id: id, 
-    param: launchParam, 
-    children: children, 
-    executeBefore: executeBefore, 
-    executeDuring: executeDuring,
-    transitionsBuilder: transitionsBuilder
+    param: launchParam
   );
 
   factory AFNavigateReplaceAllAction.toStartupScreen({required AFRouteParam param}) {
@@ -156,23 +134,16 @@ class AFNavigateReplaceAllAction extends AFNavigateAction {
 /// Subsequently, [AFNavigatePopAction] will return you to the parent screen.
 class AFNavigatePushAction extends AFNavigateActionWithReturn {
   AFNavigatePushAction({
-    AFID? id, 
+    super.id, 
     required AFRouteParam launchParam, 
-    List<AFRouteParam>? children,
-    AFActionOnReturnDelegate? onReturn,
-    AFCreateDefaultChildParamDelegate? createDefaultChildParam,
-    AFAsyncQuery? executeBefore,
-    AFAsyncQuery? executeDuring,
-    RouteTransitionsBuilder? transitionsBuilder,
+    super.children,
+    super.onReturn,
+    super.createDefaultChildParam,
+    super.executeBefore,
+    super.executeDuring,
+    super.transitionsBuilder,
   }): super(
-    id: id, 
-    param: launchParam, 
-    children: children, 
-    onReturn: onReturn, 
-    createDefaultChildParam: createDefaultChildParam, 
-    executeBefore: executeBefore, 
-    executeDuring: executeDuring,
-    transitionsBuilder: transitionsBuilder,
+    param: launchParam,
   );
 
   AFNavigateReplaceAllAction castToReplaceAll() {
@@ -219,20 +190,15 @@ class AFNavigateActionWithReturnData extends AFNavigateAction {
   final bool worksInSingleScreenTest;
 
   AFNavigateActionWithReturnData({
-    AFID? id, 
+    super.id, 
     required this.returnData, 
     this.worksInSingleScreenTest = false,
-    List<AFRouteParam>? children,
-    AFAsyncQuery? executeBefore,
-    AFAsyncQuery? executeDuring,
-    RouteTransitionsBuilder? transitionsBuilder,
+    super.children,
+    super.executeBefore,
+    super.executeDuring,
+    super.transitionsBuilder,
   }): super(
-    id: id, 
-    param: AFRouteParamUnused.unused, 
-    children: children, 
-    executeBefore: executeBefore, 
-    executeDuring: executeDuring,
-    transitionsBuilder: transitionsBuilder,
+    param: AFRouteParamUnused.unused,
   );
 }
 
@@ -248,10 +214,10 @@ class AFNavigateActionWithReturnData extends AFNavigateAction {
 class AFNavigatePopAction extends AFNavigateActionWithReturnData {
   
   AFNavigatePopAction({
-    AFID? id, 
-    dynamic returnData, 
-    bool worksInSingleScreenTest = false
-  }): super(id: id, returnData: returnData, worksInSingleScreenTest: worksInSingleScreenTest);
+    super.id, 
+    super.returnData, 
+    super.worksInSingleScreenTest
+  });
 
 }
 
@@ -261,12 +227,10 @@ class AFNavigatePopNAction extends AFNavigateActionWithReturnData {
 
   AFNavigatePopNAction({
     required this.popCount,
-    AFID? id, 
-    dynamic returnData, 
+    super.id, 
+    super.returnData, 
     bool worksInPrototypeMode = true
     }): super(
-      id: id,
-      returnData: returnData,
       worksInSingleScreenTest: worksInPrototypeMode
     );
 }
@@ -278,12 +242,10 @@ class AFNavigatePopToAction extends AFNavigateActionWithReturnData {
   AFNavigatePopToAction({
     required this.popTo,
     this.push,
-    AFID? id, 
-    dynamic returnData, 
+    super.id, 
+    super.returnData, 
     bool worksInPrototypeMode = true
   }): super(
-    id: id,
-    returnData: returnData,
     worksInSingleScreenTest: worksInPrototypeMode
   );
 
@@ -299,9 +261,9 @@ class AFNavigatePopToAction extends AFNavigateActionWithReturnData {
 
 class AFNavigateAddChildParamAction extends AFNavigateAction {
   AFNavigateAddChildParamAction({
-    AFID? id, 
-    required AFRouteParam param, 
-  }): super(id: id, param: param, children: null, executeBefore: null, executeDuring: null, transitionsBuilder: null);
+    super.id, 
+    required super.param, 
+  }): super(children: null, executeBefore: null, executeDuring: null, transitionsBuilder: null);
 }
 
 class AFNavigateRemoveChildParamAction extends AFNavigateAction {
@@ -309,11 +271,11 @@ class AFNavigateRemoveChildParamAction extends AFNavigateAction {
   final AFID widget;
   final AFRouteLocation route;
   AFNavigateRemoveChildParamAction({
-    AFID? id, 
+    super.id, 
     required this.screen, 
     required this.widget,
     required this.route,
-  }): super(id: id, param: AFRouteParamUnused.unused, children: null, executeBefore: null, executeDuring: null, transitionsBuilder: null); 
+  }): super(param: AFRouteParamUnused.unused, children: null, executeBefore: null, executeDuring: null, transitionsBuilder: null); 
 }
 
 class AFNavigateShowScreenBeginAction extends AFNavigateAction {

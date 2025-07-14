@@ -93,7 +93,7 @@ class AFUIPrototypeDrawerRouteParam extends AFDrawerRouteParam {
 
 class AFUIPrototypeDrawerSPI extends AFUIDrawerSPI<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> {
 
-  const AFUIPrototypeDrawerSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIPrototypeDrawerSPI(super.context, super.standard);
   
   factory AFUIPrototypeDrawerSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerRouteParam> context, AFStandardSPIData standard) {
     return AFUIPrototypeDrawerSPI(context, standard);

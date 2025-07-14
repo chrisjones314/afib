@@ -50,7 +50,7 @@ class AFUIPrototypeTestScreenParam extends AFScreenRouteParam {
 
 
 class AFUIPrototypeTestScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> {
-  const AFUIPrototypeTestScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIPrototypeTestScreenSPI(super.context, super.standard);
   
   factory AFUIPrototypeTestScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeTestScreenParam> context, AFStandardSPIData standard) {
     return AFUIPrototypeTestScreenSPI(context, standard,

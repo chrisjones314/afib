@@ -6,14 +6,10 @@ class SnippetScreenMemberVariableDeclsT extends AFSnippetSourceTemplate {
   static const insertDecls = AFSourceTemplateInsertion("member_variable_decls");
   
   SnippetScreenMemberVariableDeclsT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    required AFSourceTemplateInsertions? embeddedInsertions,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions
-  );
+    required super.templateFileId,
+    required super.templateFolder,
+    required super.embeddedInsertions,
+  });
 
   factory SnippetScreenMemberVariableDeclsT.core() {
     return SnippetScreenMemberVariableDeclsT(

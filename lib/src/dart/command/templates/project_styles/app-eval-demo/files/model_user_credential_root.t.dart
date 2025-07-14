@@ -6,10 +6,9 @@ class ModelUserCredentialRootT extends ModelExampleStartHereT {
   
   ModelUserCredentialRootT({
     List<String>? templatePath,
-    AFSourceTemplateInsertions? embeddedInsertions,
+    super.embeddedInsertions,
   }): super(
     templateFileId: "model_user_credential_root",
-    embeddedInsertions: embeddedInsertions,
   );  
 
   factory ModelUserCredentialRootT.example() {

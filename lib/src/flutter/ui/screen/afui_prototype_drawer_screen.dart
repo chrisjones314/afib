@@ -33,7 +33,7 @@ class AFUIPrototypeDrawerScreenRouteParam extends AFScreenRouteParam {
 }
 
 class AFUIPrototypeDrawerScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeDrawerScreenRouteParam> {
-  const AFUIPrototypeDrawerScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerScreenRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIPrototypeDrawerScreenSPI(super.context, super.standard);
   
   factory AFUIPrototypeDrawerScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDrawerScreenRouteParam> context, AFStandardSPIData standard) {
     return AFUIPrototypeDrawerScreenSPI(context, standard,

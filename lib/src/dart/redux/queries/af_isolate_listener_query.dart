@@ -1,6 +1,5 @@
 import 'dart:isolate';
 
-import 'package:afib/afib_command.dart';
 import 'package:afib/afib_flutter.dart';
 
 class AFIsolateListenerExecutionContext<TMessage> {
@@ -20,16 +19,11 @@ abstract class AFIsolateListenerQuery<TMessage> extends AFAsyncListenerQuery<TMe
   Isolate? isolate;
 
   AFIsolateListenerQuery({
-    AFID? id,
-    AFOnResponseDelegate<TMessage>? onSuccess,
-    AFOnErrorDelegate? onError,
-    AFPreExecuteResponseDelegate<TMessage>? onPreExecuteResponse
-  }): super(
-    id: id,
-    onSuccess: onSuccess,
-    onError: onError,
-    onPreExecuteResponse: onPreExecuteResponse,
-  );
+    super.id,
+    super.onSuccess,
+    super.onError,
+    super.onPreExecuteResponse
+  });
 
   void runInIsolateInternal(SendPort sendPort) {
     final ctx = AFIsolateListenerExecutionContext<TMessage>(sendPort: sendPort);

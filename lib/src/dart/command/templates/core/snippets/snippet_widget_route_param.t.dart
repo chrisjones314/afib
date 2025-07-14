@@ -5,14 +5,10 @@ import 'package:afib/src/dart/command/templates/core/files/screen.t.dart';
 class SnippetWidgetRouteParamT extends AFSnippetSourceTemplate {
   
   SnippetWidgetRouteParamT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    required AFSourceTemplateInsertions? embeddedInsertions,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions
-  );
+    required super.templateFileId,
+    required super.templateFolder,
+    required super.embeddedInsertions,
+  });
 
   factory SnippetWidgetRouteParamT.core() {
     return SnippetWidgetRouteParamT(

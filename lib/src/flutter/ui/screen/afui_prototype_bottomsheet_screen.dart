@@ -33,7 +33,7 @@ class AFUIPrototypeBottomSheetRouteParam extends AFScreenRouteParam {
 }
 
 class AFUIPrototypeBottomSheetScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeBottomSheetRouteParam> {
-  const AFUIPrototypeBottomSheetScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeBottomSheetRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIPrototypeBottomSheetScreenSPI(super.context, super.standard);
   
   factory AFUIPrototypeBottomSheetScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeBottomSheetRouteParam> context, AFStandardSPIData standard) {
     return AFUIPrototypeBottomSheetScreenSPI(context, standard,

@@ -11,14 +11,14 @@ class AFUIStandardNotification extends StatelessWidget {
   final AFRichTextBuilder? actionText;
 
   const AFUIStandardNotification({
-    Key? key, 
+    super.key, 
     required this.onAction, 
     required this.body, 
     required this.title,
     required this.colorBackground,
     required this.colorForeground,
     required this.actionText,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

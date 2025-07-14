@@ -1716,11 +1716,9 @@ Available commands:
 /// The extension context used by the app itself to register commands.
 class AFCommandAppExtensionContext extends AFCommandLibraryExtensionContext {
   AFCommandAppExtensionContext({
-    required AFDartParams paramsD, 
-    required AFCommandRunner commands
+    required super.paramsD, 
+    required super.commands
   }): super(
-      paramsD: paramsD, 
-      commands: commands,
       templates: AFTemplateRegistry(),
       createCommandLPIs: <AFLibraryProgrammingInterfaceID, AFCreateCommandLPIDelegate>{},
     );

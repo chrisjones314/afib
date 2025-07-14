@@ -7,13 +7,11 @@ class UnitTestT extends AFFileSourceTemplate {
   static const insertUnitTestCode = AFSourceTemplateInsertion("unit_test_code");
 
   UnitTestT({
-    required String templateFileId,
-    required List<String> templateFolder,
+    required super.templateFileId,
+    required super.templateFolder,
     AFSourceTemplate? additionalMethods,
     AFSourceTemplate? testCode,
   }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
     embeddedInsertions: AFSourceTemplateInsertions(insertions: {
         AFSourceTemplate.insertAdditionalMethodsInsertion: additionalMethods ?? AFSourceTemplate.empty,
         insertUnitTestCode: testCode ?? AFSourceTemplate.empty,

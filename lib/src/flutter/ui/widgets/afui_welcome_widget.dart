@@ -1,5 +1,4 @@
 
-import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
@@ -11,7 +10,7 @@ import 'package:flutter/material.dart';
 class AFUIWelcomeWidgetSPI extends AFUIWidgetSPI<AFUIDefaultStateView, AFRouteParamUnused> {
 
   //--------------------------------------------------------------------------------------
-  const AFUIWelcomeWidgetSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIWelcomeWidgetSPI(super.context, super.standard);
   factory AFUIWelcomeWidgetSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard) {
     return AFUIWelcomeWidgetSPI(context, standard);
   }
@@ -28,13 +27,11 @@ class AFUIAlphaWarningWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, A
 
 
   AFUIAlphaWarningWidget({
-    AFScreenID? screenIdOverride,
-    AFWidgetID? widOverride,
+    super.screenIdOverride,
+    super.widOverride,
     this.roundBottom = false,
   }): super(
     uiConfig: config,
-    screenIdOverride: screenIdOverride, 
-    widOverride: widOverride,
     launchParam: AFRouteParamUnused.unused,
   );
 
@@ -72,12 +69,10 @@ class AFUIWelcomeWidget extends AFUIConnectedWidget<AFUIWelcomeWidgetSPI, AFUIDe
   );
 
   AFUIWelcomeWidget({
-    AFScreenID? screenIdOverride,
-    AFWidgetID? widOverride,
+    super.screenIdOverride,
+    super.widOverride,
   }): super(
     uiConfig: config,
-    screenIdOverride: screenIdOverride, 
-    widOverride: widOverride,
     launchParam: AFRouteParamUnused.unused,
   );
 

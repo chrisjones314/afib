@@ -6,14 +6,10 @@ import 'package:afib/src/dart/command/templates/core/files/model.t.dart';
 class ModelUserT extends ModelT {
   
   ModelUserT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    AFSourceTemplateInsertions? embeddedInsertions,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions,
-  );  
+    required super.templateFileId,
+    required super.templateFolder,
+    super.embeddedInsertions,
+  });  
 
   factory ModelUserT.custom({
     required List<String> templateFolder,

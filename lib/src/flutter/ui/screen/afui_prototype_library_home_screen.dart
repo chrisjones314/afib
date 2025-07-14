@@ -22,7 +22,7 @@ class AFUIPrototypeLibraryHomeParam extends AFScreenRouteParam {
 }
 
 class AFUIPrototypeLibraryHomeScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeLibraryHomeParam> {
-  const AFUIPrototypeLibraryHomeScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeLibraryHomeParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIPrototypeLibraryHomeScreenSPI(super.context, super.standard);
   
   factory AFUIPrototypeLibraryHomeScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeLibraryHomeParam> context, AFStandardSPIData standard) {
     return AFUIPrototypeLibraryHomeScreenSPI(context, standard,

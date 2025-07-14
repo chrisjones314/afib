@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 abstract class AFApp<AppState> extends StatelessWidget {
   /// Construct an app with the specified [AFScreenMap]
   const AFApp({
-    Key? key,
-  }): super(key: key);
+    super.key,
+  });
 
   ///
   void afBeforeRunApp() {

@@ -41,8 +41,8 @@ class AFUIPrototypeHomeScreenParam extends AFScreenRouteParamWithFlutterState {
     required this.textControllers,
     required this.results,
     required this.view,
-    required AFFlutterRouteParamState flutterState,
-  }): super(screenId: AFUIScreenID.screenPrototypeHome, flutterState: flutterState);
+    required super.flutterState,
+  }): super(screenId: AFUIScreenID.screenPrototypeHome);
 
   AFUIPrototypeHomeScreenParam reviseFilter(String filter) {
     return copyWith(filter: filter);
@@ -85,7 +85,7 @@ class AFUIPrototypeHomeScreenParam extends AFScreenRouteParamWithFlutterState {
 }
 
 class AFPrototypeHomeScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeHomeScreenParam> {
-  const AFPrototypeHomeScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeHomeScreenParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFPrototypeHomeScreenSPI(super.context, super.standard);
   
   factory AFPrototypeHomeScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeHomeScreenParam> context, AFStandardSPIData standard) {
     return AFPrototypeHomeScreenSPI(context, standard,

@@ -8,12 +8,10 @@ class SnippetWireframeImplT extends AFSnippetSourceTemplate {
   static const insertNavPushParams = AFSourceTemplateInsertion("nav_push_params");
 
   SnippetWireframeImplT({
-    required String templateFileId,
-    required List<String> templateFolder,
+    required super.templateFileId,
+    required super.templateFolder,
     Object? navPushParams,
   }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
     embeddedInsertions: AFSourceTemplateInsertions(insertions: {
       SnippetWireframeImplT.insertNavPushParams: navPushParams ?? AFSourceTemplate.empty,
     }),

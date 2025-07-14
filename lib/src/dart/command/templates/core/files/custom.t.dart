@@ -6,14 +6,10 @@ import 'package:afib/src/dart/command/af_source_template.dart';
 class CustomT extends AFFileSourceTemplate {
 
   CustomT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    AFSourceTemplateInsertions? embeddedInsertions,     
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions,
-  );
+    required super.templateFileId,
+    required super.templateFolder,
+    super.embeddedInsertions,     
+  });
 
   factory CustomT.core() {
     return CustomT(

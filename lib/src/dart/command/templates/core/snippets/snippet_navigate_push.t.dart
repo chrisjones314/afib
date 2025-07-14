@@ -6,14 +6,10 @@ class SnippetNavigatePushT extends AFSnippetSourceTemplate {
   static const insertNavigatePushParamCall = AFSourceTemplateInsertion("navigate_push_param_call");
 
   SnippetNavigatePushT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    required AFSourceTemplateInsertions? embeddedInsertions,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions,
-  );
+    required super.templateFileId,
+    required super.templateFolder,
+    required super.embeddedInsertions,
+  });
 
   factory SnippetNavigatePushT.core() {
     return SnippetNavigatePushT(

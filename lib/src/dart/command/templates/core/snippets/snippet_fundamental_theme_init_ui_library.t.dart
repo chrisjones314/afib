@@ -7,14 +7,10 @@ import 'package:afib/src/dart/command/templates/core/snippets/snippet_fundamenta
 class SnippetFundamentalThemeInitUILibraryT extends AFSnippetSourceTemplate {
 
   SnippetFundamentalThemeInitUILibraryT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    required AFSourceTemplateInsertions? embeddedInsertions,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions,
-  );
+    required super.templateFileId,
+    required super.templateFolder,
+    required super.embeddedInsertions,
+  });
 
   factory SnippetFundamentalThemeInitUILibraryT.custom({
     required String templateFileId,

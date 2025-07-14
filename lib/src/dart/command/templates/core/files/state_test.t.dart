@@ -7,14 +7,10 @@ class StateTestT extends AFFileSourceTemplate {
   static const insertExtendTestId = AFSourceTemplateInsertion("extend_test_id");
 
   StateTestT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    required AFSourceTemplateInsertions? embeddedInsertions,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions,
-  );  
+    required super.templateFileId,
+    required super.templateFolder,
+    required super.embeddedInsertions,
+  });  
 
   factory StateTestT.core() {
     return StateTestT(

@@ -7,14 +7,10 @@ class SnippetStandardRouteParamT extends AFSnippetSourceTemplate {
   static const insertWithFlutterStateSuffix = AFSourceTemplateInsertion("with_flutter_state_suffix");
 
   SnippetStandardRouteParamT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    required AFSourceTemplateInsertions? embeddedInsertions,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions
-  );
+    required super.templateFileId,
+    required super.templateFolder,
+    required super.embeddedInsertions,
+  });
 
   factory SnippetStandardRouteParamT.core() {
     return SnippetStandardRouteParamT(

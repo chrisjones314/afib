@@ -33,7 +33,7 @@ class AFUIPrototypeDialogRouteParam extends AFScreenRouteParam {
 }
 
 class AFUIPrototypeDialogScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeDialogRouteParam> {
-  const AFUIPrototypeDialogScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDialogRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIPrototypeDialogScreenSPI(super.context, super.standard);
   
   factory AFUIPrototypeDialogScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeDialogRouteParam> context, AFStandardSPIData standard) {
     return AFUIPrototypeDialogScreenSPI(context, standard,

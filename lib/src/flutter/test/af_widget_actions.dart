@@ -34,7 +34,7 @@ abstract class AFApplyWidgetAction extends AFWidgetByTypeAction {
   static const applySetValue = "apply_set_value";
   static const applyDismiss = "apply_dismiss";
 
-  AFApplyWidgetAction(String actionType, Type appliesTo): super(actionType, appliesTo);
+  AFApplyWidgetAction(super.actionType, super.appliesTo);
 
   static bool isTap(String applyType) { return applyType == applyTap; }
   static bool isSetValue(String applyType) { return applyType == applySetValue; }
@@ -67,7 +67,7 @@ abstract class AFScrollerAction {
 
 class AFScrollableScrollTracker extends AFScrollTracker {
 
-  AFScrollableScrollTracker(AFWidgetSelector selector, Element element): super(selector, element);
+  AFScrollableScrollTracker(super.selector, super.element);
   
   @override
   bool canScrollMore() {
@@ -135,7 +135,7 @@ abstract class AFExtractWidgetAction extends AFWidgetByTypeAction {
   static const extractPrimary = "extract_primary";
   static const extractChildren = "extract_children";
 
-  AFExtractWidgetAction(String actionType, Type appliesTo): super(actionType, appliesTo);
+  AFExtractWidgetAction(super.actionType, super.appliesTo);
 
   /// This extracts data from a widget and returns it.
   dynamic extract(String extractType, AFWidgetSelector selector, Element element) {

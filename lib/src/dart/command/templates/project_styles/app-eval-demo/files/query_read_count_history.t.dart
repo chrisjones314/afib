@@ -5,14 +5,11 @@ import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/fil
 
 class QueryReadCountHistoryT extends QueryExampleStartHereT {
   QueryReadCountHistoryT({
-    required Object insertExtraImports,
-    required Object insertStartImpl,
-    required Object insertFinishImpl,
+    required super.insertExtraImports,
+    required super.insertStartImpl,
+    required super.insertFinishImpl,
   }): super(
     templateFileId: "query_read_count_history",
-    insertExtraImports: insertExtraImports,
-    insertStartImpl: insertStartImpl,
-    insertFinishImpl: insertFinishImpl,
     insertAdditionalMethods: AFSourceTemplate.empty,
   );
 

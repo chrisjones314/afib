@@ -7,16 +7,14 @@ import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/af_typedefs_dart.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
-import 'package:afib/src/flutter/ui/theme/afui_default_theme.dart';
-import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:afib/src/flutter/utils/afib_f.dart';
 
 class AFUIDefaultStateView extends AFUIFlexibleStateView with AFUIStateModelAccess {
   static final AFCreateStateViewDelegate<AFUIDefaultStateView> creator = (models) => AFUIDefaultStateView(models: models, create: null);
   AFUIDefaultStateView({
-    required Map<String, Object> models, 
+    required super.models, 
     AFCreateStateViewDelegate? create
-  }): super(models: models, create: create ?? creator);
+  }): super(create: create ?? creator);
 
   factory AFUIDefaultStateView.create(Map<String, Object> models) {
     return AFUIDefaultStateView(models: models);
@@ -59,36 +57,30 @@ mixin AFUIDefaultStateViewModelsMixin<TRouteParam extends AFRouteParam> {
 //--------------------------------------------------------------------------------------
 class AFUIDefaultScreenConfig<TSPI extends AFScreenStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIScreenConfig<TSPI, AFUIDefaultStateView, TRouteParam> with AFUIDefaultStateViewModelsMixin<TRouteParam> {
   AFUIDefaultScreenConfig({
-    required AFCreateSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
+    required super.spiCreator,
   }): super(
     stateViewCreator: AFUIDefaultStateView.create,
-    spiCreator: spiCreator,
   );
 }
 
 //--------------------------------------------------------------------------------------
 class AFUIDefaultDrawerConfig<TSPI extends AFDrawerStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIDrawerConfig<TSPI, AFUIDefaultStateView, TRouteParam> with AFUIDefaultStateViewModelsMixin<TRouteParam> {
   AFUIDefaultDrawerConfig({
-    required AFCreateSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
-    AFRouteLocation? route,
-    AFCreateDefaultRouteParamDelegate? createDefaultRouteParam
+    required super.spiCreator,
+    super.route,
+    super.createDefaultRouteParam
   }): super(
     stateViewCreator: AFUIDefaultStateView.create,
-    spiCreator: spiCreator,
-    route: route,
-    createDefaultRouteParam: createDefaultRouteParam,
   );
 }
 
 //--------------------------------------------------------------------------------------
 class AFUIDefaultDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIDialogConfig<TSPI, AFUIDefaultStateView, TRouteParam> with AFUIDefaultStateViewModelsMixin<TRouteParam> {
   AFUIDefaultDialogConfig({
-    required AFCreateSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
-    AFRouteLocation? route,
+    required super.spiCreator,
+    super.route,
   }): super(
     stateViewCreator: AFUIDefaultStateView.create,
-    spiCreator: spiCreator,
-    route: route,
   );
 }
 
@@ -96,11 +88,9 @@ class AFUIDefaultDialogConfig<TSPI extends AFDialogStateProgrammingInterface, TR
 class AFUIDefaultWidgetConfig<TSPI extends AFWidgetStateProgrammingInterface, TRouteParam extends AFRouteParam> extends AFUIWidgetConfig<TSPI, AFUIDefaultStateView, TRouteParam> with AFUIDefaultStateViewModelsMixin<TRouteParam> {
 
     AFUIDefaultWidgetConfig({
-      required AFCreateSPIDelegate<TSPI, AFBuildContext<AFUIDefaultStateView, TRouteParam>, AFUIDefaultTheme> spiCreator,
-      AFRouteLocation? route
+      required super.spiCreator,
+      super.route
     }): super(
       stateViewCreator: AFUIDefaultStateView.create,
-      spiCreator: spiCreator,
-      route: route,
     );
 }

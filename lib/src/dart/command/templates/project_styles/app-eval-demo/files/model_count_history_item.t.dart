@@ -4,10 +4,9 @@ import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/fil
 class ModelCountHistoryItemT extends ModelExampleStartHereT {
   
   ModelCountHistoryItemT({
-    AFSourceTemplateInsertions? embeddedInsertions,
+    super.embeddedInsertions,
   }): super(
     templateFileId: "model_count_history_item",
-    embeddedInsertions: embeddedInsertions,
   );  
 
   factory ModelCountHistoryItemT.example() {

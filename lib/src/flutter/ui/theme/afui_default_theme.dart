@@ -11,7 +11,7 @@ class AFUIDefaultTheme extends AFFunctionalTheme {
       1: FlexColumnWidth(),
     };
 
-  AFUIDefaultTheme(AFThemeID id, AFFundamentalThemeState fundamentals, AFBuildContext context): super(id, fundamentals, context);
+  AFUIDefaultTheme(super.id, super.fundamentals, super.context);
 
   factory AFUIDefaultTheme.create(AFThemeID id, AFFundamentalThemeState fundamentals, AFBuildContext context) {
     return AFUIDefaultTheme(id, fundamentals, context);

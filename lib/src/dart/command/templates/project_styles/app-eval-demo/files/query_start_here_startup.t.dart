@@ -5,16 +5,12 @@ import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/fil
 
 class QueryStartHereStartupT extends QueryExampleStartHereT {
   QueryStartHereStartupT({
-    required Object insertExtraImports,
-    required Object insertStartImpl,
-    required Object insertFinishImpl,
-    required Object insertAdditionalMethods,
+    required super.insertExtraImports,
+    required super.insertStartImpl,
+    required super.insertFinishImpl,
+    required super.insertAdditionalMethods,
   }): super(
     templateFileId: "query_startup",
-    insertExtraImports: insertExtraImports,
-    insertStartImpl: insertStartImpl,
-    insertFinishImpl: insertFinishImpl,
-    insertAdditionalMethods: insertAdditionalMethods,
   );
 
   factory QueryStartHereStartupT.example() {

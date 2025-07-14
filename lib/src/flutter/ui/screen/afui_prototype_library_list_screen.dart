@@ -11,7 +11,7 @@ import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 
 class AFUIPrototypeLibraryListScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFRouteParam> {
-  const AFUIPrototypeLibraryListScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIPrototypeLibraryListScreenSPI(super.context, super.standard);
   
   factory AFUIPrototypeLibraryListScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard) {
     return AFUIPrototypeLibraryListScreenSPI(context, standard,

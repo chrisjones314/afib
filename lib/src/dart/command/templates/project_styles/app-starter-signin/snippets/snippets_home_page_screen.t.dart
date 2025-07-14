@@ -156,12 +156,10 @@ TableRow _createDetailRow(HomePageScreenSPI spi, { required AFWidgetID wid, requ
 
 class SnippetHomeScreenBuildWithSPIImplT extends AFSnippetSourceTemplate {
   SnippetHomeScreenBuildWithSPIImplT({
-    required List<String> templateFolder,
-    required AFSourceTemplateInsertions? embeddedInsertions,
+    required super.templateFolder,
+    required super.embeddedInsertions,
   }): super(
-    templateFileId: "screen_build_with_spi_impl",
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions
+    templateFileId: "screen_build_with_spi_impl"
   );
 
   factory SnippetHomeScreenBuildWithSPIImplT.example() {

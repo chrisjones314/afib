@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 
 
 class AFUIPrototypeWaitingScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFRouteParam> {
-  const AFUIPrototypeWaitingScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard): super(context, standard );
+  const AFUIPrototypeWaitingScreenSPI(super.context, super.standard);
   
   factory AFUIPrototypeWaitingScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParam> context, AFStandardSPIData standard) {
     return AFUIPrototypeWaitingScreenSPI(context, standard,

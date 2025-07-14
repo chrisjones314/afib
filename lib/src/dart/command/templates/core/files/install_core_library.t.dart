@@ -5,10 +5,8 @@ class InstallCoreLibraryT extends AFCoreFileSourceTemplate {
   final bool defineFundamentalTheme;
   InstallCoreLibraryT({
     required this.defineFundamentalTheme,
-    required String templateFileId,
-  }): super(
-    templateFileId: templateFileId,
-  );
+    required super.templateFileId,
+  });
 
 
   @override

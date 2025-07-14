@@ -7,9 +7,9 @@ import 'package:meta/meta.dart';
 @immutable
 abstract class AFFlexibleStateView extends AFComponentState {
   AFFlexibleStateView({
-    required Map<String, Object> models,
-    required AFCreateStateViewDelegate create,
-  }): super(models: models, create: create);
+    required super.models,
+    required AFCreateStateViewDelegate super.create,
+  });
 
   static Map<String, Object> createModels(Iterable<Object> toIntegrate) {
     return AFComponentState.createModels(toIntegrate);

@@ -6,14 +6,10 @@ class SnippetScreenParamsConstructorT extends AFSnippetSourceTemplate {
   static const insertExtraConstructorParams = AFSourceTemplateInsertion("extra_constructor_params");
   
   SnippetScreenParamsConstructorT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    required AFSourceTemplateInsertions? embeddedInsertions,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions
-  );
+    required super.templateFileId,
+    required super.templateFolder,
+    required super.embeddedInsertions,
+  });
 
   factory SnippetScreenParamsConstructorT.core() {
     return SnippetScreenParamsConstructorT(

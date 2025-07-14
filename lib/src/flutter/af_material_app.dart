@@ -51,10 +51,8 @@ abstract class AFMaterialApp<AppState> extends AFApp<AppState> {
   
   /// Construct an app with the specified [AFScreenMap]
   const AFMaterialApp({
-    Key? key,
-  }): super(
-    key: key,
-  );
+    super.key,
+  });
   
   /// This widget is the root of your application
   @override

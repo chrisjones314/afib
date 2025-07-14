@@ -160,20 +160,13 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
   final bool allowMultiple;
   
   AFConfigurationItemOptionChoice({ 
-    required AFLibraryID libraryId,
-    required String name, 
-    required dynamic defaultValue, 
-    required int validContexts, 
-    required double ordinal, 
-    String help = "", 
-    this.allowMultiple = false }): super(
-      libraryId: libraryId,
-      name: name, 
-      defaultValue: defaultValue, 
-      validContexts: validContexts, 
-      ordinal: ordinal, 
-      help: help
-    );
+    required super.libraryId,
+    required super.name, 
+    required super.defaultValue, 
+    required super.validContexts, 
+    required super.ordinal, 
+    super.help = "", 
+    this.allowMultiple = false });
 
   void addChoiceSection(String title) {
     choices.add(AFConfigEntryDescription(
@@ -277,20 +270,13 @@ class AFConfigurationItemOptionChoice extends AFConfigurationItem {
 class AFConfigurationItemString extends AFConfigurationItem {
 
   AFConfigurationItemString({ 
-    required AFLibraryID libraryId,
-    required String name, 
-    required int validContexts, 
-    required double ordinal, 
-    required String defaultValue, 
-    required String help 
-  }): super(
-    libraryId: libraryId,
-    name: name, 
-    defaultValue: defaultValue, 
-    validContexts: validContexts, 
-    ordinal: ordinal, 
-    help: help
-  );
+    required super.libraryId,
+    required super.name, 
+    required super.validContexts, 
+    required super.ordinal, 
+    required String super.defaultValue, 
+    required super.help 
+  });
 
    @override
   void addArguments(args.ArgParser argParser) {
@@ -314,19 +300,13 @@ class AFConfigurationItemString extends AFConfigurationItem {
 class AFConfigurationItemTrueFalse extends AFConfigurationItemOptionChoice {
 
   AFConfigurationItemTrueFalse({ 
-    required AFLibraryID libraryId,
-    required String name, 
-    required int validContexts, 
-    required double ordinal, 
-    required bool defaultValue, 
-    required String help 
-  }): super(
-    libraryId: libraryId,
-    name: name, 
-    defaultValue: defaultValue, 
-    validContexts: validContexts, 
-    ordinal: ordinal, help: help
-  ) {
+    required super.libraryId,
+    required super.name, 
+    required super.validContexts, 
+    required super.ordinal, 
+    required bool super.defaultValue, 
+    required super.help 
+  }) {
     addChoice(textValue: "true", runtimeValue: true, help: "");
     addChoice(textValue: "false", runtimeValue: false, help: "");
   }
@@ -348,21 +328,15 @@ class AFConfigurationItemInt extends AFConfigurationItem {
   final int max;
 
   AFConfigurationItemInt({ 
-    required AFLibraryID libraryId,
-    required String name, 
-    required int validContexts, 
-    required double ordinal, 
-    required int defaultValue, 
+    required super.libraryId,
+    required super.name, 
+    required super.validContexts, 
+    required super.ordinal, 
+    required int super.defaultValue, 
     required this.min,
     required this.max,
-    required String help 
-  }): super(
-    libraryId: libraryId,
-    name: name, 
-    defaultValue: defaultValue, 
-    validContexts: validContexts, 
-    ordinal: ordinal, help: help
-  );
+    required super.help 
+  });
 
   @override
   void addArguments(args.ArgParser argParser) {
@@ -407,23 +381,16 @@ class AFConfigurationItemOption extends AFConfigurationItem {
   final int options;
 
   AFConfigurationItemOption({
-    required AFLibraryID libraryId,
-    required String name, 
-    required String help, 
-    required int validContexts, 
-    required double ordinal, 
-    String defaultValue = "",
+    required super.libraryId,
+    required super.name, 
+    required super.help, 
+    required super.validContexts, 
+    required super.ordinal, 
+    String super.defaultValue = "",
     this.minChars = -1, 
     this.maxChars = -1, 
     this.options = 0 
-  }): super(
-    libraryId: libraryId,
-    name: name, 
-    help: help,
-    validContexts: validContexts, 
-    ordinal: ordinal,
-    defaultValue: defaultValue,
-  );
+  });
 
   @override
   void addArguments(args.ArgParser argParser) {

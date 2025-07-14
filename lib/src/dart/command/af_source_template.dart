@@ -261,8 +261,8 @@ abstract class AFPathSourceTemplate extends AFSourceTemplate {
   const AFPathSourceTemplate({
     required this.templateFolder,
     required this.templateFileId,
-    AFSourceTemplateInsertions? embeddedInsertions, 
-  }): super(embeddedInsertions: embeddedInsertions);
+    super.embeddedInsertions, 
+  });
 
   String get templateId => joinAll(templatePath);
 
@@ -277,26 +277,20 @@ abstract class AFPathSourceTemplate extends AFSourceTemplate {
 abstract class AFSnippetSourceTemplate extends AFPathSourceTemplate {  
 
   const AFSnippetSourceTemplate({
-    required List<String> templateFolder,
-    required String templateFileId,
-    AFSourceTemplateInsertions? embeddedInsertions, 
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions
-  );
+    required super.templateFolder,
+    required super.templateFileId,
+    super.embeddedInsertions, 
+  });
 }
 
 /// Superclass for a snippet of code which is inserted in a file, and is part of AFib's core (e.g. not from a project style)
 abstract class AFCoreSnippetSourceTemplate extends AFSnippetSourceTemplate {  
 
   const AFCoreSnippetSourceTemplate({
-    String templateFileId = "TODO",
-    AFSourceTemplateInsertions? embeddedInsertions, 
+    super.templateFileId = "TODO",
+    super.embeddedInsertions, 
   }): super(
-    templateFileId: templateFileId,
-    templateFolder: AFProjectPaths.pathGenerateCoreSnippets,
-    embeddedInsertions: embeddedInsertions
+    templateFolder: AFProjectPaths.pathGenerateCoreSnippets
   );
 }
 
@@ -308,14 +302,10 @@ abstract class AFFileSourceTemplate extends AFPathSourceTemplate {
   static const templatePathExample = "examples";
   
   const AFFileSourceTemplate({
-    required List<String> templateFolder,
-    required String templateFileId,
-    AFSourceTemplateInsertions? embeddedInsertions, 
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions
-  );
+    required super.templateFolder,
+    required super.templateFileId,
+    super.embeddedInsertions, 
+  });
 
 
   AFGeneratedFile createGeneratedTemplate(AFCommandContext context) {
@@ -328,12 +318,10 @@ abstract class AFFileSourceTemplate extends AFPathSourceTemplate {
 abstract class AFCoreFileSourceTemplate extends AFFileSourceTemplate {
 
  const AFCoreFileSourceTemplate({
-    required String templateFileId,
-    AFSourceTemplateInsertions? embeddedInsertions, 
+    required super.templateFileId,
+    super.embeddedInsertions, 
   }): super(
-    templateFileId: templateFileId,
     templateFolder: AFProjectPaths.pathGenerateCoreFiles,
-    embeddedInsertions: embeddedInsertions,
   );
 
 }
@@ -341,12 +329,10 @@ abstract class AFCoreFileSourceTemplate extends AFFileSourceTemplate {
 
 abstract class AFProjectStyleSourceTemplate extends AFFileSourceTemplate {
   const AFProjectStyleSourceTemplate({
-    required String templateFileId,
-    AFSourceTemplateInsertions? embeddedInsertions, 
+    required super.templateFileId,
+    super.embeddedInsertions, 
   }): super(
-    templateFileId: templateFileId,
-    templateFolder: AFProjectPaths.pathProjectStyles,
-    embeddedInsertions: embeddedInsertions
+    templateFolder: AFProjectPaths.pathProjectStyles
   );
 }
 

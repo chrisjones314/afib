@@ -5,10 +5,9 @@ class ModelCountHistoryRootT extends ModelExampleStartHereT {
   
   ModelCountHistoryRootT({
     List<String>? templatePath,
-    AFSourceTemplateInsertions? embeddedInsertions,
+    super.embeddedInsertions,
   }): super(
     templateFileId: "model_count_history_items_root",
-    embeddedInsertions: embeddedInsertions,
   );  
 
   factory ModelCountHistoryRootT.example() {

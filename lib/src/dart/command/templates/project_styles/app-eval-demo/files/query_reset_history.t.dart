@@ -5,16 +5,12 @@ import 'package:afib/src/dart/command/templates/project_styles/app-eval-demo/fil
 
 class QueryResetHistoryT extends QueryExampleStartHereT {
   QueryResetHistoryT({
-    required Object insertExtraImports,
-    required Object insertStartImpl,
-    required Object insertFinishImpl,
-    required Object insertAdditionalMethods,
+    required super.insertExtraImports,
+    required super.insertStartImpl,
+    required super.insertFinishImpl,
+    required super.insertAdditionalMethods,
   }): super(
     templateFileId: "query_reset_history",
-    insertExtraImports: insertExtraImports,
-    insertStartImpl: insertStartImpl,
-    insertFinishImpl: insertFinishImpl,
-    insertAdditionalMethods: insertAdditionalMethods,
   );
 
   factory QueryResetHistoryT.example() {

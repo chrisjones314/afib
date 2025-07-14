@@ -17,14 +17,10 @@ class ModelT extends AFFileSourceTemplate {
   static const insertInitialState = AFSourceTemplateInsertion("initial_state");
   
   ModelT({
-    required List<String> templateFolder,
-    required String templateFileId,
-    AFSourceTemplateInsertions? embeddedInsertions,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions,
-  );
+    required super.templateFolder,
+    required super.templateFileId,
+    super.embeddedInsertions,
+  });
 
   factory ModelT.core({
     required bool isRoot,

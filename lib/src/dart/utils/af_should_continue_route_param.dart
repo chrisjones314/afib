@@ -1,5 +1,4 @@
 
-import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 
 enum AFShouldContinue {
@@ -11,9 +10,9 @@ class AFShouldContinueRouteParam extends AFDialogRouteParam {
   final AFShouldContinue shouldContinue;
 
   AFShouldContinueRouteParam({
-    required AFScreenID screenId,
+    required super.screenId,
     required this.shouldContinue,
-  }): super(screenId: screenId);
+  });
 
   AFShouldContinueRouteParam copyWith({
     AFShouldContinue? shouldContinue

@@ -7,21 +7,15 @@ import 'package:afib/src/dart/command/templates/project_styles/app-starter-signi
 
 class QueryCheckSigninSigninFirebaseStarterT extends SimpleQueryT {
   QueryCheckSigninSigninFirebaseStarterT({
-    required Object insertExtraImports,
-    required Object insertStartImpl,
-    required Object insertFinishImpl,
-    required Object insertAdditionalMethods,
-    required Object insertMemberVariables,
-    required Object insertConstructorParams,
+    required Object super.insertExtraImports,
+    required Object super.insertStartImpl,
+    required Object super.insertFinishImpl,
+    required Object super.insertAdditionalMethods,
+    required super.insertMemberVariables,
+    required super.insertConstructorParams,
   }): super.withMemberVariables(
     templateFileId: "query_check_signin",
     templateFolder: AFProjectPaths.pathGenerateStarterSigninFirebaseFiles,
-    insertExtraImports: insertExtraImports,
-    insertStartImpl: insertStartImpl,
-    insertFinishImpl: insertFinishImpl,
-    insertAdditionalMethods: insertAdditionalMethods,
-    insertConstructorParams: insertConstructorParams,
-    insertMemberVariables: insertMemberVariables,
   );
 
   factory QueryCheckSigninSigninFirebaseStarterT.example() {

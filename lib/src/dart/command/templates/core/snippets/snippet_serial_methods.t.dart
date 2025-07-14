@@ -11,13 +11,11 @@ class SnippetSerialMethodsT extends AFSnippetSourceTemplate {
   static const insertSerializeFromBody = AFSourceTemplateInsertion("serialize_from_body");
 
   SnippetSerialMethodsT({
-    required String templateFileId,
-    required List<String> templateFolder,
+    required super.templateFileId,
+    required super.templateFolder,
     required Object serializeFrom,
     required Object serializeTo,
   }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
     embeddedInsertions: AFSourceTemplateInsertions(insertions: {
       insertSerializeToBody: serializeTo,
       insertSerializeFromBody: serializeFrom,

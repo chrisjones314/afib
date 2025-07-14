@@ -6,12 +6,10 @@ class SnippetScreenBuildWithSPIImplT extends AFSnippetSourceTemplate {
   
   SnippetScreenBuildWithSPIImplT({
     String? templateFileId,
-    required List<String> templateFolder,
-    required AFSourceTemplateInsertions? embeddedInsertions,
+    required super.templateFolder,
+    required super.embeddedInsertions,
   }): super(
-    templateFileId: templateFileId ?? "screen_build_with_spi_impl",
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions
+    templateFileId: templateFileId ?? "screen_build_with_spi_impl"
   );
 
   factory SnippetScreenBuildWithSPIImplT.core() {

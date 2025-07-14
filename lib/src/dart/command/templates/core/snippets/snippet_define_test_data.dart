@@ -14,14 +14,10 @@ class SnippetDefineTestDataT extends AFSnippetSourceTemplate {
   static const insertModelCall = AFSourceTemplateInsertion("model_call");
 
   SnippetDefineTestDataT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    AFSourceTemplateInsertions? embeddedInsertions,     
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions,
-  );
+    required super.templateFileId,
+    required super.templateFolder,
+    super.embeddedInsertions,     
+  });
 
   factory SnippetDefineTestDataT.core() {
     return SnippetDefineTestDataT(

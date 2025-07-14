@@ -3,16 +3,14 @@ import 'dart:io';
 import 'package:afib/src/dart/redux/actions/af_app_state_actions.dart';
 import 'package:afib/src/dart/redux/actions/af_async_query.dart';
 import 'package:afib/src/dart/redux/state/models/af_app_platform_info_state.dart';
-import 'package:afib/src/flutter/utils/af_typedefs_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class AFAppPlatformInfoQuery extends AFAsyncQuery<AFAppPlatformInfoState> {
 
   AFAppPlatformInfoQuery({    
-    AFOnResponseDelegate<AFAppPlatformInfoState>? onSuccess,
-    AFPreExecuteResponseDelegate<AFAppPlatformInfoState>? onPreExecuteResponse,
-  }):
-    super(onSuccess: onSuccess, onPreExecuteResponse: onPreExecuteResponse);
+    super.onSuccess,
+    super.onPreExecuteResponse,
+  });
 
   @override
   void startAsync(AFStartQueryContext<AFAppPlatformInfoState> context) {

@@ -7,14 +7,12 @@ class StarterSigninStateTestT extends AFFileSourceTemplate {
   static const insertReadUserQuery = AFSourceTemplateInsertion("read_user_query");
 
   StarterSigninStateTestT({
-    required String templateFileId,
-    required List<String> templateFolder,
+    required super.templateFileId,
+    required super.templateFolder,
     required Object checkSigninQuery,
     required Object readUserQuery,
     required Object extraImports,
   }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
     embeddedInsertions: AFSourceTemplateInsertions(insertions: {
       insertCheckSigninQuery: checkSigninQuery,
       insertReadUserQuery: readUserQuery,

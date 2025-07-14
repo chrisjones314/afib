@@ -5,13 +5,11 @@ import 'package:afib/src/dart/command/af_source_template.dart';
 class LPIT extends AFFileSourceTemplate {
 
   LPIT({
-    required String templateFileId,
-    required List<String> templateFolder,
+    required super.templateFileId,
+    required super.templateFolder,
     required Object insertExtraImports,
     required Object insertAdditionalMethods,
   }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
     embeddedInsertions: AFSourceTemplateInsertions(insertions: {
       AFSourceTemplate.insertExtraImportsInsertion: insertExtraImports,
       AFSourceTemplate.insertAdditionalMethodsInsertion: insertAdditionalMethods,

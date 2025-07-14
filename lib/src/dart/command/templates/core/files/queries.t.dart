@@ -9,16 +9,14 @@ class SimpleQueryT extends AFFileSourceTemplate {
   static const insertFinishImplInsertion = AFSourceTemplateInsertion("finish_impl");
 
   SimpleQueryT({
-    required String templateFileId,
-    required List<String> templateFolder,
+    required super.templateFileId,
+    required super.templateFolder,
     Object? insertExtraImports,
     Object? insertStartImpl,
     Object? insertFinishImpl,
     Object? insertAdditionalMethods,
     Object? insertSuperParams
   }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
     embeddedInsertions: AFSourceTemplateInsertions(
       insertions: <AFSourceTemplateInsertion, Object>{
         AFSourceTemplate.insertExtraImportsInsertion: insertExtraImports ?? AFSourceTemplate.empty,
@@ -33,8 +31,8 @@ throwUnimplemented();
   );
 
   SimpleQueryT.withMemberVariables({
-    required String templateFileId,
-    required List<String> templateFolder,
+    required super.templateFileId,
+    required super.templateFolder,
     Object? insertExtraImports,
     Object? insertStartImpl,
     Object? insertFinishImpl,
@@ -43,8 +41,6 @@ throwUnimplemented();
     required Object insertConstructorParams,
     required Object insertMemberVariables,
   }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
     embeddedInsertions: AFSourceTemplateInsertions(
       insertions: <AFSourceTemplateInsertion, Object>{
         AFSourceTemplate.insertExtraImportsInsertion: insertExtraImports ?? AFSourceTemplate.empty,
@@ -179,18 +175,12 @@ class $insertQueryType extends $insertQueryParentType<$insertResultType> {
 class DeferredQueryT extends SimpleQueryT {
 
   DeferredQueryT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    AFSourceTemplate? insertStartImpl,
-    AFSourceTemplate? insertFinishImpl = const SnippetReturnNullT(),
-    AFSourceTemplate? insertAdditionalMethods,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    insertStartImpl: insertStartImpl,
-    insertFinishImpl: insertFinishImpl,
-    insertAdditionalMethods: insertAdditionalMethods,
-  );
+    required super.templateFileId,
+    required super.templateFolder,
+    AFSourceTemplate? super.insertStartImpl,
+    AFSourceTemplate? super.insertFinishImpl = const SnippetReturnNullT(),
+    AFSourceTemplate? super.insertAdditionalMethods,
+  });
 
   factory DeferredQueryT.core() {
      return DeferredQueryT(
@@ -235,18 +225,12 @@ class ${insertQueryType}Query extends AFDeferredQuery {
 class IsolateQueryT extends SimpleQueryT {
 
   IsolateQueryT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    AFSourceTemplate? insertStartImpl,
-    AFSourceTemplate? insertFinishImpl,
-    AFSourceTemplate? insertAdditionalMethods,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    insertStartImpl: insertStartImpl,
-    insertFinishImpl: insertFinishImpl,
-    insertAdditionalMethods: insertAdditionalMethods,
-  );
+    required super.templateFileId,
+    required super.templateFolder,
+    AFSourceTemplate? super.insertStartImpl,
+    AFSourceTemplate? super.insertFinishImpl,
+    AFSourceTemplate? super.insertAdditionalMethods,
+  });
 
   factory IsolateQueryT.core() {
      return IsolateQueryT(

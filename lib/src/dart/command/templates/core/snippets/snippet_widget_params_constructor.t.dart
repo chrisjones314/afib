@@ -6,14 +6,10 @@ class SnippetWidgetParamsConstructorT extends AFSnippetSourceTemplate {
   static const insertExtraConstructorParams = AFSourceTemplateInsertion("extra_constructor_params");
   
   SnippetWidgetParamsConstructorT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    required AFSourceTemplateInsertions? embeddedInsertions,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions
-  );
+    required super.templateFileId,
+    required super.templateFolder,
+    required super.embeddedInsertions,
+  });
 
   factory SnippetWidgetParamsConstructorT.core() {
     return SnippetWidgetParamsConstructorT(

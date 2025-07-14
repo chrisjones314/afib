@@ -29,7 +29,7 @@ class AFUIStandardChoiceDialogRouteParam extends AFDialogRouteParam {
 }
 
 class AFUIStandardChoiceDialogSPI extends AFUIDialogSPI<AFUIDefaultStateView, AFUIStandardChoiceDialogRouteParam> {
-  const AFUIStandardChoiceDialogSPI(AFBuildContext<AFUIDefaultStateView, AFUIStandardChoiceDialogRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIStandardChoiceDialogSPI(super.context, super.standard);
   
   factory AFUIStandardChoiceDialogSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIStandardChoiceDialogRouteParam> context, AFStandardSPIData standard) {
     return AFUIStandardChoiceDialogSPI(context, standard);

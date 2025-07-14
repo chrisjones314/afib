@@ -1,5 +1,4 @@
 
-import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
@@ -11,7 +10,7 @@ import 'package:flutter/material.dart';
 class AFUICompleteProjectStyleWidgetSPI extends AFUIWidgetSPI<AFUIDefaultStateView, AFRouteParamUnused> {
 
   //--------------------------------------------------------------------------------------
-  const AFUICompleteProjectStyleWidgetSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard): super(context, standard);
+  const AFUICompleteProjectStyleWidgetSPI(super.context, super.standard);
   factory AFUICompleteProjectStyleWidgetSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard) {
     return AFUICompleteProjectStyleWidgetSPI(context, standard);
   }
@@ -30,13 +29,11 @@ class AFUICompleteProjectStyleWidget extends AFUIConnectedWidget<AFUICompletePro
 
   //--------------------------------------------------------------------------------------
   AFUICompleteProjectStyleWidget({
-    AFScreenID? screenIdOverride,
-    AFWidgetID? widOverride,
+    super.screenIdOverride,
+    super.widOverride,
     required this.projectStyle,
   }): super(
     uiConfig: config,
-    screenIdOverride: screenIdOverride, 
-    widOverride: widOverride,
     launchParam: AFRouteParamUnused.unused,
   );
 

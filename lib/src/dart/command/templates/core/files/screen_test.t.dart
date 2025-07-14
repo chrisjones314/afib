@@ -6,12 +6,9 @@ class ScreenTestT extends AFCoreFileSourceTemplate {
   static const insertSmokeTestImpl = AFSourceTemplateInsertion("smoke_test_impl");
 
   ScreenTestT({
-    required String templateFileId,
-    AFSourceTemplateInsertions? embeddedInsertions,
-  }): super(
-    templateFileId: templateFileId,
-    embeddedInsertions: embeddedInsertions,
-  );  
+    required super.templateFileId,
+    super.embeddedInsertions,
+  });  
 
   factory ScreenTestT.core() {
     return ScreenTestT(

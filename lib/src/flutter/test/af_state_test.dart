@@ -98,11 +98,11 @@ abstract class AFStateTestContext extends AFStateTestExecute {
 class AFStateTestContextForState extends AFStateTestContext {
 
   AFStateTestContextForState(
-    AFStateTest test, 
+    super.test, 
     AFConceptualStore targetStore, {      
-      required bool isTrueTestContext
+      required super.isTrueTestContext
     }
-  ): super(test, isTrueTestContext: isTrueTestContext, targetStore: targetStore);
+  ): super(targetStore: targetStore);
 
 
   @override
@@ -117,11 +117,11 @@ class AFStateTestContextForState extends AFStateTestContext {
 class AFStateTestContextForScreen extends AFStateTestContext {
 
   AFStateTestContextForScreen(
-    AFStateTest test,
+    super.test,
     AFConceptualStore targetStore, {
-      required bool isTrueTestContext
+      required super.isTrueTestContext
     }
-  ): super(test, isTrueTestContext: isTrueTestContext, targetStore: targetStore);
+  ): super(targetStore: targetStore);
 
 
   @override
@@ -347,7 +347,7 @@ class _AFStateTestQueryStatement extends _AFStateTestExecutionStatement {
 }
 
 class _AFStateTestStartupStatement extends _AFStateTestQueryStatement {
-  _AFStateTestStartupStatement(List<AFAsyncQuery> queries): super(queries);  
+  _AFStateTestStartupStatement(super.queries);  
 }
 
 class _AFStateTestVerifyStatement extends _AFStateTestExecutionStatement {
@@ -688,9 +688,9 @@ abstract class AFStateTestScreenContext<TSPI extends AFStateProgrammingInterface
 
 class AFStateTestScreenContextForState<TSPI extends AFStateProgrammingInterface> extends AFStateTestScreenContext<TSPI>  {
   AFStateTestScreenContextForState({
-    required AFScreenID screenId,
-    required AFConnectedUIConfig screenConfig,
-  }): super(screenId: screenId, screenConfig: screenConfig);
+    required super.screenId,
+    required super.screenConfig,
+  });
 
   @override
   TSPI createScreenSPI({ required AFRouteParam? launchParam }) {
@@ -709,9 +709,9 @@ class AFStateTestScreenContextForState<TSPI extends AFStateProgrammingInterface>
 
 class AFStateTestScreenContextForScreen<TSPI extends AFStateProgrammingInterface> extends AFStateTestScreenContext<TSPI>  {
   AFStateTestScreenContextForScreen({
-    required AFScreenID screenId,
-    required AFConnectedUIConfig screenConfig,
-  }): super(screenId: screenId, screenConfig: screenConfig);
+    required super.screenId,
+    required super.screenConfig,
+  });
 
   @override
   TSPI createScreenSPI({ required AFRouteParam? launchParam }) {
@@ -743,7 +743,7 @@ class AFStateTestScreenLikeShortcut<TSPI extends AFScreenStateProgrammingInterfa
 
 class AFStateTestScreenShortcut<TSPI extends AFScreenStateProgrammingInterface> extends AFStateTestScreenLikeShortcut<TSPI> {
 
-  AFStateTestScreenShortcut(AFSpecificStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
+  AFStateTestScreenShortcut(super.testContext, super.screenId);
 
   void executeScreen(AFStateTestScreenHandlerDelegate<TSPI> handler, { bool verifyIsActiveScreen = true }) {
     testContext.executeScreen<TSPI>(screenId, handler, verifyIsActiveScreen: verifyIsActiveScreen);
@@ -758,7 +758,7 @@ class AFStateTestScreenShortcut<TSPI extends AFScreenStateProgrammingInterface> 
 
 class AFStateTestDrawerShortcut<TSPI extends AFDrawerStateProgrammingInterface> extends AFStateTestScreenLikeShortcut<TSPI> {
 
-  AFStateTestDrawerShortcut(AFSpecificStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
+  AFStateTestDrawerShortcut(super.testContext, super.screenId);
 
   void executeDrawer(AFStateTestScreenHandlerDelegate<TSPI> handler) {
     testContext.executeDrawer<TSPI>(screenId, handler);
@@ -774,7 +774,7 @@ class AFStateTestDrawerShortcut<TSPI extends AFDrawerStateProgrammingInterface> 
 
 class AFStateTestDialogShortcut<TSPI extends AFDialogStateProgrammingInterface> extends AFStateTestScreenLikeShortcut<TSPI> {
 
-  AFStateTestDialogShortcut(AFSpecificStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
+  AFStateTestDialogShortcut(super.testContext, super.screenId);
 
   void executeDialog(AFStateTestScreenHandlerDelegate<TSPI> handler) {
     testContext.executeDialog<TSPI>(screenId, handler);
@@ -790,7 +790,7 @@ class AFStateTestDialogShortcut<TSPI extends AFDialogStateProgrammingInterface> 
 
 class AFStateTestBottomSheetShortcut<TSPI extends AFBottomSheetStateProgrammingInterface> extends AFStateTestScreenLikeShortcut<TSPI> {
 
-  AFStateTestBottomSheetShortcut(AFSpecificStateTestDefinitionContext testContext, AFScreenID screenId): super(testContext, screenId);
+  AFStateTestBottomSheetShortcut(super.testContext, super.screenId);
 
   void executeBottomSheet(AFStateTestScreenHandlerDelegate<TSPI> handler) {
     testContext.executeBottomSheet<TSPI>(screenId, handler);

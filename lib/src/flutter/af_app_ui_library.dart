@@ -6,7 +6,7 @@ import 'package:afib/src/flutter/utils/afib_f.dart';
 import 'package:flutter/material.dart';
 
 class AFAppUILibrary extends AFMaterialApp<AFComponentState> {
-  const AFAppUILibrary({Key? key}) : super(key: key);
+  const AFAppUILibrary({super.key});
 
   //----------------------------------------------------------------------------
   @override

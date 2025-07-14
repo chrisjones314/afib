@@ -28,12 +28,9 @@ class AFCurrentStateContext with AFStandardAPIContextMixin, AFStandardNavigateMi
 
 class AFLibraryProgrammingInterfaceContext extends AFCurrentStateContext implements AFStandardAPIContextInterface {
   AFLibraryProgrammingInterfaceContext({
-    required AFDispatcher dispatcher,
-    required AFConceptualStore targetStore,
-  }): super(
-    dispatcher: dispatcher,
-    targetStore: targetStore,
-  );
+    required super.dispatcher,
+    required super.targetStore,
+  });
 
   Logger? get log {
     return AFibD.log(AFConfigEntryLogArea.query);

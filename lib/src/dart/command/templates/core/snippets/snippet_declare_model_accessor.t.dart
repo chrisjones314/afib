@@ -6,12 +6,10 @@ class SnippetDeclareModelAccessorT extends AFSnippetSourceTemplate {
 
   SnippetDeclareModelAccessorT({
     String? templateFileId,
-    required List<String> templateFolder,
-    required AFSourceTemplateInsertions? embeddedInsertions,
+    required super.templateFolder,
+    required super.embeddedInsertions,
   }): super(
     templateFileId: templateFileId ?? "declare_root_accessor",
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions,
   );
 
   factory SnippetDeclareModelAccessorT.core() {

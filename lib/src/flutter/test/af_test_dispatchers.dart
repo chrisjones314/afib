@@ -23,8 +23,8 @@ abstract class AFTestDispatcher extends AFDispatcher {
 class AFStateScreenTestDispatcher extends AFTestDispatcher {
   
   AFStateScreenTestDispatcher(
-    AFDispatcher main
-  ): super(main);
+    super.main
+  );
 
   @override
   void dispatch(dynamic action) {
@@ -41,7 +41,7 @@ class AFStateScreenTestDispatcher extends AFTestDispatcher {
 
 abstract class AFScreenTestDispatcher extends AFTestDispatcher {
   AFScreenTestContext? testContext;
-  AFScreenTestDispatcher(AFDispatcher main, this.testContext): super(main);
+  AFScreenTestDispatcher(super.main, this.testContext);
 
   void setContext(AFScreenTestContext context) {
     testContext = context;

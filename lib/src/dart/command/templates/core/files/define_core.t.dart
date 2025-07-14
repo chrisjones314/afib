@@ -34,14 +34,10 @@ class DefineCoreT extends AFFileSourceTemplate {
   static const insertAddStateViewAugmentor = AFSourceTemplateInsertion("add_state_view_augmentor");
 
   DefineCoreT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    required AFSourceTemplateInsertions? embeddedInsertions,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions,
-  );
+    required super.templateFileId,
+    required super.templateFolder,
+    required super.embeddedInsertions,
+  });
 
   factory DefineCoreT.core() {
     return DefineCoreT(

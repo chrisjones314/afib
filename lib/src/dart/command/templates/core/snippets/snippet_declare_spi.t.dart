@@ -10,14 +10,10 @@ class SnippetDeclareSPIT extends AFSnippetSourceTemplate {
   static const insertSPIOnUpdateMethods = AFSourceTemplateInsertion("spi_on_update_methods");
 
   SnippetDeclareSPIT({
-    required String templateFileId,
-    required List<String> templateFolder,
-    AFSourceTemplateInsertions? embeddedInsertions,
-  }): super(
-    templateFileId: templateFileId,
-    templateFolder: templateFolder,
-    embeddedInsertions: embeddedInsertions,
-  );
+    required super.templateFileId,
+    required super.templateFolder,
+    super.embeddedInsertions,
+  });
 
   factory SnippetDeclareSPIT.core() {
     return SnippetDeclareSPIT(

@@ -51,7 +51,7 @@ class AFUIStateTestListScreenParam extends AFScreenRouteParam {
 
 class AFUIStateTestListScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIStateTestListScreenParam> {
   static const rootParentName = "root";
-  const AFUIStateTestListScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIStateTestListScreenParam> context, AFStandardSPIData standard): super(context, standard );
+  const AFUIStateTestListScreenSPI(super.context, super.standard);
   
   factory AFUIStateTestListScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIStateTestListScreenParam> context, AFStandardSPIData standard) {
     return AFUIStateTestListScreenSPI(context, standard,

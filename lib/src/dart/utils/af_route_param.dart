@@ -71,63 +71,49 @@ class AFRouteParam {
 
 class AFScreenRouteParam extends AFRouteParam {
   AFScreenRouteParam({
-    required AFScreenID screenId,
-    AFRouteLocation routeLocation = AFRouteLocation.screenHierarchy,
-    AFTimeStateUpdateSpecificity? timeSpecificity,
-    AFWidgetID wid = AFUIWidgetID.useScreenParam,
+    required super.screenId,
+    super.routeLocation = AFRouteLocation.screenHierarchy,
+    super.timeSpecificity,
+    super.wid,
   }): super(
-    screenId: screenId,
-    routeLocation: routeLocation,
-    timeSpecificity: timeSpecificity,
     flutterStatePrivate: null,
-    wid: wid,
   );
 }
 
 class AFBottomSheetRouteParam extends AFScreenRouteParam {
   AFBottomSheetRouteParam({
-    required AFScreenID screenId,
-    AFTimeStateUpdateSpecificity? timeSpecificity,
+    required super.screenId,
+    super.timeSpecificity,
   }): super(
-    screenId: screenId,
     routeLocation: AFRouteLocation.globalPool,
-    timeSpecificity: timeSpecificity,
   );
 }
 
 class AFDialogRouteParam extends AFScreenRouteParam {
   AFDialogRouteParam({
-    required AFScreenID screenId,
-    AFTimeStateUpdateSpecificity? timeSpecificity    
+    required super.screenId,
+    super.timeSpecificity    
   }): super(
-    screenId: screenId,
     routeLocation: AFRouteLocation.globalPool,
-    timeSpecificity: timeSpecificity,
   );
 }
 
 
 class AFDrawerRouteParam extends AFScreenRouteParam {
   AFDrawerRouteParam({
-    required AFScreenID screenId,
-    AFTimeStateUpdateSpecificity? timeSpecificity    
+    required super.screenId,
+    super.timeSpecificity    
   }): super(
-    screenId: screenId,
     routeLocation: AFRouteLocation.globalPool,
-    timeSpecificity: timeSpecificity,
   );
 }
 
 class AFWidgetRouteParam extends AFRouteParam {
   AFWidgetRouteParam({
-    required AFScreenID screenId,
-    required AFRouteLocation routeLocation,
-    required AFWidgetID wid,
-  }): super(
-    screenId: screenId,
-    routeLocation: routeLocation,
-    wid: wid,
-  );
+    required super.screenId,
+    required super.routeLocation,
+    required super.wid,
+  });
 }
 
 /// Used internally in test cases where we need to substitute a different screen id,
@@ -138,9 +124,9 @@ class AFRouteParamWrapper extends AFRouteParam {
   final AFRouteParam original;
 
   AFRouteParamWrapper({
-    required AFScreenID screenId,
+    required super.screenId,
     required this.original,
-  }): super(screenId: screenId, routeLocation: original.routeLocation, wid: AFUIWidgetID.useScreenParam);
+  }): super(routeLocation: original.routeLocation, wid: AFUIWidgetID.useScreenParam);
   
   AFRouteParam unwrap() { return original; }
 }
@@ -149,14 +135,10 @@ class AFRouteParamWrapper extends AFRouteParam {
 class AFRouteParamUnused extends AFRouteParam {
   static const unused = AFRouteParamUnused(screenId: AFUIScreenID.unused, routeLocation: AFRouteLocation.globalPool, wid: AFUIWidgetID.useScreenParam);
   const AFRouteParamUnused({ 
-    required AFScreenID screenId, 
-    required AFWidgetID wid, 
-    required AFRouteLocation routeLocation 
-  }): super(
-    screenId: screenId, 
-    wid: wid,
-    routeLocation: routeLocation
-  );
+    required super.screenId, 
+    required super.wid, 
+    required super.routeLocation 
+  });
 
   factory AFRouteParamUnused.forScreen(AFScreenID screenId) {
     return AFRouteParamUnused(
@@ -170,10 +152,10 @@ class AFRouteParamUnused extends AFRouteParam {
 
 class AFRouteParamRef extends AFRouteParam {
   const AFRouteParamRef({ 
-    required AFScreenID screenId,
-     required AFRouteLocation routeLocation,
-     AFWidgetID wid = AFUIWidgetID.useScreenParam,
-  } ): super(screenId: screenId, routeLocation: routeLocation, wid: wid);
+    required super.screenId,
+     required super.routeLocation,
+     super.wid,
+  } );
 
   factory AFRouteParamRef.forScreen(
     AFScreenID screenId, {

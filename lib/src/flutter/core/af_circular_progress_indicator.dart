@@ -11,15 +11,14 @@ class AFCircularProgressIndicator extends StatelessWidget {
   final String? semanticsValue;
   
   const AFCircularProgressIndicator({
-    Key? key,
+    super.key,
     this.childKey,
     this.value, 
     this.backgroundColor, 
     this.valueColor, 
     this.strokeWidth = 4.0, 
     this.semanticsLabel, 
-    this.semanticsValue}): 
-    super(key: key);
+    this.semanticsValue});
 
   @override
   Widget build(BuildContext context) {

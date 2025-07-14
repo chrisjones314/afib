@@ -1,7 +1,6 @@
 
 import 'package:afib/afib_uiid.dart';
 import 'package:afib/src/dart/redux/actions/af_route_actions.dart';
-import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_route_param.dart';
 import 'package:afib/src/flutter/ui/afui_connected_base.dart';
 import 'package:afib/src/flutter/ui/screen/af_connected_screen.dart';
@@ -10,7 +9,7 @@ import 'package:flutter/material.dart';
 
 
 class AFUIDemoModeTransitionScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFRouteParamUnused> {
-  const AFUIDemoModeTransitionScreenSPI(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIDemoModeTransitionScreenSPI(super.context, super.standard);
   
   factory AFUIDemoModeTransitionScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFRouteParamUnused> context, AFStandardSPIData standard) {
     return AFUIDemoModeTransitionScreenSPI(context, standard,
@@ -28,9 +27,9 @@ class AFUIDemoModeTransitionScreen extends AFUIConnectedScreen<AFUIDemoModeTrans
   );
 
   AFUIDemoModeTransitionScreen({ 
-    required AFScreenID screenId,
+    required super.screenId,
     required this.transitionTitle
-  }): super(screenId: screenId, config: config);
+  }): super(config: config);
 
   @override
   Widget buildWithSPI(AFUIDemoModeTransitionScreenSPI spi) {    

@@ -6,7 +6,6 @@ import 'package:afib/src/dart/redux/actions/af_deferred_query.dart';
 import 'package:afib/src/dart/redux/state/af_state.dart';
 import 'package:afib/src/dart/redux/state/af_store.dart';
 import 'package:afib/src/dart/utils/af_exception.dart';
-import 'package:afib/src/dart/utils/af_id.dart';
 import 'package:afib/src/dart/utils/af_query_error.dart';
 import 'package:afib/src/dart/utils/afib_d.dart';
 import 'package:afib/src/flutter/test/af_state_test.dart';
@@ -67,12 +66,10 @@ class AFStartQueryContext<TResponse> extends AFQueryContext {
   final void Function(AFQueryError) onError;
 
   AFStartQueryContext({
-    required AFConceptualStore conceptualStore,
+    required super.conceptualStore,
     required this.onSuccess, 
     required this.onError,
-  }): super(
-    conceptualStore: conceptualStore,
-  );
+  });
 
   Future<AFFinishQuerySuccessContext<TRespLocal>> executeQueryWithAwait<TRespLocal>(AFAsyncQuery query) {
     final completer = Completer<AFFinishQuerySuccessContext<TRespLocal>>();
@@ -88,10 +85,8 @@ class AFStartQueryContext<TResponse> extends AFQueryContext {
 
 class AFFinishQueryContext extends AFQueryContext {
   AFFinishQueryContext({
-    required AFConceptualStore conceptualStore,
-  }): super(
-    conceptualStore: conceptualStore,
-  );
+    required super.conceptualStore,
+  });
 
   AFState get state {
     return AFibF.g.internalOnlyStoreEntry(conceptualStore).store!.state;
@@ -122,10 +117,10 @@ class AFFinishQuerySuccessContext<TResponse> extends AFFinishQueryContext  {
   final TResponse response;
   final bool isPreExecute;
   AFFinishQuerySuccessContext({
-    required AFConceptualStore conceptualStore,
+    required super.conceptualStore,
     required this.response,
     required this.isPreExecute,
-  }): super(conceptualStore: conceptualStore);
+  });
 
 
   TResponse get r {
@@ -136,9 +131,9 @@ class AFFinishQuerySuccessContext<TResponse> extends AFFinishQueryContext  {
 class AFFinishQueryErrorContext extends AFFinishQueryContext {
   final AFQueryError error;
   AFFinishQueryErrorContext({
-    required AFConceptualStore conceptualStore,
+    required super.conceptualStore,
     required this.error
-  }): super(conceptualStore: conceptualStore);
+  });
 
   AFQueryError get e {
     return error;
@@ -174,12 +169,12 @@ abstract class AFAsyncQuery<TResponse> extends AFActionWithKey {
   final int? simulatedLatencyFactor;
 
   AFAsyncQuery({
-    AFID? id, 
+    super.id, 
     this.onSuccess, 
     this.onError, 
     this.onPreExecuteResponse,
     this.simulatedLatencyFactor,
-  }): super(id: id) {
+  }) {
     conceptualStore = AFibF.g.activeConceptualStore;
   }
 
@@ -416,11 +411,11 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
   final AFCompositeQueryResponse queryResponses;
 
   AFCompositeQuery(this.queryResponses, {
-    AFID? id, 
-    AFOnResponseDelegate<AFCompositeQueryResponse>? onSuccess, 
-    AFOnErrorDelegate? onError,     
-    int? simulatedLatencyFactor,
-  }): super(id: id, onSuccess: onSuccess, onError: onError, simulatedLatencyFactor: simulatedLatencyFactor);
+    super.id, 
+    super.onSuccess, 
+    super.onError,     
+    super.simulatedLatencyFactor,
+  });
 
   static List<AFAsyncQuery> createList() {
     return <AFAsyncQuery>[];
@@ -561,11 +556,11 @@ class AFCompositeQuery extends AFAsyncQuery<AFCompositeQueryResponse> {
 /// to shut them down.
 abstract class AFAsyncListenerQuery<TResponse> extends AFAsyncQuery<TResponse> implements AFTrackedQuery {
   AFAsyncListenerQuery({
-    AFID? id, 
-    AFPreExecuteResponseDelegate<TResponse>? onPreExecuteResponse,
-    AFOnResponseDelegate<TResponse>? onSuccess, 
+    super.id, 
+    super.onPreExecuteResponse,
+    super.onSuccess, 
     AFOnErrorDelegate? onError
-  }): super(id: id, onSuccess: onSuccess, onPreExecuteResponse: onPreExecuteResponse);
+  });
 
   void afShutdown() {
     AFibD.logQueryAF?.d("Shutting down listener query $this");

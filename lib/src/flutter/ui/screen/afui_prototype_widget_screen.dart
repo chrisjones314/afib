@@ -15,8 +15,8 @@ class AFUIPrototypeWidgetRouteParam extends AFScreenRouteParam {
 
   AFUIPrototypeWidgetRouteParam({
     required this.test, 
-    required AFWidgetID wid,
-  }): super(screenId: AFUIScreenID.screenPrototypeWidget, wid: wid);
+    required super.wid,
+  }): super(screenId: AFUIScreenID.screenPrototypeWidget);
 
   AFUIPrototypeWidgetRouteParam copyWith({
     AFWidgetPrototype? test,
@@ -30,7 +30,7 @@ class AFUIPrototypeWidgetRouteParam extends AFScreenRouteParam {
 }
 
 class AFUIPrototypeWidgetScreenSPI extends AFUIScreenSPI<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> {
-  const AFUIPrototypeWidgetScreenSPI(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> context, AFStandardSPIData standard): super(context, standard);
+  const AFUIPrototypeWidgetScreenSPI(super.context, super.standard);
   
   factory AFUIPrototypeWidgetScreenSPI.create(AFBuildContext<AFUIDefaultStateView, AFUIPrototypeWidgetRouteParam> context, AFStandardSPIData standard) {
     return AFUIPrototypeWidgetScreenSPI(context, standard,

@@ -9,7 +9,7 @@ import 'package:flutter/widgets.dart';
 
 //--------------------------------------------------------------------------------------
 class AFStartupScreenWrapper extends StatefulWidget {
-  const AFStartupScreenWrapper({Key? key}) : super(key: key);
+  const AFStartupScreenWrapper({super.key});
 
   //--------------------------------------------------------------------------------------
   @override

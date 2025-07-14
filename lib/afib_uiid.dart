@@ -1,5 +1,5 @@
 /// IDs used in the UI provided by AFib, like the prototype mode UI.
-library afib_uiid;
+library;
 
 import 'package:afib/src/dart/utils/af_id.dart';
 

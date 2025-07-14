@@ -411,7 +411,7 @@ class AFibGlobalState {
     if(enableUIRouting) {
       middleware.addAll(createRouteMiddleware());
     }
-    middleware.add(AFQueryMiddleware());
+    middleware.add(AFQueryMiddleware().call);
 
     var initialState = AFState.initialState(conceptual);
     if(publicState != null) {

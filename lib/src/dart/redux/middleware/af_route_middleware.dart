@@ -12,15 +12,15 @@ import 'package:redux/redux.dart';
 //---------------------------------------------------------------------------
 List<Middleware<AFState>> createRouteMiddleware() {
   return [
-    TypedMiddleware<AFState, AFNavigateReplaceAction>(_navigateReplaceAction),
-    TypedMiddleware<AFState, AFNavigateReplaceAllAction>(_navigateReplaceAllAction),
-    TypedMiddleware<AFState, AFNavigatePushAction>(_navigatePushAction),
-    TypedMiddleware<AFState, AFNavigatePopAction>(_navigatePopAction),
-    TypedMiddleware<AFState, AFNavigatePopNAction>(_navigatePopNAction),
-    TypedMiddleware<AFState, AFNavigatePopToAction>(_navigatePopToAction),
-    TypedMiddleware<AFState, AFNavigateExitTestAction>(_navigateExitTestAction),
-    TypedMiddleware<AFState, AFWireframeEventAction>(_navigateWireframe),
-    TypedMiddleware<AFState, AFNavigateSyncNavigatorStateWithRoute>(_navigateSyncNavigatorState),
+    TypedMiddleware<AFState, AFNavigateReplaceAction>(_navigateReplaceAction).call,
+    TypedMiddleware<AFState, AFNavigateReplaceAllAction>(_navigateReplaceAllAction).call,
+    TypedMiddleware<AFState, AFNavigatePushAction>(_navigatePushAction).call,
+    TypedMiddleware<AFState, AFNavigatePopAction>(_navigatePopAction).call,
+    TypedMiddleware<AFState, AFNavigatePopNAction>(_navigatePopNAction).call,
+    TypedMiddleware<AFState, AFNavigatePopToAction>(_navigatePopToAction).call,
+    TypedMiddleware<AFState, AFNavigateExitTestAction>(_navigateExitTestAction).call,
+    TypedMiddleware<AFState, AFWireframeEventAction>(_navigateWireframe).call,
+    TypedMiddleware<AFState, AFNavigateSyncNavigatorStateWithRoute>(_navigateSyncNavigatorState).call,
   ];
 }
 

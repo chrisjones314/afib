@@ -1,7 +1,7 @@
 /// AFib code that depends on flutter.
 ///
 /// Be careful not to reference this library from integration tests.
-library afib_flutter;
+library;
 
 export 'afib_uiid.dart';
 export 'afib_localeid.dart';

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:afib/src/dart/redux/state/models/af_app_state.dart';
 import 'package:afib/src/dart/redux/state/models/af_theme_state.dart';
 import 'package:flutter/material.dart';

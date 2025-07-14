@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:afib/afib_uiid.dart';
 import 'package:afib/src/dart/command/af_command.dart';
 import 'package:afib/src/dart/command/af_command_enums.dart';

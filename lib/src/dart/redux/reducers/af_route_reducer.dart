@@ -5,20 +5,20 @@ import 'package:redux/redux.dart';
 
 //---------------------------------------------------------------------------
 final routeReducer = combineReducers<AFRouteState>([
-  TypedReducer<AFRouteState, AFNavigateReplaceAction>(_navReplace),
-  TypedReducer<AFRouteState, AFNavigateReplaceAllAction>(_navReplaceAll),
-  TypedReducer<AFRouteState, AFNavigatePushAction>(_navPush),
-  TypedReducer<AFRouteState, AFNavigatePopAction>(_navPop),
-  TypedReducer<AFRouteState, AFNavigatePopNAction>(_navPopN),
-  TypedReducer<AFRouteState, AFNavigatePopToAction>(_navPopTo),
-  TypedReducer<AFRouteState, AFNavigateSetParamAction>(_navSetParam),
-  TypedReducer<AFRouteState, AFNavigateExitTestAction>(_navExitTest),
-  TypedReducer<AFRouteState, AFNavigateAddChildParamAction>(_navAddChildParam),
-  TypedReducer<AFRouteState, AFNavigateRemoveChildParamAction>(_navRemoveChildParam),
-  TypedReducer<AFRouteState, AFResetToInitialRouteAction>(_resetToInitialRoute),
-  TypedReducer<AFRouteState, AFUpdateTimeRouteParametersAction>(_updateTimeRouteParameters),
-  TypedReducer<AFRouteState, AFNavigateShowScreenBeginAction>(_navShowScreenBegin),
-  TypedReducer<AFRouteState, AFNavigateShowScreenEndAction>(_navShowScreenEnd),
+  TypedReducer<AFRouteState, AFNavigateReplaceAction>(_navReplace).call,
+  TypedReducer<AFRouteState, AFNavigateReplaceAllAction>(_navReplaceAll).call,
+  TypedReducer<AFRouteState, AFNavigatePushAction>(_navPush).call,
+  TypedReducer<AFRouteState, AFNavigatePopAction>(_navPop).call,
+  TypedReducer<AFRouteState, AFNavigatePopNAction>(_navPopN).call,
+  TypedReducer<AFRouteState, AFNavigatePopToAction>(_navPopTo).call,
+  TypedReducer<AFRouteState, AFNavigateSetParamAction>(_navSetParam).call,
+  TypedReducer<AFRouteState, AFNavigateExitTestAction>(_navExitTest).call,
+  TypedReducer<AFRouteState, AFNavigateAddChildParamAction>(_navAddChildParam).call,
+  TypedReducer<AFRouteState, AFNavigateRemoveChildParamAction>(_navRemoveChildParam).call,
+  TypedReducer<AFRouteState, AFResetToInitialRouteAction>(_resetToInitialRoute).call,
+  TypedReducer<AFRouteState, AFUpdateTimeRouteParametersAction>(_updateTimeRouteParameters).call,
+  TypedReducer<AFRouteState, AFNavigateShowScreenBeginAction>(_navShowScreenBegin).call,
+  TypedReducer<AFRouteState, AFNavigateShowScreenEndAction>(_navShowScreenEnd).call,
 ]);
 
 //---------------------------------------------------------------------------

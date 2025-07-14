@@ -3,7 +3,7 @@
 /// When I looked at the time, it did not seem that Flutter itself provided constants for known language ids,
 /// or even for common language IDs.   Maybe there is a good reason for that, or maybe I missed it, but it seems
 /// to me like something that should be standardized.  So, this is a holding places for that future standardization.
-library afib_localeid;
+library;
 
 import 'dart:ui';
 

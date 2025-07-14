@@ -3,7 +3,7 @@
 /// This code is separated out because it cannot reference flutter UI,
 /// or the command won't load properly.  When creating an AFib command,
 /// you should import this library, not afib_flutter.
-library afib_command;
+library;
 
 export 'afib_uiid.dart'; // ok
 export 'src/dart/command/af_args.dart'; // ok

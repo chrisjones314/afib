@@ -18,6 +18,10 @@ class AFQueryError {
     return AFQueryError(message: message, code: noCode);
   }
 
+  factory AFQueryError.createMessageWithClass(String message, Type classType) {
+    return AFQueryError(message: "$classType: $message", code: noCode);
+  }
+
   factory AFQueryError.createCode(int code) {
     return AFQueryError(message: noMessage, code: code);
   }

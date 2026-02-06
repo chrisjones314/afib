@@ -75,7 +75,7 @@ abstract class AFBaseTestExecute extends AFModelWithCustomID {
     final matchState = <dynamic, dynamic>{};
     if(!addPassIf(test: matcher.matches(value, matchState))) {
       final matchDesc = matcher.describe(flutter_test.StringDescription());
-      final desc = "Expected $matchDesc, found $value";
+      final desc = "Expected $value, found $matchDesc";
       final stackFrames = extraFrames + 2;
       addError(desc, stackFrames);
     }

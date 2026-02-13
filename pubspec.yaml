@@ -27,7 +27,7 @@ dependencies:
   plural_noun: ^0.1.2
   meta: ^1.16.0
   collection: ^1.17.1
-  material_color_utilities: ^0.11.1
+  material_color_utilities: ^0.13.0
   flutter_test:
     sdk: flutter
   

@@ -1719,6 +1719,10 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return AFThemeAreaUtilties.colorLighter(cFound, percent);
   }
 
+  Color get colorTempHighlight {
+    return Colors.green;
+  }
+
   // The primary color from [ThemeData], adjusted for light/dark mode.
   Color get colorPrimary {
     return fundamentals.colorPrimary;

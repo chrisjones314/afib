@@ -1299,6 +1299,22 @@ class AFFundamentalThemeState {
     return themeDataActive.colorScheme.primary;
   }
 
+  Color get colorOnSurfaceVariant {
+    return themeDataActive.colorScheme.onSurfaceVariant;
+  }
+
+  Color get colorSurfaceVariant {
+    return themeDataActive.colorScheme.surfaceVariant;
+  }
+
+  Color get colorSurfaceContainerLowest {
+    return themeDataActive.colorScheme.surfaceContainerLowest;
+  }
+
+  Color get colorOutlineVariant {
+    return themeDataActive.colorScheme.outlineVariant;
+  }
+
   TonalPalette get colorPrimaryPalette {
     final hct = Hct.fromInt(colorPrimary.value);
     return TonalPalette.of(hct.hue, hct.chroma);
@@ -1726,6 +1742,22 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   // The primary color from [ThemeData], adjusted for light/dark mode.
   Color get colorPrimary {
     return fundamentals.colorPrimary;
+  }
+
+  Color get colorOutlineVariant {
+    return fundamentals.colorOutlineVariant;
+  }
+
+  Color get colorSurfaceContainerLowest {
+    return fundamentals.colorSurfaceContainerLowest;
+  }
+
+  Color get colorOnSurfaceVariant {
+    return fundamentals.colorOnSurfaceVariant;
+  }
+
+  Color get colorSurfaceVariant {
+    return fundamentals.colorSurfaceVariant;
   }
 
   Color get colorPrimaryContainer {

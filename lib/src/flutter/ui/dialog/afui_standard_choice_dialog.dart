@@ -71,30 +71,22 @@ class AFUIStandardChoiceDialog extends AFUIConnectedDialog<AFUIStandardChoiceDia
 
     final rows = t.column();
     
-    final icon = t.iconStandard(context.p.icon, size: 30.0);
-    final titleCols = t.row();
-    if(icon != null) {
-      titleCols.add(icon);
-    }
     final title = context.p.title;
     final body = context.p.body;
 
-    titleCols.add(Expanded(child: t.childMargin(
-      margin: t.margin.h.s3,
-      child: title.toRichText(
+    rows.add(title.toRichText(
         maxLines: 11,
         softWrap: true,
       )
-    )));
+    );
 
-    rows.add(Row(children: titleCols));
     if(body != null) {
-      rows.add(t.childMargin(
-        margin: const EdgeInsets.fromLTRB(38, 8, 8, 8),
-        child: body.toRichText(maxLines: 10,
+      rows.add(SizedBox(height: 10));
+      rows.add(body.toRichText(maxLines: 10,
           softWrap: true)
-      ));
+      );
     }
+    rows.add(SizedBox(height: 10));
 
     final actions = t.row();
     final buttonTitles = context.p.buttonTitles;
@@ -127,6 +119,11 @@ class AFUIStandardChoiceDialog extends AFUIConnectedDialog<AFUIStandardChoiceDia
       }
     }
 
+    rows.add(SizedBox(height: 10));
+
+    rows.add(const Divider(height: 0.5, thickness: 0.5));
+
+
     rows.add(t.childMargin(
       margin: t.margin.t.s3,
       child: Row(
@@ -134,11 +131,16 @@ class AFUIStandardChoiceDialog extends AFUIConnectedDialog<AFUIStandardChoiceDia
         children: actions
     )));
 
+
+
     return Dialog(
       shape: t.shapeStandardDialog,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 26),
       backgroundColor: t.colorSurface,
+      elevation: 0,
+      clipBehavior: Clip.antiAlias,      
       child: Container(
-        margin: t.margin.a.s5,
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,

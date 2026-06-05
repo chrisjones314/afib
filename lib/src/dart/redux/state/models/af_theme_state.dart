@@ -2995,7 +2995,9 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
   Widget childTopBottomHostedControls(BuildContext context, Widget main, {
     Widget? bottomControls,
     Widget? topControls,
-    double topHeight = 0.0
+    double topHeight = 0.0,
+    bool showScrim = false,
+    VoidCallback? onTapScrim,
   }) {
     final stackChildren = column();
 
@@ -3003,7 +3005,12 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     stackChildren.add(Positioned(
       key: keyForWID(AFUIWidgetID.positionedCenterHosted),
       top: topHeight, left: 0, bottom: 0, right: 0,
-      child: main));
+      child: main
+    ));
+
+    if(showScrim) {
+      stackChildren.add(Scrim(onTap: onTapScrim));
+    }
 
     if(topControls != null) {
       stackChildren.add(Positioned(
@@ -3215,6 +3222,31 @@ class AFThemeState {
   }) {
     return AFThemeState.create(
       fundamentals: fundamentals ?? this.fundamentals
+    );
+  }
+}
+
+class Scrim extends StatelessWidget {
+  final VoidCallback? onTap;
+  const Scrim({super.key, required this.onTap});
+
+  static const _scrimColor = Color(0x571C2640); // rgba(28,38,64,.34) → alpha 0x57 ≈ 0.34
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque, // catch taps over the whole area
+        child: TweenAnimationBuilder<double>(
+          // fade in to 1.0 over 180ms, matching the web @keyframes pmFade
+          tween: Tween(begin: 0, end: 1),
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          builder: (_, t, __) => ColoredBox(
+            color: _scrimColor.withOpacity(0.34 * t),
+          ),
+        ),
+      ),
     );
   }
 }

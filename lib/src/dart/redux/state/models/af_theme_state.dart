@@ -2080,12 +2080,13 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     final style = TextButton.styleFrom(
       backgroundColor: color,
       foregroundColor: textColor,
-      tapTargetSize: tapTargetSize,
+      tapTargetSize: tapTargetSize,      
     );
 
     return TextButton(
       key: keyForWID(wid),
       style: style,
+      
       onPressed: onPressed,
       onLongPress: onLongPress,
       child: child

@@ -2672,6 +2672,10 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     return ValueKey<String>(wid.code);
   }
 
+  static LocalKey keyForWIDStaticNotNull(AFID wid) {
+    return ValueKey<String>(wid.code);
+  }
+
     /// Returns a unique key for the specified widget.
   LocalKey keyForWIDNotNull(AFID wid) {
     var result = keyForWIDStatic(wid);

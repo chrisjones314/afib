@@ -664,6 +664,20 @@ mixin AFContextShowMixin {
     );
   }
 
+  void showDialogInfo({
+    required AFRichTextBuilder title,
+    required AFRichTextBuilder? body,
+    List<String> buttonTitles = const ["OK"],   
+    void Function(int?)? onReturn
+  }) {
+    showDialogChoice(
+      title: title,
+      body: body,
+      buttonTitles: buttonTitles,
+      onReturn: onReturn,  
+    );
+  }
+
   void showDialogError({
     required AFRichTextBuilder title,
     required AFRichTextBuilder? body,

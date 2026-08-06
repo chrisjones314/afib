@@ -2487,6 +2487,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
     TextStyle? style,
     Color? cursorColor,
     ValueChanged<String>? onSubmitted,
+    TextCapitalization textCapitalization = TextCapitalization.none,
   }) {
     return AFUITextField(
       screenId: screenId,
@@ -2510,6 +2511,7 @@ class AFFunctionalTheme with AFDeviceFormFactorMixin {
       decoration: decoration,
       onSubmitted: onSubmitted,
       cursorColor: cursorColor,
+      textCapitalization: textCapitalization,
     );
   }
 

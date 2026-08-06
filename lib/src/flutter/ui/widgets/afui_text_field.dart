@@ -42,6 +42,7 @@ class AFUITextField extends StatelessWidget {
   final AFTextEditingController? controller;
   final AFTextEditingControllers? controllers;
   final AFRouteParamWithFlutterState? parentParam;
+  final TextCapitalization textCapitalization;
 
   
   //--------------------------------------------------------------------------------------
@@ -69,6 +70,7 @@ class AFUITextField extends StatelessWidget {
     this.onSubmitted,
     this.onChanged,
     this.normalizeValue,
+    this.textCapitalization = TextCapitalization.none,
   }) {
     var textController;
     if(controller != null) {
@@ -145,6 +147,7 @@ class AFUITextField extends StatelessWidget {
       focusNode: focusNode,
       onSubmitted: onSubmitted,
       cursorColor: cursorColor,
+      textCapitalization: textCapitalization,
     );
   }
 
